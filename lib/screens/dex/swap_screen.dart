@@ -1,0 +1,545 @@
+import 'dart:async';
+import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
+import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
+import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/account/account_state.dart';
+import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
+import 'package:defi_wallet/bloc/dex/dex_state.dart';
+import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/models/test_pool_swap_model.dart';
+import 'package:defi_wallet/screens/dex/review_swap_screen.dart';
+import 'package:defi_wallet/screens/dex/swap_status.dart';
+import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
+import 'package:defi_wallet/services/transaction_service.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:defi_wallet/models/focus_model.dart';
+import './widgets/amount_selector_field.dart';
+import './widgets/swap_price_details.dart';
+
+class SwapScreen extends StatefulWidget {
+  const SwapScreen({Key? key}) : super(key: key);
+
+  @override
+  _SwapScreenState createState() => _SwapScreenState();
+}
+
+class _SwapScreenState extends State<SwapScreen> {
+  final TextEditingController amountFromController = TextEditingController();
+  final TextEditingController amountToController = TextEditingController();
+  final GlobalKey<AssetSelectState> selectKeyFrom =
+      GlobalKey<AssetSelectState>();
+  final GlobalKey<PendingButtonState> pendingButton =
+      GlobalKey<PendingButtonState>();
+  final GlobalKey<AssetSelectState> selectKeyTo = GlobalKey<AssetSelectState>();
+
+  TransactionService transactionService = TransactionService();
+  BalancesHelper balancesHelper = BalancesHelper();
+  LockHelper lockHelper = LockHelper();
+  TestPoolSwapModel dexModel = TestPoolSwapModel();
+  FocusNode focusFrom = new FocusNode();
+  FocusNode focusTo = new FocusNode();
+  FocusModel focusAmountFromModel = new FocusModel();
+  FocusModel focusAmountToModel = new FocusModel();
+  Timer? debounce;
+
+  List<String> tokensForSwap = [];
+  List<String> assets = [];
+  String assetFrom = '';
+  String assetTo = '';
+  String address = '';
+  String swapFieldMsg = '';
+  int iteratorUpdate = 0;
+  bool inputFromFocus = false;
+  bool inputToFocus = false;
+  bool isFailed = false;
+  bool isBalanceError = false;
+  bool waitingTo = true;
+  bool waitingFrom = true;
+  double toolbarHeight = 55;
+  double toolbarHeightWithBottom = 105;
+
+  @override
+  void initState() {
+    super.initState();
+    focusTo.addListener(onFocusToChange);
+    focusFrom.addListener(onFocusFromChange);
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      BlocBuilder<DexCubit, DexState>(builder: (dexContext, dexState) {
+        DexCubit dexCubit = BlocProvider.of<DexCubit>(dexContext);
+
+        return BlocBuilder<AccountCubit, AccountState>(
+            builder: (accountContext, accountState) {
+          return BlocBuilder<TokensCubit, TokensState>(
+              builder: (tokensContext, tokensState) {
+            if (tokensState is TokensLoadedState) {
+              if (accountState is AccountLoadedState) {
+                stateInit(accountState, dexState, tokensState);
+                if (dexState is DexLoadedState) {
+                  dexInit(dexState);
+                }
+                if (iteratorUpdate == 0) {
+                  iteratorUpdate++;
+                  dexCubit.updateDex(assetFrom, assetTo, 0, 0, address,
+                      accountState.activeAccount.addressList!, tokensState.tokens);
+                }
+              }
+            }
+
+            return BlocBuilder<TransactionCubit, TransactionState>(
+              builder: (context, transactionState) => ScaffoldConstrainedBox(
+                child: GestureDetector(
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    if (constraints.maxWidth < ScreenSizes.medium) {
+                      return Scaffold(
+                        appBar: MainAppBar(
+                            title: 'Decentralized Exchange',
+                            isShowBottom: !(transactionState is TransactionInitialState),
+                            height: !(transactionState is TransactionInitialState)
+                                ? toolbarHeightWithBottom
+                                : toolbarHeight),
+                        body: _buildBody(context, dexState, dexCubit,
+                            accountState, tokensState),
+                      );
+                    } else {
+                      return Container(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Scaffold(
+                          body: _buildBody(context, dexState, dexCubit,
+                              accountState, tokensState,
+                              isCustomBgColor: true),
+                          appBar: MainAppBar(
+                              title: 'Decentralized Exchange',
+                              action: null,
+                              isShowBottom: !(transactionState is TransactionInitialState),
+                              height: !(transactionState is TransactionInitialState)
+                                  ? toolbarHeightWithBottom
+                                  : toolbarHeight,
+                              isSmall: true),
+                        ),
+                      );
+                    }
+                  }),
+                  onTap: () => hideOverlay(),
+                ),
+              ),
+            );
+          });
+        });
+      });
+
+  // TODO: need to review for refactoring
+  Widget _buildBody(context, dexState, dexCubit, accountState, tokensState,
+      {isCustomBgColor = false}) {
+    return Container(
+      color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: Center(
+        child: StretchBox(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AmountSelectorField(
+                    label: 'Swap from',
+                    selectedAsset: assetFrom,
+                    assets: assets,
+                    selectKey: selectKeyFrom,
+                    amountController: amountFromController,
+                    onSelect: (String asset) => onSelectFromAsset(
+                        asset, tokensState, accountState, dexCubit),
+                    onChanged: (value) =>
+                        onChangeFromAsset(value, accountState, dexCubit, tokensState),
+                    focusNode: focusFrom,
+                    focusModel: focusAmountFromModel,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    swapFieldMsg,
+                    style: Theme.of(context).textTheme.headline4!.apply(
+                        color: Theme.of(context)
+                            .textTheme
+                            .headline4!
+                            .color!
+                            .withOpacity(0.5)),
+                  ),
+                  SizedBox(height: 24),
+                  AmountSelectorField(
+                    label: 'Swap to',
+                    selectedAsset: assetTo,
+                    assets: tokensForSwap,
+                    selectKey: selectKeyTo,
+                    amountController: amountToController,
+                    onSelect: (String asset) => onSelectToAsset(
+                        asset, tokensState, accountState, dexCubit),
+                    onChanged: (value) =>
+                        onChangeToAsset(value, accountState, dexCubit, tokensState),
+                    focusNode: focusTo,
+                    focusModel: focusAmountToModel,
+                  ),
+                  SizedBox(height: 32),
+                  // TODO: must be constant so as not to be updated
+                  SwapPriceDetails(
+                    feeDetails: createFeeString(dexState),
+                    priceFromDetails:
+                    createPriceString(dexState, assetFrom, assetTo),
+                    priceToDetails:
+                    createPriceString(dexState, assetTo, assetFrom),
+                  ),
+                  Center(
+                    child: Text(
+                      'Some error. Please try later',
+                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                        color: isFailed
+                            ? AppTheme.redErrorColor
+                            : Colors.transparent,
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      'Insufficient funds',
+                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                        color: isBalanceError
+                            ? AppTheme.redErrorColor
+                            : Colors.transparent,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Column(
+                  children: [
+                    PendingButton(
+                      'Review Swap',
+                      key: pendingButton,
+                      callback: !isDisableSubmit()
+                          ? (parent) => submitReviewSwap(parent, accountState)
+                          : null,
+                    ),
+                    SizedBox(height: 24),
+                    TextButton(
+                      child: Text(
+                        'SWAP INSTANTLY',
+                        style: Theme.of(context).textTheme.headline6!.apply(
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      onPressed: () => lockHelper.provideWithLockChecker(
+                          context,
+                          () => submitInstantlySwap(
+                              accountState, dexState, tokensState, pendingButton)),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  stateInit(accountState, dexState, tokensState) {
+    getFieldMsg(accountState, dexState);
+    accountState.activeAccount.balanceList!.forEach((el) {
+      if (tokensState.tokensForSwap[el.token] != null &&
+          !assets.contains(el.token)) {
+        assets.add(el.token!);
+      }
+    });
+    assetFrom = (assetFrom.isEmpty) ? accountState.activeToken : assetFrom;
+    address = accountState.activeAccount.getActiveAddress(isChange: false);
+    tokensForSwap = tokensState.tokensForSwap[assetFrom].cast<String>();
+    assetTo = (assetTo.isEmpty || !tokensForSwap.contains(assetTo))
+        ? tokensForSwap[0]
+        : assetTo;
+  }
+
+  dexInit(dexState) {
+    if (waitingFrom && waitingTo) {
+      if (dexState.dexModel.amountFrom != null) {
+        amountFromController.text = dexState.dexModel.amountFrom.toString();
+        amountFromController.selection = TextSelection.fromPosition(
+            TextPosition(offset: amountFromController.text.length));
+      }
+      if (dexState.dexModel.amountTo != null) {
+        amountToController.text = dexState.dexModel.amountTo.toString();
+        amountToController.selection = TextSelection.fromPosition(
+            TextPosition(offset: amountToController.text.length));
+      }
+    }
+  }
+
+  bool isEnoughBalance(state) {
+    int balance = state.activeAccount.balanceList!
+        .firstWhere((el) => el.token! == assetFrom)
+        .balance!;
+    return convertFromSatoshi(balance) < double.parse(amountFromController.text);
+  }
+
+  submitReviewSwap(parent, state) {
+    hideOverlay();
+    if (isEnoughBalance(state)) {
+      if (!isBalanceError) {
+        setState(() {
+          isBalanceError = true;
+        });
+      }
+      return;
+    }
+    if (isNumeric(amountFromController.text)) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ReviewSwapScreen(
+                assetFrom,
+                assetTo,
+                double.parse(amountFromController.text),
+                double.parse(amountToController.text)),
+          ));
+    }
+  }
+
+  submitInstantlySwap(accountState, dexState, tokensState, pendingButton) async {
+    hideOverlay();
+    if (isEnoughBalance(accountState)) {
+      if (!isBalanceError) {
+        setState(() {
+          isBalanceError = true;
+        });
+      }
+      return;
+    }
+    getFieldMsg(accountState, dexState);
+    if (accountState is AccountLoadedState) {
+      try {
+        pendingButton.currentState!.emitPending(true);
+
+        if (isNumeric(amountFromController.text) && assetFrom != assetTo) {
+          var txResponse = await transactionService.createAndSendSwap(
+              account: accountState.activeAccount,
+              tokenFrom: assetFrom,
+              tokenTo: assetTo,
+              amount: balancesHelper.toSatoshi(amountFromController.text), tokens: tokensState.tokensPairs);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SwapStatusScreen(
+                  txResponse: txResponse,
+                  amount: double.parse(amountFromController.text),
+                  assetFrom: assetFrom,
+                  assetTo: assetTo),
+            ),
+          );
+        }
+      } catch (err) {
+        setState(() {
+          isFailed = true;
+        });
+      }
+
+      pendingButton.currentState!.emitPending(false);
+    }
+  }
+
+  onSelectFromAsset(asset, tokensState, accountState, dexCubit) {
+    tokensForSwap = tokensState.tokensForSwap[asset].cast<String>();
+    assetTo = (assetTo.isEmpty || !tokensForSwap.contains(assetTo))
+        ? tokensForSwap[0]
+        : assetTo;
+    setState(() => {assetFrom = asset, assetTo = assetTo});
+    if (assetFrom == assetTo) {
+      amountFromController.text = amountToController.text;
+    } else {
+      dexCubit.updateDex(
+          assetFrom,
+          assetTo,
+          null,
+          double.parse(amountToController.text),
+          address,
+          accountState.activeAccount.addressList!, tokensState.tokens);
+    }
+  }
+
+  onSelectToAsset(asset, tokensState, accountState, dexCubit) {
+    setState(() => {assetTo = asset});
+    if (assetFrom == assetTo) {
+      amountFromController.text = amountToController.text;
+    } else {
+      dexCubit.updateDex(
+          assetFrom,
+          assetTo,
+          null,
+          double.parse(amountToController.text),
+          address,
+          accountState.activeAccount.addressList!, tokensState.tokens);
+    }
+  }
+
+  onChangeFromAsset(value, accountState, dexCubit, tokensState) {
+    String valueFormat = value.replaceAll(',', '.');
+    if (isFailed) {
+      setState(() {
+        isFailed = false;
+      });
+    }
+    waitingFrom = false;
+    amountFromController.text = valueFormat;
+    amountFromController.selection = TextSelection.fromPosition(
+        TextPosition(offset: amountFromController.text.length));
+    onFromInputChanged(valueFormat, dexCubit, accountState, tokensState);
+  }
+
+  onChangeToAsset(value, accountState, dexCubit, tokensState) {
+    String valueFormat = value.replaceAll(',', '.');
+    if (isFailed) {
+      setState(() {
+        isFailed = false;
+      });
+    }
+    waitingTo = false;
+    amountToController.text = valueFormat;
+    amountToController.selection = TextSelection.fromPosition(
+        TextPosition(offset: amountToController.text.length));
+    onToInputChanged(valueFormat, dexCubit, accountState, tokensState);
+  }
+
+  getFieldMsg(accountState, dexState) {
+    var availableAmount =
+        calculateAvailableAmount(accountState, assetFrom, dexState);
+    swapFieldMsg = '$availableAmount $assetFrom available to swap';
+  }
+
+  bool isNumeric(String string) {
+    final numericRegex = RegExp(r'^-?(([0-9]*)|(([0-9]*)\.([0-9]*)))$');
+    return numericRegex.hasMatch(string);
+  }
+
+  String fixTokenName(String tokenName) =>
+      (tokenName != 'DFI' && tokenName != 'dUSD') ? 'd' + tokenName : tokenName;
+
+  String createPriceString(dexState, tokenFrom, tokenTo) {
+    double price = 0;
+    if (dexState is DexLoadedState) {
+      if (dexState.dexModel.tokenFrom == tokenFrom) {
+        price = dexState.dexModel.priceFrom!;
+      } else {
+        price = dexState.dexModel.priceTo!;
+      }
+    }
+    return '${balancesHelper.numberStyling(price, fixedCount: 8, fixed: true)} ${fixTokenName(tokenTo)} per ${fixTokenName(tokenFrom)}';
+  }
+
+  String createFeeString(dexState) {
+    var fee = 0;
+    if (dexState is DexLoadedState) {
+      if (dexState.dexModel.fee != null) {
+        fee = dexState.dexModel.fee!;
+      }
+    }
+    return '${balancesHelper.numberStyling(convertFromSatoshi(fee))} DFI';
+  }
+
+  onFromInputChanged(String query, dexCubit, accountState, tokensState) {
+    double amount = (query == '') ? 0 : double.parse(query);
+
+    if (debounce?.isActive ?? false) debounce?.cancel();
+    debounce = Timer(const Duration(milliseconds: 800), () {
+      waitingFrom = true;
+      if (assetFrom == assetTo) {
+        amountToController.text = amountFromController.text;
+      } else {
+        dexCubit.updateDex(assetFrom, assetTo, amount, null,
+            address, accountState.activeAccount.addressList!, tokensState.tokens);
+      }
+      //TODO: add validation
+    });
+  }
+
+  onToInputChanged(String query, dexCubit, accountState, tokensState) {
+    double amount = (query == '') ? 0 : double.parse(query);
+    if (debounce?.isActive ?? false) debounce?.cancel();
+    debounce = Timer(const Duration(milliseconds: 800), () {
+      waitingTo = true;
+      if (assetFrom == assetTo) {
+        amountFromController.text = amountToController.text;
+      } else {
+        dexCubit.updateDex(assetFrom, assetTo, null, amount,
+            address, accountState.activeAccount.addressList!, tokensState.tokens);
+      }
+    });
+  }
+
+  onFocusToChange() {
+    hideOverlay();
+    setState(() {
+      inputToFocus = focusTo.hasFocus;
+    });
+    amountToController.selection = TextSelection.fromPosition(
+        TextPosition(offset: amountToController.text.length));
+  }
+
+  onFocusFromChange() {
+    hideOverlay();
+    setState(() {
+      inputFromFocus = focusFrom.hasFocus;
+    });
+    amountFromController.selection = TextSelection.fromPosition(
+        TextPosition(offset: amountFromController.text.length));
+  }
+
+  hideOverlay() {
+    try {
+      selectKeyFrom.currentState!.hideOverlay();
+    } catch (_) {}
+    try {
+      selectKeyTo.currentState!.hideOverlay();
+    } catch (_) {}
+  }
+
+  calculateAvailableAmount(accountState, assetFrom, dexState) {
+    int amount = 0;
+    int fee = 0;
+    if (accountState is AccountLoadedState && dexState is DexLoadedState) {
+      if (dexState.dexModel.fee != null) {
+        fee = dexState.dexModel.fee!;
+      }
+      accountState.activeAccount.balanceList!.forEach((balance) {
+        if (balance.token == assetFrom) {
+          amount = balance.balance!;
+        }
+        if (assetFrom == 'DFI') {
+          amount -= fee;
+        }
+      });
+    }
+
+    return balancesHelper.numberStyling(convertFromSatoshi(amount));
+  }
+
+  bool isDisableSubmit() {
+    try {
+      return double.parse(amountFromController.text) <= 0;
+    } catch (err) {
+      return false;
+    }
+  }
+}

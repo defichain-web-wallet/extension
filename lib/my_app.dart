@@ -1,0 +1,30 @@
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
+import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
+import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:defi_wallet/bloc/auth/auth_bloc.dart';
+import 'package:defi_wallet/utils/wallet_checker.dart';
+
+class App extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(create: (context) => AuthBloc()),
+        BlocProvider<AccountCubit>(create: (context) => AccountCubit()),
+        BlocProvider<TokensCubit>(create: (context) => TokensCubit()),
+        BlocProvider<DexCubit>(create: (context) => DexCubit()),
+        BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
+        BlocProvider<TransactionCubit>(create: (context) => TransactionCubit()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: WalletChecker(),
+      ),
+    );
+  }
+}

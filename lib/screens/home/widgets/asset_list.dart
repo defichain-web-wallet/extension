@@ -1,0 +1,115 @@
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/account/account_state.dart';
+import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/models/balance_model.dart';
+import 'package:defi_wallet/requests/currency_requests.dart';
+import 'package:defi_wallet/utils/convert.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
+
+// ignore: must_be_immutable
+class AssetList extends StatelessWidget {
+  TokensHelper tokenHelper = TokensHelper();
+  BalancesHelper balancesHelper = BalancesHelper();
+  CurrencyRequests currencyRequests = CurrencyRequests();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
+      if (state is AccountLoadedState) {
+        List<BalanceModel> balances = state.activeAccount.balanceList!
+            .where((el) => !el.isHidden!)
+            .toList();
+        String currency = SettingsHelper.settings.currency!;
+
+        return BlocBuilder<TokensCubit, TokensState>(
+          builder: (context, tokensState) {
+            if (tokensState is TokensLoadedState) {
+              return ListView.builder(
+                itemCount: balances.length,
+                itemBuilder: (context, index) {
+                  String coin = balances[index].token!;
+                  String tokenName = (coin != 'DFI') ? 'd' + coin : coin;
+                  double tokenBalance = convertFromSatoshi(balances[index].balance!);
+
+                  return Padding(
+                    padding:
+                    const EdgeInsets.only(bottom: 8, left: 6, right: 6, top: 2),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).cardColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context).shadowColor,
+                            blurRadius: 2,
+                            spreadRadius: 2,
+                          )
+                        ],
+                      ),
+                      child: ListTile(
+                        leading: _buildTokenIcon(balances[index]),
+                        title: Text(
+                          getFormatTokenBalance(tokenBalance, tokenName),
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                        subtitle: Text(
+                          getFormatTokenBalanceByFiat(tokensState, coin, tokenBalance, currency),
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                        trailing: Icon(
+                          Icons.keyboard_arrow_right,
+                          color: Theme.of(context).textTheme.headline1!.color,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            } else {
+              return Container();
+            }
+          }
+        );
+      } else {
+        return Container();
+      }
+    });
+  }
+
+  Widget _buildTokenIcon(BalanceModel token) {
+    if (token.isPair!) {
+      return AssetPair(pair: token.token!);
+    } else {
+      return SvgPicture.asset(
+        tokenHelper.getImageNameByTokenName(token.token!),
+        height: 40,
+        width: 40,
+      );
+    }
+  }
+
+  String getFormatTokenBalance(double tokenBalance, String tokenName) =>
+      '${balancesHelper.numberStyling(tokenBalance)} $tokenName';
+
+  String getFormatTokenBalanceByFiat(state,
+      String coin, double tokenBalance, String fiat) {
+    double balanceInUsd;
+    if (tokenHelper.isPair(coin)) {
+      double satoshi = convertToSatoshi(tokenBalance) + .0;
+      balanceInUsd = tokenHelper.getPairsAmountByUsd(state.tokensPairs, satoshi, coin, fiat);
+    } else {
+      balanceInUsd = tokenHelper.getAmountByUsd(state.tokensPairs, tokenBalance, coin, fiat);
+    }
+    if (fiat == 'EUR') {
+      balanceInUsd *= state.eurRate;
+    }
+    return '${balancesHelper.numberStyling(balanceInUsd, fixed: true)} $fiat';
+  }
+}
