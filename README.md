@@ -1,4 +1,4 @@
-# Jellywallet extension [CURRENTLY IN BETA DEVELOPMENT]
+# Jellywallet extension [BETA]
 
 You can find the latest version of Jellywallet on [our official website](https://jellywallet.io/).
 
