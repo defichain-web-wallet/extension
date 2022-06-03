@@ -1,3 +1,4 @@
+import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
@@ -18,12 +19,12 @@ class DexHelper {
   TransactionRequests _txRequests = TransactionRequests();
 
   Future<TestPoolSwapModel> calculateDex(String tokenFrom, String tokenTo,
-      double? amountFrom, double? amountTo, String address, List<AddressModel> addressList, List<TokensModel> tokens) async {
+      double? amountFrom, double? amountTo, String address, List<AddressModel> addressList, TokensState tokensState) async {
     List<double> rates = [];
     if(tokenTo == tokenFrom){
       rates = [1, 1];
     } else {
-      var responce = await _dexRequests.getDexRate(tokenTo, tokenFrom, tokens);
+      var responce = await _dexRequests.getDexRate(tokenTo, tokenFrom, tokensState);
       rates = responce!;
     }
 

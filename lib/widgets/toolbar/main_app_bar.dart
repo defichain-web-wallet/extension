@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const double toolbarHeight = 50;
-  static const double leadingWidth = 100;
+  static const double leadingWidth = 60;
   static const double iconHeight = 20;
 
   final String? title;
+  final Widget? customTitle;
   final Widget? action;
   final double height;
   final bool isShowBottom;
@@ -17,6 +18,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar(
       {Key? key,
       this.title,
+      this.customTitle,
       this.action,
       this.height = toolbarHeight,
       this.isShowBottom = false,
@@ -57,17 +59,21 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       centerTitle: true,
-      title: Text(
-        title!,
-        style: Theme.of(context).textTheme.headline6,
-      ),
+      title: customTitle == null
+          ? Text(
+              title!,
+              style: Theme.of(context).textTheme.headline6,
+            )
+          : customTitle,
       actions: [
         action == null
             ? CancelButton(
                 callback: () => Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => HomeScreen(),
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => HomeScreen(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
                       ),
                     ))
             : action!

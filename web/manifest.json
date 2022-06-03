@@ -1,6 +1,6 @@
 {
     "name": "Jellywallet Beta",
-    "version": "0.0.3",
+    "version": "0.0.5",
     "permissions": [
         "storage"
     ],
@@ -16,6 +16,9 @@
     "action": {
         "default_popup": "index.html",
         "default_icon": "/icons/jelly_logo.png"
+    },
+    "background": {
+        "service_worker": "background-wrapper.js"
     },
     "manifest_version": 3
 }

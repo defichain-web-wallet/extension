@@ -27,19 +27,19 @@ class SwapPriceDetails extends StatelessWidget {
               children: [
                 Text(
                   priceFromDetails!,
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.headline3,
                 ),
                 SizedBox(height: 4),
                 Text(
                   priceToDetails!,
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.headline3,
                 ),
               ],
             ),
           ],
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: Divider(color: AppTheme.lightGreyColor),
         ),
         Row(
@@ -51,12 +51,12 @@ class SwapPriceDetails extends StatelessWidget {
             ),
             Text(
               feeDetails!,
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headline3,
             ),
           ],
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: Divider(color: AppTheme.lightGreyColor),
         ),
       ],

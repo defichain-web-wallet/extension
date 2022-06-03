@@ -6,7 +6,6 @@ class CustomRadioButton extends StatelessWidget {
   final bool selected;
   final Color color;
   final ValueChanged<bool>? onChange;
-  final bool isTransformRadioPoint;
 
   const CustomRadioButton({
     Key? key,
@@ -14,7 +13,6 @@ class CustomRadioButton extends StatelessWidget {
     this.selected = false,
     this.color = Colors.grey,
     this.onChange,
-    this.isTransformRadioPoint = false,
   }) : super(key: key);
 
   @override
@@ -28,10 +26,10 @@ class CustomRadioButton extends StatelessWidget {
           height: size,
           child: CustomPaint(
             painter: CustomRadioButtonPainter(
-                animation: animation,
-                checked: true,
-                color: color,
-                isTransformRadioPoint: isTransformRadioPoint),
+              animation: animation,
+              checked: true,
+              color: color,
+            ),
           ),
         );
       },
@@ -43,21 +41,19 @@ class CustomRadioButtonPainter extends CustomPainter {
   final Animation animation;
   final Color color;
   final bool checked;
-  final bool isTransformRadioPoint;
 
-  CustomRadioButtonPainter(
-      {required this.animation,
-      required this.checked,
-      required this.color,
-      required this.isTransformRadioPoint})
-      : super(repaint: animation);
+  CustomRadioButtonPainter({
+    required this.animation,
+    required this.checked,
+    required this.color,
+  }) : super(repaint: animation);
 
   @override
   void paint(Canvas canvas, Size size) {
-    double transformSize = isTransformRadioPoint ? 0 : 1;
-    final Offset centerBorder = Offset(size.width / 1, size.height / 1);
-    final Offset centerInner = Offset(
-        (size.width / 1) + transformSize, (size.height / 1) + transformSize);
+    double transformSize = 1;
+    final Offset centerBorder = Offset(size.width, size.height);
+    final Offset centerInner =
+        Offset((size.width) + transformSize, (size.height) + transformSize);
     final Paint borderPaint = Paint()
       ..color = color
       ..strokeWidth = 2.0
@@ -65,8 +61,8 @@ class CustomRadioButtonPainter extends CustomPainter {
     final Paint innerCirclePaint = Paint()
       ..strokeWidth = 2.0
       ..color = color.withOpacity(animation.value);
-    canvas.drawCircle(centerBorder, size.width / 1, borderPaint);
-    canvas.drawCircle(centerInner, size.width / 1 - 5.0, innerCirclePaint);
+    canvas.drawCircle(centerBorder, size.width, borderPaint);
+    canvas.drawCircle(centerInner, size.width - 5.0, innerCirclePaint);
   }
 
   @override

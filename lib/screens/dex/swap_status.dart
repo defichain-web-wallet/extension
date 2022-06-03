@@ -38,8 +38,10 @@ class SwapStatusScreen extends StatelessWidget {
               title: 'Decentralized Exchange',
               cancel: () => Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => HomeScreen(),
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) => HomeScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
                 ),
               ),
               isShownLogo: false,
@@ -56,8 +58,10 @@ class SwapStatusScreen extends StatelessWidget {
                 isShownLogo: false,
                 cancel: () => Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeScreen(),
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => HomeScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
                 ),
               ),

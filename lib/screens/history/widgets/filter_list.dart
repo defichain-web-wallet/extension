@@ -1,5 +1,4 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +31,7 @@ class _FilterListState extends State<FilterList> {
     double horizontalMargin = menuHelper.getHorizontalMargin(context);
 
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (state is AccountLoadedState) {
+      if (state.status == AccountStatusList.success) {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
         return CustomPopupMenu(
           menuOnChange: (b) => widget.onSelect(),
@@ -64,15 +63,7 @@ class _FilterListState extends State<FilterList> {
                                       behavior: HitTestBehavior.translucent,
                                       onTap: () {
                                         controller.hideMenu();
-                                        accountCubit.setHistoryFilterBy(
-                                            state.mnemonic,
-                                            state.seed,
-                                            state.accounts,
-                                            state.balances,
-                                            state.masterKeyPair,
-                                            state.activeAccount,
-                                            state.activeToken,
-                                            item['name']);
+                                        accountCubit.setHistoryFilterBy(item['name']);
                                       },
                                       child: Container(
                                         height: 40,

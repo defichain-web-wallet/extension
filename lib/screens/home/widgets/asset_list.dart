@@ -1,12 +1,9 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance_model.dart';
-import 'package:defi_wallet/requests/currency_requests.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,20 +14,19 @@ import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 class AssetList extends StatelessWidget {
   TokensHelper tokenHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
-  CurrencyRequests currencyRequests = CurrencyRequests();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (state is AccountLoadedState) {
-        List<BalanceModel> balances = state.activeAccount.balanceList!
+      if (state.status == AccountStatusList.success) {
+        List<BalanceModel> balances = state.activeAccount!.balanceList!
             .where((el) => !el.isHidden!)
             .toList();
         String currency = SettingsHelper.settings.currency!;
 
         return BlocBuilder<TokensCubit, TokensState>(
           builder: (context, tokensState) {
-            if (tokensState is TokensLoadedState) {
+            if (tokensState.status == TokensStatusList.success) {
               return ListView.builder(
                 itemCount: balances.length,
                 itemBuilder: (context, index) {

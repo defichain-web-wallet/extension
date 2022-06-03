@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/services/logger_service.dart';
@@ -47,9 +46,9 @@ class AccountSelectState extends State<AccountSelect> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (state is AccountLoadedState) {
-        _activeAccount = state.activeAccount;
-        _accountList = state.accounts;
+      if (state.status == AccountStatusList.success) {
+        _activeAccount = state.activeAccount!;
+        _accountList = state.accounts!;
 
         return MouseRegion(
           cursor: SystemMouseCursors.click,
@@ -142,6 +141,8 @@ class AccountSelectState extends State<AccountSelect> {
 
   void _showOverlay(
       BuildContext context, _accountList, _activeAccount, state) async {
+    AccountCubit accountCubit =
+      BlocProvider.of<AccountCubit>(context);
     if (_isOpen) {
       hideOverlay();
     } else {
@@ -217,11 +218,7 @@ class AccountSelectState extends State<AccountSelect> {
                       onPressed: () async {
                         await lockHelper.provideWithLockChecker(context, () async {
                           hideOverlay();
-
-                          AccountCubit accountCubit =
-                          BlocProvider.of<AccountCubit>(context);
-                          accountCubit.addAccount(state.mnemonic, state.seed,
-                              state.accounts, state.masterKeyPair);
+                          accountCubit.addAccount();
                           LoggerService.invokeInfoLogg('user created new account');
                         });
                       },
@@ -271,14 +268,7 @@ class AccountSelectState extends State<AccountSelect> {
                       onPressed: () async {
                         await lockHelper.provideWithLockChecker(context, () async {
                           hideOverlay();
-                          AccountCubit accountCubit =
-                          BlocProvider.of<AccountCubit>(context);
-                          accountCubit.updateActiveAccount(
-                              state.mnemonic,
-                              state.seed,
-                              state.accounts,
-                              state.masterKeyPair,
-                              _accountList[index].index!);
+                          accountCubit.updateActiveAccount(_accountList[index].index!);
                         });
                       },
                     );

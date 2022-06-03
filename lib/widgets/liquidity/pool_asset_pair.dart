@@ -51,7 +51,11 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
                   Container(
                     child: Row(
                       children: [
-                        AssetPair(pair: widget.assetPair.symbol!, size: 20),
+                        AssetPair(
+                          pair: widget.assetPair.symbol!,
+                          size: 20,
+                          isTransform: false,
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(left: 4.0),
                           child: Text(
@@ -80,7 +84,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Yeld',
+                        Text('Yield',
                             style: widget.isFullSize
                                 ? Theme.of(context)
                                     .textTheme

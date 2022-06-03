@@ -8,32 +8,28 @@ class TokenRequests {
   var networkHelper = NetworkHelper();
   var tokenHelper = TokensHelper();
 
-  Future<List<dynamic>> getTokensResponse(list, {next = 0}) async {
+  Future<List<dynamic>> getTokensResponse() async {
     final Uri url = Uri.parse(
-        'https://ocean.defichain.com/v0/${networkHelper.getNetworkString()}/tokens${(next == 0) ? '' : '?next=$next'}');
-
+        'https://ocean.defichain.com/v0/${networkHelper.getNetworkString()}/tokens?size=200');
     final response = await http.get(url);
-    List<dynamic> result = list;
-    var pageNext = next;
 
     if (response.statusCode == 200) {
       var json = jsonDecode(response.body);
-      if (json['page'] != null) {
-        pageNext = json['page']['next'];
-        result = new List.from(result)..addAll(json['data']);
-        return await getTokensResponse(result, next: pageNext);
-      }
-      return result;
+      return new List.from(json['data']);
     } else {
       return [];
     }
   }
 
-  Future<List<TokensModel>> getTokenList() async {
+  Future<List<TokensModel>> getTokenList({String json = ''}) async {
     try {
-      List<dynamic> tokensHash = await getTokensResponse([], next: 0);
-
+      List<dynamic> tokensHash;
       List<TokensModel> tokens = [];
+      if (json == '') {
+        tokensHash = await getTokensResponse();
+      } else {
+        tokensHash = jsonDecode(json);
+      }
 
       tokensHash.forEach((el) {
         var token = TokensModel.fromJson(el);

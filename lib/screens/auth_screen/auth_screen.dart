@@ -8,6 +8,8 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hive/hive.dart';
+import 'package:defi_wallet/client/hive_names.dart';
 
 class AuthScreen extends StatelessWidget {
   @override
@@ -40,16 +42,25 @@ class AuthScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 StretchBox(
-                    maxWidth: ScreenSizes.xSmall,
-                    child: AccentButton(
-                      label: 'Import using secret Recovery Phrase',
-                      callback: () => Navigator.push(
+                  maxWidth: ScreenSizes.xSmall,
+                  child: AccentButton(
+                    label: 'Import using secret Recovery Phrase',
+                    callback: () async {
+                      var box = await Hive.openBox(HiveBoxes.client);
+                      await box.put(HiveNames.openedMnemonic, null);
+                      await box.close();
+                      Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => RecoveryScreen(),
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) =>
+                              RecoveryScreen(),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
                         ),
-                      ),
-                    )),
+                      );
+                    },
+                  ),
+                ),
                 SizedBox(height: 16),
                 StretchBox(
                   maxWidth: ScreenSizes.xSmall,
@@ -58,8 +69,11 @@ class AuthScreen extends StatelessWidget {
                     label: 'Create a new wallet',
                     callback: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => NotSecureScreen(),
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation1, animation2) =>
+                            NotSecureScreen(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
                       ),
                     ),
                   ),

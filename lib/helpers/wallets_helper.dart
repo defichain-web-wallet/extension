@@ -16,7 +16,7 @@ class WalletsHelper {
   final SettingsHelper settingsHelper = SettingsHelper();
 
   Future<AccountModel> createNewAccount(
-      bip32.BIP32 masterKeyPair, int accountIndex, String network) async {
+      bip32.BIP32 masterKeyPair, String network, {int accountIndex = 0}) async {
     AccountModel account = AccountModel(index: accountIndex);
 
     List<AddressModel> addressList = [];

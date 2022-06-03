@@ -1,16 +1,16 @@
 import 'dart:async';
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
 import 'package:defi_wallet/bloc/dex/dex_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/models/test_pool_swap_model.dart';
 import 'package:defi_wallet/screens/dex/review_swap_screen.dart';
@@ -66,14 +66,27 @@ class _SwapScreenState extends State<SwapScreen> {
   bool isBalanceError = false;
   bool waitingTo = true;
   bool waitingFrom = true;
+  bool isEnable = true;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+  double slippage = 0.03; //3%
 
   @override
   void initState() {
     super.initState();
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+
     focusTo.addListener(onFocusToChange);
     focusFrom.addListener(onFocusFromChange);
+
+    tokensCubit.loadTokens();
+  }
+
+  @override
+  void dispose() {
+    focusTo.unfocus();
+    focusFrom.unfocus();
+    super.dispose();
   }
 
   @override
@@ -83,10 +96,13 @@ class _SwapScreenState extends State<SwapScreen> {
 
         return BlocBuilder<AccountCubit, AccountState>(
             builder: (accountContext, accountState) {
+          if (accountState.activeToken!.contains('-')) {
+            assetFrom = TokensHelper.DefiAccountSymbol;
+          }
           return BlocBuilder<TokensCubit, TokensState>(
               builder: (tokensContext, tokensState) {
-            if (tokensState is TokensLoadedState) {
-              if (accountState is AccountLoadedState) {
+            if (tokensState.status == TokensStatusList.success) {
+              if (accountState.status == AccountStatusList.success) {
                 stateInit(accountState, dexState, tokensState);
                 if (dexState is DexLoadedState) {
                   dexInit(dexState);
@@ -94,7 +110,7 @@ class _SwapScreenState extends State<SwapScreen> {
                 if (iteratorUpdate == 0) {
                   iteratorUpdate++;
                   dexCubit.updateDex(assetFrom, assetTo, 0, 0, address,
-                      accountState.activeAccount.addressList!, tokensState.tokens);
+                      accountState.activeAccount!.addressList!, tokensState);
                 }
               }
             }
@@ -107,27 +123,31 @@ class _SwapScreenState extends State<SwapScreen> {
                       return Scaffold(
                         appBar: MainAppBar(
                             title: 'Decentralized Exchange',
-                            isShowBottom: !(transactionState is TransactionInitialState),
-                            height: !(transactionState is TransactionInitialState)
-                                ? toolbarHeightWithBottom
-                                : toolbarHeight),
+                            isShowBottom:
+                                !(transactionState is TransactionInitialState),
+                            height:
+                                !(transactionState is TransactionInitialState)
+                                    ? toolbarHeightWithBottom
+                                    : toolbarHeight),
                         body: _buildBody(context, dexState, dexCubit,
-                            accountState, tokensState),
+                            accountState, tokensState, transactionState),
                       );
                     } else {
                       return Container(
                         padding: const EdgeInsets.only(top: 20),
                         child: Scaffold(
                           body: _buildBody(context, dexState, dexCubit,
-                              accountState, tokensState,
+                              accountState, tokensState, transactionState,
                               isCustomBgColor: true),
                           appBar: MainAppBar(
                               title: 'Decentralized Exchange',
                               action: null,
-                              isShowBottom: !(transactionState is TransactionInitialState),
-                              height: !(transactionState is TransactionInitialState)
-                                  ? toolbarHeightWithBottom
-                                  : toolbarHeight,
+                              isShowBottom: !(transactionState
+                                  is TransactionInitialState),
+                              height:
+                                  !(transactionState is TransactionInitialState)
+                                      ? toolbarHeightWithBottom
+                                      : toolbarHeight,
                               isSmall: true),
                         ),
                       );
@@ -142,11 +162,12 @@ class _SwapScreenState extends State<SwapScreen> {
       });
 
   // TODO: need to review for refactoring
-  Widget _buildBody(context, dexState, dexCubit, accountState, tokensState,
+  Widget _buildBody(
+      context, dexState, dexCubit, accountState, tokensState, transactionState,
       {isCustomBgColor = false}) {
     return Container(
       color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Center(
         child: StretchBox(
           child: Column(
@@ -163,10 +184,30 @@ class _SwapScreenState extends State<SwapScreen> {
                     amountController: amountFromController,
                     onSelect: (String asset) => onSelectFromAsset(
                         asset, tokensState, accountState, dexCubit),
-                    onChanged: (value) =>
-                        onChangeFromAsset(value, accountState, dexCubit, tokensState),
+                    onChanged: (value) => onChangeFromAsset(
+                        value, accountState, dexCubit, tokensState),
                     focusNode: focusFrom,
                     focusModel: focusAmountFromModel,
+                    sufixIcon: Container(
+                      padding: EdgeInsets.only(
+                        top: 8,
+                        bottom: 8,
+                        right: 6,
+                      ),
+                      child: SizedBox(
+                        width: 40,
+                        child: TextButton(
+                          child: Text('MAX', style: TextStyle(fontSize: 10)),
+                          onPressed: () {
+                            double maxAmount = getAvailableAmount(
+                                accountState, assetFrom, dexState);
+                            amountFromController.text = maxAmount.toString();
+                            onChangeFromAsset(amountFromController.text,
+                                accountState, dexCubit, tokensState);
+                          },
+                        ),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 12),
                   Text(
@@ -187,38 +228,101 @@ class _SwapScreenState extends State<SwapScreen> {
                     amountController: amountToController,
                     onSelect: (String asset) => onSelectToAsset(
                         asset, tokensState, accountState, dexCubit),
-                    onChanged: (value) =>
-                        onChangeToAsset(value, accountState, dexCubit, tokensState),
+                    onChanged: (value) => onChangeToAsset(
+                        value, accountState, dexCubit, tokensState),
                     focusNode: focusTo,
                     focusModel: focusAmountToModel,
+                    sufixIcon: Container(
+                      padding: EdgeInsets.only(
+                        top: 8,
+                        bottom: 8,
+                        right: 6,
+                      ),
+                      child: SizedBox(
+                        width: 40,
+                      ),
+                    ),
                   ),
-                  SizedBox(height: 32),
+                  SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Slippage tolerance',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                      Container(
+                        child: Row(
+                          children: [
+                            SlippageButton(
+                              label: '0.5%',
+                              isActive: slippage == 0.005,
+                              callback: () => setState(() => slippage = 0.005),
+                            ),
+                            SizedBox(
+                              width: 6,
+                            ),
+                            SlippageButton(
+                              label: '1%',
+                              isActive: slippage == 0.01,
+                              callback: () => setState(() => slippage = 0.01),
+                            ),
+                            SizedBox(
+                              width: 6,
+                            ),
+                            SlippageButton(
+                              label: '3%',
+                              isActive: slippage == 0.03,
+                              callback: () => setState(() => slippage = 0.03),
+                            ),
+                            SizedBox(
+                              width: 6,
+                            ),
+                            SlippageButton(
+                              label: '5%',
+                              isActive: slippage == 0.05,
+                              callback: () => setState(() => slippage = 0.05),
+                            ),
+                            SizedBox(
+                              width: 6,
+                            ),
+                            SlippageButton(
+                              label: '10%',
+                              isActive: slippage == 0.1,
+                              callback: () => setState(() => slippage = 0.1),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 22),
                   // TODO: must be constant so as not to be updated
                   SwapPriceDetails(
                     feeDetails: createFeeString(dexState),
                     priceFromDetails:
-                    createPriceString(dexState, assetFrom, assetTo),
+                        createPriceString(dexState, assetFrom, assetTo),
                     priceToDetails:
-                    createPriceString(dexState, assetTo, assetFrom),
+                        createPriceString(dexState, assetTo, assetFrom),
                   ),
                   Center(
                     child: Text(
                       'Some error. Please try later',
                       style: Theme.of(context).textTheme.headline4!.copyWith(
-                        color: isFailed
-                            ? AppTheme.redErrorColor
-                            : Colors.transparent,
-                      ),
+                            color: isFailed
+                                ? AppTheme.redErrorColor
+                                : Colors.transparent,
+                          ),
                     ),
                   ),
                   Center(
                     child: Text(
                       'Insufficient funds',
                       style: Theme.of(context).textTheme.headline4!.copyWith(
-                        color: isBalanceError
-                            ? AppTheme.redErrorColor
-                            : Colors.transparent,
-                      ),
+                            color: isBalanceError
+                                ? AppTheme.redErrorColor
+                                : Colors.transparent,
+                          ),
                     ),
                   ),
                 ],
@@ -229,23 +333,32 @@ class _SwapScreenState extends State<SwapScreen> {
                   children: [
                     PendingButton(
                       'Review Swap',
+                      isCheckLock: false,
                       key: pendingButton,
                       callback: !isDisableSubmit()
-                          ? (parent) => submitReviewSwap(parent, accountState)
+                          ? (parent) => submitReviewSwap(
+                              parent, accountState, transactionState, context)
                           : null,
                     ),
-                    SizedBox(height: 24),
+                    SizedBox(height: 14),
                     TextButton(
                       child: Text(
                         'SWAP INSTANTLY',
                         style: Theme.of(context).textTheme.headline6!.apply(
-                          decoration: TextDecoration.underline,
-                        ),
+                              decoration: TextDecoration.underline,
+                            ),
                       ),
-                      onPressed: () => lockHelper.provideWithLockChecker(
-                          context,
-                          () => submitInstantlySwap(
-                              accountState, dexState, tokensState, pendingButton)),
+                      onPressed: isEnable
+                          ? () => lockHelper.provideWithLockChecker(
+                              context,
+                              () => submitInstantlySwap(
+                                  accountState,
+                                  dexState,
+                                  tokensState,
+                                  transactionState,
+                                  pendingButton,
+                                  context))
+                          : null,
                     )
                   ],
                 ),
@@ -261,7 +374,8 @@ class _SwapScreenState extends State<SwapScreen> {
     getFieldMsg(accountState, dexState);
     accountState.activeAccount.balanceList!.forEach((el) {
       if (tokensState.tokensForSwap[el.token] != null &&
-          !assets.contains(el.token)) {
+          !assets.contains(el.token) &&
+          !el.isHidden) {
         assets.add(el.token!);
       }
     });
@@ -290,13 +404,26 @@ class _SwapScreenState extends State<SwapScreen> {
 
   bool isEnoughBalance(state) {
     int balance = state.activeAccount.balanceList!
-        .firstWhere((el) => el.token! == assetFrom)
+        .firstWhere((el) => el.token! == assetFrom && !el.isHidden)
         .balance!;
-    return convertFromSatoshi(balance) < double.parse(amountFromController.text);
+    return convertFromSatoshi(balance) <
+        double.parse(amountFromController.text);
   }
 
-  submitReviewSwap(parent, state) {
+  submitReviewSwap(parent, state, transactionState, context) {
     hideOverlay();
+    if (transactionState is TransactionLoadingState) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Wait for the previous transaction to complete',
+            style: Theme.of(context).textTheme.headline5,
+          ),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+        ),
+      );
+      return;
+    }
     if (isEnoughBalance(state)) {
       if (!isBalanceError) {
         setState(() {
@@ -308,18 +435,35 @@ class _SwapScreenState extends State<SwapScreen> {
     if (isNumeric(amountFromController.text)) {
       Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => ReviewSwapScreen(
-                assetFrom,
-                assetTo,
-                double.parse(amountFromController.text),
-                double.parse(amountToController.text)),
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) => ReviewSwapScreen(
+              assetFrom,
+              assetTo,
+              double.parse(amountFromController.text),
+              double.parse(amountToController.text),
+              slippage,
+            ),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
           ));
     }
   }
 
-  submitInstantlySwap(accountState, dexState, tokensState, pendingButton) async {
+  submitInstantlySwap(accountState, dexState, tokensState, transactionState,
+      pendingButton, context) async {
     hideOverlay();
+    if (transactionState is TransactionLoadingState) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Wait for the previous transaction to complete',
+            style: Theme.of(context).textTheme.headline5,
+          ),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+        ),
+      );
+      return;
+    }
     if (isEnoughBalance(accountState)) {
       if (!isBalanceError) {
         setState(() {
@@ -329,30 +473,43 @@ class _SwapScreenState extends State<SwapScreen> {
       return;
     }
     getFieldMsg(accountState, dexState);
-    if (accountState is AccountLoadedState) {
+    if (accountState.status == AccountStatusList.success) {
       try {
+        setState(() {
+          isEnable = false;
+        });
         pendingButton.currentState!.emitPending(true);
 
         if (isNumeric(amountFromController.text) && assetFrom != assetTo) {
           var txResponse = await transactionService.createAndSendSwap(
-              account: accountState.activeAccount,
-              tokenFrom: assetFrom,
-              tokenTo: assetTo,
-              amount: balancesHelper.toSatoshi(amountFromController.text), tokens: tokensState.tokensPairs);
-          Navigator.pushReplacement(
+            account: accountState.activeAccount,
+            tokenFrom: assetFrom,
+            tokenTo: assetTo,
+            amount: balancesHelper.toSatoshi(amountFromController.text),
+            amountTo: balancesHelper.toSatoshi(amountToController.text),
+            slippage: slippage,
+            tokens: tokensState.tokens,
+          );
+          focusTo.unfocus();
+          focusFrom.unfocus();
+          Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => SwapStatusScreen(
-                  txResponse: txResponse,
-                  amount: double.parse(amountFromController.text),
-                  assetFrom: assetFrom,
-                  assetTo: assetTo),
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  SwapStatusScreen(
+                      txResponse: txResponse,
+                      amount: double.parse(amountFromController.text),
+                      assetFrom: assetFrom,
+                      assetTo: assetTo),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
             ),
           );
         }
       } catch (err) {
         setState(() {
           isFailed = true;
+          isEnable = true;
         });
       }
 
@@ -375,7 +532,8 @@ class _SwapScreenState extends State<SwapScreen> {
           null,
           double.parse(amountToController.text),
           address,
-          accountState.activeAccount.addressList!, tokensState.tokens);
+          accountState.activeAccount.addressList!,
+          tokensState);
     }
   }
 
@@ -390,7 +548,8 @@ class _SwapScreenState extends State<SwapScreen> {
           null,
           double.parse(amountToController.text),
           address,
-          accountState.activeAccount.addressList!, tokensState.tokens);
+          accountState.activeAccount.addressList!,
+          tokensState);
     }
   }
 
@@ -423,9 +582,9 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   getFieldMsg(accountState, dexState) {
-    var availableAmount =
-        calculateAvailableAmount(accountState, assetFrom, dexState);
-    swapFieldMsg = '$availableAmount $assetFrom available to swap';
+    var availableAmount = getAvailableAmount(accountState, assetFrom, dexState);
+    swapFieldMsg =
+        '${balancesHelper.numberStyling(availableAmount)} $assetFrom available to swap';
   }
 
   bool isNumeric(String string) {
@@ -467,8 +626,8 @@ class _SwapScreenState extends State<SwapScreen> {
       if (assetFrom == assetTo) {
         amountToController.text = amountFromController.text;
       } else {
-        dexCubit.updateDex(assetFrom, assetTo, amount, null,
-            address, accountState.activeAccount.addressList!, tokensState.tokens);
+        dexCubit.updateDex(assetFrom, assetTo, amount, null, address,
+            accountState.activeAccount.addressList!, tokensState);
       }
       //TODO: add validation
     });
@@ -482,8 +641,8 @@ class _SwapScreenState extends State<SwapScreen> {
       if (assetFrom == assetTo) {
         amountFromController.text = amountToController.text;
       } else {
-        dexCubit.updateDex(assetFrom, assetTo, null, amount,
-            address, accountState.activeAccount.addressList!, tokensState.tokens);
+        dexCubit.updateDex(assetFrom, assetTo, null, amount, address,
+            accountState.activeAccount.addressList!, tokensState);
       }
     });
   }
@@ -515,24 +674,31 @@ class _SwapScreenState extends State<SwapScreen> {
     } catch (_) {}
   }
 
-  calculateAvailableAmount(accountState, assetFrom, dexState) {
+  double getAmountByFee(int balance, String token) {
+    int fee = token == 'DFI' ? 12000 : 0;
+    int amount = balance - fee;
+    return (amount > 0) ? convertFromSatoshi(balance - fee) : 0.0;
+  }
+
+  double getAvailableAmount(accountState, assetFrom, dexState) {
     int amount = 0;
     int fee = 0;
-    if (accountState is AccountLoadedState && dexState is DexLoadedState) {
+    if (accountState.status == AccountStatusList.success &&
+        dexState is DexLoadedState) {
       if (dexState.dexModel.fee != null) {
         fee = dexState.dexModel.fee!;
       }
       accountState.activeAccount.balanceList!.forEach((balance) {
-        if (balance.token == assetFrom) {
+        if (balance.token == assetFrom && !balance.isHidden) {
           amount = balance.balance!;
         }
-        if (assetFrom == 'DFI') {
+        if (assetFrom == 'DFI' && !balance.isHidden) {
           amount -= fee;
         }
       });
     }
 
-    return balancesHelper.numberStyling(convertFromSatoshi(amount));
+    return convertFromSatoshi(amount);
   }
 
   bool isDisableSubmit() {

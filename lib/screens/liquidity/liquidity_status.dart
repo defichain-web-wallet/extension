@@ -54,18 +54,6 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
           return Scaffold(
             appBar: MainAppBar(
               title: 'Add Recipient',
-              action: IconButton(
-                      padding: const EdgeInsets.all(0),
-                      splashRadius: 18,
-                      color:
-                          Theme.of(context).appBarTheme.actionsIconTheme!.color,
-                      onPressed: () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomeScreen(),
-                            ),
-                          ),
-                      icon: Icon(Icons.clear)),
             ),
             body: _buildBody(context),
           );
@@ -75,18 +63,6 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
             child: Scaffold(
                 appBar: MainAppBar(
                   title: 'Add Recipient',
-                  action: IconButton(
-                      padding: const EdgeInsets.all(0),
-                      splashRadius: 18,
-                      color:
-                      Theme.of(context).appBarTheme.actionsIconTheme!.color,
-                      onPressed: () => Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(),
-                        ),
-                      ),
-                      icon: Icon(Icons.clear)),
                   isSmall: true,
                 ),
               body: _buildBody(context),

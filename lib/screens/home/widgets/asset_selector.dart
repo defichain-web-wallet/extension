@@ -1,5 +1,4 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
@@ -23,15 +22,10 @@ class _AssetSelectorState extends State<AssetSelector> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (state is AccountLoadedState) {
-        var tokenBalances = state.activeAccount.balanceList!
-            .where((el) => !el.isHidden! && !el.isPair!)
+      if (state.status == AccountStatusList.success) {
+        var balances = state.activeAccount!.balanceList!
+            .where((el) => !el.isHidden!)
             .toList();
-        var pairBalances = state.activeAccount.balanceList!
-            .where((el) => !el.isHidden! && el.isPair! && el.balance != 0)
-            .toList();
-
-        var balances = [...tokenBalances, ...pairBalances];
 
         final isScrollable = balances.length > 3;
         return Stack(
@@ -59,7 +53,7 @@ class _AssetSelectorState extends State<AssetSelector> {
             Padding(
               padding: const EdgeInsets.only(left: 10),
               child: ClipRect(
-                child: _buildCustomRadioSelector(state, isScrollable),
+                child: _buildCustomRadioSelector(state, isScrollable, balances),
               ),
             ),
             isScrollable
@@ -77,10 +71,8 @@ class _AssetSelectorState extends State<AssetSelector> {
     });
   }
 
-  Widget _buildCustomRadioSelector(state, isScrollable) {
+  Widget _buildCustomRadioSelector(state, isScrollable, balances) {
     var activeToken = state.activeAccount.activeToken;
-    var balances =
-        state.activeAccount.balanceList!.where((el) => !el.isHidden!).toList();
     var balancesList;
     if (balances.length >= 3) {
       balancesList =
@@ -89,41 +81,40 @@ class _AssetSelectorState extends State<AssetSelector> {
       balancesList = balances;
     }
 
-    var isTransformRadioPoint =
-        balancesList.length <= 3 && widget.layoutSize != 'small';
-
     List<Widget> result = [];
     balancesList.asMap().forEach((index, balance) {
       final bool selected = balance.token == activeToken;
 
-      result.add(ListTile(
-        contentPadding: (widget.layoutSize == 'small')
-            ? EdgeInsets.only(
-                left: 10.0 + ((index == 1 && isScrollable) ? 11 : 0), bottom: 3)
-            : EdgeInsets.only(
-                left: 15.0 + ((index == 1 && isScrollable) ? 16 : 0),
-                bottom: 10,
-                top: 8,
-              ),
-        title: Align(
-          alignment: Alignment(-1.4, 0),
-          child: Text(
-            TokensHelper().getTokenFormat(balance.token),
-            style: Theme.of(context).textTheme.headline6,
+      result.add(
+        ListTile(
+          contentPadding: (widget.layoutSize == 'small')
+              ? EdgeInsets.only(
+                  left: 10.0 + ((index == 1 && isScrollable) ? 11 : 0),
+                  bottom: 3)
+              : EdgeInsets.only(
+                  left: 15.0 + ((index == 1 && isScrollable) ? 16 : 0),
+                  bottom: 10,
+                  top: 8,
+                ),
+          title: Align(
+            alignment: Alignment(-1.4, 0),
+            child: Text(
+              TokensHelper().getTokenFormat(balance.token),
+              style: Theme.of(context).textTheme.headline6,
+            ),
           ),
-        ),
-        leading: CustomRadioButton(
-          color: balance.color,
-          selected: selected,
-          onChange: (newVal) {
-            _changeToken(state, balance);
+          leading: CustomRadioButton(
+            color: balance.color,
+            selected: selected,
+            onChange: (newVal) {
+              _changeToken(state, balance);
+            },
+          ),
+          onTap: () {
+            if (!selected) _changeToken(state, balance);
           },
-          isTransformRadioPoint: isTransformRadioPoint
         ),
-        onTap: () {
-          if (!selected) _changeToken(state, balance);
-        },
-      ));
+      );
     });
 
     return Column(
@@ -136,19 +127,12 @@ class _AssetSelectorState extends State<AssetSelector> {
     lockHelper.provideWithLockChecker(context, () async {
       state.activeAccount.activeToken = balance.token;
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-      accountCubit.updateActiveToken(
-          state.mnemonic,
-          state.seed,
-          state.accounts,
-          state.balances,
-          state.masterKeyPair,
-          state.activeAccount,
-          balance.token);
+      accountCubit.updateActiveToken(balance.token);
       if (SettingsHelper.settings.network! == 'testnet') {
-        accountCubit.saveAccountInfoToStorage(
+        accountCubit.saveAccountsToStorage(
             null, null, state.accounts, state.masterKeyPair);
       } else {
-        accountCubit.saveAccountInfoToStorage(
+        accountCubit.saveAccountsToStorage(
             state.accounts, state.masterKeyPair, null, null);
       }
     });

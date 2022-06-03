@@ -1,7 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -30,6 +28,7 @@ class SelectPool extends StatefulWidget {
 }
 
 class _SelectPoolState extends State<SelectPool> {
+  TokensHelper tokensHelper = TokensHelper();
   final TextEditingController _amountBaseController =
       TextEditingController(text: '0');
   final TextEditingController _amountQuoteController =
@@ -61,47 +60,47 @@ class _SelectPoolState extends State<SelectPool> {
   @override
   void initState() {
     super.initState();
+    TokensState tokensState = BlocProvider.of<TokensCubit>(context).state;
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       _setShareOfPool();
-      _setAmount();
+      _setAmount(tokensState);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TransactionCubit, TransactionState>(
-      builder: (context, state) => ScaffoldConstrainedBox(
-        child: LayoutBuilder(builder: (context, constraints) {
-          if (constraints.maxWidth < ScreenSizes.medium) {
-            return Scaffold(
-              appBar: MainAppBar(
+        builder: (context, state) => ScaffoldConstrainedBox(
+              child: LayoutBuilder(builder: (context, constraints) {
+                if (constraints.maxWidth < ScreenSizes.medium) {
+                  return Scaffold(
+                    appBar: MainAppBar(
                         title: 'Select Pool Pair',
                         isShowBottom: !(state is TransactionInitialState),
                         height: !(state is TransactionInitialState)
                             ? toolbarHeightWithBottom
                             : toolbarHeight),
-              body: _buildBody(context),
-            );
-          } else {
-            return Container(
-              padding: const EdgeInsets.only(top: 20),
-              child: Scaffold(
-                appBar: MainAppBar(
-                  title: 'Select Pool Pair',
-                  action: null,
-                  isShowBottom: !(state is TransactionInitialState),
-                  height: !(state is TransactionInitialState)
-                      ? toolbarHeightWithBottom
-                      : toolbarHeight,
-                  isSmall: true,
-                ),
-                body: _buildBody(context, isFullSize: true),
-              ),
-            );
-          }
-        }),
-      )
-    );
+                    body: _buildBody(context),
+                  );
+                } else {
+                  return Container(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Scaffold(
+                      appBar: MainAppBar(
+                        title: 'Select Pool Pair',
+                        action: null,
+                        isShowBottom: !(state is TransactionInitialState),
+                        height: !(state is TransactionInitialState)
+                            ? toolbarHeightWithBottom
+                            : toolbarHeight,
+                        isSmall: true,
+                      ),
+                      body: _buildBody(context, isFullSize: true),
+                    ),
+                  );
+                }
+              }),
+            ));
   }
 
   Widget _buildBody(context, {isFullSize = false}) =>
@@ -109,11 +108,11 @@ class _SelectPoolState extends State<SelectPool> {
         builder: (context, tokensState) {
           return BlocBuilder<AccountCubit, AccountState>(
               builder: (accountContext, accountState) {
-            if (tokensState is TokensLoadedState) {
-              if (accountState is AccountLoadedState) {
+            if (tokensState.status == TokensStatusList.success) {
+              if (accountState.status == AccountStatusList.success) {
                 assetFrom = widget.assetPair.symbol!.split('-')[0];
                 assetTo = widget.assetPair.symbol!.split('-')[1];
-                accountState.activeAccount.balanceList!.forEach((el) {
+                accountState.activeAccount!.balanceList!.forEach((el) {
                   if (el.token == widget.assetPair.symbol!) {
                     balance = el.balance!;
                   }
@@ -126,11 +125,13 @@ class _SelectPoolState extends State<SelectPool> {
                 });
 
                 try {
-                  var baseBalance = List.from(
-                      accountState.activeAccount.balanceList!.where((element) =>
+                  var baseBalance = List.from(accountState
+                      .activeAccount!.balanceList!
+                      .where((element) =>
                           element.token == widget.assetPair.tokenA))[0];
-                  var quoteBalance = List.from(
-                      accountState.activeAccount.balanceList!.where((element) =>
+                  var quoteBalance = List.from(accountState
+                      .activeAccount!.balanceList!
+                      .where((element) =>
                           element.token == widget.assetPair.tokenB))[0];
                   isErrorBalance = balanceA > baseBalance.balance ||
                       balanceB > quoteBalance.balance;
@@ -217,21 +218,30 @@ class _SelectPoolState extends State<SelectPool> {
                                               controller: _amountBaseController,
                                               focusNode: _focusBase,
                                               focusModel: _baseAmountFocusModel,
-                                              onChanged: (value) {
-                                                double baseAmount =
-                                                    double.parse(
-                                                        _amountBaseController
-                                                            .text
-                                                            .replaceAll(
-                                                                ',', '.'));
-                                                _amountQuoteController
-                                                    .text = (baseAmount *
-                                                        widget.assetPair
-                                                            .reserveBDivReserveA!)
-                                                    .toStringAsFixed(8);
-                                                _setShareOfPool();
-                                                _setAmount();
-                                              },
+                                              suffixIcon: Container(
+                                                padding: EdgeInsets.only(
+                                                  top: 8,
+                                                  bottom: 8,
+                                                  right: 6,
+                                                ),
+                                                child: SizedBox(
+                                                  width: 40,
+                                                  child: TextButton(
+                                                      child: Text('MAX',  style: TextStyle(fontSize: 10)),
+                                                      onPressed: () => setMaxAmount(
+                                                          _amountBaseController,
+                                                          _amountQuoteController,
+                                                          assetFrom,
+                                                          widget.assetPair.reserveBDivReserveA!,
+                                                          accountState,
+                                                          tokensState)),
+                                                ),
+                                              ),
+                                              onChanged: (value) => onChanged(
+                                                  _amountQuoteController,
+                                                  value,
+                                                  widget.assetPair.reserveBDivReserveA!,
+                                                  tokensState),
                                             ),
                                           ),
                                         ],
@@ -325,21 +335,31 @@ class _SelectPoolState extends State<SelectPool> {
                                                 focusNode: _focusQuote,
                                                 focusModel:
                                                     _quoteAmountFocusModel,
-                                                onChanged: (value) {
-                                                  double quoteAmount =
-                                                      double.parse(
-                                                          _amountQuoteController
-                                                              .text
-                                                              .replaceAll(
-                                                                  ',', '.'));
-                                                  _amountBaseController
-                                                      .text = (quoteAmount *
-                                                          widget.assetPair
-                                                              .reserveADivReserveB!)
-                                                      .toStringAsFixed(8);
-                                                  _setShareOfPool();
-                                                  _setAmount();
-                                                },
+                                                suffixIcon: Container(
+                                                  padding: EdgeInsets.only(
+                                                    top: 8,
+                                                    bottom: 8,
+                                                    right: 6,
+                                                  ),
+                                                  child: SizedBox(
+                                                    width: 40,
+                                                    child: TextButton(
+                                                      child: Text('MAX',  style: TextStyle(fontSize: 10)),
+                                                      onPressed: () => setMaxAmount(
+                                                          _amountQuoteController,
+                                                          _amountBaseController,
+                                                          assetTo,
+                                                          widget.assetPair.reserveADivReserveB!,
+                                                          accountState,
+                                                          tokensState),
+                                                    ),
+                                                  ),
+                                                ),
+                                                onChanged: (value) => onChanged(
+                                                    _amountBaseController,
+                                                    value,
+                                                    widget.assetPair.reserveADivReserveB!,
+                                                    tokensState),
                                               ),
                                             ),
                                           ],
@@ -462,8 +482,8 @@ class _SelectPoolState extends State<SelectPool> {
                                     }
                                   : () => Navigator.push(
                                         context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation1, animation2) =>
                                               LiquidityConfirmation(
                                                   assetPair: widget.assetPair,
                                                   baseAmount: double.parse(
@@ -481,6 +501,8 @@ class _SelectPoolState extends State<SelectPool> {
                                                   balanceA: balanceA,
                                                   balanceB: balanceB,
                                                   amount: amount),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration: Duration.zero,
                                         ),
                                       ),
                             ),
@@ -500,18 +522,21 @@ class _SelectPoolState extends State<SelectPool> {
         },
       );
 
-  void _setBalanceAndAmountUSD() {
-    var totalBalanceInUsd =
-        getTokenBalanceByFiat(widget.assetPair.tokenA!, balanceA, 'USD') +
-            getTokenBalanceByFiat(widget.assetPair.tokenB!, balanceB, 'USD');
+  void _setBalanceAndAmountUSD(tokensState) {
+    var totalBalanceInUsd = tokensHelper.getAmountByUsd(tokensState.tokensPairs,
+            balanceA, widget.assetPair.tokenA!, 'USD') +
+        tokensHelper.getAmountByUsd(
+            tokensState.tokensPairs, balanceB, widget.assetPair.tokenB!, 'USD');
 
-    var totalAmountInUsd = getTokenBalanceByFiat(
-            widget.assetPair.tokenA!,
+    var totalAmountInUsd = tokensHelper.getAmountByUsd(
+            tokensState.tokensPairs,
             double.parse(_amountBaseController.text.replaceAll(',', '.')),
+            widget.assetPair.tokenA!,
             'USD') +
-        getTokenBalanceByFiat(
-            widget.assetPair.tokenB!,
+        tokensHelper.getAmountByUsd(
+            tokensState.tokensPairs,
             double.parse(_amountQuoteController.text.replaceAll(',', '.')),
+            widget.assetPair.tokenB!,
             'USD');
 
     setState(() {
@@ -520,9 +545,9 @@ class _SelectPoolState extends State<SelectPool> {
     });
   }
 
-  void _setAmount() {
+  void _setAmount(tokensState) {
     _setBalances();
-    _setBalanceAndAmountUSD();
+    _setBalanceAndAmountUSD(tokensState);
     setState(() {
       amount = double.parse(_amountBaseController.text.replaceAll(',', '.')) /
           (widget.assetPair.reserveA! / widget.assetPair.totalLiquidity!);
@@ -547,7 +572,7 @@ class _SelectPoolState extends State<SelectPool> {
   }
 
   String getAvailableAmount(balance, assetCode) {
-    return '${convertFromSatoshi(balance)} $assetCode available';
+    return '${getAmountByFee(balance, assetCode)} $assetCode available';
   }
 
   bool isDisableSubmit() {
@@ -560,5 +585,39 @@ class _SelectPoolState extends State<SelectPool> {
         balanceTo == 0 ||
         amountFrom > balanceFrom ||
         amountTo > balanceTo;
+  }
+
+  setMaxAmount(TextEditingController controller,
+      TextEditingController toController, String asset, double reserve, state, tokensState) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      setState(() {
+        int balance = state.activeAccount!.balanceList!
+            .firstWhere((el) => el.token! == asset)
+            .balance!;
+        double amount = getAmountByFee(balance, asset);
+        controller.text = amount.toString();
+
+        onChanged(
+            toController, controller.text, reserve, tokensState);
+      });
+    });
+  }
+
+  double getAmountByFee(int balance, String token) {
+    int fee = token == 'DFI' ? 21000 : 0;
+    int amount = balance - fee;
+    return (amount > 0) ? convertFromSatoshi(balance - fee) : 0.0;
+  }
+
+  onChanged(TextEditingController controller, String value, double reserve, tokensState) {
+    try {
+      double baseAmount = double.parse(value.replaceAll(',', '.'));
+      controller.text = (baseAmount * reserve)
+          .toStringAsFixed(8);
+      _setShareOfPool();
+      _setAmount(tokensState);
+    } catch (_) {
+      controller.text = '0';
+    }
   }
 }

@@ -6,11 +6,14 @@ class TokensModel {
   int? id;
   String? symbol;
   String? symbolKey;
+  bool? isPair;
   bool? isDAT;
   bool? isLPS;
   Color? color;
 
-  TokensModel({this.symbol, this.symbolKey, this.color});
+  TokensModel({this.symbol, this.symbolKey, this.color}) {
+    this.isPair = this.symbol?.contains('-');
+  }
 
   TokensModel.fromJson(Map<String, dynamic> json) {
     this.id = int.parse(json["id"]);
@@ -19,6 +22,7 @@ class TokensModel {
     this.symbolKey = json["symbolKey"];
     this.isDAT = json["isDAT"];
     this.isLPS = json["isLPS"];
+    this.isPair = json["symbol"].contains('-');
     this.color = tokenHelper.getColorByTokenName(json["symbolKey"]);
   }
 

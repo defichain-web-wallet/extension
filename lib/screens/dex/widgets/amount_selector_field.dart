@@ -13,6 +13,7 @@ class AmountSelectorField extends StatelessWidget {
   final Function(String)? onChanged;
   final FocusNode? focusNode;
   final FocusModel? focusModel;
+  final Widget? sufixIcon;
 
   const AmountSelectorField(
       {Key? key,
@@ -24,7 +25,8 @@ class AmountSelectorField extends StatelessWidget {
       this.onSelect,
       this.onChanged,
       this.focusNode,
-      this.focusModel})
+      this.focusModel,
+      this.sufixIcon})
       : super(key: key);
 
   @override
@@ -49,11 +51,11 @@ class AmountSelectorField extends StatelessWidget {
             ),
             Expanded(
               child: DecorationTextField(
-                controller: amountController,
-                focusNode: focusNode,
-                focusModel: focusModel,
-                onChanged: onChanged,
-              ),
+                  controller: amountController,
+                  focusNode: focusNode,
+                  focusModel: focusModel,
+                  onChanged: onChanged,
+                  suffixIcon: sufixIcon),
             ),
           ],
         ),

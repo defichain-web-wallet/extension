@@ -23,6 +23,7 @@ class LockScreen extends StatefulWidget {
 
 class _LockScreenState extends State<LockScreen> {
   SettingsHelper settingsHelper = SettingsHelper();
+  bool isEnable = true;
   bool isVisiblePasswordField = true;
   String password = '';
   bool isFailed = false;
@@ -72,14 +73,14 @@ class _LockScreenState extends State<LockScreen> {
                         hintText: 'Enter password',
                         onChanged: (value) => password = value,
                         onIconPressed: () => setState(() =>
-                        isVisiblePasswordField = !isVisiblePasswordField),
+                            isVisiblePasswordField = !isVisiblePasswordField),
                       ),
                       SizedBox(height: 4),
                       Text(
                         isFailed ? 'Incorrect password' : '',
                         style: Theme.of(context).textTheme.headline4!.copyWith(
-                          color: AppTheme.redErrorColor,
-                        ),
+                              color: AppTheme.redErrorColor,
+                            ),
                       ),
                     ],
                   ),
@@ -100,12 +101,16 @@ class _LockScreenState extends State<LockScreen> {
                     'or import using Secret Recovery Phrase',
                     style: AppTheme.defiUnderlineText,
                   ),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RecoveryScreen(),
-                    ),
-                  ),
+                  onTap: isEnable
+                      ? () => Navigator.push(
+                            context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) => RecoveryScreen(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          )
+                      : null,
                 ),
               ],
             ),
@@ -116,31 +121,32 @@ class _LockScreenState extends State<LockScreen> {
   void _restoreWallet(parent) async {
     setState(() {
       isFailed = false;
+      isEnable = false;
     });
     var box = await Hive.openBox(HiveBoxes.client);
-    var decodedPassword =
-    stringToBase64.decode(box.get(HiveNames.password));
+    var decodedPassword = stringToBase64.decode(box.get(HiveNames.password));
     if (password == decodedPassword) {
       parent.emitPending(true);
 
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
       await accountCubit
-          .restoreAccountFromStorage(SettingsHelper.settings.network);
+          .restoreAccountFromStorage(SettingsHelper.settings.network!);
       LoggerService.invokeInfoLogg('user was unlock wallet');
-      Future.delayed(const Duration(milliseconds: 300), () async {
-        parent.emitPending(false);
+      parent.emitPending(false);
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(isLoadTokens: true),
-          ),
-        );
-      });
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => HomeScreen(isLoadTokens: true),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
     } else {
       setState(() {
         isFailed = true;
+        isEnable = true;
       });
     }
   }

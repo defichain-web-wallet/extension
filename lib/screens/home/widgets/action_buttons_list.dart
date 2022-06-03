@@ -18,8 +18,10 @@ class ActionButtonsList extends StatelessWidget {
       hideOverlay();
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => ReceiveScreen(),
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => ReceiveScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
         ),
       );
     };
@@ -28,8 +30,10 @@ class ActionButtonsList extends StatelessWidget {
       hideOverlay();
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => SendTokenSelector(),
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => SendTokenSelector(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
         ),
       );
     };
@@ -38,16 +42,20 @@ class ActionButtonsList extends StatelessWidget {
       hideOverlay();
       Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => SwapScreen(),
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) => SwapScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
           ));
     };
     var liquidityCallback = () {
       hideOverlay();
       Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => LiquidityScreen(),
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) => LiquidityScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
           ));
     };
 

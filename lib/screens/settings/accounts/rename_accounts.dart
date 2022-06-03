@@ -1,9 +1,9 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/settings/accounts/account_name_text_form.dart';
+import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -49,7 +49,7 @@ class RenameAccounts extends StatelessWidget {
 
   Widget _buildBody(context, {isCustomBgColor = false}) {
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (state is AccountLoadedState) {
+      if (state.status == AccountStatusList.success) {
         var accountList = state.accounts;
 
         return Container(
@@ -61,7 +61,7 @@ class RenameAccounts extends StatelessWidget {
             child: Center(
               child: Column(
                 children: List.generate(
-                  accountList.length,
+                  accountList!.length,
                   (index) => StretchBox(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,12 +77,7 @@ class RenameAccounts extends StatelessWidget {
                             accountList[index].name = text;
                             AccountCubit accountCubit =
                                 BlocProvider.of<AccountCubit>(context);
-                            accountCubit.updateAccountDetails(
-                                state.mnemonic,
-                                state.seed,
-                                state.accounts,
-                                state.masterKeyPair,
-                                state.activeAccount);
+                            accountCubit.updateAccountDetails();
                           },
                         ),
                         SizedBox(height: 18),
@@ -95,7 +90,7 @@ class RenameAccounts extends StatelessWidget {
           ),
         );
       } else {
-        return Container();
+        return Loader();
       }
     });
   }

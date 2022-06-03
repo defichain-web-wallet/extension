@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PasswordField extends StatelessWidget {
+  final TextEditingController? passwordController;
   final String? hintText;
   final Function(String text)? onChanged;
   final Function()? onIconPressed;
@@ -10,6 +11,7 @@ class PasswordField extends StatelessWidget {
 
   const PasswordField(
       {Key? key,
+      this.passwordController,
       this.hintText,
       this.onChanged,
       this.onIconPressed,
@@ -25,6 +27,7 @@ class PasswordField extends StatelessWidget {
       textAlignVertical: TextAlignVertical.center,
       obscureText: obscureText,
       onEditingComplete: onEditComplete,
+      controller: passwordController,
       decoration: InputDecoration(
         hintText: hintText,
         suffixIcon: IconButton(

@@ -1,11 +1,8 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/requests/currency_requests.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_selector.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -24,22 +21,17 @@ class WalletDetails extends StatefulWidget {
 class _WalletDetailsState extends State<WalletDetails> {
   var balancesHelper = BalancesHelper();
   TokensHelper tokensHelper = TokensHelper();
-  CurrencyRequests currencyRequests = CurrencyRequests();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TokensCubit, TokensState>(
       builder: (context, tokensState) {
         return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-          if (state is AccountLoadedState && tokensState is TokensLoadedState) {
-            var activeToken = state.activeAccount.activeToken!;
-            var tokenBalancesNotHidden = state.activeAccount.balanceList!
-                .where((el) => !el.isHidden! && !el.isPair!)
+          if (state.status == AccountStatusList.success && tokensState.status == TokensStatusList.success) {
+            var activeToken = state.activeAccount!.activeToken!;
+            var balances = state.activeAccount!.balanceList!
+                .where((el) => !el.isHidden!)
                 .toList();
-            var pairBalancesNotHidden = state.activeAccount.balanceList!
-                .where((el) => !el.isHidden! && el.isPair! && el.balance != 0)
-                .toList();
-            var balances = [...tokenBalancesNotHidden, ...pairBalancesNotHidden];
             var balance = balances
                 .firstWhere((el) => el.token == activeToken)
                 .balance!;
@@ -112,7 +104,7 @@ class _WalletDetailsState extends State<WalletDetails> {
 
     return BlocBuilder<TokensCubit, TokensState>(
       builder: (context, state) {
-        if (state is TokensLoadedState) {
+        if (state.status == TokensStatusList.success) {
           return Container(
             width: 140,
             height: 170,

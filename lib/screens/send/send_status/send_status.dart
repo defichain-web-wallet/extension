@@ -37,8 +37,10 @@ class SendStatusScreen extends StatelessWidget {
               title: 'Send',
               cancel: () => Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => HomeScreen(),
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) => HomeScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
                 ),
               ),
             ),
@@ -53,8 +55,10 @@ class SendStatusScreen extends StatelessWidget {
                 isSmall: true,
                 cancel: () => Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeScreen(),
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => HomeScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
                 ),
               ),

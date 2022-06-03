@@ -1,38 +1,79 @@
-import 'package:defi_wallet/models/account_model.dart';
-import 'package:defi_wallet/models/balance_model.dart';
+part of 'account_cubit.dart';
 
-abstract class AccountState {
-}
+enum AccountStatusList { initial, loading, success, restore, failure }
 
-class AccountInitialState extends AccountState {}
+class AccountState extends Equatable {
+  final AccountStatusList status;
+  final List<String>? mnemonic;
+  final Uint8List? seed;
+  final List<AccountModel>? accounts;
+  final List<BalanceModel>? balances;
+  final bip32.BIP32? masterKeyPair;
+  final AccountModel? activeAccount;
+  final String? activeToken;
+  final String? historyFilterBy;
+  final int? needRestore;
+  final int? restored;
+  final Exception? exception;
 
-class AccountLoadingState extends AccountState {}
-class AccountRestoreState extends AccountState {
-  final int needRestore;
-  final int restored;
-  AccountRestoreState(
-      this.needRestore,
-      this.restored
-      );
-}
+  AccountState({
+    this.status = AccountStatusList.initial,
+    this.mnemonic,
+    this.seed,
+    this.accounts,
+    this.balances,
+    this.masterKeyPair,
+    this.activeAccount,
+    this.activeToken,
+    this.historyFilterBy = 'all',
+    this.needRestore,
+    this.restored,
+    this.exception,
+  });
 
-class AccountLoadedState extends AccountState {
-  final List<String> mnemonic;
-  final seed;
-  final List<AccountModel> accounts;
-  final List<BalanceModel> balances;
-  final masterKeyPair;
-  final AccountModel activeAccount;
-  final activeToken;
-  final historyFilterBy;
+  @override
+  List<Object?> get props => [
+        status,
+        mnemonic,
+        seed,
+        accounts,
+        balances,
+        masterKeyPair,
+        activeAccount,
+        activeToken,
+        historyFilterBy,
+        needRestore,
+        restored,
+        exception,
+      ];
 
-  AccountLoadedState(
-      this.mnemonic,
-      this.seed,
-      this.accounts,
-      this.balances,
-      this.masterKeyPair,
-      this.activeAccount,
-      this.activeToken,
-      [this.historyFilterBy = 'all']);
+  AccountState copyWith({
+    AccountStatusList? status,
+    List<String>? mnemonic,
+    Uint8List? seed,
+    List<AccountModel>? accounts,
+    List<BalanceModel>? balances,
+    bip32.BIP32? masterKeyPair,
+    AccountModel? activeAccount,
+    String? activeToken,
+    String? historyFilterBy,
+    int? needRestore,
+    int? restored,
+    Exception? exception,
+  }) {
+    return AccountState(
+      status: status ?? this.status,
+      mnemonic: mnemonic ?? this.mnemonic,
+      seed: seed ?? this.seed,
+      accounts: accounts ?? this.accounts,
+      balances: balances ?? this.balances,
+      masterKeyPair: masterKeyPair ?? this.masterKeyPair,
+      activeAccount: activeAccount ?? this.activeAccount,
+      activeToken: activeToken ?? this.activeToken,
+      historyFilterBy: historyFilterBy ?? this.historyFilterBy,
+      needRestore: needRestore ?? this.needRestore,
+      restored: restored ?? this.restored,
+      exception: exception ?? this.exception,
+    );
+  }
 }

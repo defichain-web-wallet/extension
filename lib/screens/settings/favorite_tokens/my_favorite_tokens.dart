@@ -1,14 +1,14 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance_model.dart';
+import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -23,6 +23,9 @@ class MyFavoriteTokens extends StatefulWidget {
 
 class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
   TokensHelper tokenHelper = TokensHelper();
+  final GlobalKey<PendingButtonState> saveButton =
+      GlobalKey<PendingButtonState>();
+  bool isEnable = true;
   bool balanceHiddenInit = true;
   int changedButtonCounter = 0;
   int activeButtonCounter = 0;
@@ -34,47 +37,45 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TransactionCubit, TransactionState>(
-      builder: (context, state) => ScaffoldConstrainedBox(
-          child: LayoutBuilder(builder: (context, constraints) {
-            if (constraints.maxWidth < ScreenSizes.medium) {
-              return Scaffold(
-                appBar: MainAppBar(
-                    title: 'My favorite tokens',
-                    isShowBottom: !(state is TransactionInitialState),
-                    height: !(state is TransactionInitialState)
-                        ? toolbarHeightWithBottom
-                        : toolbarHeight
-                ),
-                body: _buildBody(context),
-              );
-            } else {
-              return Container(
-                padding: const EdgeInsets.only(top: 20),
-                child: Scaffold(
+        builder: (context, state) => ScaffoldConstrainedBox(
+                child: LayoutBuilder(builder: (context, constraints) {
+              if (constraints.maxWidth < ScreenSizes.medium) {
+                return Scaffold(
                   appBar: MainAppBar(
-                    title: 'My favorite tokens',
-                    isShowBottom: !(state is TransactionInitialState),
-                    height: !(state is TransactionInitialState)
-                        ? toolbarHeightWithBottom
-                        : toolbarHeight,
-                    isSmall: true,
+                      title: 'My favorite tokens',
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight),
+                  body: _buildBody(context),
+                );
+              } else {
+                return Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Scaffold(
+                    appBar: MainAppBar(
+                      title: 'My favorite tokens',
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight,
+                      isSmall: true,
+                    ),
+                    body: _buildBody(context, isCustomBgColor: true),
                   ),
-                  body: _buildBody(context, isCustomBgColor: true),
-                ),
-              );
-            }
-          }))
-    );
+                );
+              }
+            })));
   }
 
   Widget _buildBody(context, {isCustomBgColor = false}) {
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (state is AccountLoadedState) {
+      if (state.status == AccountStatusList.success) {
         if (balanceHiddenInit) {
           balanceHiddenInit = false;
-          balanceList = state.activeAccount.balanceList!;
+          balanceList = state.activeAccount!.balanceList!.toList();
           balanceList!.forEach((balance) {
-            balanceCheckMap[balance] = balance.isHidden;
+            balanceCheckMap[balance.token] = balance.isHidden;
             if (!balance.isHidden!) activeButtonCounter++;
           });
         }
@@ -108,25 +109,28 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
                               height: 30,
                             ),
                             trailing: Icon(
-                              balanceCheckMap[balanceList![index]]
+                              balanceCheckMap[balanceList![index].token]
                                   ? Icons.radio_button_unchecked
                                   : Icons.check_circle,
-                              color: balanceCheckMap[balanceList![index]]
+                              color: balanceCheckMap[balanceList![index].token]
                                   ? Colors.grey
                                   : AppTheme.pinkColor,
                             ),
                             onTap: () {
                               setState(() {
                                 if (balanceList![index].token != 'DFI') {
-                                  balanceCheckMap[balanceList![index]] =
-                                      !balanceCheckMap[balanceList![index]];
+                                  balanceCheckMap[balanceList![index].token] =
+                                      !balanceCheckMap[
+                                          balanceList![index].token];
                                   if (balanceList![index].isHidden !=
-                                      balanceCheckMap[balanceList![index]]) {
+                                      balanceCheckMap[
+                                          balanceList![index].token]) {
                                     changedButtonCounter++;
                                   } else {
                                     changedButtonCounter--;
                                   }
-                                  if (!balanceCheckMap[balanceList![index]]) {
+                                  if (!balanceCheckMap[
+                                      balanceList![index].token]) {
                                     activeButtonCounter++;
                                   } else {
                                     activeButtonCounter--;
@@ -145,15 +149,24 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
                         Expanded(
                           child: AccentButton(
                               label: 'Cancel',
-                              callback: () => Navigator.of(context).pop()),
+                              callback: isEnable
+                                  ? () => Navigator.of(context).pop()
+                                  : null),
                         ),
                         SizedBox(width: 16),
                         Expanded(
-                          child: PrimaryButton(
-                            label: 'Save',
+                          child: PendingButton(
+                            'Save',
+                            key: saveButton,
+                            isCheckLock: false,
                             callback: changedButtonCounter > 0 &&
                                     activeButtonCounter > 0
-                                ? () => submit(state)
+                                ? (parent) {
+                                    setState(() {
+                                      isEnable = false;
+                                    });
+                                    submit(state, context);
+                                  }
                                 : null,
                           ),
                         ),
@@ -171,9 +184,9 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
     });
   }
 
-  void submit(state) {
-    balanceList!
-        .forEach((balance) => balance.isHidden = balanceCheckMap[balance]);
+  submit(state, context) async {
+    balanceList!.forEach(
+        (balance) => balance.isHidden = balanceCheckMap[balance.token]);
 
     var activeToken = state.activeAccount.activeToken;
     balanceList!.forEach((balance) {
@@ -187,23 +200,22 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
     state.activeAccount.balanceList = balanceList!.cast<BalanceModel>();
     state.activeAccount.activeToken = activeToken;
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-    accountCubit.updateActiveToken(
-      state.mnemonic,
-      state.seed,
-      state.accounts,
-      state.balances,
-      state.masterKeyPair,
-      state.activeAccount,
-      activeToken,
-    );
+    await accountCubit.updateActiveToken(activeToken);
     if (SettingsHelper.settings.network! == 'testnet') {
-      accountCubit.saveAccountInfoToStorage(
+      await accountCubit.saveAccountsToStorage(
           null, null, state.accounts, state.masterKeyPair);
     } else {
-      accountCubit.saveAccountInfoToStorage(
+      await accountCubit.saveAccountsToStorage(
           state.accounts, state.masterKeyPair, null, null);
     }
 
-    Navigator.of(context).pop();
+    await Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) => HomeScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
   }
 }

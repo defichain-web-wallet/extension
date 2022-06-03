@@ -13,6 +13,7 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       toolbarHeight: toolbarHeight,
       elevation: 0,

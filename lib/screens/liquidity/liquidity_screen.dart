@@ -1,7 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -30,6 +28,13 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
   LockHelper lockHelper = LockHelper();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+
+  @override
+  void initState() {
+    super.initState();
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+    tokensCubit.loadTokens();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,22 +78,23 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (tokensContext, tokensState) {
 
-          if (tokensState is TokensLoadedState &&
-              accountState is AccountLoadedState) {
-            var tokensPairs = accountState.activeAccount.balanceList!
-                .where((element) => element.token!.contains(('-')));
+          if (tokensState.status == TokensStatusList.success &&
+              accountState.status == AccountStatusList.success) {
+            var tokensPairs = accountState.activeAccount!.balanceList!.where(
+                (element) =>
+                    element.token!.contains(('-')) && element.balance! > 0);
             var tokensPairsList = List.from(tokensPairs);
 
             double totalTokensBalance = 0;
             double totalPairsBalance = 0;
 
-            accountState.activeAccount.balanceList!.forEach((element) {
+            accountState.activeAccount!.balanceList!.forEach((element) {
               if (!element.isHidden! && !element.isPair!) {
                 var balance = convertFromSatoshi(element.balance!);
                 totalTokensBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs, balance, element.token!, 'USD');
+                    tokensState.tokensPairs!, balance, element.token!, 'USD');
               } else if (element.isPair!) {
-                var foundedAssetPair = List.from(tokensState.tokensPairs
+                var foundedAssetPair = List.from(tokensState.tokensPairs!
                     .where((item) => element.token == item.symbol))[0];
 
                 double baseBalance = element.balance! *
@@ -99,23 +105,23 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                     foundedAssetPair.reserveB!;
 
                 totalTokensBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs,
+                    tokensState.tokensPairs!,
                     baseBalance,
                     foundedAssetPair.tokenA,
                     'USD');
                 totalTokensBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs,
+                    tokensState.tokensPairs!,
                     quoteBalance,
                     foundedAssetPair.tokenB,
                     'USD');
 
                 totalPairsBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs,
+                    tokensState.tokensPairs!,
                     baseBalance,
                     foundedAssetPair.tokenA,
                     'USD');
                 totalPairsBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs,
+                    tokensState.tokensPairs!,
                     quoteBalance,
                     foundedAssetPair.tokenB,
                     'USD');
@@ -147,7 +153,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                               shrinkWrap: true,
                               itemCount: tokensPairsList.length,
                               itemBuilder: (context, index) {
-                                var foundedAssetPair = tokensState.tokensPairs
+                                var foundedAssetPair = tokensState.tokensPairs!
                                     .where((element) =>
                                         tokensPairsList[index].token ==
                                         element.symbol);
@@ -182,9 +188,11 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                                 context,
                                 () => Navigator.push(
                                       context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              LiquidityPoolList()),
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation1, animation2) =>
+                                              LiquidityPoolList(),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration: Duration.zero,),
                                     ));
                           },
                         ),

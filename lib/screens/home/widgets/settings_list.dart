@@ -23,10 +23,10 @@ class _SettingsListState extends State<SettingsList> {
   MenuHelper menuHelper = MenuHelper();
   final List<dynamic> menuItems = [
     {'name': 'arrow'},
-    {'name': 'Rename accounts', 'value': (context) => RenameAccounts()},
-    {'name': 'My tokens', 'value': (context) => MyFavoriteTokens()},
-    {'name': 'Settings', 'value': (context) => Settings()},
-    {'name': 'Lock wallet', 'value': (context) => null}
+    {'name': 'Rename accounts', 'value': (context, animation1, animation2) => RenameAccounts()},
+    {'name': 'My tokens', 'value': (context, animation1, animation2) => MyFavoriteTokens()},
+    {'name': 'Settings', 'value': (context, animation1, animation2) => Settings()},
+    {'name': 'Lock wallet', 'value': (context, animation1, animation2) => null}
   ];
 
   void lockWallet() async {
@@ -34,7 +34,10 @@ class _SettingsListState extends State<SettingsList> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) =>  LockScreen()),
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) =>  LockScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,),
     );
   }
 
@@ -90,12 +93,15 @@ class _SettingsListState extends State<SettingsList> {
                                       )),
                                   onPressed: () {
                                     _controller.hideMenu();
+                                    widget.onSelect();
                                     if (item['name'] == 'Lock wallet') {
                                       lockWallet();
                                     } else {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: item['value']),
+                                        PageRouteBuilder(
+                                          pageBuilder: item['value'],  transitionDuration: Duration.zero,
+                                          reverseTransitionDuration: Duration.zero,),
                                       );
                                     }
                                   },

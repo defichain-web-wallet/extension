@@ -1,3 +1,4 @@
+import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -28,6 +29,8 @@ class RemoveLiquidity extends StatefulWidget {
 }
 
 class _RemoveLiquidityState extends State<RemoveLiquidity> {
+  TokensHelper tokensHelper = TokensHelper();
+
   double currentSliderValue = 0;
   double shareOfPool = 0;
   double amountUSD = 0;
@@ -42,50 +45,58 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
   @override
   void initState() {
     super.initState();
+    TokensState tokensState =
+      BlocProvider.of<TokensCubit>(context).state;
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       _setShareOfPool();
       _setAmountA();
       _setAmountB();
       _setBalanceA();
       _setBalanceB();
-      _setBalanceAndAmountUSD();
+      _setBalanceAndAmountUSD(tokensState);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TransactionCubit, TransactionState>(
-        builder: (context, state) => ScaffoldConstrainedBox(
-              child: LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth < ScreenSizes.medium) {
-                  return Scaffold(
+        builder: (context, state) {
+      return BlocBuilder<TokensCubit, TokensState>(
+        builder: (context, tokensState) {
+          return ScaffoldConstrainedBox(
+            child: LayoutBuilder(builder: (context, constraints) {
+              if (constraints.maxWidth < ScreenSizes.medium) {
+                return Scaffold(
+                  appBar: MainAppBar(
+                      title: 'Remove liquidity',
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight),
+                  body: _buildBody(context),
+                );
+              } else {
+                return Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Scaffold(
                     appBar: MainAppBar(
-                        title: 'Remove liquidity',
-                        isShowBottom: !(state is TransactionInitialState),
-                        height: !(state is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight),
-                    body: _buildBody(context),
-                  );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Scaffold(
-                      appBar: MainAppBar(
-                        title: 'Remove liquidity',
-                        action: null,
-                        isShowBottom: !(state is TransactionInitialState),
-                        height: !(state is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight,
-                        isSmall: true,
-                      ),
-                      body: _buildBody(context, isFullSize: true),
+                      title: 'Remove liquidity',
+                      action: null,
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight,
+                      isSmall: true,
                     ),
-                  );
-                }
-              }),
-            ));
+                    body: _buildBody(context, isFullSize: true),
+                  ),
+                );
+              }
+            }),
+          );
+        },
+      );
+    });
   }
 
   Widget _buildBody(context, {isFullSize = false}) {
@@ -313,8 +324,8 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
                             globalKey: GlobalKey(),
                             callback: () => Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => LiquidityConfirmation(
+                              PageRouteBuilder(
+                                pageBuilder: (context, animation1, animation2) => LiquidityConfirmation(
                                   assetPair: widget.assetPair,
                                   baseAmount: amountA,
                                   quoteAmount: amountB,
@@ -326,6 +337,8 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
                                   amount: 0,
                                   removeLT: getRemoveAmount(),
                                 ),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
                               ),
                             ),
                           ),
@@ -354,13 +367,15 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
     });
   }
 
-  void _setBalanceAndAmountUSD() {
-    var totalBalanceInUsd =
-        getTokenBalanceByFiat(widget.assetPair.tokenA!, balanceA, 'USD') +
-            getTokenBalanceByFiat(widget.assetPair.tokenB!, balanceB, 'USD');
-    var totalAmountInUsd =
-        getTokenBalanceByFiat(widget.assetPair.tokenA!, amountA, 'USD') +
-            getTokenBalanceByFiat(widget.assetPair.tokenB!, amountB, 'USD');
+  void _setBalanceAndAmountUSD(tokensState) {
+    var totalBalanceInUsd = tokensHelper.getAmountByUsd(tokensState.tokensPairs,
+        balanceA, widget.assetPair.tokenA!, 'USD') +
+        tokensHelper.getAmountByUsd(
+            tokensState.tokensPairs, balanceB, widget.assetPair.tokenB!, 'USD');
+    var totalAmountInUsd = tokensHelper.getAmountByUsd(tokensState.tokensPairs,
+        amountB, widget.assetPair.tokenA!, 'USD') +
+        tokensHelper.getAmountByUsd(
+            tokensState.tokensPairs, amountB, widget.assetPair.tokenB!, 'USD');
     setState(() {
       balanceUSD = totalBalanceInUsd;
       amountUSD = totalAmountInUsd;

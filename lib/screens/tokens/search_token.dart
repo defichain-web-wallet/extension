@@ -1,14 +1,14 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/tokens/add_token.dart';
 import 'package:defi_wallet/screens/tokens/widgets/search_field.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -72,13 +72,13 @@ class SearchTokenState extends State<SearchToken> {
             if (iterator == 0) {
               TokensCubit token = BlocProvider.of<TokensCubit>(context);
 
-              token.loadTokens();
+              token.loadTokensFromStorage();
               iterator++;
             }
-            if (tokenState is TokensLoadingState) {
+            if (tokenState.status == TokensStatusList.loading) {
               return Loader();
-            } else if (tokenState is TokensLoadedState &&
-                state is AccountLoadedState) {
+            } else if (tokenState.status == TokensStatusList.success &&
+                state.status == AccountStatusList.success) {
               return Container(
                 color: isCustomBgColor
                     ? Theme.of(context).dialogBackgroundColor
@@ -108,7 +108,6 @@ class SearchTokenState extends State<SearchToken> {
                                 });
                               },
                             ),
-                            // _buildSearchField(context, tokenState),
                             SizedBox(height: 32),
                             Text(
                               'Popular tokens:',
@@ -140,16 +139,25 @@ class SearchTokenState extends State<SearchToken> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         SnackBar(
-                                          content:
-                                              Text('Chose a least one coin'),
+                                          content: Text(
+                                            'Chose a least one coin',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline5,
+                                          ),
+                                          backgroundColor: Theme.of(context)
+                                              .snackBarTheme
+                                              .backgroundColor,
                                         ),
                                       );
                                     } else {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1, animation2) =>
                                               AddToken(arguments: symbols),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration: Duration.zero,
                                         ),
                                       );
                                     }
@@ -178,7 +186,12 @@ class SearchTokenState extends State<SearchToken> {
           accountState.activeAccount.balanceList
               .firstWhere((token) => token.token == el.symbol);
         } catch (err) {
-          availableTokens.add(el);
+
+          if (SettingsHelper.settings.network == "mainnet") {
+            availableTokens.add(el);
+          } else if (el.symbol != "TSLA") {
+            availableTokens.add(el);
+          }
         }
       }
     });

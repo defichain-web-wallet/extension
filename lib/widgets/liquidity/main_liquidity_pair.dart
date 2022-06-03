@@ -48,10 +48,12 @@ class MainLiquidityPair extends StatelessWidget {
                     context,
                     () => Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => SelectPool(
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation1, animation2) => SelectPool(
                                     assetPair: assetPair!,
-                                  )),
+                                  ),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,),
                         )),
                 child: Icon(
                   Icons.add,
@@ -79,11 +81,12 @@ class MainLiquidityPair extends StatelessWidget {
                     context,
                     () => Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => RemoveLiquidity(
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation1, animation2) => RemoveLiquidity(
                                     assetPair: assetPair!,
                                     balance: balance!,
-                                  )),
+                                  ),  transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,),
                         )),
                 child: Icon(
                   Icons.remove,

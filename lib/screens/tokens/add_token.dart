@@ -1,5 +1,4 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -69,7 +68,7 @@ class _AddTokenState extends State<AddToken> {
 
   Widget _buildBody(context, {isCustomBgColor = false}) =>
       BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-        if (state is AccountLoadedState) {
+        if (state.status == AccountStatusList.success) {
           return Container(
             color: isCustomBgColor
                 ? Theme.of(context).dialogBackgroundColor
@@ -160,21 +159,15 @@ class _AddTokenState extends State<AddToken> {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
     for (var tokenName in symbols) {
-      await accountCubit.addToken(
-          state.mnemonic,
-          state.seed,
-          state.accounts,
-          state.balances,
-          state.masterKeyPair,
-          state.activeAccount,
-          state.activeToken,
-          tokenName);
+      await accountCubit.addToken(tokenName);
     }
     LoggerService.invokeInfoLogg('user added new token');
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(),
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) => HomeScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
       ),
     );
   }

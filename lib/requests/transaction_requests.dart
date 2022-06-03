@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_model.dart';
-import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:http/http.dart' as http;
 
 class TransactionRequests {
-  var networkHelper = NetworkHelper();
   var addressesHelper = AddressesHelper();
   Future<List<UtxoModel>> getUTXOs({
     required List<AddressModel> addresses,
@@ -16,8 +15,11 @@ class TransactionRequests {
 
     for(var i = 0; i < addresses.length; i++){
       try {
-        final Uri _url = Uri.parse(
-            'https://ocean.defichain.com/v0/${networkHelper.getNetworkString()}/address/${addresses[i].address}/transactions/unspent');
+        String urlAddress = SettingsHelper.settings.network == 'mainnet'
+            ? 'https://ocean.defichain.com/v0/mainnet/address/${addresses[i].address}/transactions/unspent'
+            : 'http://testnet-ocean.mydefichain.com:3000/v0/testnet/address/${addresses[i].address}/transactions/unspent';
+
+        final Uri _url = Uri.parse(urlAddress);
         final _headers = {
           'Content-type': 'application/json',
         };
@@ -40,8 +42,11 @@ class TransactionRequests {
 
   Future<TxErrorModel> sendTxHex(String txHex) async {
     try {
-      final Uri _url = Uri.parse(
-          'https://ocean.defichain.com/v0/${networkHelper.getNetworkString()}/rawtx/send');
+      String urlAddress = SettingsHelper.settings.network == 'mainnet'
+          ? 'https://ocean.defichain.com/v0/mainnet/rawtx/send'
+          : 'http://testnet-ocean.mydefichain.com:3000/v0/testnet/rawtx/send';
+
+      final Uri _url = Uri.parse(urlAddress);
 
       final _headers = {
         'Content-type': 'application/json',

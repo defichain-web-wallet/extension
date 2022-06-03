@@ -1,5 +1,4 @@
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
@@ -82,7 +81,7 @@ class LiquidityDetails extends StatelessWidget {
 
     return BlocBuilder<TokensCubit, TokensState>(
       builder: (context, state) {
-        if (state is TokensLoadedState) {
+        if (state.status == TokensStatusList.success) {
           return Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

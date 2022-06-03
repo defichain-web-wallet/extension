@@ -2,6 +2,8 @@ import 'package:defi_wallet/utils/convert.dart';
 
 class AssetPairModel {
   int? id;
+  int? idA;
+  int? idB;
   String? symbol;
   String? tokenA;
   String? tokenB;
@@ -17,6 +19,8 @@ class AssetPairModel {
 
   AssetPairModel(
       {this.id,
+      this.idA,
+      this.idB,
       this.symbol,
       this.tokenA,
       this.tokenB,
@@ -32,6 +36,8 @@ class AssetPairModel {
 
   AssetPairModel.fromJson(Map<String, dynamic> json) {
     this.id = int.parse(json["id"]);
+    this.idA = int.parse(json["tokenA"]["id"]);
+    this.idB = int.parse(json["tokenB"]["id"]);
     this.symbol = json["symbol"];
     this.tokenA = json["symbol"].split('-')[0];
     this.tokenB = json["symbol"].split('-')[1];

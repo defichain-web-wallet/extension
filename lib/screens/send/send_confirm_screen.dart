@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -35,6 +33,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
   TransactionService transactionService = TransactionService();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+  bool isEnable = true;
 
   @override
   Widget build(BuildContext context) =>
@@ -75,12 +74,14 @@ class _SendConfirmState extends State<SendConfirmScreen> {
       BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
         return BlocBuilder<TokensCubit, TokensState>(
           builder: (context, tokensState) {
-            if (state is AccountLoadedState && tokensState is TokensLoadedState) {
+            if (state.status == AccountStatusList.success &&
+                tokensState.status == TokensStatusList.success) {
               return Container(
                 color: isCustomBgColor
                     ? Theme.of(context).dialogBackgroundColor
                     : null,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: Center(
                   child: StretchBox(
                     child: Column(
@@ -103,7 +104,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                   child: Text(
                                     '${balancesHelper.numberStyling(widget.amount)} ',
                                     overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context).textTheme.headline1,
+                                    style:
+                                        Theme.of(context).textTheme.headline1,
                                   ),
                                 ),
                                 Text(
@@ -139,14 +141,22 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                               Expanded(
                                 child: AccentButton(
                                   label: 'Cancel',
-                                  callback: () => Navigator.of(context).pop(),
+                                  callback: isEnable
+                                      ? () => Navigator.of(context).pop()
+                                      : null,
                                 ),
                               ),
                               SizedBox(width: 16),
                               Expanded(
                                 child: PendingButton(
                                   'Send',
-                                  callback: (parent) => submitSend(parent, state, tokensState),
+                                  isCheckLock: false,
+                                  callback: (parent) {
+                                    setState(() {
+                                      isEnable = false;
+                                    });
+                                    submitSend(parent, state, tokensState);
+                                  },
                                 ),
                               ),
                             ],
@@ -169,7 +179,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
 
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
-        await _sendTransaction(context, tokensState, widget.token, state.activeAccount);
+        await _sendTransaction(
+            context, tokensState, widget.token, state.activeAccount);
       }
     } catch (_) {
       print(_);
@@ -185,30 +196,33 @@ class _SendConfirmState extends State<SendConfirmScreen> {
     parent.emitPending(false);
   }
 
-  Future _sendTransaction(context, tokensState, String token, AccountModel account) async {
+  Future _sendTransaction(
+      context, tokensState, String token, AccountModel account) async {
     TxErrorModel? txResponse;
     if (token == 'DFI') {
       txResponse = await transactionService.createAndSendTransaction(
           account: account,
           destinationAddress: widget.address,
           amount: balancesHelper.toSatoshi(widget.amount.toString()),
-      tokens: tokensState.tokens);
+          tokens: tokensState.tokens);
     } else {
       txResponse = await transactionService.createAndSendToken(
           account: account,
           token: token,
           destinationAddress: widget.address,
           amount: tokensState.toSatoshi(widget.amount.toString()),
-      tokens: tokensState.tokens);
+          tokens: tokensState.tokens);
     }
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => SendStatusScreen(
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) => SendStatusScreen(
             txResponse: txResponse,
             amount: widget.amount,
             token: token,
             address: widget.address),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
       ),
     );
   }

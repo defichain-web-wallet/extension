@@ -1,12 +1,10 @@
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/dex/swap_status.dart';
@@ -23,9 +21,10 @@ class ReviewSwapScreen extends StatefulWidget {
   final String assetTo;
   final double amountFrom;
   final double amountTo;
+  final double slippage;
 
   const ReviewSwapScreen(
-      this.assetFrom, this.assetTo, this.amountFrom, this.amountTo);
+      this.assetFrom, this.assetTo, this.amountFrom, this.amountTo, this.slippage);
 
   @override
   _ReviewSwapScreenState createState() => _ReviewSwapScreenState();
@@ -70,7 +69,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                     ),
                   );
                 }
-              })));
+              },),),);
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
         color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
@@ -127,10 +126,12 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                       builder: (context, state) {
                     return BlocBuilder<TokensCubit, TokensState>(
                       builder: (context, tokensState) {
-                        if (tokensState is TokensLoadedState) {
+                        if (tokensState.status == TokensStatusList.success) {
                           return PendingButton(
                             'SWAP',
-                            callback: (parent) => submitSwap(state, tokensState, parent),
+                            isCheckLock: false,
+                            callback: (parent) =>
+                                submitSwap(state, tokensState, parent),
                           );
                         } else {
                           return Container();
@@ -146,7 +147,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
       );
 
   submitSwap(state, tokenState, parent) async {
-    if (state is AccountLoadedState) {
+    if (state.status == AccountStatusList.success) {
       parent.emitPending(true);
 
       try {
@@ -155,15 +156,20 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
               account: state.activeAccount,
               tokenFrom: widget.assetFrom,
               tokenTo: widget.assetTo,
-              amount: balancesHelper.toSatoshi(widget.amountFrom.toString()),tokens: tokenState.tokens);
+              amount: balancesHelper.toSatoshi(widget.amountFrom.toString()),
+              amountTo: balancesHelper.toSatoshi(widget.amountTo.toString()),
+              slippage: widget.slippage,
+              tokens: tokenState.tokens);
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => SwapStatusScreen(
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => SwapStatusScreen(
                   txResponse: txResponse,
                   amount: widget.amountFrom,
                   assetFrom: widget.assetFrom,
                   assetTo: widget.assetTo),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
             ),
           );
         }

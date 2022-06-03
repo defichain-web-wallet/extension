@@ -1,5 +1,4 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
@@ -26,6 +25,7 @@ class _SettingsState extends State<Settings> {
   final LogoHelper logoHelper = LogoHelper();
   final SettingsHelper settingsHelper = SettingsHelper();
   late SettingsModel localSettings;
+  bool isEnable = true;
   bool isPending = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
@@ -76,7 +76,7 @@ class _SettingsState extends State<Settings> {
   Widget _buildBody(context, {isCustomBgColor = false}) {
     return BlocBuilder<AccountCubit, AccountState>(
       builder: (context, state) {
-        if (state is AccountLoadedState) {
+        if (state.status == AccountStatusList.success) {
           return Container(
             color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -263,7 +263,7 @@ class _SettingsState extends State<Settings> {
                                 height: 50,
                                 child: AccentButton(
                                   label: 'Cancel',
-                                  callback: () => Navigator.of(context).pop()
+                                  callback: isEnable ? () => Navigator.of(context).pop() : null,
                                 ),
                               ),
                             ),
@@ -275,19 +275,23 @@ class _SettingsState extends State<Settings> {
                                 height: 50,
                                 child: PrimaryButton(
                                   label: isPending ? 'Pending...' : 'Save',
+                                    isCheckLock: false,
                                     callback: !SettingsHelper.settings.compare(localSettings)
                                         ? () async {
+                                      setState(() {
+                                        isEnable = false;
+                                      });
                                       SettingsHelper.settings = localSettings;
                                       settingsHelper.saveSettings();
                                       ThemeCubit themeCubit = BlocProvider.of<ThemeCubit>(context);
                                       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
                                       TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
                                       themeCubit.changeTheme();
-                                      setState(() => isPending = true);
+                                      setState(() { isPending = true;});
                                       await accountCubit.changeNetwork(
                                         localSettings.network!,
                                       );
-                                      tokensCubit.loadTokens();
+                                      tokensCubit.loadTokensFromStorage();
                                       Navigator.of(context).pop();
                                     } : null
                                 ),

@@ -16,8 +16,10 @@ class LockHelper {
             DateTime.now().millisecondsSinceEpoch) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => ThemeChecker(LockScreen()),
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2)  => ThemeChecker(LockScreen()),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
         ),
       );
     } else {

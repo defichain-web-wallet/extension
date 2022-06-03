@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/models/history_model.dart';
@@ -36,7 +37,8 @@ class HistoryRequests {
 
     allTransactions = [...transactions, ...actions];
 
-    allTransactions.removeWhere((item) => historyHelper.isAvailableTypes(item.type!));
+    allTransactions
+        .removeWhere((item) => historyHelper.isAvailableTypes(item.type!));
 
     historyHelper.sortHistoryList(allTransactions);
 
@@ -52,9 +54,11 @@ class HistoryRequests {
     try {
       List<HistoryModel> txModels = [];
 
-      final Uri url = Uri.parse(
-        'https://ocean.defichain.com/v0/$network/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}',
-      );
+      String urlAddress = network == 'mainnet'
+          ? 'https://ocean.defichain.com/v0/mainnet/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}'
+          : 'http://testnet-ocean.mydefichain.com:3000/v0/testnet/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}';
+
+      final Uri url = Uri.parse(urlAddress);
 
       final headers = {'Content-type': 'application/json'};
 
@@ -73,8 +77,7 @@ class HistoryRequests {
             txid: txJson.txid,
             blockTime: txJson.time.toString(),
             type: txJson.type,
-            token: txJson.token
-        ));
+            token: txJson.token));
       }
 
       return [txModels, nextPage];
@@ -89,9 +92,11 @@ class HistoryRequests {
     try {
       List<HistoryModel> txModels = [];
 
-      final Uri url = Uri.parse(
-        'https://ocean.defichain.com/v0/$network/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}',
-      );
+      String urlAddress = network == 'mainnet'
+          ? 'https://ocean.defichain.com/v0/mainnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}'
+          : 'http://testnet-ocean.mydefichain.com:3000/v0/testnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}';
+
+      final Uri url = Uri.parse(urlAddress);
 
       final headers = {'Content-type': 'application/json'};
 
@@ -110,8 +115,7 @@ class HistoryRequests {
             txid: txJson.txid,
             blockTime: txJson.time.toString(),
             type: txJson.type,
-            token: txJson.token
-        ));
+            token: txJson.token));
       }
 
       return [txModels, nextPage];
@@ -122,16 +126,17 @@ class HistoryRequests {
 
   Future<bool> getTxPresent(String txId) async {
     try {
-      final Uri url = Uri.parse(
-        'https://ocean.defichain.com/v0/${networkHelper.getNetworkString()}/transactions/$txId',
-      );
+      String urlAddress = SettingsHelper.settings.network == 'mainnet'
+          ? 'https://ocean.defichain.com/v0/mainnet/transactions/$txId'
+          : 'http://testnet-ocean.mydefichain.com:3000/v0/testnet/transactions/$txId';
+
+      final Uri url = Uri.parse(urlAddress);
 
       final headers = {'Content-type': 'application/json'};
 
       final response = await http.get(url, headers: headers);
 
       if (response.statusCode == 200) {
-
         return true;
       }
       return false;

@@ -1,7 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -43,14 +41,15 @@ class _TransactionHistoryState extends State<TransactionHistory> {
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
       return BlocBuilder<TokensCubit, TokensState>(
           builder: (context, tokensState) {
-        if (state is AccountLoadedState && tokensState is TokensLoadedState) {
+        if (state.status == AccountStatusList.success &&
+            tokensState.status == TokensStatusList.success) {
           var historyList;
           DateFormat formatter = DateFormat('yyyy.MM.dd HH:mm');
           var balancesHelper = BalancesHelper();
           TokensHelper tokenHelper = TokensHelper();
           HistoryHelper historyHelper = HistoryHelper();
           var currency = SettingsHelper.settings.currency!;
-          historyList = new List.from(state.activeAccount.historyList!);
+          historyList = new List.from(state.activeAccount!.historyList!);
           if (historyList != null && historyList.length != 0) {
             return ListView.builder(
               controller: _controller,
@@ -111,7 +110,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             style: Theme.of(context).textTheme.headline5,
                           ),
                           Text(
-                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs, txValue, tokenName, currency), fixed: true, fixedCount: 4)} $currency")
+                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName, currency), fixed: true, fixedCount: 4)} $currency")
                         ],
                       ),
                       trailing: Icon(

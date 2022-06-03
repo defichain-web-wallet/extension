@@ -1,7 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
@@ -54,13 +52,13 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
       builder: (context, tokensState) {
         return BlocBuilder<AccountCubit, AccountState>(
           builder: (context, state) {
-            if (state is AccountLoadedState &&
-                tokensState is TokensLoadedState) {
+            if (state.status == AccountStatusList.success &&
+                tokensState.status == TokensStatusList.success) {
               if (iterator == 0) {
-                var baseBalance = List.from(state.activeAccount.balanceList!
+                var baseBalance = List.from(state.activeAccount!.balanceList!
                     .where((element) =>
                         element.token == widget.assetPair.tokenA))[0];
-                var quoteBalance = List.from(state.activeAccount.balanceList!
+                var quoteBalance = List.from(state.activeAccount!.balanceList!
                     .where((element) =>
                         element.token == widget.assetPair.tokenB))[0];
 
@@ -68,22 +66,22 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                 balanceB = convertFromSatoshi(quoteBalance.balance!);
 
                 balanceUsd += tokensHelper.getAmountByUsd(
-                    tokensState.tokensPairs,
+                    tokensState.tokensPairs!,
                     widget.balanceA,
                     widget.assetPair.tokenA!,
                     'USD');
                 balanceUsd += tokensHelper.getAmountByUsd(
-                    tokensState.tokensPairs,
+                    tokensState.tokensPairs!,
                     widget.balanceB,
                     widget.assetPair.tokenB!,
                     'USD');
                 targetAmountUsd += tokensHelper.getAmountByUsd(
-                    tokensState.tokensPairs,
+                    tokensState.tokensPairs!,
                     widget.amountA,
                     widget.assetPair.tokenA!,
                     'USD');
                 targetAmountUsd += tokensHelper.getAmountByUsd(
-                    tokensState.tokensPairs,
+                    tokensState.tokensPairs!,
                     widget.amountB,
                     widget.assetPair.tokenB!,
                     'USD');

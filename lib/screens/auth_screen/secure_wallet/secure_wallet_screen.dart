@@ -1,13 +1,12 @@
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/create_password_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/text_fields.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
+import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/auth_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:hive/hive.dart';
 
@@ -56,14 +55,34 @@ class _SecureScreenState extends State<SecureScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: _buildBody(context),
-        appBar: AuthAppBar(isSavedMnemonic: widget.mnemonic != null),
+  Widget build(BuildContext context) => ScaffoldConstrainedBox(
+        child: LayoutBuilder(builder: (context, constraints) {
+          if (constraints.maxWidth < ScreenSizes.medium) {
+            return Scaffold(
+              appBar: AuthAppBar(
+                isSavedMnemonic: widget.mnemonic != null,
+                isShowFullScreen: true,
+              ),
+              body: _buildBody(context),
+            );
+          } else {
+            return Container(
+              padding: EdgeInsets.only(top: 20),
+              child: Scaffold(
+                appBar: AuthAppBar(
+                  isSavedMnemonic: widget.mnemonic != null,
+                  isSmall: false,
+                ),
+                body: _buildBody(context, isCustomBgColor: true),
+              ),
+            );
+          }
+        }),
       );
 
-  Widget _buildBody(context) =>
-      BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-        return Padding(
+  Widget _buildBody(context, {isCustomBgColor = false}) => Container(
+        color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+        child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Center(
             child: Column(
@@ -100,9 +119,11 @@ class _SecureScreenState extends State<SecureScreen> {
                     callback: () async {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) =>
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) =>
                               CreatePasswordScreen(mnemonic: mnemonic),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
                         ),
                       );
                     },
@@ -111,6 +132,6 @@ class _SecureScreenState extends State<SecureScreen> {
               ],
             ),
           ),
-        );
-      });
+        ),
+      );
 }

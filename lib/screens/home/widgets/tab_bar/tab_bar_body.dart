@@ -35,8 +35,9 @@ class TabBarBody extends StatelessWidget {
                       context,
                       () => Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => SearchToken()),
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) => SearchToken(),  transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,),
                           ));
                 },
               ),
@@ -60,8 +61,9 @@ class TabBarBody extends StatelessWidget {
                             context,
                             () => Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => History()),
+                              PageRouteBuilder(
+                                pageBuilder: (context, animation1, animation2) => History(),  transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,),
                                 ));
                       },
                     ),

@@ -29,7 +29,7 @@ class AddressField extends StatelessWidget {
         decoration: InputDecoration(
           filled: true,
           fillColor: Theme.of(context).cardColor,
-          hoverColor: Theme.of(context).cardColor,
+          hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(

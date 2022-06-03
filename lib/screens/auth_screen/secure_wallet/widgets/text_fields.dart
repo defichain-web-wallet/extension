@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
+import 'package:defi_wallet/client/hive_names.dart';
 
 class TextFields extends StatelessWidget {
   final List<TextEditingController>? controllers;
@@ -51,7 +53,7 @@ class TextFields extends StatelessWidget {
   }
 }
 
-class ColumnTextFields extends StatelessWidget {
+class ColumnTextFields extends StatefulWidget {
   final List<TextEditingController>? controllers;
   final List<FocusNode>? focusNodes;
   final GlobalKey? globalKey;
@@ -72,60 +74,84 @@ class ColumnTextFields extends StatelessWidget {
       : super(key: key);
 
   @override
+  State<ColumnTextFields> createState() => _ColumnTextFieldsState();
+}
+
+class _ColumnTextFieldsState extends State<ColumnTextFields> {
+  static List<String> mnemonic = [];
+
+  @override
+  void initState() {
+    mnemonic = List.generate(widget.controllers!.length, (index) => '');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Expanded(
       flex: 10,
       child: Column(
         children: List.generate(
-          columnsCount!,
+          widget.columnsCount!,
           (index) => Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
               child: Row(
                 children: [
                   Text(
-                    (index + depth + 1 < 10)
-                        ? '  ${index + depth + 1}.'
-                        : '${index + depth + 1}.',
+                    (index + widget.depth + 1 < 10)
+                        ? '  ${index + widget.depth + 1}.'
+                        : '${index + widget.depth + 1}.',
                     style: Theme.of(context).textTheme.headline4,
                   ),
                   Spacer(),
                   Expanded(
                     flex: 10,
                     child: RawKeyboardListener(
-                        focusNode: focusNodes![(index + depth).toInt()],
+                        focusNode:
+                            widget.focusNodes![(index + widget.depth).toInt()],
                         onKey: (RawKeyEvent event) {
                           if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
-                            if (index + depth == controllers!.length - 1) {
-                              (globalKey!.currentWidget! as ElevatedButton)
+                            if (index + widget.depth ==
+                                widget.controllers!.length - 1) {
+                              (widget.globalKey!.currentWidget!
+                                      as ElevatedButton)
                                   .onPressed!();
                             } else {
-                              focusNodes![(index + depth + 1).toInt()]
+                              widget.focusNodes![
+                                      (index + widget.depth + 1).toInt()]
                                   .requestFocus();
                             }
                           }
                         },
                         child: TextField(
-                          enabled: enabled,
+                          enabled: widget.enabled,
                           textAlign: TextAlign.center,
                           textAlignVertical: TextAlignVertical.center,
                           style: Theme.of(context).textTheme.headline4,
-                          onEditingComplete: () => index + depth ==
-                                  controllers!.length - 1
-                              ? (globalKey!.currentWidget! as ElevatedButton)
+                          onChanged: (value) async {
+                            mnemonic[index + widget.depth] = value;
+                            var box = await Hive.openBox(HiveBoxes.client);
+                            await box.put(
+                                HiveNames.recoveryMnemonic, mnemonic.join(','));
+                            await box.close();
+                          },
+                          onEditingComplete: () => index + widget.depth ==
+                                  widget.controllers!.length - 1
+                              ? (widget.globalKey!.currentWidget!
+                                      as ElevatedButton)
                                   .onPressed!()
                               : null,
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.zero,
-                              enabledBorder: invalidControllerIndexes
-                                      .contains(index + depth)
+                              enabledBorder: widget.invalidControllerIndexes
+                                      .contains(index + widget.depth)
                                   ? OutlineInputBorder(
                                       borderSide: const BorderSide(
                                           color: Colors.red, width: 1.0),
                                       borderRadius: BorderRadius.circular(10.0),
                                     )
                                   : null),
-                          controller: controllers![index + depth],
+                          controller: widget.controllers![index + widget.depth],
                         )),
                   ),
                 ],

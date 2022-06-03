@@ -114,7 +114,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         Padding(
           padding: EdgeInsets.only(right: 6),
           child: isSettingsList
-              ? SettingsList(onSelect: () => hideOverlay)
+              ? SettingsList(onSelect: () => hideOverlay!())
               : CancelButton(),
         )
       ],

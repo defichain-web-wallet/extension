@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/account/account_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/requests/currency_requests.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -26,7 +23,6 @@ class ReceiveScreen extends StatefulWidget {
 }
 
 class _ReceiveScreenState extends State<ReceiveScreen> {
-  CurrencyRequests currencyRequests = CurrencyRequests();
   LockHelper lockHelper = LockHelper();
   GlobalKey<AccountSelectState> _selectKey = GlobalKey<AccountSelectState>();
   late Color? textColorHover;
@@ -45,37 +41,42 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     }
     return BlocBuilder<AccountCubit, AccountState>(
       builder: (BuildContext context, state) {
-        if (state is AccountLoadedState) {
+        if (state.status == AccountStatusList.success) {
           return ScaffoldConstrainedBox(
-              child: LayoutBuilder(builder: (context, constraints) {
-            if (constraints.maxWidth < ScreenSizes.medium) {
-              return Scaffold(
-                appBar: HomeAppBar(
-                  isRefresh: false,
-                  isSettingsList: false,
-                  selectKey: _selectKey,
-                  updateCallback: () => updateAccountDetails(context, state),
-                  hideOverlay: () => hideOverlay(),
-                ),
-                body: _buildBody(state),
-              );
-            } else {
-              return Container(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Scaffold(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < ScreenSizes.medium) {
+                  return Scaffold(
                     appBar: HomeAppBar(
                       isRefresh: false,
                       isSettingsList: false,
-                      isSmall: false,
                       selectKey: _selectKey,
                       updateCallback: () =>
                           updateAccountDetails(context, state),
                       hideOverlay: () => hideOverlay(),
                     ),
-                    body: _buildBody(state, isFullSize: true),
-                  ));
-            }
-          }));
+                    body: _buildBody(state),
+                  );
+                } else {
+                  return Container(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Scaffold(
+                      appBar: HomeAppBar(
+                        isRefresh: false,
+                        isSettingsList: false,
+                        isSmall: false,
+                        selectKey: _selectKey,
+                        updateCallback: () =>
+                            updateAccountDetails(context, state),
+                        hideOverlay: () => hideOverlay(),
+                      ),
+                      body: _buildBody(state, isFullSize: true),
+                    ),
+                  );
+                }
+              },
+            ),
+          );
         } else
           return Container();
       },
@@ -152,9 +153,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.only(left: 6),
                                   child: Text(
-                                    state.activeAccount
-                                        .getActiveAddress(isChange: false),
-                                    overflow: TextOverflow.ellipsis,
+                                    cutAddress(state.activeAccount
+                                        .getActiveAddress(isChange: false)),
                                     softWrap: false,
                                     style: Theme.of(context)
                                         .textTheme
@@ -167,11 +167,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                                 ),
                               ),
                               IconButton(
-                                  onPressed: () => copyAddress(state),
-                                  splashRadius: 18,
-                                  iconSize: 18,
-                                  icon: SvgPicture.asset(
-                                      'assets/copy_icon_pink.svg')),
+                                onPressed: () => copyAddress(state),
+                                splashRadius: 10,
+                                iconSize: 18,
+                                icon: SvgPicture.asset(
+                                    'assets/copy_icon_pink.svg'),
+                              ),
                               Padding(padding: const EdgeInsets.only(right: 12))
                             ],
                           ),
@@ -216,7 +217,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                         padding: EdgeInsets.only(
                             left: 20, right: 20, bottom: 15, top: 15),
                         width: 274,
-                        // height: 88,
                         decoration: BoxDecoration(
                           color: Theme.of(context).backgroundColor,
                           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -264,22 +264,26 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     });
   }
 
+  cutAddress(String s) {
+    return s.substring(0,16) + '...' + s.substring(26,42);
+  }
+
   updateAccountDetails(context, state) async {
     lockHelper.provideWithLockChecker(context, () async {
       hideOverlay();
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-      if (state is AccountLoadedState) {
-        await currencyRequests
-            .getCoingeckoList(SettingsHelper.settings.currency!);
-        await accountCubit.updateAccountDetails(state.mnemonic, state.seed,
-            state.accounts, state.masterKeyPair, state.activeAccount);
+      if (state.status == AccountStatusList.success) {
+        await accountCubit.updateAccountDetails();
 
         Future.delayed(const Duration(milliseconds: 1), () async {
           Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ReceiveScreen(),
-              ));
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => ReceiveScreen(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
         });
       }
     });

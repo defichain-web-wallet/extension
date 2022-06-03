@@ -1,3 +1,4 @@
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -18,6 +19,8 @@ class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
   Widget build(BuildContext context) {
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
+    AccountCubit accountCubit =
+        BlocProvider.of<AccountCubit>(context);
     return BlocBuilder<TransactionCubit, TransactionState>(
         builder: (context, state) {
       return Container(
@@ -91,8 +94,10 @@ class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
                         border: Border.all(
                             width: 1.0,
                             color: Theme.of(context).dividerColor))),
-                onTap: () {
-                  transactionCubit.confirmTransactionStatus();
+                onTap: () async {
+                  await accountCubit.updateAccountDetails(
+                      isChangeActiveToken: true);
+                  await transactionCubit.confirmTransactionStatus();
                 },
               )
           ],

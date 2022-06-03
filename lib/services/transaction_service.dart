@@ -413,9 +413,15 @@ class TransactionService {
       {required AccountModel account,
       required String tokenFrom,
       required String tokenTo,
-      required int amount, required List<TokensModel> tokens}) async {
+      required int amount, required int amountTo, required List<TokensModel> tokens, double slippage = 0.03}) async {
     var tokenFromId = await tokensRequests.getTokenID(tokenFrom, tokens);
     var tokenToId = await tokensRequests.getTokenID(tokenTo, tokens);
+
+    var maxPrice = amount / (amountTo) * (1 + slippage);
+    var oneHundredMillions = 100000000;
+    var n = maxPrice * oneHundredMillions;
+    var fraction = (n % oneHundredMillions).round();
+    var integer = ((n - fraction) / oneHundredMillions).round();
 
     await _getUtxoList(account);
 
@@ -591,8 +597,8 @@ class TransactionService {
                 txAuthList[i].value!,
                 tokenToId,
                 account.getActiveAddress(isChange: false),
-                9007199254740991,
-                9007199254740991);
+                integer,
+                fraction);
           },
           useAllUtxo: true);
        if (responseModel.isError) {

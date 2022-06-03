@@ -16,8 +16,8 @@ class AccentButton extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         child: Text(label!, style: TextStyle(fontSize: 14)),
-        onPressed: () =>
-            lockHelper.provideWithLockChecker(context, () => callback!()),
+        onPressed: callback != null ? () =>
+            lockHelper.provideWithLockChecker(context, () => callback!()) : null,
       ),
     );
   }

@@ -1,8 +1,8 @@
-# Jellywallet extension [BETA]
+# Jellywallet extension
 
 You can find the latest version of Jellywallet on [our official website](https://jellywallet.io/).
 
-Jellywallet supports Chromium-based browsers like GoogleChrome and Brave. We recommend using the latest available browser version.
+Jellywallet supports Google Chrome, and Chromium-based browsers. We recommend using the latest available browser version.
 
 ## IntelliJ IDEA
 
