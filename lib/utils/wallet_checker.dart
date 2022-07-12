@@ -38,11 +38,11 @@ class _WalletCheckerState extends State<WalletChecker> {
       var masterKeyPair = await box.get(masterKeyPairName);
       var password = await box.get(HiveNames.password);
       bool isSavedMnemonic = await box.get(HiveNames.openedMnemonic) != null;
-      String savedMnemonic = await box.get(HiveNames.openedMnemonic);
+      String? savedMnemonic = await box.get(HiveNames.openedMnemonic);
 
       bool isRecoveryMnemonic =
           await box.get(HiveNames.recoveryMnemonic) != null;
-      String recoveryMnemonic = await box.get(HiveNames.recoveryMnemonic);
+      String? recoveryMnemonic = await box.get(HiveNames.recoveryMnemonic);
 
       if (password != null) {
         password = stringToBase64.decode(password);

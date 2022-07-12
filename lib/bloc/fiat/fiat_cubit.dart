@@ -104,7 +104,7 @@ class FiatCubit extends Cubit<FiatState> {
 
   loadUserDetails(String accessToken) async {
     var box = await Hive.openBox(HiveBoxes.client);
-    String tutorialStatus = await box.get(HiveNames.tutorialStatus);
+    String? tutorialStatus = await box.get(HiveNames.tutorialStatus);
     bool isShowTutorial;
     if (tutorialStatus == null) {
       isShowTutorial = state.isShowTutorial!;

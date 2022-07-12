@@ -47,7 +47,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     tabController = TabController(length: 2, vsync: this);
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     transactionCubit.checkOngoingTransaction();
+
+    if (widget.isLoadTokens && SettingsHelper.settings.network == 'mainnet') {
+      fiatCubit.loadUserDetails(accountCubit.state.accessToken!);
+    }
   }
 
   @override
@@ -76,76 +82,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       isSaveOpenTime = true;
     }
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
     if (widget.isLoadTokens) {
       tokensCubit.loadTokensFromStorage();
     }
 
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (widget.isLoadTokens && SettingsHelper.settings.network == 'mainnet') {
-        fiatCubit.loadUserDetails(state.accessToken!);
-      }
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
           return BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, transactionState) {
-            return BlocBuilder<FiatCubit, FiatState>(
-                builder: (context, fiatState) {
-              return ScaffoldConstrainedBox(
-                child: GestureDetector(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    if (state.status == AccountStatusList.loading ||
-                        tokensState.status == TokensStatusList.loading) {
-                      return Container(
-                        child: Center(
-                          child: Loader(),
-                        ),
-                      );
-                    }
+                return ScaffoldConstrainedBox(
+                  child: GestureDetector(
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      if (state.status == AccountStatusList.loading ||
+                          tokensState.status == TokensStatusList.loading) {
+                        return Container(
+                          child: Center(
+                            child: Loader(),
+                          ),
+                        );
+                      }
 
-                    if (constraints.maxWidth < ScreenSizes.medium) {
-                      return Scaffold(
-                        appBar: HomeAppBar(
-                          selectKey: selectKey,
-                          updateCallback: () =>
-                              updateAccountDetails(context, state),
-                          hideOverlay: () => hideOverlay(),
-                          isShowBottom:
-                              !(transactionState is TransactionInitialState),
-                          height: !(transactionState is TransactionInitialState)
-                              ? toolbarHeightWithBottom
-                              : toolbarHeight,
-                        ),
-                        body: _buildBody(
-                            context, state, transactionState, tokensState),
-                      );
-                    } else {
-                      return Container(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Scaffold(
-                          body: _buildBody(
-                              context, state, transactionState, tokensState),
+                      if (constraints.maxWidth < ScreenSizes.medium) {
+                        return Scaffold(
                           appBar: HomeAppBar(
                             selectKey: selectKey,
                             updateCallback: () =>
                                 updateAccountDetails(context, state),
                             hideOverlay: () => hideOverlay(),
                             isShowBottom:
-                                !(transactionState is TransactionInitialState),
-                            height:
-                                !(transactionState is TransactionInitialState)
-                                    ? toolbarHeightWithBottom
-                                    : toolbarHeight,
-                            isSmall: false,
+                            !(transactionState is TransactionInitialState),
+                            height: !(transactionState is TransactionInitialState)
+                                ? toolbarHeightWithBottom
+                                : toolbarHeight,
                           ),
-                        ),
-                      );
-                    }
-                  }),
-                  onTap: () => hideOverlay(),
-                ),
-              );
-            });
+                          body: _buildBody(
+                              context, state, transactionState, tokensState),
+                        );
+                      } else {
+                        return Container(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Scaffold(
+                            body: _buildBody(
+                                context, state, transactionState, tokensState),
+                            appBar: HomeAppBar(
+                              selectKey: selectKey,
+                              updateCallback: () =>
+                                  updateAccountDetails(context, state),
+                              hideOverlay: () => hideOverlay(),
+                              isShowBottom:
+                              !(transactionState is TransactionInitialState),
+                              height:
+                              !(transactionState is TransactionInitialState)
+                                  ? toolbarHeightWithBottom
+                                  : toolbarHeight,
+                              isSmall: false,
+                            ),
+                          ),
+                        );
+                      }
+                    }),
+                    onTap: () => hideOverlay(),
+                  ),
+                );
           });
         },
       );
