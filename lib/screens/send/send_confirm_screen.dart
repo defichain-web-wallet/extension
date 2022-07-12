@@ -210,7 +210,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
           account: account,
           token: token,
           destinationAddress: widget.address,
-          amount: tokensState.toSatoshi(widget.amount.toString()),
+          amount: balancesHelper.toSatoshi(widget.amount.toString()),
           tokens: tokensState.tokens);
     }
     Navigator.pushReplacement(

@@ -51,14 +51,18 @@ class AssetPairModel {
     this.totalLiquidityRaw =
         convertToSatoshi(double.parse(json["totalLiquidity"]['token']));
     this.totalLiquidity = double.parse(json["totalLiquidity"]['token']);
-    this.totalLiquidityUsd = double.parse(json["totalLiquidity"]['usd']);
+    this.totalLiquidityUsd = double.parse(json["totalLiquidity"]['usd'] ?? '0');
 
-    var _apr = json["apr"]['total'];
+    try {
+      var _apr = json["apr"]['total'];
 
-    if (_apr is int) {
-      this.apr = _apr + .0;
-    } else {
-      this.apr = _apr ?? 0;
+      if (_apr is int) {
+        this.apr = _apr + .0;
+      } else {
+        this.apr = _apr ?? 0;
+      }
+    } catch (e) {
+      this.apr = 0.0;
     }
   }
 

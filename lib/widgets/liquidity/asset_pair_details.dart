@@ -137,7 +137,7 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                             ),
                           ),
                           Container(
-                            child: Text(getAprFormat(widget.assetPair.apr),
+                            child: Text(TokensHelper().getAprFormat(widget.assetPair.apr!),
                                 style: Theme.of(context)
                                     .textTheme
                                     .headline6
@@ -260,11 +260,6 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
     } else {
       return amount.toStringAsFixed(2);
     }
-  }
-
-  String getAprFormat(apr) {
-    double result = apr * 100;
-    return '${result.toStringAsFixed(2)}% APR';
   }
 
   TextSpan getFormatAmountText(stringAmount) {

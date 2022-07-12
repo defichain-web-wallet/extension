@@ -17,11 +17,15 @@ class DexCubit extends Cubit<DexState> {
     if (tokenFrom == tokenTo) {
       dexModel = TestPoolSwapModel(
           tokenFrom: tokenFrom, tokenTo: tokenTo, amountFrom: 0, amountTo: 0, priceFrom: 1, priceTo: 1);
+      emit(DexLoadedState(dexModel));
     } else {
-      dexModel = await _dexHelper.calculateDex(
-          tokenFrom, tokenTo, amountFrom, amountTo, address, addressList, tokensState);
+      try {
+        dexModel = await _dexHelper.calculateDex(
+            tokenFrom, tokenTo, amountFrom, amountTo, address, addressList, tokensState);
+        emit(DexLoadedState(dexModel));
+      } catch (err) {
+        emit(DexErrorState());
+      }
     }
-
-    emit(DexLoadedState(dexModel));
   }
 }

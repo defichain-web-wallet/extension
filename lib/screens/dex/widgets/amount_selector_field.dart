@@ -10,24 +10,30 @@ class AmountSelectorField extends StatelessWidget {
   final GlobalKey<AssetSelectState>? selectKey;
   final TextEditingController? amountController;
   final Function(String)? onSelect;
+  final Function()? onAnotherSelect;
   final Function(String)? onChanged;
   final FocusNode? focusNode;
   final FocusModel? focusModel;
-  final Widget? sufixIcon;
+  final Widget? suffixIcon;
+  final bool? isShow;
+  final bool? isFixedWidthAssetSelectorText;
 
-  const AmountSelectorField(
-      {Key? key,
-      this.label,
-      this.selectedAsset,
-      this.assets,
-      this.selectKey,
-      this.amountController,
-      this.onSelect,
-      this.onChanged,
-      this.focusNode,
-      this.focusModel,
-      this.sufixIcon})
-      : super(key: key);
+  const AmountSelectorField({
+    Key? key,
+    this.label,
+    this.selectedAsset,
+    this.assets,
+    this.selectKey,
+    this.amountController,
+    this.onSelect,
+    this.onAnotherSelect,
+    this.onChanged,
+    this.focusNode,
+    this.focusModel,
+    this.suffixIcon,
+    this.isShow,
+    this.isFixedWidthAssetSelectorText = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +48,16 @@ class AmountSelectorField extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: AssetSelect(
-                key: selectKey,
-                tokensForSwap: assets!,
-                selectedToken: selectedAsset!,
-                onSelect: onSelect!,
+              child: GestureDetector(
+                onTap: () {},
+                child: AssetSelect(
+                  key: selectKey,
+                  tokensForSwap: assets!,
+                  selectedToken: selectedAsset!,
+                  onSelect: onSelect!,
+                  onAnotherSelect: onAnotherSelect!,
+                  isFixedWidthText: isFixedWidthAssetSelectorText!,
+                ),
               ),
             ),
             Expanded(
@@ -55,7 +66,7 @@ class AmountSelectorField extends StatelessWidget {
                   focusNode: focusNode,
                   focusModel: focusModel,
                   onChanged: onChanged,
-                  suffixIcon: sufixIcon),
+                  suffixIcon: suffixIcon),
             ),
           ],
         ),

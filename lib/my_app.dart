@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
@@ -20,6 +21,7 @@ class App extends StatelessWidget {
         BlocProvider<DexCubit>(create: (context) => DexCubit()),
         BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
         BlocProvider<TransactionCubit>(create: (context) => TransactionCubit()),
+        BlocProvider<FiatCubit>(create: (context) => FiatCubit()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

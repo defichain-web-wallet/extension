@@ -565,9 +565,11 @@ class _SelectPoolState extends State<SelectPool> {
 
   void _setShareOfPool() {
     setState(() {
-      shareOfPool = (convertToSatoshi(
-              double.parse(_amountBaseController.text.replaceAll(',', '.'))) /
-          widget.assetPair.totalLiquidityRaw!);
+      if (widget.assetPair.totalLiquidityRaw! != 0) {
+        shareOfPool = (convertToSatoshi(
+            double.parse(_amountBaseController.text.replaceAll(',', '.'))) /
+            widget.assetPair.totalLiquidityRaw!);
+      }
     });
   }
 
@@ -612,9 +614,11 @@ class _SelectPoolState extends State<SelectPool> {
   onChanged(TextEditingController controller, String value, double reserve, tokensState) {
     try {
       double baseAmount = double.parse(value.replaceAll(',', '.'));
-      controller.text = (baseAmount * reserve)
-          .toStringAsFixed(8);
-      _setShareOfPool();
+      if (!(baseAmount * reserve).isNaN) {
+        controller.text = (baseAmount * reserve)
+            .toStringAsFixed(8);
+        _setShareOfPool();
+      }
       _setAmount(tokensState);
     } catch (_) {
       controller.text = '0';
