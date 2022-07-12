@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/address_balance_model.dart';
 import 'package:defi_wallet/models/address_model.dart';
@@ -18,8 +19,9 @@ class BalanceRequests {
 
   Future<List<BalanceModel>> getBalanceListByAddress(String address, bool sumDFI, String network) async {
     try {
-      final Uri url = Uri.parse(
-        'https://ocean.defichain.com/v0/$network/address/$address/tokens');
+      String hostUrl = SettingsHelper.getHostApiUrl();
+      String urlAddress = '$hostUrl/$network/address/$address/tokens';
+      final Uri url = Uri.parse(urlAddress);
 
       final response = await http.get(url);
 
@@ -51,15 +53,16 @@ class BalanceRequests {
         return balancesHelper.findAndSumDuplicates(balances);
       }
       return [];
-    } catch (_) {
-      return [];
+    } catch (err) {
+      throw err;
     }
   }
 
   Future<BalanceModel> getBalanceDFIcoinByAddress(String address, bool sumDFI, String network) async {
     try {
-      final Uri url = Uri.parse(
-        'https://ocean.defichain.com/v0/$network/address/$address/balance');
+      String hostUrl = SettingsHelper.getHostApiUrl();
+      String urlAddress = '$hostUrl/$network/address/$address/balance';
+      final Uri url = Uri.parse(urlAddress);
 
       final response = await http.get(url);
 
@@ -68,8 +71,8 @@ class BalanceRequests {
         return BalanceModel(token: '\$DFI', balance: convertToSatoshi(double.parse(data['data'])));
       }
       return BalanceModel(token: '\$DFI', balance: 0);
-    } catch (_) {
-      return BalanceModel(token: '\$DFI', balance: 0);
+    } catch (err) {
+      throw err;
     }
   }
 

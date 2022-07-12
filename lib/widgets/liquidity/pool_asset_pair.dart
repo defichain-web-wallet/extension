@@ -95,7 +95,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
                                     .headline4
                                     ?.apply(fontWeightDelta: 2)),
                         Text(
-                            '${toFixed(getYeldAmountPercentage(widget.assetPair.apr!), 2)}% APR',
+                            TokensHelper().getAprFormat(widget.assetPair.apr!),
                             style: Theme.of(context).textTheme.headline4)
                       ],
                     ),
@@ -129,10 +129,6 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
         ),
       ),
     );
-  }
-
-  double getYeldAmountPercentage(double value) {
-    return value * 100;
   }
 
   String getTotalAmountByUsd(double amount) {

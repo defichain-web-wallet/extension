@@ -65,6 +65,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
             return Scaffold(
               appBar: MainAppBar(
                 title: 'Send',
+                hideOverlay: () => hideOverlay(),
                 isShowBottom: !(state is TransactionInitialState),
                 height: !(state is TransactionInitialState)
                     ? toolbarHeightWithBottom
@@ -78,6 +79,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
               child: Scaffold(
                 appBar: MainAppBar(
                   title: 'Send',
+                  hideOverlay: () => hideOverlay(),
                   action: null,
                   isSmall: true,
                 ),
@@ -163,7 +165,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   });
                                 }
                               },
-                              onPressed: () {
+                              onPressedMax: () {
                                 setState(() {
                                   int balance = state
                                       .activeAccount!.balanceList!
@@ -178,6 +180,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   _amountController.text = amount.toString();
                                 });
                               },
+                              isFixedWidthAssetSelectorText: isCustomBgColor,
                             ),
                             SizedBox(height: 8),
                             Text(

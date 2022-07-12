@@ -189,7 +189,7 @@ class _HistoryState extends State<History> {
                                                 .headline6,
                                           ),
                                           Text(
-                                            '$txValuePrefix$txValue $tokenName',
+                                            '$txValuePrefix${balancesHelper.numberStyling(txValue)} $tokenName',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .headline4,

@@ -22,11 +22,12 @@ class BalancesHelper {
     // return balanceMap.map((balance)=>BalanceModel(token: balance));
   }
 
-  int getBalanceByTokenName(List<AddressBalanceModel> addressBalanceList, String token){
+  int getBalanceByTokenName(
+      List<AddressBalanceModel> addressBalanceList, String token) {
     var sum = 0;
     addressBalanceList.forEach((addressBalanceModel) {
       addressBalanceModel.balanceList!.forEach((balanceModel) {
-        if(token == balanceModel.token){
+        if (token == balanceModel.token) {
           sum += balanceModel.balance!;
         }
       });
@@ -34,12 +35,17 @@ class BalancesHelper {
     return sum;
   }
 
-  List<AddressBalanceModel> updateBalance(List<AddressBalanceModel> addressBalanceList, String address, String token, int deltaBalance){
-    for(var i = 0; i < addressBalanceList.length; i++){
-      if(addressBalanceList[i].address == address){
-        for(var j = 0; j < addressBalanceList[i].balanceList!.length; j++){
-          if(addressBalanceList[i].balanceList![j].token == token){
-            addressBalanceList[i].balanceList![j].balance = addressBalanceList[i].balanceList![j].balance! + deltaBalance;
+  List<AddressBalanceModel> updateBalance(
+      List<AddressBalanceModel> addressBalanceList,
+      String address,
+      String token,
+      int deltaBalance) {
+    for (var i = 0; i < addressBalanceList.length; i++) {
+      if (addressBalanceList[i].address == address) {
+        for (var j = 0; j < addressBalanceList[i].balanceList!.length; j++) {
+          if (addressBalanceList[i].balanceList![j].token == token) {
+            addressBalanceList[i].balanceList![j].balance =
+                addressBalanceList[i].balanceList![j].balance! + deltaBalance;
           }
         }
       }
@@ -47,26 +53,39 @@ class BalancesHelper {
     return addressBalanceList;
   }
 
-  int toSatoshi(String balance){
+  int toSatoshi(String balance) {
     double amount = double.tryParse(balance)!;
 
-    return  (amount * COIN).round();
+    return (amount * COIN).round();
   }
 
-  double fromSatohi(int amount){
+  double fromSatohi(int amount) {
     return amount / COIN;
   }
 
-  String numberStyling(double number, {bool fixed = false, int fixedCount = 2}){
+  String numberStyling(double number,
+      {bool fixed = false, int fixedCount = 2}) {
     const double minAmountByFixed = 0.0001;
     int _fixedCount = fixedCount;
     if (number < minAmountByFixed && number != 0) {
       _fixedCount = 6;
     }
-    var string = fixed ? number.toStringAsFixed(_fixedCount) : number.toString();
+
+    var string = '';
+
+    if (number < 0.000001 && !fixed && number != 0) {
+      string = number.toStringAsFixed(8);
+    } else {
+      string = fixed ? number.toStringAsFixed(_fixedCount) : number.toString();
+    }
     var stringList = string.split('.');
 
-    stringList[0] = StringUtils.addCharAtPosition(stringList[0].split('').reversed.join(), ",", 3, repeat: true).split('').reversed.join();
+    stringList[0] = StringUtils.addCharAtPosition(
+            stringList[0].split('').reversed.join(), ",", 3,
+            repeat: true)
+        .split('')
+        .reversed
+        .join();
     return stringList.join('.');
   }
 }

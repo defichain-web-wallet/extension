@@ -26,15 +26,16 @@ class _WalletDetailsState extends State<WalletDetails> {
   Widget build(BuildContext context) {
     return BlocBuilder<TokensCubit, TokensState>(
       builder: (context, tokensState) {
-        return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-          if (state.status == AccountStatusList.success && tokensState.status == TokensStatusList.success) {
+        return BlocBuilder<AccountCubit, AccountState>(
+            builder: (context, state) {
+          if (state.status == AccountStatusList.success &&
+              tokensState.status == TokensStatusList.success) {
             var activeToken = state.activeAccount!.activeToken!;
             var balances = state.activeAccount!.balanceList!
                 .where((el) => !el.isHidden!)
                 .toList();
-            var balance = balances
-                .firstWhere((el) => el.token == activeToken)
-                .balance!;
+            var balance =
+                balances.firstWhere((el) => el.token == activeToken).balance!;
             return SizedBox(
               height: widget.layoutSize == 'small' ? 200 : 250,
               child: Row(
@@ -42,19 +43,19 @@ class _WalletDetailsState extends State<WalletDetails> {
                   Stack(
                     alignment: Alignment.center,
                     children: [
-                      _buildBalance(
-                          balance, activeToken, SettingsHelper.settings.currency!),
+                      _buildBalance(balance, activeToken,
+                          SettingsHelper.settings.currency!),
                       AspectRatio(
                         aspectRatio: 1,
                         child: PieChart(
                           PieChartData(
-                            pieTouchData:
-                            PieTouchData(touchCallback: (pieTouchResponse) {}),
+                            pieTouchData: PieTouchData(
+                                touchCallback: (pieTouchResponse) {}),
                             borderData: FlBorderData(show: false),
                             sectionsSpace: 0,
                             centerSpaceRadius: 80,
-                            sections:
-                            showingSections(balances, activeToken, tokensState),
+                            sections: showingSections(
+                                balances, activeToken, tokensState),
                           ),
                           swapAnimationDuration: Duration.zero,
                         ),
@@ -77,16 +78,17 @@ class _WalletDetailsState extends State<WalletDetails> {
     );
   }
 
-  List<PieChartSectionData> showingSections(balances, activeToken, tokensState) {
+  List<PieChartSectionData> showingSections(
+      balances, activeToken, tokensState) {
     return List.generate(balances.length, (i) {
       final balance = balances[i];
 
       int _averageBalanceAmount = 0;
-      _averageBalanceAmount = getAverageBalanceAmount(balances, tokensState.tokensPairs);
+      _averageBalanceAmount =
+          getAverageBalanceAmount(balances, tokensState.tokensPairs);
       var balanceUsd = tokensHelper.getAmountByUsd(tokensState.tokensPairs,
           convertFromSatoshi(balances[i].balance), balances[i].token, 'USD');
-      var balanceValue =
-          (balanceUsd == 0 || balanceUsd < 1) ? 10 : balanceUsd;
+      var balanceValue = (balanceUsd == 0 || balanceUsd < 1) ? 10 : balanceUsd;
       balanceValue = (balanceValue + _averageBalanceAmount).round();
       double radius = (balance.token == activeToken) ? 9 : 5;
       return PieChartSectionData(
@@ -102,42 +104,43 @@ class _WalletDetailsState extends State<WalletDetails> {
     var tokenName = TokensHelper().getTokenFormat(coin);
     var tokenBalance = convertFromSatoshi(balance);
 
-    return BlocBuilder<TokensCubit, TokensState>(
-      builder: (context, state) {
-        if (state.status == TokensStatusList.success) {
-          return Container(
-            width: 140,
-            height: 170,
-            child: Center(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 65,
+    return BlocBuilder<TokensCubit, TokensState>(builder: (context, state) {
+      if (state.status == TokensStatusList.success) {
+        return Container(
+          width: 140,
+          height: 170,
+          child: Center(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 65,
+                ),
+                Center(
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      "${balancesHelper.numberStyling(tokenBalance)} $tokenName",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                    ),
                   ),
-                  Center(
-                    child: FittedBox(
-                        fit: BoxFit.fitWidth,
-                        child: Text(
-                          "${balancesHelper.numberStyling(tokenBalance)} $tokenName",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                        )),
-                  ),
-                  SizedBox(
-                    height: 17,
-                  ),
-                  FittedBox(
-                      fit: BoxFit.fitWidth,
-                      child: Text(getBalanceByUsd(state, tokenBalance, coin, currency))
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(
+                  height: 17,
+                ),
+                FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      getBalanceByUsd(state, tokenBalance, coin, currency),
+                    )),
+              ],
             ),
-          );
-        } else {
-          return Container();
-        }
+          ),
+        );
+      } else {
+        return Container();
       }
-    );
+    });
   }
 
   int getAverageBalanceAmount(balances, tokensPairs) {
@@ -153,9 +156,11 @@ class _WalletDetailsState extends State<WalletDetails> {
     double balanceByUsd;
     if (tokensHelper.isPair(token)) {
       double satoshi = convertToSatoshi(balance) + .0;
-      balanceByUsd = tokensHelper.getPairsAmountByUsd(state.tokensPairs, satoshi, token, currency);
+      balanceByUsd = tokensHelper.getPairsAmountByUsd(
+          state.tokensPairs, satoshi, token, currency);
     } else {
-      balanceByUsd = tokensHelper.getAmountByUsd(state.tokensPairs, balance, token, currency);
+      balanceByUsd = tokensHelper.getAmountByUsd(
+          state.tokensPairs, balance, token, currency);
     }
     if (currency == 'EUR') {
       balanceByUsd *= state.eurRate;

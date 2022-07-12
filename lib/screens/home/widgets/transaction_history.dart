@@ -49,7 +49,14 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           TokensHelper tokenHelper = TokensHelper();
           HistoryHelper historyHelper = HistoryHelper();
           var currency = SettingsHelper.settings.currency!;
-          historyList = new List.from(state.activeAccount!.historyList!);
+          const int defaultShowItemsCount = 30;
+          int showItemsCount =
+              state.activeAccount!.historyList!.length < defaultShowItemsCount
+                  ? state.activeAccount!.historyList!.length
+                  : defaultShowItemsCount;
+          historyList = new List.from(state.activeAccount!.historyList!
+              .sublist(0, showItemsCount)
+              .reversed);
           if (historyList != null && historyList.length != 0) {
             return ListView.builder(
               controller: _controller,
@@ -97,7 +104,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             style: Theme.of(context).textTheme.headline6,
                           ),
                           Text(
-                            '$txValuePrefix$txValue $tokenName',
+                            '$txValuePrefix${balancesHelper.numberStyling(txValue)} $tokenName',
                             style: Theme.of(context).textTheme.headline4,
                           ),
                         ],
@@ -112,10 +119,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                           Text(
                               "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName, currency), fixed: true, fixedCount: 4)} $currency")
                         ],
-                      ),
-                      trailing: Icon(
-                        Icons.keyboard_arrow_right,
-                        color: Theme.of(context).textTheme.headline1!.color,
                       ),
                     ),
                   ),

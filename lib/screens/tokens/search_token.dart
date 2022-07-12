@@ -210,10 +210,7 @@ class SearchTokenState extends State<SearchToken> {
               height: 30,
               width: 30,
             ),
-            title: Text(
-              (tokenName != 'DFI' && tokenName != 'dUSD')
-                  ? 'd' + tokenName
-                  : tokenName,
+            title: Text(tokenHelper.getTokenWithPrefix(tokenName),
               style: Theme.of(context).textTheme.bodyText1,
             ),
             onTap: () {

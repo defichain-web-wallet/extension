@@ -14,17 +14,18 @@ class AddressModel {
 
   AddressModel(
       {this.address,
-        this.account,
-        this.isChange,
-        this.index,
-        this.keyPair});
+      this.account,
+      this.isChange,
+      this.index,
+      this.keyPair});
 
-  AddressModel.fromJson(Map<String, dynamic> json) {
+  AddressModel.fromJson(Map<String, dynamic> json)  {
     this.address = json["address"];
     this.account = json["account"];
     this.isChange = json["isChange"];
     this.index = json["index"];
-    this.keyPair = hdWalletService.getKeypairFromWIF(json["keyPair"], SettingsHelper.settings.network!);
+    this.keyPair = hdWalletService.getKeypairFromWIF(
+        json["keyPair"], SettingsHelper.settings.network!);
   }
 
   Map<String, dynamic> toJson() {

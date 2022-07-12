@@ -6,6 +6,8 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
+import 'package:defi_wallet/widgets/error_placeholder.dart';
+import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
@@ -22,6 +24,7 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import './widgets/amount_selector_field.dart';
@@ -37,6 +40,7 @@ class SwapScreen extends StatefulWidget {
 class _SwapScreenState extends State<SwapScreen> {
   final TextEditingController amountFromController = TextEditingController();
   final TextEditingController amountToController = TextEditingController();
+  final TextEditingController slippageController = TextEditingController();
   final GlobalKey<AssetSelectState> selectKeyFrom =
       GlobalKey<AssetSelectState>();
   final GlobalKey<PendingButtonState> pendingButton =
@@ -46,6 +50,7 @@ class _SwapScreenState extends State<SwapScreen> {
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
   LockHelper lockHelper = LockHelper();
+  TokensHelper tokensHelper = TokensHelper();
   TestPoolSwapModel dexModel = TestPoolSwapModel();
   FocusNode focusFrom = new FocusNode();
   FocusNode focusTo = new FocusNode();
@@ -67,6 +72,7 @@ class _SwapScreenState extends State<SwapScreen> {
   bool waitingTo = true;
   bool waitingFrom = true;
   bool isEnable = true;
+  bool isShowSlippageField = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   double slippage = 0.03; //3%
@@ -123,6 +129,7 @@ class _SwapScreenState extends State<SwapScreen> {
                       return Scaffold(
                         appBar: MainAppBar(
                             title: 'Decentralized Exchange',
+                            hideOverlay: () => hideOverlay(),
                             isShowBottom:
                                 !(transactionState is TransactionInitialState),
                             height:
@@ -140,15 +147,16 @@ class _SwapScreenState extends State<SwapScreen> {
                               accountState, tokensState, transactionState,
                               isCustomBgColor: true),
                           appBar: MainAppBar(
-                              title: 'Decentralized Exchange',
-                              action: null,
-                              isShowBottom: !(transactionState
-                                  is TransactionInitialState),
-                              height:
-                                  !(transactionState is TransactionInitialState)
-                                      ? toolbarHeightWithBottom
-                                      : toolbarHeight,
-                              isSmall: true),
+                            title: 'Decentralized Exchange',
+                            hideOverlay: () => hideOverlay(),
+                            isShowBottom:
+                                !(transactionState is TransactionInitialState),
+                            height:
+                                !(transactionState is TransactionInitialState)
+                                    ? toolbarHeightWithBottom
+                                    : toolbarHeight,
+                            isSmall: true,
+                          ),
                         ),
                       );
                     }
@@ -165,209 +173,299 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildBody(
       context, dexState, dexCubit, accountState, tokensState, transactionState,
       {isCustomBgColor = false}) {
-    return Container(
-      color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Center(
-        child: StretchBox(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    if (tokensState.status == TokensStatusList.loading) {
+      return Container(
+        child: Center(
+          child: Loader(),
+        ),
+      );
+    } else {
+      if (dexState is DexErrorState) {
+        return Container(
+          child: Center(
+            child: ErrorPlaceholder(
+              message: 'API error',
+              description: 'Please change the API on settings and try again',
+            ),
+          ),
+        );
+      } else {
+        return Container(
+          color:
+              isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Center(
+            child: StretchBox(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AmountSelectorField(
-                    label: 'Swap from',
-                    selectedAsset: assetFrom,
-                    assets: assets,
-                    selectKey: selectKeyFrom,
-                    amountController: amountFromController,
-                    onSelect: (String asset) => onSelectFromAsset(
-                        asset, tokensState, accountState, dexCubit),
-                    onChanged: (value) => onChangeFromAsset(
-                        value, accountState, dexCubit, tokensState),
-                    focusNode: focusFrom,
-                    focusModel: focusAmountFromModel,
-                    sufixIcon: Container(
-                      padding: EdgeInsets.only(
-                        top: 8,
-                        bottom: 8,
-                        right: 6,
-                      ),
-                      child: SizedBox(
-                        width: 40,
-                        child: TextButton(
-                          child: Text('MAX', style: TextStyle(fontSize: 10)),
-                          onPressed: () {
-                            double maxAmount = getAvailableAmount(
-                                accountState, assetFrom, dexState);
-                            amountFromController.text = maxAmount.toString();
-                            onChangeFromAsset(amountFromController.text,
-                                accountState, dexCubit, tokensState);
-                          },
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AmountSelectorField(
+                        label: 'Swap from',
+                        selectedAsset: assetFrom,
+                        assets: assets,
+                        selectKey: selectKeyFrom,
+                        amountController: amountFromController,
+                        onAnotherSelect: hideOverlay,
+                        onSelect: (String asset) {
+                          onSelectFromAsset(
+                              asset, tokensState, accountState, dexCubit);
+                        },
+                        onChanged: (value) => onChangeFromAsset(
+                            value, accountState, dexCubit, tokensState),
+                        focusNode: focusFrom,
+                        focusModel: focusAmountFromModel,
+                        suffixIcon: Container(
+                          padding: EdgeInsets.only(
+                            top: 8,
+                            bottom: 8,
+                            right: 6,
+                          ),
+                          child: SizedBox(
+                            width: 40,
+                            child: TextButton(
+                              child:
+                                  Text('MAX', style: TextStyle(fontSize: 10)),
+                              onPressed: () {
+                                double maxAmount = getAvailableAmount(
+                                    accountState, assetFrom, dexState);
+                                amountFromController.text =
+                                    maxAmount.toString();
+                                onChangeFromAsset(amountFromController.text,
+                                    accountState, dexCubit, tokensState);
+                              },
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    swapFieldMsg,
-                    style: Theme.of(context).textTheme.headline4!.apply(
-                        color: Theme.of(context)
-                            .textTheme
-                            .headline4!
-                            .color!
-                            .withOpacity(0.5)),
-                  ),
-                  SizedBox(height: 24),
-                  AmountSelectorField(
-                    label: 'Swap to',
-                    selectedAsset: assetTo,
-                    assets: tokensForSwap,
-                    selectKey: selectKeyTo,
-                    amountController: amountToController,
-                    onSelect: (String asset) => onSelectToAsset(
-                        asset, tokensState, accountState, dexCubit),
-                    onChanged: (value) => onChangeToAsset(
-                        value, accountState, dexCubit, tokensState),
-                    focusNode: focusTo,
-                    focusModel: focusAmountToModel,
-                    sufixIcon: Container(
-                      padding: EdgeInsets.only(
-                        top: 8,
-                        bottom: 8,
-                        right: 6,
-                      ),
-                      child: SizedBox(
-                        width: 40,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                      SizedBox(height: 12),
                       Text(
-                        'Slippage tolerance',
-                        style: Theme.of(context).textTheme.headline6,
+                        swapFieldMsg,
+                        style: Theme.of(context).textTheme.headline4!.apply(
+                            color: Theme.of(context)
+                                .textTheme
+                                .headline4!
+                                .color!
+                                .withOpacity(0.5)),
                       ),
-                      Container(
+                      SizedBox(height: 24),
+                      AmountSelectorField(
+                        label: 'Swap to',
+                        selectedAsset: assetTo,
+                        assets: tokensForSwap,
+                        selectKey: selectKeyTo,
+                        amountController: amountToController,
+                        onAnotherSelect: hideOverlay,
+                        onSelect: (String asset) {
+                          onSelectToAsset(
+                              asset, tokensState, accountState, dexCubit);
+                        },
+                        onChanged: (value) => onChangeToAsset(
+                            value, accountState, dexCubit, tokensState),
+                        focusNode: focusTo,
+                        focusModel: focusAmountToModel,
+                        suffixIcon: Container(
+                          padding: EdgeInsets.only(
+                            top: 8,
+                            bottom: 8,
+                            right: 6,
+                          ),
+                          child: SizedBox(
+                            width: 40,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      SizedBox(
+                        height: 30,
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SlippageButton(
-                              label: '0.5%',
-                              isActive: slippage == 0.005,
-                              callback: () => setState(() => slippage = 0.005),
+                            Text(
+                              'Slippage tolerance',
+                              style: Theme.of(context).textTheme.headline6,
                             ),
-                            SizedBox(
-                              width: 6,
-                            ),
-                            SlippageButton(
-                              label: '1%',
-                              isActive: slippage == 0.01,
-                              callback: () => setState(() => slippage = 0.01),
-                            ),
-                            SizedBox(
-                              width: 6,
-                            ),
-                            SlippageButton(
-                              label: '3%',
-                              isActive: slippage == 0.03,
-                              callback: () => setState(() => slippage = 0.03),
-                            ),
-                            SizedBox(
-                              width: 6,
-                            ),
-                            SlippageButton(
-                              label: '5%',
-                              isActive: slippage == 0.05,
-                              callback: () => setState(() => slippage = 0.05),
-                            ),
-                            SizedBox(
-                              width: 6,
-                            ),
-                            SlippageButton(
-                              label: '10%',
-                              isActive: slippage == 0.1,
-                              callback: () => setState(() => slippage = 0.1),
-                            )
+                            isShowSlippageField
+                                ? SizedBox(
+                                  height: 30,
+                                  width: 140,
+                                  child: TextField(
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.allow(RegExp(r'(^-?\d*\.?d*\,?\d*)')),
+                                    ],
+                                    controller: slippageController,
+                                    decoration: InputDecoration(
+                                      contentPadding:
+                                          const EdgeInsets.all(8),
+                                      hintText: 'Type in percent..',
+                                      suffixIcon: IconButton(
+                                        splashRadius: 16,
+                                        icon: Icon(
+                                          Icons.clear,
+                                          size: 14,
+                                        ),
+                                        onPressed: () => setState(() {
+                                          slippage = 0.03;
+                                          isShowSlippageField = false;
+                                        }),
+                                      ),
+                                    ),
+                                    onChanged: (String value) {
+                                      setState(() {
+                                        try {
+                                          slippage = double.parse(value) / 100;
+                                        } catch (err) {
+                                          slippage = 0.03;
+                                        }
+                                      });
+                                    },
+                                  ),
+                                )
+                                : Container(
+                                    child: Row(
+                                      children: [
+                                        SlippageButton(
+                                          label: '0.5%',
+                                          isActive: slippage == 0.005,
+                                          callback: () =>
+                                              setState(() => slippage = 0.005),
+                                        ),
+                                        SizedBox(
+                                          width: 6,
+                                        ),
+                                        SlippageButton(
+                                          label: '1%',
+                                          isActive: slippage == 0.01,
+                                          callback: () =>
+                                              setState(() => slippage = 0.01),
+                                        ),
+                                        SizedBox(
+                                          width: 6,
+                                        ),
+                                        SlippageButton(
+                                          label: '3%',
+                                          isActive: slippage == 0.03,
+                                          callback: () =>
+                                              setState(() => slippage = 0.03),
+                                        ),
+                                        SizedBox(
+                                          width: 6,
+                                        ),
+                                        SlippageButton(
+                                          label: '5%',
+                                          isActive: slippage == 0.05,
+                                          callback: () =>
+                                              setState(() => slippage = 0.05),
+                                        ),
+                                        SizedBox(
+                                          width: 6,
+                                        ),
+                                        SizedBox(
+                                          height: 22,
+                                          width: 30,
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              padding: const EdgeInsets.all(0),
+                                              elevation: 2,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                            ),
+                                            child: Icon(
+                                              Icons.edit,
+                                              size: 16,
+                                            ),
+                                            onPressed: () => setState(() =>
+                                                isShowSlippageField = true),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
                           ],
                         ),
-                      )
+                      ),
+                      SizedBox(height: 22),
+                      // TODO: must be constant so as not to be updated
+                      SwapPriceDetails(
+                        feeDetails: createFeeString(dexState),
+                        priceFromDetails:
+                            createPriceString(dexState, assetFrom, assetTo),
+                        priceToDetails:
+                            createPriceString(dexState, assetTo, assetFrom),
+                      ),
+                      Center(
+                        child: Text(
+                          'Some error. Please try later',
+                          style:
+                              Theme.of(context).textTheme.headline4!.copyWith(
+                                    color: isFailed
+                                        ? AppTheme.redErrorColor
+                                        : Colors.transparent,
+                                  ),
+                        ),
+                      ),
+                      Center(
+                        child: Text(
+                          'Insufficient funds',
+                          style:
+                              Theme.of(context).textTheme.headline4!.copyWith(
+                                    color: isBalanceError
+                                        ? AppTheme.redErrorColor
+                                        : Colors.transparent,
+                                  ),
+                        ),
+                      ),
                     ],
                   ),
-                  SizedBox(height: 22),
-                  // TODO: must be constant so as not to be updated
-                  SwapPriceDetails(
-                    feeDetails: createFeeString(dexState),
-                    priceFromDetails:
-                        createPriceString(dexState, assetFrom, assetTo),
-                    priceToDetails:
-                        createPriceString(dexState, assetTo, assetFrom),
-                  ),
-                  Center(
-                    child: Text(
-                      'Some error. Please try later',
-                      style: Theme.of(context).textTheme.headline4!.copyWith(
-                            color: isFailed
-                                ? AppTheme.redErrorColor
-                                : Colors.transparent,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Column(
+                      children: [
+                        PendingButton(
+                          'Review Swap',
+                          isCheckLock: false,
+                          key: pendingButton,
+                          callback: !isDisableSubmit()
+                              ? (parent) => submitReviewSwap(parent,
+                                  accountState, transactionState, context)
+                              : null,
+                        ),
+                        SizedBox(height: 14),
+                        TextButton(
+                          child: Text(
+                            'SWAP INSTANTLY',
+                            style: Theme.of(context).textTheme.headline6!.apply(
+                                  decoration: TextDecoration.underline,
+                                ),
                           ),
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      'Insufficient funds',
-                      style: Theme.of(context).textTheme.headline4!.copyWith(
-                            color: isBalanceError
-                                ? AppTheme.redErrorColor
-                                : Colors.transparent,
-                          ),
+                          onPressed: isEnable
+                              ? () => lockHelper.provideWithLockChecker(
+                                  context,
+                                  () => submitInstantlySwap(
+                                      accountState,
+                                      dexState,
+                                      tokensState,
+                                      transactionState,
+                                      pendingButton,
+                                      context))
+                              : null,
+                        )
+                      ],
                     ),
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Column(
-                  children: [
-                    PendingButton(
-                      'Review Swap',
-                      isCheckLock: false,
-                      key: pendingButton,
-                      callback: !isDisableSubmit()
-                          ? (parent) => submitReviewSwap(
-                              parent, accountState, transactionState, context)
-                          : null,
-                    ),
-                    SizedBox(height: 14),
-                    TextButton(
-                      child: Text(
-                        'SWAP INSTANTLY',
-                        style: Theme.of(context).textTheme.headline6!.apply(
-                              decoration: TextDecoration.underline,
-                            ),
-                      ),
-                      onPressed: isEnable
-                          ? () => lockHelper.provideWithLockChecker(
-                              context,
-                              () => submitInstantlySwap(
-                                  accountState,
-                                  dexState,
-                                  tokensState,
-                                  transactionState,
-                                  pendingButton,
-                                  context))
-                          : null,
-                    )
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        );
+      }
+    }
   }
 
   stateInit(accountState, dexState, tokensState) {
@@ -592,9 +690,6 @@ class _SwapScreenState extends State<SwapScreen> {
     return numericRegex.hasMatch(string);
   }
 
-  String fixTokenName(String tokenName) =>
-      (tokenName != 'DFI' && tokenName != 'dUSD') ? 'd' + tokenName : tokenName;
-
   String createPriceString(dexState, tokenFrom, tokenTo) {
     double price = 0;
     if (dexState is DexLoadedState) {
@@ -604,7 +699,7 @@ class _SwapScreenState extends State<SwapScreen> {
         price = dexState.dexModel.priceTo!;
       }
     }
-    return '${balancesHelper.numberStyling(price, fixedCount: 8, fixed: true)} ${fixTokenName(tokenTo)} per ${fixTokenName(tokenFrom)}';
+    return '${balancesHelper.numberStyling(price, fixedCount: 8, fixed: true)} ${tokensHelper.getTokenWithPrefix(tokenTo)} per ${tokensHelper.getTokenWithPrefix(tokenFrom)}';
   }
 
   String createFeeString(dexState) {
@@ -696,6 +791,9 @@ class _SwapScreenState extends State<SwapScreen> {
           amount -= fee;
         }
       });
+    }
+    if (amount < 0) {
+      amount = 0;
     }
 
     return convertFromSatoshi(amount);

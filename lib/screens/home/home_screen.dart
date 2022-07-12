@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
 import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
@@ -13,6 +15,7 @@ import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/wallet_details.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
@@ -42,6 +45,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
+    TransactionCubit transactionCubit =
+        BlocProvider.of<TransactionCubit>(context);
+    transactionCubit.checkOngoingTransaction();
   }
 
   @override
@@ -70,52 +76,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       isSaveOpenTime = true;
     }
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    TransactionCubit transactionCubit =
-        BlocProvider.of<TransactionCubit>(context);
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
     if (widget.isLoadTokens) {
       tokensCubit.loadTokensFromStorage();
     }
-    transactionCubit.checkOngoingTransaction();
 
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
+      if (widget.isLoadTokens && SettingsHelper.settings.network == 'mainnet') {
+        fiatCubit.loadUserDetails(state.accessToken!);
+      }
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
           return BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, transactionState) {
-            return ScaffoldConstrainedBox(
-              child: GestureDetector(
-                child: LayoutBuilder(builder: (context, constraints) {
-                  if (state.status == AccountStatusList.loading ||
-                      tokensState.status == TokensStatusList.loading) {
-                    return Container(
-                      child: Center(
-                        child: Loader(),
-                      ),
-                    );
-                  }
+            return BlocBuilder<FiatCubit, FiatState>(
+                builder: (context, fiatState) {
+              return ScaffoldConstrainedBox(
+                child: GestureDetector(
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    if (state.status == AccountStatusList.loading ||
+                        tokensState.status == TokensStatusList.loading) {
+                      return Container(
+                        child: Center(
+                          child: Loader(),
+                        ),
+                      );
+                    }
 
-                  if (constraints.maxWidth < ScreenSizes.medium) {
-                    return Scaffold(
-                      appBar: HomeAppBar(
-                        selectKey: selectKey,
-                        updateCallback: () =>
-                            updateAccountDetails(context, state),
-                        hideOverlay: () => hideOverlay(),
-                        isShowBottom:
-                            !(transactionState is TransactionInitialState),
-                        height: !(transactionState is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight,
-                      ),
-                      body: _buildBody(
-                          context, state, transactionState, tokensState),
-                    );
-                  } else {
-                    return Container(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Scaffold(
-                        body: _buildBody(
-                            context, state, transactionState, tokensState),
+                    if (constraints.maxWidth < ScreenSizes.medium) {
+                      return Scaffold(
                         appBar: HomeAppBar(
                           selectKey: selectKey,
                           updateCallback: () =>
@@ -126,15 +115,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           height: !(transactionState is TransactionInitialState)
                               ? toolbarHeightWithBottom
                               : toolbarHeight,
-                          isSmall: false,
                         ),
-                      ),
-                    );
-                  }
-                }),
-                onTap: () => hideOverlay(),
-              ),
-            );
+                        body: _buildBody(
+                            context, state, transactionState, tokensState),
+                      );
+                    } else {
+                      return Container(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Scaffold(
+                          body: _buildBody(
+                              context, state, transactionState, tokensState),
+                          appBar: HomeAppBar(
+                            selectKey: selectKey,
+                            updateCallback: () =>
+                                updateAccountDetails(context, state),
+                            hideOverlay: () => hideOverlay(),
+                            isShowBottom:
+                                !(transactionState is TransactionInitialState),
+                            height:
+                                !(transactionState is TransactionInitialState)
+                                    ? toolbarHeightWithBottom
+                                    : toolbarHeight,
+                            isSmall: false,
+                          ),
+                        ),
+                      );
+                    }
+                  }),
+                  onTap: () => hideOverlay(),
+                ),
+              );
+            });
           });
         },
       );
@@ -260,7 +271,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     } else if (tokensState.status == TokensStatusList.failure) {
       return Container(
         child: Center(
-          child: Text('Failed background process. Please try later'),
+          child: ErrorPlaceholder(
+            message: 'API error',
+            description: 'Please change the API on settings and try again',
+          ),
         ),
       );
     } else {

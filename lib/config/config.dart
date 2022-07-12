@@ -1,3 +1,9 @@
+class Hosts {
+  static const String oceanDefichain = 'https://ocean.defichain.com/v0';
+  static const String myDefichain = 'http://ocean.mydefichain.com:3000/v0';
+  static const String ocean = 'https://testnet-ocean.mydefichain.com:8443/v0';
+}
+
 class ScreenSizes {
   static const double xSmall = 328;
   static const double small = 458;

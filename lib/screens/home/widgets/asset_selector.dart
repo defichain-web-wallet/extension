@@ -130,10 +130,10 @@ class _AssetSelectorState extends State<AssetSelector> {
       accountCubit.updateActiveToken(balance.token);
       if (SettingsHelper.settings.network! == 'testnet') {
         accountCubit.saveAccountsToStorage(
-            null, null, state.accounts, state.masterKeyPair);
+            null, null, state.accounts, state.masterKeyPair, state.accessToken);
       } else {
         accountCubit.saveAccountsToStorage(
-            state.accounts, state.masterKeyPair, null, null);
+            state.accounts, state.masterKeyPair, null, null, state.accessToken);
       }
     });
   }

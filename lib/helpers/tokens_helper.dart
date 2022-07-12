@@ -304,8 +304,13 @@ class TokensHelper {
 
       default:
         {
-          return Color.fromARGB(_random.nextInt(256), _random.nextInt(128),
-              _random.nextInt(256), _random.nextInt(256));
+          if (tokenName.contains('-')) {
+            String baseToken = tokenName.split('-')[0];
+            return getColorByTokenName(baseToken).withOpacity(0.3);
+          } else {
+            return Color.fromARGB(_random.nextInt(256), _random.nextInt(128),
+                _random.nextInt(256), _random.nextInt(256));
+          }
         }
     }
   }
@@ -340,7 +345,7 @@ class TokensHelper {
   }
 
   String getTokenWithPrefix(token) {
-    return (token != 'DFI') ? 'd' + token : token;
+    return (token != 'DFI' && token != 'DUSD') ? 'd' + token : token;
   }
 
   bool isPair(symbol) {
@@ -405,5 +410,16 @@ class TokensHelper {
     double result =
         balance * (1 / assetPair!.totalLiquidityRaw) * assetPair.reserveB!;
     return result;
+  }
+
+  String getAprFormat(double apr) {
+    dynamic result;
+
+    if (apr != 0) {
+      result = '${(apr * 100).toStringAsFixed(2)}%';
+    } else {
+      result = 'N/A';
+    }
+    return '$result APR';
   }
 }

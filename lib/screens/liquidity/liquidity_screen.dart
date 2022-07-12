@@ -77,7 +77,6 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
         builder: (accountContext, accountState) {
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (tokensContext, tokensState) {
-
           if (tokensState.status == TokensStatusList.success &&
               accountState.status == AccountStatusList.success) {
             var tokensPairs = accountState.activeAccount!.balanceList!.where(
@@ -178,23 +177,30 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                               ),
                             ),
                           ),
-                        TextButton(
-                          child: Text(
-                            ' +  Add liquidity ',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          onPressed: () async {
-                            await lockHelper.provideWithLockChecker(
-                                context,
-                                () => Navigator.push(
-                                      context,
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, animation1, animation2) =>
-                                              LiquidityPoolList(),
-                                        transitionDuration: Duration.zero,
-                                        reverseTransitionDuration: Duration.zero,),
-                                    ));
-                          },
+                        Row(
+                          children: [
+                            TextButton(
+                              child: Text(
+                                ' +  Add liquidity ',
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                              onPressed: () async {
+                                await lockHelper.provideWithLockChecker(
+                                    context,
+                                    () => Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LiquidityPoolList(),
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
+                                          ),
+                                        ));
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),

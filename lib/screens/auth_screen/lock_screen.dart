@@ -34,26 +34,26 @@ class _LockScreenState extends State<LockScreen> {
   Widget build(BuildContext context) => Scaffold(
         appBar: WelcomeAppBar(),
         body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SvgPicture.asset(
                   'assets/jelly_logo.svg',
-                  height: 220,
-                  width: 220,
+                  height: 180,
+                  width: 200,
                 ),
                 Text(
                   'Welcome Back!',
                   style: Theme.of(context).textTheme.headline1,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 16),
                 Text(
                   'Your Keys. Your Crypto.',
                   style: Theme.of(context).textTheme.headline2,
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 25),
                 StretchBox(
                   maxWidth: ScreenSizes.xSmall,
                   child: Column(
@@ -95,7 +95,7 @@ class _LockScreenState extends State<LockScreen> {
                     callback: (parent) => _restoreWallet(parent),
                   ),
                 ),
-                SizedBox(height: 24),
+                SizedBox(height: 20),
                 InkWell(
                   child: Text(
                     'or import using Secret Recovery Phrase',

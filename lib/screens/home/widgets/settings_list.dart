@@ -60,7 +60,7 @@ class _SettingsListState extends State<SettingsList> {
           lockHelper.provideWithLockChecker(context, () async {
             _controller.showMenu();
             setState(() {});
-          });
+          },);
         },
       ),
       menuBuilder: () => CustomPaint(
