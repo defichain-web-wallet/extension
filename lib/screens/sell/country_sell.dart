@@ -25,7 +25,6 @@ class _CountrySellState extends State<CountrySell> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<FiatCubit, FiatState>(builder: (context, state) {
-      print(state.personalInfo);
       if (state.personalInfo!.country != null) {
         selectedCountry = state.personalInfo!.country!;
       } else {
