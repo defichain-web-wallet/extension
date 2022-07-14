@@ -222,7 +222,7 @@ class IbanSelectorState extends State<IbanSelector> {
                               ));
                         } else {
                           FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-                          // fiatCubit.changeCurrentIban(iban)
+                          fiatCubit.changeCurrentIban(widget.ibanList[index]);
                           Navigator.push(
                               context,
                               PageRouteBuilder(

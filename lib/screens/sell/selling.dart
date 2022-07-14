@@ -86,65 +86,50 @@ class _SellingState extends State<Selling> {
     return BlocBuilder<AccountCubit, AccountState>(
         builder: (accountContext, accountState) {
       fiatCubit.loadAllAssets(accountState.accessToken!);
-      return BlocBuilder<TransactionCubit, TransactionState>(
-        builder: (context, transactionState) =>
-            BlocBuilder<FiatCubit, FiatState>(
-          builder: (BuildContext context, fiatState) {
-            return BlocBuilder<TokensCubit, TokensState>(
-                builder: (context, tokensState) {
-              return ScaffoldConstrainedBox(
-                child: GestureDetector(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    if (constraints.maxWidth < ScreenSizes.medium) {
-                      return Scaffold(
+      return BlocBuilder<FiatCubit, FiatState>(
+        builder: (BuildContext context, fiatState) {
+          return BlocBuilder<TokensCubit, TokensState>(
+              builder: (context, tokensState) {
+            return ScaffoldConstrainedBox(
+              child: GestureDetector(
+                child: LayoutBuilder(builder: (context, constraints) {
+                  if (constraints.maxWidth < ScreenSizes.medium) {
+                    return Scaffold(
+                      key: _scaffoldKey,
+                      appBar: MainAppBar(
+                        title: 'Selling',
+                        hideOverlay: () => hideOverlay(),
+                      ),
+                      body: _buildBody(
+                          context, accountState, fiatState, tokensState),
+                    );
+                  } else {
+                    return Container(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Scaffold(
                         key: _scaffoldKey,
+                        body: _buildBody(
+                            context, accountState, fiatState, tokensState,
+                            isCustomBgColor: true),
                         appBar: MainAppBar(
-                            title: 'Selling',
-                            hideOverlay: () => hideOverlay(),
-                            isShowBottom:
-                                !(transactionState is TransactionInitialState),
-                            height:
-                                !(transactionState is TransactionInitialState)
-                                    ? toolbarHeightWithBottom
-                                    : toolbarHeight),
-                        body: _buildBody(context, accountState,
-                            transactionState, fiatState, tokensState),
-                      );
-                    } else {
-                      return Container(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Scaffold(
-                          key: _scaffoldKey,
-                          body: _buildBody(context, accountState,
-                              transactionState, fiatState, tokensState,
-                              isCustomBgColor: true),
-                          appBar: MainAppBar(
-                            title: 'Selling',
-                            hideOverlay: () => hideOverlay(),
-                            isShowBottom:
-                                !(transactionState is TransactionInitialState),
-                            height:
-                                !(transactionState is TransactionInitialState)
-                                    ? toolbarHeightWithBottom
-                                    : toolbarHeight,
-                            isSmall: true,
-                          ),
+                          title: 'Selling',
+                          hideOverlay: () => hideOverlay(),
+                          isSmall: true,
                         ),
-                      );
-                    }
-                  }),
-                  onTap: () => hideOverlay(),
-                ),
-              );
-            });
-          },
-        ),
+                      ),
+                    );
+                  }
+                }),
+                onTap: () => hideOverlay(),
+              ),
+            );
+          });
+        },
       );
     });
   }
 
-  Widget _buildBody(
-      context, accountState, transactionState, fiatState, tokensState,
+  Widget _buildBody(context, accountState, fiatState, tokensState,
       {isCustomBgColor = false}) {
     if (fiatState.status == FiatStatusList.loading) {
       return Loader();
@@ -152,12 +137,10 @@ class _SellingState extends State<Selling> {
       Future.microtask(() => Navigator.pushReplacement(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                LockScreen(),
+            pageBuilder: (context, animation1, animation2) => LockScreen(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
-          ))
-      );
+          )));
       return Container();
     } else {
       FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
@@ -207,7 +190,6 @@ class _SellingState extends State<Selling> {
                         amountController: amountController,
                         onAnotherSelect: hideOverlay,
                         onSelect: (String asset) {
-                          print(asset);
                           assetFrom = asset;
                           setState(() {
                             getFieldMsg(accountState);
@@ -350,13 +332,16 @@ class _SellingState extends State<Selling> {
                   isCheckLock: false,
                   callback: !isPending
                       ? (parent) async {
+                          TransactionCubit transactionCubit =
+                              BlocProvider.of<TransactionCubit>(context);
                           lockHelper.provideWithLockChecker(context, () async {
-                            if (transactionState is TransactionLoadingState) {
+                            if (transactionCubit.state is TransactionLoadingState) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
                                     'Wait for the previous transaction to complete',
-                                    style: Theme.of(context).textTheme.headline5,
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
                                   ),
                                   backgroundColor: Theme.of(context)
                                       .snackBarTheme
@@ -375,11 +360,12 @@ class _SellingState extends State<Selling> {
                                 });
                                 try {
                                   String address;
-                                  double amount = double.parse(
-                                      amountController.text.replaceAll(',', '.'));
+                                  double amount = double.parse(amountController
+                                      .text
+                                      .replaceAll(',', '.'));
                                   if (_ibanController.text == '') {
                                     address =
-                                    fiatState.activeIban.deposit["address"];
+                                        fiatState.activeIban.deposit["address"];
                                   } else {
                                     Map sellDetails = await dfxRequests.sell(
                                         _ibanController.text,
@@ -388,12 +374,12 @@ class _SellingState extends State<Selling> {
                                     address = sellDetails["deposit"]["address"];
                                   }
                                   await _sendTransaction(
-                                      context,
-                                      tokensState,
-                                      assetFrom,
-                                      accountState.activeAccount,
-                                      address,
-                                      amount,
+                                    context,
+                                    tokensState,
+                                    assetFrom,
+                                    accountState.activeAccount,
+                                    address,
+                                    amount,
                                   );
                                   parent.emitPending(false);
                                 } catch (err) {
@@ -401,8 +387,9 @@ class _SellingState extends State<Selling> {
                                     SnackBar(
                                       content: Text(
                                         err.toString(),
-                                        style:
-                                        Theme.of(context).textTheme.headline5,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5,
                                       ),
                                       backgroundColor: Theme.of(context)
                                           .snackBarTheme
@@ -412,14 +399,15 @@ class _SellingState extends State<Selling> {
                                 }
                               } else {
                                 if (double.parse(amountController.text
-                                    .replaceAll(',', '.')) ==
+                                        .replaceAll(',', '.')) ==
                                     0) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
                                         'Amount is empty',
-                                        style:
-                                        Theme.of(context).textTheme.headline5,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5,
                                       ),
                                       backgroundColor: Theme.of(context)
                                           .snackBarTheme
@@ -431,8 +419,9 @@ class _SellingState extends State<Selling> {
                                     SnackBar(
                                       content: Text(
                                         'Insufficient funds',
-                                        style:
-                                        Theme.of(context).textTheme.headline5,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5,
                                       ),
                                       backgroundColor: Theme.of(context)
                                           .snackBarTheme
@@ -511,7 +500,7 @@ class _SellingState extends State<Selling> {
           amount: balancesHelper.toSatoshi(amount.toString()),
           tokens: tokensState.tokens);
     }
-    await Navigator.push(
+    await Navigator.pushReplacement(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) => SellInitiated(

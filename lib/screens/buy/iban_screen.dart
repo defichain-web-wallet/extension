@@ -179,7 +179,7 @@ class _IbanScreenState extends State<IbanScreen> {
       fiatCubit.addIban(_ibanController.text);
       await fiatCubit.saveBuyDetails(
           _ibanController.text, widget.asset, accountState.accessToken!);
-      Navigator.pushReplacement(
+      Navigator.push(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation1, animation2) =>

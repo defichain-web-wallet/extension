@@ -87,7 +87,7 @@ class SellInitiated extends StatelessWidget {
                 PrimaryButton(
                   label: 'Done ',
                   callback: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation1, animation2) =>
@@ -104,12 +104,4 @@ class SellInitiated extends StatelessWidget {
       ),
     );
   }
-
-// Widget build(BuildContext context) {
-//   return Container(child: Image.asset(
-//     'assets/success_gif.gif',
-//     height: 126,
-//     width: 124,
-//   ),);
-// }
 }
