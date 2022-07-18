@@ -276,9 +276,6 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   restoreAccount(List<String> mnemonic, String password) async {
-    var box = await Hive.openBox(HiveBoxes.client);
-    await box.clear();
-    await box.close();
     SettingsHelper settingsHelper = SettingsHelper();
 
     settingsHelper.initSetting();
