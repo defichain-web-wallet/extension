@@ -3,7 +3,6 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
-import 'package:defi_wallet/helpers/dex_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/screens/send/widgets/address_field.dart';
 import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
@@ -23,6 +22,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SendTokenSelector extends StatefulWidget {
+
+  final String selectedAddress;
+
+  const SendTokenSelector({Key? key, this.selectedAddress = '',}) : super(key: key);
   @override
   State<SendTokenSelector> createState() => _SendConfirmState();
 }
@@ -102,6 +105,8 @@ class _SendConfirmState extends State<SendTokenSelector> {
                     assets.add(el.token!);
                   }
             });
+
+            addressController.text = widget.selectedAddress;
 
             return Container(
               color: isCustomBgColor
