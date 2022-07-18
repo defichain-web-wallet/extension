@@ -69,7 +69,6 @@ class _AddressBookState extends State<AddressBook> {
                               child: Text(
                                 addressBookState
                                     .addressBookList![index].name!,
-                                // overflow: TextOverflow.ellipsis,
                                 style:
                                 Theme.of(context).textTheme.headline2,
                               ),
@@ -92,7 +91,6 @@ class _AddressBookState extends State<AddressBook> {
                         ),
                       ),
                       Column(
-                        // mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           AddressBookButtons(
                             editCallback: () {
@@ -133,17 +131,11 @@ class _AddressBookState extends State<AddressBook> {
                 : Center(
               child: Text(
                 'Address book is empty',
-                // style: TextStyle(
-                //   fontSize: 30,
-                // ),
               ),
             )
                 : Center(
               child: Text(
                 'Address book is empty',
-                // style: TextStyle(
-                //   fontSize: 30,
-                // ),
               ),
             ),
           );

@@ -32,7 +32,6 @@ class _SelectAddressFromAddressBookState
       return ScaffoldConstrainedBoxNew(
         appBar: MainAppBar(
           title: "Select address from Address book",
-          // action: Container(),
         ),
         child: Column(
           children: [
@@ -171,9 +170,6 @@ class _SelectAddressFromAddressBookState
                       : const Center(
                           child: Text(
                             'No matches found',
-                            // style: TextStyle(
-                            //   fontSize: 30,
-                            // ),
                           ),
                         )
                   : addressBookState.addressBookList != null
@@ -257,17 +253,11 @@ class _SelectAddressFromAddressBookState
                           : Center(
                               child: Text(
                                 'Address book is empty',
-                                // style: TextStyle(
-                                //   fontSize: 30,
-                                // ),
                               ),
                             )
                       : Center(
                           child: Text(
                             'Address book is empty',
-                            // style: TextStyle(
-                            //   fontSize: 30,
-                            // ),
                           ),
                         ),
             )
