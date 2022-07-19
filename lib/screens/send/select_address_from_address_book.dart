@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/screens/address_book/add_new_address.dart';
 import 'package:defi_wallet/screens/send/send_token_selector.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
@@ -250,17 +251,65 @@ class _SelectAddressFromAddressBookState
                                 );
                               },
                             )
-                          : Center(
-                              child: Text(
-                                'Address book is empty',
-                              ),
-                            )
-                      : Center(
-                          child: Text(
+                          : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Address book is empty',
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  InkWell(
+                    child: Text(
+                      'Create new contact',
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        color: AppTheme.pinkColor,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => AddNewAddress(isRedirect: true,),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          ));
+                    },
+                  ),
+                ],
+              )
+                      : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
                             'Address book is empty',
                           ),
-                        ),
-            )
+                          SizedBox(
+                            height: 10,
+                          ),
+                          InkWell(
+                            child: Text(
+                              'Create new contact',
+                              style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: AppTheme.pinkColor,
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation1, animation2) => AddNewAddress(isRedirect: true,),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ));
+                            },
+                          ),
+                        ],
+                      ),
+            ),
           ],
         ),
       );

@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/address_book.dart';
+import 'package:defi_wallet/screens/send/send_token_selector.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -13,12 +14,14 @@ class AddNewAddress extends StatefulWidget {
   final String? name;
   final String? address;
   final int? id;
+  final bool isRedirect;
 
   const AddNewAddress({
     Key? key,
     this.name,
     this.address,
     this.id,
+    this.isRedirect = false,
   }) : super(key: key);
 
   @override
@@ -143,14 +146,14 @@ class _AddNewAddressState extends State<AddNewAddress> {
     if (_formKey.currentState!.validate()) {
       if (isNew) {
         AddressBookCubit addressBookCubit =
-        BlocProvider.of<AddressBookCubit>(context);
+            BlocProvider.of<AddressBookCubit>(context);
         addressBookCubit.addAddress(AddressBookModel(
           name: nameController.text,
           address: addressController.text,
         ));
       } else {
         AddressBookCubit addressBookCubit =
-        BlocProvider.of<AddressBookCubit>(context);
+            BlocProvider.of<AddressBookCubit>(context);
         addressBookCubit.editAddress(
           AddressBookModel(
             name: nameController.text,
@@ -159,14 +162,28 @@ class _AddNewAddressState extends State<AddNewAddress> {
           widget.id!,
         );
       }
-      Navigator.pop(context);
-      Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => AddressBook(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ));
+      if (!widget.isRedirect) {
+        Navigator.pop(context);
+        Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => AddressBook(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ));
+      } else {
+        Navigator.pop(context);
+        Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  SendTokenSelector(
+                selectedAddress: addressController.text,
+              ),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ));
+      }
     }
   }
 }
