@@ -106,15 +106,16 @@ class ActionButtonsList extends StatelessWidget {
               onPressed: swapCallback,
             ),
             ActionButton(
-              iconPath: 'assets/images/liquidity.png',
-              label: 'Liquidity',
-              onPressed: liquidityCallback,
-            ),
-            ActionButton(
               iconPath: 'assets/images/buy_sell.png',
               label: 'Buy/Sell',
               onPressed: () => buySellCallback(state),
             ),
+            ActionButton(
+              iconPath: 'assets/images/liquidity.png',
+              label: 'Liquidity',
+              onPressed: liquidityCallback,
+            ),
+
           ],
         );
       },
