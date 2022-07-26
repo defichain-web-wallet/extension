@@ -1,5 +1,5 @@
-import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
-import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
+// import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
+// import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/screens/auth_screen/auth_screen.dart';
 import 'package:defi_wallet/widgets/buttons/back_button.dart';
@@ -93,8 +93,8 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
                                 HiveNames.recoveryMnemonic, mnemonic.join(','));
                             await box.close();
                           }
-                          js.context
-                              .callMethod('open', [window.location.toString()]);
+                          // js.context
+                          //     .callMethod('open', [window.location.toString()]);
                         },
                       ),
                     ),

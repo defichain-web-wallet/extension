@@ -3,11 +3,12 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/screens/home/widgets/asset_selector.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+enum AssetList { fiat, dfi, btc }
 
 class WalletDetails extends StatefulWidget {
   late final String layoutSize;
@@ -19,8 +20,10 @@ class WalletDetails extends StatefulWidget {
 }
 
 class _WalletDetailsState extends State<WalletDetails> {
-  var balancesHelper = BalancesHelper();
+  BalancesHelper balancesHelper = BalancesHelper();
   TokensHelper tokensHelper = TokensHelper();
+  AssetList activeAsset = AssetList.fiat;
+  late String activeAssetName;
 
   @override
   Widget build(BuildContext context) {
@@ -30,43 +33,91 @@ class _WalletDetailsState extends State<WalletDetails> {
             builder: (context, state) {
           if (state.status == AccountStatusList.success &&
               tokensState.status == TokensStatusList.success) {
-            var activeToken = state.activeAccount!.activeToken!;
-            var balances = state.activeAccount!.balanceList!
+            int totalBalance = state.activeAccount!.balanceList!
                 .where((el) => !el.isHidden!)
-                .toList();
-            var balance =
-                balances.firstWhere((el) => el.token == activeToken).balance!;
-            return SizedBox(
-              height: widget.layoutSize == 'small' ? 200 : 250,
-              child: Row(
+                .map<int>((e) => e.balance!)
+                .reduce((value, element) => value + element);
+            double convertTotalBalance = convertFromSatoshi(totalBalance);
+
+            double totalResult = convertTotalBalance;
+            if (activeAsset == AssetList.fiat) {
+              totalResult = tokensHelper.getAmountByUsd(
+                tokensState.tokensPairs!,
+                convertTotalBalance,
+                'DFI',
+              );
+              if (SettingsHelper.settings.currency == 'EUR') {
+                totalResult *= tokensState.eurRate!;
+              }
+            } else if (activeAsset == AssetList.btc) {
+              totalResult = tokensHelper.getAmountByBtc(
+                tokensState.tokensPairs!,
+                convertTotalBalance,
+                'DFI',
+              );
+            }
+
+            activeAssetName = activeAsset == AssetList.fiat
+                ? SettingsHelper.settings.currency!
+                : activeAsset.name;
+
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              child: Column(
                 children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      _buildBalance(balance, activeToken,
-                          SettingsHelper.settings.currency!),
-                      AspectRatio(
-                        aspectRatio: 1,
-                        child: PieChart(
-                          PieChartData(
-                            pieTouchData: PieTouchData(
-                                touchCallback: (pieTouchResponse) {}),
-                            borderData: FlBorderData(show: false),
-                            sectionsSpace: 0,
-                            centerSpaceRadius: 80,
-                            sections: showingSections(
-                                balances, activeToken, tokensState),
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () => setState(() {
+                            activeAsset = AssetList.fiat;
+                          }),
+                          child: Text(
+                            SettingsHelper.settings.currency!,
+                            style: getTextStyle(AssetList.fiat),
                           ),
-                          swapAnimationDuration: Duration.zero,
+                          style: getButtonStyle(AssetList.fiat),
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 24),
+                        ElevatedButton(
+                          onPressed: () => setState(() {
+                            activeAsset = AssetList.dfi;
+                          }),
+                          child: Text(
+                            'DFI',
+                            style: getTextStyle(AssetList.dfi),
+                          ),
+                          style: getButtonStyle(AssetList.dfi),
+                        ),
+                        SizedBox(width: 24),
+                        TextButton(
+                          onPressed: () => setState(() {
+                            activeAsset = AssetList.btc;
+                          }),
+                          child: Text(
+                            'BTC',
+                            style: getTextStyle(AssetList.btc),
+                          ),
+                          style: getButtonStyle(AssetList.btc),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(
-                    width: 150,
-                    height: widget.layoutSize == 'small' ? 200 : 250,
-                    child: AssetSelector(layoutSize: widget.layoutSize),
+                    height: 22,
                   ),
+                  Container(
+                    child: Center(
+                      child: Text(
+                        "${balancesHelper.numberStyling(totalResult, fixed: true, fixedCount: 6)} ${activeAssetName.toUpperCase()}",
+                        style: Theme.of(context).textTheme.headline1!.apply(
+                              fontWeightDelta: 1,
+                              fontFamily: 'IBM Plex Sans',
+                            ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             );
@@ -78,89 +129,32 @@ class _WalletDetailsState extends State<WalletDetails> {
     );
   }
 
-  List<PieChartSectionData> showingSections(
-      balances, activeToken, tokensState) {
-    return List.generate(balances.length, (i) {
-      final balance = balances[i];
-
-      int _averageBalanceAmount = 0;
-      _averageBalanceAmount =
-          getAverageBalanceAmount(balances, tokensState.tokensPairs);
-      var balanceUsd = tokensHelper.getAmountByUsd(tokensState.tokensPairs,
-          convertFromSatoshi(balances[i].balance), balances[i].token, 'USD');
-      var balanceValue = (balanceUsd == 0 || balanceUsd < 1) ? 10 : balanceUsd;
-      balanceValue = (balanceValue + _averageBalanceAmount).round();
-      double radius = (balance.token == activeToken) ? 9 : 5;
-      return PieChartSectionData(
-        color: balance.color,
-        showTitle: false,
-        radius: radius,
-        value: double.parse(balanceValue.toString()),
+  ButtonStyle getButtonStyle(AssetList targetAsset) => ButtonStyle(
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+                side: BorderSide(color: Colors.transparent))),
+        shadowColor: MaterialStateProperty.all(Colors.transparent),
+        backgroundColor: activeAsset == targetAsset
+            ? MaterialStateProperty.all(Theme.of(context).secondaryHeaderColor)
+            : MaterialStateProperty.all(Colors.transparent),
       );
-    });
-  }
 
-  Widget _buildBalance(int balance, String coin, String currency) {
-    var tokenName = TokensHelper().getTokenFormat(coin);
-    var tokenBalance = convertFromSatoshi(balance);
-
-    return BlocBuilder<TokensCubit, TokensState>(builder: (context, state) {
-      if (state.status == TokensStatusList.success) {
-        return Container(
-          width: 140,
-          height: 170,
-          child: Center(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 65,
-                ),
-                Center(
-                  child: FittedBox(
-                    fit: BoxFit.fitWidth,
-                    child: Text(
-                      "${balancesHelper.numberStyling(tokenBalance)} $tokenName",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 17,
-                ),
-                FittedBox(
-                    fit: BoxFit.fitWidth,
-                    child: Text(
-                      getBalanceByUsd(state, tokenBalance, coin, currency),
-                    )),
-              ],
-            ),
-          ),
-        );
-      } else {
-        return Container();
-      }
-    });
-  }
-
-  int getAverageBalanceAmount(balances, tokensPairs) {
-    double temp = 0;
-    for (var el in balances) {
-      temp += tokensHelper.getAmountByUsd(
-          tokensPairs, convertFromSatoshi(el.balance), el.token, 'USD');
-    }
-    return (temp / balances.length).round();
-  }
+  TextStyle getTextStyle(AssetList targetAsset) =>
+      Theme.of(context).textTheme.headline3!.apply(
+          color: activeAsset == targetAsset
+              ? AppTheme.pinkColor
+              : Theme.of(context).textTheme.headline3!.color);
 
   String getBalanceByUsd(state, balance, token, currency) {
     double balanceByUsd;
     if (tokensHelper.isPair(token)) {
       double satoshi = convertToSatoshi(balance) + .0;
-      balanceByUsd = tokensHelper.getPairsAmountByUsd(
-          state.tokensPairs, satoshi, token, currency);
+      balanceByUsd =
+          tokensHelper.getPairsAmountByUsd(state.tokensPairs, satoshi, token);
     } else {
-      balanceByUsd = tokensHelper.getAmountByUsd(
-          state.tokensPairs, balance, token, currency);
+      balanceByUsd =
+          tokensHelper.getAmountByUsd(state.tokensPairs, balance, token);
     }
     if (currency == 'EUR') {
       balanceByUsd *= state.eurRate;

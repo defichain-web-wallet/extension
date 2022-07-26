@@ -123,6 +123,7 @@ flutter:
     - family: IBM Plex Sans
       fonts:
         - asset: fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf
+        - asset: fonts/IBM_Plex_Sans/IBMPlexSans-Bold.ttf
         - asset: fonts/IBM_Plex_Sans/IBMPlexSans-Italic.ttf
           style: italic
   #   - family: Trajan Pro

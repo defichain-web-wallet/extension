@@ -227,12 +227,15 @@ class _SelectPoolState extends State<SelectPool> {
                                                 child: SizedBox(
                                                   width: 40,
                                                   child: TextButton(
-                                                      child: Text('MAX',  style: TextStyle(fontSize: 10)),
+                                                      child: Text('MAX',
+                                                          style: TextStyle(
+                                                              fontSize: 10)),
                                                       onPressed: () => setMaxAmount(
                                                           _amountBaseController,
                                                           _amountQuoteController,
                                                           assetFrom,
-                                                          widget.assetPair.reserveBDivReserveA!,
+                                                          widget.assetPair
+                                                              .reserveBDivReserveA!,
                                                           accountState,
                                                           tokensState)),
                                                 ),
@@ -240,7 +243,8 @@ class _SelectPoolState extends State<SelectPool> {
                                               onChanged: (value) => onChanged(
                                                   _amountQuoteController,
                                                   value,
-                                                  widget.assetPair.reserveBDivReserveA!,
+                                                  widget.assetPair
+                                                      .reserveBDivReserveA!,
                                                   tokensState),
                                             ),
                                           ),
@@ -344,12 +348,15 @@ class _SelectPoolState extends State<SelectPool> {
                                                   child: SizedBox(
                                                     width: 40,
                                                     child: TextButton(
-                                                      child: Text('MAX',  style: TextStyle(fontSize: 10)),
+                                                      child: Text('MAX',
+                                                          style: TextStyle(
+                                                              fontSize: 10)),
                                                       onPressed: () => setMaxAmount(
                                                           _amountQuoteController,
                                                           _amountBaseController,
                                                           assetTo,
-                                                          widget.assetPair.reserveADivReserveB!,
+                                                          widget.assetPair
+                                                              .reserveADivReserveB!,
                                                           accountState,
                                                           tokensState),
                                                     ),
@@ -358,7 +365,8 @@ class _SelectPoolState extends State<SelectPool> {
                                                 onChanged: (value) => onChanged(
                                                     _amountBaseController,
                                                     value,
-                                                    widget.assetPair.reserveADivReserveB!,
+                                                    widget.assetPair
+                                                        .reserveADivReserveB!,
                                                     tokensState),
                                               ),
                                             ),
@@ -482,8 +490,9 @@ class _SelectPoolState extends State<SelectPool> {
                                     }
                                   : () => Navigator.push(
                                         context,
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation1, animation2) =>
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1,
+                                                  animation2) =>
                                               LiquidityConfirmation(
                                                   assetPair: widget.assetPair,
                                                   baseAmount: double.parse(
@@ -502,7 +511,8 @@ class _SelectPoolState extends State<SelectPool> {
                                                   balanceB: balanceB,
                                                   amount: amount),
                                           transitionDuration: Duration.zero,
-                                          reverseTransitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                              Duration.zero,
                                         ),
                                       ),
                             ),
@@ -523,21 +533,27 @@ class _SelectPoolState extends State<SelectPool> {
       );
 
   void _setBalanceAndAmountUSD(tokensState) {
-    var totalBalanceInUsd = tokensHelper.getAmountByUsd(tokensState.tokensPairs,
-            balanceA, widget.assetPair.tokenA!, 'USD') +
+    var totalBalanceInUsd = tokensHelper.getAmountByUsd(
+          tokensState.tokensPairs,
+          balanceA,
+          widget.assetPair.tokenA!,
+        ) +
         tokensHelper.getAmountByUsd(
-            tokensState.tokensPairs, balanceB, widget.assetPair.tokenB!, 'USD');
+          tokensState.tokensPairs,
+          balanceB,
+          widget.assetPair.tokenB!,
+        );
 
     var totalAmountInUsd = tokensHelper.getAmountByUsd(
-            tokensState.tokensPairs,
-            double.parse(_amountBaseController.text.replaceAll(',', '.')),
-            widget.assetPair.tokenA!,
-            'USD') +
+          tokensState.tokensPairs,
+          double.parse(_amountBaseController.text.replaceAll(',', '.')),
+          widget.assetPair.tokenA!,
+        ) +
         tokensHelper.getAmountByUsd(
-            tokensState.tokensPairs,
-            double.parse(_amountQuoteController.text.replaceAll(',', '.')),
-            widget.assetPair.tokenB!,
-            'USD');
+          tokensState.tokensPairs,
+          double.parse(_amountQuoteController.text.replaceAll(',', '.')),
+          widget.assetPair.tokenB!,
+        );
 
     setState(() {
       balanceUSD = totalBalanceInUsd;
@@ -567,7 +583,7 @@ class _SelectPoolState extends State<SelectPool> {
     setState(() {
       if (widget.assetPair.totalLiquidityRaw! != 0) {
         shareOfPool = (convertToSatoshi(
-            double.parse(_amountBaseController.text.replaceAll(',', '.'))) /
+                double.parse(_amountBaseController.text.replaceAll(',', '.'))) /
             widget.assetPair.totalLiquidityRaw!);
       }
     });
@@ -589,8 +605,13 @@ class _SelectPoolState extends State<SelectPool> {
         amountTo > balanceTo;
   }
 
-  setMaxAmount(TextEditingController controller,
-      TextEditingController toController, String asset, double reserve, state, tokensState) {
+  setMaxAmount(
+      TextEditingController controller,
+      TextEditingController toController,
+      String asset,
+      double reserve,
+      state,
+      tokensState) {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       setState(() {
         int balance = state.activeAccount!.balanceList!
@@ -599,8 +620,7 @@ class _SelectPoolState extends State<SelectPool> {
         double amount = getAmountByFee(balance, asset);
         controller.text = amount.toString();
 
-        onChanged(
-            toController, controller.text, reserve, tokensState);
+        onChanged(toController, controller.text, reserve, tokensState);
       });
     });
   }
@@ -611,12 +631,12 @@ class _SelectPoolState extends State<SelectPool> {
     return (amount > 0) ? convertFromSatoshi(balance - fee) : 0.0;
   }
 
-  onChanged(TextEditingController controller, String value, double reserve, tokensState) {
+  onChanged(TextEditingController controller, String value, double reserve,
+      tokensState) {
     try {
       double baseAmount = double.parse(value.replaceAll(',', '.'));
       if (!(baseAmount * reserve).isNaN) {
-        controller.text = (baseAmount * reserve)
-            .toStringAsFixed(8);
+        controller.text = (baseAmount * reserve).toStringAsFixed(8);
         _setShareOfPool();
       }
       _setAmount(tokensState);
