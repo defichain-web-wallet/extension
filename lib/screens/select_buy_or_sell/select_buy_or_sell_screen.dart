@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/screens/buy/contact_screen.dart';
 import 'package:defi_wallet/screens/buy/search_buy_token.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
@@ -20,15 +21,14 @@ class SelectBuyOrSellScreen extends StatefulWidget {
   _SelectBuyOrSellScreenState createState() => _SelectBuyOrSellScreenState();
 }
 
-
-
 class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
+  BalancesHelper balancesHelper = BalancesHelper();
+
+
   @override
   Widget build(BuildContext context) {
-
     var buyCallback = (state) {
       if (state.isShowTutorial) {
-
         Navigator.push(
             context,
             PageRouteBuilder(
@@ -37,7 +37,6 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
               reverseTransitionDuration: Duration.zero,
             ));
       } else {
-
         Navigator.push(
             context,
             PageRouteBuilder(
@@ -50,7 +49,6 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
     };
 
     var sellCallback = (state) async {
-
       var box = await Hive.openBox(HiveBoxes.client);
       var kycStatus = await box.get(HiveNames.kycStatus);
       bool isSkipKyc = kycStatus == 'skip';
@@ -59,7 +57,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation1, animation2) =>
-            isSkipKyc ? Selling() : AccountTypeSell(),
+                isSkipKyc ? Selling() : AccountTypeSell(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ));
@@ -86,7 +84,6 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                         blurRadius: 3,
                       ),
                     ],
-
                     borderRadius: BorderRadius.circular(12.5),
                   ),
                   width: double.infinity,
@@ -95,13 +92,9 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                       Container(
                         child: Text(
                           'Your limit',
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .headline2!
-                              .apply(
-                            fontFamily: 'IBM Plex Sans',
-                          ),
+                          style: Theme.of(context).textTheme.headline2!.apply(
+                                fontFamily: 'IBM Plex Sans',
+                              ),
                         ),
                       ),
                       SizedBox(
@@ -109,14 +102,10 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                       ),
                       Container(
                         child: Text(
-                          '900€ / Day',
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .headline1!
-                              .apply(
-                            fontFamily: 'IBM Plex Sans',
-                          ),
+                          '${balancesHelper.numberStyling(fiatState.limit! / 100)}€ / Day',
+                          style: Theme.of(context).textTheme.headline1!.apply(
+                                fontFamily: 'IBM Plex Sans',
+                              ),
                         ),
                       ),
                       SizedBox(
@@ -139,11 +128,6 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                               label: 'Sell',
                               onPressed: () => sellCallback(fiatState),
                             ),
-                            // ActionButton(
-                            //   iconPath: 'assets/images/send.png',
-                            //   label: 'Increase limit',
-                            //   onPressed: () {},
-                            // ),
                           ],
                         ),
                       )
