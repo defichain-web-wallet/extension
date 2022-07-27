@@ -59,7 +59,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               .reversed);
           if (historyList != null && historyList.length != 0) {
             return ListView.builder(
-              controller: _controller,
               itemCount: historyList.length,
               itemBuilder: (context, index) {
                 final tokenName = historyList[index].token;
