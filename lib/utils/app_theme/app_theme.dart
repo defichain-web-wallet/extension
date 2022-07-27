@@ -50,6 +50,7 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: Color(0xffFAFAFA),
       dialogBackgroundColor: Color(0xffFFFFFF),
+      selectedRowColor: Color(0xFFFAFAFA),
       shadowColor: Colors.grey[300]!,
       cardColor: Colors.white,
       backgroundColor: Colors.white,
@@ -162,6 +163,7 @@ class AppTheme {
       secondaryHeaderColor: Color(0xff333436),
       scaffoldBackgroundColor: AppTheme.shadowColor,
       dialogBackgroundColor: Color(0xFF1C1D1F),
+      selectedRowColor: Color(0xFF1C1D1F),
       shadowColor: Colors.transparent,
       cardColor: Color(0xff1C1D1F),
       colorScheme: ColorScheme.dark(

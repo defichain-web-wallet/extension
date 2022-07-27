@@ -11,9 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 enum AssetList { fiat, dfi, btc }
 
 class WalletDetails extends StatefulWidget {
-  late final String layoutSize;
-
-  WalletDetails({Key? key, required this.layoutSize}) : super(key: key);
+  WalletDetails({Key? key}) : super(key: key);
 
   @override
   State<WalletDetails> createState() => _WalletDetailsState();
@@ -112,8 +110,7 @@ class _WalletDetailsState extends State<WalletDetails> {
                       child: Text(
                         "${balancesHelper.numberStyling(totalResult, fixed: true, fixedCount: 6)} ${activeAssetName.toUpperCase()}",
                         style: Theme.of(context).textTheme.headline1!.apply(
-                              fontWeightDelta: 1,
-                              fontFamily: 'IBM Plex Sans',
+                              fontFamily: 'IBM Plex Bold',
                             ),
                       ),
                     ),
@@ -141,24 +138,10 @@ class _WalletDetailsState extends State<WalletDetails> {
       );
 
   TextStyle getTextStyle(AssetList targetAsset) =>
-      Theme.of(context).textTheme.headline3!.apply(
+      Theme.of(context).textTheme.headline5!.apply(
+          fontStyle: FontStyle.normal,
+          fontSizeFactor: 0.9,
           color: activeAsset == targetAsset
               ? AppTheme.pinkColor
               : Theme.of(context).textTheme.headline3!.color);
-
-  String getBalanceByUsd(state, balance, token, currency) {
-    double balanceByUsd;
-    if (tokensHelper.isPair(token)) {
-      double satoshi = convertToSatoshi(balance) + .0;
-      balanceByUsd =
-          tokensHelper.getPairsAmountByUsd(state.tokensPairs, satoshi, token);
-    } else {
-      balanceByUsd =
-          tokensHelper.getAmountByUsd(state.tokensPairs, balance, token);
-    }
-    if (currency == 'EUR') {
-      balanceByUsd *= state.eurRate;
-    }
-    return "${balancesHelper.numberStyling(balanceByUsd, fixed: true, fixedCount: 2)} $currency";
-  }
 }
