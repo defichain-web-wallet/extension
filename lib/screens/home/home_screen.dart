@@ -202,6 +202,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       child: TabBarBody(
                         tabController: tabController,
                         historyList: state.activeAccount.historyList!,
+                        testnetHistoryList: state.activeAccount.testnetHistoryList!,
                       ),
                     ),
                   ],
@@ -258,6 +259,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       child: TabBarBody(
                         tabController: tabController,
                         historyList: state.activeAccount.historyList!,
+                        testnetHistoryList: state.activeAccount.testnetHistoryList!,
                       ),
                     ),
                   ],

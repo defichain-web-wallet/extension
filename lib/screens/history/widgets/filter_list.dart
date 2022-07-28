@@ -24,6 +24,10 @@ class _FilterListState extends State<FilterList> {
     {'name': 'send'},
     {'name': 'receive'},
     {'name': 'swap'},
+    {'name': 'add liquidity'},
+    {'name': 'remove liquidity'},
+    {'name': 'utxos to account'},
+    {'name': 'account to utxos'},
   ];
 
   @override
