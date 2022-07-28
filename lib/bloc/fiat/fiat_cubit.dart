@@ -131,6 +131,7 @@ class FiatCubit extends Cubit<FiatState> {
     try {
       Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
 
+
       emit(state.copyWith(
         status: FiatStatusList.success,
         phone: data['phone'],
@@ -142,6 +143,7 @@ class FiatCubit extends Cubit<FiatState> {
         ibansList: state.ibansList,
         assets: state.assets,
         isShowTutorial: isShowTutorial,
+        limit: data['depositLimit'],
       ));
     } catch (err) {
       lockHelper.lockWallet();
