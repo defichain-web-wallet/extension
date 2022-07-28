@@ -46,7 +46,7 @@ class _SellingState extends State<Selling> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController amountController =
       TextEditingController(text: '0');
-  final _ibanController = TextEditingController();
+  final TextEditingController _ibanController = TextEditingController();
   late FiatModel selectedFiat;
   final GlobalKey<AssetSelectState> _selectKeyTokenList =
       GlobalKey<AssetSelectState>();
