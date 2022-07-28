@@ -19,6 +19,7 @@ class FiatState extends Equatable {
   final List<dynamic>? countryList;
   final List<FiatModel>? fiatList;
   final bool? isShowTutorial;
+  final double? limit;
 
   FiatState({
     this.status = FiatStatusList.initial,
@@ -37,6 +38,7 @@ class FiatState extends Equatable {
     this.countryList,
     this.fiatList,
     this.isShowTutorial = true,
+    this.limit,
   });
 
   @override
@@ -57,6 +59,7 @@ class FiatState extends Equatable {
     countryList,
     fiatList,
     isShowTutorial,
+    limit,
   ];
 
   FiatState copyWith({
@@ -76,6 +79,7 @@ class FiatState extends Equatable {
     List<dynamic>? countryList,
     List<FiatModel>? fiatList,
     bool? isShowTutorial,
+    double? limit,
   }) {
     return FiatState(
       status: status ?? this.status,
@@ -94,6 +98,7 @@ class FiatState extends Equatable {
       countryList: countryList ?? this.countryList,
       fiatList: fiatList ?? this.fiatList,
       isShowTutorial: isShowTutorial ?? this.isShowTutorial,
+      limit: limit ?? this.limit,
     );
   }
 }

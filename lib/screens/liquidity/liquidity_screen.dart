@@ -181,6 +181,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                             ),
                           ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             TextButton(
                               child: Text(
