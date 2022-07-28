@@ -132,7 +132,6 @@ class FiatCubit extends Cubit<FiatState> {
       Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
 
 
-      print(data['depositLimit']);
       emit(state.copyWith(
         status: FiatStatusList.success,
         phone: data['phone'],
