@@ -8,6 +8,7 @@ import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
@@ -87,6 +88,15 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
   Widget _buildBody(state, fiatState, {isFullSize = false}) {
     if (fiatState.status == FiatStatusList.loading) {
       return Loader();
+    } else if (fiatState.status == FiatStatusList.failure) {
+      return Container(
+        child: Center(
+          child: ErrorPlaceholder(
+            message: 'Something went wrong',
+            description: 'Please try later',
+          ),
+        ),
+      );
     } else {
       return Container(
         color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
