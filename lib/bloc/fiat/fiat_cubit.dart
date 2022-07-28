@@ -83,6 +83,8 @@ class FiatCubit extends Cubit<FiatState> {
       email: state.email,
       currentIban: iban,
       ibansList: ibanList,
+      activeIban: state.activeIban,
+      ibanList: state.ibanList,
       assets: state.assets,
       isShowTutorial: state.isShowTutorial,
     ));
@@ -245,8 +247,17 @@ class FiatCubit extends Cubit<FiatState> {
     IbanModel? iban;
 
     try {
-      iban = activeIbanList
-          .firstWhere((element) => (element.asset!.name == asset.name));
+      if (state.currentIban != null && state.currentIban != '') {
+        iban = activeIbanList
+            .firstWhere((element) => (element.iban == state.currentIban!.replaceAll(' ', '')));
+      } else {
+        if (state.activeIban != null && state.activeIban!.asset!.name == asset.name) {
+          iban = state.activeIban;
+        } else {
+          iban = activeIbanList
+              .firstWhere((element) => (element.asset!.name == asset.name));
+        }
+      }
     } catch (_) {
       iban = null;
     }
@@ -258,7 +269,7 @@ class FiatCubit extends Cubit<FiatState> {
       phoneWithoutPrefix: state.phoneWithoutPrefix,
       numberPrefix: state.numberPrefix,
       email: state.email,
-      currentIban: state.currentIban,
+      currentIban: '',
       ibansList: state.ibansList,
       assets: state.assets,
       foundAssets: state.foundAssets,

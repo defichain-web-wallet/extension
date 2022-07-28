@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
@@ -16,6 +17,7 @@ class App extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(create: (context) => AuthBloc()),
+        BlocProvider<AddressBookCubit>(create: (context) => AddressBookCubit()),
         BlocProvider<AccountCubit>(create: (context) => AccountCubit()),
         BlocProvider<TokensCubit>(create: (context) => TokensCubit()),
         BlocProvider<DexCubit>(create: (context) => DexCubit()),

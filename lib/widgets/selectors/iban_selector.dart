@@ -205,7 +205,7 @@ class IbanSelectorState extends State<IbanSelector> {
                           ),
                         ),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         hideOverlay();
                         if (widget.asset != null) {
                           Navigator.push(
@@ -221,8 +221,6 @@ class IbanSelectorState extends State<IbanSelector> {
                                 reverseTransitionDuration: Duration.zero,
                               ));
                         } else {
-                          FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-                          fiatCubit.changeCurrentIban(widget.ibanList[index]);
                           Navigator.push(
                               context,
                               PageRouteBuilder(

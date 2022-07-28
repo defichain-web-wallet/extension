@@ -46,7 +46,7 @@ class _SellingState extends State<Selling> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController amountController =
       TextEditingController(text: '0');
-  final _ibanController = TextEditingController();
+  final TextEditingController _ibanController = TextEditingController();
   late FiatModel selectedFiat;
   final GlobalKey<AssetSelectState> _selectKeyTokenList =
       GlobalKey<AssetSelectState>();
@@ -163,10 +163,14 @@ class _SellingState extends State<Selling> {
               element.type == "Sell" && element.fiat.name == selectedFiat.name)
           .toList();
       try {
-        IbanModel iban =
-            ibanList.firstWhere((el) => el.fiat!.name == selectedFiat.name);
-        fiatCubit.changeCurrentIban(iban);
-        currentIban = fiatState.activeIban;
+        if (fiatState.activeIban != null) {
+          currentIban = fiatState.activeIban;
+        } else {
+          IbanModel iban =
+          ibanList.firstWhere((el) => el.fiat!.name == selectedFiat.name);
+          fiatCubit.changeCurrentIban(iban);
+          currentIban = fiatState.activeIban;
+        }
       } catch (_) {
         currentIban = null;
       }
@@ -266,7 +270,7 @@ class _SellingState extends State<Selling> {
                             padding: EdgeInsets.only(top: 20),
                             child: widget.isNewIban || currentIban == null
                                 ? IbanField(
-                                    ibanController: TextEditingController(),
+                                    ibanController: _ibanController,
                                     hintText: 'DE89 3704 0044 0532 0130 00',
                                     maskFormat: 'AA## #### #### #### #### ##',
                                   )
