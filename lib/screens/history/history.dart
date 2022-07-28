@@ -244,6 +244,6 @@ class _HistoryState extends State<History> {
   String getBalanceByUsd(tokenName, currency, txValue, tokensState) =>
       balancesHelper.numberStyling(
           tokenHelper.getAmountByUsd(
-              tokensState.tokensPairs, txValue, tokenName, currency),
+              tokensState.tokensPairs, txValue, tokenName),
           fixed: true);
 }

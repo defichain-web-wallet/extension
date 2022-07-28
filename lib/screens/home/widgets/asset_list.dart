@@ -97,10 +97,10 @@ class AssetList extends StatelessWidget {
     if (tokenHelper.isPair(coin)) {
       double satoshi = convertToSatoshi(tokenBalance) + .0;
       balanceInUsd = tokenHelper.getPairsAmountByUsd(
-          state.tokensPairs, satoshi, coin, fiat);
+          state.tokensPairs, satoshi, coin);
     } else {
       balanceInUsd = tokenHelper.getAmountByUsd(
-          state.tokensPairs, tokenBalance, coin, fiat);
+          state.tokensPairs, tokenBalance, coin);
     }
     if (fiat == 'EUR') {
       balanceInUsd *= state.eurRate;

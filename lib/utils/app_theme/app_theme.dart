@@ -50,9 +50,11 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: Color(0xffFAFAFA),
       dialogBackgroundColor: Color(0xffFFFFFF),
+      selectedRowColor: Color(0xFFFAFAFA),
       shadowColor: Colors.grey[300]!,
       cardColor: Colors.white,
       backgroundColor: Colors.white,
+      secondaryHeaderColor: lightGreyColor,
       colorScheme: ColorScheme.light(
         primary: pinkColor,
         primaryVariant: pinkColor,
@@ -158,8 +160,10 @@ class AppTheme {
         actionTextColor: Colors.white,
       ),
       backgroundColor: Color(0xff333436),
+      secondaryHeaderColor: Color(0xff333436),
       scaffoldBackgroundColor: AppTheme.shadowColor,
       dialogBackgroundColor: Color(0xFF1C1D1F),
+      selectedRowColor: Color(0xFF1C1D1F),
       shadowColor: Colors.transparent,
       cardColor: Color(0xff1C1D1F),
       colorScheme: ColorScheme.dark(
