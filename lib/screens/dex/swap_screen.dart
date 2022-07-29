@@ -436,26 +436,6 @@ class _SwapScreenState extends State<SwapScreen> {
                                   accountState, transactionState, context)
                               : null,
                         ),
-                        SizedBox(height: 14),
-                        TextButton(
-                          child: Text(
-                            'SWAP INSTANTLY',
-                            style: Theme.of(context).textTheme.headline6!.apply(
-                                  decoration: TextDecoration.underline,
-                                ),
-                          ),
-                          onPressed: isEnable
-                              ? () => lockHelper.provideWithLockChecker(
-                                  context,
-                                  () => submitInstantlySwap(
-                                      accountState,
-                                      dexState,
-                                      tokensState,
-                                      transactionState,
-                                      pendingButton,
-                                      context))
-                              : null,
-                        )
                       ],
                     ),
                   ),
@@ -544,74 +524,6 @@ class _SwapScreenState extends State<SwapScreen> {
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ));
-    }
-  }
-
-  submitInstantlySwap(accountState, dexState, tokensState, transactionState,
-      pendingButton, context) async {
-    hideOverlay();
-    if (transactionState is TransactionLoadingState) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Wait for the previous transaction to complete',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-        ),
-      );
-      return;
-    }
-    if (isEnoughBalance(accountState)) {
-      if (!isBalanceError) {
-        setState(() {
-          isBalanceError = true;
-        });
-      }
-      return;
-    }
-    getFieldMsg(accountState, dexState);
-    if (accountState.status == AccountStatusList.success) {
-      try {
-        setState(() {
-          isEnable = false;
-        });
-        pendingButton.currentState!.emitPending(true);
-
-        if (isNumeric(amountFromController.text) && assetFrom != assetTo) {
-          var txResponse = await transactionService.createAndSendSwap(
-            account: accountState.activeAccount,
-            tokenFrom: assetFrom,
-            tokenTo: assetTo,
-            amount: balancesHelper.toSatoshi(amountFromController.text),
-            amountTo: balancesHelper.toSatoshi(amountToController.text),
-            slippage: slippage,
-            tokens: tokensState.tokens,
-          );
-          focusTo.unfocus();
-          focusFrom.unfocus();
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SwapStatusScreen(
-                      txResponse: txResponse,
-                      amount: double.parse(amountFromController.text),
-                      assetFrom: assetFrom,
-                      assetTo: assetTo),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
-        }
-      } catch (err) {
-        setState(() {
-          isFailed = true;
-          isEnable = true;
-        });
-      }
-
-      pendingButton.currentState!.emitPending(false);
     }
   }
 

@@ -65,15 +65,15 @@ class AppTheme {
       textTheme: TextTheme(
         headline1: TextStyle(
           fontSize: 34,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.normal,
         ),
         headline2: TextStyle(
           fontSize: 14,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.normal,
         ),
         headline3: TextStyle(
           fontSize: 14,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.normal,
         ),
         headline4: TextStyle(
           fontSize: 12,
@@ -85,11 +85,11 @@ class AppTheme {
         ),
         headline6: TextStyle(
           fontSize: 16,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.normal,
         ),
         subtitle1: TextStyle(
           fontSize: 12,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.normal,
         ),
         subtitle2: TextStyle(
           fontSize: 12,
@@ -103,7 +103,7 @@ class AppTheme {
         ),
         bodyText1: TextStyle(
           fontSize: 19,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.normal,
           decorationColor: Colors.grey.withOpacity(0.3),
         ),
       ).apply(
