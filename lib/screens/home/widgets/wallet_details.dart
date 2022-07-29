@@ -110,6 +110,7 @@ class _WalletDetailsState extends State<WalletDetails> {
                       child: Text(
                         "${balancesHelper.numberStyling(totalResult, fixed: true, fixedCount: 6)} ${activeAssetName.toUpperCase()}",
                         style: Theme.of(context).textTheme.headline1!.apply(
+                          fontWeightDelta: 2,
                               fontFamily: 'IBM Plex Bold',
                             ),
                       ),
