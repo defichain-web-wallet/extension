@@ -5,6 +5,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -27,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/models/focus_model.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import './widgets/amount_selector_field.dart';
 import './widgets/swap_price_details.dart';
 
@@ -76,6 +78,7 @@ class _SwapScreenState extends State<SwapScreen> {
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   double slippage = 0.03; //3%
+  String stabilizationFee = '';
 
   @override
   void initState() {
@@ -173,6 +176,9 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildBody(
       context, dexState, dexCubit, accountState, tokensState, transactionState,
       {isCustomBgColor = false}) {
+    bool isShowStabilizationFee = assetFrom == 'DUSD' && assetTo == 'DFI' ||
+        assetFrom == 'DUSD' && assetTo == 'USDT' ||
+        assetFrom == 'DUSD' && assetTo == 'USDC';
     if (tokensState.status == TokensStatusList.loading) {
       return Container(
         child: Center(
@@ -190,6 +196,19 @@ class _SwapScreenState extends State<SwapScreen> {
           ),
         );
       } else {
+        if (isShowStabilizationFee) {
+          try {
+            AssetPairModel targetPair = tokensState.tokensPairs
+                .firstWhere((e) => e.tokenA == 'DUSD' && e.tokenB == 'DFI');
+            stabilizationFee = balancesHelper.numberStyling(
+                ((1 / (1 - targetPair.fee!)) - 1) * 100,
+                fixedCount: 2,
+                fixed: true);
+          } catch (err) {
+            print(err);
+          }
+        }
+
         return Container(
           color:
               isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
@@ -250,7 +269,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                 .color!
                                 .withOpacity(0.5)),
                       ),
-                      SizedBox(height: 24),
+                      SizedBox(height: 14),
                       AmountSelectorField(
                         label: 'Swap to',
                         selectedAsset: assetTo,
@@ -290,41 +309,42 @@ class _SwapScreenState extends State<SwapScreen> {
                             ),
                             isShowSlippageField
                                 ? SizedBox(
-                                  height: 30,
-                                  width: 140,
-                                  child: TextField(
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.allow(RegExp(r'(^-?\d*\.?d*\,?\d*)')),
-                                    ],
-                                    controller: slippageController,
-                                    decoration: InputDecoration(
-                                      contentPadding:
-                                          const EdgeInsets.all(8),
-                                      hintText: 'Type in percent..',
-                                      suffixIcon: IconButton(
-                                        splashRadius: 16,
-                                        icon: Icon(
-                                          Icons.clear,
-                                          size: 14,
+                                    height: 30,
+                                    width: 140,
+                                    child: TextField(
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: <TextInputFormatter>[
+                                        FilteringTextInputFormatter.allow(
+                                            RegExp(r'(^-?\d*\.?d*\,?\d*)')),
+                                      ],
+                                      controller: slippageController,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.all(8),
+                                        hintText: 'Type in percent..',
+                                        suffixIcon: IconButton(
+                                          splashRadius: 16,
+                                          icon: Icon(
+                                            Icons.clear,
+                                            size: 14,
+                                          ),
+                                          onPressed: () => setState(() {
+                                            slippage = 0.03;
+                                            isShowSlippageField = false;
+                                          }),
                                         ),
-                                        onPressed: () => setState(() {
-                                          slippage = 0.03;
-                                          isShowSlippageField = false;
-                                        }),
                                       ),
+                                      onChanged: (String value) {
+                                        setState(() {
+                                          try {
+                                            slippage =
+                                                double.parse(value) / 100;
+                                          } catch (err) {
+                                            slippage = 0.03;
+                                          }
+                                        });
+                                      },
                                     ),
-                                    onChanged: (String value) {
-                                      setState(() {
-                                        try {
-                                          slippage = double.parse(value) / 100;
-                                        } catch (err) {
-                                          slippage = 0.03;
-                                        }
-                                      });
-                                    },
-                                  ),
-                                )
+                                  )
                                 : Container(
                                     child: Row(
                                       children: [
@@ -399,28 +419,28 @@ class _SwapScreenState extends State<SwapScreen> {
                         priceToDetails:
                             createPriceString(dexState, assetTo, assetFrom),
                       ),
-                      Center(
-                        child: Text(
-                          'Some error. Please try later',
-                          style:
-                              Theme.of(context).textTheme.headline4!.copyWith(
-                                    color: isFailed
-                                        ? AppTheme.redErrorColor
-                                        : Colors.transparent,
-                                  ),
+                      if (isShowStabilizationFee)
+                        Container(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 12),
+                                child: SvgPicture.asset(
+                                  'assets/important.svg',
+                                  height: 20,
+                                ),
+                              ),
+                              Flexible(
+                                child: Text(
+                                  'There is currently a high DEX stabilization fee imposed on DUSD-DFI, DUSD-USDT, and DUSD-USDC swaps due to DFIP 2206-D and DFIP 2207-B. In order to execute the swap, you need to set your Slippage to at least $stabilizationFee%',
+                                  textAlign: TextAlign.justify,
+                                  style: TextStyle(fontSize: 13, height: 1.1),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      Center(
-                        child: Text(
-                          'Insufficient funds',
-                          style:
-                              Theme.of(context).textTheme.headline4!.copyWith(
-                                    color: isBalanceError
-                                        ? AppTheme.redErrorColor
-                                        : Colors.transparent,
-                                  ),
-                        ),
-                      ),
                     ],
                   ),
                   Padding(
@@ -503,11 +523,15 @@ class _SwapScreenState extends State<SwapScreen> {
       return;
     }
     if (isEnoughBalance(state)) {
-      if (!isBalanceError) {
-        setState(() {
-          isBalanceError = true;
-        });
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Insufficient funds',
+            style: Theme.of(context).textTheme.headline5,
+          ),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+        ),
+      );
       return;
     }
     if (isNumeric(amountFromController.text)) {
