@@ -50,9 +50,11 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: Color(0xffFAFAFA),
       dialogBackgroundColor: Color(0xffFFFFFF),
+      selectedRowColor: Color(0xFFFAFAFA),
       shadowColor: Colors.grey[300]!,
       cardColor: Colors.white,
       backgroundColor: Colors.white,
+      secondaryHeaderColor: lightGreyColor,
       colorScheme: ColorScheme.light(
         primary: pinkColor,
         primaryVariant: pinkColor,
@@ -63,15 +65,15 @@ class AppTheme {
       textTheme: TextTheme(
         headline1: TextStyle(
           fontSize: 34,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.normal,
         ),
         headline2: TextStyle(
           fontSize: 14,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.normal,
         ),
         headline3: TextStyle(
           fontSize: 14,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.normal,
         ),
         headline4: TextStyle(
           fontSize: 12,
@@ -83,11 +85,11 @@ class AppTheme {
         ),
         headline6: TextStyle(
           fontSize: 16,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.normal,
         ),
         subtitle1: TextStyle(
           fontSize: 12,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.normal,
         ),
         subtitle2: TextStyle(
           fontSize: 12,
@@ -101,7 +103,7 @@ class AppTheme {
         ),
         bodyText1: TextStyle(
           fontSize: 19,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.normal,
           decorationColor: Colors.grey.withOpacity(0.3),
         ),
       ).apply(
@@ -158,8 +160,10 @@ class AppTheme {
         actionTextColor: Colors.white,
       ),
       backgroundColor: Color(0xff333436),
+      secondaryHeaderColor: Color(0xff333436),
       scaffoldBackgroundColor: AppTheme.shadowColor,
       dialogBackgroundColor: Color(0xFF1C1D1F),
+      selectedRowColor: Color(0xFF1C1D1F),
       shadowColor: Colors.transparent,
       cardColor: Color(0xff1C1D1F),
       colorScheme: ColorScheme.dark(

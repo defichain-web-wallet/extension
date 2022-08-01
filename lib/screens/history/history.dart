@@ -284,7 +284,7 @@ class _HistoryState extends State<History> {
                                                 .headline5,
                                           ),
                                           Text(
-                                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName, currency), fixed: true, fixedCount: 4)} $currency")
+                                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
                                         ],
                                       ),
                                     ),
@@ -321,6 +321,6 @@ class _HistoryState extends State<History> {
   String getBalanceByUsd(tokenName, currency, txValue, tokensState) =>
       balancesHelper.numberStyling(
           tokenHelper.getAmountByUsd(
-              tokensState.tokensPairs, txValue, tokenName, currency),
+              tokensState.tokensPairs, txValue, tokenName),
           fixed: true);
 }

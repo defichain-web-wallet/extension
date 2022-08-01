@@ -353,7 +353,7 @@ class TokensHelper {
   }
 
   double getAmountByUsd(
-      List<dynamic> tokensPairs, double amount, String token, String fiat) {
+      List<dynamic> tokensPairs, double amount, String token) {
     String symbol = 'USDT-DFI';
     String testnetSymbol = 'DFI-USDT';
 
@@ -385,17 +385,50 @@ class TokensHelper {
     }
   }
 
+  double getAmountByBtc(
+      List<dynamic> tokensPairs, double amount, String token) {
+    String symbol = 'BTC-DFI';
+    String testnetSymbol = 'DFI-BTC';
+
+    try {
+      AssetPairModel assetPair = tokensPairs.firstWhere((element) =>
+      element.symbol! == symbol || element.symbol! == testnetSymbol);
+      if (token == 'DFI') {
+        return assetPair.reserveADivReserveB! * amount;
+      }
+      AssetPairModel targetPair = tokensPairs
+          .firstWhere((item) {
+        return item.tokenA == token && (item.tokenB == 'DFI' || item.tokenB == 'BTC');
+      });
+
+      double dfiByUsd = assetPair.reserveADivReserveB!;
+      double dfiByToken = targetPair.reserveBDivReserveA!;
+
+      double result;
+      if (targetPair.tokenB == 'BTC') {
+        result = (dfiByToken * amount);
+        return result;
+      } else {
+        double result = (dfiByToken * amount) * dfiByUsd;
+        return result;
+      }
+    } catch (err) {
+      // TODO: need review for return value when throw error
+      return 0.00;
+    }
+  }
+
   double getPairsAmountByUsd(
-      List<dynamic> tokensPairs, double amount, String symbol, String fiat) {
+      List<dynamic> tokensPairs, double amount, String symbol) {
     AssetPairModel assetPair =
       tokensPairs.firstWhere((element) => element.symbol! == symbol);
     double baseBalance = getBaseBalance(amount, assetPair);
     double quoteBalance = getQuoteBalance(amount, assetPair);
 
     double baseBalanceByUsd =
-      getAmountByUsd(tokensPairs, baseBalance, symbol.split('-')[0], fiat);
+      getAmountByUsd(tokensPairs, baseBalance, symbol.split('-')[0]);
     double quoteBalanceByUsd =
-      getAmountByUsd(tokensPairs, quoteBalance, symbol.split('-')[1], fiat);
+      getAmountByUsd(tokensPairs, quoteBalance, symbol.split('-')[1]);
 
     return baseBalanceByUsd + quoteBalanceByUsd;
   }

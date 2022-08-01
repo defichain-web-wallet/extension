@@ -150,7 +150,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             style: Theme.of(context).textTheme.headline5,
                           ),
                           Text(
-                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName, currency), fixed: true, fixedCount: 4)} $currency")
+                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
                         ],
                       ),
                     ),

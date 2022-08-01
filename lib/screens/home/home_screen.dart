@@ -154,121 +154,60 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildBody(context, state, transactionState, tokensState) {
     if (state.status == AccountStatusList.success &&
         tokensState.status == TokensStatusList.success) {
-      return LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth < ScreenSizes.medium) {
-          return Container(
-            child: Center(
-              child: StretchBox(
-                maxWidth: ScreenSizes.medium,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      color: Theme.of(context).dialogBackgroundColor,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 26, top: 20),
-                            child: WalletDetails(layoutSize: 'small'),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: ActionButtonsList(
-                              hideOverlay: () => hideOverlay(),
-                            ),
-                          ),
-                        ],
+      return Container(
+        child: Center(
+          child: StretchBox(
+            maxWidth: ScreenSizes.medium,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  color: Theme.of(context).selectedRowColor,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 26, top: 20),
+                        child: WalletDetails(),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).appBarTheme.backgroundColor,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.shadowColor.withOpacity(0.1),
-                              spreadRadius: 2,
-                              blurRadius: 3,
-                            ),
-                          ],
-                        ),
-                        child: TabBarHeader(
-                          tabController: tabController,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: ActionButtonsList(
+                          hideOverlay: () => hideOverlay(),
                         ),
                       ),
-                    ),
-                    Flexible(
-                      child: TabBarBody(
-                        tabController: tabController,
-                        historyList: state.activeAccount.historyList!,
-                        testnetHistoryList: state.activeAccount.testnetHistoryList!,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        } else {
-          return Container(
-            child: Center(
-              child: StretchBox(
-                maxWidth: ScreenSizes.medium,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      color: Theme.of(context).dialogBackgroundColor,
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 26),
-                            child: WalletDetails(layoutSize: 'large'),
-                          ),
-                          Expanded(
-                            child: ActionButtonsList(
-                              hideOverlay: () => hideOverlay(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).appBarTheme.backgroundColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.shadowColor.withOpacity(0.1),
-                                spreadRadius: 2,
-                                blurRadius: 3,
-                              ),
-                            ],
-                          ),
-                          child: TabBarHeader(
-                            tabController: tabController,
-                          ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).appBarTheme.backgroundColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.shadowColor.withOpacity(0.1),
+                          spreadRadius: 2,
+                          blurRadius: 3,
                         ),
-                      ),
+                      ],
                     ),
-                    Flexible(
-                      child: TabBarBody(
-                        tabController: tabController,
-                        historyList: state.activeAccount.historyList!,
-                        testnetHistoryList: state.activeAccount.testnetHistoryList!,
-                      ),
+                    child: TabBarHeader(
+                      tabController: tabController,
                     ),
-                  ],
+                  ),
                 ),
-              ),
+                Flexible(
+                  child: TabBarBody(
+                    tabController: tabController,
+                    historyList: state.activeAccount.historyList!,
+                    testnetHistoryList: state.activeAccount.testnetHistoryList!,
+                  ),
+                ),
+              ],
             ),
-          );
-        }
-      });
+          ),
+        ),
+      );
     } else if (tokensState.status == TokensStatusList.failure) {
       return Container(
         child: Center(

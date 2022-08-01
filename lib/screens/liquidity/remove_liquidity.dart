@@ -45,8 +45,7 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
   @override
   void initState() {
     super.initState();
-    TokensState tokensState =
-      BlocProvider.of<TokensCubit>(context).state;
+    TokensState tokensState = BlocProvider.of<TokensCubit>(context).state;
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       _setShareOfPool();
       _setAmountA();
@@ -325,7 +324,9 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
                             callback: () => Navigator.push(
                               context,
                               PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) => LiquidityConfirmation(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        LiquidityConfirmation(
                                   assetPair: widget.assetPair,
                                   baseAmount: amountA,
                                   quoteAmount: amountB,
@@ -368,14 +369,26 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
   }
 
   void _setBalanceAndAmountUSD(tokensState) {
-    var totalBalanceInUsd = tokensHelper.getAmountByUsd(tokensState.tokensPairs,
-        balanceA, widget.assetPair.tokenA!, 'USD') +
+    var totalBalanceInUsd = tokensHelper.getAmountByUsd(
+          tokensState.tokensPairs,
+          balanceA,
+          widget.assetPair.tokenA!,
+        ) +
         tokensHelper.getAmountByUsd(
-            tokensState.tokensPairs, balanceB, widget.assetPair.tokenB!, 'USD');
-    var totalAmountInUsd = tokensHelper.getAmountByUsd(tokensState.tokensPairs,
-        amountB, widget.assetPair.tokenA!, 'USD') +
+          tokensState.tokensPairs,
+          balanceB,
+          widget.assetPair.tokenB!,
+        );
+    var totalAmountInUsd = tokensHelper.getAmountByUsd(
+          tokensState.tokensPairs,
+          amountB,
+          widget.assetPair.tokenA!,
+        ) +
         tokensHelper.getAmountByUsd(
-            tokensState.tokensPairs, amountB, widget.assetPair.tokenB!, 'USD');
+          tokensState.tokensPairs,
+          amountB,
+          widget.assetPair.tokenB!,
+        );
     setState(() {
       balanceUSD = totalBalanceInUsd;
       amountUSD = totalAmountInUsd;

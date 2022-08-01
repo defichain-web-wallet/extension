@@ -66,25 +66,25 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                 balanceB = convertFromSatoshi(quoteBalance.balance!);
 
                 balanceUsd += tokensHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    widget.balanceA,
-                    widget.assetPair.tokenA!,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  widget.balanceA,
+                  widget.assetPair.tokenA!,
+                );
                 balanceUsd += tokensHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    widget.balanceB,
-                    widget.assetPair.tokenB!,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  widget.balanceB,
+                  widget.assetPair.tokenB!,
+                );
                 targetAmountUsd += tokensHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    widget.amountA,
-                    widget.assetPair.tokenA!,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  widget.amountA,
+                  widget.assetPair.tokenA!,
+                );
                 targetAmountUsd += tokensHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    widget.amountB,
-                    widget.assetPair.tokenB!,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  widget.amountB,
+                  widget.assetPair.tokenB!,
+                );
 
                 iterator++;
               }
@@ -137,7 +137,9 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                             ),
                           ),
                           Container(
-                            child: Text(TokensHelper().getAprFormat(widget.assetPair.apr!),
+                            child: Text(
+                                TokensHelper()
+                                    .getAprFormat(widget.assetPair.apr!),
                                 style: Theme.of(context)
                                     .textTheme
                                     .headline6
