@@ -5,11 +5,13 @@ import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
+import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/wallets_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
+import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/tx_list_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
@@ -111,9 +113,11 @@ class AccountCubit extends Cubit<AccountState> {
     state.activeAccount!.activeToken = activeToken;
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(null, null, accounts, state.masterKeyPair, state.accessToken!);
+      await saveAccountsToStorage(
+          null, null, accounts, state.masterKeyPair, state.accessToken!);
     } else {
-      await saveAccountsToStorage(accounts, state.masterKeyPair, null, null, state.accessToken!);
+      await saveAccountsToStorage(
+          accounts, state.masterKeyPair, null, null, state.accessToken!);
     }
 
     emit(state.copyWith(
@@ -217,23 +221,41 @@ class AccountCubit extends Cubit<AccountState> {
         }
       });
       if (needUpdate) {
-        TxListModel txListModel;
+        List<HistoryNew> txListModel;
+        TxListModel testnetTxListModel;
         try {
-          txListModel = await historyRequests.getFullHistoryList(
-              accounts[i].addressList![0],
-              'DFI',
-              SettingsHelper.settings.network!);
-          List<String> txids = [];
-          accounts[i].historyList!.forEach((history) {
-            txids.add(history.txid!);
-          });
-          accounts[i].transactionNext = txListModel.transactionNext;
-          accounts[i].historyNext = txListModel.historyNext;
-          txListModel.list!.forEach((history) {
-            if (!txids.contains(history.txid)) {
-              accounts[i].historyList!.add(history);
-            }
-          });
+          if (SettingsHelper.settings.network! == 'mainnet') {
+            txListModel = await historyRequests.getHistory(
+                accounts[i].addressList![0],
+                'DFI',
+                SettingsHelper.settings.network!);
+            List<String> txids = [];
+            accounts[i].historyList!.forEach((history) {
+              txids.add(history.txid!);
+            });
+            accounts[i].testnetHistoryList = [];
+            txListModel.forEach((history) {
+              if (!txids.contains(history.txid)) {
+                accounts[i].historyList!.add(history);
+              }
+            });
+          } else {
+            testnetTxListModel = await historyRequests.getFullHistoryList(
+                accounts[i].addressList![0],
+                'DFI',
+                SettingsHelper.settings.network!);
+            List<String> txids = [];
+            accounts[i].testnetHistoryList!.forEach((history) {
+              txids.add(history.txid!);
+            });
+            accounts[i].transactionNext = testnetTxListModel.transactionNext;
+            accounts[i].historyNext = testnetTxListModel.historyNext;
+            testnetTxListModel.list!.forEach((history) {
+              if (!txids.contains(history.txid)) {
+                accounts[i].testnetHistoryList!.add(history);
+              }
+            });
+          }
         } catch (err) {
           accounts[i].transactionNext = '';
           accounts[i].historyNext = '';
@@ -257,9 +279,11 @@ class AccountCubit extends Cubit<AccountState> {
     accounts.add(account);
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(null, null, accounts, state.masterKeyPair!, state.accessToken!);
+      await saveAccountsToStorage(
+          null, null, accounts, state.masterKeyPair!, state.accessToken!);
     } else {
-      await saveAccountsToStorage(accounts, state.masterKeyPair!, null, null, state.accessToken!);
+      await saveAccountsToStorage(
+          accounts, state.masterKeyPair!, null, null, state.accessToken!);
     }
 
     emit(state.copyWith(
@@ -315,7 +339,8 @@ class AccountCubit extends Cubit<AccountState> {
         ));
       });
       final balances = accountsMainnet[0].balanceList!;
-      final String accessToken = await getAccessToken(accountsMainnet[0], password);
+      final String accessToken =
+          await getAccessToken(accountsMainnet[0], password);
       await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet,
           accountsTestnet, masterKeyPairTestnet, accessToken,
           password: password);
@@ -405,7 +430,8 @@ class AccountCubit extends Cubit<AccountState> {
     var box = await Hive.openBox(HiveBoxes.client);
     var encodedPassword = await box.get(HiveNames.password);
     var password = stringToBase64.decode(encodedPassword);
-    final String accessToken = await getAccessToken(state.accounts![accountIndex], password);
+    final String accessToken =
+        await getAccessToken(state.accounts![accountIndex], password);
     emit(state.copyWith(
       status: AccountStatusList.loading,
       accessToken: accessToken,
@@ -516,20 +542,32 @@ class AccountCubit extends Cubit<AccountState> {
       historyFilterBy: state.historyFilterBy,
     ));
     AccountModel activeAccount = state.activeAccount!;
-    TxListModel history;
-    try {
-      history = await historyRequests.getFullHistoryList(
-          activeAccount.addressList![0], 'DFI', SettingsHelper.settings.network!,
-          transactionNext: activeAccount.transactionNext!,
-          historyNext: activeAccount.historyNext!);
-    } catch (err) {
-      history = TxListModel();
+    List<HistoryNew> history;
+    TxListModel txListModel;
+    if (SettingsHelper.settings.network! == 'mainnet') {
+      try {
+        history = await historyRequests.getHistory(
+            activeAccount.addressList![0],
+            'DFI',
+            SettingsHelper.settings.network!);
+      } catch (err) {
+        history = [];
+      }
+      var newHistory = activeAccount.historyList!..addAll(history);
+      activeAccount.historyList = newHistory;
+    } else {
+      try {
+        txListModel = await historyRequests.getFullHistoryList(
+            activeAccount.addressList![0],
+            'DFI',
+            SettingsHelper.settings.network!);
+      } catch (err) {
+        txListModel = TxListModel();
+      }
+      var newHistory = activeAccount.testnetHistoryList!
+        ..addAll(txListModel.list!);
+      activeAccount.testnetHistoryList = newHistory;
     }
-    var newHistory = activeAccount.historyList!..addAll(history.list!);
-
-    activeAccount.historyList = newHistory;
-    activeAccount.transactionNext = history.transactionNext;
-    activeAccount.historyNext = history.historyNext;
 
     emit(state.copyWith(
       status: AccountStatusList.success,

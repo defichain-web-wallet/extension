@@ -3,6 +3,7 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
+import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
@@ -18,6 +19,27 @@ class HistoryRequests {
   var addressesHelper = AddressesHelper();
   var balancesHelper = BalancesHelper();
   var historyHelper = HistoryHelper();
+
+  Future<List<HistoryNew>> getHistory(AddressModel addressModel, String token,
+      String network) async {
+    try {
+      String urlAddress = '${DfxApi.url}${addressModel.address}/2022/USD';
+
+      final Uri url = Uri.parse(urlAddress);
+
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        var body = jsonDecode(response.body);
+        List<HistoryNew> list = List<HistoryNew>.generate(
+            body.length, (index) => HistoryNew.fromJson(body[index]));
+        return list;
+      } else {
+        return [];
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
 
   Future<TxListModel> getFullHistoryList(
       AddressModel addressModel, String token, String network,
@@ -120,7 +142,8 @@ class HistoryRequests {
 
       String hostUrl = SettingsHelper.getHostApiUrl();
       String urlAddress = fallbackUrl.isEmpty
-          ? '$hostUrl/$network/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}'
+          ? '$hostUrl/$network/address/${addressModel
+          .address}/history?size=30${next != '' ? '&next=' + next : ''}'
           : fallbackUrl;
 
       final Uri url = Uri.parse(urlAddress);
@@ -154,8 +177,10 @@ class HistoryRequests {
       if (fallbackUrl.isEmpty &&
           SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = network == 'mainnet'
-            ? '${Hosts.myDefichain}/mainnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}'
-            : '${Hosts.ocean}/testnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}';
+            ? '${Hosts.myDefichain}/mainnet/address/${addressModel
+            .address}/history?size=30${next != '' ? '&next=' + next : ''}'
+            : '${Hosts.ocean}/testnet/address/${addressModel
+            .address}/history?size=30${next != '' ? '&next=' + next : ''}';
         return getHistoryActions(addressModel, token, network,
             next: next, fallbackUrl: fallbackUrlAddress);
       } else {

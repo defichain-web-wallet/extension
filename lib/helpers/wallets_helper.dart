@@ -1,3 +1,4 @@
+import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_model.dart';
@@ -25,6 +26,7 @@ class WalletsHelper {
     account.addressList = addressList;
     account.balanceList = [BalanceModel(token: 'DFI', balance: 0)];
     account.historyList = [];
+    account.testnetHistoryList = [];
     account.index = accountIndex;
     account.activeToken = 'DFI';
     return account;
@@ -37,14 +39,23 @@ class WalletsHelper {
     for (var accountIndex = 0; accountIndex < 10; accountIndex++) {
       statusBar(10, accountIndex);
       List<AddressModel> addressList = [];
-      List<HistoryModel> historyList = [];
+      List<HistoryNew> historyList = [];
+      List<HistoryModel> testnetHistoryList = [];
       addressList.add(await _hdWalletService.getAddressModelFromKeyPair(
           masterKeyPair, accountIndex, network));
       var balances =
           await _balanceRequests.getBalanceListByAddressList(addressList, network);
-      TxListModel txListModel = await _historyRequests.getFullHistoryList(
-          addressList[0], 'DFI', network);
-      historyList.addAll(txListModel.list!);
+
+      if (network == 'mainnet') {
+        List<HistoryNew> txListModel = await _historyRequests.getHistory(
+            addressList[0], 'DFI', network);
+        historyList.addAll(txListModel);
+      } else {
+        TxListModel testnetTxListModel = await _historyRequests.getFullHistoryList(
+            addressList[0], 'DFI', network
+        );
+        testnetHistoryList.addAll(testnetTxListModel.list!);
+      }
       if (balances.length == 0) {
         balances.add(BalanceModel(token: 'DFI', balance: 0));
       } else {
@@ -55,8 +66,9 @@ class WalletsHelper {
         addressList: addressList,
         balanceList: balances,
         historyList: historyList,
-        transactionNext: txListModel.transactionNext,
-        historyNext: txListModel.historyNext,
+        testnetHistoryList: testnetHistoryList,
+        transactionNext: '',
+        historyNext: '',
         activeToken: balances[0].token,
       ));
     }
