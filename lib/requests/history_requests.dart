@@ -27,9 +27,7 @@ class HistoryRequests {
 
       final Uri url = Uri.parse(urlAddress);
 
-      final headers = {'Content-type': 'application/json'};
-
-      final response = await http.get(url, headers: headers);
+      final response = await http.get(url);
       if (response.statusCode == 200) {
         var body = jsonDecode(response.body);
         List<HistoryNew> list = List<HistoryNew>.generate(
