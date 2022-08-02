@@ -24,7 +24,6 @@ class SelectBuyOrSellScreen extends StatefulWidget {
 class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
   BalancesHelper balancesHelper = BalancesHelper();
 
-
   @override
   Widget build(BuildContext context) {
     var buyCallback = (state) {
@@ -104,7 +103,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                         child: Text(
                           '${balancesHelper.numberStyling(fiatState.limit! / 100)}€ / Day',
                           style: Theme.of(context).textTheme.headline1!.apply(
-                                fontFamily: 'IBM Plex Sans',
+                                fontFamily: 'IBM Plex Medium',
                               ),
                         ),
                       ),
