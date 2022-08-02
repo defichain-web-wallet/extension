@@ -202,10 +202,22 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
     await accountCubit.updateActiveToken(activeToken);
     if (SettingsHelper.settings.network! == 'testnet') {
       await accountCubit.saveAccountsToStorage(
-          null, null, state.accounts, state.masterKeyPair, state.accessToken);
+        null,
+        null,
+        state.accounts,
+        state.masterKeyPair,
+        state.accessToken,
+        state.mnemonic,
+      );
     } else {
       await accountCubit.saveAccountsToStorage(
-          state.accounts, state.masterKeyPair, null, null, state.accessToken);
+        state.accounts,
+        state.masterKeyPair,
+        null,
+        null,
+        state.accessToken,
+        state.mnemonic,
+      );
     }
 
     await Navigator.push(
