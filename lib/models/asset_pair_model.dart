@@ -16,23 +16,26 @@ class AssetPairModel {
   double? totalLiquidity;
   double? totalLiquidityUsd;
   double? apr;
+  double? fee;
 
-  AssetPairModel(
-      {this.id,
-      this.idA,
-      this.idB,
-      this.symbol,
-      this.tokenA,
-      this.tokenB,
-      this.status,
-      this.reserveA,
-      this.reserveB,
-      this.reserveADivReserveB,
-      this.reserveBDivReserveA,
-      this.totalLiquidityRaw,
-      this.totalLiquidityUsd,
-      this.totalLiquidity,
-      this.apr});
+  AssetPairModel({
+    this.id,
+    this.idA,
+    this.idB,
+    this.symbol,
+    this.tokenA,
+    this.tokenB,
+    this.status,
+    this.reserveA,
+    this.reserveB,
+    this.reserveADivReserveB,
+    this.reserveBDivReserveA,
+    this.totalLiquidityRaw,
+    this.totalLiquidityUsd,
+    this.totalLiquidity,
+    this.apr,
+    this.fee,
+  });
 
   AssetPairModel.fromJson(Map<String, dynamic> json) {
     this.id = int.parse(json["id"]);
@@ -64,6 +67,12 @@ class AssetPairModel {
     } catch (e) {
       this.apr = 0.0;
     }
+
+    try {
+      this.fee = double.parse(json["tokenA"]["fee"]["pct"]);
+    } catch (err) {
+      this.fee = 0;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -81,6 +90,7 @@ class AssetPairModel {
     data["totalLiquidity"] = this.totalLiquidity;
     data["totalLiquidityUsd"] = this.totalLiquidityUsd;
     data["apr"] = this.apr;
+    data["fee"] = this.fee;
     return data;
   }
 }

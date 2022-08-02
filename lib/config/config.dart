@@ -4,6 +4,10 @@ class Hosts {
   static const String ocean = 'https://testnet-ocean.mydefichain.com:8443/v0';
 }
 
+class DfxApi {
+  static const String url = 'https://api.dfi.tax/p01/hst/';
+}
+
 class ScreenSizes {
   static const double xSmall = 328;
   static const double small = 458;
