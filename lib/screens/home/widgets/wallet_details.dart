@@ -60,58 +60,70 @@ class _WalletDetailsState extends State<WalletDetails> {
                 : activeAsset.name;
 
             return Container(
-              padding: const EdgeInsets.symmetric(vertical: 32),
               child: Column(
                 children: [
                   Container(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ElevatedButton(
-                          onPressed: () => setState(() {
-                            activeAsset = AssetList.fiat;
-                          }),
-                          child: Text(
-                            SettingsHelper.settings.currency!,
-                            style: getTextStyle(AssetList.fiat),
+                        SizedBox(
+                          width: 40,
+                          height: 16,
+                          child: ElevatedButton(
+                            onPressed: () => setState(() {
+                              activeAsset = AssetList.fiat;
+                            }),
+                            child: Text(
+                              SettingsHelper.settings.currency!,
+                              style: getTextStyle(AssetList.fiat),
+                            ),
+                            style: getButtonStyle(AssetList.fiat),
                           ),
-                          style: getButtonStyle(AssetList.fiat),
                         ),
-                        SizedBox(width: 24),
-                        ElevatedButton(
-                          onPressed: () => setState(() {
-                            activeAsset = AssetList.dfi;
-                          }),
-                          child: Text(
-                            'DFI',
-                            style: getTextStyle(AssetList.dfi),
+                        SizedBox(width: 8),
+                        SizedBox(
+                          width: 40,
+                          height: 16,
+                          child: ElevatedButton(
+                            onPressed: () => setState(() {
+                              activeAsset = AssetList.dfi;
+                            }),
+                            child: Text(
+                              'DFI',
+                              overflow: TextOverflow.visible,
+                              maxLines: 1,
+                              style: getTextStyle(AssetList.dfi),
+                            ),
+                            style: getButtonStyle(AssetList.dfi),
                           ),
-                          style: getButtonStyle(AssetList.dfi),
                         ),
-                        SizedBox(width: 24),
-                        TextButton(
-                          onPressed: () => setState(() {
-                            activeAsset = AssetList.btc;
-                          }),
-                          child: Text(
-                            'BTC',
-                            style: getTextStyle(AssetList.btc),
+                        SizedBox(width: 8),
+                        SizedBox(
+                          width: 40,
+                          height: 16,
+                          child: TextButton(
+                            onPressed: () => setState(() {
+                              activeAsset = AssetList.btc;
+                            }),
+                            child: Text(
+                              'BTC',
+                              style: getTextStyle(AssetList.btc),
+                            ),
+                            style: getButtonStyle(AssetList.btc),
                           ),
-                          style: getButtonStyle(AssetList.btc),
                         ),
                       ],
                     ),
                   ),
                   SizedBox(
-                    height: 22,
+                    height: 12,
                   ),
                   Container(
                     child: Center(
                       child: Text(
                         "${balancesHelper.numberStyling(totalResult, fixed: true, fixedCount: 6)} ${activeAssetName.toUpperCase()}",
                         style: Theme.of(context).textTheme.headline1!.apply(
-                          fontWeightDelta: 2,
-                              fontFamily: 'IBM Plex Bold',
+                              fontFamily: 'IBM Plex Medium',
                             ),
                       ),
                     ),
@@ -128,9 +140,10 @@ class _WalletDetailsState extends State<WalletDetails> {
   }
 
   ButtonStyle getButtonStyle(AssetList targetAsset) => ButtonStyle(
+        padding: MaterialStateProperty.all(const EdgeInsets.all(0)),
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
+                borderRadius: BorderRadius.circular(4.0),
                 side: BorderSide(color: Colors.transparent))),
         shadowColor: MaterialStateProperty.all(Colors.transparent),
         backgroundColor: activeAsset == targetAsset
@@ -139,10 +152,10 @@ class _WalletDetailsState extends State<WalletDetails> {
       );
 
   TextStyle getTextStyle(AssetList targetAsset) =>
-      Theme.of(context).textTheme.headline5!.apply(
+      Theme.of(context).textTheme.subtitle2!.apply(
           fontStyle: FontStyle.normal,
-          fontSizeFactor: 0.9,
+          decoration: TextDecoration.none,
           color: activeAsset == targetAsset
               ? AppTheme.pinkColor
-              : Theme.of(context).textTheme.headline3!.color);
+              : Theme.of(context).textTheme.subtitle2!.color);
 }

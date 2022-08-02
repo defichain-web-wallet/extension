@@ -9,6 +9,7 @@ import 'package:defi_wallet/screens/send/send_token_selector.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ActionButtonsList extends StatelessWidget {
   final Function() hideOverlay;
@@ -79,7 +80,8 @@ class ActionButtonsList extends StatelessWidget {
         Navigator.push(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => SelectBuyOrSellScreen(),
+              pageBuilder: (context, animation1, animation2) =>
+                  SelectBuyOrSellScreen(),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ));
@@ -87,36 +89,38 @@ class ActionButtonsList extends StatelessWidget {
     };
     return BlocBuilder<FiatCubit, FiatState>(
       builder: (BuildContext context, state) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ActionButton(
-              iconPath: 'assets/images/receive.png',
-              label: 'Receive',
-              onPressed: receiveCallback,
-            ),
-            ActionButton(
-              iconPath: 'assets/images/send.png',
-              label: 'Send',
-              onPressed: sendCallback,
-            ),
-            ActionButton(
-              iconPath: 'assets/images/swap.png',
-              label: 'Swap',
-              onPressed: swapCallback,
-            ),
-            ActionButton(
-              iconPath: 'assets/images/buy_sell.png',
-              label: 'Buy/Sell',
-              onPressed: () => buySellCallback(state),
-            ),
-            ActionButton(
-              iconPath: 'assets/images/liquidity.png',
-              label: 'Liquidity',
-              onPressed: liquidityCallback,
-            ),
-
-          ],
+        return Container(
+          width: 340,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ActionButton(
+                iconPath: 'assets/images/receive.png',
+                label: 'Receive',
+                onPressed: receiveCallback,
+              ),
+              ActionButton(
+                iconPath: 'assets/images/send.png',
+                label: 'Send',
+                onPressed: sendCallback,
+              ),
+              ActionButton(
+                iconPath: 'assets/images/swap.png',
+                label: 'Swap',
+                onPressed: swapCallback,
+              ),
+              ActionButton(
+                iconPath: 'assets/images/buy_sell.png',
+                label: 'Buy/Sell',
+                onPressed: () => buySellCallback(state),
+              ),
+              ActionButton(
+                iconPath: 'assets/images/earn.png',
+                label: 'Earn',
+                onPressed: liquidityCallback,
+              ),
+            ],
+          ),
         );
       },
     );
@@ -138,29 +142,29 @@ class ActionButton extends StatelessWidget {
     return Column(
       children: [
         Container(
+          width: 35,
           decoration: BoxDecoration(
             color: Colors.transparent,
             shape: BoxShape.circle,
-            border: Border.all(color: AppTheme.pinkColor, width: 2),
+            border: Border.all(color: AppTheme.pinkColor, width: 1.5),
           ),
           child: IconButton(
-            iconSize: 26,
+            iconSize: 22,
             icon: Image(
               image: AssetImage(iconPath!),
-              width: 15,
-              height: 15,
+              width: 12,
+              height: 12,
             ),
             onPressed: () =>
                 lockHelper.provideWithLockChecker(context, () => onPressed!()),
           ),
         ),
-        SizedBox(height: 6),
         Text(
           label!,
           style: Theme.of(context)
               .textTheme
-              .headline3!
-              .apply(color: AppTheme.pinkColor),
+              .headline4!
+              .apply(color: AppTheme.pinkColor, fontSizeFactor: 0.9),
         ),
       ],
     );

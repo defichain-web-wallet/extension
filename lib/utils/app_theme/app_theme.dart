@@ -8,7 +8,7 @@ class AppTheme {
   static const Color darkTextColor = Color(0xff132235);
   static const Color shadowColor = Color(0xff131415);
 
-  static const String mainFontFamily = 'Roboto';
+  static const String mainFontFamily = 'IBM Plex Sans';
 
   // Текст - ссылка в стиле DEFI (розовая с нижним подчеркиванием)
   static TextStyle get defiUnderlineText {
@@ -34,7 +34,7 @@ class AppTheme {
         color: Colors.white,
         fontFamily: mainFontFamily,
         fontSize: 16,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.normal,
       ),
       shadowColor: Colors.black.withOpacity(0.35),
       elevation: 8,
@@ -64,38 +64,37 @@ class AppTheme {
       ),
       textTheme: TextTheme(
         headline1: TextStyle(
-          fontSize: 34,
-          fontWeight: FontWeight.normal,
-        ),
+            fontSize: 30,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline2: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-        ),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline3: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-        ),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline4: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.normal,
-        ),
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline5: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-        ),
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline6: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-        ),
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         subtitle1: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.normal,
-        ),
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         subtitle2: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          decoration: TextDecoration.underline,
-        ),
+            fontSize: 9,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         button: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.normal,
@@ -125,7 +124,7 @@ class AppTheme {
             color: darkTextColor,
             fontFamily: mainFontFamily,
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.normal,
           ),
           shadowColor: Colors.black.withOpacity(0.35),
           elevation: 8,
@@ -175,48 +174,47 @@ class AppTheme {
       ),
       textTheme: TextTheme(
         headline1: TextStyle(
-          fontSize: 34,
-          fontWeight: FontWeight.bold,
-        ),
+            fontSize: 30,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline2: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-        ),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline3: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline4: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.normal,
-        ),
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline5: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-        ),
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         headline6: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         subtitle1: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         subtitle2: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          decoration: TextDecoration.underline,
-        ),
+            fontSize: 9,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'IBM Plex Sans'),
         button: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-          decorationColor: Color(0xff545556),
-        ),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            decorationColor: Color(0xff545556),
+            fontFamily: 'IBM Plex Sans'),
         bodyText1: TextStyle(
-          fontSize: 19,
-          fontWeight: FontWeight.bold,
-          decorationColor: Colors.grey.withOpacity(0.7),
-        ),
+            fontSize: 19,
+            fontWeight: FontWeight.normal,
+            decorationColor: Colors.grey.withOpacity(0.7),
+            fontFamily: 'IBM Plex Sans'),
       ).apply(
         fontFamily: mainFontFamily,
         bodyColor: Colors.white,
@@ -236,7 +234,7 @@ class AppTheme {
             color: Colors.white,
             fontFamily: mainFontFamily,
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.normal,
           ),
           shadowColor: Colors.black.withOpacity(0.35),
           elevation: 8,
@@ -247,9 +245,8 @@ class AppTheme {
         elevation: 0,
         backgroundColor: Color(0xff333436),
         shadowColor: Colors.black.withOpacity(0.35),
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-        ),
+        titleTextStyle:
+            TextStyle(color: Colors.white, fontFamily: 'IBM Plex Sans'),
         actionsIconTheme: IconThemeData(
           color: Colors.white,
         ),

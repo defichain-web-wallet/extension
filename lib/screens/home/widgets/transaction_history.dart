@@ -79,7 +79,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 
                 return Padding(
                   padding: const EdgeInsets.only(
-                      bottom: 8, left: 6, right: 6, top: 2),
+                      bottom: 8, left: 16, right: 16, top: 2),
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),

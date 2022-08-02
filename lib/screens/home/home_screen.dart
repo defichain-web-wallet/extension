@@ -91,67 +91,68 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         builder: (context, tokensState) {
           return BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, transactionState) {
-                return ScaffoldConstrainedBox(
-                  child: GestureDetector(
-                    child: LayoutBuilder(builder: (context, constraints) {
-                      if (state.status == AccountStatusList.loading ||
-                          tokensState.status == TokensStatusList.loading) {
-                        return Container(
-                          child: Center(
-                            child: Loader(),
-                          ),
-                        );
-                      }
+            return ScaffoldConstrainedBox(
+              child: GestureDetector(
+                child: LayoutBuilder(builder: (context, constraints) {
+                  if (state.status == AccountStatusList.loading ||
+                      tokensState.status == TokensStatusList.loading) {
+                    return Container(
+                      child: Center(
+                        child: Loader(),
+                      ),
+                    );
+                  }
 
-                      if (constraints.maxWidth < ScreenSizes.medium) {
-                        return Scaffold(
-                          appBar: HomeAppBar(
-                            selectKey: selectKey,
-                            updateCallback: () =>
-                                updateAccountDetails(context, state),
-                            hideOverlay: () => hideOverlay(),
-                            isShowBottom:
+                  if (constraints.maxWidth < ScreenSizes.medium) {
+                    return Scaffold(
+                      appBar: HomeAppBar(
+                        selectKey: selectKey,
+                        updateCallback: () =>
+                            updateAccountDetails(context, state),
+                        hideOverlay: () => hideOverlay(),
+                        isShowBottom:
                             !(transactionState is TransactionInitialState),
-                            height: !(transactionState is TransactionInitialState)
-                                ? toolbarHeightWithBottom
-                                : toolbarHeight,
-                          ),
-                          body: _buildBody(
-                              context, state, transactionState, tokensState),
-                        );
-                      } else {
-                        return Container(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Scaffold(
-                            body: _buildBody(
-                                context, state, transactionState, tokensState),
-                            appBar: HomeAppBar(
-                              selectKey: selectKey,
-                              updateCallback: () =>
-                                  updateAccountDetails(context, state),
-                              hideOverlay: () => hideOverlay(),
-                              isShowBottom:
+                        height: !(transactionState is TransactionInitialState)
+                            ? toolbarHeightWithBottom
+                            : toolbarHeight,
+                      ),
+                      body: _buildBody(
+                          context, state, transactionState, tokensState),
+                    );
+                  } else {
+                    return Container(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Scaffold(
+                        body: _buildBody(
+                            context, state, transactionState, tokensState,
+                            isFullSize: true),
+                        appBar: HomeAppBar(
+                          selectKey: selectKey,
+                          updateCallback: () =>
+                              updateAccountDetails(context, state),
+                          hideOverlay: () => hideOverlay(),
+                          isShowBottom:
                               !(transactionState is TransactionInitialState),
-                              height:
-                              !(transactionState is TransactionInitialState)
-                                  ? toolbarHeightWithBottom
-                                  : toolbarHeight,
-                              isSmall: false,
-                            ),
-                          ),
-                        );
-                      }
-                    }),
-                    onTap: () => hideOverlay(),
-                  ),
-                );
+                          height: !(transactionState is TransactionInitialState)
+                              ? toolbarHeightWithBottom
+                              : toolbarHeight,
+                          isSmall: false,
+                        ),
+                      ),
+                    );
+                  }
+                }),
+                onTap: () => hideOverlay(),
+              ),
+            );
           });
         },
       );
     });
   }
 
-  Widget _buildBody(context, state, transactionState, tokensState) {
+  Widget _buildBody(context, state, transactionState, tokensState,
+      {isFullSize = false}) {
     if (state.status == AccountStatusList.success &&
         tokensState.status == TokensStatusList.success) {
       return Container(
@@ -162,15 +163,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  color: Theme.of(context).selectedRowColor,
+                  color: isFullSize
+                      ? Theme.of(context).dialogBackgroundColor
+                      : Theme.of(context).selectedRowColor,
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 26, top: 20),
+                        padding: const EdgeInsets.only(top: 40, bottom: 8),
                         child: WalletDetails(),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.only(bottom: 40),
                         child: ActionButtonsList(
                           hideOverlay: () => hideOverlay(),
                         ),
