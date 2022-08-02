@@ -5,6 +5,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/settings_model.dart';
+import 'package:defi_wallet/screens/settings/preview_seed.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/modal_dialog.dart';
@@ -91,6 +92,50 @@ class _SettingsState extends State<Settings> {
                       child: Container(
                         child: Column(
                           children: [
+                            Column(
+                              children: [
+                                Text('Seed'),
+                                SizedBox(
+                                  height: 6,
+                                ),
+                                ListTile(
+                                  onTap: () {
+                                    AccountState accountCubit =
+                                        BlocProvider.of<AccountCubit>(context)
+                                            .state;
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder:
+                                            (context, animation1, animation2) =>
+                                            PreviewSeed(
+                                              mnemonic: accountCubit.mnemonic!,
+                                            ),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration:
+                                        Duration.zero,
+                                      ),
+                                    );
+                                  },
+                                  title: Padding(
+                                    padding: const EdgeInsets.only(bottom: 4),
+                                    child: Text(
+                                      'Recovery seed',
+                                      style:
+                                      Theme.of(context).textTheme.headline3,
+                                    ),
+                                  ),
+                                  subtitle: Text('Click to show recovery seed'),
+                                ),
+                                SizedBox(
+                                  height: 6,
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Divider(),
+                            ),
                             Column(
                               children: [
                                 Text('Currency'),

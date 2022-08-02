@@ -14,6 +14,7 @@ class HiveNames {
   static const String settings = 'settings';
   static const String openedMnemonic = 'opened_mnemonic';
   static const String recoveryMnemonic = 'recovery_mnemonic';
+  static const String savedMnemonic = 'saved_mnemonic';
   static const String ongoingTransaction = 'ongoing_transaction';
   static const String tutorialStatus = 'tutorial_status';
   static const String kycStatus = 'kyc_status';
