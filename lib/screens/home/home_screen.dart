@@ -196,7 +196,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       padding: const EdgeInsets.only(top: 20),
                       child: Scaffold(
                         body: _buildBody(
-                            context, state, transactionState, tokensState),
+                            context, state, transactionState, tokensState,
+                            isFullSize: true),
                         appBar: HomeAppBar(
                           selectKey: selectKey,
                           updateCallback: () =>
@@ -222,7 +223,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
-  Widget _buildBody(context, state, transactionState, tokensState) {
+  Widget _buildBody(context, state, transactionState, tokensState,
+      {isFullSize = false}) {
     if (state.status == AccountStatusList.success &&
         tokensState.status == TokensStatusList.success) {
       setTabBody(tabIndex: tabController!.index);
@@ -250,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       bottom: 26, top: 20),
-                                  child: WalletDetails(layoutSize: 'small'),
+                                  child: WalletDetails(),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 16),
@@ -293,6 +295,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             child: TabBarBody(
                               tabController: tabController,
                               historyList: state.activeAccount.historyList!,
+                              testnetHistoryList: state.activeAccount.testnetHistoryList!,
                             ),
                           ),
                         ),
@@ -322,7 +325,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       bottom: 26, top: 20),
-                                  child: WalletDetails(layoutSize: 'small'),
+                                  child: WalletDetails(),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 16),
@@ -365,6 +368,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             child: TabBarBody(
                               tabController: tabController,
                               historyList: state.activeAccount.historyList!,
+                              testnetHistoryList: state.activeAccount.testnetHistoryList!,
                             ),
                           ),
                         ),

@@ -1,19 +1,15 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
-import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/screens/buy/contact_screen.dart';
-import 'package:defi_wallet/screens/buy/search_buy_token.dart';
 import 'package:defi_wallet/screens/dex/swap_screen.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screen.dart';
-import 'package:defi_wallet/screens/sell/account_type_sell.dart';
-import 'package:defi_wallet/screens/sell/selling.dart';
+import 'package:defi_wallet/screens/select_buy_or_sell/select_buy_or_sell_screen.dart';
 import 'package:defi_wallet/screens/send/send_token_selector.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ActionButtonsList extends StatelessWidget {
   final Function() hideOverlay;
@@ -67,7 +63,7 @@ class ActionButtonsList extends StatelessWidget {
             reverseTransitionDuration: Duration.zero,
           ));
     };
-    var buyCallback = (state) {
+    var buySellCallback = (state) {
       if (SettingsHelper.settings.network == 'testnet') {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -79,91 +75,52 @@ class ActionButtonsList extends StatelessWidget {
           ),
         );
         return;
-      }
-      if (state.isShowTutorial) {
-        hideOverlay();
-        Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => ContactScreen(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ));
       } else {
         hideOverlay();
         Navigator.push(
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
-                  SearchBuyToken(),
+                  SelectBuyOrSellScreen(),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ));
       }
     };
-    var sellCallback = (state) async {
-      if (SettingsHelper.settings.network == 'testnet') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Forbidden to testnet',
-              style: Theme.of(context).textTheme.headline5,
-            ),
-            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-          ),
-        );
-        return;
-      }
-      var box = await Hive.openBox(HiveBoxes.client);
-      var kycStatus = await box.get(HiveNames.kycStatus);
-      bool isSkipKyc = kycStatus == 'skip';
-      await box.close();
-      hideOverlay();
-      Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                isSkipKyc ? Selling() : AccountTypeSell(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ));
-    };
     return BlocBuilder<FiatCubit, FiatState>(
       builder: (BuildContext context, state) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ActionButton(
-              iconPath: 'assets/images/receive.png',
-              label: 'Receive',
-              onPressed: receiveCallback,
-            ),
-            ActionButton(
-              iconPath: 'assets/images/send.png',
-              label: 'Send',
-              onPressed: sendCallback,
-            ),
-            ActionButton(
-              iconPath: 'assets/images/swap.png',
-              label: 'Swap',
-              onPressed: swapCallback,
-            ),
-            ActionButton(
-              iconPath: 'assets/images/liquidity.png',
-              label: 'Liquidity',
-              onPressed: liquidityCallback,
-            ),
-            ActionButton(
-              iconPath: 'assets/images/buy.png',
-              label: 'Buy',
-              onPressed: () => buyCallback(state),
-            ),
-            ActionButton(
-              iconPath: 'assets/images/sell.png',
-              label: 'Sell',
-              onPressed: () => sellCallback(state),
-            ),
-          ],
+        return Container(
+          width: 340,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ActionButton(
+                iconPath: 'assets/images/receive.png',
+                label: 'Receive',
+                onPressed: receiveCallback,
+              ),
+              ActionButton(
+                iconPath: 'assets/images/send.png',
+                label: 'Send',
+                onPressed: sendCallback,
+              ),
+              ActionButton(
+                iconPath: 'assets/images/swap.png',
+                label: 'Swap',
+                onPressed: swapCallback,
+              ),
+              ActionButton(
+                iconPath: 'assets/images/buy_sell.png',
+                label: 'Buy/Sell',
+                onPressed: () => buySellCallback(state),
+              ),
+              ActionButton(
+                iconPath: 'assets/images/earn.png',
+                label: 'Earn',
+                onPressed: liquidityCallback,
+              ),
+            ],
+          ),
         );
       },
     );
@@ -185,29 +142,29 @@ class ActionButton extends StatelessWidget {
     return Column(
       children: [
         Container(
+          width: 35,
           decoration: BoxDecoration(
             color: Colors.transparent,
             shape: BoxShape.circle,
-            border: Border.all(color: AppTheme.pinkColor, width: 2),
+            border: Border.all(color: AppTheme.pinkColor, width: 1.5),
           ),
           child: IconButton(
-            iconSize: 26,
+            iconSize: 22,
             icon: Image(
               image: AssetImage(iconPath!),
-              width: 15,
-              height: 15,
+              width: 12,
+              height: 12,
             ),
             onPressed: () =>
                 lockHelper.provideWithLockChecker(context, () => onPressed!()),
           ),
         ),
-        SizedBox(height: 6),
         Text(
           label!,
           style: Theme.of(context)
               .textTheme
-              .headline3!
-              .apply(color: AppTheme.pinkColor),
+              .headline4!
+              .apply(color: AppTheme.pinkColor, fontSizeFactor: 0.9),
         ),
       ],
     );

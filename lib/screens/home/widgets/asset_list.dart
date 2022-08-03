@@ -37,7 +37,7 @@ class AssetList extends StatelessWidget {
 
                 return Padding(
                   padding: const EdgeInsets.only(
-                      bottom: 8, left: 6, right: 6, top: 2),
+                      bottom: 8, left: 16, right: 16, top: 2),
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -59,7 +59,10 @@ class AssetList extends StatelessWidget {
                       subtitle: Text(
                         getFormatTokenBalanceByFiat(
                             tokensState, coin, tokenBalance, currency),
-                        style: Theme.of(context).textTheme.headline4,
+                        style: Theme.of(context).textTheme.headline4!.apply(
+                          color: SettingsHelper.settings.theme == 'dark' ? Colors.white : Color(0xFF7D7D7D),
+                          fontSizeFactor: 0.9
+                        ),
                       ),
                     ),
                   ),
@@ -97,10 +100,10 @@ class AssetList extends StatelessWidget {
     if (tokenHelper.isPair(coin)) {
       double satoshi = convertToSatoshi(tokenBalance) + .0;
       balanceInUsd = tokenHelper.getPairsAmountByUsd(
-          state.tokensPairs, satoshi, coin, fiat);
+          state.tokensPairs, satoshi, coin);
     } else {
       balanceInUsd = tokenHelper.getAmountByUsd(
-          state.tokensPairs, tokenBalance, coin, fiat);
+          state.tokensPairs, tokenBalance, coin);
     }
     if (fiat == 'EUR') {
       balanceInUsd *= state.eurRate;

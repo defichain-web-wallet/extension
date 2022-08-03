@@ -52,6 +52,7 @@ class _IbanScreenState extends State<IbanScreen> {
                   return Scaffold(
                     appBar: MainAppBar(
                       title: 'Buying Token with Fiat',
+                      hideOverlay: () => hideOverlay(),
                     ),
                     body: _buildBody(state, accountState),
                   );
@@ -61,6 +62,7 @@ class _IbanScreenState extends State<IbanScreen> {
                     child: Scaffold(
                       appBar: MainAppBar(
                         title: 'Buying Token with Fiat',
+                        hideOverlay: () => hideOverlay(),
                         isSmall: true,
                       ),
                       body: _buildBody(state, accountState, isFullSize: true),
@@ -150,7 +152,10 @@ class _IbanScreenState extends State<IbanScreen> {
                     Expanded(
                       child: AccentButton(
                           label: 'Cancel',
-                          callback: () => Navigator.of(context).pop()),
+                          callback: () {
+                            hideOverlay();
+                            Navigator.of(context).pop();
+                          }),
                     ),
                     SizedBox(width: 16),
                     Expanded(

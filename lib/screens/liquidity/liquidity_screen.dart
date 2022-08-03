@@ -91,7 +91,10 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
               if (!element.isHidden! && !element.isPair!) {
                 var balance = convertFromSatoshi(element.balance!);
                 totalTokensBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!, balance, element.token!, 'USD');
+                  tokensState.tokensPairs!,
+                  balance,
+                  element.token!,
+                );
               } else if (element.isPair!) {
                 var foundedAssetPair = List.from(tokensState.tokensPairs!
                     .where((item) => element.token == item.symbol))[0];
@@ -104,26 +107,26 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                     foundedAssetPair.reserveB!;
 
                 totalTokensBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    baseBalance,
-                    foundedAssetPair.tokenA,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  baseBalance,
+                  foundedAssetPair.tokenA,
+                );
                 totalTokensBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    quoteBalance,
-                    foundedAssetPair.tokenB,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  quoteBalance,
+                  foundedAssetPair.tokenB,
+                );
 
                 totalPairsBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    baseBalance,
-                    foundedAssetPair.tokenA,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  baseBalance,
+                  foundedAssetPair.tokenA,
+                );
                 totalPairsBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    quoteBalance,
-                    foundedAssetPair.tokenB,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  quoteBalance,
+                  foundedAssetPair.tokenB,
+                );
               }
             });
 
@@ -178,6 +181,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                             ),
                           ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             TextButton(
                               child: Text(

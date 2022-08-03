@@ -9,10 +9,12 @@ class IconHistoryType extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (type) {
+      case 'SEND':
       case 'vin':
         return SvgPicture.asset(
           'assets/send_icon.svg',
         );
+      case 'RECEIVE':
       case 'vout':
         return SvgPicture.asset(
           'assets/receive_icon.svg',

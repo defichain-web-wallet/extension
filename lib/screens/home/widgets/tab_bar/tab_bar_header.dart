@@ -9,6 +9,9 @@ class TabBarHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Ink(
         child: TabBar(
+          labelStyle: TextStyle(
+            fontWeight: FontWeight.normal,
+          ),
           unselectedLabelColor:
               Theme.of(context).textTheme.headline1!.color!.withOpacity(0.6),
           labelColor: AppTheme.pinkColor,
