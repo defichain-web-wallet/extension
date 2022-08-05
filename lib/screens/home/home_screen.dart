@@ -41,80 +41,66 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   LockHelper lockHelper = LockHelper();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
-  late ScrollController _controller;
-  bool isChangeScrollOffset = true;
-  double tabBodyHeight = 0;
-  double minDefaultTabBodyHeight = 195;
-  double maxDefaultTabBodyHeight = 595;
-
-  _scrollListener() {
-    HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
-
-    isChangeScrollOffset = true;
-    if (_controller.offset >= _controller.position.maxScrollExtent &&
-        !_controller.position.outOfRange) {
-      isChangeScrollOffset = false;
-    }
-    if (_controller.offset > 0) {
-      homeCubit.onHide();
-    } else {
-      if (isChangeScrollOffset) {
-        homeCubit.onShow();
-      }
-    }
-  }
+  bool isFullSizeScreen = false;
+  double assetsTabBodyHeight = 0;
+  double historyTabBodyHeight = 0;
+  double minDefaultTabBodyHeight = 275;
+  double maxDefaultTabBodyHeight = 475;
+  double maxHistoryEntries = 30;
+  double heightListEntry = 74;
+  double heightAdditionalAction = 60;
 
   tabListener() {
-    print(tabController);
+    HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
+    homeCubit.updateTabIndex(index: tabController!.index);
     setTabBody(tabIndex: tabController!.index);
   }
 
-  setTabBody({tabIndex = 0}) {
-    HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
+  setTabBody({int tabIndex = 0}) {
     AccountState accountState = BlocProvider.of<AccountCubit>(context).state;
     double countAssets = 0;
+    double countTransactions = 0;
 
-    if (tabIndex == 0) {
-      countAssets = accountState.activeAccount!.balanceList!
-          .where((el) => !el.isHidden!)
-          .length
-          .toDouble();
-      if (countAssets < 6) {
-        tabBodyHeight = countAssets * 104;
-      } else {
-        tabBodyHeight = countAssets * 84;
+    countAssets = accountState.activeAccount!.balanceList!
+        .where((el) => !el.isHidden!)
+        .length
+        .toDouble();
+    assetsTabBodyHeight =
+        countAssets * heightListEntry + heightAdditionalAction;
+
+    countTransactions =
+        accountState.activeAccount!.historyList!.length.toDouble();
+    if (countTransactions < maxHistoryEntries) {
+      historyTabBodyHeight =
+          countTransactions * heightListEntry + heightAdditionalAction;
+    } else {
+      historyTabBodyHeight =
+          maxHistoryEntries * heightListEntry + heightAdditionalAction;
+    }
+
+    if (isFullSizeScreen) {
+      if (assetsTabBodyHeight < maxDefaultTabBodyHeight) {
+        assetsTabBodyHeight = maxDefaultTabBodyHeight;
       }
 
-      if (countAssets == 2) {
-        tabBodyHeight += 280;
-      } else if (countAssets == 3) {
-        tabBodyHeight += 180;
-      } else if (countAssets == 4) {
-        tabBodyHeight += 80;
-      } else if (countAssets == 5) {
-        tabBodyHeight -= 30;
+      if (historyTabBodyHeight < maxDefaultTabBodyHeight) {
+        historyTabBodyHeight = maxDefaultTabBodyHeight;
       }
     } else {
-      countAssets =
-          accountState.activeAccount!.historyList!.length.toDouble();
-      tabBodyHeight = countAssets * 54;
-    }
+      if (assetsTabBodyHeight < minDefaultTabBodyHeight) {
+        assetsTabBodyHeight = minDefaultTabBodyHeight;
+      }
 
-    if (tabBodyHeight < minDefaultTabBodyHeight) {
-      tabBodyHeight = minDefaultTabBodyHeight;
-      homeCubit.onShow();
+      if (historyTabBodyHeight < minDefaultTabBodyHeight) {
+        historyTabBodyHeight = minDefaultTabBodyHeight;
+      }
     }
-
-    print(countAssets);
-    print(tabBodyHeight);
   }
 
   @override
   void initState() {
     super.initState();
     setTabBody();
-    _controller = ScrollController();
-    _controller.addListener(_scrollListener);
     tabController = TabController(length: 2, vsync: this);
     tabController!.addListener(tabListener);
     TransactionCubit transactionCubit =
@@ -227,158 +213,79 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       {isFullSize = false}) {
     if (state.status == AccountStatusList.success &&
         tokensState.status == TokensStatusList.success) {
+      isFullSizeScreen = isFullSize;
       setTabBody(tabIndex: tabController!.index);
       return BlocBuilder<HomeCubit, HomeState>(
         builder: (context, homeState) {
-          return LayoutBuilder(builder: (context, constraints) {
-            if (constraints.maxWidth < ScreenSizes.medium) {
-              return Container(
-                child: Center(
-                  child: StretchBox(
-                    maxWidth: ScreenSizes.medium,
-                    child: ListView(
-                      controller: _controller,
-                      children: [
-                        AnimatedSize(
-                          curve: Curves.fastOutSlowIn,
-                          duration: new Duration(milliseconds: 1000),
-                          child: Container(
-                            height: homeState.status == HomeStatusList.show
-                                ? null
-                                : 0,
-                            color: Theme.of(context).dialogBackgroundColor,
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 26, top: 20),
-                                  child: WalletDetails(),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: ActionButtonsList(
-                                    hideOverlay: () => hideOverlay(),
-                                  ),
-                                ),
-                              ],
+          return Container(
+            child: Center(
+              child: StretchBox(
+                maxWidth: ScreenSizes.medium,
+                child: ListView(
+                  children: [
+                    Container(
+                      color: Theme.of(context).dialogBackgroundColor,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8, top: 40),
+                            child: WalletDetails(),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 40),
+                            child: ActionButtonsList(
+                              hideOverlay: () => hideOverlay(),
                             ),
                           ),
-                        ),
-                        Container(
-                          color: Theme.of(context).appBarTheme.backgroundColor,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .appBarTheme
-                                    .backgroundColor,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color:
-                                        AppTheme.shadowColor.withOpacity(0.1),
-                                    spreadRadius: 2,
-                                    blurRadius: 3,
-                                  ),
-                                ],
+                        ],
+                      ),
+                    ),
+                    Container(
+                      color: Colors.transparent,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).appBarTheme.backgroundColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.shadowColor.withOpacity(0.1),
+                                spreadRadius: 2,
+                                blurRadius: 3,
                               ),
-                              child: TabBarHeader(
-                                tabController: tabController,
-                              ),
-                            ),
+                            ],
+                          ),
+                          child: TabBarHeader(
+                            tabController: tabController,
                           ),
                         ),
-                        SizedBox(
-                          height: tabBodyHeight,
-                          child: Container(
-                            color: Colors.white,
+                      ),
+                    ),
+                    homeState.tabIndex == 0
+                        ? SizedBox(
+                            height: assetsTabBodyHeight,
                             child: TabBarBody(
                               tabController: tabController,
                               historyList: state.activeAccount.historyList!,
-                              testnetHistoryList: state.activeAccount.testnetHistoryList!,
+                              testnetHistoryList:
+                                  state.activeAccount.testnetHistoryList!,
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            } else {
-              return Container(
-                child: Center(
-                  child: StretchBox(
-                    maxWidth: ScreenSizes.medium,
-                    child: ListView(
-                      controller: _controller,
-                      children: [
-                        AnimatedSize(
-                          curve: Curves.fastOutSlowIn,
-                          duration: new Duration(milliseconds: 1000),
-                          child: Container(
-                            height: homeState.status == HomeStatusList.show
-                                ? null
-                                : 0,
-                            color: Theme.of(context).dialogBackgroundColor,
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 26, top: 20),
-                                  child: WalletDetails(),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: ActionButtonsList(
-                                    hideOverlay: () => hideOverlay(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Container(
-                          color: Theme.of(context).appBarTheme.backgroundColor,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .appBarTheme
-                                    .backgroundColor,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color:
-                                    AppTheme.shadowColor.withOpacity(0.1),
-                                    spreadRadius: 2,
-                                    blurRadius: 3,
-                                  ),
-                                ],
-                              ),
-                              child: TabBarHeader(
-                                tabController: tabController,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: tabBodyHeight,
-                          child: Container(
-                            color: Colors.white,
+                          )
+                        : SizedBox(
+                            height: historyTabBodyHeight,
                             child: TabBarBody(
                               tabController: tabController,
                               historyList: state.activeAccount.historyList!,
-                              testnetHistoryList: state.activeAccount.testnetHistoryList!,
+                              testnetHistoryList:
+                                  state.activeAccount.testnetHistoryList!,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
-              );
-            }
-          });
+              ),
+            ),
+          );
         },
       );
     } else if (tokensState.status == TokensStatusList.failure) {

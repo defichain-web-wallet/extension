@@ -17,4 +17,10 @@ class HomeCubit extends Cubit<HomeState> {
       status: HomeStatusList.show,
     ));
   }
+
+  updateTabIndex({int index = 0}) {
+    emit(state.copyWith(
+      tabIndex: index,
+    ));
+  }
 }
