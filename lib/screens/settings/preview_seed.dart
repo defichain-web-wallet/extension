@@ -52,7 +52,7 @@ class _PreviewSeedState extends State<PreviewSeed> {
             child: Scaffold(
               appBar: MainAppBar(
                 title: 'Seed',
-                isSmall: false,
+                isSmall: true,
               ),
               body: _buildBody(context, isFullSize: true),
             ),
