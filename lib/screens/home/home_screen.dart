@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
@@ -40,11 +41,68 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   LockHelper lockHelper = LockHelper();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+  bool isFullSizeScreen = false;
+  double assetsTabBodyHeight = 0;
+  double historyTabBodyHeight = 0;
+  double minDefaultTabBodyHeight = 275;
+  double maxDefaultTabBodyHeight = 475;
+  double maxHistoryEntries = 30;
+  double heightListEntry = 74;
+  double heightAdditionalAction = 60;
+
+  tabListener() {
+    HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
+    homeCubit.updateTabIndex(index: tabController!.index);
+    setTabBody(tabIndex: tabController!.index);
+  }
+
+  setTabBody({int tabIndex = 0}) {
+    AccountState accountState = BlocProvider.of<AccountCubit>(context).state;
+    double countAssets = 0;
+    double countTransactions = 0;
+
+    countAssets = accountState.activeAccount!.balanceList!
+        .where((el) => !el.isHidden!)
+        .length
+        .toDouble();
+    assetsTabBodyHeight =
+        countAssets * heightListEntry + heightAdditionalAction;
+
+    countTransactions =
+        accountState.activeAccount!.historyList!.length.toDouble();
+    if (countTransactions < maxHistoryEntries) {
+      historyTabBodyHeight =
+          countTransactions * heightListEntry + heightAdditionalAction;
+    } else {
+      historyTabBodyHeight =
+          maxHistoryEntries * heightListEntry + heightAdditionalAction;
+    }
+
+    if (isFullSizeScreen) {
+      if (assetsTabBodyHeight < maxDefaultTabBodyHeight) {
+        assetsTabBodyHeight = maxDefaultTabBodyHeight;
+      }
+
+      if (historyTabBodyHeight < maxDefaultTabBodyHeight) {
+        historyTabBodyHeight = maxDefaultTabBodyHeight;
+      }
+    } else {
+      if (assetsTabBodyHeight < minDefaultTabBodyHeight) {
+        assetsTabBodyHeight = minDefaultTabBodyHeight;
+      }
+
+      if (historyTabBodyHeight < minDefaultTabBodyHeight) {
+        historyTabBodyHeight = minDefaultTabBodyHeight;
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    setTabBody();
     tabController = TabController(length: 2, vsync: this);
+    tabController!.addListener(tabListener);
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
@@ -155,61 +213,80 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       {isFullSize = false}) {
     if (state.status == AccountStatusList.success &&
         tokensState.status == TokensStatusList.success) {
-      return Container(
-        child: Center(
-          child: StretchBox(
-            maxWidth: ScreenSizes.medium,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  color: isFullSize
-                      ? Theme.of(context).dialogBackgroundColor
-                      : Theme.of(context).selectedRowColor,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 40, bottom: 8),
-                        child: WalletDetails(),
+      isFullSizeScreen = isFullSize;
+      setTabBody(tabIndex: tabController!.index);
+      return BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, homeState) {
+          return Container(
+            child: Center(
+              child: StretchBox(
+                maxWidth: ScreenSizes.medium,
+                child: ListView(
+                  children: [
+                    Container(
+                      color: Theme.of(context).dialogBackgroundColor,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8, top: 40),
+                            child: WalletDetails(),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 40),
+                            child: ActionButtonsList(
+                              hideOverlay: () => hideOverlay(),
+                            ),
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 40),
-                        child: ActionButtonsList(
-                          hideOverlay: () => hideOverlay(),
+                    ),
+                    Container(
+                      color: Colors.transparent,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).appBarTheme.backgroundColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.shadowColor.withOpacity(0.1),
+                                spreadRadius: 2,
+                                blurRadius: 3,
+                              ),
+                            ],
+                          ),
+                          child: TabBarHeader(
+                            tabController: tabController,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).appBarTheme.backgroundColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.shadowColor.withOpacity(0.1),
-                          spreadRadius: 2,
-                          blurRadius: 3,
-                        ),
-                      ],
                     ),
-                    child: TabBarHeader(
-                      tabController: tabController,
-                    ),
-                  ),
+                    homeState.tabIndex == 0
+                        ? SizedBox(
+                            height: assetsTabBodyHeight,
+                            child: TabBarBody(
+                              tabController: tabController,
+                              historyList: state.activeAccount.historyList!,
+                              testnetHistoryList:
+                                  state.activeAccount.testnetHistoryList!,
+                            ),
+                          )
+                        : SizedBox(
+                            height: historyTabBodyHeight,
+                            child: TabBarBody(
+                              tabController: tabController,
+                              historyList: state.activeAccount.historyList!,
+                              testnetHistoryList:
+                                  state.activeAccount.testnetHistoryList!,
+                            ),
+                          ),
+                  ],
                 ),
-                Flexible(
-                  child: TabBarBody(
-                    tabController: tabController,
-                    historyList: state.activeAccount.historyList!,
-                    testnetHistoryList: state.activeAccount.testnetHistoryList!,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       );
     } else if (tokensState.status == TokensStatusList.failure) {
       return Container(
