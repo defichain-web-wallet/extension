@@ -25,6 +25,7 @@ class TabBarBody extends StatelessWidget {
     LockHelper lockHelper = LockHelper();
 
     return TabBarView(
+      physics: NeverScrollableScrollPhysics(),
       children: [
         Column(
           children: [

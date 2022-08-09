@@ -70,7 +70,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 
           if (historyList != null && historyList.length != 0) {
             return ListView.builder(
-              controller: _controller,
               itemCount: historyList.length,
               itemBuilder: (context, index) {
                 var tokenName;
