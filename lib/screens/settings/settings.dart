@@ -136,7 +136,7 @@ class _SettingsState extends State<Settings> {
                                   Container(
                                     padding: const EdgeInsets.only(top: 12),
                                     child: Text(
-                                      'You need to reset your wallet to activate this feature',
+                                      'To access this feature, you need to reinstall the wallet.',
                                       style:
                                           Theme.of(context).textTheme.headline4,
                                     ),
