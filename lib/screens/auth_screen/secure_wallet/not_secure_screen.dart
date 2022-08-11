@@ -46,7 +46,7 @@ class NotSecureScreen extends StatelessWidget {
                         Column(
                           children: [
                             Text(
-                              '1/3',
+                              '1/4',
                               style: Theme.of(context).textTheme.headline2,
                             ),
                             SizedBox(height: 8),
