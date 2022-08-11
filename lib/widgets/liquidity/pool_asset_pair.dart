@@ -60,7 +60,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
                         Padding(
                           padding: const EdgeInsets.only(left: 4.0),
                           child: Container(
-                            width: 123,
+                            width: widget.isFullSize ? 123 : 73,
                             child: TickerText(
                               child: Text(
                                   TokensHelper()
