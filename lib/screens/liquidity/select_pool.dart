@@ -56,6 +56,7 @@ class _SelectPoolState extends State<SelectPool> {
   int balanceTo = 0;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+  double minShareOfPool = 0.00000001;
 
   @override
   void initState() {
@@ -435,30 +436,32 @@ class _SelectPoolState extends State<SelectPool> {
                                           ),
                                         ),
                                         Divider(),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Share of pool',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6,
-                                              ),
-                                              Text(
-                                                '${shareOfPool.toStringAsFixed(8)}%',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5,
-                                              ),
-                                            ],
-                                          ),
-                                        )
+                                        if (shareOfPool > minShareOfPool)
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 8),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Share of pool',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline6,
+                                                ),
+                                                Text(
+                                                  '${shareOfPool.toStringAsFixed(8)}%',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5,
+                                                ),
+                                              ],
+                                            ),
+                                          )
                                       ],
                                     ),
                                   ),
