@@ -301,7 +301,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: 70,
+                                  height: 80,
                                   decoration: BoxDecoration(
                                     border: Border(
                                       bottom: BorderSide(
