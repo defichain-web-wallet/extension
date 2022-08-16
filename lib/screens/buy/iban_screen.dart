@@ -32,7 +32,6 @@ class _IbanScreenState extends State<IbanScreen> {
   final _ibanController = TextEditingController();
   final GlobalKey<IbanSelectorState> selectKeyIban =
       GlobalKey<IbanSelectorState>();
-
   @override
   void dispose() {
     _ibanController.dispose();
@@ -83,6 +82,25 @@ class _IbanScreenState extends State<IbanScreen> {
     } else {
       List<IbanModel> ibanList =
           state.ibanList.where((element) => element.type == "Wallet").toList();
+
+      List<String> stringIbans =[];
+      List<IbanModel> uniqueIbans =[];
+
+      state.ibanList!.forEach((element) {
+        stringIbans.add(element.iban!);
+        print(
+            'type: ${element.type} , iban: ${element.iban}, asset: ${element.asset}, fiat: ${element.fiat}');
+      });
+
+      var stringUniqueIbans = Set<String>.from(stringIbans).toList();
+
+      stringUniqueIbans.forEach((element) {
+        uniqueIbans.add(state.ibanList.firstWhere((el) => el.iban == element));
+      });
+
+      uniqueIbans.forEach((element) {
+        print('iban: ${element.iban}');
+      });
 
       return Container(
         color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
@@ -137,7 +155,7 @@ class _IbanScreenState extends State<IbanScreen> {
                                       key: selectKeyIban,
                                       onAnotherSelect: hideOverlay,
                                       routeWidget: widget.routeWidget,
-                                      ibanList: ibanList,
+                                      ibanList: uniqueIbans,
                                       selectedIban: state.activeIban,
                                     )
                             ],

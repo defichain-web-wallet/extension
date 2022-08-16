@@ -246,6 +246,7 @@ class FiatCubit extends Cubit<FiatState> {
     IbanModel? iban;
 
     try {
+      print('try start');
       if (state.currentIban != null && state.currentIban != '') {
         iban = activeIbanList
             .firstWhere((element) => (element.iban == state.currentIban!.replaceAll(' ', '')));
@@ -257,7 +258,9 @@ class FiatCubit extends Cubit<FiatState> {
               .firstWhere((element) => (element.asset!.name == asset.name));
         }
       }
+      print('try end');
     } catch (_) {
+      print('catch');
       iban = null;
     }
 
