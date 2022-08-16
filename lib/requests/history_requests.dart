@@ -87,9 +87,6 @@ class HistoryRequests {
     String nextEnd = next;
 
     String hostUrl = SettingsHelper.getHostApiUrl();
-    String urlAddress = fallbackUrl.isEmpty
-        ? '$hostUrl/$network/address/${addressModel.address}/transactions?size=30${nextEnd != '' ? '&next=' + nextEnd : ''}'
-        : fallbackUrl;
 
     bool needToContinue = true;
     while (txModels.length < count && needToContinue) {
@@ -99,6 +96,9 @@ class HistoryRequests {
           break;
         }
       }
+      String urlAddress = fallbackUrl.isEmpty
+          ? '$hostUrl/$network/address/${addressModel.address}/transactions?size=30${nextEnd != '' ? '&next=' + nextEnd : ''}'
+          : fallbackUrl;
       final Uri url = Uri.parse(urlAddress);
 
       // final headers = {'Content-type': 'application/json'};
@@ -108,6 +108,7 @@ class HistoryRequests {
         final historyList = jsonDecode(response.body)['data'];
         if (jsonDecode(response.body)['page'] != null) {
           nextEnd = jsonDecode(response.body)['page']['next'];
+          print('nextEnd '+nextEnd);
         }
 
         for (var tx in historyList) {
