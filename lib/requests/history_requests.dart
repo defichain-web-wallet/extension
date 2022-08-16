@@ -167,8 +167,16 @@ class HistoryRequests {
       await http.get(Uri.parse(urlHistory));
       if (responseHistory.statusCode == 200) {
         final historyList = jsonDecode(responseHistory.body)['data'];
+
+        if(historyList.length == 0){
+          lastBlockNumber = blockNumber + 1;
+          break;
+        }
+
         if (jsonDecode(responseHistory.body)['page'] != null) {
           next = jsonDecode(responseHistory.body)['page']['next'];
+        } else {
+          lastBlockNumber = blockNumber + 1;
         }
         try {
           for (var tx in historyList) {
