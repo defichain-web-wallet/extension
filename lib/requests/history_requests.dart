@@ -74,6 +74,126 @@ class HistoryRequests {
     }
   }
 
+  Future<List<dynamic>> getHistoryTxsBySingleAddressV1(
+      AddressModel addressModel, String network,
+      {String next = '', String fallbackUrl = '', count = 10}) async
+  {
+    List<HistoryModel> txModels = [];
+    int blockNumber = 0;
+
+    if (next == 'done') {
+      return [txModels, 'done'];
+    }
+    String nextEnd = next;
+
+    String hostUrl = SettingsHelper.getHostApiUrl();
+    String urlAddress = fallbackUrl.isEmpty
+        ? '$hostUrl/$network/address/${addressModel.address}/transactions?size=30${nextEnd != '' ? '&next=' + nextEnd : ''}'
+        : fallbackUrl;
+
+    bool needToContinue = true;
+    while (txModels.length < count && needToContinue) {
+      if(txModels.isNotEmpty){
+        if(txModels.length >= count && txModels[txModels.length -1].id != nextEnd){
+          needToContinue = false;
+          break;
+        }
+      }
+      final Uri url = Uri.parse(urlAddress);
+
+      // final headers = {'Content-type': 'application/json'};
+
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final historyList = jsonDecode(response.body)['data'];
+        if (jsonDecode(response.body)['page'] != null) {
+          nextEnd = jsonDecode(response.body)['page']['next'];
+        }
+
+        for (var tx in historyList) {
+          if(txModels.length >= count){
+            if(txModels[txModels.length -1].txid != tx['txid']){
+              nextEnd = tx['id'];
+              break;
+            }
+          }
+          var isExist = false;
+          for (var txModel in txModels) {
+            if (txModel.txid == tx['txid']) {
+              isExist = true;
+              if (tx['type'] == 'vin') {
+                txModel.value =
+                    txModel.value! -
+                        convertToSatoshi(double.parse(tx['value']));
+              } else {
+                txModel.value =
+                    txModel.value! +
+                        convertToSatoshi(double.parse(tx['value']));
+              }
+            }
+          }
+          if (txModels.length < count && !isExist) {
+            print(tx['type'] == 'vin'
+                ? -1
+                : 1 * convertToSatoshi(double.parse(tx['value'])));
+            txModels.add(HistoryModel(
+              value: tx['type'] == 'vin'
+                  ? -1
+                  : 1 * convertToSatoshi(double.parse(tx['value'])),
+              txid: tx['txid'],
+              id: tx['id'],
+              blockTime: tx['block']['time'].toString(),
+            ));
+            blockNumber = tx['block']['height'];
+          }
+        }
+      } else {
+        nextEnd = 'done';
+        break;
+      }
+    }
+    var lastBlockNumber = 0;
+    while (blockNumber >= lastBlockNumber) {
+      String hostUrl = SettingsHelper.getHostApiUrl();
+      String urlHistory = fallbackUrl.isEmpty
+          ? '$hostUrl/$network/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}'
+          : fallbackUrl;
+
+      // final headersHistory = {'Content-type': 'application/json'};
+
+      final responseHistory =
+      await http.get(Uri.parse(urlHistory));
+      if (responseHistory.statusCode == 200) {
+        final historyList = jsonDecode(responseHistory.body)['data'];
+        if (jsonDecode(responseHistory.body)['page'] != null) {
+          next = jsonDecode(responseHistory.body)['page']['next'];
+        }
+        try {
+          for (var tx in historyList) {
+            lastBlockNumber = tx['block']['height'];
+            var index =
+            txModels.indexWhere((element) => element.txid == tx['txid']);
+            if (index >= 0) {
+              print(tx['type']);
+              txModels[index].type = tx['type'];
+              txModels[index].amounts = List<String>.from(tx['amounts']);
+
+              if(tx['type'] == 'AccountToUtxos' || tx['type'] == 'UtxosToAccount'){
+                txModels[index].value = txModels[index].value! + convertToSatoshi(double.parse(txModels[index].amounts![0].split('@')[0]));
+              }
+            }
+          }
+        } catch (e) {
+          print(e);
+        }
+      } else {
+        lastBlockNumber = blockNumber + 1;
+      }
+    }
+
+    return [txModels, nextEnd];
+  }
+
   Future<List<dynamic>> getHistoryTxsBySingleAddress(
       AddressModel addressModel, String token, String network,
       {String next = '', String fallbackUrl = ''}) async {
@@ -104,12 +224,10 @@ class HistoryRequests {
         for (var tx in historyList) {
           var txJson = TxModel.fromJson(tx);
           txModels.add(HistoryModel(
-              isSend: txJson.type == 'vin',
               value: convertToSatoshi(double.parse(txJson.amount!)),
               txid: txJson.txid,
               blockTime: txJson.time.toString(),
-              type: txJson.type,
-              token: txJson.token));
+              type: txJson.type));
         }
 
         return [txModels, nextPage];
@@ -161,12 +279,10 @@ class HistoryRequests {
         for (var tx in historyList) {
           var txJson = TxModel.fromJson(tx);
           txModels.add(HistoryModel(
-              isSend: txJson.type == 'vin',
               value: convertToSatoshi(double.parse(txJson.amount!)),
               txid: txJson.txid,
               blockTime: txJson.time.toString(),
-              type: txJson.type,
-              token: txJson.token));
+              type: txJson.type));
         }
 
         return [txModels, nextPage];
