@@ -20,8 +20,8 @@ class HistoryRequests {
   var balancesHelper = BalancesHelper();
   var historyHelper = HistoryHelper();
 
-  Future<List<HistoryNew>> getHistory(AddressModel addressModel, String token,
-      String network) async {
+  Future<List<HistoryNew>> getHistory(
+      AddressModel addressModel, String token, String network) async {
     try {
       String urlAddress = '${DfxApi.url}${addressModel.address}/2022/USD';
 
@@ -76,8 +76,7 @@ class HistoryRequests {
 
   Future<List<dynamic>> getHistoryTxsBySingleAddressV1(
       AddressModel addressModel, String network,
-      {String next = '', String fallbackUrl = '', count = 10}) async
-  {
+      {String next = '', String fallbackUrl = '', count = 10}) async {
     List<HistoryModel> txModels = [];
     int blockNumber = 0;
 
@@ -90,8 +89,9 @@ class HistoryRequests {
 
     bool needToContinue = true;
     while (txModels.length < count && needToContinue) {
-      if(txModels.isNotEmpty){
-        if(txModels.length >= count && txModels[txModels.length -1].id != nextEnd){
+      if (txModels.isNotEmpty) {
+        if (txModels.length >= count &&
+            txModels[txModels.length - 1].id != nextEnd) {
           needToContinue = false;
           break;
         }
@@ -107,12 +107,12 @@ class HistoryRequests {
         final historyList = jsonDecode(response.body)['data'];
         if (jsonDecode(response.body)['page'] != null) {
           nextEnd = jsonDecode(response.body)['page']['next'];
-          print('nextEnd '+nextEnd);
+          print('nextEnd ' + nextEnd);
         }
 
         for (var tx in historyList) {
-          if(txModels.length >= count){
-            if(txModels[txModels.length -1].txid != tx['txid']){
+          if (txModels.length >= count) {
+            if (txModels[txModels.length - 1].txid != tx['txid']) {
               nextEnd = tx['id'];
               break;
             }
@@ -122,13 +122,11 @@ class HistoryRequests {
             if (txModel.txid == tx['txid']) {
               isExist = true;
               if (tx['type'] == 'vin') {
-                txModel.value =
-                    txModel.value! -
-                        convertToSatoshi(double.parse(tx['value']));
+                txModel.value = txModel.value! -
+                    convertToSatoshi(double.parse(tx['value']));
               } else {
-                txModel.value =
-                    txModel.value! +
-                        convertToSatoshi(double.parse(tx['value']));
+                txModel.value = txModel.value! +
+                    convertToSatoshi(double.parse(tx['value']));
               }
             }
           }
@@ -144,7 +142,7 @@ class HistoryRequests {
             blockNumber = tx['block']['height'];
           }
         }
-        if(nextEnd.isEmpty){
+        if (nextEnd.isEmpty) {
           needToContinue = false;
           nextEnd = 'done';
           break;
@@ -163,40 +161,47 @@ class HistoryRequests {
 
       // final headersHistory = {'Content-type': 'application/json'};
 
-      final responseHistory =
-      await http.get(Uri.parse(urlHistory));
-      if (responseHistory.statusCode == 200) {
-        final historyList = jsonDecode(responseHistory.body)['data'];
+      final responseHistory = await http.get(Uri.parse(urlHistory));
 
-        if(historyList.length == 0){
-          lastBlockNumber = blockNumber + 1;
-          break;
-        }
+      try {
+        if (responseHistory.statusCode == 200) {
+          final historyList = jsonDecode(responseHistory.body)['data'];
 
-        if (jsonDecode(responseHistory.body)['page'] != null) {
-          next = jsonDecode(responseHistory.body)['page']['next'];
+          if (historyList.length == 0) {
+            lastBlockNumber = blockNumber + 1;
+            break;
+          }
+
+          if (jsonDecode(responseHistory.body)['page'] != null) {
+            next = jsonDecode(responseHistory.body)['page']['next'];
+          } else {
+            lastBlockNumber = blockNumber + 1;
+          }
+          try {
+            for (var tx in historyList) {
+              lastBlockNumber = tx['block']['height'];
+              var index =
+                  txModels.indexWhere((element) => element.txid == tx['txid']);
+              if (index >= 0) {
+                txModels[index].type = tx['type'];
+                txModels[index].amounts = List<String>.from(tx['amounts']);
+
+                if (tx['type'] == 'AccountToUtxos' ||
+                    tx['type'] == 'UtxosToAccount') {
+                  txModels[index].value = txModels[index].value! +
+                      convertToSatoshi(double.parse(
+                          txModels[index].amounts![0].split('@')[0]));
+                }
+              }
+            }
+          } catch (e) {
+            print(e);
+            break;
+          }
         } else {
           lastBlockNumber = blockNumber + 1;
         }
-        try {
-          for (var tx in historyList) {
-            lastBlockNumber = tx['block']['height'];
-            var index =
-            txModels.indexWhere((element) => element.txid == tx['txid']);
-            if (index >= 0) {
-              txModels[index].type = tx['type'];
-              txModels[index].amounts = List<String>.from(tx['amounts']);
-
-              if(tx['type'] == 'AccountToUtxos' || tx['type'] == 'UtxosToAccount'){
-                txModels[index].value = txModels[index].value! + convertToSatoshi(double.parse(txModels[index].amounts![0].split('@')[0]));
-              }
-            }
-          }
-        } catch (e) {
-          print(e);
-          break;
-        }
-      } else {
+      } catch (e) {
         lastBlockNumber = blockNumber + 1;
       }
     }
@@ -270,8 +275,7 @@ class HistoryRequests {
 
       String hostUrl = SettingsHelper.getHostApiUrl();
       String urlAddress = fallbackUrl.isEmpty
-          ? '$hostUrl/$network/address/${addressModel
-          .address}/history?size=30${next != '' ? '&next=' + next : ''}'
+          ? '$hostUrl/$network/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}'
           : fallbackUrl;
 
       final Uri url = Uri.parse(urlAddress);
@@ -303,10 +307,8 @@ class HistoryRequests {
       if (fallbackUrl.isEmpty &&
           SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = network == 'mainnet'
-            ? '${Hosts.myDefichain}/mainnet/address/${addressModel
-            .address}/history?size=30${next != '' ? '&next=' + next : ''}'
-            : '${Hosts.ocean}/testnet/address/${addressModel
-            .address}/history?size=30${next != '' ? '&next=' + next : ''}';
+            ? '${Hosts.myDefichain}/mainnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}'
+            : '${Hosts.ocean}/testnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}';
         return getHistoryActions(addressModel, token, network,
             next: next, fallbackUrl: fallbackUrlAddress);
       } else {
