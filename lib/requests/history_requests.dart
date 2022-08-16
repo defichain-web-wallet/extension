@@ -100,7 +100,6 @@ class HistoryRequests {
           ? '$hostUrl/$network/address/${addressModel.address}/transactions?size=30${nextEnd != '' ? '&next=' + nextEnd : ''}'
           : fallbackUrl;
       final Uri url = Uri.parse(urlAddress);
-
       // final headers = {'Content-type': 'application/json'};
 
       final response = await http.get(url);
@@ -144,6 +143,11 @@ class HistoryRequests {
             ));
             blockNumber = tx['block']['height'];
           }
+        }
+        if(nextEnd.isEmpty){
+          needToContinue = false;
+          nextEnd = 'done';
+          break;
         }
       } else {
         nextEnd = 'done';
