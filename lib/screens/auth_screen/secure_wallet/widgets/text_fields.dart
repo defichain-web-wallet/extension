@@ -9,15 +9,17 @@ class TextFields extends StatelessWidget {
   final GlobalKey? globalKey;
   final List<int> invalidControllerIndexes;
   final bool enabled;
+  final bool readOnly;
 
-  const TextFields(
-      {Key? key,
-      this.controllers,
-      this.focusNodes,
-      this.globalKey,
-      this.invalidControllerIndexes = const [],
-      this.enabled = true})
-      : super(key: key);
+  const TextFields({
+    Key? key,
+    this.controllers,
+    this.focusNodes,
+    this.globalKey,
+    this.invalidControllerIndexes = const [],
+    this.enabled = true,
+    this.readOnly = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +46,7 @@ class TextFields extends StatelessWidget {
                       columnsCount: _defaultTextFieldCount,
                       depth: index > 0 ? _defaultTextFieldCount * index : 0,
                       enabled: enabled,
+                      readOnly: readOnly,
                       invalidControllerIndexes: invalidControllerIndexes,
                     )),
           ),
@@ -61,17 +64,19 @@ class ColumnTextFields extends StatefulWidget {
   final int depth;
   final List<int> invalidControllerIndexes;
   final bool enabled;
+  final bool readOnly;
 
-  const ColumnTextFields(
-      {Key? key,
-      this.controllers,
-      this.focusNodes,
-      this.globalKey,
-      this.columnsCount,
-      this.depth = 0,
-      this.invalidControllerIndexes = const [],
-      this.enabled = true})
-      : super(key: key);
+  const ColumnTextFields({
+    Key? key,
+    this.controllers,
+    this.focusNodes,
+    this.globalKey,
+    this.columnsCount,
+    this.depth = 0,
+    this.invalidControllerIndexes = const [],
+    this.enabled = true,
+    this.readOnly = false,
+  }) : super(key: key);
 
   @override
   State<ColumnTextFields> createState() => _ColumnTextFieldsState();
@@ -82,6 +87,7 @@ class _ColumnTextFieldsState extends State<ColumnTextFields> {
 
   @override
   void initState() {
+    super.initState();
     mnemonic = List.generate(widget.controllers!.length, (index) => '');
   }
 
@@ -124,6 +130,7 @@ class _ColumnTextFieldsState extends State<ColumnTextFields> {
                           }
                         },
                         child: TextField(
+                          readOnly: widget.readOnly,
                           enabled: widget.enabled,
                           textAlign: TextAlign.center,
                           textAlignVertical: TextAlignVertical.center,
