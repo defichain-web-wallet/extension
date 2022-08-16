@@ -133,9 +133,6 @@ class HistoryRequests {
             }
           }
           if (txModels.length < count && !isExist) {
-            print(tx['type'] == 'vin'
-                ? -1
-                : 1 * convertToSatoshi(double.parse(tx['value'])));
             txModels.add(HistoryModel(
               value: tx['type'] == 'vin'
                   ? -1
@@ -174,7 +171,6 @@ class HistoryRequests {
             var index =
             txModels.indexWhere((element) => element.txid == tx['txid']);
             if (index >= 0) {
-              print(tx['type']);
               txModels[index].type = tx['type'];
               txModels[index].amounts = List<String>.from(tx['amounts']);
 
@@ -185,6 +181,7 @@ class HistoryRequests {
           }
         } catch (e) {
           print(e);
+          break;
         }
       } else {
         lastBlockNumber = blockNumber + 1;
