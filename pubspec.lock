@@ -56,7 +56,7 @@ packages:
       path: "."
       ref: b1b48f6b165a44d3336aa7a8ef5888007a8e600e
       resolved-ref: b1b48f6b165a44d3336aa7a8ef5888007a8e600e
-      url: "https://github.com/IhorSavva/bip32-dart"
+      url: "https://github.com/Jellywallet/bip32-dart"
     source: git
     version: "3.0.1+1"
   bloc:
@@ -177,7 +177,7 @@ packages:
       name: collection
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.15.0"
+    version: "1.16.0"
   convert:
     dependency: transitive
     description:
@@ -231,9 +231,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "091cee22ee53716e8565f5f0871e83b9162bc705"
-      resolved-ref: "091cee22ee53716e8565f5f0871e83b9162bc705"
-      url: "https://github.com/Jellywallet/DeFiChain-dart"
+      ref: "655734e"
+      resolved-ref: "655734e3c2d77840d86893ba068c9f85341b7237"
+      url: "https://github.com/p3root/DeFiChain-dart"
     source: git
     version: "3.8.7+3"
   dotted_border:
@@ -270,7 +270,7 @@ packages:
       name: fake_async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.0"
   ffi:
     dependency: transitive
     description:
@@ -369,7 +369,7 @@ packages:
       name: hive
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.1"
+    version: "2.2.3"
   hive_flutter:
     dependency: "direct main"
     description:
@@ -441,12 +441,12 @@ packages:
     source: hosted
     version: "1.0.3"
   js:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: js
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.3"
+    version: "0.6.4"
   json_annotation:
     dependency: transitive
     description:
@@ -481,7 +481,7 @@ packages:
       name: material_color_utilities
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.3"
+    version: "0.1.4"
   meta:
     dependency: transitive
     description:
@@ -565,7 +565,7 @@ packages:
       name: path
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.8.0"
+    version: "1.8.1"
   path_drawing:
     dependency: transitive
     description:
@@ -836,7 +836,7 @@ packages:
       name: source_span
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.8.1"
+    version: "1.8.2"
   stack_trace:
     dependency: transitive
     description:
@@ -885,7 +885,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.8"
+    version: "0.4.9"
   timing:
     dependency: transitive
     description:
@@ -969,7 +969,7 @@ packages:
       name: vector_math
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   watcher:
     dependency: transitive
     description:
@@ -1013,5 +1013,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.16.0 <3.0.0"
+  dart: ">=2.17.0-0 <3.0.0"
   flutter: ">=2.10.0"

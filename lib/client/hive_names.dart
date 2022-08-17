@@ -18,4 +18,5 @@ class HiveNames {
   static const String ongoingTransaction = 'ongoing_transaction';
   static const String tutorialStatus = 'tutorial_status';
   static const String kycStatus = 'kyc_status';
+  static const String walletType = 'wallet_type';
 }
