@@ -12,6 +12,8 @@ class HiveNames {
   static const String openTime = 'open_time';
   static const String settings = 'settings';
   static const String openedMnemonic = 'opened_mnemonic';
+  static const String openeLedger = 'opened_ledger';
   static const String recoveryMnemonic = 'recovery_mnemonic';
   static const String ongoingTransaction = 'ongoing_transaction';
+  static const String walletType = 'wallet_type';
 }

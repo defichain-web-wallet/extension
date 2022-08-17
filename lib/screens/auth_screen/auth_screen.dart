@@ -1,5 +1,6 @@
 import 'package:defi_wallet/screens/auth_screen/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/not_secure_screen.dart';
+import 'package:defi_wallet/screens/ledger_screen/ledger_init_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
@@ -43,6 +44,26 @@ class AuthScreen extends StatelessWidget {
                 SizedBox(height: 16),
                 StretchBox(
                   maxWidth: ScreenSizes.xSmall,
+                  child: PrimaryButton(
+                    label: 'Ledger Setup',
+                    callback: () async {
+                      var box = await Hive.openBox(HiveBoxes.client);
+                      await box.put(HiveNames.openeLedger, null);
+                      await box.close();
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) => LedgerInitScreen(),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 16),
+                StretchBox(
+                  maxWidth: ScreenSizes.xSmall,
                   child: AccentButton(
                     label: 'Import using secret Recovery Phrase',
                     callback: () async {
@@ -52,8 +73,7 @@ class AuthScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              RecoveryScreen(),
+                          pageBuilder: (context, animation1, animation2) => RecoveryScreen(),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
                         ),
@@ -70,8 +90,7 @@ class AuthScreen extends StatelessWidget {
                     callback: () => Navigator.push(
                       context,
                       PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) =>
-                            NotSecureScreen(),
+                        pageBuilder: (context, animation1, animation2) => NotSecureScreen(),
                         transitionDuration: Duration.zero,
                         reverseTransitionDuration: Duration.zero,
                       ),

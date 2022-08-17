@@ -8,8 +8,9 @@ Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   await SentryFlutter.init(
-        (options) {
-      options.dsn = 'https://13eea5580f3541d7aed98ce3c9bbe835@o1163199.ingest.sentry.io/6251231';
+    (options) {
+      options.dsn = "";
+      //'https://13eea5580f3541d7aed98ce3c9bbe835@o1163199.ingest.sentry.io/6251231';
       options.tracesSampleRate = 1.0;
     },
     appRunner: () => runApp(App()),

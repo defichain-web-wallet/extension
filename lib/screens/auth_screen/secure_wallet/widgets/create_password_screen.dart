@@ -20,12 +20,9 @@ class CreatePasswordScreen extends StatefulWidget {
   final showDoneScreen;
   final isRecovery;
   final mnemonic;
+  final walletType;
 
-  CreatePasswordScreen(
-      {this.showStep = true,
-      this.showDoneScreen = true,
-      this.isRecovery = false,
-      this.mnemonic = const []});
+  CreatePasswordScreen({this.showStep = true, this.showDoneScreen = true, this.isRecovery = false, this.mnemonic = const [], this.walletType = "local"});
 
   @override
   _CreatePasswordScreenState createState() => _CreatePasswordScreenState();
@@ -110,8 +107,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                             setState(() {});
                             validateButton();
                           },
-                          onIconPressed: () => setState(
-                              () => isVisiblePassword = !isVisiblePassword),
+                          onIconPressed: () => setState(() => isVisiblePassword = !isVisiblePassword),
                         ),
                         SizedBox(height: 4),
                         Text(
@@ -137,9 +133,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                             setState(() {});
                             validateButton();
                           },
-                          onIconPressed: () => setState(() =>
-                              isVisibleConfirmPassword =
-                                  !isVisibleConfirmPassword),
+                          onIconPressed: () => setState(() => isVisibleConfirmPassword = !isVisibleConfirmPassword),
                         ),
                         SizedBox(height: 4),
                         Text(
@@ -180,11 +174,8 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                                     text: TextSpan(
                                       children: [
                                         TextSpan(
-                                          text:
-                                              'I understand that this password cannot be recovered.',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .subtitle1,
+                                          text: 'I understand that this password cannot be recovered.',
+                                          style: Theme.of(context).textTheme.subtitle1,
                                         ),
                                       ],
                                     ),
@@ -211,10 +202,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                           builder: (context, state) {
                             return PendingButton(
                               'Create password',
-                              pendingText: state.status ==
-                                      AccountStatusList.restore
-                                  ? 'Pending... (${state.restored}/${state.needRestore})'
-                                  : 'Pending...',
+                              pendingText: state.status == AccountStatusList.restore ? 'Pending... (${state.restored}/${state.needRestore})' : 'Pending...',
                               isCheckLock: false,
                               callback: isEnable
                                   ? (parent) {
@@ -249,7 +237,11 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       Future.delayed(const Duration(milliseconds: 500), () async {
         if (widget.isRecovery) {
           try {
-            await accountCubit.restoreAccount(widget.mnemonic, password);
+            if (this.widget.walletType == AccountCubit.ledgerWalletType) {
+              await accountCubit.restoreLedgerAccount();
+            } else {
+              await accountCubit.restoreAccount(widget.mnemonic, password);
+            }
             LoggerService.invokeInfoLogg('user was recover wallet');
           } catch (err) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -258,15 +250,18 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                   'Something error',
                   style: Theme.of(context).textTheme.headline5,
                 ),
-                backgroundColor:
-                    Theme.of(context).snackBarTheme.backgroundColor,
+                backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
               ),
             );
           }
         } else {
-          if (widget.mnemonic.length != 0) {
-            await accountCubit.createAccount(widget.mnemonic, password);
-            LoggerService.invokeInfoLogg('user created new wallet');
+          if (this.widget.walletType == AccountCubit.ledgerWalletType) {
+              await accountCubit.createLedgerAccount();
+          } else {
+            if (widget.mnemonic.length != 0) {
+              await accountCubit.createAccount(widget.mnemonic, password);
+              LoggerService.invokeInfoLogg('user created new wallet');
+            }
           }
         }
 
@@ -317,8 +312,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
   void validateButton() {
     bool isValid = true;
 
-    isValid =
-        _password.text.isNotEmpty && _confirmPass.text.isNotEmpty && isConfirm;
+    isValid = _password.text.isNotEmpty && _confirmPass.text.isNotEmpty && isConfirm;
 
     setState(() {
       isEnable = isValid;
