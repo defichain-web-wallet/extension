@@ -324,68 +324,88 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
       );
       return;
     }
-    var txser = TransactionService();
-    var txError;
-    setState(() {
-      isPending = true;
-    });
-    if (widget.removeLT != 0) {
-      txError = await txser.removeLiqudity(
-          account: state.activeAccount,
-          token: widget.assetPair,
-          amount: convertToSatoshi(widget.removeLT));
+    try {
+      var txser = TransactionService();
+      var txError;
+      setState(() {
+        isPending = true;
+      });
+      if (widget.removeLT != 0) {
+        txError = await txser.removeLiqudity(
+            account: state.activeAccount,
+            token: widget.assetPair,
+            amount: convertToSatoshi(widget.removeLT));
 
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => LiquidityStatus(
-            assetPair: widget.assetPair,
-            isRemove: widget.removeLT != 0,
-            amountA: widget.baseAmount,
-            amountB: widget.quoteAmount,
-            amountUSD: widget.amountUSD,
-            balanceUSD: widget.balanceUSD,
-            balanceA: widget.balanceA,
-            balanceB: widget.balanceB,
-            txError: txError,
-            isBalanceDetails: false,
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) => LiquidityStatus(
+              assetPair: widget.assetPair,
+              isRemove: widget.removeLT != 0,
+              amountA: widget.baseAmount,
+              amountB: widget.quoteAmount,
+              amountUSD: widget.amountUSD,
+              balanceUSD: widget.balanceUSD,
+              balanceA: widget.balanceA,
+              balanceB: widget.balanceB,
+              txError: txError,
+              isBalanceDetails: false,
+            ),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
           ),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
+        );
+      } else {
+        txError = await txser.createAndSendLiqudity(
+            account: state.activeAccount,
+            tokenA: widget.assetPair.tokenA!,
+            tokenB: widget.assetPair.tokenB!,
+            amountA: convertToSatoshi(widget.baseAmount),
+            amountB: convertToSatoshi(widget.quoteAmount),
+            tokens: tokensState.tokens);
+
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) => LiquidityStatus(
+              assetPair: widget.assetPair,
+              isRemove: widget.removeLT != 0,
+              amountA: widget.baseAmount,
+              amountB: widget.quoteAmount,
+              amountUSD: widget.amountUSD,
+              balanceUSD: widget.balanceUSD,
+              balanceA: widget.balanceA,
+              balanceB: widget.balanceB,
+              txError: txError,
+              isBalanceDetails: false,
+            ),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      }
+      setState(() {
+        isPending = false;
+      });
+    } catch (err) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            'Something went wrong. Please, try later',
+            style: Theme.of(context)
+                .textTheme
+                .headline5,
+          ),
+          backgroundColor: Theme.of(context)
+              .snackBarTheme
+              .backgroundColor,
         ),
       );
-    } else {
-      txError = await txser.createAndSendLiqudity(
-          account: state.activeAccount,
-          tokenA: widget.assetPair.tokenA!,
-          tokenB: widget.assetPair.tokenB!,
-          amountA: convertToSatoshi(widget.baseAmount),
-          amountB: convertToSatoshi(widget.quoteAmount),
-          tokens: tokensState.tokens);
-
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => LiquidityStatus(
-            assetPair: widget.assetPair,
-            isRemove: widget.removeLT != 0,
-            amountA: widget.baseAmount,
-            amountB: widget.quoteAmount,
-            amountUSD: widget.amountUSD,
-            balanceUSD: widget.balanceUSD,
-            balanceA: widget.balanceA,
-            balanceB: widget.balanceB,
-            txError: txError,
-            isBalanceDetails: false,
-          ),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      setState(() {
+        isPending = false;
+      });
     }
-    setState(() {
-      isPending = false;
-    });
   }
 
   String getLiquidityToken() {

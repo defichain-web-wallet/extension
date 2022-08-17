@@ -93,9 +93,8 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
                         shrinkWrap: true,
                         itemCount: balanceList!.length,
                         itemBuilder: (context, index) {
-                          final tokenName = (balanceList![index].token != 'DFI')
-                              ? 'd' + balanceList![index].token!
-                              : balanceList![index].token;
+                          final tokenName = tokenHelper
+                              .getTokenWithPrefix(balanceList![index].token);
                           return ListTile(
                             title: Text(
                               '$tokenName',
@@ -203,10 +202,22 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
     await accountCubit.updateActiveToken(activeToken);
     if (SettingsHelper.settings.network! == 'testnet') {
       await accountCubit.saveAccountsToStorage(
-          null, null, state.accounts, state.masterKeyPair);
+        null,
+        null,
+        state.accounts,
+        state.masterKeyPair,
+        state.accessToken,
+        state.mnemonic,
+      );
     } else {
       await accountCubit.saveAccountsToStorage(
-          state.accounts, state.masterKeyPair, null, null);
+        state.accounts,
+        state.masterKeyPair,
+        null,
+        null,
+        state.accessToken,
+        state.mnemonic,
+      );
     }
 
     await Navigator.push(

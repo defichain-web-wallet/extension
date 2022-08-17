@@ -1,3 +1,5 @@
+import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/create_password_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/text_fields.dart';
 import 'package:defi_wallet/services/mnemonic_service.dart';
@@ -141,6 +143,8 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
   }
 
   void _restoreWallet(parent) async {
+    SettingsHelper.settings.apiName = ApiName.auto;
+    SettingsHelper().saveSettings();
     var phrase = _getPhrase(controllers);
     if (phrase.length >= fieldsLength) {
       parent.emitPending(true);

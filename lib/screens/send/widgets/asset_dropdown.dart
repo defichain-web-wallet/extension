@@ -12,20 +12,28 @@ class AssetDropdown extends StatelessWidget {
   final String? assetFrom;
   final Function(String)? onSelect;
   final Function(String)? onChanged;
-  final Function()? onPressed;
+  final Function()? onPressedMax;
+  final Function()? onPressedHalf;
+  final Function()? onAnotherSelect;
+  final bool? isMaxOnly;
+  final bool? isFixedWidthAssetSelectorText;
 
-  const AssetDropdown(
-      {Key? key,
-      this.selectKeyFrom,
-      this.amountController,
-      this.focusNode,
-      this.focusModel,
-      this.assets,
-      this.assetFrom,
-      this.onSelect,
-      this.onChanged,
-      this.onPressed})
-      : super(key: key);
+  const AssetDropdown({
+    Key? key,
+    this.selectKeyFrom,
+    this.amountController,
+    this.focusNode,
+    this.focusModel,
+    this.assets,
+    this.assetFrom,
+    this.onSelect,
+    this.onChanged,
+    this.onPressedMax,
+    this.onPressedHalf,
+    this.onAnotherSelect,
+    this.isFixedWidthAssetSelectorText = false,
+    this.isMaxOnly = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +41,12 @@ class AssetDropdown extends StatelessWidget {
       children: [
         Expanded(
           child: AssetSelect(
+            onAnotherSelect: onAnotherSelect,
             key: selectKeyFrom,
             tokensForSwap: assets!,
             selectedToken: assetFrom!,
             onSelect: onSelect!,
+            isFixedWidthText: isFixedWidthAssetSelectorText!,
           ),
         ),
         Expanded(
@@ -46,14 +56,62 @@ class AssetDropdown extends StatelessWidget {
             focusModel: focusModel,
             onChanged: onChanged,
             suffixIcon: Container(
-              padding: EdgeInsets.symmetric(
-                vertical: 8,
-                horizontal: 12,
-              ),
-              child: TextButton(
-                child: Text('MAX'),
-                onPressed: onPressed,
-              ),
+              padding: isMaxOnly!
+                  ? EdgeInsets.only(top: 8, bottom: 8, right: 12, left: 0)
+                  : EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 12,
+                    ),
+              child: isMaxOnly!
+                  ? Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween, // added line
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 40,
+                          height: 30,
+                          child: TextButton(
+                            child: Text(
+                              '50%',
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                            onPressed: () {
+                              if (onAnotherSelect != null) {
+                                onAnotherSelect!();
+                              }
+                              onPressedHalf!();
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          width: 40,
+                          // height: 30,
+                          child: TextButton(
+                            child: Text(
+                              'MAX',
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                            onPressed: () {
+                              if (onAnotherSelect != null) {
+                                onAnotherSelect!();
+                              }
+                              onPressedMax!();
+                            },
+                          ),
+                        ),
+
+                        //
+                      ],
+                    )
+                  : TextButton(
+                      child: Text('MAX'),
+                      onPressed: onPressedMax,
+                    ),
             ),
           ),
         ),

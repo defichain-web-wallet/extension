@@ -1,3 +1,4 @@
+import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/screens/history/history.dart';
@@ -9,16 +10,22 @@ import 'package:flutter/material.dart';
 
 class TabBarBody extends StatelessWidget {
   final TabController? tabController;
-  final List<HistoryModel> historyList;
+  final List<HistoryNew> historyList;
+  final List<HistoryModel> testnetHistoryList;
 
-  const TabBarBody({Key? key, this.tabController, required this.historyList})
-      : super(key: key);
+  const TabBarBody({
+    Key? key,
+    this.tabController,
+    required this.historyList,
+    required this.testnetHistoryList,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     LockHelper lockHelper = LockHelper();
 
     return TabBarView(
+      physics: NeverScrollableScrollPhysics(),
       children: [
         Column(
           children: [
@@ -35,9 +42,12 @@ class TabBarBody extends StatelessWidget {
                       context,
                       () => Navigator.push(
                             context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) => SearchToken(),  transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,),
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  SearchToken(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
                           ));
                 },
               ),
@@ -47,7 +57,7 @@ class TabBarBody extends StatelessWidget {
         Column(
           children: [
             Expanded(child: TransactionHistory()),
-            historyList.length > 0
+            historyList.length > 0 || testnetHistoryList.length > 0
                 ? Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: TextButton(
@@ -61,9 +71,13 @@ class TabBarBody extends StatelessWidget {
                             context,
                             () => Navigator.push(
                                   context,
-                              PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) => History(),  transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,),
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            History(),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ),
                                 ));
                       },
                     ),

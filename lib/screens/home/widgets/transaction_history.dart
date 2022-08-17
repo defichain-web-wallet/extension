@@ -17,6 +17,7 @@ class TransactionHistory extends StatefulWidget {
 
 class _TransactionHistoryState extends State<TransactionHistory> {
   late ScrollController _controller;
+  SettingsHelper settingsHelper = SettingsHelper();
 
   _scrollListener() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
@@ -49,30 +50,68 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           TokensHelper tokenHelper = TokensHelper();
           HistoryHelper historyHelper = HistoryHelper();
           var currency = SettingsHelper.settings.currency!;
-          historyList = new List.from(state.activeAccount!.historyList!);
+          const int defaultShowItemsCount = 30;
+          late int showItemsCount;
+          if (SettingsHelper.settings.network == 'mainnet') {
+            showItemsCount =
+                state.activeAccount!.historyList!.length < defaultShowItemsCount
+                    ? state.activeAccount!.historyList!.length
+                    : defaultShowItemsCount;
+            historyList = new List.from(
+                state.activeAccount!.historyList!.sublist(0, showItemsCount));
+          } else {
+            showItemsCount = state.activeAccount!.testnetHistoryList!.length <
+                    defaultShowItemsCount
+                ? state.activeAccount!.testnetHistoryList!.length
+                : defaultShowItemsCount;
+            historyList = new List.from(state.activeAccount!.testnetHistoryList!
+                .sublist(0, showItemsCount));
+          }
+
           if (historyList != null && historyList.length != 0) {
             return ListView.builder(
-              controller: _controller,
               itemCount: historyList.length,
               itemBuilder: (context, index) {
-                final tokenName = historyList[index].token;
-                final txValue = convertFromSatoshi(historyList[index].value);
-                final isSend = historyList[index].isSend;
-                final type = historyList[index].type;
-                final date = (historyList[index].blockTime != null)
-                    ? formatter.format(DateTime.fromMillisecondsSinceEpoch(
-                            int.parse(historyList[index].blockTime) * 1000)
-                        .toLocal())
-                    : 'date';
-                final txValuePrefix = (type == 'vout' || type == 'vin')
-                    ? isSend
-                        ? '-'
-                        : '+'
-                    : '';
+                var tokenName;
+                var txValue;
+                var isSend;
+                var type;
+                var date;
+                var txValuePrefix;
+                if (SettingsHelper.settings.network == 'mainnet') {
+                  tokenName = historyList[index].tokens![0].code;
+                  txValue = historyList[index].value;
+                  isSend = historyList[index].category == 'SEND';
+                  type = historyList[index].category;
+                  DateTime dateTime = DateTime.parse(historyList[index].date);
+                  date = formatter.format(DateTime.fromMillisecondsSinceEpoch(
+                          dateTime.millisecondsSinceEpoch)
+                      .toLocal());
+                  txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
+                      ? isSend
+                          ? '-'
+                          : '+'
+                      : '';
+                } else {
+                  tokenName = historyList[index].token;
+                  txValue = convertFromSatoshi(historyList[index].value);
+                  isSend = historyList[index].isSend;
+                  type = historyList[index].type;
+                  date = (historyList[index].blockTime != null)
+                      ? formatter.format(DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(historyList[index].blockTime) * 1000)
+                          .toLocal())
+                      : 'date';
+                  txValuePrefix = (type == 'vout' || type == 'vin')
+                      ? isSend
+                          ? '-'
+                          : '+'
+                      : '';
+                }
 
                 return Padding(
                   padding: const EdgeInsets.only(
-                      bottom: 8, left: 6, right: 6, top: 2),
+                      bottom: 8, left: 16, right: 16, top: 2),
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -97,7 +136,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             style: Theme.of(context).textTheme.headline6,
                           ),
                           Text(
-                            '$txValuePrefix$txValue $tokenName',
+                            '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 6)} $tokenName',
                             style: Theme.of(context).textTheme.headline4,
                           ),
                         ],
@@ -110,12 +149,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             style: Theme.of(context).textTheme.headline5,
                           ),
                           Text(
-                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName, currency), fixed: true, fixedCount: 4)} $currency")
+                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
                         ],
-                      ),
-                      trailing: Icon(
-                        Icons.keyboard_arrow_right,
-                        color: Theme.of(context).textTheme.headline1!.color,
                       ),
                     ),
                   ),

@@ -16,23 +16,26 @@ class AssetPairModel {
   double? totalLiquidity;
   double? totalLiquidityUsd;
   double? apr;
+  double? fee;
 
-  AssetPairModel(
-      {this.id,
-      this.idA,
-      this.idB,
-      this.symbol,
-      this.tokenA,
-      this.tokenB,
-      this.status,
-      this.reserveA,
-      this.reserveB,
-      this.reserveADivReserveB,
-      this.reserveBDivReserveA,
-      this.totalLiquidityRaw,
-      this.totalLiquidityUsd,
-      this.totalLiquidity,
-      this.apr});
+  AssetPairModel({
+    this.id,
+    this.idA,
+    this.idB,
+    this.symbol,
+    this.tokenA,
+    this.tokenB,
+    this.status,
+    this.reserveA,
+    this.reserveB,
+    this.reserveADivReserveB,
+    this.reserveBDivReserveA,
+    this.totalLiquidityRaw,
+    this.totalLiquidityUsd,
+    this.totalLiquidity,
+    this.apr,
+    this.fee,
+  });
 
   AssetPairModel.fromJson(Map<String, dynamic> json) {
     this.id = int.parse(json["id"]);
@@ -51,14 +54,24 @@ class AssetPairModel {
     this.totalLiquidityRaw =
         convertToSatoshi(double.parse(json["totalLiquidity"]['token']));
     this.totalLiquidity = double.parse(json["totalLiquidity"]['token']);
-    this.totalLiquidityUsd = double.parse(json["totalLiquidity"]['usd']);
+    this.totalLiquidityUsd = double.parse(json["totalLiquidity"]['usd'] ?? '0');
 
-    var _apr = json["apr"]['total'];
+    try {
+      var _apr = json["apr"]['total'];
 
-    if (_apr is int) {
-      this.apr = _apr + .0;
-    } else {
-      this.apr = _apr ?? 0;
+      if (_apr is int) {
+        this.apr = _apr + .0;
+      } else {
+        this.apr = _apr ?? 0;
+      }
+    } catch (e) {
+      this.apr = 0.0;
+    }
+
+    try {
+      this.fee = double.parse(json["tokenA"]["fee"]["pct"]);
+    } catch (err) {
+      this.fee = 0;
     }
   }
 
@@ -77,6 +90,7 @@ class AssetPairModel {
     data["totalLiquidity"] = this.totalLiquidity;
     data["totalLiquidityUsd"] = this.totalLiquidityUsd;
     data["apr"] = this.apr;
+    data["fee"] = this.fee;
     return data;
   }
 }

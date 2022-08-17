@@ -3,7 +3,6 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
-import 'package:defi_wallet/helpers/dex_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/screens/send/widgets/address_field.dart';
 import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
@@ -23,6 +22,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SendTokenSelector extends StatefulWidget {
+
+  final String selectedAddress;
+
+  const SendTokenSelector({Key? key, this.selectedAddress = '',}) : super(key: key);
   @override
   State<SendTokenSelector> createState() => _SendConfirmState();
 }
@@ -65,6 +68,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
             return Scaffold(
               appBar: MainAppBar(
                 title: 'Send',
+                hideOverlay: () => hideOverlay(),
                 isShowBottom: !(state is TransactionInitialState),
                 height: !(state is TransactionInitialState)
                     ? toolbarHeightWithBottom
@@ -78,6 +82,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
               child: Scaffold(
                 appBar: MainAppBar(
                   title: 'Send',
+                  hideOverlay: () => hideOverlay(),
                   action: null,
                   isSmall: true,
                 ),
@@ -100,6 +105,8 @@ class _SendConfirmState extends State<SendTokenSelector> {
                     assets.add(el.token!);
                   }
             });
+
+            addressController.text = widget.selectedAddress;
 
             return Container(
               color: isCustomBgColor
@@ -163,7 +170,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   });
                                 }
                               },
-                              onPressed: () {
+                              onPressedMax: () {
                                 setState(() {
                                   int balance = state
                                       .activeAccount!.balanceList!
@@ -178,6 +185,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   _amountController.text = amount.toString();
                                 });
                               },
+                              isFixedWidthAssetSelectorText: isCustomBgColor,
                             ),
                             SizedBox(height: 8),
                             Text(

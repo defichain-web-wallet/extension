@@ -38,9 +38,9 @@ class HDWalletService {
           ),
           network: networkHelper.getNetwork(networkString),
         ).data!.address;
-    print(address);
     return address!;
   }
+
   Future<AddressModel> getAddressModelFromKeyPair(bip32.BIP32 masterKeyPair, accountIndex, String networkString) async {
     final keyPair = getKeypairForPath(masterKeyPair, derivePath(accountIndex), networkString);
     final addressString = await getAddressFromKeyPair(keyPair, networkString);

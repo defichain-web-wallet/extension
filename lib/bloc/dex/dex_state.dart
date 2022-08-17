@@ -11,3 +11,5 @@ class DexLoadedState extends DexState {
 
   DexLoadedState(this.dexModel);
 }
+
+class DexErrorState extends DexState {}
