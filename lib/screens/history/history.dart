@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
+import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/screens/history/widgets/icon_history_type.dart';
@@ -33,11 +34,12 @@ class _HistoryState extends State<History> {
   double toolbarHeightWithBottom = 105;
 
   _scrollListener() async {
-    if (_controller.offset >= _controller.position.maxScrollExtent &&
-        !_controller.position.outOfRange) {
-      AccountCubit accountCubit =
-          BlocProvider.of<AccountCubit>(context);
-      await accountCubit.loadHistoryNext();
+    if (SettingsHelper.settings.network == 'testnet') {
+      if (_controller.offset >= _controller.position.maxScrollExtent &&
+          !_controller.position.outOfRange) {
+        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+        await accountCubit.loadHistoryNext();
+      }
     }
   }
 
@@ -93,34 +95,77 @@ class _HistoryState extends State<History> {
   }
 
   Widget _buildBody(BuildContext context, {isCustomBgColor = false}) =>
-      BlocBuilder<AccountCubit, AccountState>(
-          builder: (context, state) {
+      BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
         return BlocBuilder<TokensCubit, TokensState>(
           builder: (context, tokensState) {
             if (tokensState.status == TokensStatusList.success) {
-              late Iterable<HistoryModel>? filteredList;
+              late Iterable<HistoryNew>? filteredList;
+              late Iterable<HistoryModel>? testnetFilteredList;
 
-              if (state.historyFilterBy == 'receive') {
-                filteredList = state.activeAccount!.historyList!
-                    .where((element) => element.type == 'vout');
-              } else if (state.historyFilterBy == 'send') {
-                filteredList = state.activeAccount!.historyList!
-                    .where((element) => element.type == 'vin');
-              } else if (state.historyFilterBy == 'swap') {
-                filteredList = state.activeAccount!.historyList!
-                    .where((element) => element.type == 'PoolSwap');
+              var historyList = [];
+              var testnetHistoryList = [];
+
+              if (SettingsHelper.settings.network == 'testnet') {
+                if (state.historyFilterBy == 'receive') {
+                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                      .where((element) => element.type == 'vout');
+                } else if (state.historyFilterBy == 'send') {
+                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                      .where((element) => element.type == 'vin');
+                } else if (state.historyFilterBy == 'swap') {
+                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                      .where((element) => element.type == 'PoolSwap');
+                } else if (state.historyFilterBy == 'add liquidity') {
+                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                      .where((element) => element.type == 'AddPoolLiquidity');
+                } else if (state.historyFilterBy == 'remove liquidity') {
+                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                      .where((element) => element.type == 'RemovePoolLiquidity');
+                } else if (state.historyFilterBy == 'account to utxos') {
+                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                      .where((element) => element.type == 'AccountToUtxos');
+                } else if (state.historyFilterBy == 'utxos to account') {
+                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                      .where((element) => element.type == 'UtxosToAccount');
+                } else {
+                  testnetFilteredList =
+                      state.activeAccount!.testnetHistoryList!;
+                }
+                testnetHistoryList =
+                    new List.from(testnetFilteredList.toList());
               } else {
-                filteredList = state.activeAccount!.historyList!;
+                if (state.historyFilterBy == 'receive') {
+                  filteredList = state.activeAccount!.historyList!
+                      .where((element) => element.category == 'RECEIVE');
+                } else if (state.historyFilterBy == 'send') {
+                  filteredList = state.activeAccount!.historyList!
+                      .where((element) => element.category == 'SEND');
+                } else if (state.historyFilterBy == 'swap') {
+                  filteredList = state.activeAccount!.historyList!
+                      .where((element) => element.category == 'PoolSwap');
+                } else if (state.historyFilterBy == 'add liquidity') {
+                  filteredList = state.activeAccount!.historyList!
+                      .where((element) => element.category == 'AddPoolLiquidity');
+                } else if (state.historyFilterBy == 'remove liquidity') {
+                  filteredList = state.activeAccount!.historyList!
+                      .where((element) => element.category == 'RemovePoolLiquidity');
+                } else if (state.historyFilterBy == 'account to utxos') {
+                  filteredList = state.activeAccount!.historyList!
+                      .where((element) => element.category == 'AccountToUtxos');
+                } else if (state.historyFilterBy == 'utxos to account') {
+                  filteredList = state.activeAccount!.historyList!
+                      .where((element) => element.category == 'UtxosToAccount');
+                } else {
+                  filteredList = state.activeAccount!.historyList!;
+                }
+                historyList = new List.from(filteredList.toList());
               }
 
-              historyHelper.sortHistoryList(filteredList.toList());
-
-              final historyList = new List.from(filteredList);
               final DateFormat formatter = DateFormat('yyyy.MM.dd HH:mm');
 
               String currency = SettingsHelper.settings.currency!;
 
-              if (historyList.length > 0) {
+              if (historyList.length > 0 || testnetHistoryList.length > 0) {
                 return Container(
                   color: isCustomBgColor
                       ? Theme.of(context).dialogBackgroundColor
@@ -133,28 +178,60 @@ class _HistoryState extends State<History> {
                             Expanded(
                                 child: ListView.builder(
                               controller: _controller,
-                              itemCount: historyList.length,
+                              itemCount:
+                                  SettingsHelper.settings.network == 'mainnet'
+                                      ? historyList.length
+                                      : testnetHistoryList.length,
                               itemBuilder: (context, index) {
-                                final tokenName = historyList[index].token;
-                                final txValue = convertFromSatoshi(
-                                    historyList[index].value);
-                                final isSend = historyList[index].isSend;
-                                final type = historyList[index].type;
-                                final date =
-                                    (historyList[index].blockTime != null)
-                                        ? formatter.format(
-                                            DateTime.fromMillisecondsSinceEpoch(
-                                                    int.parse(historyList[index]
-                                                            .blockTime) *
-                                                        1000)
-                                                .toLocal())
-                                        : 'date';
-                                final txValuePrefix =
-                                    (type == 'vout' || type == 'vin')
-                                        ? isSend
-                                            ? '-'
-                                            : '+'
-                                        : '';
+                                var tokenName;
+                                var txValue;
+                                var isSend;
+                                var type;
+                                var date;
+                                var txValuePrefix;
+                                if (SettingsHelper.settings.network ==
+                                    'mainnet') {
+                                  tokenName =
+                                      historyList[index].tokens![0].code;
+                                  txValue = historyList[index].value;
+                                  isSend =
+                                      historyList[index].category == 'SEND';
+                                  type = historyList[index].category;
+                                  DateTime dateTime =
+                                      DateTime.parse(historyList[index].date);
+                                  date = formatter.format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                              dateTime.millisecondsSinceEpoch)
+                                          .toLocal());
+                                  txValuePrefix =
+                                      (type == 'SEND' || type == 'RECEIVE')
+                                          ? isSend
+                                              ? '-'
+                                              : '+'
+                                          : '';
+                                } else {
+                                  tokenName = testnetHistoryList[index].token;
+                                  txValue = convertFromSatoshi(
+                                      testnetHistoryList[index].value);
+                                  isSend = testnetHistoryList[index].isSend;
+                                  type = testnetHistoryList[index].type;
+                                  date = (testnetHistoryList[index].blockTime !=
+                                          null)
+                                      ? formatter.format(
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                                  int.parse(testnetHistoryList[
+                                                              index]
+                                                          .blockTime) *
+                                                      1000)
+                                              .toLocal())
+                                      : 'date';
+                                  txValuePrefix =
+                                      (type == 'vout' || type == 'vin')
+                                          ? isSend
+                                              ? '-'
+                                              : '+'
+                                          : '';
+                                }
 
                                 return Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -189,7 +266,7 @@ class _HistoryState extends State<History> {
                                                 .headline6,
                                           ),
                                           Text(
-                                            '$txValuePrefix$txValue $tokenName',
+                                            '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 6)} $tokenName',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .headline4,
@@ -207,7 +284,7 @@ class _HistoryState extends State<History> {
                                                 .headline5,
                                           ),
                                           Text(
-                                              "${getBalanceByUsd(tokenName, currency, txValue, tokensState)} $currency")
+                                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
                                         ],
                                       ),
                                     ),
@@ -244,6 +321,6 @@ class _HistoryState extends State<History> {
   String getBalanceByUsd(tokenName, currency, txValue, tokensState) =>
       balancesHelper.numberStyling(
           tokenHelper.getAmountByUsd(
-              tokensState.tokensPairs, txValue, tokenName, currency),
+              tokensState.tokensPairs, txValue, tokenName),
           fixed: true);
 }

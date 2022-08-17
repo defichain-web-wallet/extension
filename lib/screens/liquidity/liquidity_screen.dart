@@ -77,7 +77,6 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
         builder: (accountContext, accountState) {
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (tokensContext, tokensState) {
-
           if (tokensState.status == TokensStatusList.success &&
               accountState.status == AccountStatusList.success) {
             var tokensPairs = accountState.activeAccount!.balanceList!.where(
@@ -92,7 +91,10 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
               if (!element.isHidden! && !element.isPair!) {
                 var balance = convertFromSatoshi(element.balance!);
                 totalTokensBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!, balance, element.token!, 'USD');
+                  tokensState.tokensPairs!,
+                  balance,
+                  element.token!,
+                );
               } else if (element.isPair!) {
                 var foundedAssetPair = List.from(tokensState.tokensPairs!
                     .where((item) => element.token == item.symbol))[0];
@@ -105,26 +107,26 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                     foundedAssetPair.reserveB!;
 
                 totalTokensBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    baseBalance,
-                    foundedAssetPair.tokenA,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  baseBalance,
+                  foundedAssetPair.tokenA,
+                );
                 totalTokensBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    quoteBalance,
-                    foundedAssetPair.tokenB,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  quoteBalance,
+                  foundedAssetPair.tokenB,
+                );
 
                 totalPairsBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    baseBalance,
-                    foundedAssetPair.tokenA,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  baseBalance,
+                  foundedAssetPair.tokenA,
+                );
                 totalPairsBalance += tokenHelper.getAmountByUsd(
-                    tokensState.tokensPairs!,
-                    quoteBalance,
-                    foundedAssetPair.tokenB,
-                    'USD');
+                  tokensState.tokensPairs!,
+                  quoteBalance,
+                  foundedAssetPair.tokenB,
+                );
               }
             });
 
@@ -178,23 +180,31 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                               ),
                             ),
                           ),
-                        TextButton(
-                          child: Text(
-                            ' +  Add liquidity ',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          onPressed: () async {
-                            await lockHelper.provideWithLockChecker(
-                                context,
-                                () => Navigator.push(
-                                      context,
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, animation1, animation2) =>
-                                              LiquidityPoolList(),
-                                        transitionDuration: Duration.zero,
-                                        reverseTransitionDuration: Duration.zero,),
-                                    ));
-                          },
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              child: Text(
+                                ' +  Add liquidity ',
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                              onPressed: () async {
+                                await lockHelper.provideWithLockChecker(
+                                    context,
+                                    () => Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LiquidityPoolList(),
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
+                                          ),
+                                        ));
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),

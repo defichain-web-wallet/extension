@@ -79,7 +79,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                   Column(
                     children: [
                       Text(
-                        widget.showStep ? '3/3' : '',
+                        widget.showStep ? '4/4' : '',
                         style: Theme.of(context).textTheme.headline2,
                       ),
                       SizedBox(height: 8),

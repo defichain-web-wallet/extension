@@ -11,6 +11,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final Widget? customTitle;
   final Widget? action;
+  final Function()? hideOverlay;
   final double height;
   final bool isShowBottom;
   final bool? isSmall;
@@ -20,6 +21,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.title,
       this.customTitle,
       this.action,
+      this.hideOverlay,
       this.height = toolbarHeight,
       this.isShowBottom = false,
       this.isSmall = false})
@@ -53,7 +55,12 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   size: iconHeight,
                   color: Theme.of(context).appBarTheme.actionsIconTheme!.color),
               splashRadius: 18,
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                if (hideOverlay != null) {
+                  hideOverlay!();
+                }
+                Navigator.of(context).pop();
+              },
             ),
           ],
         ),
@@ -68,14 +75,19 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         action == null
             ? CancelButton(
-                callback: () => Navigator.pushReplacement(
-                      context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => HomeScreen(),
-                        transitionDuration: Duration.zero,
-                        reverseTransitionDuration: Duration.zero,
-                      ),
-                    ))
+                callback: () {
+                  if (hideOverlay != null) {
+                    hideOverlay!();
+                  }
+                  Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) => HomeScreen(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                })
             : action!
       ],
     );

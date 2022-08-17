@@ -40,7 +40,12 @@ class _WalletCheckerState extends State<WalletChecker> {
       bool isSavedMnemonic = await box.get(HiveNames.openedMnemonic) != null;
       String? savedMnemonic = await box.get(HiveNames.openedMnemonic);
 
+<<<<<<< HEAD
       bool isRecoveryMnemonic = await box.get(HiveNames.recoveryMnemonic) != null;
+=======
+      bool isRecoveryMnemonic =
+          await box.get(HiveNames.recoveryMnemonic) != null;
+>>>>>>> master
       String? recoveryMnemonic = await box.get(HiveNames.recoveryMnemonic);
 
       if (password != null) {

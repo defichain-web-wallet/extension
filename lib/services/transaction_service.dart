@@ -1,14 +1,12 @@
 import 'dart:math';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_auth_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
-import 'package:defi_wallet/models/tx_model.dart';
 import 'package:defi_wallet/models/tx_response_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
@@ -855,7 +853,12 @@ class TransactionService {
     bool txPresent = false;
 
     for (; wait;) {
-      txPresent = await historyRequests.getTxPresent(txid);
+      try {
+        txPresent = await historyRequests.getTxPresent(
+            txid, SettingsHelper.settings.network!);
+      } catch (err) {
+        txPresent = false;
+      }
       if (txPresent) {
         wait = false;
       } else {

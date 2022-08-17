@@ -4,6 +4,7 @@ import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -58,16 +59,21 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 4.0),
-                          child: Text(
-                              TokensHelper()
-                                  .getTokenFormat(widget.assetPair.symbol!),
-                              overflow: TextOverflow.ellipsis,
-                              style: widget.isFullSize
-                                  ? Theme.of(context).textTheme.headline6
-                                  : Theme.of(context)
-                                      .textTheme
-                                      .headline4
-                                      ?.apply(fontWeightDelta: 2)),
+                          child: Container(
+                            width: widget.isFullSize ? 123 : 73,
+                            child: TickerText(
+                              child: Text(
+                                  TokensHelper()
+                                      .getTokenFormat(widget.assetPair.symbol!),
+                                  overflow: TextOverflow.ellipsis,
+                                  style: widget.isFullSize
+                                      ? Theme.of(context).textTheme.headline6
+                                      : Theme.of(context)
+                                          .textTheme
+                                          .headline4
+                                          ?.apply(fontWeightDelta: 2)),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -95,7 +101,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
                                     .headline4
                                     ?.apply(fontWeightDelta: 2)),
                         Text(
-                            '${toFixed(getYeldAmountPercentage(widget.assetPair.apr!), 2)}% APR',
+                            TokensHelper().getAprFormat(widget.assetPair.apr!),
                             style: Theme.of(context).textTheme.headline4)
                       ],
                     ),
@@ -129,10 +135,6 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
         ),
       ),
     );
-  }
-
-  double getYeldAmountPercentage(double value) {
-    return value * 100;
   }
 
   String getTotalAmountByUsd(double amount) {

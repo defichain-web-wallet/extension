@@ -15,10 +15,16 @@ class HistoryHelper {
         return 'Add Liquidity';
       case 'RemovePoolLiquidity':
         return 'Remove Liquidity';
+      case 'UtxosToAccount':
+        return 'UtxosToAccount';
+      case 'AccountToUtxos':
+        return 'AccountToUtxos';
       case 'PoolSwap':
         return 'Swap';
+      case 'SEND':
       case 'vin':
         return 'Send';
+      case 'RECEIVE':
       case 'vout':
         return 'Receive';
       default:

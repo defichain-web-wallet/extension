@@ -78,6 +78,11 @@ dependencies:
   percent_indicator: ^4.0.0
 
   js: ^0.6.4
+  email_validator: ^2.0.1
+  mask_text_input_formatter: ^2.3.0
+  intl_phone_field: ^3.1.0
+  iban_form_field: ^0.2.2
+  country_list_pick: ^1.0.1+6
 
 dev_dependencies:
   flutter_test:
@@ -119,8 +124,11 @@ flutter:
     - family: IBM Plex Sans
       fonts:
         - asset: fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf
-        - asset: fonts/IBM_Plex_Sans/IBMPlexSans-Italic.ttf
-          style: italic
+          style: normal
+    - family: IBM Plex Medium
+      fonts:
+        - asset: fonts/IBM_Plex_Sans/IBMPlexSans-Medium.ttf
+          style: normal
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

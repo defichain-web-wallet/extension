@@ -25,54 +25,54 @@ class AssetList extends StatelessWidget {
         String currency = SettingsHelper.settings.currency!;
 
         return BlocBuilder<TokensCubit, TokensState>(
-          builder: (context, tokensState) {
-            if (tokensState.status == TokensStatusList.success) {
-              return ListView.builder(
-                itemCount: balances.length,
-                itemBuilder: (context, index) {
-                  String coin = balances[index].token!;
-                  String tokenName = (coin != 'DFI') ? 'd' + coin : coin;
-                  double tokenBalance = convertFromSatoshi(balances[index].balance!);
+            builder: (context, tokensState) {
+          if (tokensState.status == TokensStatusList.success) {
+            return ListView.builder(
+              itemCount: balances.length,
+              itemBuilder: (context, index) {
+                String coin = balances[index].token!;
+                String tokenName = tokenHelper.getTokenWithPrefix(coin);
+                double tokenBalance =
+                    convertFromSatoshi(balances[index].balance!);
 
-                  return Padding(
-                    padding:
-                    const EdgeInsets.only(bottom: 8, left: 6, right: 6, top: 2),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).cardColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context).shadowColor,
-                            blurRadius: 2,
-                            spreadRadius: 2,
-                          )
-                        ],
+                return Padding(
+                  padding: const EdgeInsets.only(
+                      bottom: 8, left: 16, right: 16, top: 2),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).cardColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).shadowColor,
+                          blurRadius: 2,
+                          spreadRadius: 2,
+                        )
+                      ],
+                    ),
+                    child: ListTile(
+                      leading: _buildTokenIcon(balances[index]),
+                      title: Text(
+                        getFormatTokenBalance(tokenBalance, tokenName),
+                        style: Theme.of(context).textTheme.headline6,
                       ),
-                      child: ListTile(
-                        leading: _buildTokenIcon(balances[index]),
-                        title: Text(
-                          getFormatTokenBalance(tokenBalance, tokenName),
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
-                        subtitle: Text(
-                          getFormatTokenBalanceByFiat(tokensState, coin, tokenBalance, currency),
-                          style: Theme.of(context).textTheme.headline4,
-                        ),
-                        trailing: Icon(
-                          Icons.keyboard_arrow_right,
-                          color: Theme.of(context).textTheme.headline1!.color,
+                      subtitle: Text(
+                        getFormatTokenBalanceByFiat(
+                            tokensState, coin, tokenBalance, currency),
+                        style: Theme.of(context).textTheme.headline4!.apply(
+                          color: SettingsHelper.settings.theme == 'dark' ? Colors.white : Color(0xFF7D7D7D),
+                          fontSizeFactor: 0.9
                         ),
                       ),
                     ),
-                  );
-                },
-              );
-            } else {
-              return Container();
-            }
+                  ),
+                );
+              },
+            );
+          } else {
+            return Container();
           }
-        );
+        });
       } else {
         return Container();
       }
@@ -94,14 +94,16 @@ class AssetList extends StatelessWidget {
   String getFormatTokenBalance(double tokenBalance, String tokenName) =>
       '${balancesHelper.numberStyling(tokenBalance)} $tokenName';
 
-  String getFormatTokenBalanceByFiat(state,
-      String coin, double tokenBalance, String fiat) {
+  String getFormatTokenBalanceByFiat(
+      state, String coin, double tokenBalance, String fiat) {
     double balanceInUsd;
     if (tokenHelper.isPair(coin)) {
       double satoshi = convertToSatoshi(tokenBalance) + .0;
-      balanceInUsd = tokenHelper.getPairsAmountByUsd(state.tokensPairs, satoshi, coin, fiat);
+      balanceInUsd = tokenHelper.getPairsAmountByUsd(
+          state.tokensPairs, satoshi, coin);
     } else {
-      balanceInUsd = tokenHelper.getAmountByUsd(state.tokensPairs, tokenBalance, coin, fiat);
+      balanceInUsd = tokenHelper.getAmountByUsd(
+          state.tokensPairs, tokenBalance, coin);
     }
     if (fiat == 'EUR') {
       balanceInUsd *= state.eurRate;

@@ -1,6 +1,6 @@
 {
   "name": "Jellywallet Beta",
-  "version": "0.0.5",
+  "version": "0.8.1",
   "permissions": ["storage"],
   "icons": [
     { "src": "/icons/jelly_logo.png", "sizes": "16x16" },

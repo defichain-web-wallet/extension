@@ -1,10 +1,13 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
 import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
@@ -13,6 +16,7 @@ import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/wallet_details.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
@@ -37,11 +41,77 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   LockHelper lockHelper = LockHelper();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+  bool isFullSizeScreen = false;
+  double assetsTabBodyHeight = 0;
+  double historyTabBodyHeight = 0;
+  double minDefaultTabBodyHeight = 275;
+  double maxDefaultTabBodyHeight = 475;
+  double maxHistoryEntries = 30;
+  double heightListEntry = 74;
+  double heightAdditionalAction = 60;
+
+  tabListener() {
+    HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
+    homeCubit.updateTabIndex(index: tabController!.index);
+    setTabBody(tabIndex: tabController!.index);
+  }
+
+  setTabBody({int tabIndex = 0}) {
+    AccountState accountState = BlocProvider.of<AccountCubit>(context).state;
+    double countAssets = 0;
+    double countTransactions = 0;
+
+    countAssets = accountState.activeAccount!.balanceList!
+        .where((el) => !el.isHidden!)
+        .length
+        .toDouble();
+    assetsTabBodyHeight =
+        countAssets * heightListEntry + heightAdditionalAction;
+
+    countTransactions =
+        accountState.activeAccount!.historyList!.length.toDouble();
+    if (countTransactions < maxHistoryEntries) {
+      historyTabBodyHeight =
+          countTransactions * heightListEntry + heightAdditionalAction;
+    } else {
+      historyTabBodyHeight =
+          maxHistoryEntries * heightListEntry + heightAdditionalAction;
+    }
+
+    if (isFullSizeScreen) {
+      if (assetsTabBodyHeight < maxDefaultTabBodyHeight) {
+        assetsTabBodyHeight = maxDefaultTabBodyHeight;
+      }
+
+      if (historyTabBodyHeight < maxDefaultTabBodyHeight) {
+        historyTabBodyHeight = maxDefaultTabBodyHeight;
+      }
+    } else {
+      if (assetsTabBodyHeight < minDefaultTabBodyHeight) {
+        assetsTabBodyHeight = minDefaultTabBodyHeight;
+      }
+
+      if (historyTabBodyHeight < minDefaultTabBodyHeight) {
+        historyTabBodyHeight = minDefaultTabBodyHeight;
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    setTabBody();
     tabController = TabController(length: 2, vsync: this);
+    tabController!.addListener(tabListener);
+    TransactionCubit transactionCubit =
+        BlocProvider.of<TransactionCubit>(context);
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    transactionCubit.checkOngoingTransaction();
+
+    if (widget.isLoadTokens && SettingsHelper.settings.network == 'mainnet') {
+      fiatCubit.loadUserDetails(accountCubit.state.accessToken!);
+    }
   }
 
   @override
@@ -70,12 +140,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       isSaveOpenTime = true;
     }
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    TransactionCubit transactionCubit =
-        BlocProvider.of<TransactionCubit>(context);
     if (widget.isLoadTokens) {
       tokensCubit.loadTokensFromStorage();
     }
-    transactionCubit.checkOngoingTransaction();
 
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
       return BlocBuilder<TokensCubit, TokensState>(
@@ -115,7 +182,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       padding: const EdgeInsets.only(top: 20),
                       child: Scaffold(
                         body: _buildBody(
-                            context, state, transactionState, tokensState),
+                            context, state, transactionState, tokensState,
+                            isFullSize: true),
                         appBar: HomeAppBar(
                           selectKey: selectKey,
                           updateCallback: () =>
@@ -141,81 +209,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
-  Widget _buildBody(context, state, transactionState, tokensState) {
+  Widget _buildBody(context, state, transactionState, tokensState,
+      {isFullSize = false}) {
     if (state.status == AccountStatusList.success &&
         tokensState.status == TokensStatusList.success) {
-      return LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth < ScreenSizes.medium) {
+      isFullSizeScreen = isFullSize;
+      setTabBody(tabIndex: tabController!.index);
+      return BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, homeState) {
           return Container(
             child: Center(
               child: StretchBox(
                 maxWidth: ScreenSizes.medium,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: ListView(
                   children: [
                     Container(
                       color: Theme.of(context).dialogBackgroundColor,
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 26, top: 20),
-                            child: WalletDetails(layoutSize: 'small'),
+                            padding: const EdgeInsets.only(bottom: 8, top: 40),
+                            child: WalletDetails(),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: ActionButtonsList(
-                              hideOverlay: () => hideOverlay(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).appBarTheme.backgroundColor,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.shadowColor.withOpacity(0.1),
-                              spreadRadius: 2,
-                              blurRadius: 3,
-                            ),
-                          ],
-                        ),
-                        child: TabBarHeader(
-                          tabController: tabController,
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: TabBarBody(
-                        tabController: tabController,
-                        historyList: state.activeAccount.historyList!,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        } else {
-          return Container(
-            child: Center(
-              child: StretchBox(
-                maxWidth: ScreenSizes.medium,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      color: Theme.of(context).dialogBackgroundColor,
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 26),
-                            child: WalletDetails(layoutSize: 'large'),
-                          ),
-                          Expanded(
+                            padding: const EdgeInsets.only(bottom: 40),
                             child: ActionButtonsList(
                               hideOverlay: () => hideOverlay(),
                             ),
@@ -224,6 +241,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ),
                     Container(
+                      color: Colors.transparent,
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: Container(
@@ -244,23 +262,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                    Flexible(
-                      child: TabBarBody(
-                        tabController: tabController,
-                        historyList: state.activeAccount.historyList!,
-                      ),
-                    ),
+                    homeState.tabIndex == 0
+                        ? SizedBox(
+                            height: assetsTabBodyHeight,
+                            child: TabBarBody(
+                              tabController: tabController,
+                              historyList: state.activeAccount.historyList!,
+                              testnetHistoryList:
+                                  state.activeAccount.testnetHistoryList!,
+                            ),
+                          )
+                        : SizedBox(
+                            height: historyTabBodyHeight,
+                            child: TabBarBody(
+                              tabController: tabController,
+                              historyList: state.activeAccount.historyList!,
+                              testnetHistoryList:
+                                  state.activeAccount.testnetHistoryList!,
+                            ),
+                          ),
                   ],
                 ),
               ),
             ),
           );
-        }
-      });
+        },
+      );
     } else if (tokensState.status == TokensStatusList.failure) {
       return Container(
         child: Center(
-          child: Text('Failed background process. Please try later'),
+          child: ErrorPlaceholder(
+            message: 'API error',
+            description: 'Please change the API on settings and try again',
+          ),
         ),
       );
     } else {

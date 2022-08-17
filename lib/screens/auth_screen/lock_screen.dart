@@ -17,6 +17,10 @@ import 'package:hive/hive.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 
 class LockScreen extends StatefulWidget {
+  final Widget? redirectTo;
+
+  const LockScreen({Key? key, this.redirectTo}) : super(key: key);
+
   @override
   _LockScreenState createState() => _LockScreenState();
 }
@@ -34,26 +38,28 @@ class _LockScreenState extends State<LockScreen> {
   Widget build(BuildContext context) => Scaffold(
         appBar: WelcomeAppBar(),
         body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SvgPicture.asset(
                   'assets/jelly_logo.svg',
-                  height: 220,
-                  width: 220,
+                  height: 180,
+                  width: 200,
                 ),
                 Text(
-                  'Welcome Back!',
+                  widget.redirectTo == null
+                      ? 'Welcome Back!'
+                      : 'Enter password',
                   style: Theme.of(context).textTheme.headline1,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 16),
                 Text(
                   'Your Keys. Your Crypto.',
                   style: Theme.of(context).textTheme.headline2,
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 25),
                 StretchBox(
                   maxWidth: ScreenSizes.xSmall,
                   child: Column(
@@ -89,29 +95,32 @@ class _LockScreenState extends State<LockScreen> {
                 StretchBox(
                   maxWidth: ScreenSizes.xSmall,
                   child: PendingButton(
-                    'Unlock',
+                    widget.redirectTo == null ? 'Unlock' : 'Continue',
                     isCheckLock: false,
                     globalKey: globalKey,
                     callback: (parent) => _restoreWallet(parent),
                   ),
                 ),
-                SizedBox(height: 24),
-                InkWell(
-                  child: Text(
-                    'or import using Secret Recovery Phrase',
-                    style: AppTheme.defiUnderlineText,
+                SizedBox(height: 20),
+                if (widget.redirectTo == null)
+                  InkWell(
+                    child: Text(
+                      'or import using Secret Recovery Phrase',
+                      style: AppTheme.defiUnderlineText,
+                    ),
+                    onTap: isEnable
+                        ? () => Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        RecoveryScreen(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            )
+                        : null,
                   ),
-                  onTap: isEnable
-                      ? () => Navigator.push(
-                            context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) => RecoveryScreen(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),
-                          )
-                      : null,
-                ),
               ],
             ),
           ),
@@ -127,22 +136,34 @@ class _LockScreenState extends State<LockScreen> {
     var decodedPassword = stringToBase64.decode(box.get(HiveNames.password));
     if (password == decodedPassword) {
       parent.emitPending(true);
+      if (widget.redirectTo == null) {
+        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
-      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+        await accountCubit
+            .restoreAccountFromStorage(SettingsHelper.settings.network!);
+        LoggerService.invokeInfoLogg('user was unlock wallet');
+        parent.emitPending(false);
 
-      await accountCubit
-          .restoreAccountFromStorage(SettingsHelper.settings.network!);
-      LoggerService.invokeInfoLogg('user was unlock wallet');
-      parent.emitPending(false);
-
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => HomeScreen(isLoadTokens: true),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                HomeScreen(isLoadTokens: true),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                widget.redirectTo!,
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      }
     } else {
       setState(() {
         isFailed = true;

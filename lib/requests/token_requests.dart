@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:http/http.dart' as http;
 
 class TokenRequests {
@@ -9,15 +10,21 @@ class TokenRequests {
   var tokenHelper = TokensHelper();
 
   Future<List<dynamic>> getTokensResponse() async {
-    final Uri url = Uri.parse(
-        'https://ocean.defichain.com/v0/${networkHelper.getNetworkString()}/tokens?size=200');
-    final response = await http.get(url);
+    String hostUrl = SettingsHelper.getHostApiUrl();
+    String urlAddress =
+        '$hostUrl/${SettingsHelper.settings.network}/tokens?size=200';
+    final Uri url = Uri.parse(urlAddress);
+    try {
+      final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      var json = jsonDecode(response.body);
-      return new List.from(json['data']);
-    } else {
-      return [];
+      if (response.statusCode == 200) {
+        var json = jsonDecode(response.body);
+        return List.from(json['data']);
+      } else {
+        return [];
+      }
+    } catch (err) {
+      throw err;
     }
   }
 
@@ -56,12 +63,16 @@ class TokenRequests {
   Future<double> getEurByUsdRate() async {
     final Uri url = Uri.parse('https://api.exchangerate.host/latest?base=USD');
 
-    final response = await http.get(url);
+    try {
+      final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      var res = jsonDecode(response.body);
-      return res['rates']['EUR'];
-    } else {
+      if (response.statusCode == 200) {
+        var res = jsonDecode(response.body);
+        return res['rates']['EUR'];
+      } else {
+        return 1.0;
+      }
+    } catch (_) {
       return 1.0;
     }
   }

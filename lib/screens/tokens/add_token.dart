@@ -106,10 +106,7 @@ class _AddTokenState extends State<AddToken> {
                               height: 30,
                               width: 30,
                             ),
-                            title: Text(
-                              (symbols[index] != 'DFI')
-                                  ? 'd' + symbols[index]
-                                  : symbols[index],
+                            title: Text(tokenHelper.getTokenWithPrefix(symbols[index]),
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
                             trailing: Text(
@@ -162,7 +159,7 @@ class _AddTokenState extends State<AddToken> {
       await accountCubit.addToken(tokenName);
     }
     LoggerService.invokeInfoLogg('user added new token');
-    Navigator.push(
+    await Navigator.pushReplacement(
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) => HomeScreen(),

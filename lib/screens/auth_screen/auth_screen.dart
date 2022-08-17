@@ -31,12 +31,12 @@ class AuthScreen extends StatelessWidget {
                   'Welcome to wallet!',
                   style: Theme.of(context).textTheme.headline1,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 16),
                 Text(
                   'Your Keys. Your Crypto.',
                   style: Theme.of(context).textTheme.headline2,
                 ),
-                SizedBox(height: 60),
+                SizedBox(height: 50),
                 Text(
                   'Wallet setup',
                   style: Theme.of(context).textTheme.headline2,
@@ -97,7 +97,7 @@ class AuthScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 24),
+                SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

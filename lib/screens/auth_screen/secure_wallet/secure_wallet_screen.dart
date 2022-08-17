@@ -1,5 +1,6 @@
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/screens/auth_screen/confirmation_mnemonic.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/create_password_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/text_fields.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
@@ -91,7 +92,7 @@ class _SecureScreenState extends State<SecureScreen> {
                 Column(
                   children: [
                     Text(
-                      '2/3',
+                      '2/4',
                       style: Theme.of(context).textTheme.headline2,
                     ),
                     SizedBox(height: 8),
@@ -121,7 +122,7 @@ class _SecureScreenState extends State<SecureScreen> {
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation1, animation2) =>
-                              CreatePasswordScreen(mnemonic: mnemonic),
+                              ConfirmationMnemonic(mnemonic: mnemonic),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
                         ),

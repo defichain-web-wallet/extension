@@ -21,11 +21,11 @@ class TokensCubit extends Cubit<TokensState> {
       status: TokensStatusList.loading,
     ));
 
-    final tokens = await TokenRequests().getTokenList();
-    final tokensDex = await DexRequests().getPoolPairs();
-    final eurRate = await TokenRequests().getEurByUsdRate();
-
     try {
+      final tokens = await TokenRequests().getTokenList();
+      final tokensDex = await DexRequests().getPoolPairs();
+      final eurRate = await TokenRequests().getEurByUsdRate();
+
       emit(state.copyWith(
         status: TokensStatusList.success,
         tokens: tokens,
