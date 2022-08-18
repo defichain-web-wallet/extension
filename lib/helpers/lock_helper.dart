@@ -23,6 +23,13 @@ class LockHelper {
         ),
       );
     } else {
+      try {
+        var box = await Hive.openBox(HiveBoxes.client);
+        await box.put(HiveNames.openTime, DateTime.now().millisecondsSinceEpoch);
+        await box.close();
+      } catch (err) {
+        print(err);
+      }
       callback();
     }
   }
