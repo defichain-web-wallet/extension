@@ -70,16 +70,12 @@ class _AddNewAddressState extends State<AddNewAddress> {
                   ),
                 ),
                 TextFormField(
-                  onFieldSubmitted: (value) {
-                    _focusNode.requestFocus();
-                  },
+                  onFieldSubmitted: (value) => _focusNode.requestFocus(),
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(20),
                   ],
                   controller: nameController,
-                  onChanged: (value) {
-                    checkButtonStatus();
-                  },
+                  onChanged: (value) => checkButtonStatus(),
                   validator: (value) {
                     if (nameController.text.length > 3) {
                       return null;

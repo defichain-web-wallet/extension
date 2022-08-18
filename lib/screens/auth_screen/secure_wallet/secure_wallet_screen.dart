@@ -116,7 +116,7 @@ class _SecureScreenState extends State<SecureScreen> {
                   ],
                 ),
                 TextFields(
-                  readOnly: true,
+                  isReadOnly: true,
                   controllers: controllers,
                   focusNodes: focusNodes,
                   globalKey: globalKey,

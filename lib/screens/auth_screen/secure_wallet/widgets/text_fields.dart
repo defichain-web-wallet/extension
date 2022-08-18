@@ -9,7 +9,7 @@ class TextFields extends StatelessWidget {
   final GlobalKey? globalKey;
   final List<int> invalidControllerIndexes;
   final bool enabled;
-  final bool readOnly;
+  final bool isReadOnly;
 
   const TextFields({
     Key? key,
@@ -18,7 +18,7 @@ class TextFields extends StatelessWidget {
     this.globalKey,
     this.invalidControllerIndexes = const [],
     this.enabled = true,
-    this.readOnly = false,
+    this.isReadOnly = false,
   }) : super(key: key);
 
   @override
@@ -46,7 +46,7 @@ class TextFields extends StatelessWidget {
                       columnsCount: _defaultTextFieldCount,
                       depth: index > 0 ? _defaultTextFieldCount * index : 0,
                       enabled: enabled,
-                      readOnly: readOnly,
+                      readOnly: isReadOnly,
                       invalidControllerIndexes: invalidControllerIndexes,
                     )),
           ),

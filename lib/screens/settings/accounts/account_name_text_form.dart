@@ -45,20 +45,12 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
     });
   }
 
-  void _onEdit() {
-    setState(() {
-      _focusNode.requestFocus();
-      _textEditingController.selection = TextSelection(baseOffset: 0, extentOffset: _textEditingController.text.length);
-      showConfirmButton = true;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-
-  }
+  void _onEdit() => setState(() {
+        _focusNode.requestFocus();
+        _textEditingController.selection = TextSelection(
+            baseOffset: 0, extentOffset: _textEditingController.text.length);
+        showConfirmButton = true;
+      });
 
   @override
   void dispose() {
@@ -77,8 +69,9 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
         child: GestureDetector(
           onDoubleTap: () {
             _focusNode.requestFocus();
-            _textEditingController.selection = TextSelection(baseOffset: 0, extentOffset: _textEditingController.text.length);
-            
+            _textEditingController.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: _textEditingController.text.length);
           },
           child: TextField(
             autofocus: true,
@@ -91,15 +84,18 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(
-                    color: Theme.of(context).textTheme.button!.decorationColor!),
+                    color:
+                        Theme.of(context).textTheme.button!.decorationColor!),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: showConfirmButton
                     ? BorderSide(color: AppTheme.pinkColor)
                     : BorderSide(
-                        color:
-                            Theme.of(context).textTheme.button!.decorationColor!),
+                        color: Theme.of(context)
+                            .textTheme
+                            .button!
+                            .decorationColor!),
               ),
               suffixIcon: showConfirmButton
                   ? IconButton(

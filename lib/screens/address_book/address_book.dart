@@ -74,12 +74,9 @@ class _AddressBookState extends State<AddressBook> {
                             ),
                           );
                         },
-                        deleteCallback: () {
-                          setState(() {
+                        deleteCallback: () => setState(() =>
                             addressBookCubit.deleteAddress(
-                                addressBookState.addressBookList![index]);
-                          });
-                        },
+                                addressBookState.addressBookList![index])),
                       );
                     },
                   )

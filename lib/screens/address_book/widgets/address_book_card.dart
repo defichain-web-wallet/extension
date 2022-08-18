@@ -32,15 +32,16 @@ class _AddressBookCardState extends State<AddressBookCard> {
   Timer? timer;
   String tooltipMessage = "Copy to clipboard";
   bool isShowTooltip = false;
-  bool firstBuild = true;
+  bool isFirstBuild = true;
+  double maxNameWidth = 250;
   double x = 0.0;
   double y = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    if (firstBuild) {
+    if (isFirstBuild) {
       textColorHover = Theme.of(context).textTheme.headline4!.color!;
-      firstBuild = !firstBuild;
+      isFirstBuild = !isFirstBuild;
     }
     return Card(
       margin: EdgeInsets.only(top: 0, bottom: 10, left: 0, right: 0),
@@ -53,7 +54,7 @@ class _AddressBookCardState extends State<AddressBookCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 250,
+                  width: maxNameWidth,
                   child: Text(
                     widget.name,
                     style: Theme.of(context).textTheme.headline2,
@@ -109,21 +110,19 @@ class _AddressBookCardState extends State<AddressBookCard> {
           Column(
             children: [
               AddressBookButtons(
-                editCallback: () {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) =>
-                          AddNewAddress(
-                        name: widget.name,
-                        address: widget.address,
-                        id: widget.id,
-                      ),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
+                editCallback: () => Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) =>
+                        AddNewAddress(
+                      name: widget.name,
+                      address: widget.address,
+                      id: widget.id,
                     ),
-                  );
-                },
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                ),
                 deleteCallback: widget.deleteCallback,
               ),
             ],
@@ -134,9 +133,7 @@ class _AddressBookCardState extends State<AddressBookCard> {
   }
 
   copyAddress(address) async {
-    setState(() {
-      isShowTooltip = false;
-    });
+    setState(() => isShowTooltip = false);
 
     await Clipboard.setData(ClipboardData(text: address));
 
@@ -146,20 +143,16 @@ class _AddressBookCardState extends State<AddressBookCard> {
     });
   }
 
-  void _updateLocation(PointerEvent details) {
-    setState(() {
-      textColorHover = Color(0xFFFF00A3);
-      isShowTooltip = true;
-      x = details.position.dx;
-      y = details.position.dy;
-    });
-  }
+  void _updateLocation(PointerEvent details) => setState(() {
+        textColorHover = Color(0xFFFF00A3);
+        isShowTooltip = true;
+        x = details.position.dx;
+        y = details.position.dy;
+      });
 
-  void _updateLocationExit(PointerEvent details) {
-    setState(() {
-      textColorHover = Theme.of(context).textTheme.headline4!.color!;
-      isShowTooltip = false;
-      Timer(Duration(seconds: 1), () => tooltipMessage = "Copy to clipboard");
-    });
-  }
+  void _updateLocationExit(PointerEvent details) => setState(() {
+        textColorHover = Theme.of(context).textTheme.headline4!.color!;
+        isShowTooltip = false;
+        Timer(Duration(seconds: 1), () => tooltipMessage = "Copy to clipboard");
+      });
 }
