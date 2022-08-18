@@ -1,4 +1,3 @@
-import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/screens/history/history.dart';
@@ -10,14 +9,12 @@ import 'package:flutter/material.dart';
 
 class TabBarBody extends StatelessWidget {
   final TabController? tabController;
-  final List<HistoryNew> historyList;
-  final List<HistoryModel> testnetHistoryList;
+  final List<HistoryModel> historyList;
 
   const TabBarBody({
     Key? key,
     this.tabController,
     required this.historyList,
-    required this.testnetHistoryList,
   }) : super(key: key);
 
   @override
@@ -57,7 +54,7 @@ class TabBarBody extends StatelessWidget {
         Column(
           children: [
             Expanded(child: TransactionHistory()),
-            historyList.length > 0 || testnetHistoryList.length > 0
+            historyList.length > 0
                 ? Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: TextButton(

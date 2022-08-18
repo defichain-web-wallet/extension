@@ -5,13 +5,11 @@ import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
-import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/wallets_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
-import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/tx_list_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
@@ -230,41 +228,20 @@ class AccountCubit extends Cubit<AccountState> {
         }
       });
       if (needUpdate) {
-        List<HistoryNew> txListModel;
-        TxListModel testnetTxListModel;
+        TxListModel txListModel;
         try {
-          if (SettingsHelper.settings.network! == 'mainnet') {
-            txListModel = await historyRequests.getHistory(
-                accounts[i].addressList![0],
-                'DFI',
-                SettingsHelper.settings.network!);
-            List<String> txids = [];
-            accounts[i].historyList!.forEach((history) {
-              txids.add(history.txid!);
-            });
-            accounts[i].testnetHistoryList = [];
-            txListModel.forEach((history) {
-              if (!txids.contains(history.txid)) {
-                accounts[i].historyList!.add(history);
-              }
-            });
-          } else {
-            testnetTxListModel = await historyRequests.getFullHistoryList(
-                accounts[i].addressList![0],
-                'DFI',
-                SettingsHelper.settings.network!);
-            List<String> txids = [];
-            accounts[i].testnetHistoryList!.forEach((history) {
-              txids.add(history.txid!);
-            });
-            accounts[i].transactionNext = testnetTxListModel.transactionNext;
-            accounts[i].historyNext = testnetTxListModel.historyNext;
-            testnetTxListModel.list!.forEach((history) {
-              if (!txids.contains(history.txid)) {
-                accounts[i].testnetHistoryList!.add(history);
-              }
-            });
-          }
+          txListModel = await historyRequests.getHistoryTxsBySingleAddressV1(
+              accounts[i].addressList![0], SettingsHelper.settings.network!);
+          List<String> txids = [];
+          accounts[i].historyList!.forEach((history) {
+            txids.add(history.txid!);
+          });
+          accounts[i].historyNext = txListModel.historyNext;
+          txListModel.list!.forEach((history) {
+            if (!txids.contains(history.txid)) {
+              accounts[i].historyList!.add(history);
+            }
+          });
         } catch (err) {
           accounts[i].transactionNext = '';
           accounts[i].historyNext = '';
@@ -569,31 +546,18 @@ class AccountCubit extends Cubit<AccountState> {
       historyFilterBy: state.historyFilterBy,
     ));
     AccountModel activeAccount = state.activeAccount!;
-    List<HistoryNew> history;
     TxListModel txListModel;
-    if (SettingsHelper.settings.network! == 'mainnet') {
-      try {
-        history = await historyRequests.getHistory(
-            activeAccount.addressList![0],
-            'DFI',
-            SettingsHelper.settings.network!);
-      } catch (err) {
-        history = [];
-      }
-      var newHistory = activeAccount.historyList!..addAll(history);
+    try {
+      txListModel = await historyRequests.getHistoryTxsBySingleAddressV1(
+          activeAccount.addressList![0], SettingsHelper.settings.network!, next: activeAccount.historyNext!);
+      var newHistory = activeAccount.historyList!..addAll(txListModel.list!);
       activeAccount.historyList = newHistory;
-    } else {
-      try {
-        txListModel = await historyRequests.getFullHistoryList(
-            activeAccount.addressList![0],
-            'DFI',
-            SettingsHelper.settings.network!);
-      } catch (err) {
-        txListModel = TxListModel();
-      }
-      var newHistory = activeAccount.testnetHistoryList!
-        ..addAll(txListModel.list!);
-      activeAccount.testnetHistoryList = newHistory;
+      activeAccount.historyNext = txListModel.historyNext;
+    } catch (err) {
+      txListModel = TxListModel(
+        list: [],
+        historyNext: '',
+      );
     }
 
     emit(state.copyWith(

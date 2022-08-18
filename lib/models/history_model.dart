@@ -6,7 +6,14 @@ class HistoryModel {
   String? type;
   List<String>? amounts;
 
-  HistoryModel({this.value, this.txid, this.id, this.blockTime, this.type, this.amounts});
+  HistoryModel({
+    this.value,
+    this.txid,
+    this.id,
+    this.blockTime,
+    this.type,
+    this.amounts = const [],
+  });
 
   HistoryModel.fromJson(Map<String, dynamic> json) {
     this.value = json["value"];
@@ -14,7 +21,11 @@ class HistoryModel {
     this.type = json["type"];
     this.txid = json["txid"];
     this.id = json["id"];
-    this.amounts = json["amounts"];
+    if (json["amounts"] == null) {
+      this.amounts = [];
+    } else {
+      this.amounts = List<String>.from(json['amounts'] as List);
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -24,7 +35,11 @@ class HistoryModel {
     data["id"] = this.id;
     data["blockTime"] = this.blockTime;
     data["type"] = this.type;
-    data["amounts"] = this.amounts;
+    if (this.amounts == null) {
+      data["amounts"] = [];
+    } else {
+      data["amounts"] = this.amounts;
+    }
     return data;
   }
 }

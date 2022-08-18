@@ -1,4 +1,3 @@
-import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_model.dart';
@@ -26,7 +25,6 @@ class WalletsHelper {
     account.addressList = addressList;
     account.balanceList = [BalanceModel(token: 'DFI', balance: 0)];
     account.historyList = [];
-    account.testnetHistoryList = [];
     account.index = accountIndex;
     account.activeToken = 'DFI';
     return account;
@@ -39,23 +37,17 @@ class WalletsHelper {
     for (var accountIndex = 0; accountIndex < 10; accountIndex++) {
       statusBar(10, accountIndex);
       List<AddressModel> addressList = [];
-      List<HistoryNew> historyList = [];
-      List<HistoryModel> testnetHistoryList = [];
+      List<HistoryModel> historyList = [];
+      TxListModel txListModel;
       addressList.add(await _hdWalletService.getAddressModelFromKeyPair(
           masterKeyPair, accountIndex, network));
       var balances =
           await _balanceRequests.getBalanceListByAddressList(addressList, network);
 
-      if (network == 'mainnet') {
-        List<HistoryNew> txListModel = await _historyRequests.getHistory(
-            addressList[0], 'DFI', network);
-        historyList.addAll(txListModel);
-      } else {
-        TxListModel testnetTxListModel = await _historyRequests.getFullHistoryList(
-            addressList[0], 'DFI', network
-        );
-        testnetHistoryList.addAll(testnetTxListModel.list!);
-      }
+      txListModel = await _historyRequests
+          .getHistoryTxsBySingleAddressV1(addressList[0], network);
+      historyList.addAll(txListModel.list!);
+
       if (balances.length == 0) {
         balances.add(BalanceModel(token: 'DFI', balance: 0));
       } else {
@@ -66,9 +58,8 @@ class WalletsHelper {
         addressList: addressList,
         balanceList: balances,
         historyList: historyList,
-        testnetHistoryList: testnetHistoryList,
         transactionNext: '',
-        historyNext: '',
+        historyNext: txListModel.historyNext,
         activeToken: balances[0].token,
       ));
     }

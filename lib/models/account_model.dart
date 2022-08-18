@@ -1,4 +1,3 @@
-import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +7,7 @@ class AccountModel {
   @required int? index;
   List<AddressModel>? addressList;
   List<BalanceModel>? balanceList;
-  List<HistoryNew>? historyList;
-  List<HistoryModel>? testnetHistoryList;
+  List<HistoryModel>? historyList;
   String? transactionNext;
   String? historyNext;
   String? activeToken;
@@ -20,7 +18,6 @@ class AccountModel {
     this.addressList,
     this.balanceList,
     this.historyList,
-    this.testnetHistoryList,
     this.transactionNext,
     this.historyNext,
     this.activeToken,
@@ -47,19 +44,12 @@ class AccountModel {
         .toList();
     this.balanceList = balanceList;
 
-    List<HistoryNew> historyList = [];
+    List<HistoryModel> historyList = [];
     jsonModel["historyList"]
-        .map((data) => historyList.add(HistoryNew.fromJson(data)))
+        .map((data) => historyList.add(HistoryModel.fromJson(data)))
         .toList();
 
     this.historyList = historyList;
-
-    List<HistoryModel> testnetHistoryList = [];
-    jsonModel["testnetHistoryList"]
-        .map((data) => testnetHistoryList.add(HistoryModel.fromJson(data)))
-        .toList();
-
-    this.testnetHistoryList = testnetHistoryList;
   }
 
   String getActiveAddress({required bool isChange}) {
@@ -77,7 +67,6 @@ class AccountModel {
     data['addressList'] = this.addressList?.map((e) => e.toJson()).toList();
     data['balanceList'] = this.balanceList?.map((e) => e.toJson()).toList();
     data['historyList'] = this.historyList?.map((e) => e.toJson()).toList();
-    data['testnetHistoryList'] = this.testnetHistoryList?.map((e) => e.toJson()).toList();
     return data;
   }
 }

@@ -52,62 +52,50 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           var currency = SettingsHelper.settings.currency!;
           const int defaultShowItemsCount = 30;
           late int showItemsCount;
-          if (SettingsHelper.settings.network == 'mainnet') {
-            showItemsCount =
-                state.activeAccount!.historyList!.length < defaultShowItemsCount
-                    ? state.activeAccount!.historyList!.length
-                    : defaultShowItemsCount;
-            historyList = new List.from(
-                state.activeAccount!.historyList!.sublist(0, showItemsCount));
-          } else {
-            showItemsCount = state.activeAccount!.testnetHistoryList!.length <
-                    defaultShowItemsCount
-                ? state.activeAccount!.testnetHistoryList!.length
-                : defaultShowItemsCount;
-            historyList = new List.from(state.activeAccount!.testnetHistoryList!
-                .sublist(0, showItemsCount));
-          }
+          showItemsCount =
+              state.activeAccount!.historyList!.length < defaultShowItemsCount
+                  ? state.activeAccount!.historyList!.length
+                  : defaultShowItemsCount;
+          historyList = new List.from(
+              state.activeAccount!.historyList!.sublist(0, showItemsCount));
 
           if (historyList != null && historyList.length != 0) {
             return ListView.builder(
               itemCount: historyList.length,
               itemBuilder: (context, index) {
                 var tokenName;
+                var tokenAdvancedName;
                 var txValue;
-                var isSend;
+                var txAdvancedValue;
                 var type;
                 var date;
-                var txValuePrefix;
-                if (SettingsHelper.settings.network == 'mainnet') {
-                  tokenName = historyList[index].tokens![0].code;
-                  txValue = historyList[index].value;
-                  isSend = historyList[index].category == 'SEND';
-                  type = historyList[index].category;
-                  DateTime dateTime = DateTime.parse(historyList[index].date);
-                  date = formatter.format(DateTime.fromMillisecondsSinceEpoch(
-                          dateTime.millisecondsSinceEpoch)
-                      .toLocal());
-                  txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
-                      ? isSend
-                          ? '-'
-                          : '+'
-                      : '';
-                } else {
-                  tokenName = historyList[index].token;
+                if (historyList[index].type == null) {
                   txValue = convertFromSatoshi(historyList[index].value);
-                  isSend = historyList[index].isSend;
-                  type = historyList[index].type;
-                  date = (historyList[index].blockTime != null)
-                      ? formatter.format(DateTime.fromMillisecondsSinceEpoch(
-                              int.parse(historyList[index].blockTime) * 1000)
-                          .toLocal())
-                      : 'date';
-                  txValuePrefix = (type == 'vout' || type == 'vin')
-                      ? isSend
-                          ? '-'
-                          : '+'
-                      : '';
+                  tokenName = 'DFI';
+                } else {
+                  if (historyList[index].amounts.length == 1) {
+                    var amount = historyList[index].amounts[0].split('@');
+                    txValue = double.parse(amount[0]);
+                    tokenName = amount[1];
+                  } else {
+                    var amount = historyList[index].amounts[0].split('@');
+                    var secondAmount = historyList[index].amounts[1].split('@');
+                    txValue = double.parse(amount[0]);
+                    tokenName = amount[1];
+                    txAdvancedValue = double.parse(secondAmount[0]);
+                    tokenAdvancedName = secondAmount[1];
+                  }
                 }
+                if (historyList[index].type == null) {
+                  type = historyList[index].value < 0 ? 'SEND' : 'RECEIVE';
+                } else {
+                  type = historyList[index].type;
+                }
+                date = (historyList[index].blockTime != null)
+                    ? formatter.format(DateTime.fromMillisecondsSinceEpoch(
+                            int.parse(historyList[index].blockTime) * 1000)
+                        .toLocal())
+                    : 'date';
 
                 return Padding(
                   padding: const EdgeInsets.only(
@@ -136,7 +124,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             style: Theme.of(context).textTheme.headline6,
                           ),
                           Text(
-                            '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 6)} $tokenName',
+                            '${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 6)} $tokenName',
                             style: Theme.of(context).textTheme.headline4,
                           ),
                         ],
@@ -148,8 +136,14 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             date.toString(),
                             style: Theme.of(context).textTheme.headline5,
                           ),
-                          Text(
-                              "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
+                          if (historyList[index].amounts.length == 2)
+                            Text(
+                              '${balancesHelper.numberStyling(txAdvancedValue, fixed: true, fixedCount: 6)} $tokenAdvancedName',
+                              style: Theme.of(context).textTheme.headline4,
+                            )
+                          else
+                            Text(
+                                "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
                         ],
                       ),
                     ),
