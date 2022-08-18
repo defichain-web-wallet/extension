@@ -96,9 +96,7 @@ class _AddNewAddressState extends State<AddNewAddress> {
                 ),
                 TextFormField(
                   focusNode: _focusNode,
-                  onFieldSubmitted: (value) {
-                    saveButtonValidation();
-                  },
+                  onFieldSubmitted: (value) => saveButtonValidation(),
                   controller: addressController,
                   onChanged: (value) async {
                     checkButtonStatus();

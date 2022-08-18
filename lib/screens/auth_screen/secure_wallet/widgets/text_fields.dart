@@ -46,7 +46,7 @@ class TextFields extends StatelessWidget {
                       columnsCount: _defaultTextFieldCount,
                       depth: index > 0 ? _defaultTextFieldCount * index : 0,
                       enabled: enabled,
-                      readOnly: isReadOnly,
+                      isReadOnly: isReadOnly,
                       invalidControllerIndexes: invalidControllerIndexes,
                     )),
           ),
@@ -64,7 +64,7 @@ class ColumnTextFields extends StatefulWidget {
   final int depth;
   final List<int> invalidControllerIndexes;
   final bool enabled;
-  final bool readOnly;
+  final bool isReadOnly;
 
   const ColumnTextFields({
     Key? key,
@@ -75,7 +75,7 @@ class ColumnTextFields extends StatefulWidget {
     this.depth = 0,
     this.invalidControllerIndexes = const [],
     this.enabled = true,
-    this.readOnly = false,
+    this.isReadOnly = false,
   }) : super(key: key);
 
   @override
@@ -130,7 +130,7 @@ class _ColumnTextFieldsState extends State<ColumnTextFields> {
                           }
                         },
                         child: TextField(
-                          readOnly: widget.readOnly,
+                          readOnly: widget.isReadOnly,
                           enabled: widget.enabled,
                           textAlign: TextAlign.center,
                           textAlignVertical: TextAlignVertical.center,

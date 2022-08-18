@@ -32,17 +32,15 @@ class _AddressBookState extends State<AddressBook> {
               focusColor: Colors.transparent,
               iconSize: 20,
               splashRadius: 18,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) =>
-                        AddNewAddress(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
+              onPressed: () => Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      AddNewAddress(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              ),
               icon: Icon(Icons.add),
             ),
           ),
@@ -57,23 +55,21 @@ class _AddressBookState extends State<AddressBook> {
                         address:
                             addressBookState.addressBookList![index].address!,
                         id: addressBookState.addressBookList![index].id,
-                        editCallback: () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) =>
-                                  AddNewAddress(
-                                name: addressBookState
-                                    .addressBookList![index].name!,
-                                address: addressBookState
-                                    .addressBookList![index].address!,
-                                id: addressBookState.addressBookList![index].id,
-                              ),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
+                        editCallback: () => Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                AddNewAddress(
+                              name: addressBookState
+                                  .addressBookList![index].name!,
+                              address: addressBookState
+                                  .addressBookList![index].address!,
+                              id: addressBookState.addressBookList![index].id,
                             ),
-                          );
-                        },
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          ),
+                        ),
                         deleteCallback: () => setState(() =>
                             addressBookCubit.deleteAddress(
                                 addressBookState.addressBookList![index])),
