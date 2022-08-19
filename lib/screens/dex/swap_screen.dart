@@ -4,9 +4,11 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -51,6 +53,7 @@ class _SwapScreenState extends State<SwapScreen> {
 
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
+  RouterHelper routerHelper = RouterHelper();
   LockHelper lockHelper = LockHelper();
   TokensHelper tokensHelper = TokensHelper();
   TestPoolSwapModel dexModel = TestPoolSwapModel();
@@ -89,6 +92,10 @@ class _SwapScreenState extends State<SwapScreen> {
     focusFrom.addListener(onFocusFromChange);
 
     tokensCubit.loadTokens();
+
+    WidgetsBinding.instance!.addPostFrameCallback((_){
+      routerHelper.setCurrentRoute(Routes.swap);
+    });
   }
 
   @override

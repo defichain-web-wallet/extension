@@ -3,9 +3,12 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
+import 'package:defi_wallet/models/forms/send_former.dart';
 import 'package:defi_wallet/screens/send/widgets/address_field.dart';
 import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
@@ -32,6 +35,8 @@ class SendTokenSelector extends StatefulWidget {
 
 class _SendConfirmState extends State<SendTokenSelector> {
   TokensHelper tokenHelper = TokensHelper();
+  RouterHelper routerHelper = RouterHelper();
+  late SendFormer sendFormer;
   BalancesHelper balancesHelper = BalancesHelper();
   TransactionService transactionService = TransactionService();
   GlobalKey<AssetSelectState> _selectKeyFrom = GlobalKey<AssetSelectState>();
@@ -51,6 +56,33 @@ class _SendConfirmState extends State<SendTokenSelector> {
   void dispose() {
     hideOverlay();
     super.dispose();
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      sendFormer.reset();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await routerHelper.setCurrentRoute(Routes.send);
+      await loadSavedFormer();
+    });
+  }
+
+  loadSavedFormer () async {
+    try {
+      dynamic formerData = await SendFormer.loadExist();
+      sendFormer = SendFormer.fromJson(formerData);
+      addressController.text = sendFormer.address!;
+      _amountController.text = sendFormer.amount!;
+      print(sendFormer.address);
+    } catch (err) {
+      print(err);
+      sendFormer = SendFormer(
+          address: addressController.text, amount: _amountController.text);
+      print(sendFormer.address);
+    }
   }
 
   void hideOverlay() {
@@ -127,6 +159,9 @@ class _SendConfirmState extends State<SendTokenSelector> {
                             AddressField(
                               addressController: addressController,
                               onChanged: (value) {
+                                sendFormer.address = value;
+                                sendFormer.save();
+                                print(sendFormer.address);
                                 if (isFailed) {
                                   setState(() {
                                     isFailed = false;
@@ -164,6 +199,8 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 setState(() => {assetFrom = asset});
                               },
                               onChanged: (value) {
+                                sendFormer.amount = value;
+                                sendFormer.save();
                                 if (isFailed) {
                                   setState(() {
                                     isFailed = false;

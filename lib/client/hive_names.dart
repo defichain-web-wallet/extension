@@ -1,6 +1,7 @@
 class HiveBoxes {
   static const String client = 'client_box';
   static const String settings = 'settings_box';
+  static const String state = 'state';
 }
 
 class HiveNames {
@@ -18,4 +19,6 @@ class HiveNames {
   static const String ongoingTransaction = 'ongoing_transaction';
   static const String tutorialStatus = 'tutorial_status';
   static const String kycStatus = 'kyc_status';
+  static const String currentRoute = 'current_route';
+  static const String sendState = 'send_state';
 }

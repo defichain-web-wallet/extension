@@ -4,7 +4,9 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/liquidity/liquidity_header.dart';
 import 'package:defi_wallet/widgets/liquidity/main_liquidity_pair.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_pool_list.dart';
@@ -26,6 +28,7 @@ class LiquidityScreen extends StatefulWidget {
 class _LiquidityScreenState extends State<LiquidityScreen> {
   TokensHelper tokenHelper = TokensHelper();
   LockHelper lockHelper = LockHelper();
+  RouterHelper routerHelper = RouterHelper();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
 
@@ -34,6 +37,9 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
     super.initState();
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     tokensCubit.loadTokens();
+    WidgetsBinding.instance!.addPostFrameCallback((_){
+      routerHelper.setCurrentRoute(Routes.earn);
+    });
   }
 
   @override

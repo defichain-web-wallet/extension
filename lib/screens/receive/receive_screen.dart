@@ -3,9 +3,11 @@ import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:simple_tooltip/simple_tooltip.dart';
@@ -24,6 +26,7 @@ class ReceiveScreen extends StatefulWidget {
 
 class _ReceiveScreenState extends State<ReceiveScreen> {
   LockHelper lockHelper = LockHelper();
+  RouterHelper routerHelper = RouterHelper();
   GlobalKey<AccountSelectState> _selectKey = GlobalKey<AccountSelectState>();
   late Color? textColorHover;
   Timer? timer;
@@ -32,6 +35,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   bool firstBuild = true;
   double x = 0.0;
   double y = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_){
+      routerHelper.setCurrentRoute(Routes.receive);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

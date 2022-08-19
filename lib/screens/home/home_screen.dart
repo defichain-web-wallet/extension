@@ -7,6 +7,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
 import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
@@ -39,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool isSaveOpenTime = false;
   GlobalKey<AccountSelectState> selectKey = GlobalKey<AccountSelectState>();
   LockHelper lockHelper = LockHelper();
+  RouterHelper routerHelper = RouterHelper();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   bool isFullSizeScreen = false;
@@ -107,6 +109,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         BlocProvider.of<TransactionCubit>(context);
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
+    routerHelper.redirectTo(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       await transactionCubit.checkOngoingTransaction();
