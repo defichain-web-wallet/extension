@@ -31,6 +31,7 @@ class AddNewAddress extends StatefulWidget {
 class _AddNewAddressState extends State<AddNewAddress> {
   AddressesHelper addressHelper = AddressesHelper();
   final _formKey = GlobalKey<FormState>();
+  final _focusNode = FocusNode();
   TextEditingController nameController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   bool isNew = true;
@@ -69,13 +70,12 @@ class _AddNewAddressState extends State<AddNewAddress> {
                   ),
                 ),
                 TextFormField(
+                  onFieldSubmitted: (value) => _focusNode.requestFocus(),
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(20),
                   ],
                   controller: nameController,
-                  onChanged: (value) {
-                    checkButtonStatus();
-                  },
+                  onChanged: (value) => checkButtonStatus(),
                   validator: (value) {
                     if (nameController.text.length > 3) {
                       return null;
@@ -95,6 +95,8 @@ class _AddNewAddressState extends State<AddNewAddress> {
                   ),
                 ),
                 TextFormField(
+                  focusNode: _focusNode,
+                  onFieldSubmitted: (value) => saveButtonValidation(),
                   controller: addressController,
                   onChanged: (value) async {
                     checkButtonStatus();

@@ -22,7 +22,7 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:async';
 
 class HomeScreen extends StatefulWidget {
@@ -107,11 +107,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         BlocProvider.of<TransactionCubit>(context);
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-    transactionCubit.checkOngoingTransaction();
 
-    if (widget.isLoadTokens && SettingsHelper.settings.network == 'mainnet') {
-      fiatCubit.loadUserDetails(accountCubit.state.accessToken!);
-    }
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await transactionCubit.checkOngoingTransaction();
+
+      if (widget.isLoadTokens && SettingsHelper.settings.network == 'mainnet') {
+        await fiatCubit.loadUserDetails(accountCubit.state.accessToken!);
+      }
+
+      await saveOpenTime();
+    });
   }
 
   @override
@@ -129,16 +134,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> saveOpenTime() async {
-    var box = await Hive.openBox(HiveBoxes.client);
-    await box.put(HiveNames.openTime, DateTime.now().millisecondsSinceEpoch);
+    try {
+      var box = await Hive.openBox(HiveBoxes.client);
+      await box.put(HiveNames.openTime, DateTime.now().millisecondsSinceEpoch);
+      await box.close();
+    } catch (err) {
+      print(err);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!isSaveOpenTime) {
-      saveOpenTime();
-      isSaveOpenTime = true;
-    }
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     if (widget.isLoadTokens) {
       tokensCubit.loadTokensFromStorage();

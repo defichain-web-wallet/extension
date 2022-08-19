@@ -45,11 +45,12 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
     });
   }
 
-  void _onEdit() {
-    setState(() {
-      showConfirmButton = true;
-    });
-  }
+  void _onEdit() => setState(() {
+        _focusNode.requestFocus();
+        _textEditingController.selection = TextSelection(
+            baseOffset: 0, extentOffset: _textEditingController.text.length);
+        showConfirmButton = true;
+      });
 
   @override
   void dispose() {
@@ -65,53 +66,65 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
         elevation: 5,
         shadowColor: AppTheme.shadowColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(10),
-        child: TextField(
-          textAlignVertical: TextAlignVertical.center,
-          style: Theme.of(context).textTheme.button,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Theme.of(context).cardColor,
-            hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                  color: Theme.of(context).textTheme.button!.decorationColor!),
+        child: GestureDetector(
+          onDoubleTap: () {
+            _focusNode.requestFocus();
+            _textEditingController.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: _textEditingController.text.length);
+          },
+          child: TextField(
+            autofocus: true,
+            textAlignVertical: TextAlignVertical.center,
+            style: Theme.of(context).textTheme.button,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Theme.of(context).cardColor,
+              hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                    color:
+                        Theme.of(context).textTheme.button!.decorationColor!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: showConfirmButton
+                    ? BorderSide(color: AppTheme.pinkColor)
+                    : BorderSide(
+                        color: Theme.of(context)
+                            .textTheme
+                            .button!
+                            .decorationColor!),
+              ),
+              suffixIcon: showConfirmButton
+                  ? IconButton(
+                      icon: Icon(Icons.done),
+                      iconSize: 20,
+                      color: AppTheme.pinkColor,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      onPressed: _onConfirm,
+                    )
+                  : (showEditButton
+                      ? IconButton(
+                          icon: Icon(Icons.edit),
+                          iconSize: 18,
+                          color: AppTheme.pinkColor,
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          onPressed: _onEdit,
+                        )
+                      : null),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: showConfirmButton
-                  ? BorderSide(color: AppTheme.pinkColor)
-                  : BorderSide(
-                      color:
-                          Theme.of(context).textTheme.button!.decorationColor!),
-            ),
-            suffixIcon: showConfirmButton
-                ? IconButton(
-                    icon: Icon(Icons.done),
-                    iconSize: 20,
-                    color: AppTheme.pinkColor,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    onPressed: _onConfirm,
-                  )
-                : (showEditButton
-                    ? IconButton(
-                        icon: Icon(Icons.edit),
-                        iconSize: 18,
-                        color: AppTheme.pinkColor,
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        onPressed: _onEdit,
-                      )
-                    : null),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+            focusNode: _focusNode,
+            controller: _textEditingController,
+            readOnly: !showConfirmButton,
+            onSubmitted: (value) => _onConfirm(),
           ),
-          focusNode: _focusNode,
-          controller: _textEditingController,
-          readOnly: !showConfirmButton,
-          onSubmitted: (value) => _onConfirm(),
         ),
       ),
       onEnter: (details) {
