@@ -17,6 +17,10 @@ import 'package:hive/hive.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 
 class LockScreen extends StatefulWidget {
+  final Widget? redirectTo;
+
+  const LockScreen({Key? key, this.redirectTo}) : super(key: key);
+
   @override
   _LockScreenState createState() => _LockScreenState();
 }
@@ -45,7 +49,9 @@ class _LockScreenState extends State<LockScreen> {
                   width: 200,
                 ),
                 Text(
-                  'Welcome Back!',
+                  widget.redirectTo == null
+                      ? 'Welcome Back!'
+                      : 'Enter password',
                   style: Theme.of(context).textTheme.headline1,
                 ),
                 SizedBox(height: 16),
@@ -89,29 +95,32 @@ class _LockScreenState extends State<LockScreen> {
                 StretchBox(
                   maxWidth: ScreenSizes.xSmall,
                   child: PendingButton(
-                    'Unlock',
+                    widget.redirectTo == null ? 'Unlock' : 'Continue',
                     isCheckLock: false,
                     globalKey: globalKey,
                     callback: (parent) => _restoreWallet(parent),
                   ),
                 ),
                 SizedBox(height: 20),
-                InkWell(
-                  child: Text(
-                    'or import using Secret Recovery Phrase',
-                    style: AppTheme.defiUnderlineText,
+                if (widget.redirectTo == null)
+                  InkWell(
+                    child: Text(
+                      'or import using Secret Recovery Phrase',
+                      style: AppTheme.defiUnderlineText,
+                    ),
+                    onTap: isEnable
+                        ? () => Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        RecoveryScreen(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            )
+                        : null,
                   ),
-                  onTap: isEnable
-                      ? () => Navigator.push(
-                            context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) => RecoveryScreen(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),
-                          )
-                      : null,
-                ),
               ],
             ),
           ),
@@ -127,22 +136,34 @@ class _LockScreenState extends State<LockScreen> {
     var decodedPassword = stringToBase64.decode(box.get(HiveNames.password));
     if (password == decodedPassword) {
       parent.emitPending(true);
+      if (widget.redirectTo == null) {
+        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
-      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+        await accountCubit
+            .restoreAccountFromStorage(SettingsHelper.settings.network!);
+        LoggerService.invokeInfoLogg('user was unlock wallet');
+        parent.emitPending(false);
 
-      await accountCubit
-          .restoreAccountFromStorage(SettingsHelper.settings.network!);
-      LoggerService.invokeInfoLogg('user was unlock wallet');
-      parent.emitPending(false);
-
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => HomeScreen(isLoadTokens: true),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                HomeScreen(isLoadTokens: true),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                widget.redirectTo!,
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      }
     } else {
       setState(() {
         isFailed = true;

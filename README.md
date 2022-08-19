@@ -10,19 +10,19 @@ Jellywallet supports Google Chrome, and Chromium-based browsers. We recommend us
 
 2. At the command prompt, go to the flutter directory and change the flutter version:
 
-        $ cd flutter
-        $ git checkout v2.10.3
+        cd flutter
+        git checkout 2.10.3
 
 3. Clone this repository:
 
 4. Go to directory with app and install dependencies:
 
-        $ flutter pub get
+        flutter pub get
 
 ## Build
 Make build for upload to chrome extensions
 
-    $ flutter build web --csp --web-renderer html  --no-sound-null-safety
+    flutter build web --csp --web-renderer html  --no-sound-null-safety
 
 ## Deploy
 1. In Chrome, open chrome://extensions/
@@ -33,7 +33,7 @@ Make build for upload to chrome extensions
 Where `/build/web` is directory with ready extension
 
 ## Debug
-    $  flutter run -d chrome --no-sound-null-safety
+    flutter run -d chrome --no-sound-null-safety
 
 ## License & Disclaimer
 

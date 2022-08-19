@@ -260,25 +260,12 @@ class IbanSelectorState extends State<IbanSelector> {
                               Row(
                                 children: [
                                   Container(
-                                    width: 100,
+                                    width: 78,
                                     padding: EdgeInsets.only(
                                         top: 12.0,
                                         bottom: 12.0,
                                         left: 22,
                                         right: 22),
-                                    child: Text(
-                                      '$assetName',
-                                      softWrap: true,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline2!
-                                          .apply(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .headline3!
-                                                  .color!),
-                                    ),
                                   ),
                                   Text(
                                     '${fiatHelper.getIbanFormat(widget.ibanList[index].iban!)}',

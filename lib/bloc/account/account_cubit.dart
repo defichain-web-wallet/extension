@@ -44,7 +44,9 @@ class AccountCubit extends Cubit<AccountState> {
   createAccount(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: AccountStatusList.loading));
     var box = await Hive.openBox(HiveBoxes.client);
-    await box.put(HiveNames.savedMnemonic, mnemonic.join(','));
+    var encryptMnemonic =
+        encryptHelper.getEncryptedData(mnemonic.join(','), password);
+    await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     await box.close();
 
     final seed = convertMnemonicToSeed(mnemonic);
@@ -116,11 +118,11 @@ class AccountCubit extends Cubit<AccountState> {
     state.activeAccount!.activeToken = activeToken;
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(
-          null, null, accounts, state.masterKeyPair, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(null, null, accounts, state.masterKeyPair,
+          state.accessToken!, state.mnemonic!);
     } else {
-      await saveAccountsToStorage(
-          accounts, state.masterKeyPair, null, null, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(accounts, state.masterKeyPair, null, null,
+          state.accessToken!, state.mnemonic!);
     }
 
     emit(state.copyWith(
@@ -168,7 +170,9 @@ class AccountCubit extends Cubit<AccountState> {
       await box.put(HiveNames.masterKeyPairMainnet, encryptedMasterKey);
       await box.put(HiveNames.accountsMainnet, encryptedAccounts);
       await box.put(HiveNames.accessToken, accessToken);
-      await box.put(HiveNames.savedMnemonic, mnemonic.join(','));
+      var encryptMnemonic =
+          encryptHelper.getEncryptedData(mnemonic.join(','), key);
+      await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     }
 
     if (accountsTestnet != null) {
@@ -284,11 +288,11 @@ class AccountCubit extends Cubit<AccountState> {
     accounts.add(account);
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(
-          null, null, accounts, state.masterKeyPair!, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(null, null, accounts, state.masterKeyPair!,
+          state.accessToken!, state.mnemonic!);
     } else {
-      await saveAccountsToStorage(
-          accounts, state.masterKeyPair!, null, null, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(accounts, state.masterKeyPair!, null, null,
+          state.accessToken!, state.mnemonic!);
     }
 
     emit(state.copyWith(
@@ -308,7 +312,9 @@ class AccountCubit extends Cubit<AccountState> {
     var box = await Hive.openBox(HiveBoxes.client);
     await box.put(HiveNames.kycStatus, 'show');
     await box.put(HiveNames.tutorialStatus, 'show');
-    await box.put(HiveNames.savedMnemonic, mnemonic.join(','));
+    var encryptMnemonic =
+        encryptHelper.getEncryptedData(mnemonic.join(','), password);
+    await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     await box.close();
     SettingsHelper settingsHelper = SettingsHelper();
 
@@ -374,9 +380,23 @@ class AccountCubit extends Cubit<AccountState> {
     var accountsName;
     var box = await Hive.openBox(HiveBoxes.client);
     var encodedPassword = await box.get(HiveNames.password);
-    var mnemonic = await box.get(HiveNames.savedMnemonic);
+    var savedMnemonic;
+    var mnemonic;
     var password = stringToBase64.decode(encodedPassword);
 
+    try {
+      savedMnemonic = await box.get(HiveNames.savedMnemonic);
+      if (savedMnemonic.split(',').length == 24) {
+        var encryptMnemonic =
+            encryptHelper.getEncryptedData(savedMnemonic, password);
+        await box.put(HiveNames.savedMnemonic, encryptMnemonic);
+        mnemonic = encryptHelper.getDecryptedData(encryptMnemonic, password);
+      } else {
+        mnemonic = encryptHelper.getDecryptedData(savedMnemonic, password);
+      }
+    } catch (err) {
+      mnemonic = '';
+    }
     if (network == testnet) {
       masterKeyName = HiveNames.masterKeyPairTestnet;
       accountsName = HiveNames.accountsTestnet;
@@ -412,7 +432,7 @@ class AccountCubit extends Cubit<AccountState> {
     emit(state.copyWith(
       status: AccountStatusList.success,
       accessToken: accessToken,
-      mnemonic: mnemonic.split(','),
+      mnemonic: mnemonic != '' ? mnemonic.split(',') : [],
       seed: Uint8List(24),
       accounts: accounts,
       balances: balances,
@@ -500,11 +520,11 @@ class AccountCubit extends Cubit<AccountState> {
     activeAccount.balanceList!.add(newBalance);
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(
-          null, null, state.accounts, state.masterKeyPair, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(null, null, state.accounts,
+          state.masterKeyPair, state.accessToken!, state.mnemonic!);
     } else {
-      await saveAccountsToStorage(
-          state.accounts, state.masterKeyPair, null, null, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(state.accounts, state.masterKeyPair, null,
+          null, state.accessToken!, state.mnemonic!);
     }
 
     emit(state.copyWith(
