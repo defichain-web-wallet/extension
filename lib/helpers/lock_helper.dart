@@ -23,13 +23,7 @@ class LockHelper {
         ),
       );
     } else {
-      try {
-        var box = await Hive.openBox(HiveBoxes.client);
-        await box.put(HiveNames.openTime, DateTime.now().millisecondsSinceEpoch);
-        await box.close();
-      } catch (err) {
-        print(err);
-      }
+      await updateTimer();
       callback();
     }
   }
@@ -38,5 +32,15 @@ class LockHelper {
     var box = await Hive.openBox(HiveBoxes.client);
     await box.put(HiveNames.openTime, 0);
     await box.close();
+  }
+
+  Future<void> updateTimer() async {
+    try {
+      var box = await Hive.openBox(HiveBoxes.client);
+      await box.put(HiveNames.openTime, DateTime.now().millisecondsSinceEpoch);
+      await box.close();
+    } catch (err) {
+      print(err);
+    }
   }
 }
