@@ -10,6 +10,7 @@ class FiatState extends Equatable {
   final String? numberPrefix;
   final String? email;
   final String? currentIban;
+  final String? kycHash;
   final List<String>? ibansList;
   final List<AssetByFiatModel>? assets;
   final List<AssetByFiatModel>? foundAssets;
@@ -19,7 +20,8 @@ class FiatState extends Equatable {
   final List<dynamic>? countryList;
   final List<FiatModel>? fiatList;
   final bool? isShowTutorial;
-  final double? limit;
+  final bool? isKycDataComplete;
+  final int? limit;
 
   FiatState({
     this.status = FiatStatusList.initial,
@@ -29,6 +31,7 @@ class FiatState extends Equatable {
     this.numberPrefix,
     this.email,
     this.currentIban,
+    this.kycHash,
     this.ibansList,
     this.assets,
     this.foundAssets,
@@ -38,6 +41,7 @@ class FiatState extends Equatable {
     this.countryList,
     this.fiatList,
     this.isShowTutorial = true,
+    this.isKycDataComplete,
     this.limit,
   });
 
@@ -50,6 +54,7 @@ class FiatState extends Equatable {
     numberPrefix,
     email,
     currentIban,
+    kycHash,
     ibansList,
     assets,
     foundAssets,
@@ -59,6 +64,7 @@ class FiatState extends Equatable {
     countryList,
     fiatList,
     isShowTutorial,
+    isKycDataComplete,
     limit,
   ];
 
@@ -70,6 +76,7 @@ class FiatState extends Equatable {
     String? numberPrefix,
     String? email,
     String? currentIban,
+    String? kycHash,
     List<String>? ibansList,
     List<AssetByFiatModel>? assets,
     List<AssetByFiatModel>? foundAssets,
@@ -79,7 +86,8 @@ class FiatState extends Equatable {
     List<dynamic>? countryList,
     List<FiatModel>? fiatList,
     bool? isShowTutorial,
-    double? limit,
+    bool? isKycDataComplete,
+    int? limit,
   }) {
     return FiatState(
       status: status ?? this.status,
@@ -89,6 +97,7 @@ class FiatState extends Equatable {
       numberPrefix: numberPrefix ?? this.numberPrefix,
       email: email ?? this.email,
       currentIban: currentIban ?? this.currentIban,
+      kycHash: kycHash ?? this.kycHash,
       ibansList: ibansList ?? this.ibansList,
       assets: assets ?? this.assets,
       foundAssets: foundAssets ?? this.foundAssets,
@@ -98,6 +107,7 @@ class FiatState extends Equatable {
       countryList: countryList ?? this.countryList,
       fiatList: fiatList ?? this.fiatList,
       isShowTutorial: isShowTutorial ?? this.isShowTutorial,
+      isKycDataComplete: isKycDataComplete ?? this.isKycDataComplete,
       limit: limit ?? this.limit,
     );
   }

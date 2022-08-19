@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SelectBuyOrSellScreen extends StatefulWidget {
   const SelectBuyOrSellScreen({Key? key}) : super(key: key);
@@ -115,17 +116,34 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                           horizontal: 80,
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            SizedBox(
+                              width: 16,
+                            ),
                             ActionButton(
                               iconPath: 'assets/images/buy.png',
                               label: 'Buy',
                               onPressed: () => buyCallback(fiatState),
                             ),
+                            SizedBox(
+                              width: 26,
+                            ),
                             ActionButton(
                               iconPath: 'assets/images/sell.png',
                               label: 'Sell',
                               onPressed: () => sellCallback(fiatState),
+                            ),
+                            SizedBox(
+                              width: 12,
+                            ),
+                            ActionButton(
+                              iconPath: 'assets/images/increase.png',
+                              label: 'Increase limit',
+                              onPressed: () {
+                                String kycHash = fiatState.kycHash!;
+                                launch('https://payment.dfx.swiss/kyc?code=$kycHash');
+                              },
                             ),
                           ],
                         ),

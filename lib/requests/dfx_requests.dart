@@ -294,6 +294,31 @@ class DfxRequests {
     }
   }
 
+  Future<Map<String, dynamic>> getStakingRouteBalance(String accessToken, String address,
+  ) async {
+    try {
+      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
+
+      final Uri url = Uri.parse(
+          'https://api.dfx.swiss/v1/staking/routeBalance?addresses=$address}');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $decryptedAccessToken'
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
   Future<String> getDecryptedAccessToken(String accessToken) async {
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     var box = await Hive.openBox(HiveBoxes.client);
