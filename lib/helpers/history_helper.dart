@@ -1,12 +1,11 @@
-import 'package:defi_wallet/models/history_model.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HistoryHelper {
-  sortHistoryList(List<HistoryModel> list) {
-   list.sort((a, b) {
-      int aDate = DateTime.parse(a.blockTime ?? '').microsecondsSinceEpoch;
-      int bDate = DateTime.parse(b.blockTime ?? '').microsecondsSinceEpoch;
-      return bDate.compareTo(aDate);
-    });
+  Future<void> openTxOnExplorer(String txid) async {
+    String link =
+        'https://defiscan.live/transactions/$txid?network=${SettingsHelper.settings.network!}';
+    launch(link);
   }
 
   String getTransactionType(String type) {

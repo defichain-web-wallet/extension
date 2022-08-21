@@ -206,56 +206,61 @@ class _HistoryState extends State<History> {
                                         )
                                       ],
                                     ),
-                                    child: ListTile(
-                                      leading: Container(
-                                          height: 38,
-                                          width: 38,
-                                          child: IconHistoryType(
-                                            type: type,
-                                          )),
-                                      title: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            historyHelper
-                                                .getTransactionType(type),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline6,
-                                          ),
-                                          Text(
-                                            '${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 6)} $tokenName',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline4,
-                                          ),
-                                        ],
-                                      ),
-                                      subtitle: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            date.toString(),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5,
-                                          ),
-                                          if (historyList[index]
-                                                  .amounts
-                                                  .length ==
-                                              2)
+                                    child: MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: ListTile(
+                                        onTap: () => historyHelper
+                                            .openTxOnExplorer(historyList[index].txid),
+                                        leading: Container(
+                                            height: 38,
+                                            width: 38,
+                                            child: IconHistoryType(
+                                              type: type,
+                                            )),
+                                        title: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
                                             Text(
-                                              '${balancesHelper.numberStyling(txAdvancedValue, fixed: true, fixedCount: 6)} $tokenAdvancedName',
+                                              historyHelper
+                                                  .getTransactionType(type),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6,
+                                            ),
+                                            Text(
+                                              '${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 6)} $tokenName',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline4,
-                                            )
-                                          else
+                                            ),
+                                          ],
+                                        ),
+                                        subtitle: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
                                             Text(
-                                                "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
-                                        ],
+                                              date.toString(),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline5,
+                                            ),
+                                            if (historyList[index]
+                                                    .amounts
+                                                    .length ==
+                                                2)
+                                              Text(
+                                                '${balancesHelper.numberStyling(txAdvancedValue, fixed: true, fixedCount: 6)} $tokenAdvancedName',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline4,
+                                              )
+                                            else
+                                              Text(
+                                                  "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
