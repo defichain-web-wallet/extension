@@ -19,7 +19,7 @@ class FiatState extends Equatable {
   final List<dynamic>? countryList;
   final List<FiatModel>? fiatList;
   final bool? isShowTutorial;
-  final double? limit;
+  final int? limit;
 
   FiatState({
     this.status = FiatStatusList.initial,
@@ -79,7 +79,7 @@ class FiatState extends Equatable {
     List<dynamic>? countryList,
     List<FiatModel>? fiatList,
     bool? isShowTutorial,
-    double? limit,
+    int? limit,
   }) {
     return FiatState(
       status: status ?? this.status,

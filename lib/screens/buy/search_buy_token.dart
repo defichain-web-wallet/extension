@@ -171,8 +171,7 @@ class _SearchBuyTokenState extends State<SearchBuyToken> {
                                     );
                                   } else {
                                     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-
-                                    await fiatCubit.loadIbanList(state.accessToken!, selectedAsset!);
+                                    await fiatCubit.loadIbanList(state.accessToken!);
 
                                     Navigator.push(
                                         context,

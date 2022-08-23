@@ -131,7 +131,6 @@ class FiatCubit extends Cubit<FiatState> {
     try {
       Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
 
-
       emit(state.copyWith(
         status: FiatStatusList.success,
         phone: data['phone'],
@@ -222,9 +221,24 @@ class FiatCubit extends Cubit<FiatState> {
   saveBuyDetails(
       String iban, AssetByFiatModel asset, String accessToken) async {
     await dfxRequests.saveBuyDetails(iban, asset, accessToken);
+    emit(state.copyWith(
+      status: FiatStatusList.success,
+      phone: state.phone,
+      countryCode: state.countryCode,
+      phoneWithoutPrefix: state.phoneWithoutPrefix,
+      numberPrefix: state.numberPrefix,
+      email: state.email,
+      currentIban: iban,
+      ibansList: state.ibansList,
+      assets: state.assets,
+      foundAssets: state.foundAssets,
+      activeIban: state.activeIban,
+      ibanList: state.ibanList,
+      isShowTutorial: state.isShowTutorial,
+    ));
   }
 
-  loadIbanList(String accessToken, AssetByFiatModel asset) async {
+  loadIbanList(String accessToken, {AssetByFiatModel? asset}) async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
       phone: state.phone,
@@ -246,16 +260,12 @@ class FiatCubit extends Cubit<FiatState> {
     IbanModel? iban;
 
     try {
-      if (state.currentIban != null && state.currentIban != '') {
-        iban = activeIbanList
-            .firstWhere((element) => (element.iban == state.currentIban!.replaceAll(' ', '')));
+      if (state.currentIban != null && asset != null && state.currentIban != '') {
+        iban = activeIbanList.firstWhere((element) =>
+            element.asset!.name == asset.name &&
+            element.iban == state.currentIban!.replaceAll(' ', ''));
       } else {
-        if (state.activeIban != null && state.activeIban!.asset!.name == asset.name) {
-          iban = state.activeIban;
-        } else {
-          iban = activeIbanList
-              .firstWhere((element) => (element.asset!.name == asset.name));
-        }
+        iban = activeIbanList[0];
       }
     } catch (_) {
       iban = null;
@@ -515,7 +525,8 @@ class FiatCubit extends Cubit<FiatState> {
       ibansList: state.ibansList,
       assets: state.assets,
       foundAssets: state.foundAssets,
-      personalInfo: state.personalInfo,
+      activeIban: state.activeIban,
+      ibanList: state.ibanList,
       isShowTutorial: state.isShowTutorial,
     ));
     try {
@@ -529,6 +540,18 @@ class FiatCubit extends Cubit<FiatState> {
       List<IbanModel> ibanList = await dfxRequests.getIbanList(accessToken);
       List<IbanModel> activeIbanList =
       ibanList.where((el) => el.active!).toList();
+      IbanModel? iban;
+
+      try {
+        if (state.currentIban != null && state.currentIban != '') {
+          iban = activeIbanList
+              .firstWhere((element) => (element.iban == state.currentIban!.replaceAll(' ', '')));
+        } else {
+          iban = activeIbanList[0];
+        }
+      } catch (_) {
+        iban = null;
+      }
 
       emit(state.copyWith(
         status: FiatStatusList.success,
@@ -540,7 +563,7 @@ class FiatCubit extends Cubit<FiatState> {
         currentIban: state.currentIban,
         ibansList: state.ibansList,
         ibanList: activeIbanList,
-        activeIban: state.activeIban,
+        activeIban: iban,
         assets: assets,
         foundAssets: assets,
         personalInfo: state.personalInfo,
