@@ -296,7 +296,7 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                                                   ibanController:
                                                       TextEditingController(),
                                                   hintText:
-                                                      'DE89 3704 0044 0532 0130 00',
+                                                      'DE89 37XX XXXX XXXX XXXX XX',
                                                   maskFormat:
                                                       'AA## #### #### #### #### ##',
                                                 ),
