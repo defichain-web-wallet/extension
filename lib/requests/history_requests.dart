@@ -113,7 +113,9 @@ class HistoryRequests {
           }
           try {
             for (var tx in historyList) {
-              lastBlockNumber = tx['block']['height'];
+              if(lastBlockNumber < tx['block']['height']){
+                lastBlockNumber = tx['block']['height'];
+              }
               var index =
                   txModels.indexWhere((element) => element.txid == tx['txid']);
               if (index >= 0) {
