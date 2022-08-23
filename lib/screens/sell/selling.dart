@@ -270,7 +270,7 @@ class _SellingState extends State<Selling> {
                                     fiatState.activeIban == null
                                 ? IbanField(
                                     ibanController: _ibanController,
-                                    hintText: 'DE89 3704 0044 0532 0130 00',
+                                    hintText: 'DE89 37XX XXXX XXXX XXXX XX',
                                     maskFormat: 'AA## #### #### #### #### ##',
                                   )
                                 : IbanSelector(
