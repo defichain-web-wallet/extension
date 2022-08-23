@@ -233,12 +233,6 @@ class IbanSelectorState extends State<IbanSelector> {
                       },
                     );
                   } else {
-                    String assetName;
-                    if (widget.ibanList[index].asset != null) {
-                      assetName = widget.ibanList[index].asset!.name!;
-                    } else {
-                      assetName = widget.ibanList[index].fiat!.name!;
-                    }
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(0),

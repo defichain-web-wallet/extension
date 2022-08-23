@@ -88,18 +88,12 @@ class _IbanScreenState extends State<IbanScreen> {
 
       state.ibanList!.forEach((element) {
         stringIbans.add(element.iban!);
-        print(
-            'type: ${element.type} , iban: ${element.iban}, asset: ${element.asset}, fiat: ${element.fiat}');
       });
 
       var stringUniqueIbans = Set<String>.from(stringIbans).toList();
 
       stringUniqueIbans.forEach((element) {
         uniqueIbans.add(state.ibanList.firstWhere((el) => el.iban == element));
-      });
-
-      uniqueIbans.forEach((element) {
-        print('iban: ${element.iban}');
       });
 
       return Container(
@@ -182,8 +176,8 @@ class _IbanScreenState extends State<IbanScreen> {
                           isCheckLock: false,
                           callback: () {
                             hideOverlay();
-                            _authenticateWithEmailAndPassword(
-                                context, accountState);
+                            submit(
+                                context, accountState, state);
                           }),
                     ),
                   ],
@@ -196,12 +190,15 @@ class _IbanScreenState extends State<IbanScreen> {
     }
   }
 
-  _authenticateWithEmailAndPassword(context, accountState) async {
+  submit(context, accountState, fiatState) async {
     if (_formKey.currentState!.validate()) {
       FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-      fiatCubit.addIban(_ibanController.text);
+      String iban = (widget.isNewIban || fiatState.activeIban == null)
+          ? _ibanController.text
+          : fiatState.activeIban.iban;
+      print(_ibanController.text);
       await fiatCubit.saveBuyDetails(
-          _ibanController.text, widget.asset, accountState.accessToken!);
+          iban, widget.asset, accountState.accessToken!);
       Navigator.push(
           context,
           PageRouteBuilder(
