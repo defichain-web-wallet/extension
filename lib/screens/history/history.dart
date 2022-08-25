@@ -151,7 +151,9 @@ class _HistoryState extends State<History> {
                                 var txAdvancedValue;
                                 var type;
                                 var date;
-                                if (historyList[index].type == null) {
+                                if (historyList[index].type == null ||
+                                    historyList[index].type == 'AccountToUtxos' ||
+                                    historyList[index].type == 'UtxosToAccount') {
                                   txValue = convertFromSatoshi(
                                       historyList[index].value);
                                   tokenName = 'DFI';

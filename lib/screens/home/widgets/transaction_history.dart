@@ -69,7 +69,9 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 var txAdvancedValue;
                 var type;
                 var date;
-                if (historyList[index].type == null) {
+                if (historyList[index].type == null ||
+                    historyList[index].type == 'AccountToUtxos' ||
+                    historyList[index].type == 'UtxosToAccount') {
                   txValue = convertFromSatoshi(historyList[index].value);
                   tokenName = 'DFI';
                 } else {
