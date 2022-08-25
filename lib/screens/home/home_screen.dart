@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         await fiatCubit.loadUserDetails(accountCubit.state.accessToken!);
       }
 
-      await saveOpenTime();
+      await lockHelper.updateTimer();
     });
   }
 
@@ -130,16 +130,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       selectKey.currentState!.hideOverlay();
     } catch (err) {
       log('error when try to hide overlay: $err');
-    }
-  }
-
-  Future<void> saveOpenTime() async {
-    try {
-      var box = await Hive.openBox(HiveBoxes.client);
-      await box.put(HiveNames.openTime, DateTime.now().millisecondsSinceEpoch);
-      await box.close();
-    } catch (err) {
-      print(err);
     }
   }
 
