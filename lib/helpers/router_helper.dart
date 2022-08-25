@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/models/forms/send_former.dart';
 import 'package:defi_wallet/screens/buy/search_buy_token.dart';
 import 'package:defi_wallet/screens/dex/swap_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
@@ -13,13 +16,13 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class RouterHelper {
   redirectTo(context) async {
-    var box = await Hive.openBox(HiveBoxes.client);
+    var box = await Hive.openBox(HiveBoxes.state);
     String? currentRoute = await box.get(HiveNames.currentRoute);
+    String? form = await box.get(HiveNames.sendState);
     await box.close();
-    print(currentRoute);
 
     if (currentRoute != null && currentRoute != Routes.home.toShortString()) {
-      Widget target = await getWidgetByRoute(currentRoute);
+      Widget target = await getWidgetByRoute(currentRoute, form);
 
       await Navigator.push(
         context,
@@ -34,16 +37,23 @@ class RouterHelper {
   }
 
   setCurrentRoute(Routes routeName) async {
-    print(routeName);
-    var box = await Hive.openBox(HiveBoxes.client);
+    var box = await Hive.openBox(HiveBoxes.state);
     await box.put(HiveNames.currentRoute, routeName.toShortString());
+    await box.put(HiveNames.sendState, null);
     await box.close();
   }
 
-  getWidgetByRoute(String currentRoute) async {
+  getWidgetByRoute(String currentRoute, String? form) async {
     switch (currentRoute) {
-      case 'send':
-        return SendTokenSelector();
+      case 'send': {
+        SendFormer? sendFormer;
+        if (form != null) {
+          sendFormer = SendFormer.fromJson(jsonDecode(form));
+        } else {
+          sendFormer = SendFormer.init();
+        }
+        return SendTokenSelector(former: sendFormer);
+      }
       case 'receive':
         return ReceiveScreen();
       case 'swap':

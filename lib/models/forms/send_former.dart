@@ -6,21 +6,31 @@ import 'package:hive_flutter/hive_flutter.dart';
 class SendFormer {
   String? address;
   String? amount;
+  String? token;
 
   SendFormer({
     this.address,
     this.amount,
+    this.token,
   });
 
   SendFormer.fromJson(Map<String, dynamic> jsonModel) {
     this.address = jsonModel["address"];
     this.amount = jsonModel["amount"];
+    this.token = jsonModel["token"];
+  }
+
+  SendFormer.init() {
+    this.address = '';
+    this.amount = '0';
+    this.token = null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data["address"] = this.address;
     data["amount"] = this.amount;
+    data["token"] = this.token;
     return data;
   }
 

@@ -27,8 +27,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class SendTokenSelector extends StatefulWidget {
 
   final String selectedAddress;
+  final SendFormer? former;
 
-  const SendTokenSelector({Key? key, this.selectedAddress = '',}) : super(key: key);
+  const SendTokenSelector({
+    Key? key,
+    this.former,
+    this.selectedAddress = '',
+  }) : super(key: key);
   @override
   State<SendTokenSelector> createState() => _SendConfirmState();
 }
@@ -66,23 +71,12 @@ class _SendConfirmState extends State<SendTokenSelector> {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       await routerHelper.setCurrentRoute(Routes.send);
-      await loadSavedFormer();
+      if (widget.former != null) {
+        addressController.text = widget.former!.address ?? '';
+        _amountController.text = widget.former!.amount ?? '';
+        assetFrom = widget.former!.token ?? '';
+      }
     });
-  }
-
-  loadSavedFormer () async {
-    try {
-      dynamic formerData = await SendFormer.loadExist();
-      sendFormer = SendFormer.fromJson(formerData);
-      addressController.text = sendFormer.address!;
-      _amountController.text = sendFormer.amount!;
-      print(sendFormer.address);
-    } catch (err) {
-      print(err);
-      sendFormer = SendFormer(
-          address: addressController.text, amount: _amountController.text);
-      print(sendFormer.address);
-    }
   }
 
   void hideOverlay() {
@@ -129,7 +123,11 @@ class _SendConfirmState extends State<SendTokenSelector> {
       BlocBuilder<AccountCubit, AccountState>(
         builder: (context, state) {
           if (state.status == AccountStatusList.success) {
-            assetFrom = (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
+            print(widget.former);
+            assetFrom = (assetFrom.isEmpty ||
+                    (widget.former == null && widget.former!.token == null))
+                ? state.activeToken!
+                : assetFrom;
             List<String> assets = [];
             state.activeAccount!.balanceList!
                 .forEach((el) {
@@ -138,7 +136,9 @@ class _SendConfirmState extends State<SendTokenSelector> {
                   }
             });
 
-            addressController.text = widget.selectedAddress;
+            if (widget.selectedAddress.isNotEmpty) {
+              addressController.text = widget.selectedAddress;
+            }
 
             return Container(
               color: isCustomBgColor
@@ -159,9 +159,8 @@ class _SendConfirmState extends State<SendTokenSelector> {
                             AddressField(
                               addressController: addressController,
                               onChanged: (value) {
-                                sendFormer.address = value;
-                                sendFormer.save();
-                                print(sendFormer.address);
+                                widget.former!.address = value;
+                                widget.former!.save();
                                 if (isFailed) {
                                   setState(() {
                                     isFailed = false;
@@ -196,11 +195,15 @@ class _SendConfirmState extends State<SendTokenSelector> {
                               assets: assets,
                               assetFrom: assetFrom,
                               onSelect: (String asset) {
+                                print(1);
+                                widget.former!.token = asset;
+                                widget.former!.save();
                                 setState(() => {assetFrom = asset});
                               },
                               onChanged: (value) {
-                                sendFormer.amount = value;
-                                sendFormer.save();
+                                print(2);
+                                widget.former!.amount = value;
+                                widget.former!.save();
                                 if (isFailed) {
                                   setState(() {
                                     isFailed = false;
