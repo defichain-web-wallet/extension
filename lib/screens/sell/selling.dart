@@ -270,7 +270,7 @@ class _SellingState extends State<Selling> {
                                     fiatState.activeIban == null
                                 ? IbanField(
                                     ibanController: _ibanController,
-                                    hintText: 'DE89 3704 0044 0532 0130 00',
+                                    hintText: 'DE89 37XX XXXX XXXX XXXX XX',
                                     maskFormat: 'AA## #### #### #### #### ##',
                                   )
                                 : IbanSelector(
@@ -367,9 +367,9 @@ class _SellingState extends State<Selling> {
                                   double amount = double.parse(amountController
                                       .text
                                       .replaceAll(',', '.'));
-                                  IbanModel? list;
+                                  IbanModel? foundedIban;
                                   try {
-                                    list = fiatState.ibanList.firstWhere(
+                                    foundedIban = fiatState.ibanList.firstWhere(
                                             (el) =>
                                         el.active &&
                                             el.type == "Sell" &&
@@ -379,18 +379,17 @@ class _SellingState extends State<Selling> {
                                   } catch (_) {
                                     print(_);
                                   }
-                                  print(list);
                                   String iban = widget.isNewIban
                                       ? _ibanController.text
                                       : fiatState.activeIban.iban;
-                                  if (list == null || widget.isNewIban) {
+                                  if (foundedIban == null || widget.isNewIban) {
                                     Map sellDetails = await dfxRequests.sell(
                                         iban,
                                         selectedFiat,
                                         accountState.accessToken);
                                     address = sellDetails["deposit"]["address"];
                                   } else {
-                                    address = list
+                                    address = foundedIban
                                         .deposit["address"];
                                   }
                                   await _sendTransaction(
