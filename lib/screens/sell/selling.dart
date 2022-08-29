@@ -390,10 +390,7 @@ class _SellingState extends State<Selling> {
                                         accountState.accessToken);
                                     address = sellDetails["deposit"]["address"];
                                   } else {
-                                    address = fiatState.ibanList
-                                        .firstWhere((el) =>
-                                            el.active! &&
-                                            el.fiat.name == selectedFiat.name)
+                                    address = list
                                         .deposit["address"];
                                   }
                                   await _sendTransaction(
