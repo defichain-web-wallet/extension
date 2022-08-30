@@ -63,4 +63,23 @@ class IbanModel {
     }
     this.deposit = json["deposit"];
   }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data["id"] = this.id;
+    data["iban"] = this.iban;
+    data["type"] = this.type;
+    data["created"] = this.created;
+    data["updated"] = this.updated;
+    data["bankUsage"] = this.bankUsage;
+    data["volume"] = this.volume;
+    data["annualVolume"] = this.annualVolume;
+    data["fee"] = this.fee;
+    data["refBonus"] = this.refBonus;
+    data["active"] = this.active;
+    data["asset"] = this.asset == null ? {} : this.asset!.toJson();
+    data["fiat"] = this.fiat == null ? {} : this.fiat!.toJson();
+    data["deposit"] = this.deposit;
+    return data;
+  }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
@@ -294,7 +295,9 @@ class DfxRequests {
     }
   }
 
-  Future<Map<String, dynamic>> getStakingRouteBalance(String accessToken, String address,
+  Future<Map<String, dynamic>> getStakingRouteBalance(
+    String accessToken,
+    String address,
   ) async {
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
@@ -316,6 +319,46 @@ class DfxRequests {
       }
     } catch (err) {
       throw err;
+    }
+  }
+
+  Future<Map<String, dynamic>> postStaking(
+    String rewardType,
+    String paymentType,
+    AssetByFiatModel? rewardAsset,
+    AssetByFiatModel? paybackAsset,
+    IbanModel? rewardSell,
+    IbanModel? paybackSell,
+    String accessToken,
+  ) async {
+    try {
+      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
+
+      final Uri url = Uri.parse('https://api.dfx.swiss/v1/staking');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $decryptedAccessToken'
+      };
+
+      final body = jsonEncode({
+        'rewardType': rewardType,
+        'paybackType': paymentType,
+        'rewardAsset': rewardAsset == null ? {} : rewardAsset.toJson(),
+        'paybackAsset': paybackAsset == null ? {} : paybackAsset.toJson(),
+        'rewardSell': rewardSell == null ? {} : rewardSell.toJson(),
+        'paybackSell': paybackSell == null ? {} : paybackSell.toJson(),
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        throw Error();
+      }
+    } catch (err) {
+      throw err.toString();
     }
   }
 

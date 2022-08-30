@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -8,6 +9,7 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/earn_screen/widgets/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
 import 'package:defi_wallet/screens/staking/number_of_coins_to_stake.dart';
+import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -146,8 +148,9 @@ class _EarnScreenState extends State<EarnScreen> {
                                       status: 'staked',
                                       firstBtnTitle: 'STAKE',
                                       secondBtnTitle: 'UNSTAKE',
-                                      firstBtnCallback: stakingCallback,
-                                      isCheckLockSecond: false,
+                                      firstBtnCallback: () =>
+                                        stakingCallback(context),
+                                    isCheckLockSecond: false,
                                     ),
                                     SizedBox(
                                       width: 20,
@@ -212,8 +215,9 @@ class _EarnScreenState extends State<EarnScreen> {
                                         status: 'staked',
                                         firstBtnTitle: 'STAKE',
                                         secondBtnTitle: 'UNSTAKE',
-                                        firstBtnCallback: stakingCallback,
-                                        isCheckLockSecond: false,
+                                        firstBtnCallback: () =>
+                                          stakingCallback(context),
+                                      isCheckLockSecond: false,
                                         isSmall: true,
                                       ),
                                     ],
@@ -275,15 +279,34 @@ class _EarnScreenState extends State<EarnScreen> {
     return maxValue;
   }
 
-  stakingCallback() {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) => NumberOfCoinsToStakeScreen(),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ),
-    );
+  stakingCallback(context) {
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+
+    if (fiatCubit.state.isKycDataComplete!) {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => SendStakingRewardsScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            'To use this feature, you must first successfully complete a bank transaction (buy or sell)!',
+            style: Theme.of(context)
+                .textTheme
+                .headline5,
+          ),
+          backgroundColor: Theme.of(context)
+              .snackBarTheme
+              .backgroundColor,
+        ),
+      );
+    }
   }
 
   liquidityCallback() {

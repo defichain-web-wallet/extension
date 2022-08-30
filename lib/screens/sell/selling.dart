@@ -171,7 +171,6 @@ class _SellingState extends State<Selling> {
         uniqueIbans
             .add(fiatState.ibanList.firstWhere((el) => el.iban == element));
       });
-      print(uniqueIbans);
       return Container(
         color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -57,7 +57,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation1, animation2) =>
-                isSkipKyc ? Selling() : AccountTypeSell(),
+                isSkipKyc ? Selling() : Selling(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ));
