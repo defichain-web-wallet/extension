@@ -123,20 +123,20 @@ class StakingCubit extends Cubit<StakingState> {
         accessToken,
       );
       address = response['deposit']['address'];
-    } catch (err) {
-      address = '';
-    }
 
-    emit(state.copyWith(
-      status: StakingStatusList.success,
-      amount: state.amount,
-      paymentType: state.paymentType,
-      paymentAsset: state.paymentAsset,
-      paybackSell: state.paybackSell,
-      rewardType: state.rewardType,
-      rewardAsset: state.rewardAsset,
-      rewardSell: state.rewardSell,
-      depositAddress: address,
-    ));
+      emit(state.copyWith(
+        status: StakingStatusList.success,
+        amount: state.amount,
+        paymentType: state.paymentType,
+        paymentAsset: state.paymentAsset,
+        paybackSell: state.paybackSell,
+        rewardType: state.rewardType,
+        rewardAsset: state.rewardAsset,
+        rewardSell: state.rewardSell,
+        depositAddress: address,
+      ));
+    } catch (err) {
+      throw Error();
+    }
   }
 }

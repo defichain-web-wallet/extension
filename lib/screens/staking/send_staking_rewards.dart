@@ -64,7 +64,7 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                     (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
                 List<String> assets = [];
                 fiatState.assets!.forEach((el) {
-                  assets.add(el.name!);
+                  assets.add(el.dexName!);
                 });
 
                 return ScaffoldConstrainedBoxNew(
