@@ -98,9 +98,9 @@ class AssetList extends StatelessWidget {
       state, String coin, double tokenBalance, String fiat) {
     double balanceInUsd;
     if (tokenHelper.isPair(coin)) {
-      double satoshi = convertToSatoshi(tokenBalance) + .0;
-      balanceInUsd = tokenHelper.getPairsAmountByUsd(
-          state.tokensPairs, satoshi, coin);
+      double balanceInSatoshi = convertToSatoshi(tokenBalance) + .0;
+      balanceInUsd = tokenHelper.getPairsAmountByAsset(
+          state.tokensPairs, balanceInSatoshi, coin, 'USD');
     } else {
       balanceInUsd = tokenHelper.getAmountByUsd(
           state.tokensPairs, tokenBalance, coin);

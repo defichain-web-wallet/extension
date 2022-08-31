@@ -31,28 +31,48 @@ class _WalletDetailsState extends State<WalletDetails> {
             builder: (context, state) {
           if (state.status == AccountStatusList.success &&
               tokensState.status == TokensStatusList.success) {
-            int totalBalance = state.activeAccount!.balanceList!
+            double totalBalance = state.activeAccount!.balanceList!
                 .where((el) => !el.isHidden!)
-                .map<int>((e) => e.balance!)
-                .reduce((value, element) => value + element);
-            double convertTotalBalance = convertFromSatoshi(totalBalance);
-
-            double totalResult = convertTotalBalance;
-            if (activeAsset == AssetList.fiat) {
-              totalResult = tokensHelper.getAmountByUsd(
-                tokensState.tokensPairs!,
-                convertTotalBalance,
-                'DFI',
-              );
-              if (SettingsHelper.settings.currency == 'EUR') {
-                totalResult *= tokensState.eurRate!;
+                .map<double>((e) {
+              if (!e.isPair!) {
+                if (activeAsset == AssetList.fiat) {
+                  return tokensHelper.getAmountByUsd(
+                    tokensState.tokensPairs!,
+                    convertFromSatoshi(e.balance!),
+                    e.token!,
+                  );
+                } else if (activeAsset == AssetList.dfi) {
+                  return tokensHelper.getAmountByDfi(
+                    tokensState.tokensPairs!,
+                    convertFromSatoshi(e.balance!),
+                    e.token!,
+                  );
+                } else {
+                  return tokensHelper.getAmountByBtc(
+                    tokensState.tokensPairs!,
+                    convertFromSatoshi(e.balance!),
+                    e.token!,
+                  );
+                }
+              } else {
+                double balanceInSatoshi = double.parse(e.balance!.toString());
+                if (activeAsset == AssetList.fiat) {
+                  return tokensHelper.getPairsAmountByAsset(
+                      tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'USD');
+                } else if (activeAsset == AssetList.dfi) {
+                  return tokensHelper.getPairsAmountByAsset(
+                      tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'DFI');
+                } else {
+                  return tokensHelper.getPairsAmountByAsset(
+                      tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'BTC');
+                }
               }
-            } else if (activeAsset == AssetList.btc) {
-              totalResult = tokensHelper.getAmountByBtc(
-                tokensState.tokensPairs!,
-                convertTotalBalance,
-                'DFI',
-              );
+            }).reduce((value, element) => value + element);
+
+            if (activeAsset == AssetList.fiat) {
+              if (SettingsHelper.settings.currency == 'EUR') {
+                totalBalance *= tokensState.eurRate!;
+              }
             }
 
             activeAssetName = activeAsset == AssetList.fiat
@@ -121,7 +141,7 @@ class _WalletDetailsState extends State<WalletDetails> {
                   Container(
                     child: Center(
                       child: Text(
-                        "${balancesHelper.numberStyling(totalResult, fixed: true, fixedCount: 6)} ${activeAssetName.toUpperCase()}",
+                        "${balancesHelper.numberStyling(totalBalance, fixed: true, fixedCount: 6)} ${activeAssetName.toUpperCase()}",
                         style: Theme.of(context).textTheme.headline1!.apply(
                               fontFamily: 'IBM Plex Medium',
                             ),
