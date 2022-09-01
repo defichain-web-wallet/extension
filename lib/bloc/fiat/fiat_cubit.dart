@@ -578,7 +578,7 @@ class FiatCubit extends Cubit<FiatState> {
     ));
   }
 
-  loadAllAssets(String accessToken) async {
+  loadAllAssets(String accessToken, {bool isSell = false}) async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
       phone: state.phone,
@@ -615,7 +615,11 @@ class FiatCubit extends Cubit<FiatState> {
           iban = activeIbanList
               .firstWhere((element) => (element.iban == state.currentIban!.replaceAll(' ', '')));
         } else {
-          iban = activeIbanList[0];
+          if (isSell) {
+            iban = activeIbanList.firstWhere((element) => element.type == 'Sell');
+          } else {
+            iban = activeIbanList[0];
+          }
         }
       } catch (_) {
         iban = null;

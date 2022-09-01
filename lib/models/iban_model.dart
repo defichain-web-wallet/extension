@@ -16,6 +16,7 @@ class IbanModel {
   AssetByFiatModel? asset;
   FiatModel? fiat;
   dynamic deposit;
+  dynamic minDeposit;
 
 
   IbanModel({
@@ -32,7 +33,8 @@ class IbanModel {
     this.active,
     this.asset,
     this.fiat,
-    this.deposit
+    this.deposit,
+    this.minDeposit,
   });
 
   IbanModel.fromJson(Map<String, dynamic> json) {
@@ -62,6 +64,7 @@ class IbanModel {
       this.fiat = null;
     }
     this.deposit = json["deposit"];
+    this.minDeposit = json["minDeposit"];
   }
 
   Map<String, dynamic> toJson() {
@@ -80,6 +83,7 @@ class IbanModel {
     data["asset"] = this.asset == null ? {} : this.asset!.toJson();
     data["fiat"] = this.fiat == null ? {} : this.fiat!.toJson();
     data["deposit"] = this.deposit;
+    data["minDeposit"] = this.minDeposit;
     return data;
   }
 }

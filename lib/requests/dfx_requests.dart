@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
+import 'package:defi_wallet/models/staking_model.dart';
 import 'package:defi_wallet/services/dfx_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -322,15 +323,7 @@ class DfxRequests {
     }
   }
 
-  Future<Map<String, dynamic>> postStaking(
-    String rewardType,
-    String paymentType,
-    AssetByFiatModel? rewardAsset,
-    AssetByFiatModel? paybackAsset,
-    IbanModel? rewardSell,
-    IbanModel? paybackSell,
-    String accessToken,
-  ) async {
+  Future<List<StakingModel>> getStakingRoutes(String accessToken) async {
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
 
@@ -341,24 +334,72 @@ class DfxRequests {
         'Authorization': 'Bearer $decryptedAccessToken'
       };
 
-      final body = jsonEncode({
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<StakingModel> routes = List.generate(
+            data.length, (index) => StakingModel.fromJson(data[index]));
+        return routes;
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  Future<Map<String, dynamic>> postStaking(
+    String rewardType,
+    String paymentType,
+    AssetByFiatModel? rewardAsset,
+    AssetByFiatModel? paybackAsset,
+    IbanModel? rewardSell,
+    IbanModel? paybackSell,
+    String accessToken,
+    { bool isActive = false, int stakingId = 0 }
+  ) async {
+    try {
+      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
+
+      final Uri url = Uri.parse(
+          'https://api.dfx.swiss/v1/staking/' +
+          (isActive ? stakingId.toString() : ''));
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $decryptedAccessToken'
+      };
+
+      var body = {
         'rewardType': rewardType,
         'paybackType': paymentType,
         'rewardAsset': rewardAsset == null ? {} : rewardAsset.toJson(),
         'paybackAsset': paybackAsset == null ? {} : paybackAsset.toJson(),
         'rewardSell': rewardSell == null ? {} : rewardSell.toJson(),
         'paybackSell': paybackSell == null ? {} : paybackSell.toJson(),
-      });
+      };
 
-      final response = await http.post(url, headers: headers, body: body);
+      if (isActive) {
+        body['active'] = true;
+      }
+      final bodyEncode = jsonEncode(body);
+
+      var response;
+      if (isActive) {
+        response = await http.put(url, headers: headers, body: bodyEncode);
+      } else {
+        response = await http.post(url, headers: headers, body: bodyEncode);
+      }
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
-        throw Error();
+        String errMessage = jsonDecode(response.body.toString())["message"];
+        throw Error.safeToString(errMessage);
       }
     } catch (err) {
-      throw err.toString();
+      throw err;
     }
   }
 

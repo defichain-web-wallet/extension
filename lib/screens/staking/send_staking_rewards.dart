@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
@@ -51,7 +53,7 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
       builder: (context, state) {
         FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
         StakingCubit stakingCubit = BlocProvider.of<StakingCubit>(context);
-        fiatCubit.loadAllAssets(state.accessToken!);
+        fiatCubit.loadAllAssets(state.accessToken!, isSell: true);
         return BlocBuilder<FiatCubit, FiatState>(builder: (context, fiatState) {
           return BlocBuilder<StakingCubit, StakingState>(
             builder: (context, stakingState) {
@@ -334,13 +336,34 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                                   hideOverlay();
                                   AssetByFiatModel foundAsset =
                                       fiatState.assets!.firstWhere((element) =>
-                                          element.name == assetFrom);
+                                          element.dexName == assetFrom);
 
                                   try {
                                     if (widget.isPayment) {
                                       stakingCubit.updatePaymentInfo(type,
                                           foundAsset, fiatState.activeIban!);
-                                      await stakingCubit.createStaking(state.accessToken!);
+                                      String rewardType = stakingState
+                                          .rewardType
+                                          .toString()
+                                          .split('.')[1];
+                                      String paybackType = stakingState
+                                          .paymentType
+                                          .toString()
+                                          .split('.')[1];
+                                      try {
+                                        var foundedRoute = stakingState.routes!
+                                            .firstWhere((element) =>
+                                                element.active! &&
+                                                element.rewardType ==
+                                                    rewardType &&
+                                                element.paybackType ==
+                                                    paybackType);
+                                        await stakingCubit.createStaking(
+                                            state.accessToken!, isActive: true, id: foundedRoute.id!);
+                                      } catch (err) {
+                                        await stakingCubit.createStaking(
+                                            state.accessToken!);
+                                      }
                                     } else {
                                       stakingCubit.updateRewardInfo(type,
                                           foundAsset, fiatState.activeIban!);
@@ -349,22 +372,23 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                                         context,
                                         PageRouteBuilder(
                                           pageBuilder: (context, animation1,
-                                              animation2) =>
-                                          widget.isPayment
-                                              ? NumberOfCoinsToStakeScreen()
-                                              : SendStakingRewardsScreen(
-                                              isPayment: true),
+                                                  animation2) =>
+                                              widget.isPayment
+                                                  ? NumberOfCoinsToStakeScreen()
+                                                  : SendStakingRewardsScreen(
+                                                      isPayment: true),
                                           transitionDuration: Duration.zero,
                                           reverseTransitionDuration:
-                                          Duration.zero,
+                                              Duration.zero,
                                         ));
                                   } catch (err) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          'Something went wrong. Please try later',
-                                          style:
-                                          Theme.of(context).textTheme.headline5,
+                                          err.toString().replaceAll("\"", ''),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5,
                                         ),
                                         backgroundColor: Theme.of(context)
                                             .snackBarTheme

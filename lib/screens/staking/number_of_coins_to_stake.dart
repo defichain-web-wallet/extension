@@ -160,7 +160,7 @@ class _NumberOfCoinsToStakeScreenState
                                 pageBuilder:
                                     (context, animation1, animation2) =>
                                         StakingConfirmTransaction(
-                                  amount: double.parse(_amountController.text),
+                                  amount: double.parse(_amountController.text.replaceAll(',', '.')),
                                   assetName: assetFrom,
                                 ),
                                 transitionDuration: Duration.zero,

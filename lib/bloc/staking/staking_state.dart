@@ -13,6 +13,7 @@ class StakingState extends Equatable {
   final IbanModel? paybackSell;
   final IbanModel? rewardSell;
   final String? depositAddress;
+  final List<StakingModel>? routes;
 
   StakingState({
     this.status = StakingStatusList.initial,
@@ -24,6 +25,7 @@ class StakingState extends Equatable {
     this.paybackSell,
     this.rewardSell,
     this.depositAddress,
+    this.routes,
   });
 
   @override
@@ -37,6 +39,7 @@ class StakingState extends Equatable {
     paybackSell,
     rewardSell,
     depositAddress,
+    routes,
   ];
 
   StakingState copyWith({
@@ -49,6 +52,7 @@ class StakingState extends Equatable {
     IbanModel? paybackSell,
     IbanModel? rewardSell,
     String? depositAddress,
+    List<StakingModel>? routes,
   }) {
     return StakingState(
       status: status ?? this.status,
@@ -60,6 +64,7 @@ class StakingState extends Equatable {
       paybackSell: paybackSell ?? this.paybackSell,
       rewardSell: rewardSell ?? this.rewardSell,
       depositAddress: depositAddress ?? this.depositAddress,
+      routes: routes ?? this.routes,
     );
   }
 }

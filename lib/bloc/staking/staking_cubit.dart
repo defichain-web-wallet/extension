@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
+import 'package:defi_wallet/models/staking_model.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:equatable/equatable.dart';
 
@@ -21,10 +22,13 @@ class StakingCubit extends Cubit<StakingState> {
       paymentAsset: state.paymentAsset,
       rewardSell: state.rewardSell,
       paybackSell: state.paybackSell,
+      routes: state.routes,
     ));
     try {
       var stakingRouteBalance =
         await dfxRequests.getStakingRouteBalance(accessToken, address);
+      List<StakingModel> stakingRoutes =
+          await dfxRequests.getStakingRoutes(accessToken);
       emit(state.copyWith(
         status: StakingStatusList.success,
         amount: stakingRouteBalance['totalAmount'],
@@ -34,6 +38,7 @@ class StakingCubit extends Cubit<StakingState> {
         paymentAsset: state.paymentAsset,
         rewardSell: state.rewardSell,
         paybackSell: state.paybackSell,
+        routes: stakingRoutes,
       ));
     } catch (err) {
       emit(state.copyWith(
@@ -45,6 +50,7 @@ class StakingCubit extends Cubit<StakingState> {
         paymentAsset: state.paymentAsset,
         rewardSell: state.rewardSell,
         paybackSell: state.paybackSell,
+        routes: state.routes,
       ));
     }
   }
@@ -59,6 +65,7 @@ class StakingCubit extends Cubit<StakingState> {
       rewardType: state.rewardType,
       rewardAsset: state.rewardAsset,
       rewardSell: state.rewardSell,
+      routes: state.routes,
     ));
   }
 
@@ -72,6 +79,7 @@ class StakingCubit extends Cubit<StakingState> {
       rewardType: type,
       rewardAsset: state.rewardAsset,
       rewardSell: state.rewardSell,
+      routes: state.routes,
     ));
   }
 
@@ -85,6 +93,7 @@ class StakingCubit extends Cubit<StakingState> {
       rewardType: type,
       rewardAsset: asset,
       rewardSell: iban,
+      routes: state.routes,
     ));
   }
 
@@ -98,10 +107,11 @@ class StakingCubit extends Cubit<StakingState> {
       paymentType: type,
       paymentAsset: asset,
       paybackSell: iban,
+      routes: state.routes,
     ));
   }
 
-  createStaking(String accessToken) async {
+  createStaking(String accessToken, {bool isActive = false, int id = 0}) async {
     AssetByFiatModel? rewardAsset =
         state.rewardType == StakingType.Wallet ? state.rewardAsset : null;
     AssetByFiatModel? paymentAsset =
@@ -121,6 +131,8 @@ class StakingCubit extends Cubit<StakingState> {
         rewardSell,
         paybackSell,
         accessToken,
+        isActive: isActive,
+        stakingId: id,
       );
       address = response['deposit']['address'];
 
@@ -134,9 +146,10 @@ class StakingCubit extends Cubit<StakingState> {
         rewardAsset: state.rewardAsset,
         rewardSell: state.rewardSell,
         depositAddress: address,
+        routes: state.routes,
       ));
     } catch (err) {
-      throw Error();
+      throw err;
     }
   }
 }
