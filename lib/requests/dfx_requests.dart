@@ -4,6 +4,7 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
+import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
@@ -102,6 +103,32 @@ class DfxRequests {
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  Future<List<FiatHistoryModel>> getHistory(String accessToken) async {
+    try {
+      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
+
+      final Uri url = Uri.parse('https://api.dfx.swiss/v1/history');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $decryptedAccessToken'
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<FiatHistoryModel> history = List.generate(
+            data.length, (index) => FiatHistoryModel.fromJson(data[index]));
+        return history;
       } else {
         throw Error.safeToString(response.statusCode);
       }

@@ -282,7 +282,7 @@ class _EarnScreenState extends State<EarnScreen> {
   stakingCallback(context) {
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
-    if (fiatCubit.state.isKycDataComplete!) {
+    if (fiatCubit.state.isKycDataComplete! && fiatCubit.state.history.length > 0) {
       Navigator.push(
         context,
         PageRouteBuilder(

@@ -7,6 +7,7 @@ import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
 import 'package:defi_wallet/screens/sell/account_type_sell.dart';
 import 'package:defi_wallet/screens/sell/selling.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation1, animation2) =>
-                isSkipKyc ? Selling() : Selling(),
+                isSkipKyc ? Selling() : AccountTypeSell(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ));
@@ -149,6 +150,23 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                         ),
                       )
                     ],
+                  ),
+                ),
+                Expanded(
+                  child: fiatState.history.length > 0 ? ListView.builder(
+                      itemCount: fiatState.history.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          title: Text(fiatState.history[index].type!),
+                          subtitle: Text(fiatState.history[index].date!),
+                          trailing: (fiatState.history[index].buyAsset != null)
+                              ? Text(
+                                  '${toFixed(fiatState.history[index].buyAmount!, 4)} ${fiatState.history[index].buyAsset}')
+                              : Text(
+                                  '${toFixed(fiatState.history[index].sellAmount!, 4)} ${fiatState.history[index].sellAsset}'),
+                        );
+                      }) : Center(
+                    child: Text('Not yet any transaction'),
                   ),
                 ),
                 SvgPicture.asset('assets/powered_of_dfx.svg'),

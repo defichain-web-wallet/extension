@@ -14,6 +14,7 @@ class FiatState extends Equatable {
   final List<String>? ibansList;
   final List<AssetByFiatModel>? assets;
   final List<AssetByFiatModel>? foundAssets;
+  final List<FiatHistoryModel> history;
   final IbanModel? activeIban;
   final List<IbanModel>? ibanList;
   final KycModel? personalInfo;
@@ -35,6 +36,7 @@ class FiatState extends Equatable {
     this.ibansList,
     this.assets,
     this.foundAssets,
+    this.history = const [],
     this.activeIban,
     this.ibanList,
     this.personalInfo,
@@ -58,6 +60,7 @@ class FiatState extends Equatable {
     ibansList,
     assets,
     foundAssets,
+    history,
     activeIban,
     ibanList,
     personalInfo,
@@ -80,6 +83,7 @@ class FiatState extends Equatable {
     List<String>? ibansList,
     List<AssetByFiatModel>? assets,
     List<AssetByFiatModel>? foundAssets,
+    List<FiatHistoryModel>? history,
     IbanModel? activeIban,
     List<IbanModel>? ibanList,
     KycModel? personalInfo,
@@ -101,6 +105,7 @@ class FiatState extends Equatable {
       ibansList: ibansList ?? this.ibansList,
       assets: assets ?? this.assets,
       foundAssets: foundAssets ?? this.foundAssets,
+      history: history ?? this.history,
       activeIban: activeIban,
       ibanList: ibanList ?? this.ibanList,
       personalInfo: personalInfo ?? this.personalInfo,
