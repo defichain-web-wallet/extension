@@ -157,6 +157,15 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                       itemCount: fiatState.history.length,
                       itemBuilder: (BuildContext context, int index) {
                         return ListTile(
+                          leading: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (fiatState.history[index].type! == 'Withdrawal')
+                                SvgPicture.asset('assets/images/withdrawal.svg')
+                              else
+                                SvgPicture.asset('assets/images/deposit.svg')
+                            ],
+                          ),
                           title: Text(fiatState.history[index].type!),
                           subtitle: Text(fiatState.history[index].date!),
                           trailing: (fiatState.history[index].buyAsset != null)
