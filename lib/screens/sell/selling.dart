@@ -85,6 +85,7 @@ class _SellingState extends State<Selling> {
 
     return BlocBuilder<AccountCubit, AccountState>(
         builder: (accountContext, accountState) {
+      // fiatCubit.loadIbanList(accountState.accessToken!);
       fiatCubit.loadAllAssets(accountState.accessToken!);
       return BlocBuilder<FiatCubit, FiatState>(
         builder: (BuildContext context, fiatState) {
@@ -143,7 +144,6 @@ class _SellingState extends State<Selling> {
           )));
       return Container();
     } else {
-      FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
       IbanModel? currentIban;
       if (iterator == 0) {
         selectedFiat = fiatState.fiatList![0];
@@ -158,22 +158,19 @@ class _SellingState extends State<Selling> {
         getFieldMsg(accountState);
         iterator++;
       }
-      List<IbanModel> ibanList = fiatState.ibanList
-          .where((element) =>
-              element.type == "Sell" && element.fiat.name == selectedFiat.name)
-          .toList();
-      try {
-        if (fiatState.activeIban != null) {
-          currentIban = fiatState.activeIban;
-        } else {
-          IbanModel iban =
-          ibanList.firstWhere((el) => el.fiat!.name == selectedFiat.name);
-          fiatCubit.changeCurrentIban(iban);
-          currentIban = fiatState.activeIban;
-        }
-      } catch (_) {
-        currentIban = null;
-      }
+      List<String> stringIbans = [];
+      List<IbanModel> uniqueIbans = [];
+
+      fiatState.ibanList!.forEach((element) {
+        stringIbans.add(element.iban!);
+      });
+
+      var stringUniqueIbans = Set<String>.from(stringIbans).toList();
+
+      stringUniqueIbans.forEach((element) {
+        uniqueIbans
+            .add(fiatState.ibanList.firstWhere((el) => el.iban == element));
+      });
       return Container(
         color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -268,10 +265,11 @@ class _SellingState extends State<Selling> {
                         key: _formKey,
                         child: Container(
                             padding: EdgeInsets.only(top: 20),
-                            child: widget.isNewIban || currentIban == null
+                            child: widget.isNewIban ||
+                                    fiatState.activeIban == null
                                 ? IbanField(
                                     ibanController: _ibanController,
-                                    hintText: 'DE89 3704 0044 0532 0130 00',
+                                    hintText: 'DE89 37XX XXXX XXXX XXXX XX',
                                     maskFormat: 'AA## #### #### #### #### ##',
                                   )
                                 : IbanSelector(
@@ -280,7 +278,7 @@ class _SellingState extends State<Selling> {
                                     routeWidget: Selling(
                                       isNewIban: widget.isNewIban,
                                     ),
-                                    ibanList: ibanList,
+                                    ibanList: uniqueIbans,
                                     selectedIban: fiatState.activeIban,
                                   )),
                       ),
@@ -339,7 +337,8 @@ class _SellingState extends State<Selling> {
                           TransactionCubit transactionCubit =
                               BlocProvider.of<TransactionCubit>(context);
                           lockHelper.provideWithLockChecker(context, () async {
-                            if (transactionCubit.state is TransactionLoadingState) {
+                            if (transactionCubit.state
+                                is TransactionLoadingState) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -367,15 +366,30 @@ class _SellingState extends State<Selling> {
                                   double amount = double.parse(amountController
                                       .text
                                       .replaceAll(',', '.'));
-                                  if (_ibanController.text == '') {
-                                    address =
-                                        fiatState.activeIban.deposit["address"];
-                                  } else {
+                                  IbanModel? foundedIban;
+                                  try {
+                                    foundedIban = fiatState.ibanList.firstWhere(
+                                            (el) =>
+                                        el.active &&
+                                            el.type == "Sell" &&
+                                            el.iban ==
+                                                fiatState.activeIban.iban &&
+                                            el.fiat.name == selectedFiat.name);
+                                  } catch (_) {
+                                    print(_);
+                                  }
+                                  String iban = widget.isNewIban
+                                      ? _ibanController.text
+                                      : fiatState.activeIban.iban;
+                                  if (foundedIban == null || widget.isNewIban) {
                                     Map sellDetails = await dfxRequests.sell(
-                                        _ibanController.text,
+                                        iban,
                                         selectedFiat,
                                         accountState.accessToken);
                                     address = sellDetails["deposit"]["address"];
+                                  } else {
+                                    address = foundedIban
+                                        .deposit["address"];
                                   }
                                   await _sendTransaction(
                                     context,
@@ -490,19 +504,23 @@ class _SellingState extends State<Selling> {
   _sendTransaction(context, tokensState, String token, AccountModel account,
       String address, double amount) async {
     TxErrorModel? txResponse;
-    if (token == 'DFI') {
-      txResponse = await transactionService.createAndSendTransaction(
-          account: account,
-          destinationAddress: address,
-          amount: balancesHelper.toSatoshi(amount.toString()),
-          tokens: tokensState.tokens);
-    } else {
-      txResponse = await transactionService.createAndSendToken(
-          account: account,
-          token: token,
-          destinationAddress: address,
-          amount: balancesHelper.toSatoshi(amount.toString()),
-          tokens: tokensState.tokens);
+    try {
+      if (token == 'DFI') {
+        txResponse = await transactionService.createAndSendTransaction(
+            account: account,
+            destinationAddress: address,
+            amount: balancesHelper.toSatoshi(amount.toString()),
+            tokens: tokensState.tokens);
+      } else {
+        txResponse = await transactionService.createAndSendToken(
+            account: account,
+            token: token,
+            destinationAddress: address,
+            amount: balancesHelper.toSatoshi(amount.toString()),
+            tokens: tokensState.tokens);
+      }
+    } catch (err) {
+      print(err);
     }
     await Navigator.pushReplacement(
         context,

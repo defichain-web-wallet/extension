@@ -2,7 +2,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
-import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
+import 'package:defi_wallet/screens/staking/staking_confirm_transaction.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
@@ -159,7 +159,10 @@ class _NumberOfCoinsToStakeScreenState
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation1, animation2) =>
-                                        SendStakingRewardsScreen(),
+                                        StakingConfirmTransaction(
+                                  amount: double.parse(_amountController.text.replaceAll(',', '.')),
+                                  assetName: assetFrom,
+                                ),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ),
