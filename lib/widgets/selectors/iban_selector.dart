@@ -16,6 +16,7 @@ class IbanSelector extends StatefulWidget {
   IbanModel selectedIban;
   void Function()? onAnotherSelect;
   final Widget? routeWidget;
+  final bool isShowAsset;
 
   IbanSelector({
     Key? key,
@@ -24,6 +25,7 @@ class IbanSelector extends StatefulWidget {
     required this.selectedIban,
     this.onAnotherSelect,
     this.routeWidget,
+    this.isShowAsset = false
   }) : super(key: key);
 
   @override
@@ -260,6 +262,9 @@ class IbanSelectorState extends State<IbanSelector> {
                                         bottom: 12.0,
                                         left: 22,
                                         right: 22),
+                                    child: Text(widget.isShowAsset
+                                        ? widget.ibanList[index].fiat!.name!
+                                        : ''),
                                   ),
                                   Text(
                                     '${fiatHelper.getIbanFormat(widget.ibanList[index].iban!)}',

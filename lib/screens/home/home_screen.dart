@@ -1,13 +1,10 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
 import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
@@ -22,7 +19,6 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:async';
 
 class HomeScreen extends StatefulWidget {
@@ -105,18 +101,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     tabController!.addListener(tabListener);
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
-      await transactionCubit.checkOngoingTransaction();
+    transactionCubit.checkOngoingTransaction();
 
-      if (widget.isLoadTokens && SettingsHelper.settings.network == 'mainnet') {
-        await fiatCubit.loadUserDetails(accountCubit.state.accessToken!);
-      }
-
-      await lockHelper.updateTimer();
-    });
+    lockHelper.updateTimer();
   }
 
   @override
