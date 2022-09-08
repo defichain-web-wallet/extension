@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defichaindart/defichaindart.dart';
+import 'package:hex/hex.dart';
 
 class AddressModel {
   var hdWalletService = HDWalletService();
@@ -10,22 +11,20 @@ class AddressModel {
   int? account;
   bool? isChange;
   int? index;
-  ECPair? keyPair;
+  Uint8List? pubKey;
 
-  AddressModel(
-      {this.address,
-      this.account,
-      this.isChange,
-      this.index,
-      this.keyPair});
+  AddressModel({this.address, this.account, this.isChange, this.index, this.pubKey});
 
-  AddressModel.fromJson(Map<String, dynamic> json)  {
+  String getPath() {
+    return HDWalletService.derivePath(this.index!);
+  }
+
+  AddressModel.fromJson(Map<String, dynamic> json) {
     this.address = json["address"];
     this.account = json["account"];
     this.isChange = json["isChange"];
     this.index = json["index"];
-    this.keyPair = hdWalletService.getKeypairFromWIF(
-        json["keyPair"], SettingsHelper.settings.network!);
+    if (json.containsKey("pubKey")) this.pubKey = Uint8List.fromList(HEX.decode(json["pubKey"]!));
   }
 
   Map<String, dynamic> toJson() {
@@ -34,7 +33,7 @@ class AddressModel {
     data["account"] = this.account;
     data["isChange"] = this.isChange;
     data["index"] = this.index;
-    data["keyPair"] = this.keyPair!.toWIF();
+    if (this.pubKey != null) data["pubKey"] = HEX.encode(this.pubKey!);
     return data;
   }
 }

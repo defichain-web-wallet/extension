@@ -7,10 +7,21 @@ class LedgerTransactionInput {
   String prevout;
   String script;
   int sequence;
-
   int index;
 
-  LedgerTransactionInput(this.prevout, this.script, this.sequence, this.index);
+  int order;
+
+  LedgerTransactionInput(this.order, this.prevout, this.script, this.sequence, this.index);
+}
+
+class LedgerTransactionRaw {
+  String txId;
+  String rawTx;
+
+  int index;
+  String redeemScript;
+
+  LedgerTransactionRaw(this.txId, this.rawTx, this.index, this.redeemScript);
 }
 
 class LedgerTransaction {
@@ -24,7 +35,7 @@ class LedgerTransaction {
   int index;
   int sequenceNumber;
   String redeemScript;
-  List<String> witnesses;
+  String witnesses;
 
   LedgerTransaction(this.version, this.txId, this.inputs, this.outputs, this.index, this.sequenceNumber, this.lockTime, this.redeemScript, this.witnesses);
 }
@@ -42,8 +53,14 @@ external void jellyLedgerInit();
 @JS('ledger.getAddress')
 external dynamic getAddress(String path, bool verify);
 
+@JS('ledger.signMessage')
+external String signMessageLedger(String path, String message);
+
 @JS('ledger.rawTxToPsbt')
 external String rawTxToPsbt(String hex, String network);
 
 @JS('ledger.signTransaction')
-external List<String> signTransaction(List<LedgerTransaction> transaction, List<String> paths, String newTx, String network);
+external String signTransactionLedger(List<LedgerTransaction> transaction, List<String> paths, String newTx, String network);
+
+@JS('ledger.signTransactionRaw')
+external String signTransactionLedgerRaw(List<LedgerTransactionRaw> transaction, List<String> paths, String newTx, String network);

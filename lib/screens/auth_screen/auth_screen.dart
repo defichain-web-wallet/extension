@@ -48,7 +48,7 @@ class AuthScreen extends StatelessWidget {
                     label: 'Ledger Setup',
                     callback: () async {
                       var box = await Hive.openBox(HiveBoxes.client);
-                      await box.put(HiveNames.openeLedger, null);
+                      await box.put(HiveNames.openedLedger, null);
                       await box.close();
                       Navigator.push(
                         context,

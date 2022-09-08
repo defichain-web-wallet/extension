@@ -10,7 +10,16 @@ export class LedgerTransaction {
     index: number;
     sequenceNumber: number;
     redeemScript: string;
-    witnesses: String[] = [];
+    witnesses: String;
+}
+
+
+export class LedgerTransactionRaw {
+    txId: string;
+    rawTx: string;
+
+    index: number;
+    redeemScript: string;
 }
 
 export class LedgerTransactionInput {
@@ -20,6 +29,7 @@ export class LedgerTransactionInput {
     tree?: string;
 
     index: number;
+    order: number;
 
 } 
 

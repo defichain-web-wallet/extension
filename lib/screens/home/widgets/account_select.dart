@@ -39,7 +39,7 @@ class AccountSelectState extends State<AccountSelect> {
 
   @override
   void dispose() {
-    hideOverlay();
+    // hideOverlay();
     super.dispose();
   }
 
@@ -53,70 +53,49 @@ class AccountSelectState extends State<AccountSelect> {
         return MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
-            child: Container(
-              key: _selectKey,
-              height: _tileHeight,
-              width: widget.width,
-              decoration: BoxDecoration(
-                color: Theme.of(context).appBarTheme.backgroundColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.shadowColor.withOpacity(0.1),
-                    spreadRadius: 2,
-                    blurRadius: 3,
-                  ),
-                ],
-                border: Border.all(
-                    color:
-                        Theme.of(context).textTheme.button!.decorationColor!),
-                borderRadius: _isOpen
-                    ? BorderRadius.only(
-                        topLeft: Radius.circular(10.0),
-                        topRight: Radius.circular(10.0))
-                    : BorderRadius.circular(10),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _isOpen ? 'Select account' : _activeAccount.name!,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.headline4!.apply(
-                              color: _isOpen
-                                  ? Theme.of(context)
-                                      .textTheme
-                                      .headline4!
-                                      .color!
-                                      .withOpacity(0.5)
-                                  : Theme.of(context)
-                                      .textTheme
-                                      .headline4!
-                                      .color!,
-                            ),
-                      ),
-                      Icon(
-                        _isOpen
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                        color: Theme.of(context)
-                            .appBarTheme
-                            .actionsIconTheme!
-                            .color,
-                      ),
-                    ],
+              child: Container(
+                key: _selectKey,
+                height: _tileHeight,
+                width: widget.width,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).appBarTheme.backgroundColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.shadowColor.withOpacity(0.1),
+                      spreadRadius: 2,
+                      blurRadius: 3,
+                    ),
+                  ],
+                  border: Border.all(color: Theme.of(context).textTheme.button!.decorationColor!),
+                  borderRadius: _isOpen ? BorderRadius.only(topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0)) : BorderRadius.circular(10),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _isOpen ? 'Select account' : _activeAccount.name!,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.headline4!.apply(
+                                color: _isOpen ? Theme.of(context).textTheme.headline4!.color!.withOpacity(0.5) : Theme.of(context).textTheme.headline4!.color!,
+                              ),
+                        ),
+                        Icon(
+                          _isOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                          color: Theme.of(context).appBarTheme.actionsIconTheme!.color,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            onTap: () async {
-              await lockHelper.provideWithLockChecker(context, () async {
-                _showOverlay(context, _accountList, _activeAccount, state);
-              });
-            }
-          ),
+              onTap: () async {
+                await lockHelper.provideWithLockChecker(context, () async {
+                  _showOverlay(context, _accountList, _activeAccount, state);
+                });
+              }),
         );
       } else {
         return Container();
@@ -131,18 +110,17 @@ class AccountSelectState extends State<AccountSelect> {
       } catch (_) {}
     }
     try {
-      setState(() {
-        _isOpen = false;
-      });
+      if (this.mounted)
+        setState(() {
+          _isOpen = false;
+        });
     } catch (error) {
       log(error.toString());
     }
   }
 
-  void _showOverlay(
-      BuildContext context, _accountList, _activeAccount, state) async {
-    AccountCubit accountCubit =
-      BlocProvider.of<AccountCubit>(context);
+  void _showOverlay(BuildContext context, _accountList, _activeAccount, state) async {
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     if (_isOpen) {
       hideOverlay();
     } else {
@@ -162,10 +140,7 @@ class AccountSelectState extends State<AccountSelect> {
             cursor: SystemMouseCursors.click,
             child: Container(
               width: box.size.width,
-              height: (_accountList.length > 5
-                      ? (_tileHeight) * 6
-                      : (_accountList.length + 1) * (_tileHeight)) +
-                  2,
+              height: (_accountList.length > 5 ? (_tileHeight) * 6 : (_accountList.length + 1) * (_tileHeight)) + 2,
               decoration: BoxDecoration(
                 color: Theme.of(context).appBarTheme.backgroundColor,
                 boxShadow: [
@@ -176,12 +151,8 @@ class AccountSelectState extends State<AccountSelect> {
                     offset: Offset(0, 3),
                   ),
                 ],
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(10.0),
-                    bottomRight: Radius.circular(10.0)),
-                border: Border.all(
-                    color:
-                        Theme.of(context).textTheme.button!.decorationColor!),
+                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10.0), bottomRight: Radius.circular(10.0)),
+                border: Border.all(color: Theme.of(context).textTheme.button!.decorationColor!),
               ),
               child: ListView.builder(
                 itemCount: _accountList.length + 1,
@@ -192,26 +163,17 @@ class AccountSelectState extends State<AccountSelect> {
                           padding: const EdgeInsets.all(0),
                           shadowColor: Colors.transparent,
                           primary: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10.0),
-                                  bottomRight: Radius.circular(10.0))),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10.0), bottomRight: Radius.circular(10.0))),
                           side: BorderSide(
                             color: Colors.transparent,
                           )),
                       child: Container(
                         height: _tileHeight,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10.0),
-                                bottomRight: Radius.circular(10.0))),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10.0), bottomRight: Radius.circular(10.0))),
                         child: Center(
                           child: Text(
                             '+ Create new account',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline4!
-                                .apply(color: AppTheme.pinkColor),
+                            style: Theme.of(context).textTheme.headline4!.apply(color: AppTheme.pinkColor),
                           ),
                         ),
                       ),
@@ -237,11 +199,7 @@ class AccountSelectState extends State<AccountSelect> {
                           )),
                       child: Container(
                         height: _tileHeight,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    color: Theme.of(context).dividerColor,
-                                    width: 1.0))),
+                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1.0))),
                         child: Padding(
                           padding: const EdgeInsets.only(left: 16, right: 8),
                           child: Row(

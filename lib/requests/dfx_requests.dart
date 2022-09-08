@@ -16,8 +16,7 @@ class DfxRequests {
 
   Future<String> signUp(AccountModel account) async {
     try {
-      dynamic data = dfxService.getAddressAndSignature(account);
-
+      dynamic data = await dfxService.getAddressAndSignature(account);
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/auth/signUp');
 
       final headers = {
@@ -40,7 +39,7 @@ class DfxRequests {
 
   Future<String> signIn(AccountModel account) async {
     try {
-      dynamic data = dfxService.getAddressAndSignature(account);
+      dynamic data = await dfxService.getAddressAndSignature(account);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/auth/signIn');
 
@@ -62,17 +61,13 @@ class DfxRequests {
     }
   }
 
-  Future<void> createUser(String email, String phone,
-      String accessToken) async {
+  Future<void> createUser(String email, String phone, String accessToken) async {
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/user');
 
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
-      };
+      final headers = {'Content-type': 'application/json', 'Authorization': 'Bearer $decryptedAccessToken'};
 
       final body = jsonEncode({
         'mail': email,
@@ -80,9 +75,7 @@ class DfxRequests {
       });
 
       final response = await http.put(url, headers: headers, body: body);
-
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   Future<Map<String, dynamic>> getUserDetails(String accessToken) async {
@@ -91,10 +84,7 @@ class DfxRequests {
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/user');
 
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
-      };
+      final headers = {'Content-type': 'application/json', 'Authorization': 'Bearer $decryptedAccessToken'};
 
       final response = await http.get(url, headers: headers);
 
@@ -108,24 +98,19 @@ class DfxRequests {
     }
   }
 
-  Future<List<AssetByFiatModel>> getAvailableAssets(
-      String accessToken) async {
+  Future<List<AssetByFiatModel>> getAvailableAssets(String accessToken) async {
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/asset');
 
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
-      };
+      final headers = {'Content-type': 'application/json', 'Authorization': 'Bearer $decryptedAccessToken'};
 
       final response = await http.get(url, headers: headers);
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
-        List<AssetByFiatModel> assets = List.generate(
-            data.length, (index) => AssetByFiatModel.fromJson(data[index]));
+        List<AssetByFiatModel> assets = List.generate(data.length, (index) => AssetByFiatModel.fromJson(data[index]));
         return assets;
       } else {
         throw Error.safeToString(response.statusCode);
@@ -135,17 +120,13 @@ class DfxRequests {
     }
   }
 
-  Future<void> saveBuyDetails(String iban, AssetByFiatModel asset,
-      String accessToken) async {
+  Future<void> saveBuyDetails(String iban, AssetByFiatModel asset, String accessToken) async {
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/buy');
 
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
-      };
+      final headers = {'Content-type': 'application/json', 'Authorization': 'Bearer $decryptedAccessToken'};
 
       final body = jsonEncode({
         'type': "Wallet",
@@ -154,32 +135,24 @@ class DfxRequests {
       });
 
       final response = await http.post(url, headers: headers, body: body);
-
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
-  Future<List<IbanModel>> getIbanList(
-      String accessToken) async {
+  Future<List<IbanModel>> getIbanList(String accessToken) async {
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/route');
 
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
-      };
+      final headers = {'Content-type': 'application/json', 'Authorization': 'Bearer $decryptedAccessToken'};
 
       final response = await http.get(url, headers: headers);
 
       if (response.statusCode == 200) {
         List<dynamic> dataBuy = jsonDecode(response.body)["buy"];
         List<dynamic> dataSell = jsonDecode(response.body)["sell"];
-        List<IbanModel> buyIbanList = List.generate(
-            dataBuy.length, (index) => IbanModel.fromJson(dataBuy[index]));
-        List<IbanModel> sellIbanList = List.generate(
-            dataSell.length, (index) => IbanModel.fromJson(dataSell[index]));
+        List<IbanModel> buyIbanList = List.generate(dataBuy.length, (index) => IbanModel.fromJson(dataBuy[index]));
+        List<IbanModel> sellIbanList = List.generate(dataSell.length, (index) => IbanModel.fromJson(dataSell[index]));
         buyIbanList.addAll(sellIbanList);
         return buyIbanList;
       } else {
@@ -196,10 +169,7 @@ class DfxRequests {
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/country');
 
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
-      };
+      final headers = {'Content-type': 'application/json', 'Authorization': 'Bearer $decryptedAccessToken'};
 
       final response = await http.get(url, headers: headers);
 
@@ -214,17 +184,13 @@ class DfxRequests {
     }
   }
 
-  Future<void> saveKycData(KycModel kyc,
-      String accessToken) async {
+  Future<void> saveKycData(KycModel kyc, String accessToken) async {
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/kyc/data');
 
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
-      };
+      final headers = {'Content-type': 'application/json', 'Authorization': 'Bearer $decryptedAccessToken'};
 
       final body = jsonEncode(kyc.toJson());
 
@@ -234,24 +200,19 @@ class DfxRequests {
     }
   }
 
-  Future<List<FiatModel>> getFiatList(
-      String accessToken) async {
+  Future<List<FiatModel>> getFiatList(String accessToken) async {
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/fiat');
 
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
-      };
+      final headers = {'Content-type': 'application/json', 'Authorization': 'Bearer $decryptedAccessToken'};
 
       final response = await http.get(url, headers: headers);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         List<dynamic> data = jsonDecode(response.body);
-        List<FiatModel> fiatList = List.generate(
-            data.length, (index) => FiatModel.fromJson(data[index]));
+        List<FiatModel> fiatList = List.generate(data.length, (index) => FiatModel.fromJson(data[index]));
         return fiatList;
       } else {
         throw Error.safeToString(response.statusCode);
@@ -261,17 +222,13 @@ class DfxRequests {
     }
   }
 
-  Future<Map> sell(String iban, FiatModel fiat,
-      String accessToken) async {
+  Future<Map> sell(String iban, FiatModel fiat, String accessToken) async {
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/sell');
 
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
-      };
+      final headers = {'Content-type': 'application/json', 'Authorization': 'Bearer $decryptedAccessToken'};
 
       final body = jsonEncode({
         'iban': iban,

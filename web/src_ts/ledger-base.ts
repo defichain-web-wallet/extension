@@ -16,20 +16,36 @@ import { SignP2SHTransactionArg } from "hw-app-dfi/lib/signP2SHTransaction";
 
 import { serializeTransaction } from "hw-app-dfi/lib/serializeTransaction";
 import { Transaction, TransactionInput, TransactionOutput } from "hw-app-dfi/lib/types";
-import { LedgerTransaction } from "./ledger_tx";
+import { LedgerTransaction, LedgerTransactionRaw } from "./ledger_tx";
 import * as defichainlib from "defichainjs-lib";
 import { buffer } from "stream/consumers";
+import { crypto } from "bitcoinjs-lib";
 
 export class JellyWalletLedger {
 
   async appLedgerDefichain(): Promise<AppDfi> {
-    const transport = await SpeculosTransport.open({ baseURL: "192.168.8.140:5000" });
-    //  const transport = await TransportWebUSB.create();
+    // const transport = await SpeculosTransport.open({ baseURL: "172.24.97.61:5000" });
+    const transport = await TransportWebUSB.create();
 
     listen((log) => console.log(log));
 
     const btc = new AppDfi(transport);
     return btc;
+  }
+
+  public async signMessage(path: string, message: string) {
+    try {
+
+      const appBtc = await this.appLedgerDefichain();
+      var result = await appBtc.signMessageNew(path, Buffer.from(message).toString("hex"));
+      var v = result['v'] + 27 + 4;
+      var signature = Buffer.from(v.toString(16) + result['r'] + result['s'], 'hex').toString('base64');
+      return signature;
+    }
+    catch (e) {
+      console.log(e);
+      return null;
+    }
   }
 
   public async getAddress(path: string, verify: boolean) {
@@ -48,7 +64,7 @@ export class JellyWalletLedger {
     }
   };
 
-  public async signTransaction(transaction: LedgerTransaction[], paths: string[], newTx: string, networkStr: string): Promise<string[]> {
+  public async signTransactionRaw(transaction: LedgerTransactionRaw[], paths: string[], newTx: string, networkStr: string): Promise<string> {
     const ledger = await this.appLedgerDefichain();
     const splitNewTx = await ledger.splitTransaction(newTx, true);
     const outputScriptHex = await ledger.serializeTransactionOutputs(splitNewTx).toString("hex");
@@ -57,13 +73,46 @@ export class JellyWalletLedger {
       [Transaction, number, string | null | undefined, number | null | undefined]
     > = [];
 
+    console.log(transaction);
+
+    for (var tx of transaction) {
+      var ledgerTransaction = await ledger.splitTransaction(tx.rawTx, true);
+
+      inputs.push([ledgerTransaction, tx.index, tx.redeemScript, void 0]);
+    }
+
+    const txOut = await ledger.createPaymentTransactionNew({
+      inputs: inputs,
+      associatedKeysets: paths,
+      outputScriptHex: outputScriptHex,
+      segwit: true,
+      additionals: ["bech32"],
+      transactionVersion: 2,
+      lockTime: 0,
+      useTrustedInputForSegwit: true
+    });
+
+    return txOut;
+  }
+
+  public async signTransaction(transaction: LedgerTransaction[], paths: string[], newTx: string, networkStr: string): Promise<string> {
+    const ledger = await this.appLedgerDefichain();
+    const splitNewTx = await ledger.splitTransaction(newTx, true);
+    const outputScriptHex = await ledger.serializeTransactionOutputs(splitNewTx).toString("hex");
+
+    var inputs: Array<
+      [Transaction, number, string | null | undefined, number | null | undefined]
+    > = [];
+
+    console.log(transaction);
+
     for (var tx of transaction) {
       var ledgerInputs: TransactionInput[] = [];
       var ledgerOutputs: TransactionOutput[] = [];
       var ledgerTransaction: Transaction;
 
 
-      tx.inputs.forEach(ins => {
+      for (var ins of tx.inputs.sort(function (a, b) { return a.order - b.order })) {
         var sequence = Buffer.allocUnsafe(4);
         sequence.writeUInt32LE(ins.sequence);
         var prevout = Buffer.from(ins.prevout, "hex");
@@ -81,8 +130,9 @@ export class JellyWalletLedger {
           sequence: sequence.reverse(),
           tree: ins.tree ? Buffer.from(ins.tree, "hex") : Buffer.alloc(0)
         });
-      });
-      tx.outputs.forEach(outs => {
+        console.log("add input " + ins.prevout + "@" + ins.index);
+      }
+      for (var outs of tx.outputs) {
         var amount = Buffer.allocUnsafe(8);
         amount.writeInt32LE(outs.amount & -1);
         amount.writeUInt32LE(Math.floor(outs.amount / 0x100000000), 4);
@@ -91,29 +141,11 @@ export class JellyWalletLedger {
           amount: amount,
           script: Buffer.from(outs.script, "hex")
         })
-      });
+      }
 
 
       var lock = Buffer.allocUnsafe(4);
       lock.writeUInt32LE(tx.lockTime);
-
-      var witness = Buffer.alloc(0);
-
-      if (tx.witnesses) {
-        var offset = 0;
-        var witnessLength = tx.witnesses.reduce((sum, w) => { return sum + w.length / 2 }, 0);
-        var buffer = Buffer.alloc(1 + tx.witnesses.length + witnessLength);
-
-        buffer.writeInt8(tx.witnesses.length, offset++);
-        tx.witnesses.forEach(w => {
-          buffer.writeInt8(w.length/2, offset++);
-          var witnessHex = Buffer.from(w, "hex");
-          witnessHex.copy(buffer, offset);
-          offset += witnessHex.length;
-        });
-
-        witness = buffer;
-      }
 
       var version = Buffer.allocUnsafe(4);
       version.writeInt32LE(tx.version);
@@ -127,39 +159,31 @@ export class JellyWalletLedger {
         nExpiryHeight: Buffer.alloc(0),
         nVersionGroupId: Buffer.alloc(0),
         timestamp: Buffer.alloc(0),
-        witness: witness
+        witness: Buffer.from(tx.witnesses, "hex")
       };
       console.log(ledgerTransaction);
-      inputs.push([ledgerTransaction, tx.index, void 0, void 0]);
+      inputs.push([ledgerTransaction, tx.index, tx.redeemScript, void 0]);
+
+      var inputTxBuffer = serializeTransaction(ledgerTransaction, true);
+      var inputTxid = crypto.hash256(inputTxBuffer).toString("hex");
+
+      if (inputTxid != tx.txId) {
+        ledgerTransaction.inputs = ledgerInputs.reverse();
+      }
     }
-    const segwit = true;
-    const signArg: SignP2SHTransactionArg = {
+
+    const txOut = await ledger.createPaymentTransactionNew({
       inputs: inputs,
       associatedKeysets: paths,
       outputScriptHex: outputScriptHex,
-      segwit: segwit,
+      segwit: true,
+      additionals: ["bech32"],
+      transactionVersion: 2,
       lockTime: 0,
-      sigHashType: 1,
-      transactionVersion: 4,
+      useTrustedInputForSegwit: true
+    });
 
-    };
-
-    
-    // const txOut = await ledger.createPaymentTransactionNew({
-    //   inputs: inputs,
-    //   associatedKeysets: paths,
-    //   outputScriptHex: outputScriptHex,
-    //   segwit: true,
-    //   additionals: ["bech32"],
-    //   transactionVersion: 4
-    // });
-
-    // console.log(txOut);
-
-     const ledgerSignatures = await ledger.signP2SHTransaction(signArg);
-     console.log(ledgerSignatures);
-
-    return ledgerSignatures;
+    return txOut;
   }
 
 

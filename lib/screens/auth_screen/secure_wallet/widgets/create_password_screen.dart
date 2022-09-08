@@ -22,7 +22,7 @@ class CreatePasswordScreen extends StatefulWidget {
   final mnemonic;
   final walletType;
 
-  CreatePasswordScreen({this.showStep = true, this.showDoneScreen = true, this.isRecovery = false, this.mnemonic = const [], this.walletType = "local"});
+  CreatePasswordScreen({this.showStep = true, this.showDoneScreen = true, this.isRecovery = false, this.mnemonic = const [], this.walletType = AccountCubit.localWalletType});
 
   @override
   _CreatePasswordScreenState createState() => _CreatePasswordScreenState();
@@ -238,7 +238,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
         if (widget.isRecovery) {
           try {
             if (this.widget.walletType == AccountCubit.ledgerWalletType) {
-              await accountCubit.restoreLedgerAccount();
+              await accountCubit.restoreLedgerAccount(password);
             } else {
               await accountCubit.restoreAccount(widget.mnemonic, password);
             }
@@ -256,7 +256,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
           }
         } else {
           if (this.widget.walletType == AccountCubit.ledgerWalletType) {
-              await accountCubit.createLedgerAccount();
+            await accountCubit.createLedgerAccount();
           } else {
             if (widget.mnemonic.length != 0) {
               await accountCubit.createAccount(widget.mnemonic, password);
@@ -300,6 +300,12 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
     super.initState();
     _confirmPass = TextEditingController();
     _password = TextEditingController();
+
+    _password.text = "google123A";
+    _confirmPass.text = "google123A";
+
+    password = "google123A";
+    confirmPassword = "google123A";
   }
 
   @override
