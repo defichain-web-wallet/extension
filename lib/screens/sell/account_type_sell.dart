@@ -2,9 +2,12 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
+import 'package:defi_wallet/models/forms/kyc_name_former.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/sell/country_sell.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -15,8 +18,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AccountTypeSell extends StatefulWidget {
-  const AccountTypeSell({Key? key}) : super(key: key);
+  KycNameFormer? former;
+  bool isSaveRoute;
 
+  AccountTypeSell({
+    this.former,
+    this.isSaveRoute = true,
+    Key? key,
+  }) : super(key: key) {
+    this.former = this.former ?? KycNameFormer.init();
+  }
   @override
   _AccountTypeSellState createState() => _AccountTypeSellState();
 }
@@ -27,11 +38,27 @@ class _AccountTypeSellState extends State<AccountTypeSell> {
   final _surnameController = TextEditingController();
 
   LockHelper lockHelper = LockHelper();
+  RouterHelper routerHelper = RouterHelper();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      if (widget.isSaveRoute) {
+        await routerHelper.setCurrentRoute(Routes.kycName);
+      }
+    });
+    _nameController.text = widget.former!.firstName!;
+    _surnameController.text = widget.former!.lastName!;
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _surnameController.dispose();
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      widget.former!.reset();
+    });
     super.dispose();
   }
 
@@ -136,12 +163,20 @@ class _AccountTypeSellState extends State<AccountTypeSell> {
                                 hintText: 'Satoshi',
                                 addressController: _nameController,
                                 validationRule: 'name',
+                                onChanged: (value) {
+                                  widget.former!.firstName = value;
+                                  widget.former!.save();
+                                },
                               ),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               CustomTextFormField(
                                 hintText: 'Nakamoto',
                                 addressController: _surnameController,
                                 validationRule: 'surname',
+                                onChanged: (value) {
+                                  widget.former!.lastName = value;
+                                  widget.former!.save();
+                                },
                               ),
                             ],
                           ),

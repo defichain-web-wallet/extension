@@ -3,12 +3,14 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/buy/iban_screen.dart';
 import 'package:defi_wallet/screens/buy/purchase_overview_screen.dart';
 import 'package:defi_wallet/screens/tokens/widgets/search_field.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -31,9 +33,18 @@ class _SearchBuyTokenState extends State<SearchBuyToken> {
   AssetByFiatModel? selectedAsset;
   TextEditingController _searchController = TextEditingController();
   TokensHelper tokenHelper = TokensHelper();
+  RouterHelper routerHelper = RouterHelper();
   int iterator = 0;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await routerHelper.setCurrentRoute(Routes.buy);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

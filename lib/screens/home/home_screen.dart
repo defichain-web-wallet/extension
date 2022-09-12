@@ -14,6 +14,7 @@ import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/wallet_details.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';

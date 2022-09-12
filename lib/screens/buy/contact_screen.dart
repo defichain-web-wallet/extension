@@ -1,8 +1,10 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/buy/tutorials/first_step_buy_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -26,9 +28,16 @@ class _ContactScreenState extends State<ContactScreen> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final DfxRequests dfxRequests = DfxRequests();
-  String countryCode = 'US';
-  String numberPrefix = '+1';
+  RouterHelper routerHelper = RouterHelper();
   bool isEnable = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await routerHelper.setCurrentRoute(Routes.kycContactBuy);
+    });
+  }
 
   @override
   void dispose() {

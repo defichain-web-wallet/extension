@@ -3,34 +3,29 @@ import 'dart:convert';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class SendFormer {
-  String? address;
-  String? amount;
-  String? token;
+class KycNameFormer {
+  String? firstName;
+  String? lastName;
 
-  SendFormer({
-    this.address = '',
-    this.amount = '0',
-    this.token = '',
+  KycNameFormer({
+    this.firstName = '',
+    this.lastName = '',
   });
 
-  SendFormer.init() {
-    this.address = '';
-    this.amount = '0';
-    this.token = '';
+  KycNameFormer.init() {
+    this.firstName = '';
+    this.lastName = '';
   }
 
-  SendFormer.fromJson(Map<String, dynamic> jsonModel) {
-    this.address = jsonModel["address"];
-    this.amount = jsonModel["amount"];
-    this.token = jsonModel["token"];
+  KycNameFormer.fromJson(Map<String, dynamic> jsonModel) {
+    this.firstName = jsonModel["firstName"];
+    this.lastName = jsonModel["lastName"];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data["address"] = this.address;
-    data["amount"] = this.amount;
-    data["token"] = this.token;
+    data["firstName"] = this.firstName;
+    data["lastName"] = this.lastName;
     return data;
   }
 

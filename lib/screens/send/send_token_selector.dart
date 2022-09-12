@@ -25,15 +25,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SendTokenSelector extends StatefulWidget {
-
   final String selectedAddress;
-  final SendFormer? former;
+  SendFormer? former;
+  bool isSaveRoute;
 
-  const SendTokenSelector({
-    Key? key,
-    this.former,
+  SendTokenSelector({
     this.selectedAddress = '',
-  }) : super(key: key);
+    this.former,
+    this.isSaveRoute = true,
+    Key? key,
+  }) : super(key: key) {
+    this.former = this.former ?? SendFormer.init();
+  }
   @override
   State<SendTokenSelector> createState() => _SendConfirmState();
 }
@@ -41,7 +44,6 @@ class SendTokenSelector extends StatefulWidget {
 class _SendConfirmState extends State<SendTokenSelector> {
   TokensHelper tokenHelper = TokensHelper();
   RouterHelper routerHelper = RouterHelper();
-  late SendFormer sendFormer;
   BalancesHelper balancesHelper = BalancesHelper();
   TransactionService transactionService = TransactionService();
   GlobalKey<AssetSelectState> _selectKeyFrom = GlobalKey<AssetSelectState>();
@@ -62,7 +64,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
     hideOverlay();
     super.dispose();
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
-      sendFormer.reset();
+      widget.former!.reset();
     });
   }
 
@@ -70,13 +72,18 @@ class _SendConfirmState extends State<SendTokenSelector> {
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
-      await routerHelper.setCurrentRoute(Routes.send);
-      if (widget.former != null) {
-        addressController.text = widget.former!.address ?? '';
-        _amountController.text = widget.former!.amount ?? '';
-        assetFrom = widget.former!.token ?? '';
+      if (widget.isSaveRoute) {
+        await routerHelper.setCurrentRoute(Routes.send);
       }
     });
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
+    addressController.text = widget.former!.address!;
+    _amountController.text = widget.former!.amount!;
+    assetFrom = widget.former!.token!;
+
+    assetFrom =
+        (assetFrom.isEmpty) ? accountCubit.state.activeToken! : assetFrom;
   }
 
   void hideOverlay() {
@@ -123,11 +130,6 @@ class _SendConfirmState extends State<SendTokenSelector> {
       BlocBuilder<AccountCubit, AccountState>(
         builder: (context, state) {
           if (state.status == AccountStatusList.success) {
-            print(widget.former);
-            assetFrom = (assetFrom.isEmpty ||
-                    (widget.former == null && widget.former!.token == null))
-                ? state.activeToken!
-                : assetFrom;
             List<String> assets = [];
             state.activeAccount!.balanceList!
                 .forEach((el) {
@@ -195,13 +197,11 @@ class _SendConfirmState extends State<SendTokenSelector> {
                               assets: assets,
                               assetFrom: assetFrom,
                               onSelect: (String asset) {
-                                print(1);
                                 widget.former!.token = asset;
                                 widget.former!.save();
                                 setState(() => {assetFrom = asset});
                               },
                               onChanged: (value) {
-                                print(2);
                                 widget.former!.amount = value;
                                 widget.former!.save();
                                 if (isFailed) {
@@ -223,6 +223,9 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   double amount =
                                       convertFromSatoshi(balance - fee);
                                   _amountController.text = amount.toString();
+
+                                  widget.former!.amount = amount.toString();
+                                  widget.former!.save();
                                 });
                               },
                               isFixedWidthAssetSelectorText: isCustomBgColor,

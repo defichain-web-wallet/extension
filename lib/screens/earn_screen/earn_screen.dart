@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -11,6 +12,7 @@ import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
 import 'package:defi_wallet/screens/staking/number_of_coins_to_stake.dart';
 import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -28,6 +30,8 @@ class EarnScreen extends StatefulWidget {
 }
 
 class _EarnScreenState extends State<EarnScreen> {
+  RouterHelper routerHelper = RouterHelper();
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +39,7 @@ class _EarnScreenState extends State<EarnScreen> {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await routerHelper.setCurrentRoute(Routes.earn);
       await stakingCubit.loadStakingRouteBalance(
           accountCubit.state.accessToken!,
           accountCubit.state.activeAccount!.addressList![0].address!);

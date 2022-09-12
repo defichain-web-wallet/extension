@@ -1,7 +1,6 @@
 class HiveBoxes {
   static const String client = 'client_box';
   static const String settings = 'settings_box';
-  static const String state = 'state';
 }
 
 class HiveNames {

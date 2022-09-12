@@ -7,6 +7,7 @@ import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/forms/swap_former.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
@@ -19,10 +20,8 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/models/test_pool_swap_model.dart';
 import 'package:defi_wallet/screens/dex/review_swap_screen.dart';
-import 'package:defi_wallet/screens/dex/swap_status.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -35,7 +34,14 @@ import './widgets/amount_selector_field.dart';
 import './widgets/swap_price_details.dart';
 
 class SwapScreen extends StatefulWidget {
-  const SwapScreen({Key? key}) : super(key: key);
+  SwapFormer? former;
+
+  SwapScreen({
+    this.former,
+    Key? key,
+  }) : super(key: key) {
+    this.former = this.former ?? SwapFormer.init();
+  }
 
   @override
   _SwapScreenState createState() => _SwapScreenState();
@@ -93,9 +99,14 @@ class _SwapScreenState extends State<SwapScreen> {
 
     tokensCubit.loadTokens();
 
-    WidgetsBinding.instance!.addPostFrameCallback((_){
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       routerHelper.setCurrentRoute(Routes.swap);
     });
+
+    amountFromController.text = widget.former!.amountFrom!;
+    amountToController.text = widget.former!.amountTo!;
+    assetFrom = widget.former!.assetFrom!;
+    assetTo = widget.former!.assetTo!;
   }
 
   @override
@@ -103,6 +114,10 @@ class _SwapScreenState extends State<SwapScreen> {
     focusTo.unfocus();
     focusFrom.unfocus();
     super.dispose();
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      widget.former!.reset();
+    });
   }
 
   @override
@@ -559,6 +574,8 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   onSelectFromAsset(asset, tokensState, accountState, dexCubit) {
+    widget.former!.assetFrom = asset;
+    widget.former!.save();
     tokensForSwap = tokensState.tokensForSwap[asset].cast<String>();
     assetTo = (assetTo.isEmpty || !tokensForSwap.contains(assetTo))
         ? tokensForSwap[0]
@@ -579,6 +596,8 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   onSelectToAsset(asset, tokensState, accountState, dexCubit) {
+    widget.former!.assetTo = asset;
+    widget.former!.save();
     setState(() => {assetTo = asset});
     if (assetFrom == assetTo) {
       amountFromController.text = amountToController.text;
@@ -596,6 +615,8 @@ class _SwapScreenState extends State<SwapScreen> {
 
   onChangeFromAsset(value, accountState, dexCubit, tokensState) {
     String valueFormat = value.replaceAll(',', '.');
+    widget.former!.amountFrom = valueFormat;
+    widget.former!.save();
     if (isFailed) {
       setState(() {
         isFailed = false;
@@ -610,6 +631,8 @@ class _SwapScreenState extends State<SwapScreen> {
 
   onChangeToAsset(value, accountState, dexCubit, tokensState) {
     String valueFormat = value.replaceAll(',', '.');
+    widget.former!.amountTo = valueFormat;
+    widget.former!.save();
     if (isFailed) {
       setState(() {
         isFailed = false;

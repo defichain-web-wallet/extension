@@ -7,6 +7,10 @@ enum Routes {
   buy,
   sell,
   earn,
+  kycContactBuy,
+  kycContactSell,
+  kycName,
+  kycCountry
 }
 
 extension ParseToString on Routes {

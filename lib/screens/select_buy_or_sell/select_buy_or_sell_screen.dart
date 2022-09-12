@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/helpers/router_helper.dart';
 import 'package:defi_wallet/screens/buy/contact_screen.dart';
 import 'package:defi_wallet/screens/buy/search_buy_token.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
@@ -9,6 +10,7 @@ import 'package:defi_wallet/screens/sell/account_type_sell.dart';
 import 'package:defi_wallet/screens/sell/selling.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/utils/routes.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -27,6 +29,7 @@ class SelectBuyOrSellScreen extends StatefulWidget {
 
 class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
   BalancesHelper balancesHelper = BalancesHelper();
+  RouterHelper routerHelper = RouterHelper();
 
   @override
   void initState() {
@@ -35,6 +38,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await routerHelper.setCurrentRoute(Routes.buySell);
       await fiatCubit.loadUserDetails(accountCubit.state.accessToken!);
     });
   }
