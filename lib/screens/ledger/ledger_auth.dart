@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/auth_screen/auth_screen.dart';
-import 'package:defi_wallet/screens/ledger/screens/ledger_congratulations.dart';
+import 'package:defi_wallet/screens/ledger/ledger_congratulations.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
@@ -52,7 +52,7 @@ class _LedgerAuthState extends State<LedgerAuth> {
   Widget build(BuildContext context) {
     //DEMONSTRATION
     print(widget.currentStatus);
-    Timer(Duration(seconds: 5), () {
+    Timer(Duration(seconds: 2), () {
       getUpdateStatus(widget.currentStatus);
     });
     // getUpdateStatus(widget.currentStatus);
@@ -190,31 +190,6 @@ class _LedgerAuthState extends State<LedgerAuth> {
                               ],
                             ),
                           ),
-                        // SizedBox(height: 20),
-                        // Row(
-                        //   mainAxisAlignment: MainAxisAlignment.center,
-                        //   children: [
-                        //     Text(
-                        //       'Do you need help? Join us on ',
-                        //       style: Theme.of(context).textTheme.subtitle1,
-                        //     ),
-                        //     InkWell(
-                        //       child: Text(
-                        //         'Telegram',
-                        //         style: AppTheme.defiUnderlineText,
-                        //       ),
-                        //       onTap: () =>
-                        //           ScaffoldMessenger.of(context).showSnackBar(
-                        //         SnackBar(
-                        //           content: Text(
-                        //             'Work in progress',
-                        //             style: TextStyle(color: Colors.black),
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
                       ],
                     ),
                   ],
@@ -283,31 +258,55 @@ class _LedgerAuthState extends State<LedgerAuth> {
       case 'loading-first':
         return Container(
           width: stepContentWidth,
-          child: Text(
-            loadingFirstText,
-            softWrap: true,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headline2,
+          child: Column(
+            children: [
+              Text(
+                loadingFirstText,
+                softWrap: true,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline2,
+              ),
+              Image.asset(
+                'assets/images/ledger_loading_light_gray.gif',
+                width: 180,
+              )
+            ],
           ),
         );
       case 'loading-second':
         return Container(
           width: stepContentWidth,
-          child: Text(
-            loadingSecondText,
-            softWrap: true,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headline2,
+          child: Column(
+            children: [
+              Text(
+                loadingSecondText,
+                softWrap: true,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline2,
+              ),
+              Image.asset(
+                'assets/images/ledger_loading_light_gray.gif',
+                width: 180,
+              )
+            ],
           ),
         );
       case 'loading-third':
         return Container(
           width: stepContentWidth,
-          child: Text(
-            loadingThirdText,
-            softWrap: true,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headline2,
+          child: Column(
+            children: [
+              Text(
+                loadingThirdText,
+                softWrap: true,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline2,
+              ),
+              Image.asset(
+                'assets/images/ledger_loading_light_gray.gif',
+                width: 180,
+              )
+            ],
           ),
         );
     }

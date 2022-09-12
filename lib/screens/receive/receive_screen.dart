@@ -105,7 +105,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                         ),
                       ),
                     ),
-                    Image.asset('assets/images/connection_dark_theme.gif', width: 100,),
                     Container(
                       child: Text(
                         'Address ${state.activeAccount.name}'.toUpperCase(),

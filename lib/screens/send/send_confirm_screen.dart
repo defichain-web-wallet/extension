@@ -7,6 +7,7 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/screens/ledger/ledger_confirm_send.dart';
 import 'package:defi_wallet/screens/send/send_status/send_status.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';

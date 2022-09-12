@@ -4,6 +4,9 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
+import 'package:defi_wallet/screens/ledger/ledger_confirm_send.dart';
+import 'package:defi_wallet/screens/ledger/ledger_confirm_send_btc.dart';
+import 'package:defi_wallet/screens/ledger/ledger_confirm_swap.dart';
 import 'package:defi_wallet/screens/send/widgets/address_field.dart';
 import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
@@ -218,7 +221,18 @@ class _SendConfirmState extends State<SendTokenSelector> {
                       ),
                       PrimaryButton(
                         label: 'Continue',
-                        callback: () => submitToConfirm(state, transactionState),
+                        // callback: () => submitToConfirm(state, transactionState),
+                        callback: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  LedgerConfirmSwap(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
