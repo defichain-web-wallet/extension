@@ -23,7 +23,7 @@ class BtcRequests {
   Future<List<UtxoModel>> getUTXOs({required AddressModel address}) async {
     List<UtxoModel> utxos = [];
     try {
-      final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'test3' : 'test3'}/addrs/${address.address}?unspentOnly=true');
+      final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'main' : 'test3'}/addrs/${address.address}?unspentOnly=true');
 
       final response = await http.get(url);
 
@@ -52,7 +52,7 @@ class BtcRequests {
 
   Future<NetworkFeeModel> getNetworkFee() async {
     try {
-      final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'test3' : 'test3'}');
+      final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'main' : 'test3'}');
 
       final response = await http.get(url);
 
@@ -69,7 +69,7 @@ class BtcRequests {
 
   Future<int> getBalance({required AddressModel address}) async {
     try {
-      final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'test3' : 'test3'}/addrs/${address.address}/balance');
+      final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'main' : 'test3'}/addrs/${address.address}/balance');
 
       final response = await http.get(url);
 
@@ -92,7 +92,7 @@ class BtcRequests {
   }
 
   Future<TxErrorModel> sendTxHex(String txHex) async {
-      String urlAddress = '$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'test3' : 'test3'}/txs/push';
+      String urlAddress = '$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'main' : 'test3'}/txs/push';
 
       final Uri _url = Uri.parse(urlAddress);
 
