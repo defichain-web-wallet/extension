@@ -9,13 +9,19 @@ import 'package:defi_wallet/models/tx_auth_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_response_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
+import 'package:defi_wallet/requests/btc_requests.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
 import 'package:defi_wallet/requests/token_requests.dart';
 import 'package:defi_wallet/requests/transaction_requests.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
+import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
+
+import 'package:bip32_defichain/bip32.dart' as bip32;
+import 'package:defichaindart/src/models/networks.dart' as networks;
 
 class TransactionService {
   static const DUST = 1000;
@@ -81,6 +87,51 @@ class TransactionService {
     }
 
     return response;
+  }
+  Future<String> createBTCTransaction({
+    required AccountModel account,
+    required String destinationAddress,
+    required int amount,
+    required int satPerByte}) async {
+    //romance portion fit sea price casual forward piano afraid erosion want replace excite figure place butter fortune empower rotate safe surface person distance simple
+    //https://api.blockcypher.com/v1/btc/test3/addrs/tb1qhwqqsktldqypttltr59px506p890ce0sgj0fe7?unspentOnly=true
+
+    var utxos = await BtcRequests().getUTXOs(address: account.bitcoinAddress!);
+    var fee = calculateBTCFee(2,2,satPerByte);
+    var selectedUtxo = _utxoSelector(utxos, fee, amount);
+    if (selectedUtxo.length > 2){
+      selectedUtxo = _utxoSelector(utxos, calculateBTCFee(2,selectedUtxo.length,satPerByte), amount);
+    }
+    final _txb = TransactionBuilder(
+        network: networks.testnet);
+    _txb.setVersion(2);
+    var amountUtxo = 0;
+    selectedUtxo.forEach((utxo) {
+      amount += utxo.value!;
+      _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: account.bitcoinAddress!.keyPair!.publicKey), network: networks.testnet).data!.output);
+    });
+
+    _txb.addOutput(destinationAddress, amount);
+    if(amountUtxo > amount+DUST){
+      _txb.addOutput(account.bitcoinAddress!.address, amountUtxo - amount);
+    }
+    selectedUtxo.asMap().forEach((index, utxo) {
+    _txb.sign(
+        vin: index,
+        keyPair: account.bitcoinAddress!.keyPair!,
+        witnessValue: utxo.value);
+    });
+
+    print(_txb.build().toHex());
+    return _txb.build().toHex();
+  }
+
+  int calculateBTCFee(int inputCount, int outputCount, int satPerByte){
+    int txBodySize = 10;
+    int txInputSize = 148;
+    int txOutputSize = 34;
+
+    return (txBodySize+inputCount*txInputSize+txOutputSize*outputCount)*satPerByte;
   }
 
   Future<TxErrorModel> createAndSendLiqudity(
