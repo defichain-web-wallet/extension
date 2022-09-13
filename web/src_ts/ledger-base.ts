@@ -24,8 +24,8 @@ import { crypto } from "bitcoinjs-lib";
 export class JellyWalletLedger {
 
   async appLedgerDefichain(): Promise<AppDfi> {
-    const transport = await SpeculosTransport.open({ baseURL: "172.24.233.207:5000" });
-    //const transport = await TransportWebUSB.create();
+    // const transport = await SpeculosTransport.open({ baseURL: "172.24.233.207:5000" });
+    const transport = await TransportWebUSB.create();
 
     listen((log) => console.log(log));
 

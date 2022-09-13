@@ -40,6 +40,15 @@ Where `/build/web` is directory with ready extension
     npm install
     npm run build
 
+## Test Ledger Speculos
+Start the Virtual Machine (TODO: Make a public virtual machine!)
+Run Speculos using this command
+   
+   SPECULOS_APPNAME=DeFiChain:2.3.1 ./speculos.py ~/ledger-app-builder/app-bitcoin-new/bin/app.elf --apdu-port 9999  -s "SEED_PHRASE" 
+
+Change the adapter in the ledger-base.ts to use the SpeculosTransport by uncommenting the code and change the ip address.
+Rebuild, and reload the app. 
+
 ## License & Disclaimer
 
 By using `Jellywallet extension` (this repo), you (the user) agree to be bound by [the terms of this license](LICENSE).
