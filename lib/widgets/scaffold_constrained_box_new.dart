@@ -9,6 +9,8 @@ class ScaffoldConstrainedBoxNew extends StatefulWidget {
 
   const ScaffoldConstrainedBoxNew({Key? key, this.child, this.appBar, this.hideOverlay}) : super(key: key);
 
+
+
   @override
   State<ScaffoldConstrainedBoxNew> createState() => _ScaffoldConstrainedBoxState();
 }

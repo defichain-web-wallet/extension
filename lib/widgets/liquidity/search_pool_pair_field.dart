@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,6 +32,14 @@ class _SearchPoolPairFieldState extends State<SearchPoolPairField> {
           textAlignVertical: TextAlignVertical.center,
           controller: widget.controller,
           decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppTheme.pinkColor),
+            ),
             isDense: true,
             hintText: 'Search for pool pairs',
             prefixIcon: Icon(

@@ -116,13 +116,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: Theme.of(context).cardColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).shadowColor,
-                          blurRadius: 2,
-                          spreadRadius: 2,
-                        )
-                      ],
                     ),
                     child: ListTile(
                       leading: IconHistoryType(

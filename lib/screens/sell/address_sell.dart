@@ -107,16 +107,19 @@ class _AddressSellState extends State<AddressSell> {
                           child: Column(
                             children: [
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 hintText: 'Street adress',
                                 addressController: _streetAdressController,
                               ),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 hintText: 'City',
                                 addressController: _cityController,
                               ),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 hintText: 'Zip code',
                                 addressController: _zipCodeController,
                               ),

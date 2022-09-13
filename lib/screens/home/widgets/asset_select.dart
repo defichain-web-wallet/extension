@@ -15,6 +15,7 @@ class AssetSelect extends StatefulWidget {
   bool isSmallText;
   bool isBorderRadiusAll;
   bool isTopPosition;
+  final bool isBorder;
 
   AssetSelect({
     Key? key,
@@ -26,6 +27,7 @@ class AssetSelect extends StatefulWidget {
     this.isSmallText = false,
     this.isBorderRadiusAll = false,
     this.isTopPosition = false,
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -50,13 +52,6 @@ class AssetSelectState extends State<AssetSelect> {
             height: _tileHeight,
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.shadowColor.withOpacity(0.5),
-                  blurRadius: 5,
-                  offset: Offset(-3, 3),
-                )
-              ],
               borderRadius: widget.isBorderRadiusAll
                   ? BorderRadius.only(
                       topLeft: _isOpen &&
@@ -64,33 +59,36 @@ class AssetSelectState extends State<AssetSelect> {
                               MediaQuery.of(context).size.width <
                                   ScreenSizes.medium
                           ? Radius.circular(0)
-                          : Radius.circular(14),
+                          : Radius.circular(10),
                       topRight: _isOpen &&
                               widget.isTopPosition == true &&
                               MediaQuery.of(context).size.width <
                                   ScreenSizes.medium
                           ? Radius.circular(0)
-                          : Radius.circular(14),
+                          : Radius.circular(10),
                       bottomLeft: _isOpen && widget.isTopPosition == false
                           ? Radius.circular(0)
-                          : _isOpen && widget.isTopPosition == true && MediaQuery.of(context).size.width >
-                          ScreenSizes.medium
+                          : _isOpen &&
+                                  widget.isTopPosition == true &&
+                                  MediaQuery.of(context).size.width >
+                                      ScreenSizes.medium
                               ? Radius.circular(0)
-                              : Radius.circular(14),
+                              : Radius.circular(10),
                       bottomRight: _isOpen && widget.isTopPosition == false
                           ? Radius.circular(0)
-                          : _isOpen && widget.isTopPosition == true && MediaQuery.of(context).size.width >
-                          ScreenSizes.medium
-                          ? Radius.circular(0)
-                          : Radius.circular(14),
+                          : _isOpen &&
+                                  widget.isTopPosition == true &&
+                                  MediaQuery.of(context).size.width >
+                                      ScreenSizes.medium
+                              ? Radius.circular(0)
+                              : Radius.circular(10),
                     )
                   : BorderRadius.only(
-                      topLeft: Radius.circular(14),
+                      topLeft: Radius.circular(10),
                       bottomLeft:
-                          _isOpen ? Radius.circular(0) : Radius.circular(14),
+                          _isOpen ? Radius.circular(0) : Radius.circular(10),
                     ),
-              border: Border.all(
-                  color: Theme.of(context).textTheme.button!.decorationColor!),
+              border: Border.all(color: widget.isBorder ? Theme.of(context).dividerColor : Colors.transparent),
             ),
             child: DropdownButtonHideUnderline(
               child: Padding(
@@ -107,25 +105,25 @@ class AssetSelectState extends State<AssetSelect> {
                           width: 24,
                         ),
                         SizedBox(width: 16),
-                        if(widget.isFixedWidthText)
+                        if (widget.isFixedWidthText)
                           TickerText(
                             child: Text(
                               tokenHelper
                                   .getTokenWithPrefix(widget.selectedToken),
                               overflow: TextOverflow.ellipsis,
                               style:
-                              Theme.of(context).textTheme.headline6!.apply(
-                                color: _isOpen
-                                    ? Theme.of(context)
-                                    .textTheme
-                                    .headline6!
-                                    .color!
-                                    .withOpacity(0.5)
-                                    : Theme.of(context)
-                                    .textTheme
-                                    .headline6!
-                                    .color!,
-                              ),
+                                  Theme.of(context).textTheme.headline6!.apply(
+                                        color: _isOpen
+                                            ? Theme.of(context)
+                                                .textTheme
+                                                .headline6!
+                                                .color!
+                                                .withOpacity(0.5)
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .headline6!
+                                                .color!,
+                                      ),
                             ),
                           )
                         else
@@ -136,19 +134,21 @@ class AssetSelectState extends State<AssetSelect> {
                                 tokenHelper
                                     .getTokenWithPrefix(widget.selectedToken),
                                 overflow: TextOverflow.ellipsis,
-                                style:
-                                Theme.of(context).textTheme.headline6!.apply(
-                                  color: _isOpen
-                                      ? Theme.of(context)
-                                      .textTheme
-                                      .headline6!
-                                      .color!
-                                      .withOpacity(0.5)
-                                      : Theme.of(context)
-                                      .textTheme
-                                      .headline6!
-                                      .color!,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .apply(
+                                      color: _isOpen
+                                          ? Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .color!
+                                              .withOpacity(0.5)
+                                          : Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .color!,
+                                    ),
                               ),
                             ),
                           )
@@ -234,28 +234,19 @@ class AssetSelectState extends State<AssetSelect> {
                   2,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.shadowColor.withOpacity(0.5),
-                    blurRadius: 5,
-                    offset:
-                        widget.isTopPosition && MediaQuery.of(context).size.width <
-                            ScreenSizes.medium ? Offset(-3, -3) : Offset(-3, 3),
-                  ),
-                ],
                 borderRadius: widget.isTopPosition &&
                         MediaQuery.of(context).size.width < ScreenSizes.medium
                     ? BorderRadius.only(
-                        topLeft: Radius.circular(14),
-                        topRight: Radius.circular(14),
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10),
                       )
                     : BorderRadius.only(
-                        bottomLeft: Radius.circular(14),
-                        bottomRight: Radius.circular(14),
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
                       ),
                 border: Border.all(
-                    color:
-                        Theme.of(context).textTheme.button!.decorationColor!),
+                  color: Theme.of(context).dividerColor,
+                ),
               ),
               child: ListView.separated(
                 itemCount: widget.tokensForSwap.length,
@@ -294,13 +285,13 @@ class AssetSelectState extends State<AssetSelect> {
                                             widget.tokensForSwap[index]),
                                         overflow: TextOverflow.ellipsis,
                                         style: widget.tokensForSwap[index] ==
-                                            widget.selectedToken
+                                                widget.selectedToken
                                             ? Theme.of(context)
-                                            .textTheme
-                                            .headline6!
+                                                .textTheme
+                                                .headline6!
                                             : Theme.of(context)
-                                            .textTheme
-                                            .headline5!),
+                                                .textTheme
+                                                .headline5!),
                                   )
                                 else
                                   Container(
@@ -311,13 +302,13 @@ class AssetSelectState extends State<AssetSelect> {
                                               widget.tokensForSwap[index]),
                                           overflow: TextOverflow.ellipsis,
                                           style: widget.tokensForSwap[index] ==
-                                              widget.selectedToken
+                                                  widget.selectedToken
                                               ? Theme.of(context)
-                                              .textTheme
-                                              .headline6!
+                                                  .textTheme
+                                                  .headline6!
                                               : Theme.of(context)
-                                              .textTheme
-                                              .headline5!),
+                                                  .textTheme
+                                                  .headline5!),
                                     ),
                                   )
                               ],

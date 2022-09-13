@@ -122,7 +122,7 @@ class _LiquidityPoolListState extends State<LiquidityPoolList> {
           }
 
           return Container(
-            color: Theme.of(context).dialogBackgroundColor,
+            color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
             padding: const EdgeInsets.only(bottom: 24),
             child: Center(
               child: isFullSize

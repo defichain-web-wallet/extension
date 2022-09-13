@@ -122,6 +122,7 @@ class _SearchBuyTokenState extends State<SearchBuyToken> {
                           ),
                           SizedBox(height: 8),
                           SearchField(
+                            isBorder: isCustomBgColor,
                             controller: _searchController,
                             onChanged: (value) {
                               FiatCubit fiat =

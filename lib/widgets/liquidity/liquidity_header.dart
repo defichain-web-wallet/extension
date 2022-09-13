@@ -13,28 +13,29 @@ class LiquidityHeader extends StatelessWidget {
   final List<dynamic>? assetPairs;
   final double? totalTokensBalance;
   final double? totalPairsBalance;
+  final bool isBorder;
 
-  const LiquidityHeader(
-      {Key? key,
-      this.allAssetPairs,
-      this.assetPairs,
-      this.totalTokensBalance,
-      this.totalPairsBalance})
-      : super(key: key);
+  const LiquidityHeader({
+    Key? key,
+    this.allAssetPairs,
+    this.assetPairs,
+    this.totalTokensBalance,
+    this.totalPairsBalance,
+    this.isBorder = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 18),
       decoration: BoxDecoration(
-        color: Theme.of(context).appBarTheme.backgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withOpacity(0.05),
-            spreadRadius: 2,
-            blurRadius: 3,
-          ),
-        ],
+        color: Theme.of(context).cardColor,
+        border: Border.all(
+          color: isBorder
+              ? Theme.of(context).dividerColor
+              : Colors.transparent,
+        ),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -79,33 +80,31 @@ class LiquidityDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     String fiat = SettingsHelper.settings.currency!;
 
-    return BlocBuilder<TokensCubit, TokensState>(
-      builder: (context, state) {
-        if (state.status == TokensStatusList.success) {
-          return Container(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label!,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline3!
-                        .apply(color: Color(0xFFBDBDBD))),
-                Padding(padding: const EdgeInsets.symmetric(vertical: 2)),
-                Text('${getBalanceFormat(balance!, state.eurRate, fiat)} $fiat',
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline2!
-                        .apply(fontSizeDelta: 3))
-              ],
-            ),
-          );
-        } else {
-          return Container();
-        }
+    return BlocBuilder<TokensCubit, TokensState>(builder: (context, state) {
+      if (state.status == TokensStatusList.success) {
+        return Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label!,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline3!
+                      .apply(color: Color(0xFFBDBDBD))),
+              Padding(padding: const EdgeInsets.symmetric(vertical: 2)),
+              Text('${getBalanceFormat(balance!, state.eurRate, fiat)} $fiat',
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline2!
+                      .apply(fontSizeDelta: 3))
+            ],
+          ),
+        );
+      } else {
+        return Container();
       }
-    );
+    });
   }
 
   String getBalanceFormat(balance, eurRate, fiat) {
@@ -162,9 +161,10 @@ class LiquidityProgressList extends StatelessWidget {
                     ),
                     Text(
                       '${toFixed(balancePercentage * 100, 2)} %',
-                      style: Theme.of(context).textTheme.headline2!.apply(
-                        color: Color(0xFFBDBDBD)
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline2!
+                          .apply(color: Color(0xFFBDBDBD)),
                     ),
                   ],
                 ),

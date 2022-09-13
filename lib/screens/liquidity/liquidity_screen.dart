@@ -131,7 +131,8 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
             });
 
             return Container(
-                color: Theme.of(context).dialogBackgroundColor,
+                color:
+                    isFullSize ? Theme.of(context).dialogBackgroundColor : null,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: Center(
@@ -143,6 +144,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                           Padding(
                             padding: const EdgeInsets.only(bottom: 18),
                             child: LiquidityHeader(
+                              isBorder: isFullSize,
                               allAssetPairs: tokensState.tokensPairs,
                               assetPairs: tokensPairsList,
                               totalTokensBalance: totalTokensBalance,
@@ -162,6 +164,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                                 var tokenPairs = List.from(foundedAssetPair)[0];
 
                                 return MainLiquidityPair(
+                                  isBorder: isFullSize,
                                   balance: tokensPairsList[index].balance,
                                   assetPair: tokenPairs,
                                 );

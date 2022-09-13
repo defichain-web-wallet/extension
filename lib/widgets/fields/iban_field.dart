@@ -11,6 +11,7 @@ class IbanField extends StatefulWidget {
   final Function()? onFocus;
   final String? hintText;
   final String maskFormat;
+  final bool isBorder;
 
 
   IbanField({
@@ -20,6 +21,7 @@ class IbanField extends StatefulWidget {
     this.onFocus,
     this.hintText,
     this.maskFormat = '',
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -63,13 +65,7 @@ class _IbanFieldState extends State<IbanField> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.shadowColor.withOpacity(0.1),
-                  spreadRadius: 2,
-                  blurRadius: 3,
-                ),
-              ],
+              border: Border.all(color: widget.isBorder ? Theme.of(context).dividerColor : Colors.transparent)
             ),
             child: Focus(
               onFocusChange: (focused) {

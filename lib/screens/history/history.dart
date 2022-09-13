@@ -61,10 +61,11 @@ class _HistoryState extends State<History> {
                   appBar: MainAppBar(
                       title: 'History',
                       action: Padding(
-                          padding: const EdgeInsets.only(right: 14),
-                          child: FilterList(
-                            onSelect: () {},
-                          )),
+                        padding: const EdgeInsets.only(right: 14),
+                        child: FilterList(
+                          onSelect: () {},
+                        ),
+                      ),
                       isShowBottom: !(state is TransactionInitialState),
                       height: !(state is TransactionInitialState)
                           ? toolbarHeightWithBottom
@@ -120,7 +121,8 @@ class _HistoryState extends State<History> {
                       .where((element) => element.type == 'AddPoolLiquidity');
                 } else if (state.historyFilterBy == 'remove liquidity') {
                   testnetFilteredList = state.activeAccount!.testnetHistoryList!
-                      .where((element) => element.type == 'RemovePoolLiquidity');
+                      .where(
+                          (element) => element.type == 'RemovePoolLiquidity');
                 } else if (state.historyFilterBy == 'account to utxos') {
                   testnetFilteredList = state.activeAccount!.testnetHistoryList!
                       .where((element) => element.type == 'AccountToUtxos');
@@ -144,11 +146,11 @@ class _HistoryState extends State<History> {
                   filteredList = state.activeAccount!.historyList!
                       .where((element) => element.category == 'PoolSwap');
                 } else if (state.historyFilterBy == 'add liquidity') {
-                  filteredList = state.activeAccount!.historyList!
-                      .where((element) => element.category == 'AddPoolLiquidity');
+                  filteredList = state.activeAccount!.historyList!.where(
+                      (element) => element.category == 'AddPoolLiquidity');
                 } else if (state.historyFilterBy == 'remove liquidity') {
-                  filteredList = state.activeAccount!.historyList!
-                      .where((element) => element.category == 'RemovePoolLiquidity');
+                  filteredList = state.activeAccount!.historyList!.where(
+                      (element) => element.category == 'RemovePoolLiquidity');
                 } else if (state.historyFilterBy == 'account to utxos') {
                   filteredList = state.activeAccount!.historyList!
                       .where((element) => element.category == 'AccountToUtxos');
@@ -239,13 +241,11 @@ class _HistoryState extends State<History> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       color: Theme.of(context).cardColor,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Theme.of(context).shadowColor,
-                                          blurRadius: 2,
-                                          spreadRadius: 2,
-                                        )
-                                      ],
+                                      border: Border.all(
+                                        color: isCustomBgColor
+                                            ? Theme.of(context).dividerColor
+                                            : Colors.transparent,
+                                      ),
                                     ),
                                     child: ListTile(
                                       leading: Container(

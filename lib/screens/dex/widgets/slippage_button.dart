@@ -5,12 +5,14 @@ class SlippageButton extends StatelessWidget {
   final String label;
   final bool isActive;
   final Function() callback;
+  final bool isBorder;
 
   const SlippageButton({
     Key? key,
     required this.label,
     required this.isActive,
     required this.callback,
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -20,8 +22,15 @@ class SlippageButton extends StatelessWidget {
       width: 30,
       child: TextButton(
         style: TextButton.styleFrom(
+          shadowColor: Colors.transparent,
           padding: const EdgeInsets.all(0),
           elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+            side: BorderSide(
+              color: isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+            ),
+          ),
           backgroundColor:
               isActive ? AppTheme.pinkColor : Theme.of(context).backgroundColor,
         ),

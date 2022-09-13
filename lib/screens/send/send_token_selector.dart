@@ -125,6 +125,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 style: Theme.of(context).textTheme.headline6),
                             SizedBox(height: 16),
                             AddressField(
+                              isBorder: isCustomBgColor,
                               addressController: addressController,
                               onChanged: (value) {
                                 if (isFailed) {
@@ -154,6 +155,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                             ),
                             SizedBox(height: 16),
                             AssetDropdown(
+                              isBorder: isCustomBgColor,
                               selectKeyFrom: _selectKeyFrom,
                               amountController: _amountController,
                               focusNode: _amountFocusNode,

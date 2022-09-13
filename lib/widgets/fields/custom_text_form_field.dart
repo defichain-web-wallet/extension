@@ -7,6 +7,7 @@ class CustomTextFormField extends StatelessWidget {
   final Function(String)? onChanged;
   final String? hintText;
   final String? validationRule;
+  final isBorder;
 
   const CustomTextFormField({
     Key? key,
@@ -14,22 +15,15 @@ class CustomTextFormField extends StatelessWidget {
     this.onChanged,
     this.hintText,
     this.validationRule,
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      // height: 46,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: AppTheme.shadowColor.withOpacity(0.1),
-        //     spreadRadius: 2,
-        //     blurRadius: 3,
-        //   ),
-        // ],
       ),
       child: TextFormField(
         textAlignVertical: TextAlignVertical.center,
@@ -40,7 +34,9 @@ class CustomTextFormField extends StatelessWidget {
             hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+              borderSide: BorderSide(
+                color: isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -62,10 +58,8 @@ class CustomTextFormField extends StatelessWidget {
                   ? "Enter min. 6 characters"
                   : null;
             case 'name':
-              return value == null || value.isEmpty
-                  ? "Enter your name"
-                  : null;
-              case 'surname':
+              return value == null || value.isEmpty ? "Enter your name" : null;
+            case 'surname':
               return value == null || value.isEmpty
                   ? "Enter your surname"
                   : null;

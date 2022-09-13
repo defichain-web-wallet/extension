@@ -17,6 +17,7 @@ class AssetDropdown extends StatelessWidget {
   final Function()? onAnotherSelect;
   final bool? isMaxOnly;
   final bool? isFixedWidthAssetSelectorText;
+  final bool isBorder;
 
   const AssetDropdown({
     Key? key,
@@ -33,6 +34,7 @@ class AssetDropdown extends StatelessWidget {
     this.onAnotherSelect,
     this.isFixedWidthAssetSelectorText = false,
     this.isMaxOnly = false,
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -41,6 +43,7 @@ class AssetDropdown extends StatelessWidget {
       children: [
         Expanded(
           child: AssetSelect(
+            isBorder: isBorder,
             onAnotherSelect: onAnotherSelect,
             key: selectKeyFrom,
             tokensForSwap: assets!,
@@ -51,6 +54,7 @@ class AssetDropdown extends StatelessWidget {
         ),
         Expanded(
           child: DecorationTextField(
+            isBorder: isBorder,
             controller: amountController,
             focusNode: focusNode,
             focusModel: focusModel,

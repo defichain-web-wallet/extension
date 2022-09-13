@@ -12,12 +12,14 @@ import 'package:flutter/material.dart';
 class MainLiquidityPair extends StatelessWidget {
   final AssetPairModel? assetPair;
   final int? balance;
+  final bool isBorder;
 
-  const MainLiquidityPair(
-      {Key? key,
-      this.assetPair,
-      this.balance})
-      : super(key: key);
+  const MainLiquidityPair({
+    Key? key,
+    this.assetPair,
+    this.balance,
+    this.isBorder = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -48,12 +50,14 @@ class MainLiquidityPair extends StatelessWidget {
                     context,
                     () => Navigator.push(
                           context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) => SelectPool(
-                                    assetPair: assetPair!,
-                                  ),
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                SelectPool(
+                              assetPair: assetPair!,
+                            ),
                             transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,),
+                            reverseTransitionDuration: Duration.zero,
+                          ),
                         )),
                 child: Icon(
                   Icons.add,
@@ -61,16 +65,28 @@ class MainLiquidityPair extends StatelessWidget {
                   color: AppTheme.pinkColor,
                 ),
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                  padding:
-                      MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(10)),
-                  minimumSize: MaterialStateProperty.all(Size(24, 30)),
+                  shadowColor:
+                      MaterialStateProperty.all<Color>(Colors.transparent),
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    Theme.of(context).dialogBackgroundColor,
+                  ),
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                    EdgeInsets.all(10),
+                  ),
+                  minimumSize: MaterialStateProperty.all(
+                    Size(24, 30),
+                  ),
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
+                    RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+                      ),
+                      borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(10),
-                        bottomLeft: Radius.circular(10)),
-                  )),
+                        bottomLeft: Radius.circular(10),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Padding(
@@ -78,31 +94,46 @@ class MainLiquidityPair extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () => lockHelper.provideWithLockChecker(
+                  context,
+                  () => Navigator.push(
                     context,
-                    () => Navigator.push(
-                          context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) => RemoveLiquidity(
-                                    assetPair: assetPair!,
-                                    balance: balance!,
-                                  ),  transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,),
-                        )),
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) =>
+                          RemoveLiquidity(
+                        assetPair: assetPair!,
+                        balance: balance!,
+                      ),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  ),
+                ),
                 child: Icon(
                   Icons.remove,
                   size: 16,
                   color: Colors.black,
                 ),
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                  padding:
-                      MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(10)),
-                  minimumSize: MaterialStateProperty.all(Size(24, 30)),
+                  shadowColor:
+                      MaterialStateProperty.all<Color>(Colors.transparent),
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    Theme.of(context).dialogBackgroundColor,
+                  ),
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                    EdgeInsets.all(10),
+                  ),
+                  minimumSize: MaterialStateProperty.all(
+                    Size(24, 30),
+                  ),
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+                    ),
                     borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(10),
-                        bottomRight: Radius.circular(10)),
+                      topRight: Radius.circular(10),
+                      bottomRight: Radius.circular(10),
+                    ),
                   )),
                 ),
               ),

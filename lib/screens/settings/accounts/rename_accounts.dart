@@ -72,6 +72,7 @@ class RenameAccounts extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         AccountNameTextForm(
+                          isBorder: isCustomBgColor,
                           initValue: accountList[index].name,
                           onConfirm: (text) {
                             accountList[index].name = text;

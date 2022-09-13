@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 class AccountNameTextForm extends StatefulWidget {
   final String? initValue;
   final void Function(String text)? onConfirm;
+  final bool isBorder;
 
-  const AccountNameTextForm({Key? key, this.initValue, this.onConfirm})
-      : super(key: key);
+  const AccountNameTextForm({
+    Key? key,
+    this.initValue,
+    this.onConfirm,
+    this.isBorder = false,
+  }) : super(key: key);
 
   @override
   _AccountNameTextFormState createState() =>
@@ -64,66 +69,74 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
     return MouseRegion(
       child: Material(
         elevation: 5,
-        shadowColor: AppTheme.shadowColor.withOpacity(0.1),
+        shadowColor: Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         child: GestureDetector(
+          onTap: () {},
           onDoubleTap: () {
             _focusNode.requestFocus();
             _textEditingController.selection = TextSelection(
                 baseOffset: 0,
                 extentOffset: _textEditingController.text.length);
           },
-          child: TextField(
-            autofocus: true,
-            textAlignVertical: TextAlignVertical.center,
-            style: Theme.of(context).textTheme.button,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Theme.of(context).cardColor,
-              hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(
-                    color:
-                        Theme.of(context).textTheme.button!.decorationColor!),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: showConfirmButton
+                    ? AppTheme.pinkColor
+                    : widget.isBorder
+                        ? Theme.of(context).dividerColor
+                        : Colors.transparent,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: showConfirmButton
-                    ? BorderSide(color: AppTheme.pinkColor)
-                    : BorderSide(
-                        color: Theme.of(context)
-                            .textTheme
-                            .button!
-                            .decorationColor!),
-              ),
-              suffixIcon: showConfirmButton
-                  ? IconButton(
-                      icon: Icon(Icons.done),
-                      iconSize: 20,
-                      color: AppTheme.pinkColor,
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
-                      onPressed: _onConfirm,
-                    )
-                  : (showEditButton
-                      ? IconButton(
-                          icon: Icon(Icons.edit),
-                          iconSize: 18,
-                          color: AppTheme.pinkColor,
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          onPressed: _onEdit,
-                        )
-                      : null),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+              color: Theme.of(context).cardColor,
             ),
-            focusNode: _focusNode,
-            controller: _textEditingController,
-            readOnly: !showConfirmButton,
-            onSubmitted: (value) => _onConfirm(),
+            child: TextField(
+              autofocus: false,
+              textAlignVertical: TextAlignVertical.center,
+              // style: Theme.of(context).textTheme.button,
+              decoration: InputDecoration(
+                filled: false,
+                fillColor: Theme.of(context).cardColor,
+                hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.transparent,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.transparent),
+                ),
+                suffixIcon: showConfirmButton
+                    ? IconButton(
+                        icon: Icon(Icons.done),
+                        iconSize: 20,
+                        color: AppTheme.pinkColor,
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        onPressed: _onConfirm,
+                      )
+                    : (showEditButton
+                        ? IconButton(
+                            icon: Icon(Icons.edit),
+                            iconSize: 18,
+                            color: AppTheme.pinkColor,
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            onPressed: _onEdit,
+                          )
+                        : null),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+              ),
+              focusNode: _focusNode,
+              controller: _textEditingController,
+              readOnly: !showConfirmButton,
+              onSubmitted: (value) => _onConfirm(),
+            ),
           ),
         ),
       ),

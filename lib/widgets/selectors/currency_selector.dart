@@ -9,6 +9,7 @@ class CurrencySelector extends StatefulWidget {
   final void Function(FiatModel) onSelect;
   List<FiatModel> currencies;
   void Function()? onAnotherSelect;
+  final bool isBorder;
 
   CurrencySelector({
     Key? key,
@@ -16,6 +17,7 @@ class CurrencySelector extends StatefulWidget {
     required this.onSelect,
     required this.currencies,
     this.onAnotherSelect,
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -57,13 +59,6 @@ class CurrencySelectorState extends State<CurrencySelector> {
               key: _selectKey,
               height: _tileHeight,
               decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.shadowColor.withOpacity(0.1),
-                    spreadRadius: 2,
-                    blurRadius: 3,
-                  ),
-                ],
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(10),
@@ -73,7 +68,11 @@ class CurrencySelectorState extends State<CurrencySelector> {
                   bottomLeft:
                       _isOpen ? Radius.circular(0) : Radius.circular(10),
                 ),
-                border: Border.all(color: Theme.of(context).dividerColor),
+                border: Border.all(
+                  color: widget.isBorder
+                      ? Theme.of(context).dividerColor
+                      : Colors.transparent,
+                ),
               ),
               child: DropdownButtonHideUnderline(
                 child: Padding(
@@ -158,7 +157,11 @@ class CurrencySelectorState extends State<CurrencySelector> {
                   bottomLeft: Radius.circular(10),
                   bottomRight: Radius.circular(10),
                 ),
-                border: Border.all(color: Theme.of(context).dividerColor),
+                border: Border.all(
+                  color: widget.isBorder
+                      ? Theme.of(context).dividerColor
+                      : Colors.transparent,
+                ),
               ),
               child: ListView.separated(
                 itemCount: widget.currencies.length,
@@ -189,19 +192,22 @@ class CurrencySelectorState extends State<CurrencySelector> {
                                       bottom: 12.0,
                                       left: 22,
                                       right: 22),
-                                  child: SvgPicture.asset(currencyLogoPathList[index]),
+                                  child: SvgPicture.asset(
+                                      currencyLogoPathList[index]),
                                 ),
                                 Text(
                                   widget.currencies[index].name!,
                                   overflow: TextOverflow.ellipsis,
-                                  style: widget.currencies[index].name == widget.selectedCurrency.name
+                                  style: widget.currencies[index].name ==
+                                          widget.selectedCurrency.name
                                       ? Theme.of(context).textTheme.headline2
                                       : Theme.of(context).textTheme.headline3,
                                 ),
                               ],
                             ),
                             SvgPicture.asset(
-                              widget.currencies[index].name == widget.selectedCurrency.name
+                              widget.currencies[index].name ==
+                                      widget.selectedCurrency.name
                                   ? 'assets/wallet_enable_pink.svg'
                                   : 'assets/wallet_disable.svg',
                               color: AppTheme.pinkColor,

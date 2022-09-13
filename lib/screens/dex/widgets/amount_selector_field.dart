@@ -17,6 +17,7 @@ class AmountSelectorField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool? isShow;
   final bool? isFixedWidthAssetSelectorText;
+  final bool isBorder;
 
   const AmountSelectorField({
     Key? key,
@@ -33,6 +34,7 @@ class AmountSelectorField extends StatelessWidget {
     this.suffixIcon,
     this.isShow,
     this.isFixedWidthAssetSelectorText = false,
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -51,6 +53,7 @@ class AmountSelectorField extends StatelessWidget {
               child: GestureDetector(
                 onTap: () {},
                 child: AssetSelect(
+                  isBorder: isBorder,
                   key: selectKey,
                   tokensForSwap: assets!,
                   selectedToken: selectedAsset!,
@@ -62,6 +65,7 @@ class AmountSelectorField extends StatelessWidget {
             ),
             Expanded(
               child: DecorationTextField(
+                  isBorder: isBorder,
                   controller: amountController,
                   focusNode: focusNode,
                   focusModel: focusModel,

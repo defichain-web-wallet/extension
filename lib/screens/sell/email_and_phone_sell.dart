@@ -121,12 +121,14 @@ class _EmailAndPhoneSellState extends State<EmailAndPhoneSell> {
                       child: Column(
                         children: [
                           CustomTextFormField(
+                            isBorder: isFullSize,
                             hintText: 'Email',
                             validationRule: 'email',
                             addressController: _emailController,
                           ),
                           Padding(padding: EdgeInsets.only(top: 10)),
                           CustomTextFormField(
+                            isBorder: isFullSize,
                             addressController: _phoneController,
                             hintText: 'Phone number (optional)',
                           ),

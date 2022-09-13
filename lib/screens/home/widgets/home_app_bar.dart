@@ -47,13 +47,17 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     LockHelper lockHelper = LockHelper();
 
     return AppBar(
+      shadowColor: Colors.transparent,
       bottom: isShowBottom ? OngoingTransaction() : null,
       shape: isSmall
           ? null
           : RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+              side: BorderSide(
+                color: Theme.of(context).dividerColor,
               ),
             ),
       automaticallyImplyLeading: false,

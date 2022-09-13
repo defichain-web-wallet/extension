@@ -6,9 +6,14 @@ import 'package:flutter/material.dart';
 class AddressField extends StatefulWidget {
   final TextEditingController? addressController;
   final Function(String)? onChanged;
+  final bool isBorder;
 
-  const AddressField({Key? key, this.addressController, this.onChanged})
-      : super(key: key);
+  const AddressField({
+    Key? key,
+    this.addressController,
+    this.onChanged,
+    this.isBorder = false,
+  }) : super(key: key);
 
   @override
   State<AddressField> createState() => _AddressFieldState();
@@ -16,6 +21,7 @@ class AddressField extends StatefulWidget {
 
 class _AddressFieldState extends State<AddressField> {
   bool isPinkIcon = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -23,13 +29,7 @@ class _AddressFieldState extends State<AddressField> {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 3,
-          ),
-        ],
+        // border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Focus(
         onFocusChange: (focused) {
@@ -44,10 +44,18 @@ class _AddressFieldState extends State<AddressField> {
             filled: true,
             fillColor: Theme.of(context).cardColor,
             hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+            // border: OutlineInputBorder(
+            //   borderRadius: BorderRadius.circular(10),
+            //   borderSide: BorderSide(
+            //     color: Theme.of(context).dividerColor,
+            //   ),
+            // ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                  color: Theme.of(context).textTheme.button!.decorationColor!),
+                color: widget.isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+                // color: Theme.of(context).dividerColor,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -61,7 +69,9 @@ class _AddressFieldState extends State<AddressField> {
               icon: Image(
                 image: isPinkIcon
                     ? AssetImage('assets/images/address_book_pink.png')
-                    : SettingsHelper.settings.theme == 'Light' ? AssetImage('assets/images/address_book_gray.png') : AssetImage('assets/images/address_book_white.png'),
+                    : SettingsHelper.settings.theme == 'Light'
+                        ? AssetImage('assets/images/address_book_gray.png')
+                        : AssetImage('assets/images/address_book_white.png'),
               ),
               onPressed: () {
                 Navigator.push(

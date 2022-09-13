@@ -208,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: ListView(
                   children: [
                     Container(
-                      color: Theme.of(context).dialogBackgroundColor,
+                      color: null,
                       child: Column(
                         children: [
                           Padding(
@@ -232,13 +232,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           decoration: BoxDecoration(
                             color:
                                 Theme.of(context).appBarTheme.backgroundColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.shadowColor.withOpacity(0.1),
-                                spreadRadius: 2,
-                                blurRadius: 3,
-                              ),
-                            ],
                           ),
                           child: TabBarHeader(
                             tabController: tabController,

@@ -184,6 +184,7 @@ class _SellingState extends State<Selling> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AmountSelectorField(
+                        isBorder: isCustomBgColor,
                         label: 'Your asset',
                         selectedAsset: assetFrom,
                         assets: assets,
@@ -237,6 +238,7 @@ class _SellingState extends State<Selling> {
                             Expanded(
                               child: Container(
                                 child: CurrencySelector(
+                                    isBorder: isCustomBgColor,
                                     onAnotherSelect: hideOverlay,
                                     currencies: fiatState.fiatList,
                                     key: _selectKeyCurrency,
@@ -268,11 +270,13 @@ class _SellingState extends State<Selling> {
                             child: widget.isNewIban ||
                                     fiatState.activeIban == null
                                 ? IbanField(
+                                    isBorder: isCustomBgColor,
                                     ibanController: _ibanController,
                                     hintText: 'DE89 37XX XXXX XXXX XXXX XX',
                                     maskFormat: 'AA## #### #### #### #### ##',
                                   )
                                 : IbanSelector(
+                                    isBorder: isCustomBgColor,
                                     key: selectKeyIban,
                                     onAnotherSelect: hideOverlay,
                                     routeWidget: Selling(
@@ -369,8 +373,8 @@ class _SellingState extends State<Selling> {
                                   IbanModel? foundedIban;
                                   try {
                                     foundedIban = fiatState.ibanList.firstWhere(
-                                            (el) =>
-                                        el.active &&
+                                        (el) =>
+                                            el.active &&
                                             el.type == "Sell" &&
                                             el.iban ==
                                                 fiatState.activeIban.iban &&
@@ -388,8 +392,7 @@ class _SellingState extends State<Selling> {
                                         accountState.accessToken);
                                     address = sellDetails["deposit"]["address"];
                                   } else {
-                                    address = foundedIban
-                                        .deposit["address"];
+                                    address = foundedIban.deposit["address"];
                                   }
                                   await _sendTransaction(
                                     context,

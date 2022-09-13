@@ -142,12 +142,14 @@ class _ContactScreenState extends State<ContactScreen> {
                           child: Column(
                             children: [
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 addressController: _emailController,
                                 validationRule: 'email',
                                 hintText: 'Email address (optional)',
                               ),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 addressController: _phoneController,
                                 hintText: 'Phone number (optional)',
                               ),

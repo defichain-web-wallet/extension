@@ -133,12 +133,14 @@ class _AccountTypeSellState extends State<AccountTypeSell> {
                           child: Column(
                             children: [
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 hintText: 'Satoshi',
                                 addressController: _nameController,
                                 validationRule: 'name',
                               ),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 hintText: 'Nakamoto',
                                 addressController: _surnameController,
                                 validationRule: 'surname',

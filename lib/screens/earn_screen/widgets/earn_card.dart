@@ -17,6 +17,7 @@ class EarnCard extends StatefulWidget {
   final bool? isCheckLockFirst;
   final bool? isCheckLockSecond;
   final bool? isSmall;
+  final bool isBorder;
 
   const EarnCard({
     Key? key,
@@ -34,8 +35,7 @@ class EarnCard extends StatefulWidget {
     this.isCheckLockFirst = true,
     this.isCheckLockSecond = true,
     this.isSmall = false,
-
-
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -57,14 +57,10 @@ class _EarnCardState extends State<EarnCard> {
         height: 180,
         decoration: BoxDecoration(
           color: Theme.of(context).appBarTheme.backgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.shadowColor.withOpacity(0.05),
-              spreadRadius: 2,
-              blurRadius: 3,
-            ),
-          ],
-          borderRadius: BorderRadius.circular(12.5),
+          border: Border.all(
+            color: widget.isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+          ),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -73,43 +69,47 @@ class _EarnCardState extends State<EarnCard> {
               children: [
                 Container(
                   margin: EdgeInsets.only(bottom: 10),
-                  child: widget.isSmall! ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          widget.smallTitleWidget,
-                          SizedBox(width: 6,),
-                          Text(
-                            widget.title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .apply(fontWeightDelta: 2),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        widget.balance + ' ' + widget.currency,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline5!
-                            .apply(fontWeightDelta: 2),
-                      )
-                    ],
-                  ) : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.title,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline5!
-                            .apply(fontWeightDelta: 2),
-                      ),
-                      widget.titleWidget,
-                    ],
-                  ),
+                  child: widget.isSmall!
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                widget.smallTitleWidget,
+                                SizedBox(
+                                  width: 6,
+                                ),
+                                Text(
+                                  widget.title,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .apply(fontWeightDelta: 2),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              widget.balance + ' ' + widget.currency,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .apply(fontWeightDelta: 2),
+                            )
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              widget.title,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .apply(fontWeightDelta: 2),
+                            ),
+                            widget.titleWidget,
+                          ],
+                        ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,23 +121,28 @@ class _EarnCardState extends State<EarnCard> {
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: widget.isSmall! ? [
-                        Text(
-                          widget.status,
-                          style: Theme.of(context).textTheme.headline4,
-                        ),
-                      ] : [
-                        Text(
-                          widget.balance + ' ' + widget.currency,
-                          style: Theme.of(context).textTheme.headline4,
-                        ),
-                        Text(
-                          widget.status,
-                          style: Theme.of(context).textTheme.headline4!.apply(
-                            fontSizeFactor: 0.8,
-                          ),
-                        ),
-                      ],
+                      children: widget.isSmall!
+                          ? [
+                              Text(
+                                widget.status,
+                                style: Theme.of(context).textTheme.headline4,
+                              ),
+                            ]
+                          : [
+                              Text(
+                                widget.balance + ' ' + widget.currency,
+                                style: Theme.of(context).textTheme.headline4,
+                              ),
+                              Text(
+                                widget.status,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline4!
+                                    .apply(
+                                      fontSizeFactor: 0.8,
+                                    ),
+                              ),
+                            ],
                     )
                   ],
                 ),

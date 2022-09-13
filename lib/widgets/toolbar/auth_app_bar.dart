@@ -38,8 +38,11 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? null
           : RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+              side: BorderSide(
+                color: Theme.of(context).dividerColor,
               ),
             ),
       toolbarHeight: toolbarHeight,
@@ -56,7 +59,8 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) => AuthScreen(),
+                        pageBuilder: (context, animation1, animation2) =>
+                            AuthScreen(),
                         transitionDuration: Duration.zero,
                         reverseTransitionDuration: Duration.zero,
                       ),

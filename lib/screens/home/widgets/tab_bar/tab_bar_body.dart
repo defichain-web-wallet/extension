@@ -29,9 +29,14 @@ class TabBarBody extends StatelessWidget {
       children: [
         Column(
           children: [
-            Expanded(child: AssetList()),
+            Expanded(
+              child: AssetList(
+              ),
+            ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(
+                vertical: 12,
+              ),
               child: TextButton(
                 child: Text(
                   ' +  Add token ',
@@ -39,16 +44,17 @@ class TabBarBody extends StatelessWidget {
                 ),
                 onPressed: () async {
                   await lockHelper.provideWithLockChecker(
+                    context,
+                    () => Navigator.push(
                       context,
-                      () => Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) =>
-                                  SearchToken(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),
-                          ));
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation1, animation2) =>
+                            SearchToken(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
@@ -56,7 +62,9 @@ class TabBarBody extends StatelessWidget {
         ),
         Column(
           children: [
-            Expanded(child: TransactionHistory()),
+            Expanded(
+              child: TransactionHistory(),
+            ),
             historyList.length > 0 || testnetHistoryList.length > 0
                 ? Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -68,17 +76,17 @@ class TabBarBody extends StatelessWidget {
                       ),
                       onPressed: () async {
                         await lockHelper.provideWithLockChecker(
+                          context,
+                          () => Navigator.push(
                             context,
-                            () => Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            History(),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                ));
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  History(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   )

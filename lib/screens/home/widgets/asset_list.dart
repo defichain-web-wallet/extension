@@ -12,6 +12,11 @@ import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 
 // ignore: must_be_immutable
 class AssetList extends StatelessWidget {
+
+  AssetList({
+    Key? key,
+  }) : super(key: key);
+
   TokensHelper tokenHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 
@@ -42,13 +47,6 @@ class AssetList extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: Theme.of(context).cardColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).shadowColor,
-                          blurRadius: 2,
-                          spreadRadius: 2,
-                        )
-                      ],
                     ),
                     child: ListTile(
                       leading: _buildTokenIcon(balances[index]),
@@ -60,9 +58,10 @@ class AssetList extends StatelessWidget {
                         getFormatTokenBalanceByFiat(
                             tokensState, coin, tokenBalance, currency),
                         style: Theme.of(context).textTheme.headline4!.apply(
-                          color: SettingsHelper.settings.theme == 'dark' ? Colors.white : Color(0xFF7D7D7D),
-                          fontSizeFactor: 0.9
-                        ),
+                            color: SettingsHelper.settings.theme == 'dark'
+                                ? Colors.white
+                                : Color(0xFF7D7D7D),
+                            fontSizeFactor: 0.9),
                       ),
                     ),
                   ),
@@ -102,8 +101,8 @@ class AssetList extends StatelessWidget {
       balanceInUsd = tokenHelper.getPairsAmountByAsset(
           state.tokensPairs, balanceInSatoshi, coin, 'USD');
     } else {
-      balanceInUsd = tokenHelper.getAmountByUsd(
-          state.tokensPairs, tokenBalance, coin);
+      balanceInUsd =
+          tokenHelper.getAmountByUsd(state.tokensPairs, tokenBalance, coin);
     }
     if (fiat == 'EUR') {
       balanceInUsd *= state.eurRate;

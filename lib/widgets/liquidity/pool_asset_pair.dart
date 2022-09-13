@@ -33,14 +33,11 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
         decoration: BoxDecoration(
           color: Theme.of(context).backgroundColor,
           borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor,
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ],
+          border: Border.all(
+            color: widget.isFullSize
+                ? Theme.of(context).dividerColor
+                : Colors.transparent,
+          ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -90,18 +87,19 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Yield',
-                            style: widget.isFullSize
-                                ? Theme.of(context)
-                                    .textTheme
-                                    .headline5
-                                    ?.apply(fontWeightDelta: 2)
-                                : Theme.of(context)
-                                    .textTheme
-                                    .headline4
-                                    ?.apply(fontWeightDelta: 2)),
                         Text(
-                            TokensHelper().getAprFormat(widget.assetPair.apr!),
+                          'Yield',
+                          style: widget.isFullSize
+                              ? Theme.of(context)
+                                  .textTheme
+                                  .headline5
+                                  ?.apply(fontWeightDelta: 2)
+                              : Theme.of(context)
+                                  .textTheme
+                                  .headline4
+                                  ?.apply(fontWeightDelta: 2),
+                        ),
+                        Text(TokensHelper().getAprFormat(widget.assetPair.apr!),
                             style: Theme.of(context).textTheme.headline4)
                       ],
                     ),

@@ -121,6 +121,7 @@ class _EarnScreenState extends State<EarnScreen> {
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
                                     EarnCard(
+                                      isBorder: isFullSize,
                                       title: 'STAKING',
                                       titleWidget: Row(
                                         children: [
@@ -156,6 +157,7 @@ class _EarnScreenState extends State<EarnScreen> {
                                       width: 20,
                                     ),
                                     EarnCard(
+                                      isBorder: isFullSize,
                                       title: 'LIQUIDITY MINING',
                                       titleWidget: AssetPair(
                                         pair: 'BTC-DFI',
