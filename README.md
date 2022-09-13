@@ -35,6 +35,11 @@ Where `/build/web` is directory with ready extension
 ## Debug
     flutter run -d chrome --no-sound-null-safety
 
+## Build JS
+    cd web
+    npm install
+    npm run build
+
 ## License & Disclaimer
 
 By using `Jellywallet extension` (this repo), you (the user) agree to be bound by [the terms of this license](LICENSE).

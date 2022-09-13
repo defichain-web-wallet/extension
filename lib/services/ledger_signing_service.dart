@@ -23,7 +23,7 @@ class LedgerSigningService implements SigningWalletService {
   }
 
   @override
-  Future<String> signTransaction(TransactionBuilder txBuilder, AccountModel accountModel, List<UtxoModel> utxoModel, String network) async {
+  Future<String> signTransaction(TransactionBuilder txBuilder, AccountModel accountModel, List<UtxoModel> utxoModel, String network, String changePath) async {
     var prevOuts = List<LedgerTransactionRaw>.empty(growable: true);
     var paths = List<String>.empty(growable: true);
 
@@ -58,7 +58,7 @@ class LedgerSigningService implements SigningWalletService {
     final tx = txBuilder.buildIncomplete();
     final txhex = tx.toHex();
 
-    var txHex = await promiseToFuture(signTransactionLedgerRaw(prevOuts, paths, txhex, network));
+    var txHex = await promiseToFuture(signTransactionLedgerRaw(prevOuts, paths, txhex, network, changePath));
     return txHex;
   }
 

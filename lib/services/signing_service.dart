@@ -12,7 +12,7 @@ import 'package:hive/hive.dart';
 abstract class SigningWalletService {
   Future<Uint8List> getPublicKey(AccountModel accountModel, String address, String network);
 
-  Future<String> signTransaction(TransactionBuilder txBuilder, AccountModel accountModel, List<UtxoModel> utxoModel, String network);
+  Future<String> signTransaction(TransactionBuilder txBuilder, AccountModel accountModel, List<UtxoModel> utxoModel, String network, String changePath);
 
   Future<String> signMessage(AccountModel accountModel, String address, String message, String network);
 }

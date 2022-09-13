@@ -24,8 +24,8 @@ import { crypto } from "bitcoinjs-lib";
 export class JellyWalletLedger {
 
   async appLedgerDefichain(): Promise<AppDfi> {
-    // const transport = await SpeculosTransport.open({ baseURL: "172.24.97.61:5000" });
-    const transport = await TransportWebUSB.create();
+    const transport = await SpeculosTransport.open({ baseURL: "172.24.233.207:5000" });
+    //const transport = await TransportWebUSB.create();
 
     listen((log) => console.log(log));
 
@@ -64,7 +64,7 @@ export class JellyWalletLedger {
     }
   };
 
-  public async signTransactionRaw(transaction: LedgerTransactionRaw[], paths: string[], newTx: string, networkStr: string): Promise<string> {
+  public async signTransactionRaw(transaction: LedgerTransactionRaw[], paths: string[], newTx: string, networkStr: string, changePath: string): Promise<string> {
     const ledger = await this.appLedgerDefichain();
     const splitNewTx = await ledger.splitTransaction(newTx, true);
     const outputScriptHex = await ledger.serializeTransactionOutputs(splitNewTx).toString("hex");
@@ -72,8 +72,6 @@ export class JellyWalletLedger {
     var inputs: Array<
       [Transaction, number, string | null | undefined, number | null | undefined]
     > = [];
-
-    console.log(transaction);
 
     for (var tx of transaction) {
       var ledgerTransaction = await ledger.splitTransaction(tx.rawTx, true);
@@ -89,7 +87,8 @@ export class JellyWalletLedger {
       additionals: ["bech32"],
       transactionVersion: 2,
       lockTime: 0,
-      useTrustedInputForSegwit: true
+      useTrustedInputForSegwit: true,
+      changePath: changePath
     });
 
     return txOut;

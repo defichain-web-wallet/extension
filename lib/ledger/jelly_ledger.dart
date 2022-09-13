@@ -63,4 +63,4 @@ external String rawTxToPsbt(String hex, String network);
 external String signTransactionLedger(List<LedgerTransaction> transaction, List<String> paths, String newTx, String network);
 
 @JS('ledger.signTransactionRaw')
-external String signTransactionLedgerRaw(List<LedgerTransactionRaw> transaction, List<String> paths, String newTx, String network);
+external String signTransactionLedgerRaw(List<LedgerTransactionRaw> transaction, List<String> paths, String newTx, String network, String changePath);

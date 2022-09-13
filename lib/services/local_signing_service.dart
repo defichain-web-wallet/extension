@@ -17,7 +17,7 @@ class LocalSigningService implements SigningWalletService {
   }
 
   @override
-  Future<String> signTransaction(TransactionBuilder txBuilder, AccountModel accountModel, List<UtxoModel> utxoModel, String network) async {
+  Future<String> signTransaction(TransactionBuilder txBuilder, AccountModel accountModel, List<UtxoModel> utxoModel, String network, String changePath) async {
     for (var utxo in utxoModel) {
       var privateKey = await _hdWalletService.getPrivateKey(accountModel, utxo.address!, network);
       txBuilder.sign(vin: utxo.mintIndex!, keyPair: privateKey, witnessValue: utxo.value);

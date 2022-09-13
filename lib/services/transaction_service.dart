@@ -559,7 +559,7 @@ class TransactionService {
       await additional(_txb, networkHelper.getNetwork(SettingsHelper.settings.network!), newUTXO);
     }
 
-    var txHex = await signingService.signTransaction(_txb, account, selectedUTXO, SettingsHelper.settings.network!);
+    var txHex = await signingService.signTransaction(_txb, account, selectedUTXO, SettingsHelper.settings.network!, changeAddress);
 
     TxResponseModel responseModel = TxResponseModel(hex: txHex, usingUTXO: selectedUTXO, newUTXO: newUTXO, isError: false, amount: amount);
     return responseModel;
