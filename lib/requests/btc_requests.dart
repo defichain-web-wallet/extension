@@ -5,6 +5,7 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
+import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
@@ -48,6 +49,44 @@ class BtcRequests {
     return utxos;
   }
 
+  Future<List<dynamic>> getTransactionHistory({required AddressModel address}) async {
+    try {
+      final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'test3' : 'test3'}/addrs/${address.address}');
+
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        dynamic data = jsonDecode(response.body)['txrefs'];
+        Map<String, HistoryModel> txs = {};
+        data.forEach((tx){
+          if(txs[tx['tx_hash']] == null){
+            txs[tx['tx_hash']] = HistoryModel(
+                value: tx['tx_input_n'] < 0 ?  tx['value'] : -1 * tx['value'],
+                txid: tx['tx_hash'],
+                blockTime: tx['confirmed']);
+          } else {
+            txs[tx['tx_hash']]!.value = (txs[tx['tx_hash']]!.value! + (tx['tx_input_n'] < 0 ? tx['value'] : -1 * tx['value'])).toInt();
+          }
+        });
+        
+        var txList = txs.values.toList();
+        txList.forEach((tx){
+          if(tx.value! > 0){
+            tx.type = 'vin';
+            tx.isSend = false;
+          } else {
+            tx.type = 'vout';
+            tx.isSend = true;
+          }
+        });
+        return [txList, 'done'];
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
 
 
   Future<NetworkFeeModel> getNetworkFee() async {
