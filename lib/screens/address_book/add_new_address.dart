@@ -1,9 +1,13 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/address_book.dart';
 import 'package:defi_wallet/screens/send/send_token_selector.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
+import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -50,89 +54,161 @@ class _AddNewAddressState extends State<AddNewAddress> {
       }
       counter++;
     }
-    return ScaffoldConstrainedBoxNew(
-      appBar: MainAppBar(
-        title: 'Add new address',
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: Text(
-                    'Name:',
-                    style: Theme.of(context).textTheme.headline2,
-                  ),
-                ),
-                TextFormField(
-                  onFieldSubmitted: (value) => _focusNode.requestFocus(),
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(20),
-                  ],
-                  controller: nameController,
-                  onChanged: (value) => checkButtonStatus(),
-                  validator: (value) {
-                    if (nameController.text.length > 3) {
-                      return null;
-                    } else {
-                      return 'Must be at least 3 characters';
-                    }
-                  },
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: Text(
-                    'Address:',
-                    style: Theme.of(context).textTheme.headline2,
-                  ),
-                ),
-                TextFormField(
-                  focusNode: _focusNode,
-                  onFieldSubmitted: (value) => saveButtonValidation(),
-                  controller: addressController,
-                  onChanged: (value) async {
-                    checkButtonStatus();
-                    isValidAddress = await addressHelper
-                        .validateAddress(addressController.text);
-                  },
-                  validator: (value) {
-                    if (widget.address != addressController.text) {
-                      if (isValidAddress) {
-                        return null;
-                      } else {
-                        return 'Invalid address';
-                      }
-                    } else {
-                      return null;
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: PrimaryButton(
-                  label: 'Save',
-                  isCheckLock: false,
-                  callback: isEnable ? saveButtonValidation : null,
-                ),
+    return ScaffoldConstrainedBox(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < ScreenSizes.medium) {
+            return Scaffold(
+              appBar: MainAppBar(
+                title: 'Add new address',
               ),
-            ],
-          )
-        ],
+              body: _buildBody(),
+            );
+          } else {
+            return Container(
+              padding: const EdgeInsets.only(top: 20),
+              child: Scaffold(
+                appBar: MainAppBar(
+                  title: 'Add new address',
+                  isSmall: true,
+                ),
+                body: _buildBody(isFullSize: true),
+              ),
+            );
+          }
+        },
       ),
     );
   }
+
+  Widget _buildBody({isFullSize = false}) => Container(
+        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        padding:
+            const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+        child: Center(
+          child: StretchBox(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Text(
+                          'Name:',
+                          style: Theme.of(context).textTheme.headline2,
+                        ),
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Theme.of(context).cardColor,
+                          hoverColor:
+                          Theme.of(context).inputDecorationTheme.hoverColor,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: isFullSize
+                                  ? Theme.of(context).dividerColor
+                                  : Colors.transparent,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: AppTheme.pinkColor),
+                          ),
+                          contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 10),
+                          hintStyle: TextStyle(fontSize: 14),
+                        ),
+                        onFieldSubmitted: (value) => _focusNode.requestFocus(),
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(20),
+                        ],
+                        controller: nameController,
+                        onChanged: (value) => checkButtonStatus(),
+                        validator: (value) {
+                          if (nameController.text.length > 3) {
+                            return null;
+                          } else {
+                            return 'Must be at least 3 characters';
+                          }
+                        },
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Text(
+                          'Address:',
+                          style: Theme.of(context).textTheme.headline2,
+                        ),
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Theme.of(context).cardColor,
+                          hoverColor:
+                              Theme.of(context).inputDecorationTheme.hoverColor,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: isFullSize
+                                  ? Theme.of(context).dividerColor
+                                  : Colors.transparent,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: AppTheme.pinkColor),
+                          ),
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 10),
+                          hintStyle: TextStyle(fontSize: 14),
+                        ),
+                        focusNode: _focusNode,
+                        onFieldSubmitted: (value) => saveButtonValidation(),
+                        controller: addressController,
+                        onChanged: (value) async {
+                          checkButtonStatus();
+                          isValidAddress = await addressHelper
+                              .validateAddress(addressController.text);
+                        },
+                        validator: (value) {
+                          if (widget.address != addressController.text) {
+                            if (isValidAddress) {
+                              return null;
+                            } else {
+                              return 'Invalid address';
+                            }
+                          } else {
+                            return null;
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: PrimaryButton(
+                        label: 'Save',
+                        isCheckLock: false,
+                        callback: isEnable ? saveButtonValidation : null,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      );
 
   checkButtonStatus() {
     setState(() {
