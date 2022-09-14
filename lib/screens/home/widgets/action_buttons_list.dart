@@ -1,3 +1,4 @@
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -19,6 +20,7 @@ class ActionButtonsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     var receiveCallback = () async {
       hideOverlay();
       Navigator.push(
@@ -33,6 +35,19 @@ class ActionButtonsList extends StatelessWidget {
 
     var sendCallback = () {
       hideOverlay();
+      // if (SettingsHelper.isBitcoin() &&
+      //     bitcoinCubit.state.status == BitcoinStatusList.failure) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text(
+      //         'Failed',
+      //         style: Theme.of(context).textTheme.headline5,
+      //       ),
+      //       backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+      //     ),
+      //   );
+      //   return;
+      // }
       Navigator.push(
         context,
         PageRouteBuilder(

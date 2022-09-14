@@ -27,159 +27,161 @@ class _WalletDetailsState extends State<WalletDetails> {
 
   @override
   Widget build(BuildContext context) {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-
     return BlocBuilder<TokensCubit, TokensState>(
       builder: (context, tokensState) {
-        return BlocBuilder<AccountCubit, AccountState>(
-            builder: (context, state) {
-          if (state.status == AccountStatusList.success &&
-              tokensState.status == TokensStatusList.success) {
-            late double totalBalance;
-            late double totalBalanceInFiat;
-            if (SettingsHelper.isBitcoin()) {
-              activeAsset = AssetList.btc;
-              totalBalance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
-              totalBalanceInFiat = tokensHelper.getAmountByUsd(
-                tokensState.tokensPairs!,
-                totalBalance,
-                'BTC',
-              );
-              if (SettingsHelper.settings.currency == 'EUR') {
-                totalBalanceInFiat *= tokensState.eurRate!;
-              }
-            } else {
-              totalBalance = state.activeAccount!.balanceList!
-                  .where((el) => !el.isHidden!)
-                  .map<double>((e) {
-                if (!e.isPair!) {
-                  if (activeAsset == AssetList.fiat) {
-                    return tokensHelper.getAmountByUsd(
-                      tokensState.tokensPairs!,
-                      convertFromSatoshi(e.balance!),
-                      e.token!,
-                    );
-                  } else if (activeAsset == AssetList.dfi) {
-                    return tokensHelper.getAmountByDfi(
-                      tokensState.tokensPairs!,
-                      convertFromSatoshi(e.balance!),
-                      e.token!,
-                    );
-                  } else {
-                    return tokensHelper.getAmountByBtc(
-                      tokensState.tokensPairs!,
-                      convertFromSatoshi(e.balance!),
-                      e.token!,
-                    );
-                  }
-                } else {
-                  double balanceInSatoshi = double.parse(e.balance!.toString());
-                  if (activeAsset == AssetList.fiat) {
-                    return tokensHelper.getPairsAmountByAsset(
-                        tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'USD');
-                  } else if (activeAsset == AssetList.dfi) {
-                    return tokensHelper.getPairsAmountByAsset(
-                        tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'DFI');
-                  } else {
-                    return tokensHelper.getPairsAmountByAsset(
-                        tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'BTC');
-                  }
-                }
-              }).reduce((value, element) => value + element);
-            }
+        return BlocBuilder<BitcoinCubit, BitcoinState>(
+          builder: (context, bitcoinState) {
+            return BlocBuilder<AccountCubit, AccountState>(
+                builder: (context, state) {
+                  if (state.status == AccountStatusList.success &&
+                      tokensState.status == TokensStatusList.success) {
+                    late double totalBalance;
+                    late double totalBalanceInFiat;
+                    if (SettingsHelper.isBitcoin()) {
+                      activeAsset = AssetList.btc;
+                      totalBalance = convertFromSatoshi(bitcoinState.totalBalance);
+                      totalBalanceInFiat = tokensHelper.getAmountByUsd(
+                        tokensState.tokensPairs!,
+                        totalBalance,
+                        'BTC',
+                      );
+                      if (SettingsHelper.settings.currency == 'EUR') {
+                        totalBalanceInFiat *= tokensState.eurRate!;
+                      }
+                    } else {
+                      totalBalance = state.activeAccount!.balanceList!
+                          .where((el) => !el.isHidden!)
+                          .map<double>((e) {
+                        if (!e.isPair!) {
+                          if (activeAsset == AssetList.fiat) {
+                            return tokensHelper.getAmountByUsd(
+                              tokensState.tokensPairs!,
+                              convertFromSatoshi(e.balance!),
+                              e.token!,
+                            );
+                          } else if (activeAsset == AssetList.dfi) {
+                            return tokensHelper.getAmountByDfi(
+                              tokensState.tokensPairs!,
+                              convertFromSatoshi(e.balance!),
+                              e.token!,
+                            );
+                          } else {
+                            return tokensHelper.getAmountByBtc(
+                              tokensState.tokensPairs!,
+                              convertFromSatoshi(e.balance!),
+                              e.token!,
+                            );
+                          }
+                        } else {
+                          double balanceInSatoshi = double.parse(e.balance!.toString());
+                          if (activeAsset == AssetList.fiat) {
+                            return tokensHelper.getPairsAmountByAsset(
+                                tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'USD');
+                          } else if (activeAsset == AssetList.dfi) {
+                            return tokensHelper.getPairsAmountByAsset(
+                                tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'DFI');
+                          } else {
+                            return tokensHelper.getPairsAmountByAsset(
+                                tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'BTC');
+                          }
+                        }
+                      }).reduce((value, element) => value + element);
+                    }
 
-            if (activeAsset == AssetList.fiat) {
-              if (SettingsHelper.settings.currency == 'EUR') {
-                totalBalance *= tokensState.eurRate!;
-              }
-            }
+                    if (activeAsset == AssetList.fiat) {
+                      if (SettingsHelper.settings.currency == 'EUR') {
+                        totalBalance *= tokensState.eurRate!;
+                      }
+                    }
 
-            activeAssetName = activeAsset == AssetList.fiat
-                ? SettingsHelper.settings.currency!
-                : activeAsset.name;
+                    activeAssetName = activeAsset == AssetList.fiat
+                        ? SettingsHelper.settings.currency!
+                        : activeAsset.name;
 
-            return Container(
-              child: Column(
-                children: [
-                  if (!SettingsHelper.isBitcoin())
-                    Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    return Container(
+                      child: Column(
                         children: [
-                          SizedBox(
-                            width: 40,
-                            height: 16,
-                            child: ElevatedButton(
-                              onPressed: () => setState(() {
-                                activeAsset = AssetList.fiat;
-                              }),
-                              child: Text(
-                                SettingsHelper.settings.currency!,
-                                style: getTextStyle(AssetList.fiat),
+                          if (!SettingsHelper.isBitcoin())
+                            Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 40,
+                                    height: 16,
+                                    child: ElevatedButton(
+                                      onPressed: () => setState(() {
+                                        activeAsset = AssetList.fiat;
+                                      }),
+                                      child: Text(
+                                        SettingsHelper.settings.currency!,
+                                        style: getTextStyle(AssetList.fiat),
+                                      ),
+                                      style: getButtonStyle(AssetList.fiat),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  SizedBox(
+                                    width: 40,
+                                    height: 16,
+                                    child: ElevatedButton(
+                                      onPressed: () => setState(() {
+                                        activeAsset = AssetList.dfi;
+                                      }),
+                                      child: Text(
+                                        'DFI',
+                                        overflow: TextOverflow.visible,
+                                        maxLines: 1,
+                                        style: getTextStyle(AssetList.dfi),
+                                      ),
+                                      style: getButtonStyle(AssetList.dfi),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  SizedBox(
+                                    width: 40,
+                                    height: 16,
+                                    child: TextButton(
+                                      onPressed: () => setState(() {
+                                        activeAsset = AssetList.btc;
+                                      }),
+                                      child: Text(
+                                        'BTC',
+                                        style: getTextStyle(AssetList.btc),
+                                      ),
+                                      style: getButtonStyle(AssetList.btc),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              style: getButtonStyle(AssetList.fiat),
+                            )
+                          else
+                            Text(
+                              "Total value: ${balancesHelper.numberStyling(totalBalanceInFiat, fixed: true, fixedCount: 2)} ${SettingsHelper.settings.currency}",
+                              style: Theme.of(context).textTheme.headline4,
                             ),
-                          ),
-                          SizedBox(width: 8),
                           SizedBox(
-                            width: 40,
-                            height: 16,
-                            child: ElevatedButton(
-                              onPressed: () => setState(() {
-                                activeAsset = AssetList.dfi;
-                              }),
-                              child: Text(
-                                'DFI',
-                                overflow: TextOverflow.visible,
-                                maxLines: 1,
-                                style: getTextStyle(AssetList.dfi),
-                              ),
-                              style: getButtonStyle(AssetList.dfi),
-                            ),
+                            height: 12,
                           ),
-                          SizedBox(width: 8),
-                          SizedBox(
-                            width: 40,
-                            height: 16,
-                            child: TextButton(
-                              onPressed: () => setState(() {
-                                activeAsset = AssetList.btc;
-                              }),
+                          Container(
+                            child: Center(
                               child: Text(
-                                'BTC',
-                                style: getTextStyle(AssetList.btc),
+                                "${balancesHelper.numberStyling(totalBalance, fixed: true, fixedCount: 6)} ${activeAssetName.toUpperCase()}",
+                                style: Theme.of(context).textTheme.headline1!.apply(
+                                  fontFamily: 'IBM Plex Medium',
+                                ),
                               ),
-                              style: getButtonStyle(AssetList.btc),
                             ),
-                          ),
+                          )
                         ],
                       ),
-                      )
-                  else
-                    Text(
-                      "Total value: ${balancesHelper.numberStyling(totalBalanceInFiat, fixed: true, fixedCount: 2)} ${SettingsHelper.settings.currency}",
-                      style: Theme.of(context).textTheme.headline4,
-                    ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Container(
-                    child: Center(
-                      child: Text(
-                        "${balancesHelper.numberStyling(totalBalance, fixed: true, fixedCount: 6)} ${activeAssetName.toUpperCase()}",
-                        style: Theme.of(context).textTheme.headline1!.apply(
-                              fontFamily: 'IBM Plex Medium',
-                            ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            );
-          } else {
-            return Container();
-          }
-        });
+                    );
+                  } else {
+                    return Container();
+                  }
+                });
+          },
+        );
       },
     );
   }

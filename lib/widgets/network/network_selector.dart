@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/widgets/network/list_entry.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,7 @@ class _NetworkSelectorState extends State<NetworkSelector> {
   @override
   Widget build(BuildContext context) {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     String networkType = getNetworkType();
 
     Future<void> _showMyDialog() async {
@@ -96,6 +98,8 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                               SettingsHelper.settings.network = 'mainnet';
                               await accountCubit.changeNetwork(
                                   SettingsHelper.settings.network!);
+                              await bitcoinCubit.loadDetails(accountCubit
+                                  .state.activeAccount!.bitcoinAddress!);
                               await settingsHelper.saveSettings();
                             },
                           ),
@@ -112,6 +116,8 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                               SettingsHelper.settings.network = 'testnet';
                               await accountCubit.changeNetwork(
                                   SettingsHelper.settings.network!);
+                              await bitcoinCubit.loadDetails(accountCubit
+                                  .state.activeAccount!.bitcoinAddress!);
                               await settingsHelper.saveSettings();
                             },
                           ),

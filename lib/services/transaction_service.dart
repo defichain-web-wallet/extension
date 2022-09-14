@@ -102,13 +102,15 @@ class TransactionService {
     if (selectedUtxo.length > 2){
       selectedUtxo = _utxoSelector(utxos, calculateBTCFee(2,selectedUtxo.length,satPerByte), amount);
     }
+    String network = SettingsHelper.settings.network! == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet';
+    NetworkType networkType = NetworkHelper().getNetwork(network);
     final _txb = TransactionBuilder(
-        network: NetworkHelper().getNetwork(SettingsHelper.settings.network!));
+        network: networkType);
     _txb.setVersion(2);
     var amountUtxo = 0;
     selectedUtxo.forEach((utxo) {
       amount += utxo.value!;
-      _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: account.bitcoinAddress!.keyPair!.publicKey), network: SettingsHelper.settings.network!).data!.output);
+      _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: account.bitcoinAddress!.keyPair!.publicKey), network: networkType).data!.output);
     });
 
     _txb.addOutput(destinationAddress, amount);
