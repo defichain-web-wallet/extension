@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -17,11 +18,23 @@ class AssetList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
       if (state.status == AccountStatusList.success) {
-        List<BalanceModel> balances = state.activeAccount!.balanceList!
-            .where((el) => !el.isHidden!)
-            .toList();
+        late List<BalanceModel> balances;
+        if (SettingsHelper.isBitcoin()) {
+          balances = List.generate(
+              1,
+              (index) => BalanceModel(
+                    token: 'BTC',
+                    balance: bitcoinCubit.state.totalBalance,
+                  ));
+        } else {
+          balances = state.activeAccount!.balanceList!
+              .where((el) => !el.isHidden!)
+              .toList();
+        }
         String currency = SettingsHelper.settings.currency!;
 
         return BlocBuilder<TokensCubit, TokensState>(

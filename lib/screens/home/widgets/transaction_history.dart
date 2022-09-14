@@ -52,20 +52,24 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           var currency = SettingsHelper.settings.currency!;
           const int defaultShowItemsCount = 30;
           late int showItemsCount;
-          if (SettingsHelper.settings.network == 'mainnet') {
-            showItemsCount =
-                state.activeAccount!.historyList!.length < defaultShowItemsCount
-                    ? state.activeAccount!.historyList!.length
-                    : defaultShowItemsCount;
-            historyList = new List.from(
-                state.activeAccount!.historyList!.sublist(0, showItemsCount));
+          if (SettingsHelper.isBitcoin()) {
+            historyList = [];
           } else {
-            showItemsCount = state.activeAccount!.testnetHistoryList!.length <
-                    defaultShowItemsCount
-                ? state.activeAccount!.testnetHistoryList!.length
-                : defaultShowItemsCount;
-            historyList = new List.from(state.activeAccount!.testnetHistoryList!
-                .sublist(0, showItemsCount));
+            if (SettingsHelper.settings.network == 'mainnet') {
+              showItemsCount =
+              state.activeAccount!.historyList!.length < defaultShowItemsCount
+                  ? state.activeAccount!.historyList!.length
+                  : defaultShowItemsCount;
+              historyList = new List.from(
+                  state.activeAccount!.historyList!.sublist(0, showItemsCount));
+            } else {
+              showItemsCount = state.activeAccount!.testnetHistoryList!.length <
+                  defaultShowItemsCount
+                  ? state.activeAccount!.testnetHistoryList!.length
+                  : defaultShowItemsCount;
+              historyList = new List.from(state.activeAccount!.testnetHistoryList!
+                  .sublist(0, showItemsCount));
+            }
           }
 
           if (historyList != null && historyList.length != 0) {

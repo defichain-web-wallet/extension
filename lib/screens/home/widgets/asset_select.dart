@@ -154,25 +154,23 @@ class AssetSelectState extends State<AssetSelect> {
                           )
                       ],
                     ),
-                    SvgPicture.asset(
-                      _isOpen
-                          ? (widget.isTopPosition
-                              ? MediaQuery.of(context).size.width <
-                                      ScreenSizes.medium
-                                  ? 'assets/arrow_down.svg'
-                                  : 'assets/arrow_up.svg'
-                              : 'assets/arrow_up.svg')
-                          : (widget.isTopPosition
-                              ? MediaQuery.of(context).size.width <
-                                      ScreenSizes.medium
-                                  ? 'assets/arrow_up.svg'
-                                  : 'assets/arrow_down.svg'
-                              : 'assets/arrow_down.svg'),
-                      // MediaQuery.of(context).size.width < ScreenSizes.medium
-                      //     ? 'assets/arrow_up.svg'
-                      //     : 'assets/arrow_down.svg',
-                      color: Theme.of(context).textTheme.button!.color,
-                    ),
+                    if (widget.tokensForSwap.isNotEmpty)
+                      SvgPicture.asset(
+                        _isOpen
+                            ? (widget.isTopPosition
+                                ? MediaQuery.of(context).size.width <
+                                        ScreenSizes.medium
+                                    ? 'assets/arrow_down.svg'
+                                    : 'assets/arrow_up.svg'
+                                : 'assets/arrow_up.svg')
+                            : (widget.isTopPosition
+                                ? MediaQuery.of(context).size.width <
+                                        ScreenSizes.medium
+                                    ? 'assets/arrow_up.svg'
+                                    : 'assets/arrow_down.svg'
+                                : 'assets/arrow_down.svg'),
+                        color: Theme.of(context).textTheme.button!.color,
+                      ),
                   ],
                 ),
               ),
@@ -183,7 +181,9 @@ class AssetSelectState extends State<AssetSelect> {
               if (!_isOpen && widget.onAnotherSelect != null) {
                 widget.onAnotherSelect!();
               }
-              _showOverlay();
+              if (widget.tokensForSwap.isNotEmpty) {
+                _showOverlay();
+              }
             });
           },
         ),

@@ -114,11 +114,12 @@ class ActionButtonsList extends StatelessWidget {
                 label: 'Buy/Sell',
                 onPressed: () => buySellCallback(state),
               ),
-              ActionButton(
-                iconPath: 'assets/images/earn.png',
-                label: 'Earn',
-                onPressed: liquidityCallback,
-              ),
+              if (!SettingsHelper.isBitcoin())
+                ActionButton(
+                  iconPath: 'assets/images/earn.png',
+                  label: 'Earn',
+                  onPressed: liquidityCallback,
+                ),
             ],
           ),
         );

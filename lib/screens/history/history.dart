@@ -105,60 +105,64 @@ class _HistoryState extends State<History> {
               var historyList = [];
               var testnetHistoryList = [];
 
-              if (SettingsHelper.settings.network == 'testnet') {
-                if (state.historyFilterBy == 'receive') {
-                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
-                      .where((element) => element.type == 'vout');
-                } else if (state.historyFilterBy == 'send') {
-                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
-                      .where((element) => element.type == 'vin');
-                } else if (state.historyFilterBy == 'swap') {
-                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
-                      .where((element) => element.type == 'PoolSwap');
-                } else if (state.historyFilterBy == 'add liquidity') {
-                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
-                      .where((element) => element.type == 'AddPoolLiquidity');
-                } else if (state.historyFilterBy == 'remove liquidity') {
-                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
-                      .where((element) => element.type == 'RemovePoolLiquidity');
-                } else if (state.historyFilterBy == 'account to utxos') {
-                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
-                      .where((element) => element.type == 'AccountToUtxos');
-                } else if (state.historyFilterBy == 'utxos to account') {
-                  testnetFilteredList = state.activeAccount!.testnetHistoryList!
-                      .where((element) => element.type == 'UtxosToAccount');
-                } else {
-                  testnetFilteredList =
-                      state.activeAccount!.testnetHistoryList!;
-                }
-                testnetHistoryList =
-                    new List.from(testnetFilteredList.toList());
+              if (SettingsHelper.isBitcoin()) {
+                historyList = [];
               } else {
-                if (state.historyFilterBy == 'receive') {
-                  filteredList = state.activeAccount!.historyList!
-                      .where((element) => element.category == 'RECEIVE');
-                } else if (state.historyFilterBy == 'send') {
-                  filteredList = state.activeAccount!.historyList!
-                      .where((element) => element.category == 'SEND');
-                } else if (state.historyFilterBy == 'swap') {
-                  filteredList = state.activeAccount!.historyList!
-                      .where((element) => element.category == 'PoolSwap');
-                } else if (state.historyFilterBy == 'add liquidity') {
-                  filteredList = state.activeAccount!.historyList!
-                      .where((element) => element.category == 'AddPoolLiquidity');
-                } else if (state.historyFilterBy == 'remove liquidity') {
-                  filteredList = state.activeAccount!.historyList!
-                      .where((element) => element.category == 'RemovePoolLiquidity');
-                } else if (state.historyFilterBy == 'account to utxos') {
-                  filteredList = state.activeAccount!.historyList!
-                      .where((element) => element.category == 'AccountToUtxos');
-                } else if (state.historyFilterBy == 'utxos to account') {
-                  filteredList = state.activeAccount!.historyList!
-                      .where((element) => element.category == 'UtxosToAccount');
+                if (SettingsHelper.settings.network == 'testnet') {
+                  if (state.historyFilterBy == 'receive') {
+                    testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                        .where((element) => element.type == 'vout');
+                  } else if (state.historyFilterBy == 'send') {
+                    testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                        .where((element) => element.type == 'vin');
+                  } else if (state.historyFilterBy == 'swap') {
+                    testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                        .where((element) => element.type == 'PoolSwap');
+                  } else if (state.historyFilterBy == 'add liquidity') {
+                    testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                        .where((element) => element.type == 'AddPoolLiquidity');
+                  } else if (state.historyFilterBy == 'remove liquidity') {
+                    testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                        .where((element) => element.type == 'RemovePoolLiquidity');
+                  } else if (state.historyFilterBy == 'account to utxos') {
+                    testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                        .where((element) => element.type == 'AccountToUtxos');
+                  } else if (state.historyFilterBy == 'utxos to account') {
+                    testnetFilteredList = state.activeAccount!.testnetHistoryList!
+                        .where((element) => element.type == 'UtxosToAccount');
+                  } else {
+                    testnetFilteredList =
+                    state.activeAccount!.testnetHistoryList!;
+                  }
+                  testnetHistoryList =
+                  new List.from(testnetFilteredList.toList());
                 } else {
-                  filteredList = state.activeAccount!.historyList!;
+                  if (state.historyFilterBy == 'receive') {
+                    filteredList = state.activeAccount!.historyList!
+                        .where((element) => element.category == 'RECEIVE');
+                  } else if (state.historyFilterBy == 'send') {
+                    filteredList = state.activeAccount!.historyList!
+                        .where((element) => element.category == 'SEND');
+                  } else if (state.historyFilterBy == 'swap') {
+                    filteredList = state.activeAccount!.historyList!
+                        .where((element) => element.category == 'PoolSwap');
+                  } else if (state.historyFilterBy == 'add liquidity') {
+                    filteredList = state.activeAccount!.historyList!
+                        .where((element) => element.category == 'AddPoolLiquidity');
+                  } else if (state.historyFilterBy == 'remove liquidity') {
+                    filteredList = state.activeAccount!.historyList!
+                        .where((element) => element.category == 'RemovePoolLiquidity');
+                  } else if (state.historyFilterBy == 'account to utxos') {
+                    filteredList = state.activeAccount!.historyList!
+                        .where((element) => element.category == 'AccountToUtxos');
+                  } else if (state.historyFilterBy == 'utxos to account') {
+                    filteredList = state.activeAccount!.historyList!
+                        .where((element) => element.category == 'UtxosToAccount');
+                  } else {
+                    filteredList = state.activeAccount!.historyList!;
+                  }
+                  historyList = new List.from(filteredList.toList());
                 }
-                historyList = new List.from(filteredList.toList());
               }
 
               final DateFormat formatter = DateFormat('yyyy.MM.dd HH:mm');

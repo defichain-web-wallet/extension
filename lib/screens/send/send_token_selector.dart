@@ -1,11 +1,15 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
+import 'package:defi_wallet/requests/btc_requests.dart';
 import 'package:defi_wallet/screens/send/widgets/address_field.dart';
 import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
+import 'package:defi_wallet/screens/send/widgets/fee_card.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
@@ -22,10 +26,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SendTokenSelector extends StatefulWidget {
-
   final String selectedAddress;
 
-  const SendTokenSelector({Key? key, this.selectedAddress = '',}) : super(key: key);
+  const SendTokenSelector({
+    Key? key,
+    this.selectedAddress = '',
+  }) : super(key: key);
+
   @override
   State<SendTokenSelector> createState() => _SendConfirmState();
 }
@@ -40,13 +47,22 @@ class _SendConfirmState extends State<SendTokenSelector> {
   FocusModel _amountFocusModel = new FocusModel();
   AddressesHelper addressHelper = AddressesHelper();
   TextEditingController addressController = TextEditingController();
-  bool isFailed = false;
-  bool isFailedAddress = false;
-  bool _isBalanceError = false;
+  BtcRequests btcRequests = BtcRequests();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   String assetFrom = '';
   String assetTo = '';
+  int selectedFee = 0;
+  double btcAvailableBalance = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+    selectedFee = bitcoinCubit.state.networkFee!.low!;
+    btcAvailableBalance =
+        convertFromSatoshi(bitcoinCubit.state.availableBalance);
+  }
 
   void dispose() {
     hideOverlay();
@@ -96,15 +112,20 @@ class _SendConfirmState extends State<SendTokenSelector> {
   Widget _buildBody(context, transactionState, {isCustomBgColor = false}) =>
       BlocBuilder<AccountCubit, AccountState>(
         builder: (context, state) {
+          BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
           if (state.status == AccountStatusList.success) {
-            assetFrom = (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
             List<String> assets = [];
-            state.activeAccount!.balanceList!
-                .forEach((el) {
-                  if (!el.isHidden!) {
-                    assets.add(el.token!);
-                  }
-            });
+            if (SettingsHelper.isBitcoin()) {
+              assetFrom = 'BTC';
+              assets = [];
+            } else {
+              assetFrom = (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
+              state.activeAccount!.balanceList!.forEach((el) {
+                if (!el.isHidden!) {
+                  assets.add(el.token!);
+                }
+              });
+            }
 
             addressController.text = widget.selectedAddress;
 
@@ -120,32 +141,16 @@ class _SendConfirmState extends State<SendTokenSelector> {
                     children: [
                       Container(
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Address',
                                 style: Theme.of(context).textTheme.headline6),
                             SizedBox(height: 16),
                             AddressField(
                               addressController: addressController,
-                              onChanged: (value) {
-                                if (isFailed) {
-                                  setState(() {
-                                    isFailed = false;
-                                  });
-                                }
-                              },
                             ),
                             SizedBox(height: 8),
-                            Text(
-                              'Address is invalid',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline4!
-                                  .copyWith(
-                                    color: isFailedAddress
-                                        ? AppTheme.redErrorColor
-                                        : Colors.transparent,
-                                  ),
-                            ),
                             Divider(),
                             SizedBox(height: 12),
                             Text(
@@ -163,19 +168,11 @@ class _SendConfirmState extends State<SendTokenSelector> {
                               onSelect: (String asset) {
                                 setState(() => {assetFrom = asset});
                               },
-                              onChanged: (value) {
-                                if (isFailed) {
-                                  setState(() {
-                                    isFailed = false;
-                                  });
-                                }
-                              },
                               onPressedMax: () {
                                 setState(() {
                                   int balance = state
                                       .activeAccount!.balanceList!
-                                      .firstWhere(
-                                          (el) =>
+                                      .firstWhere((el) =>
                                           el.token! == assetFrom &&
                                           !el.isHidden!)
                                       .balance!;
@@ -187,38 +184,79 @@ class _SendConfirmState extends State<SendTokenSelector> {
                               },
                               isFixedWidthAssetSelectorText: isCustomBgColor,
                             ),
-                            SizedBox(height: 8),
+                            SizedBox(height: 16),
                             Text(
-                              'Amount is invalid',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline4!
-                                  .copyWith(
-                                    color: isFailed
-                                        ? AppTheme.redErrorColor
-                                        : Colors.transparent,
-                                  ),
+                                "Available balance: ${balancesHelper.numberStyling(btcAvailableBalance, fixed: true, fixedCount: 6)} BTC"),
+                            SizedBox(height: 28),
+                            Text("Fees"),
+                            SizedBox(height: 16),
+                            Column(
+                              children: [
+                                FeeCard(
+                                  fee: bitcoinCubit.state.networkFee!.low!,
+                                  iconUrl: '',
+                                  label: 'Slow',
+                                  callback: () async {
+                                    setState(() {
+                                      selectedFee =
+                                          bitcoinCubit.state.networkFee!.low!;
+                                    });
+                                    double balance =
+                                        await getAvailableBalance(state);
+                                    setState(() {
+                                      btcAvailableBalance = balance;
+                                    });
+                                  },
+                                  isActive: selectedFee ==
+                                      bitcoinCubit.state.networkFee!.low,
+                                ),
+                                SizedBox(height: 8),
+                                FeeCard(
+                                  fee: bitcoinCubit.state.networkFee!.medium!,
+                                  iconUrl: '',
+                                  label: 'Medium',
+                                  callback: () async {
+                                    setState(() {
+                                      selectedFee = bitcoinCubit
+                                          .state.networkFee!.medium!;
+                                    });
+                                    double balance =
+                                        await getAvailableBalance(state);
+                                    setState(() {
+                                      btcAvailableBalance = balance;
+                                    });
+                                  },
+                                  isActive: selectedFee ==
+                                      bitcoinCubit.state.networkFee!.medium,
+                                ),
+                                SizedBox(height: 8),
+                                FeeCard(
+                                  fee: bitcoinCubit.state.networkFee!.high!,
+                                  iconUrl: '',
+                                  label: 'Fast',
+                                  callback: () async {
+                                    setState(() {
+                                      selectedFee =
+                                          bitcoinCubit.state.networkFee!.high!;
+                                    });
+                                    double balance =
+                                        await getAvailableBalance(state);
+                                    setState(() {
+                                      btcAvailableBalance = balance;
+                                    });
+                                  },
+                                  isActive: selectedFee ==
+                                      bitcoinCubit.state.networkFee!.high,
+                                )
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: Text(
-                                'Insufficient funds',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline4!
-                                    .copyWith(
-                                      color: _isBalanceError
-                                          ? AppTheme.redErrorColor
-                                          : Colors.transparent,
-                                    ),
-                              ),
-                            )
                           ],
                         ),
                       ),
                       PrimaryButton(
                         label: 'Continue',
-                        callback: () => submitToConfirm(state, transactionState),
+                        callback: () =>
+                            submitToConfirm(state, transactionState),
                       ),
                     ],
                   ),
@@ -233,29 +271,32 @@ class _SendConfirmState extends State<SendTokenSelector> {
 
   submitToConfirm(state, transactionState) async {
     if (transactionState is TransactionLoadingState) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'Wait for the previous transaction to complete',
-            style: Theme.of(context)
-                .textTheme
-                .headline5,
+            style: Theme.of(context).textTheme.headline5,
           ),
-          backgroundColor: Theme.of(context)
-              .snackBarTheme
-              .backgroundColor,
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
         ),
       );
       return;
     }
-    var valid = await addressHelper.validateAddress(addressController.text);
-    if (valid) {
-      int balance = state.activeAccount.balanceList!
+    bool valid = false;
+    int balance = 0;
+    final int fee = 3000;
+    double amount = 0;
+    if (SettingsHelper.isBitcoin()) {
+      valid = await addressHelper.validateAddress(addressController.text);
+      amount = btcAvailableBalance;
+    } else {
+      valid = await addressHelper.validateBtcAddress(addressController.text);
+      balance = state.activeAccount.balanceList!
           .firstWhere((el) => el.token! == assetFrom && !el.isHidden)
           .balance!;
-      final int fee = 3000;
-      double amount = convertFromSatoshi(balance - fee);
+      amount = convertFromSatoshi(balance - fee);
+    }
+    if (valid) {
       if (double.parse(_amountController.text.replaceAll(',', '.')) > 0) {
         if (double.parse(_amountController.text.replaceAll(',', '.')) <
             amount) {
@@ -263,7 +304,8 @@ class _SendConfirmState extends State<SendTokenSelector> {
           Navigator.push(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => SendConfirmScreen(
+              pageBuilder: (context, animation1, animation2) =>
+                  SendConfirmScreen(
                 addressController.text,
                 assetFrom,
                 double.parse(_amountController.text.replaceAll(',', '.')),
@@ -273,25 +315,43 @@ class _SendConfirmState extends State<SendTokenSelector> {
             ),
           );
         } else {
-          if (!_isBalanceError) {
-            setState(() {
-              _isBalanceError = true;
-            });
-          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Insufficient funds',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+              backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+            ),
+          );
         }
       } else {
-        if (!isFailed) {
-          setState(() {
-            isFailed = true;
-          });
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Invalid amount',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+          ),
+        );
       }
     } else {
-      if (!isFailedAddress) {
-        setState(() {
-          isFailedAddress = true;
-        });
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Invalid address',
+            style: Theme.of(context).textTheme.headline5,
+          ),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+        ),
+      );
     }
+  }
+
+  Future<double> getAvailableBalance(state) async {
+    int balance = await btcRequests.getAvailableBalance(
+        address: state.activeAccount!.bitcoinAddress!, feePerByte: selectedFee);
+    return convertFromSatoshi(balance);
   }
 }
