@@ -22,10 +22,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SendTokenSelector extends StatefulWidget {
-
   final String selectedAddress;
 
-  const SendTokenSelector({Key? key, this.selectedAddress = '',}) : super(key: key);
+  const SendTokenSelector({
+    Key? key,
+    this.selectedAddress = '',
+  }) : super(key: key);
+
   @override
   State<SendTokenSelector> createState() => _SendConfirmState();
 }
@@ -63,34 +66,40 @@ class _SendConfirmState extends State<SendTokenSelector> {
   Widget build(BuildContext context) =>
       BlocBuilder<TransactionCubit, TransactionState>(
         builder: (context, state) => ScaffoldConstrainedBox(
-            child: LayoutBuilder(builder: (context, constraints) {
-          if (constraints.maxWidth < ScreenSizes.medium) {
-            return Scaffold(
-              appBar: MainAppBar(
-                title: 'Send',
-                hideOverlay: () => hideOverlay(),
-                isShowBottom: !(state is TransactionInitialState),
-                height: !(state is TransactionInitialState)
-                    ? toolbarHeightWithBottom
-                    : toolbarHeight,
-              ),
-              body: _buildBody(context, state),
-            );
-          } else {
-            return Container(
-              padding: const EdgeInsets.only(top: 20),
-              child: Scaffold(
-                appBar: MainAppBar(
-                  title: 'Send',
-                  hideOverlay: () => hideOverlay(),
-                  action: null,
-                  isSmall: true,
-                ),
-                body: _buildBody(context, state, isCustomBgColor: true),
-              ),
-            );
-          }
-        })),
+          child: GestureDetector(
+            onTap: hideOverlay,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < ScreenSizes.medium) {
+                  return Scaffold(
+                    appBar: MainAppBar(
+                      title: 'Send',
+                      hideOverlay: () => hideOverlay(),
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight,
+                    ),
+                    body: _buildBody(context, state),
+                  );
+                } else {
+                  return Container(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Scaffold(
+                      appBar: MainAppBar(
+                        title: 'Send',
+                        hideOverlay: () => hideOverlay(),
+                        action: null,
+                        isSmall: true,
+                      ),
+                      body: _buildBody(context, state, isCustomBgColor: true),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+        ),
       );
 
   Widget _buildBody(context, transactionState, {isCustomBgColor = false}) =>
@@ -99,11 +108,10 @@ class _SendConfirmState extends State<SendTokenSelector> {
           if (state.status == AccountStatusList.success) {
             assetFrom = (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
             List<String> assets = [];
-            state.activeAccount!.balanceList!
-                .forEach((el) {
-                  if (!el.isHidden!) {
-                    assets.add(el.token!);
-                  }
+            state.activeAccount!.balanceList!.forEach((el) {
+              if (!el.isHidden!) {
+                assets.add(el.token!);
+              }
             });
 
             addressController.text = widget.selectedAddress;
@@ -125,6 +133,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 style: Theme.of(context).textTheme.headline6),
                             SizedBox(height: 16),
                             AddressField(
+                              hideOverlay: hideOverlay,
                               addressController: addressController,
                               onChanged: (value) {
                                 if (isFailed) {
@@ -154,6 +163,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                             ),
                             SizedBox(height: 16),
                             AssetDropdown(
+                              hideOverlay: hideOverlay,
                               selectKeyFrom: _selectKeyFrom,
                               amountController: _amountController,
                               focusNode: _amountFocusNode,
@@ -172,10 +182,10 @@ class _SendConfirmState extends State<SendTokenSelector> {
                               },
                               onPressedMax: () {
                                 setState(() {
+                                  hideOverlay();
                                   int balance = state
                                       .activeAccount!.balanceList!
-                                      .firstWhere(
-                                          (el) =>
+                                      .firstWhere((el) =>
                                           el.token! == assetFrom &&
                                           !el.isHidden!)
                                       .balance!;
@@ -218,7 +228,10 @@ class _SendConfirmState extends State<SendTokenSelector> {
                       ),
                       PrimaryButton(
                         label: 'Continue',
-                        callback: () => submitToConfirm(state, transactionState),
+                        callback: () {
+                          hideOverlay();
+                          submitToConfirm(state, transactionState);
+                        },
                       ),
                     ],
                   ),
@@ -233,18 +246,13 @@ class _SendConfirmState extends State<SendTokenSelector> {
 
   submitToConfirm(state, transactionState) async {
     if (transactionState is TransactionLoadingState) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'Wait for the previous transaction to complete',
-            style: Theme.of(context)
-                .textTheme
-                .headline5,
+            style: Theme.of(context).textTheme.headline5,
           ),
-          backgroundColor: Theme.of(context)
-              .snackBarTheme
-              .backgroundColor,
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
         ),
       );
       return;
@@ -263,7 +271,8 @@ class _SendConfirmState extends State<SendTokenSelector> {
           Navigator.push(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => SendConfirmScreen(
+              pageBuilder: (context, animation1, animation2) =>
+                  SendConfirmScreen(
                 addressController.text,
                 assetFrom,
                 double.parse(_amountController.text.replaceAll(',', '.')),
