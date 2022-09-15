@@ -221,7 +221,9 @@ class AccountSelectState extends State<AccountSelect> {
                       onPressed: () async {
                         await lockHelper.provideWithLockChecker(context, () async {
                           hideOverlay();
-                          accountCubit.addAccount();
+                          await accountCubit.addAccount();
+                          await bitcoinCubit.loadDetails(
+                              state.activeAccount!.bitcoinAddress.bitcoinAddress!);
                           LoggerService.invokeInfoLogg('user created new account');
                         });
                       },

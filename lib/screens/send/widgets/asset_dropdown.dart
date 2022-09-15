@@ -1,3 +1,4 @@
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field.dart';
@@ -17,6 +18,7 @@ class AssetDropdown extends StatelessWidget {
   final Function()? onAnotherSelect;
   final bool? isMaxOnly;
   final bool? isFixedWidthAssetSelectorText;
+  final String? amountInUsd;
 
   const AssetDropdown({
     Key? key,
@@ -33,6 +35,7 @@ class AssetDropdown extends StatelessWidget {
     this.onAnotherSelect,
     this.isFixedWidthAssetSelectorText = false,
     this.isMaxOnly = false,
+    this.amountInUsd = '0.0',
   }) : super(key: key);
 
   @override
@@ -50,12 +53,17 @@ class AssetDropdown extends StatelessWidget {
           ),
         ),
         Expanded(
+          flex: SettingsHelper.isBitcoin() ? 2 : 1,
           child: DecorationTextField(
             controller: amountController,
             focusNode: focusNode,
             focusModel: focusModel,
             onChanged: onChanged,
-            suffixIcon: Container(
+            suffixIcon: SettingsHelper.isBitcoin() ? Container(
+              height: 40,
+              padding: EdgeInsets.only(top: 10, bottom: 8, right: 12, left: 0),
+              child: Text('BTC ≈ \$$amountInUsd'),
+            ) : Container(
               padding: isMaxOnly!
                   ? EdgeInsets.only(top: 8, bottom: 8, right: 12, left: 0)
                   : EdgeInsets.symmetric(

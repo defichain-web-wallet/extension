@@ -619,6 +619,18 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   changeNetwork(String network) async {
+    emit(state.copyWith(
+      status: AccountStatusList.loading,
+      accessToken: state.accessToken,
+      mnemonic: state.mnemonic,
+      seed: state.seed,
+      accounts: state.accounts,
+      balances: state.balances,
+      masterKeyPair: state.masterKeyPair,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+      historyFilterBy: state.historyFilterBy,
+    ));
     await restoreAccountFromStorage(network);
   }
 }

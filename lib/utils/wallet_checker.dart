@@ -57,7 +57,6 @@ class _WalletCheckerState extends State<WalletChecker> {
           lockHelper.provideWithLockChecker(context, () async {
             await accountCubit
                 .restoreAccountFromStorage(SettingsHelper.settings.network!);
-            print(SettingsHelper.isBitcoin());
             if (SettingsHelper.isBitcoin()) {
               await bitcoinCubit
                   .loadDetails(accountCubit.state.accounts![0].bitcoinAddress!);

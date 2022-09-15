@@ -63,11 +63,11 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
                     "Jelly speaks more than one language!",
-                    style: Theme.of(context).textTheme.headline5,
+                    style: Theme.of(context).textTheme.headline4,
                   ),
                   Text(
                     "Select the network you want to use",
-                    style: Theme.of(context).textTheme.headline5,
+                    style: Theme.of(context).textTheme.headline4,
                   ),
                 ])
               ],
@@ -96,11 +96,11 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                               Navigator.of(context).pop();
                               SettingsHelper.settings.isBitcoin = true;
                               SettingsHelper.settings.network = 'mainnet';
+                              await settingsHelper.saveSettings();
                               await accountCubit.changeNetwork(
                                   SettingsHelper.settings.network!);
                               await bitcoinCubit.loadDetails(accountCubit
                                   .state.activeAccount!.bitcoinAddress!);
-                              await settingsHelper.saveSettings();
                             },
                           ),
                           Divider(
@@ -114,11 +114,11 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                               Navigator.of(context).pop();
                               SettingsHelper.settings.isBitcoin = true;
                               SettingsHelper.settings.network = 'testnet';
+                              await settingsHelper.saveSettings();
                               await accountCubit.changeNetwork(
                                   SettingsHelper.settings.network!);
                               await bitcoinCubit.loadDetails(accountCubit
                                   .state.activeAccount!.bitcoinAddress!);
-                              await settingsHelper.saveSettings();
                             },
                           ),
                           Divider(
@@ -132,9 +132,9 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                               Navigator.of(context).pop();
                               SettingsHelper.settings.network = 'mainnet';
                               SettingsHelper.settings.isBitcoin = false;
+                              await settingsHelper.saveSettings();
                               await accountCubit.changeNetwork(
                                   SettingsHelper.settings.network!);
-                              await settingsHelper.saveSettings();
                             },
                           ),
                           Divider(
@@ -148,9 +148,9 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                               Navigator.of(context).pop();
                               SettingsHelper.settings.network = 'testnet';
                               SettingsHelper.settings.isBitcoin = false;
+                              await settingsHelper.saveSettings();
                               await accountCubit.changeNetwork(
                                   SettingsHelper.settings.network!);
-                              await settingsHelper.saveSettings();
                             },
                           ),
                           Divider(

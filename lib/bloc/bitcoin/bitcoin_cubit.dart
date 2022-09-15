@@ -13,7 +13,6 @@ class BitcoinCubit extends Cubit<BitcoinState> {
 
   loadDetails(AddressModel address) async {
     int balance;
-    NetworkFeeModel networkFee;
 
     emit(state.copyWith(
         status: BitcoinStatusList.loading,
@@ -24,14 +23,13 @@ class BitcoinCubit extends Cubit<BitcoinState> {
 
     try {
       balance = await btcRequests.getBalance(address: address);
-      networkFee = await btcRequests.getNetworkFee();
 
       emit(state.copyWith(
         status: BitcoinStatusList.success,
         totalBalance: balance,
         availableBalance: state.availableBalance,
-        activeFee: networkFee.low,
-        networkFee: networkFee,
+        activeFee: state.activeFee,
+        networkFee: state.networkFee,
       ));
     } catch (err) {
       emit(state.copyWith(
@@ -46,6 +44,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
 
   loadAvailableBalance(AddressModel address, {int? fee}) async {
     int availableBalance = 0;
+    NetworkFeeModel networkFee;
 
     emit(state.copyWith(
       status: BitcoinStatusList.loading,
@@ -56,6 +55,15 @@ class BitcoinCubit extends Cubit<BitcoinState> {
     ));
 
     try {
+      if (fee == null) {
+        networkFee = await btcRequests.getNetworkFee();
+      } else {
+        networkFee = NetworkFeeModel(
+          low: 0,
+          medium: 1,
+          high: 2,
+        );
+      }
       availableBalance = await btcRequests.getAvailableBalance(
           address: address, feePerByte: state.activeFee);
 
@@ -63,8 +71,8 @@ class BitcoinCubit extends Cubit<BitcoinState> {
         status: BitcoinStatusList.success,
         totalBalance: state.totalBalance,
         availableBalance: availableBalance,
-        activeFee: fee ?? state.activeFee,
-        networkFee: state.networkFee,
+        activeFee: fee ?? networkFee.low,
+        networkFee: networkFee,
       ));
     } catch (err) {
       emit(state.copyWith(
@@ -83,7 +91,27 @@ class BitcoinCubit extends Cubit<BitcoinState> {
   }
 
   changeActiveFee(AddressModel address, int fee) async {
-    await loadAvailableBalance(address, fee: fee);
+    int availableBalance = 0;
+    try {
+      availableBalance = await btcRequests.getAvailableBalance(
+          address: address, feePerByte: fee);
+
+      emit(state.copyWith(
+        status: BitcoinStatusList.success,
+        totalBalance: state.totalBalance,
+        availableBalance: availableBalance,
+        activeFee: fee,
+        networkFee: state.networkFee,
+      ));
+    } catch (err) {
+      emit(state.copyWith(
+        status: BitcoinStatusList.failure,
+        totalBalance: state.totalBalance,
+        availableBalance: state.availableBalance,
+        activeFee: state.activeFee,
+        networkFee: state.networkFee,
+      ));
+    }
   }
 
   sendTransaction(String tx) async {

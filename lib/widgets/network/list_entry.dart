@@ -26,7 +26,6 @@ class ListEntry extends StatelessWidget {
         if (!disabled) {
           await callback();
           await tokensCubit.loadTokensFromStorage();
-          await tokensCubit.loadTokens();
         }
       },
       contentPadding: const EdgeInsets.only(left: 60),

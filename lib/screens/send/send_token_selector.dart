@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -11,6 +12,7 @@ import 'package:defi_wallet/screens/send/widgets/address_field.dart';
 import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
 import 'package:defi_wallet/screens/send/widgets/fee_card.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
@@ -54,11 +56,13 @@ class _SendConfirmState extends State<SendTokenSelector> {
   String assetTo = '';
   int selectedFee = 0;
   double btcAvailableBalance = 0;
+  String amountInUsd = '0.0';
   int iterator = 0;
 
   @override
   void initState() {
     super.initState();
+    addressController.text = widget.selectedAddress;
   }
 
   void dispose() {
@@ -113,16 +117,20 @@ class _SendConfirmState extends State<SendTokenSelector> {
             builder: (context, state) {
               BitcoinCubit bitcoinCubit =
                   BlocProvider.of<BitcoinCubit>(context);
-              if (iterator == 0) {
+              TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+              if (iterator == 0 && SettingsHelper.isBitcoin()) {
                 bitcoinCubit
                     .loadAvailableBalance(state.activeAccount!.bitcoinAddress!);
                 iterator++;
               }
 
+              String theme =
+                  SettingsHelper.settings.theme == 'Light' ? 'dark' : 'light';
+
               print(bitcoinState.status);
               if (state.status == AccountStatusList.success &&
-                      bitcoinState.status == BitcoinStatusList.success ||
-                  bitcoinState.status == BitcoinStatusList.failure) {
+                  (bitcoinState.status == BitcoinStatusList.success ||
+                      !SettingsHelper.isBitcoin())) {
                 List<String> assets = [];
                 if (SettingsHelper.isBitcoin()) {
                   assetFrom = 'BTC';
@@ -136,8 +144,6 @@ class _SendConfirmState extends State<SendTokenSelector> {
                     }
                   });
                 }
-
-                addressController.text = widget.selectedAddress;
 
                 return Container(
                   color: isCustomBgColor
@@ -158,7 +164,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 Text('Recipient Address',
                                     style:
                                         Theme.of(context).textTheme.headline6),
-                                SizedBox(height: 16),
+                                SizedBox(height: 12),
                                 AddressField(
                                   addressController: addressController,
                                 ),
@@ -169,7 +175,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   'Asset',
                                   style: Theme.of(context).textTheme.headline6,
                                 ),
-                                SizedBox(height: 16),
+                                SizedBox(height: 12),
                                 AssetDropdown(
                                   selectKeyFrom: _selectKeyFrom,
                                   amountController: _amountController,
@@ -177,6 +183,26 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   focusModel: _amountFocusModel,
                                   assets: assets,
                                   assetFrom: assetFrom,
+                                  amountInUsd: amountInUsd,
+                                  onChanged: (String value) {
+                                    if (SettingsHelper.isBitcoin()) {
+                                      try {
+                                        var amount = tokenHelper.getAmountByUsd(
+                                          tokensCubit.state.tokensPairs!,
+                                          double.parse(
+                                              value.replaceAll(',', '.')),
+                                          'BTC',
+                                        );
+                                        setState(() {
+                                          amountInUsd = balancesHelper
+                                              .numberStyling(amount,
+                                                  fixedCount: 2, fixed: true);
+                                        });
+                                      } catch (err) {
+                                        print(err);
+                                      }
+                                    }
+                                  },
                                   onSelect: (String asset) {
                                     setState(() => {assetFrom = asset});
                                   },
@@ -198,94 +224,66 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   isFixedWidthAssetSelectorText:
                                       isCustomBgColor,
                                 ),
-                                SizedBox(height: 16),
-                                Text(
-                                  "Available balance: ${balancesHelper.numberStyling(convertFromSatoshi(bitcoinState.availableBalance), fixed: true, fixedCount: 6)} BTC",
-                                  style: Theme.of(context).textTheme.headline4!.apply(
-                                    color: Colors.grey,
+                                SizedBox(height: 12),
+                                if (SettingsHelper.isBitcoin())
+                                  Text(
+                                    "Available balance: ${balancesHelper.numberStyling(convertFromSatoshi(bitcoinState.availableBalance), fixed: true, fixedCount: 6)} BTC",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline4!
+                                        .apply(
+                                          color: Colors.grey,
+                                        ),
                                   ),
-                                ),
-                                SizedBox(height: 28),
-                                Text("Fees"),
-                                SizedBox(height: 16),
-                                Column(
-                                  children: [
-                                    FeeCard(
-                                      fee: bitcoinState.networkFee!.low!,
-                                      iconUrl: '',
-                                      label: 'Slow',
-                                      callback: () async {
-                                        bitcoinCubit.changeActiveFee(
-                                            state
-                                                .activeAccount!.bitcoinAddress!,
-                                            bitcoinState.networkFee!.low!);
-                                        // setState(() {
-                                        //   selectedFee =
-                                        //     bitcoinCubit.state.networkFee!.low!;
-                                        // });
-                                        // bitcoinCubit.loadAvailableBalance(
-                                        //     state
-                                        //         .activeAccount!.bitcoinAddress!,
-                                        //     selectedFee);
-                                        // setState(() {
-                                        //   btcAvailableBalance = balance;
-                                        // });
-                                      },
-                                      isActive: bitcoinState.activeFee ==
-                                          bitcoinState.networkFee!.low,
-                                    ),
-                                    SizedBox(height: 8),
-                                    FeeCard(
-                                      fee: bitcoinState.networkFee!.medium!,
-                                      iconUrl: '',
-                                      label: 'Medium',
-                                      callback: () async {
-                                        bitcoinCubit.changeActiveFee(
-                                            state
-                                                .activeAccount!.bitcoinAddress!,
-                                            bitcoinState.networkFee!.medium!);
-                                        // setState(() {
-                                        //   selectedFee = bitcoinCubit
-                                        //       .state.networkFee!.medium!;
-                                        // });
-                                        // bitcoinCubit.loadAvailableBalance(
-                                        //     state
-                                        //         .activeAccount!.bitcoinAddress!,
-                                        //     selectedFee);
-                                        // setState(() {
-                                        //   btcAvailableBalance = balance;
-                                        // });
-                                      },
-                                      isActive: bitcoinState.activeFee ==
-                                          bitcoinState.networkFee!.medium,
-                                    ),
-                                    SizedBox(height: 8),
-                                    FeeCard(
-                                      fee: bitcoinState.networkFee!.high!,
-                                      iconUrl: '',
-                                      label: 'Fast',
-                                      callback: () async {
-                                        bitcoinCubit.changeActiveFee(
-                                            state
-                                                .activeAccount!.bitcoinAddress!,
-                                            bitcoinState.networkFee!.high!);
-                                        // setState(() {
-                                        //   selectedFee =
-                                        //       bitcoinState.networkFee!.high!;
-                                        // });
-                                        // bitcoinCubit.loadAvailableBalance(
-                                        //     state
-                                        //         .activeAccount!.bitcoinAddress!,
-                                        //     selectedFee);
-                                        // setState(() {
-                                        //   btcAvailableBalance = balance;
-                                        // });
-                                      },
-                                      isActive: bitcoinState.activeFee ==
-                                          bitcoinState.networkFee!.high,
-                                    )
-                                  ],
-                                ),
+                                SizedBox(height: 22),
+                                if (SettingsHelper.isBitcoin()) Text("Fees"),
+                                SizedBox(height: 12),
+                                if (bitcoinState.networkFee != null)
+                                  Column(
+                                    children: [
+                                      FeeCard(
+                                        fee: bitcoinState.networkFee!.low!,
+                                        iconUrl: 'assets/slow_$theme.svg',
+                                        label: 'Slow',
+                                        callback: () async {
+                                          bitcoinCubit.changeActiveFee(
+                                              state.activeAccount!
+                                                  .bitcoinAddress!,
+                                              bitcoinState.networkFee!.low!);
+                                        },
+                                        isActive: bitcoinState.activeFee ==
+                                            bitcoinState.networkFee!.low,
+                                      ),
+                                      SizedBox(height: 8),
+                                      FeeCard(
+                                        fee: bitcoinState.networkFee!.medium!,
+                                        iconUrl: 'assets/medium_$theme.svg',
+                                        label: 'Medium',
+                                        callback: () async {
+                                          bitcoinCubit.changeActiveFee(
+                                              state.activeAccount!
+                                                  .bitcoinAddress!,
+                                              bitcoinState.networkFee!.medium!);
+                                        },
+                                        isActive: bitcoinState.activeFee ==
+                                            bitcoinState.networkFee!.medium,
+                                      ),
+                                      SizedBox(height: 8),
+                                      FeeCard(
+                                        fee: bitcoinState.networkFee!.high!,
+                                        iconUrl: 'assets/fast_$theme.svg',
+                                        label: 'Fast',
+                                        callback: () async {
+                                          bitcoinCubit.changeActiveFee(
+                                              state.activeAccount!
+                                                  .bitcoinAddress!,
+                                              bitcoinState.networkFee!.high!);
+                                        },
+                                        isActive: bitcoinState.activeFee ==
+                                            bitcoinState.networkFee!.high,
+                                      )
+                                    ],
+                                  ),
                               ],
                             ),
                           ),
@@ -297,6 +295,14 @@ class _SendConfirmState extends State<SendTokenSelector> {
                         ],
                       ),
                     ),
+                  ),
+                );
+              } else if (bitcoinState.status == BitcoinStatusList.failure &&
+                  SettingsHelper.isBitcoin()) {
+                return Center(
+                  child: ErrorPlaceholder(
+                    message: 'Something went wrong',
+                    description: 'Please try later',
                   ),
                 );
               } else {

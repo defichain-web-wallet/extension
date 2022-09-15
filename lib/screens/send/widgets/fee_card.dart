@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class FeeCard extends StatelessWidget {
   final String iconUrl;
@@ -20,7 +21,7 @@ class FeeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
             color: isActive
@@ -33,10 +34,7 @@ class FeeCard extends StatelessWidget {
           onTap: callback,
           child: ListTile(
             minLeadingWidth: 20,
-            leading: Icon(
-              Icons.arrow_back,
-              size: 20,
-            ),
+            leading: SvgPicture.asset(iconUrl, width: 20, height: 20,),
             title: Text(label),
             trailing: Text('$fee sat pro byte'),
           ),
