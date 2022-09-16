@@ -109,13 +109,13 @@ class TransactionService {
     _txb.setVersion(2);
     var amountUtxo = 0;
     selectedUtxo.forEach((utxo) {
-      amount += utxo.value!;
+      amountUtxo += utxo.value!;
       _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: account.bitcoinAddress!.keyPair!.publicKey), network: networkType).data!.output);
     });
 
     _txb.addOutput(destinationAddress, amount);
-    if(amountUtxo > amount+DUST){
-      _txb.addOutput(account.bitcoinAddress!.address, amountUtxo - amount);
+    if(amountUtxo > amount+fee+DUST){
+      _txb.addOutput(account.bitcoinAddress!.address, amountUtxo - (amount+fee));
     }
     selectedUtxo.asMap().forEach((index, utxo) {
     _txb.sign(

@@ -31,6 +31,7 @@ class WalletsHelper {
     account.activeToken = 'DFI';
     account.bitcoinAddress = await _hdWalletService.getAddressModelFromKeyPair(
         masterKeyPair, accountIndex, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
+    account.bitcoinAddress!.blockchain = 'BTC';
     return account;
   }
 
@@ -66,6 +67,7 @@ class WalletsHelper {
 
       var bitcoinAddress = await _hdWalletService.getAddressModelFromKeyPair(
           masterKeyPair, accountIndex, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
+      bitcoinAddress.blockchain = 'BTC';
 
       accountList.add(AccountModel(
         index: accountIndex,
