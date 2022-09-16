@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/address_model.dart';
+import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/requests/btc_requests.dart';
 import 'package:equatable/equatable.dart';
@@ -13,16 +14,20 @@ class BitcoinCubit extends Cubit<BitcoinState> {
 
   loadDetails(AddressModel address) async {
     int balance;
+    List<dynamic> history;
 
     emit(state.copyWith(
-        status: BitcoinStatusList.loading,
-        totalBalance: state.totalBalance,
-        availableBalance: state.availableBalance,
-        activeFee: state.activeFee,
-        networkFee: state.networkFee));
+      status: BitcoinStatusList.loading,
+      totalBalance: state.totalBalance,
+      availableBalance: state.availableBalance,
+      activeFee: state.activeFee,
+      networkFee: state.networkFee,
+      history: state.history ?? [],
+    ));
 
     try {
       balance = await btcRequests.getBalance(address: address);
+      history = await btcRequests.getTransactionHistory(address: address);
 
       emit(state.copyWith(
         status: BitcoinStatusList.success,
@@ -30,14 +35,16 @@ class BitcoinCubit extends Cubit<BitcoinState> {
         availableBalance: state.availableBalance,
         activeFee: state.activeFee,
         networkFee: state.networkFee,
+        history: history[0],
       ));
     } catch (err) {
       emit(state.copyWith(
         status: BitcoinStatusList.failure,
-        totalBalance: state.totalBalance,
-        availableBalance: state.availableBalance,
-        activeFee: state.activeFee,
+        totalBalance: 0,
+        availableBalance: 0,
+        activeFee: 0,
         networkFee: state.networkFee,
+        history: state.history ?? [],
       ));
     }
   }
@@ -52,6 +59,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
       availableBalance: state.availableBalance,
       activeFee: fee ?? state.activeFee,
       networkFee: state.networkFee,
+      history: state.history ?? [],
     ));
 
     try {
@@ -73,6 +81,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
         availableBalance: availableBalance,
         activeFee: fee ?? networkFee.low,
         networkFee: networkFee,
+        history: state.history ?? [],
       ));
     } catch (err) {
       emit(state.copyWith(
@@ -86,6 +95,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
               medium: 1,
               high: 2,
             ),
+        history: state.history ?? [],
       ));
     }
   }
@@ -102,6 +112,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
         availableBalance: availableBalance,
         activeFee: fee,
         networkFee: state.networkFee,
+        history: state.history ?? [],
       ));
     } catch (err) {
       emit(state.copyWith(
@@ -110,6 +121,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
         availableBalance: state.availableBalance,
         activeFee: state.activeFee,
         networkFee: state.networkFee,
+        history: state.history ?? [],
       ));
     }
   }

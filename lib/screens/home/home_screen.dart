@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
@@ -257,14 +258,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             height: assetsTabBodyHeight,
                             child: TabBarBody(
                               tabController: tabController,
-                              historyList: _getHistoryList(state),
+                              isEmptyList: isExistHistory(state),
                             ),
                           )
                         : SizedBox(
                             height: historyTabBodyHeight,
                             child: TabBarBody(
                               tabController: tabController,
-                              historyList: state.activeAccount.historyList!,
+                              isEmptyList: isExistHistory(state),
                             ),
                           ),
                   ],
@@ -288,13 +289,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  List<dynamic> _getHistoryList(state) {
+  bool isExistHistory(state) {
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+
     if (SettingsHelper.isBitcoin()) {
-      return [];
+      return bitcoinCubit.state.history!.length > 0;
     } else if (SettingsHelper.settings.network == 'mainnet') {
-      return state.activeAccount.historyList!;
+      return state.activeAccount.historyList!.length > 0;
     } else {
-      return state.activeAccount.testnetHistoryList!;
+      return state.activeAccount.testnetHistoryList!.length > 0;
     }
   }
 

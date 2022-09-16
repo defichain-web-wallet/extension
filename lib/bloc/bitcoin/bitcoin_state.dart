@@ -8,6 +8,7 @@ class BitcoinState extends Equatable {
   final int availableBalance;
   final int activeFee;
   final NetworkFeeModel? networkFee;
+  final List<HistoryModel>? history;
 
   BitcoinState({
     this.status = BitcoinStatusList.initial,
@@ -15,6 +16,7 @@ class BitcoinState extends Equatable {
     this.availableBalance = 0,
     this.activeFee = 0,
     this.networkFee,
+    this.history,
   });
 
   BitcoinState copyWith({
@@ -23,6 +25,7 @@ class BitcoinState extends Equatable {
     int? availableBalance,
     int? activeFee,
     NetworkFeeModel? networkFee,
+    List<HistoryModel>? history,
   }) {
     return BitcoinState(
       status: status ?? this.status,
@@ -30,6 +33,7 @@ class BitcoinState extends Equatable {
       availableBalance: availableBalance ?? this.availableBalance,
       activeFee: activeFee ?? this.activeFee,
       networkFee: networkFee ?? this.networkFee,
+      history: history ?? this.history,
     );
   }
 
@@ -40,5 +44,6 @@ class BitcoinState extends Equatable {
     availableBalance,
     activeFee,
     networkFee,
+    history,
   ];
 }

@@ -10,12 +10,12 @@ import 'package:flutter/material.dart';
 
 class TabBarBody extends StatelessWidget {
   final TabController? tabController;
-  final List<dynamic> historyList;
+  final bool isEmptyList;
 
   const TabBarBody({
     Key? key,
     this.tabController,
-    required this.historyList,
+    required this.isEmptyList,
   }) : super(key: key);
 
   @override
@@ -55,7 +55,7 @@ class TabBarBody extends StatelessWidget {
         Column(
           children: [
             Expanded(child: TransactionHistory()),
-            historyList.length > 0
+            !isEmptyList
                 ? Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: TextButton(

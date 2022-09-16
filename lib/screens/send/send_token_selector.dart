@@ -127,10 +127,10 @@ class _SendConfirmState extends State<SendTokenSelector> {
               String theme =
                   SettingsHelper.settings.theme == 'Light' ? 'dark' : 'light';
 
-              print(bitcoinState.status);
               if (state.status == AccountStatusList.success &&
                   (bitcoinState.status == BitcoinStatusList.success ||
                       !SettingsHelper.isBitcoin())) {
+                print(bitcoinState.history);
                 List<String> assets = [];
                 if (SettingsHelper.isBitcoin()) {
                   assetFrom = 'BTC';
