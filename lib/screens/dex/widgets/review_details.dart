@@ -20,13 +20,7 @@ class ReviewDetails extends StatelessWidget {
     return Container(
       height: 60,
       decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withOpacity(0.5),
-            blurRadius: 2,
-          ),
-        ],
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
             color: Theme.of(context).textTheme.button!.decorationColor!),
         color: Theme.of(context).cardColor,

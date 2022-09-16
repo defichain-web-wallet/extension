@@ -7,12 +7,14 @@ class AddressField extends StatefulWidget {
   final TextEditingController? addressController;
   final Function(String)? onChanged;
   final bool isBorder;
+  final void Function()? hideOverlay;
 
   const AddressField({
     Key? key,
     this.addressController,
     this.onChanged,
     this.isBorder = false,
+    this.hideOverlay,
   }) : super(key: key);
 
   @override
@@ -37,6 +39,7 @@ class _AddressFieldState extends State<AddressField> {
           });
         },
         child: TextField(
+          onTap: widget.hideOverlay,
           textAlignVertical: TextAlignVertical.center,
           style: Theme.of(context).textTheme.button,
           decoration: InputDecoration(
@@ -66,6 +69,7 @@ class _AddressFieldState extends State<AddressField> {
                         : AssetImage('assets/images/address_book_white.png'),
               ),
               onPressed: () {
+                widget.hideOverlay!();
                 Navigator.push(
                   context,
                   PageRouteBuilder(

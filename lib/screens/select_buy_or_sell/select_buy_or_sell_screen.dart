@@ -190,12 +190,12 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                               ),
                               title: Text(fiatState.history[index].type!),
                               subtitle: Text(fiatState.history[index].date!),
-                              trailing: (fiatState.history[index].buyAsset !=
-                                      null)
+                              trailing: (fiatState.history[index].inputAsset !=
+                                  null)
                                   ? Text(
-                                      '${toFixed(fiatState.history[index].buyAmount!, 4)} ${fiatState.history[index].buyAsset}')
+                                  '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
                                   : Text(
-                                      '${toFixed(fiatState.history[index].sellAmount!, 4)} ${fiatState.history[index].sellAsset}'),
+                                  '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
                             );
                           },
                         )
@@ -229,6 +229,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
           reverseTransitionDuration: Duration.zero,
         ),
       );
+
     }
   }
 

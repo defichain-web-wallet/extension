@@ -18,6 +18,7 @@ class AssetDropdown extends StatelessWidget {
   final bool? isMaxOnly;
   final bool? isFixedWidthAssetSelectorText;
   final bool isBorder;
+  final void Function()? hideOverlay;
 
   const AssetDropdown({
     Key? key,
@@ -35,6 +36,7 @@ class AssetDropdown extends StatelessWidget {
     this.isFixedWidthAssetSelectorText = false,
     this.isMaxOnly = false,
     this.isBorder = false,
+    this.hideOverlay,
   }) : super(key: key);
 
   @override
@@ -55,6 +57,7 @@ class AssetDropdown extends StatelessWidget {
         Expanded(
           child: DecorationTextField(
             isBorder: isBorder,
+            hideOverlay: hideOverlay,
             controller: amountController,
             focusNode: focusNode,
             focusModel: focusModel,

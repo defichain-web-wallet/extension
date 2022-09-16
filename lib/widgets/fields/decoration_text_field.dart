@@ -11,6 +11,7 @@ class DecorationTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final Widget? suffixIcon;
   final bool isBorder;
+  final void Function()? hideOverlay;
 
   const DecorationTextField({
     Key? key,
@@ -20,6 +21,7 @@ class DecorationTextField extends StatefulWidget {
     this.onChanged,
     this.suffixIcon,
     this.isBorder = false,
+    this.hideOverlay,
   }) : super(key: key);
 
   @override
@@ -70,9 +72,7 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
                     topRight: Radius.circular(10),
                     bottomRight: Radius.circular(10),
                   ),
-                  borderSide: BorderSide(
-                    color: Theme.of(context).cardColor,
-                  ),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.only(
@@ -87,6 +87,7 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
               onChanged: widget.onChanged ?? null,
               controller: widget.controller,
               focusNode: widget.focusNode,
+              onTap: widget.hideOverlay,
             ),
           ),
         ),

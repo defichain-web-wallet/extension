@@ -77,9 +77,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
             if (state.status == AccountStatusList.success &&
                 tokensState.status == TokensStatusList.success) {
               return Container(
-                color: isCustomBgColor
-                    ? Theme.of(context).dialogBackgroundColor
-                    : null,
+                color: Theme.of(context).dialogBackgroundColor,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: Center(
