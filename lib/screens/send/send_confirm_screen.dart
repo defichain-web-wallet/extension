@@ -200,7 +200,19 @@ class _SendConfirmState extends State<SendConfirmScreen> {
             satPerByte: widget.fee,
           );
           print(a);
-          await bitcoinCubit.sendTransaction(a);
+          var txResponse = await bitcoinCubit.sendTransaction(a);
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => SendStatusScreen(
+                  txResponse: txResponse,
+                  amount: widget.amount,
+                  token: 'BTC',
+                  address: widget.address),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
         } else {
           await _sendTransaction(
               context, tokensState, widget.token, state.activeAccount);

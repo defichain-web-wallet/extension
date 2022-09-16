@@ -29,6 +29,10 @@ class BtcRequests {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
+        var responseDecode = jsonDecode(response.body);
+        if (responseDecode['txrefs'] == null) {
+          return <UtxoModel>[];
+        }
         List<dynamic> data = jsonDecode(response.body)['txrefs'];
         data.map((utxo) {
           var utxoModel = UtxoModel();
@@ -51,11 +55,15 @@ class BtcRequests {
 
   Future<List<dynamic>> getTransactionHistory({required AddressModel address}) async {
     try {
-      final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'test3' : 'test3'}/addrs/${address.address}');
+      final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'main' : 'test3'}/addrs/${address.address}');
 
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
+        var responseDecode = jsonDecode(response.body);
+        if (responseDecode['txrefs'] == null) {
+          return [<HistoryModel>[], 'done'];
+        }
         dynamic data = jsonDecode(response.body)['txrefs'];
         Map<String, HistoryModel> txs = {};
         data.forEach((tx){
@@ -73,10 +81,10 @@ class BtcRequests {
         txList.forEach((tx){
           if(tx.value! > 0){
             tx.type = 'vin';
-            tx.isSend = false;
+            tx.isSend = true;
           } else {
             tx.type = 'vout';
-            tx.isSend = true;
+            tx.isSend = false;
           }
         });
         return [txList, 'done'];

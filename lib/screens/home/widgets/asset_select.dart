@@ -1,5 +1,6 @@
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
@@ -110,8 +111,10 @@ class AssetSelectState extends State<AssetSelect> {
                         if(widget.isFixedWidthText)
                           TickerText(
                             child: Text(
-                              tokenHelper
-                                  .getTokenWithPrefix(widget.selectedToken),
+                              SettingsHelper.isBitcoin()
+                                  ? widget.selectedToken
+                                  : tokenHelper
+                                      .getTokenWithPrefix(widget.selectedToken),
                               overflow: TextOverflow.ellipsis,
                               style:
                               Theme.of(context).textTheme.headline6!.apply(
@@ -133,7 +136,9 @@ class AssetSelectState extends State<AssetSelect> {
                             width: 70,
                             child: TickerText(
                               child: Text(
-                                tokenHelper
+                                SettingsHelper.isBitcoin()
+                                    ? widget.selectedToken
+                                    : tokenHelper
                                     .getTokenWithPrefix(widget.selectedToken),
                                 overflow: TextOverflow.ellipsis,
                                 style:

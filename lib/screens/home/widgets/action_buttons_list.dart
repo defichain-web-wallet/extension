@@ -35,19 +35,6 @@ class ActionButtonsList extends StatelessWidget {
 
     var sendCallback = () {
       hideOverlay();
-      // if (SettingsHelper.isBitcoin() &&
-      //     bitcoinCubit.state.status == BitcoinStatusList.failure) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     SnackBar(
-      //       content: Text(
-      //         'Failed',
-      //         style: Theme.of(context).textTheme.headline5,
-      //       ),
-      //       backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-      //     ),
-      //   );
-      //   return;
-      // }
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -59,6 +46,18 @@ class ActionButtonsList extends StatelessWidget {
     };
 
     var swapCallback = () {
+      if (SettingsHelper.isBitcoin()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Not allowed for bitcoin',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+          ),
+        );
+        return;
+      }
       hideOverlay();
       Navigator.push(
           context,

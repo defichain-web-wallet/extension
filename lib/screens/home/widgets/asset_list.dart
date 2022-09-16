@@ -18,77 +18,81 @@ class AssetList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (state.status == AccountStatusList.success) {
-        late List<BalanceModel> balances;
-        if (SettingsHelper.isBitcoin()) {
-          balances = List.generate(
-              1,
-              (index) => BalanceModel(
-                    token: 'BTC',
-                    balance: bitcoinCubit.state.totalBalance,
-                  ));
-        } else {
-          balances = state.activeAccount!.balanceList!
-              .where((el) => !el.isHidden!)
-              .toList();
-        }
-        String currency = SettingsHelper.settings.currency!;
+      return BlocBuilder<BitcoinCubit, BitcoinState>(
+          builder: (context, bitcoinState) {
+        if (state.status == AccountStatusList.success) {
+          late List<BalanceModel> balances;
+          if (SettingsHelper.isBitcoin()) {
+            balances = List.generate(
+                1,
+                (index) => BalanceModel(
+                      token: 'BTC',
+                      balance: bitcoinState.totalBalance,
+                    ));
+          } else {
+            balances = state.activeAccount!.balanceList!
+                .where((el) => !el.isHidden!)
+                .toList();
+          }
+          String currency = SettingsHelper.settings.currency!;
 
-        return BlocBuilder<TokensCubit, TokensState>(
-            builder: (context, tokensState) {
-          if (tokensState.status == TokensStatusList.success) {
-            return ListView.builder(
-              itemCount: balances.length,
-              itemBuilder: (context, index) {
-                String coin = balances[index].token!;
-                String tokenName = tokenHelper.getTokenWithPrefix(coin);
-                double tokenBalance =
-                    convertFromSatoshi(balances[index].balance!);
+          return BlocBuilder<TokensCubit, TokensState>(
+              builder: (context, tokensState) {
+            if (tokensState.status == TokensStatusList.success) {
+              return ListView.builder(
+                itemCount: balances.length,
+                itemBuilder: (context, index) {
+                  String coin = balances[index].token!;
+                  String tokenName = SettingsHelper.isBitcoin()
+                      ? coin
+                      : tokenHelper.getTokenWithPrefix(coin);
+                  double tokenBalance =
+                      convertFromSatoshi(balances[index].balance!);
 
-                return Padding(
-                  padding: const EdgeInsets.only(
-                      bottom: 8, left: 16, right: 16, top: 2),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Theme.of(context).cardColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).shadowColor,
-                          blurRadius: 2,
-                          spreadRadius: 2,
-                        )
-                      ],
-                    ),
-                    child: ListTile(
-                      leading: _buildTokenIcon(balances[index]),
-                      title: Text(
-                        getFormatTokenBalance(tokenBalance, tokenName),
-                        style: Theme.of(context).textTheme.headline6,
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                        bottom: 8, left: 16, right: 16, top: 2),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).cardColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context).shadowColor,
+                            blurRadius: 2,
+                            spreadRadius: 2,
+                          )
+                        ],
                       ),
-                      subtitle: Text(
-                        getFormatTokenBalanceByFiat(
-                            tokensState, coin, tokenBalance, currency),
-                        style: Theme.of(context).textTheme.headline4!.apply(
-                          color: SettingsHelper.settings.theme == 'dark' ? Colors.white : Color(0xFF7D7D7D),
-                          fontSizeFactor: 0.9
+                      child: ListTile(
+                        leading: _buildTokenIcon(balances[index]),
+                        title: Text(
+                          getFormatTokenBalance(tokenBalance, tokenName),
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                        subtitle: Text(
+                          getFormatTokenBalanceByFiat(
+                              tokensState, coin, tokenBalance, currency),
+                          style: Theme.of(context).textTheme.headline4!.apply(
+                              color: SettingsHelper.settings.theme == 'dark'
+                                  ? Colors.white
+                                  : Color(0xFF7D7D7D),
+                              fontSizeFactor: 0.9),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
-            );
-          } else {
-            return Container();
-          }
-        });
-      } else {
-        return Container();
-      }
+                  );
+                },
+              );
+            } else {
+              return Container();
+            }
+          });
+        } else {
+          return Container();
+        }
+      });
     });
   }
 
@@ -115,8 +119,8 @@ class AssetList extends StatelessWidget {
       balanceInUsd = tokenHelper.getPairsAmountByAsset(
           state.tokensPairs, balanceInSatoshi, coin, 'USD');
     } else {
-      balanceInUsd = tokenHelper.getAmountByUsd(
-          state.tokensPairs, tokenBalance, coin);
+      balanceInUsd =
+          tokenHelper.getAmountByUsd(state.tokensPairs, tokenBalance, coin);
     }
     if (fiat == 'EUR') {
       balanceInUsd *= state.eurRate;

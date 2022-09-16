@@ -74,10 +74,12 @@ class SendStatusScreen extends StatelessWidget {
           'user was send token failed: ${txResponse!.error}');
     } else {
       LoggerService.invokeInfoLogg('user was send token successfully');
-      TransactionCubit transactionCubit =
+      if (!SettingsHelper.isBitcoin()) {
+        TransactionCubit transactionCubit =
           BlocProvider.of<TransactionCubit>(context);
 
-      transactionCubit.setOngoingTransaction(txResponse!.txid!);
+        transactionCubit.setOngoingTransaction(txResponse!.txid!);
+      }
     }
     String tokenName = (token != 'DFI') ? 'd' + token : token;
     return Container(
@@ -158,8 +160,18 @@ class SendStatusScreen extends StatelessWidget {
                             'View on Explorer',
                             style: AppTheme.defiUnderlineText,
                           ),
-                          onTap: () => launch(
-                              'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}'),
+                          onTap: () {
+                            if (SettingsHelper.isBitcoin()) {
+                              if (SettingsHelper.settings.network! == 'mainnet') {
+                                launch('https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
+                              } else {
+                                launch('https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
+                              }
+                            } else {
+                              launch(
+                                  'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
+                            }
+                          },
                         ),
                       ],
                     ),

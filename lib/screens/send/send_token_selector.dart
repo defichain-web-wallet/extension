@@ -227,7 +227,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 SizedBox(height: 12),
                                 if (SettingsHelper.isBitcoin())
                                   Text(
-                                    "Available balance: ${balancesHelper.numberStyling(convertFromSatoshi(bitcoinState.availableBalance), fixed: true, fixedCount: 6)} BTC",
+                                    "Available balance: ${_getAvailableBalance(bitcoinState)} BTC",
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline4!
@@ -394,9 +394,12 @@ class _SendConfirmState extends State<SendTokenSelector> {
     }
   }
 
-// Future<double> getAvailableBalance(state) async {
-//   int balance = await btcRequests.getAvailableBalance(
-//       address: state.activeAccount!.bitcoinAddress!, feePerByte: selectedFee);
-//   return convertFromSatoshi(balance);
-// }
+  String _getAvailableBalance(state) {
+    double balance = convertFromSatoshi(state.availableBalance);
+    if (balance > 0) {
+      return balancesHelper.numberStyling(balance, fixed: true, fixedCount: 6);
+    } else {
+      return balancesHelper.numberStyling(0, fixed: true, fixedCount: 6);
+    }
+  }
 }

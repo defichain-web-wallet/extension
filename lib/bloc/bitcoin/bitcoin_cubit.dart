@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
+import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/btc_requests.dart';
 import 'package:equatable/equatable.dart';
 
@@ -126,11 +127,11 @@ class BitcoinCubit extends Cubit<BitcoinState> {
     }
   }
 
-  sendTransaction(String tx) async {
+  Future<TxErrorModel> sendTransaction(String tx) async {
     try {
-      await btcRequests.sendTxHex(tx);
+      return await btcRequests.sendTxHex(tx);
     } catch (err) {
-      throw err;
+      return TxErrorModel(isError: true);
     }
   }
 }
