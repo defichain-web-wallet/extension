@@ -34,7 +34,7 @@ class _SearchPoolPairFieldState extends State<SearchPoolPairField> {
           decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+              borderSide: BorderSide(color: Colors.transparent),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),

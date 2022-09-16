@@ -60,7 +60,7 @@ class _ThirdStepBuyScreenState extends State<ThirdStepBuyScreen> {
   }
 
   Widget _buildBody(state, {isFullSize = false}) => Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -115,7 +115,8 @@ class _ThirdStepBuyScreenState extends State<ThirdStepBuyScreen> {
                         callback: () async {
                           FiatCubit fiatCubit =
                               BlocProvider.of<FiatCubit>(context);
-                          await fiatCubit.changeStatusTutorial(!widget.isConfirm);
+                          await fiatCubit
+                              .changeStatusTutorial(!widget.isConfirm);
                           Navigator.push(
                             context,
                             PageRouteBuilder(

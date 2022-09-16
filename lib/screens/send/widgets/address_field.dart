@@ -29,7 +29,6 @@ class _AddressFieldState extends State<AddressField> {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        // border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Focus(
         onFocusChange: (focused) {
@@ -44,17 +43,10 @@ class _AddressFieldState extends State<AddressField> {
             filled: true,
             fillColor: Theme.of(context).cardColor,
             hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-            // border: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(10),
-            //   borderSide: BorderSide(
-            //     color: Theme.of(context).dividerColor,
-            //   ),
-            // ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: widget.isBorder ? Theme.of(context).dividerColor : Colors.transparent,
-                // color: Theme.of(context).dividerColor,
+                color: Colors.transparent,
               ),
             ),
             focusedBorder: OutlineInputBorder(

@@ -79,7 +79,7 @@ class MainLiquidityPair extends StatelessWidget {
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                       side: BorderSide(
-                        color: isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+                        color: Colors.transparent,
                       ),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(10),
@@ -128,7 +128,7 @@ class MainLiquidityPair extends StatelessWidget {
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                     side: BorderSide(
-                      color: isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+                      color: Colors.transparent,
                     ),
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(10),

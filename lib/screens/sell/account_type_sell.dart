@@ -93,7 +93,7 @@ class _AccountTypeSellState extends State<AccountTypeSell> {
       return Container();
     } else {
       return Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(

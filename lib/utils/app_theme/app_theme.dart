@@ -48,9 +48,10 @@ class AppTheme {
         backgroundColor: Colors.white,
         actionTextColor: Colors.black,
       ),
-      scaffoldBackgroundColor: Color(0xffFAFAFA),
-      dialogBackgroundColor: Color(0xffFFFFFF),
+      scaffoldBackgroundColor: Color(0xffEDEDED),
+      dialogBackgroundColor: Color(0xffFAFAFA),
       selectedRowColor: Color(0xFFFAFAFA),
+
       shadowColor: Colors.grey[300]!,
       cardColor: Colors.white,
       backgroundColor: Colors.white,

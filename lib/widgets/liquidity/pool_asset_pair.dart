@@ -33,11 +33,6 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
         decoration: BoxDecoration(
           color: Theme.of(context).backgroundColor,
           borderRadius: BorderRadius.all(Radius.circular(10)),
-          border: Border.all(
-            color: widget.isFullSize
-                ? Theme.of(context).dividerColor
-                : Colors.transparent,
-          ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

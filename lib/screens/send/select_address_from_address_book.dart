@@ -65,7 +65,7 @@ class _SelectAddressFromAddressBookState
         BlocProvider.of<AddressBookCubit>(context);
     addressBookCubit.loadAddressBook();
     return Container(
-      color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+      color: Theme.of(context).dialogBackgroundColor,
       padding: const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
       child: Center(
         child: StretchBox(
@@ -95,9 +95,7 @@ class _SelectAddressFromAddressBookState
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(
-                            color: isFullSize
-                                ? Theme.of(context).dividerColor
-                                : Colors.transparent),
+                            color: Colors.transparent),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -159,9 +157,7 @@ class _SelectAddressFromAddressBookState
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(10)),
                                       side: BorderSide(
-                                        color: isFullSize
-                                            ? Theme.of(context).dividerColor
-                                            : Colors.transparent,
+                                        color: Colors.transparent,
                                       ),
                                     ),
                                     margin: EdgeInsets.only(
@@ -246,9 +242,7 @@ class _SelectAddressFromAddressBookState
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10)),
                                           side: BorderSide(
-                                            color: isFullSize
-                                                ? Theme.of(context).dividerColor
-                                                : Colors.transparent,
+                                            color: Colors.transparent,
                                           ),
                                         ),
                                         margin: EdgeInsets.only(

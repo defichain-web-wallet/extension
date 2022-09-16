@@ -84,7 +84,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Widget _buildBody(state, {isFullSize = false}) => Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -100,9 +100,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                           side: BorderSide(
-                            color: isFullSize
-                                ? Theme.of(context).dividerColor
-                                : Colors.transparent,
+                            color: Colors.transparent,
                           ),
                         ),
                         shadowColor: Colors.transparent,
@@ -230,7 +228,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                           color: Theme.of(context).backgroundColor,
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: isFullSize ? Theme.of(context).dividerColor : Colors.transparent,
+                            color: Colors.transparent,
                           ),
                         ),
                         child: Text(

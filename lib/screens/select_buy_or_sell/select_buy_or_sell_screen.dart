@@ -87,7 +87,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
   }
 
   Widget _buildBody(fiatState, {isFullSize = false}) => Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -100,9 +100,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).appBarTheme.backgroundColor,
                     border: Border.all(
-                      color: isFullSize
-                          ? Theme.of(context).dividerColor
-                          : Colors.transparent,
+                      color: Colors.transparent,
                     ),
                     borderRadius: BorderRadius.circular(12.5),
                   ),

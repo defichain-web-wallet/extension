@@ -28,7 +28,7 @@ class SlippageButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(5),
             side: BorderSide(
-              color: isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+              color: Colors.transparent,
             ),
           ),
           backgroundColor:

@@ -84,9 +84,7 @@ class SearchTokenState extends State<SearchToken> {
             } else if (tokenState.status == TokensStatusList.success &&
                 state.status == AccountStatusList.success) {
               return Container(
-                color: isCustomBgColor
-                    ? Theme.of(context).dialogBackgroundColor
-                    : null,
+                color: Theme.of(context).dialogBackgroundColor,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: Center(
@@ -209,7 +207,7 @@ class SearchTokenState extends State<SearchToken> {
         return Container(
           color: symbols.contains(availableTokens[index].symbol)
               ? Theme.of(context).textTheme.bodyText1!.decorationColor
-              : Theme.of(context).scaffoldBackgroundColor,
+              : Theme.of(context).cardColor,
           child: ListTile(
             leading: SvgPicture.asset(
               tokenHelper.getImageNameByTokenName(tokenName),

@@ -169,9 +169,7 @@ class _HistoryState extends State<History> {
 
               if (historyList.length > 0 || testnetHistoryList.length > 0) {
                 return Container(
-                  color: isCustomBgColor
-                      ? Theme.of(context).dialogBackgroundColor
-                      : null,
+                  color: Theme.of(context).dialogBackgroundColor,
                   child: Center(
                     child: StretchBox(
                       child: Container(
@@ -242,9 +240,7 @@ class _HistoryState extends State<History> {
                                       borderRadius: BorderRadius.circular(10),
                                       color: Theme.of(context).cardColor,
                                       border: Border.all(
-                                        color: isCustomBgColor
-                                            ? Theme.of(context).dividerColor
-                                            : Colors.transparent,
+                                        color: Colors.transparent,
                                       ),
                                     ),
                                     child: ListTile(

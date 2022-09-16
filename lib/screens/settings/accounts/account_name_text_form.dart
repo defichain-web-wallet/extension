@@ -85,9 +85,7 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
               border: Border.all(
                 color: showConfirmButton
                     ? AppTheme.pinkColor
-                    : widget.isBorder
-                        ? Theme.of(context).dividerColor
-                        : Colors.transparent,
+                    : Colors.transparent,
               ),
               color: Theme.of(context).cardColor,
             ),

@@ -23,8 +23,8 @@ class ReviewSwapScreen extends StatefulWidget {
   final double amountTo;
   final double slippage;
 
-  const ReviewSwapScreen(
-      this.assetFrom, this.assetTo, this.amountFrom, this.amountTo, this.slippage);
+  const ReviewSwapScreen(this.assetFrom, this.assetTo, this.amountFrom,
+      this.amountTo, this.slippage);
 
   @override
   _ReviewSwapScreenState createState() => _ReviewSwapScreenState();
@@ -40,39 +40,43 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<TransactionCubit, TransactionState>(
-          builder: (context, state) => ScaffoldConstrainedBox(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth < ScreenSizes.medium) {
-                  return Scaffold(
-                    body: _buildBody(context),
+        builder: (context, state) => ScaffoldConstrainedBox(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < ScreenSizes.medium) {
+                return Scaffold(
+                  body: _buildBody(context),
+                  appBar: MainAppBar(
+                      title: 'Decentralized Exchange',
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight),
+                );
+              } else {
+                return Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Scaffold(
+                    body: _buildBody(context, isCustomBgColor: true),
                     appBar: MainAppBar(
-                        title: 'Decentralized Exchange',
-                        isShowBottom: !(state is TransactionInitialState),
-                        height: !(state is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight),
-                  );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Scaffold(
-                      body: _buildBody(context, isCustomBgColor: true),
-                      appBar: MainAppBar(
-                        title: 'Decentralized Exchange',
-                        action: null,
-                        isShowBottom: !(state is TransactionInitialState),
-                        height: !(state is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight,
-                        isSmall: true,
-                      ),
+                      title: 'Decentralized Exchange',
+                      action: null,
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight,
+                      isSmall: true,
                     ),
-                  );
-                }
-              },),),);
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      );
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
-        color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Center(
           child: StretchBox(
@@ -163,11 +167,12 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => SwapStatusScreen(
-                  txResponse: txResponse,
-                  amount: widget.amountFrom,
-                  assetFrom: widget.assetFrom,
-                  assetTo: widget.assetTo),
+              pageBuilder: (context, animation1, animation2) =>
+                  SwapStatusScreen(
+                      txResponse: txResponse,
+                      amount: widget.amountFrom,
+                      assetFrom: widget.assetFrom,
+                      assetTo: widget.assetTo),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),

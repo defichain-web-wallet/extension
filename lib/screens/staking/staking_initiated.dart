@@ -16,33 +16,33 @@ class StakingInitiated extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ScaffoldConstrainedBox(
-    child: LayoutBuilder(builder: (context, constraints) {
-      if (constraints.maxWidth < ScreenSizes.medium) {
-        return Scaffold(
-          appBar: AuthAppBar(),
-          body: _buildBody(context),
-        );
-      } else {
-        return Container(
-          padding: EdgeInsets.only(top: 20),
-          child: Scaffold(
-            appBar: AuthAppBar(
-              isSmall: false,
-            ),
-            body: _buildBody(context, isCustomBgColor: true),
-          ),
-        );
-      }
-    }),
-  );
+        child: LayoutBuilder(builder: (context, constraints) {
+          if (constraints.maxWidth < ScreenSizes.medium) {
+            return Scaffold(
+              appBar: AuthAppBar(),
+              body: _buildBody(context),
+            );
+          } else {
+            return Container(
+              padding: EdgeInsets.only(top: 20),
+              child: Scaffold(
+                appBar: AuthAppBar(
+                  isSmall: false,
+                ),
+                body: _buildBody(context, isCustomBgColor: true),
+              ),
+            );
+          }
+        }),
+      );
 
   Widget _buildBody(context, {isCustomBgColor = false}) {
     TransactionCubit transactionCubit =
-    BlocProvider.of<TransactionCubit>(context);
+        BlocProvider.of<TransactionCubit>(context);
 
     transactionCubit.setOngoingTransaction(txResponse!.txid!);
     return Container(
-      color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+      color: Theme.of(context).dialogBackgroundColor,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
         child: Center(

@@ -70,9 +70,7 @@ class _AddTokenState extends State<AddToken> {
       BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
         if (state.status == AccountStatusList.success) {
           return Container(
-            color: isCustomBgColor
-                ? Theme.of(context).dialogBackgroundColor
-                : null,
+            color: Theme.of(context).dialogBackgroundColor,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: Center(
               child: StretchBox(

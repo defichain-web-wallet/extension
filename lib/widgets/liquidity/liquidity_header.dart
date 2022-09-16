@@ -31,9 +31,7 @@ class LiquidityHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         border: Border.all(
-          color: isBorder
-              ? Theme.of(context).dividerColor
-              : Colors.transparent,
+          color: Colors.transparent,
         ),
         borderRadius: BorderRadius.circular(10),
       ),

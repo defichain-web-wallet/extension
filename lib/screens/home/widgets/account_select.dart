@@ -59,13 +59,6 @@ class AccountSelectState extends State<AccountSelect> {
                 width: widget.width,
                 decoration: BoxDecoration(
                   color: Theme.of(context).appBarTheme.backgroundColor,
-                  // boxShadow: [
-                  //   BoxShadow(
-                  //     color: AppTheme.shadowColor.withOpacity(0.1),
-                  //     spreadRadius: 2,
-                  //     blurRadius: 3,
-                  //   ),
-                  // ],
                   border: Border.all(
                     color: Theme.of(context).dividerColor,
                   ),

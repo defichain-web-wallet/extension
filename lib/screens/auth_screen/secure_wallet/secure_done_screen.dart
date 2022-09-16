@@ -32,7 +32,7 @@ class SecureDoneScreen extends StatelessWidget {
       );
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
-        color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Center(
@@ -85,7 +85,8 @@ class SecureDoneScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomeScreen(
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomeScreen(
                               isLoadTokens: true,
                             ),
                             transitionDuration: Duration.zero,

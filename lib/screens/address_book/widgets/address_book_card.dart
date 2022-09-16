@@ -50,9 +50,7 @@ class _AddressBookCardState extends State<AddressBookCard> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10)),
         side: BorderSide(
-          color: widget.isBorder
-              ? Theme.of(context).dividerColor
-              : Colors.transparent,
+          color: Colors.transparent,
         ),
       ),
       margin: EdgeInsets.only(top: 0, bottom: 10, left: 0, right: 0),

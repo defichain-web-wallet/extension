@@ -30,10 +30,10 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.isBorder ? 46 :48,
+      height: 48,
       decoration: BoxDecoration(
         border: Border.all(
-          color: widget.isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+          color: Colors.transparent,
         ),
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(10),

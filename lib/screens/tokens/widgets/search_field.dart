@@ -29,9 +29,7 @@ class _SearchFieldState extends State<SearchField> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: widget.isBorder
-              ? Theme.of(context).dividerColor
-              : Colors.transparent,
+          color: Colors.transparent,
         ),
       ),
       child: Focus(

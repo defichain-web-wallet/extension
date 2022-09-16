@@ -82,7 +82,7 @@ class _AddNewAddressState extends State<AddNewAddress> {
   }
 
   Widget _buildBody({isFullSize = false}) => Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -107,13 +107,11 @@ class _AddNewAddressState extends State<AddNewAddress> {
                           filled: true,
                           fillColor: Theme.of(context).cardColor,
                           hoverColor:
-                          Theme.of(context).inputDecorationTheme.hoverColor,
+                              Theme.of(context).inputDecorationTheme.hoverColor,
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
-                              color: isFullSize
-                                  ? Theme.of(context).dividerColor
-                                  : Colors.transparent,
+                              color: Colors.transparent,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
@@ -121,7 +119,7 @@ class _AddNewAddressState extends State<AddNewAddress> {
                             borderSide: BorderSide(color: AppTheme.pinkColor),
                           ),
                           contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 10),
+                              const EdgeInsets.symmetric(horizontal: 10),
                           hintStyle: TextStyle(fontSize: 14),
                         ),
                         onFieldSubmitted: (value) => _focusNode.requestFocus(),
@@ -157,9 +155,7 @@ class _AddNewAddressState extends State<AddNewAddress> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
-                              color: isFullSize
-                                  ? Theme.of(context).dividerColor
-                                  : Colors.transparent,
+                              color: Colors.transparent,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(

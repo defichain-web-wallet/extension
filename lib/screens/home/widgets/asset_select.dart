@@ -88,7 +88,7 @@ class AssetSelectState extends State<AssetSelect> {
                       bottomLeft:
                           _isOpen ? Radius.circular(0) : Radius.circular(10),
                     ),
-              border: Border.all(color: widget.isBorder ? Theme.of(context).dividerColor : Colors.transparent),
+              border: Border.all(color: Colors.transparent),
             ),
             child: DropdownButtonHideUnderline(
               child: Padding(
@@ -245,7 +245,7 @@ class AssetSelectState extends State<AssetSelect> {
                         bottomRight: Radius.circular(10),
                       ),
                 border: Border.all(
-                  color: Theme.of(context).dividerColor,
+                  color: Colors.transparent,
                 ),
               ),
               child: ListView.separated(

@@ -56,9 +56,6 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 topLeft: Radius.circular(10),
                 topRight: Radius.circular(10),
               ),
-              side: BorderSide(
-                color: Theme.of(context).dividerColor,
-              ),
             ),
       automaticallyImplyLeading: false,
       leadingWidth: leadingWidth,

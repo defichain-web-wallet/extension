@@ -80,8 +80,7 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
           });
         }
         return Container(
-          color:
-              isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+          color: Theme.of(context).dialogBackgroundColor,
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Center(
             child: StretchBox(

@@ -34,15 +34,13 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      shadowColor: Colors.transparent,
       shape: isSmall!
           ? null
           : RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(10),
                 topRight: Radius.circular(10),
-              ),
-              side: BorderSide(
-                color: Theme.of(context).dividerColor,
               ),
             ),
       toolbarHeight: toolbarHeight,

@@ -58,7 +58,7 @@ class _EarnCardState extends State<EarnCard> {
         decoration: BoxDecoration(
           color: Theme.of(context).appBarTheme.backgroundColor,
           border: Border.all(
-            color: widget.isBorder ? Theme.of(context).dividerColor : Colors.transparent,
+            color: Colors.transparent,
           ),
           borderRadius: BorderRadius.circular(10),
         ),

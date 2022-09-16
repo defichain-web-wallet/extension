@@ -76,9 +76,7 @@ class IbanSelectorState extends State<IbanSelector> {
                         _isOpen ? Radius.circular(0) : Radius.circular(10),
                   ),
                   border: Border.all(
-                    color: widget.isBorder
-                        ? Theme.of(context).dividerColor
-                        : Colors.transparent,
+                    color: Colors.transparent,
                   ),
                 ),
                 child: DropdownButtonHideUnderline(
@@ -173,9 +171,7 @@ class IbanSelectorState extends State<IbanSelector> {
                   bottomRight: Radius.circular(10),
                 ),
                 border: Border.all(
-                  color: widget.isBorder
-                      ? Theme.of(context).dividerColor
-                      : Colors.transparent,
+                  color: Colors.transparent,
                 ),
               ),
               child: ListView.separated(

@@ -202,6 +202,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return BlocBuilder<HomeCubit, HomeState>(
         builder: (context, homeState) {
           return Container(
+            color: Theme.of(context).dialogBackgroundColor,
             child: Center(
               child: StretchBox(
                 maxWidth: ScreenSizes.medium,

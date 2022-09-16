@@ -54,8 +54,7 @@ class RenameAccounts extends StatelessWidget {
 
         return Container(
           height: double.infinity,
-          color:
-              isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+          color: Theme.of(context).dialogBackgroundColor,
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: SingleChildScrollView(
             child: Center(

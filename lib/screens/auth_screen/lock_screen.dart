@@ -37,91 +37,94 @@ class _LockScreenState extends State<LockScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: WelcomeAppBar(),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  'assets/jelly_logo.svg',
-                  height: 180,
-                  width: 200,
-                ),
-                Text(
-                  widget.redirectTo == null
-                      ? 'Welcome Back!'
-                      : 'Enter password',
-                  style: Theme.of(context).textTheme.headline1,
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Your Keys. Your Crypto.',
-                  style: Theme.of(context).textTheme.headline2,
-                ),
-                SizedBox(height: 25),
-                StretchBox(
-                  maxWidth: ScreenSizes.xSmall,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Password',
-                        style: Theme.of(context).textTheme.headline2,
-                      ),
-                      SizedBox(height: 8),
-                      PasswordField(
-                        autofocus: true,
-                        obscureText: isVisiblePasswordField,
-                        onEditComplete: () =>
-                            (globalKey.currentWidget! as ElevatedButton)
-                                .onPressed!(),
-                        hintText: 'Enter password',
-                        onChanged: (value) => password = value,
-                        onIconPressed: () => setState(() =>
-                            isVisiblePasswordField = !isVisiblePasswordField),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        isFailed ? 'Incorrect password' : '',
-                        style: Theme.of(context).textTheme.headline4!.copyWith(
-                              color: AppTheme.redErrorColor,
-                            ),
-                      ),
-                    ],
+        body: Container(
+          color: Theme.of(context).dialogBackgroundColor,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'assets/jelly_logo.svg',
+                    height: 180,
+                    width: 200,
                   ),
-                ),
-                SizedBox(height: 4),
-                StretchBox(
-                  maxWidth: ScreenSizes.xSmall,
-                  child: PendingButton(
-                    widget.redirectTo == null ? 'Unlock' : 'Continue',
-                    isCheckLock: false,
-                    globalKey: globalKey,
-                    callback: (parent) => _restoreWallet(parent),
+                  Text(
+                    widget.redirectTo == null
+                        ? 'Welcome Back!'
+                        : 'Enter password',
+                    style: Theme.of(context).textTheme.headline1,
                   ),
-                ),
-                SizedBox(height: 20),
-                if (widget.redirectTo == null)
-                  InkWell(
-                    child: Text(
-                      'or import using Secret Recovery Phrase',
-                      style: AppTheme.defiUnderlineText,
-                    ),
-                    onTap: isEnable
-                        ? () => Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation1, animation2) =>
-                                        RecoveryScreen(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
+                  SizedBox(height: 16),
+                  Text(
+                    'Your Keys. Your Crypto.',
+                    style: Theme.of(context).textTheme.headline2,
+                  ),
+                  SizedBox(height: 25),
+                  StretchBox(
+                    maxWidth: ScreenSizes.xSmall,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Password',
+                          style: Theme.of(context).textTheme.headline2,
+                        ),
+                        SizedBox(height: 8),
+                        PasswordField(
+                          autofocus: true,
+                          obscureText: isVisiblePasswordField,
+                          onEditComplete: () =>
+                              (globalKey.currentWidget! as ElevatedButton)
+                                  .onPressed!(),
+                          hintText: 'Enter password',
+                          onChanged: (value) => password = value,
+                          onIconPressed: () => setState(() =>
+                              isVisiblePasswordField = !isVisiblePasswordField),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          isFailed ? 'Incorrect password' : '',
+                          style: Theme.of(context).textTheme.headline4!.copyWith(
+                                color: AppTheme.redErrorColor,
                               ),
-                            )
-                        : null,
+                        ),
+                      ],
+                    ),
                   ),
-              ],
+                  SizedBox(height: 4),
+                  StretchBox(
+                    maxWidth: ScreenSizes.xSmall,
+                    child: PendingButton(
+                      widget.redirectTo == null ? 'Unlock' : 'Continue',
+                      isCheckLock: false,
+                      globalKey: globalKey,
+                      callback: (parent) => _restoreWallet(parent),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  if (widget.redirectTo == null)
+                    InkWell(
+                      child: Text(
+                        'or import using Secret Recovery Phrase',
+                        style: AppTheme.defiUnderlineText,
+                      ),
+                      onTap: isEnable
+                          ? () => Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          RecoveryScreen(),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
+                              )
+                          : null,
+                    ),
+                ],
+              ),
             ),
           ),
         ),

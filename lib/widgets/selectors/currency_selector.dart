@@ -69,9 +69,7 @@ class CurrencySelectorState extends State<CurrencySelector> {
                       _isOpen ? Radius.circular(0) : Radius.circular(10),
                 ),
                 border: Border.all(
-                  color: widget.isBorder
-                      ? Theme.of(context).dividerColor
-                      : Colors.transparent,
+                  color: Colors.transparent,
                 ),
               ),
               child: DropdownButtonHideUnderline(
@@ -158,9 +156,7 @@ class CurrencySelectorState extends State<CurrencySelector> {
                   bottomRight: Radius.circular(10),
                 ),
                 border: Border.all(
-                  color: widget.isBorder
-                      ? Theme.of(context).dividerColor
-                      : Colors.transparent,
+                  color: Colors.transparent,
                 ),
               ),
               child: ListView.separated(

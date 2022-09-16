@@ -65,7 +65,7 @@ class _IbanFieldState extends State<IbanField> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: widget.isBorder ? Theme.of(context).dividerColor : Colors.transparent)
+              border: Border.all(color: Colors.transparent)
             ),
             child: Focus(
               onFocusChange: (focused) {
@@ -119,7 +119,7 @@ class _IbanFieldState extends State<IbanField> {
                   hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Theme.of(context).dividerColor),
+                    borderSide: BorderSide(color: Colors.transparent),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),

@@ -210,8 +210,7 @@ class _SwapScreenState extends State<SwapScreen> {
         }
 
         return Container(
-          color:
-              isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+          color: Theme.of(context).dialogBackgroundColor,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Center(
             child: StretchBox(
@@ -330,9 +329,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                           borderRadius:
                                               BorderRadius.circular(5),
                                           borderSide: BorderSide(
-                                            color: isCustomBgColor
-                                                ? Theme.of(context).dividerColor
-                                                : Colors.transparent,
+                                            color: Colors.transparent,
                                           ),
                                         ),
                                         focusedBorder: OutlineInputBorder(
@@ -422,10 +419,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                                 borderRadius:
                                                     BorderRadius.circular(5),
                                                 side: BorderSide(
-                                                  color: isCustomBgColor
-                                                      ? Theme.of(context)
-                                                          .dividerColor
-                                                      : Colors.transparent,
+                                                  color: Colors.transparent,
                                                 ),
                                               ),
                                             ),

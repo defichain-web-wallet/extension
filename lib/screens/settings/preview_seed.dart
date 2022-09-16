@@ -64,7 +64,7 @@ class _PreviewSeedState extends State<PreviewSeed> {
 
   Widget _buildBody(context, {isFullSize = false}) {
     return Container(
-      color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+      color: Theme.of(context).dialogBackgroundColor,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
         child: Center(
