@@ -4,22 +4,23 @@ import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-
 class DecorationTextField extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final FocusModel? focusModel;
   final ValueChanged<String>? onChanged;
   final Widget? suffixIcon;
+  final void Function()? hideOverlay;
 
-  const DecorationTextField(
-      {Key? key,
-      this.controller,
-      this.focusNode,
-      this.focusModel,
-      this.onChanged,
-      this.suffixIcon})
-      : super(key: key);
+  const DecorationTextField({
+    Key? key,
+    this.controller,
+    this.focusNode,
+    this.focusModel,
+    this.onChanged,
+    this.suffixIcon,
+    this.hideOverlay,
+  }) : super(key: key);
 
   @override
   _DecorationTextFieldState createState() => _DecorationTextFieldState();
@@ -45,7 +46,8 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
       ),
       child: FocusScope(
         child: Focus(
-          onFocusChange: (focus) => setState(() => widget.focusModel!.isFocus = focus),
+          onFocusChange: (focus) =>
+              setState(() => widget.focusModel!.isFocus = focus),
           child: Container(
             decoration: BoxDecoration(
               boxShadow: [
@@ -60,11 +62,9 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
               ],
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(
-                    SettingsHelper.settings.theme == 'Light' ? 16 : 15
-                ),
+                    SettingsHelper.settings.theme == 'Light' ? 16 : 15),
                 bottomRight: Radius.circular(
-                    SettingsHelper.settings.theme == 'Light' ? 16 : 15
-                ),
+                    SettingsHelper.settings.theme == 'Light' ? 16 : 15),
               ),
             ),
             child: TextField(
@@ -72,7 +72,8 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
               textAlignVertical: TextAlignVertical.center,
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp(r'(^-?\d*\.?d*\,?\d*)')),
+                FilteringTextInputFormatter.allow(
+                    RegExp(r'(^-?\d*\.?d*\,?\d*)')),
               ],
               style: Theme.of(context).textTheme.button,
               decoration: InputDecoration(
@@ -84,8 +85,7 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
                     topRight: Radius.circular(14),
                     bottomRight: Radius.circular(14),
                   ),
-                  borderSide: BorderSide(
-                      color: Colors.transparent),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.only(
@@ -100,6 +100,7 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
               onChanged: widget.onChanged ?? null,
               controller: widget.controller,
               focusNode: widget.focusNode,
+              onTap: widget.hideOverlay,
             ),
           ),
         ),
