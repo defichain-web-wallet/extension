@@ -93,17 +93,17 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                       tokenName = 'BTC';
                       txValue = convertFromSatoshi(historyList[index].value);
                       isSend = historyList[index].isSend;
-                      type = historyList[index].type;
+                      type = isSend ? 'SEND' : 'RECEIVE';
                       DateTime dateTime = DateTime.parse(historyList[index].blockTime);
                       date = formatter.format(DateTime.fromMillisecondsSinceEpoch(
                           dateTime.millisecondsSinceEpoch)
                           .toLocal());
                       txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
-                          ? isSend
-                          ? '-'
-                          : '+'
-                          : '';
-                    } else if (SettingsHelper.settings.network == 'mainnet') {
+                        ? isSend
+                            ? ''
+                            : '+'
+                        : '';
+                  } else if (SettingsHelper.settings.network == 'mainnet') {
                       tokenName = historyList[index].tokens![0].code;
                       txValue = historyList[index].value;
                       isSend = historyList[index].category == 'SEND';

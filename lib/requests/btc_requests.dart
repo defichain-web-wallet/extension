@@ -81,10 +81,10 @@ class BtcRequests {
         txList.forEach((tx){
           if(tx.value! > 0){
             tx.type = 'vin';
-            tx.isSend = true;
+            tx.isSend = false;
           } else {
             tx.type = 'vout';
-            tx.isSend = false;
+            tx.isSend = true;
           }
         });
         return [txList, 'done'];

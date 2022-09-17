@@ -73,6 +73,10 @@ class AddressBookCubit extends Cubit<AddressBookState> {
 
   loadAddressBook() async {
     List<AddressBookModel> addressBookList = [];
+    emit(state.copyWith(
+      status: AddressBookStatusList.loading,
+      addressBookList: state.addressBookList,
+    ));
     var box = await Hive.openBox('AddressBookBox');
     var addressBookJson;
     if (SettingsHelper.isBitcoin()) {
@@ -81,15 +85,18 @@ class AddressBookCubit extends Cubit<AddressBookState> {
       addressBookJson = await box.get('addressBookList');
     }
 
-    List<dynamic> jsonFromString = json.decode(addressBookJson);
+    if (addressBookJson != null) {
+      List<dynamic> jsonFromString = json.decode(addressBookJson);
 
-    for (var element in jsonFromString) {
-      addressBookList.add(AddressBookModel.fromJson(element));
+      for (var element in jsonFromString) {
+        addressBookList.add(AddressBookModel.fromJson(element));
+      }
     }
 
     await box.close();
 
     emit(state.copyWith(
+      status: AddressBookStatusList.success,
       addressBookList: addressBookList,
     ));
   }
