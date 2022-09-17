@@ -1,5 +1,6 @@
 import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/screens/history/history.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
@@ -28,28 +29,30 @@ class TabBarBody extends StatelessWidget {
         Column(
           children: [
             Expanded(child: AssetList()),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: TextButton(
-                child: Text(
-                  ' +  Add token ',
-                  style: Theme.of(context).textTheme.headline6,
+            if (!SettingsHelper.isBitcoin())
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: TextButton(
+                  child: Text(
+                    ' +  Add token ',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  onPressed: () async {
+                    await lockHelper.provideWithLockChecker(
+                        context,
+                        () => Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        SearchToken(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            ));
+                  },
                 ),
-                onPressed: () async {
-                  await lockHelper.provideWithLockChecker(
-                      context,
-                      () => Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) =>
-                                  SearchToken(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),
-                          ));
-                },
               ),
-            ),
           ],
         ),
         Column(
