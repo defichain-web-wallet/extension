@@ -418,15 +418,33 @@ class AccountCubit extends Cubit<AccountState> {
     final jsonString = decryptedAccounts;
 
     List<dynamic> jsonFromString = json.decode(jsonString);
+    var needToStoreBTCAddress = false;
     for (var account in jsonFromString) {
-      accounts.add(AccountModel.fromJson(account));
+      var accountModel = AccountModel.fromJson(account);
+      if(accountModel.bitcoinAddress == null){
+        needToStoreBTCAddress = true;
+        accountModel.bitcoinAddress = await HDWalletService().getAddressModelFromKeyPair(
+            masterKeyPair, accountModel.index, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
+        accountModel.bitcoinAddress!.blockchain = 'BTC';
+      }
+      accounts.add(accountModel);
     }
+
     var accountList = await loadAccountDetails(accounts);
     final String accessToken = await getAccessToken(accountList[0], password);
     accounts = accountList;
 
     final balances = accounts[0].balanceList!;
 
+    if(needToStoreBTCAddress){
+      if (SettingsHelper.settings.network! == 'testnet') {
+        await saveAccountsToStorage(null, null, accounts, masterKeyPair,
+            accessToken, mnemonic.split(','), password: password);
+      } else {
+        await saveAccountsToStorage(accounts, masterKeyPair, null, null,
+            accessToken, mnemonic.split(','), password: password);
+      }
+    }
     await box.close();
     emit(state.copyWith(
       status: AccountStatusList.success,
