@@ -165,7 +165,7 @@ class AppTheme {
       dialogBackgroundColor: Color(0xFF1C1D1F),
       selectedRowColor: Color(0xFF1C1D1F),
       shadowColor: Colors.transparent,
-      cardColor: Color(0xff1C1D1F),
+      cardColor: Color(0xff333436),
       colorScheme: ColorScheme.dark(
         primary: pinkColor,
         primaryVariant: pinkColor,

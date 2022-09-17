@@ -45,20 +45,21 @@ class MainLiquidityPair extends StatelessWidget {
           LiquidityAssetPair(assetPair: assetPair, balance: balance),
           Row(
             children: [
-              ElevatedButton(
+              TextButton(
                 onPressed: () => lockHelper.provideWithLockChecker(
+                  context,
+                  () => Navigator.push(
                     context,
-                    () => Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                SelectPool(
-                              assetPair: assetPair!,
-                            ),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        )),
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) =>
+                          SelectPool(
+                        assetPair: assetPair!,
+                      ),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  ),
+                ),
                 child: Icon(
                   Icons.add,
                   size: 16,
@@ -68,7 +69,7 @@ class MainLiquidityPair extends StatelessWidget {
                   shadowColor:
                       MaterialStateProperty.all<Color>(Colors.transparent),
                   backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).dialogBackgroundColor,
+                    Theme.of(context).cardColor,
                   ),
                   padding: MaterialStateProperty.all<EdgeInsets>(
                     EdgeInsets.all(10),
@@ -92,7 +93,7 @@ class MainLiquidityPair extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
               ),
-              ElevatedButton(
+              TextButton(
                 onPressed: () => lockHelper.provideWithLockChecker(
                   context,
                   () => Navigator.push(
@@ -117,7 +118,7 @@ class MainLiquidityPair extends StatelessWidget {
                   shadowColor:
                       MaterialStateProperty.all<Color>(Colors.transparent),
                   backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).dialogBackgroundColor,
+                    Theme.of(context).cardColor,
                   ),
                   padding: MaterialStateProperty.all<EdgeInsets>(
                     EdgeInsets.all(10),
@@ -126,15 +127,16 @@ class MainLiquidityPair extends StatelessWidget {
                     Size(24, 30),
                   ),
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: Colors.transparent,
+                    RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: Colors.transparent,
+                      ),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      ),
                     ),
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(10),
-                      bottomRight: Radius.circular(10),
-                    ),
-                  )),
+                  ),
                 ),
               ),
             ],

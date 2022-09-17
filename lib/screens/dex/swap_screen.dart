@@ -244,17 +244,21 @@ class _SwapScreenState extends State<SwapScreen> {
                           ),
                           child: SizedBox(
                             width: 40,
-                            child: TextButton(
-                              child:
-                                  Text('MAX', style: TextStyle(fontSize: 10)),
-                              onPressed: () {
-                                double maxAmount = getAvailableAmount(
-                                    accountState, assetFrom, dexState);
-                                amountFromController.text =
-                                    maxAmount.toString();
-                                onChangeFromAsset(amountFromController.text,
-                                    accountState, dexCubit, tokensState);
-                              },
+
+                            child: Container(
+                              color: Theme.of(context).cardColor,
+                              child: TextButton(
+                                child:
+                                    Text('MAX', style: TextStyle(fontSize: 10)),
+                                onPressed: () {
+                                  double maxAmount = getAvailableAmount(
+                                      accountState, assetFrom, dexState);
+                                  amountFromController.text =
+                                      maxAmount.toString();
+                                  onChangeFromAsset(amountFromController.text,
+                                      accountState, dexCubit, tokensState);
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -322,9 +326,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                       decoration: InputDecoration(
                                         filled: true,
                                         fillColor: Theme.of(context).cardColor,
-                                        hoverColor: Theme.of(context)
-                                            .inputDecorationTheme
-                                            .hoverColor,
+                                        hoverColor: Colors.transparent,
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(5),
@@ -410,8 +412,9 @@ class _SwapScreenState extends State<SwapScreen> {
                                         SizedBox(
                                           height: 22,
                                           width: 30,
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
+                                          child: TextButton(
+                                            style: TextButton.styleFrom(
+                                              backgroundColor: Theme.of(context).cardColor,
                                               padding: const EdgeInsets.all(0),
                                               elevation: 2,
                                               shadowColor: Colors.transparent,
@@ -424,6 +427,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                               ),
                                             ),
                                             child: Icon(
+
                                               Icons.edit,
                                               size: 16,
                                             ),

@@ -225,7 +225,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                             left: 20, right: 20, bottom: 15, top: 15),
                         width: 274,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).backgroundColor,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
                             color: Colors.transparent,

@@ -12,7 +12,6 @@ import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 
 // ignore: must_be_immutable
 class AssetList extends StatelessWidget {
-
   AssetList({
     Key? key,
   }) : super(key: key);
