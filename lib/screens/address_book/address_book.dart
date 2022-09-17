@@ -16,6 +16,8 @@ class AddressBook extends StatefulWidget {
 }
 
 class _AddressBookState extends State<AddressBook> {
+  int iterator = 0;
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AddressBookCubit, AddressBookState>(

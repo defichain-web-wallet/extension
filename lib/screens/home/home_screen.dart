@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
 import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
@@ -15,6 +17,7 @@ import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/network/network_selector.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     assetsTabBodyHeight =
         countAssets * heightListEntry + heightAdditionalAction;
 
-    countTransactions =
+    countTransactions = (SettingsHelper.isBitcoin()) ? 0 :
         accountState.activeAccount!.historyList!.length.toDouble();
     if (countTransactions < maxHistoryEntries) {
       historyTabBodyHeight =
@@ -213,6 +216,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       child: Column(
                         children: [
                           Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: NetworkSelector(isFullSize: isFullSize,),
+                          ),
+                          Padding(
                             padding: const EdgeInsets.only(bottom: 8, top: 40),
                             child: WalletDetails(),
                           ),
@@ -245,18 +252,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             height: assetsTabBodyHeight,
                             child: TabBarBody(
                               tabController: tabController,
-                              historyList: state.activeAccount.historyList!,
-                              testnetHistoryList:
-                                  state.activeAccount.testnetHistoryList!,
+                              isEmptyList: isExistHistory(state),
                             ),
                           )
                         : SizedBox(
                             height: historyTabBodyHeight,
                             child: TabBarBody(
                               tabController: tabController,
-                              historyList: state.activeAccount.historyList!,
-                              testnetHistoryList:
-                                  state.activeAccount.testnetHistoryList!,
+                              isEmptyList: isExistHistory(state),
                             ),
                           ),
                   ],
@@ -277,6 +280,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
     } else {
       return Container();
+    }
+  }
+
+  bool isExistHistory(state) {
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+
+    if (SettingsHelper.isBitcoin()) {
+      return bitcoinCubit.state.history!.length > 0;
+    } else if (SettingsHelper.settings.network == 'mainnet') {
+      return state.activeAccount.historyList!.length > 0;
+    } else {
+      return state.activeAccount.testnetHistoryList!.length > 0;
     }
   }
 

@@ -50,6 +50,8 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: Color(0xffEDEDED),
       dialogBackgroundColor: Color(0xffFAFAFA),
+      primaryColorLight: Color(0xFF5D5D5D),
+
       selectedRowColor: Color(0xFFFAFAFA),
 
       shadowColor: Colors.grey[300]!,
@@ -159,6 +161,7 @@ class AppTheme {
         backgroundColor: Color(0xff333436),
         actionTextColor: Colors.white,
       ),
+      primaryColorLight: Color(0xFF545556),
       backgroundColor: Color(0xff333436),
       secondaryHeaderColor: Color(0xff333436),
       scaffoldBackgroundColor: AppTheme.shadowColor,

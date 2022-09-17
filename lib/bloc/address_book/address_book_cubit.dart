@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
@@ -27,7 +28,11 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var jsonString = json.encode(resultJSON);
 
     var box = await Hive.openBox('AddressBookBox');
-    await box.put('addressBookList', jsonString);
+    if (SettingsHelper.isBitcoin()) {
+      await box.put('btcAddressBookList', jsonString);
+    } else {
+      await box.put('addressBookList', jsonString);
+    }
     await box.close();
 
     emit(state.copyWith(
@@ -54,7 +59,11 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var jsonString = json.encode(resultJSON);
 
     var box = await Hive.openBox('AddressBookBox');
-    await box.put('addressBookList', jsonString);
+    if (SettingsHelper.isBitcoin()) {
+      await box.put('btcAddressBookList', jsonString);
+    } else {
+      await box.put('addressBookList', jsonString);
+    }
     await box.close();
 
     emit(state.copyWith(
@@ -64,18 +73,30 @@ class AddressBookCubit extends Cubit<AddressBookState> {
 
   loadAddressBook() async {
     List<AddressBookModel> addressBookList = [];
+    emit(state.copyWith(
+      status: AddressBookStatusList.loading,
+      addressBookList: state.addressBookList,
+    ));
     var box = await Hive.openBox('AddressBookBox');
-    var s = await box.get('addressBookList');
+    var addressBookJson;
+    if (SettingsHelper.isBitcoin()) {
+      addressBookJson = await box.get('btcAddressBookList');
+    } else {
+      addressBookJson = await box.get('addressBookList');
+    }
 
-    List<dynamic> jsonFromString = json.decode(s);
+    if (addressBookJson != null) {
+      List<dynamic> jsonFromString = json.decode(addressBookJson);
 
-    for (var element in jsonFromString) {
-      addressBookList.add(AddressBookModel.fromJson(element));
+      for (var element in jsonFromString) {
+        addressBookList.add(AddressBookModel.fromJson(element));
+      }
     }
 
     await box.close();
 
     emit(state.copyWith(
+      status: AddressBookStatusList.success,
       addressBookList: addressBookList,
     ));
   }
@@ -96,7 +117,11 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var jsonString = json.encode(resultJSON);
 
     var box = await Hive.openBox('AddressBookBox');
-    await box.put('addressBookList', jsonString);
+    if (SettingsHelper.isBitcoin()) {
+      await box.put('btcAddressBookList', jsonString);
+    } else {
+      await box.put('addressBookList', jsonString);
+    }
     await box.close();
 
     emit(state.copyWith(

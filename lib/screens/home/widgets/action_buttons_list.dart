@@ -1,3 +1,4 @@
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -19,6 +20,7 @@ class ActionButtonsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     var receiveCallback = () async {
       hideOverlay();
       Navigator.push(
@@ -44,6 +46,18 @@ class ActionButtonsList extends StatelessWidget {
     };
 
     var swapCallback = () {
+      if (SettingsHelper.isBitcoin()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Not allowed for bitcoin',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+          ),
+        );
+        return;
+      }
       hideOverlay();
       Navigator.push(
           context,
@@ -114,11 +128,12 @@ class ActionButtonsList extends StatelessWidget {
                 label: 'Buy/Sell',
                 onPressed: () => buySellCallback(state),
               ),
-              ActionButton(
-                iconPath: 'assets/images/earn.png',
-                label: 'Earn',
-                onPressed: liquidityCallback,
-              ),
+              if (!SettingsHelper.isBitcoin())
+                ActionButton(
+                  iconPath: 'assets/images/earn.png',
+                  label: 'Earn',
+                  onPressed: liquidityCallback,
+                ),
             ],
           ),
         );

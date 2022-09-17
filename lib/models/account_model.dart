@@ -7,6 +7,7 @@ import 'address_model.dart';
 class AccountModel {
   @required int? index;
   List<AddressModel>? addressList;
+  AddressModel? bitcoinAddress;
   List<BalanceModel>? balanceList;
   List<HistoryNew>? historyList;
   List<HistoryModel>? testnetHistoryList;
@@ -18,6 +19,7 @@ class AccountModel {
   AccountModel({
     this.index,
     this.addressList,
+    this.bitcoinAddress,
     this.balanceList,
     this.historyList,
     this.testnetHistoryList,
@@ -32,6 +34,7 @@ class AccountModel {
     this.index = jsonModel["index"];
     this.name = jsonModel["name"];
     this.activeToken = jsonModel["activeToken"];
+    this.bitcoinAddress = AddressModel.fromJson(jsonModel["bitcoinAddress"]);
 
     List<AddressModel> addressList = [];
     jsonModel["addressList"]
@@ -74,6 +77,7 @@ class AccountModel {
     data["index"] = this.index;
     data["activeToken"] = this.activeToken;
     data["name"] = this.name;
+    data["bitcoinAddress"] = this.bitcoinAddress!.toJson();
     data['addressList'] = this.addressList?.map((e) => e.toJson()).toList();
     data['balanceList'] = this.balanceList?.map((e) => e.toJson()).toList();
     data['historyList'] = this.historyList?.map((e) => e.toJson()).toList();

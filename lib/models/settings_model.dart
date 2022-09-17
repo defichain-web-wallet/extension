@@ -4,6 +4,7 @@ class SettingsModel {
   String? currency;
   String? theme;
   String? network;
+  bool? isBitcoin;
   ApiName? apiName;
 
   SettingsModel({
@@ -11,12 +12,14 @@ class SettingsModel {
     this.theme = 'Light',
     this.network = 'mainnet',
     this.apiName = ApiName.auto,
+    this.isBitcoin = false,
   });
 
   SettingsModel.fromJson(Map<String, dynamic> json) {
     this.currency = json["currency"];
     this.theme = json["theme"];
     this.network = json["network"];
+    this.isBitcoin = json["isBitcoin"];
     try {
       this.apiName =
           ApiName.values.firstWhere((e) => e.toString() == json["apiName"]);
@@ -30,6 +33,7 @@ class SettingsModel {
     data["currency"] = this.currency;
     data["theme"] = this.theme;
     data["network"] = this.network;
+    data["isBitcoin"] = this.isBitcoin;
     data["apiName"] = this.apiName.toString();
     return data;
   }
@@ -39,6 +43,7 @@ class SettingsModel {
       currency: currency,
       theme: theme,
       network: network,
+      isBitcoin: isBitcoin,
       apiName: apiName,
     );
   }

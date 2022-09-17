@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -32,6 +33,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   bool firstBuild = true;
   double x = 0.0;
   double y = 0.0;
+  late String destinationAddress;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     return BlocBuilder<AccountCubit, AccountState>(
       builder: (BuildContext context, state) {
         if (state.status == AccountStatusList.success) {
+          if (SettingsHelper.isBitcoin()) {
+            destinationAddress = state.activeAccount!.bitcoinAddress!.address!;
+          } else {
+            destinationAddress = state.activeAccount!
+                .getActiveAddress(isChange: false);
+          }
           return ScaffoldConstrainedBox(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -106,8 +114,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                         shadowColor: Colors.transparent,
                         color: Colors.white,
                         child: QrImage(
-                          data: state.activeAccount
-                              .getActiveAddress(isChange: false),
+                          data: destinationAddress,
                           size: 170,
                         ),
                       ),
@@ -160,8 +167,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.only(left: 6),
                                   child: Text(
-                                    cutAddress(state.activeAccount
-                                        .getActiveAddress(isChange: false)),
+                                    cutAddress(destinationAddress),
                                     softWrap: false,
                                     style: Theme.of(context)
                                         .textTheme
@@ -257,7 +263,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     });
 
     await Clipboard.setData(ClipboardData(
-        text: state.activeAccount.getActiveAddress(isChange: false)));
+        text: destinationAddress));
 
     setState(() {
       tooltipMessage = "Address copied!";
