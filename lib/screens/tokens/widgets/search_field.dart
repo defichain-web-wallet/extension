@@ -45,7 +45,7 @@ class _SearchFieldState extends State<SearchField> {
             hintText: 'Search for a token',
             filled: true,
             fillColor: Theme.of(context).cardColor,
-            hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+            hoverColor: Colors.transparent,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
