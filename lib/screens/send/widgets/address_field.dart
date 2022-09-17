@@ -48,9 +48,10 @@ class _AddressFieldState extends State<AddressField> {
           textAlignVertical: TextAlignVertical.center,
           style: Theme.of(context).textTheme.button,
           decoration: InputDecoration(
+            hintText: "Enter address",
             filled: true,
             fillColor: Theme.of(context).cardColor,
-            hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+            hoverColor: Colors.transparent,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(

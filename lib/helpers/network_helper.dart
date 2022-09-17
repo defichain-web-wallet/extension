@@ -11,9 +11,18 @@ class NetworkHelper {
   }
 
   NetworkType getNetwork(String networkString) {
-    return networkString == 'mainnet'
-        ? networks.defichain
-        : networks.defichain_testnet;
+    switch (networkString) {
+      case 'mainnet':
+        return networks.defichain;
+      case 'testnet':
+        return networks.defichain_testnet;
+      case 'bitcoin':
+        return networks.bitcoin;
+      case 'bitcoin_testnet':
+        return networks.testnet;
+      default:
+        return networks.defichain;
+    }
   }
 
   bip32.NetworkType getNetworkType(String networkString) {

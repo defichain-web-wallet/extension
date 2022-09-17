@@ -11,7 +11,6 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/wallets_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
-import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/tx_list_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
@@ -419,15 +418,33 @@ class AccountCubit extends Cubit<AccountState> {
     final jsonString = decryptedAccounts;
 
     List<dynamic> jsonFromString = json.decode(jsonString);
+    var needToStoreBTCAddress = false;
     for (var account in jsonFromString) {
-      accounts.add(AccountModel.fromJson(account));
+      var accountModel = AccountModel.fromJson(account);
+      if(accountModel.bitcoinAddress == null){
+        needToStoreBTCAddress = true;
+        accountModel.bitcoinAddress = await HDWalletService().getAddressModelFromKeyPair(
+            masterKeyPair, accountModel.index, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
+        accountModel.bitcoinAddress!.blockchain = 'BTC';
+      }
+      accounts.add(accountModel);
     }
+
     var accountList = await loadAccountDetails(accounts);
     final String accessToken = await getAccessToken(accountList[0], password);
     accounts = accountList;
 
     final balances = accounts[0].balanceList!;
 
+    if(needToStoreBTCAddress){
+      if (SettingsHelper.settings.network! == 'testnet') {
+        await saveAccountsToStorage(null, null, accounts, masterKeyPair,
+            accessToken, mnemonic.split(','), password: password);
+      } else {
+        await saveAccountsToStorage(accounts, masterKeyPair, null, null,
+            accessToken, mnemonic.split(','), password: password);
+      }
+    }
     await box.close();
     emit(state.copyWith(
       status: AccountStatusList.success,
@@ -620,6 +637,18 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   changeNetwork(String network) async {
+    emit(state.copyWith(
+      status: AccountStatusList.loading,
+      accessToken: state.accessToken,
+      mnemonic: state.mnemonic,
+      seed: state.seed,
+      accounts: state.accounts,
+      balances: state.balances,
+      masterKeyPair: state.masterKeyPair,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+      historyFilterBy: state.historyFilterBy,
+    ));
     await restoreAccountFromStorage(network);
   }
 }

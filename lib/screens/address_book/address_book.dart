@@ -14,13 +14,18 @@ class AddressBook extends StatefulWidget {
 }
 
 class _AddressBookState extends State<AddressBook> {
+  int iterator = 0;
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AddressBookCubit, AddressBookState>(
         builder: (context, addressBookState) {
       AddressBookCubit addressBookCubit =
           BlocProvider.of<AddressBookCubit>(context);
-      addressBookCubit.loadAddressBook();
+      if (iterator == 0) {
+        addressBookCubit.loadAddressBook();
+        iterator++;
+      }
 
       return ScaffoldConstrainedBoxNew(
         appBar: MainAppBar(

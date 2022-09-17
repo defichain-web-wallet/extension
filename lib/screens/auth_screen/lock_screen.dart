@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -138,9 +139,12 @@ class _LockScreenState extends State<LockScreen> {
       parent.emitPending(true);
       if (widget.redirectTo == null) {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+        BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
 
         await accountCubit
             .restoreAccountFromStorage(SettingsHelper.settings.network!);
+        await bitcoinCubit
+            .loadDetails(accountCubit.state.activeAccount!.bitcoinAddress!);
         LoggerService.invokeInfoLogg('user was unlock wallet');
         parent.emitPending(false);
 

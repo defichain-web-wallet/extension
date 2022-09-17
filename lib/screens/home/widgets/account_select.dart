@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/services/logger_service.dart';
@@ -143,6 +144,8 @@ class AccountSelectState extends State<AccountSelect> {
       BuildContext context, _accountList, _activeAccount, state) async {
     AccountCubit accountCubit =
       BlocProvider.of<AccountCubit>(context);
+    BitcoinCubit bitcoinCubit =
+      BlocProvider.of<BitcoinCubit>(context);
     if (_isOpen) {
       hideOverlay();
     } else {
@@ -218,7 +221,9 @@ class AccountSelectState extends State<AccountSelect> {
                       onPressed: () async {
                         await lockHelper.provideWithLockChecker(context, () async {
                           hideOverlay();
-                          accountCubit.addAccount();
+                          await accountCubit.addAccount();
+                          await bitcoinCubit.loadDetails(
+                              state.activeAccount!.bitcoinAddress.bitcoinAddress!);
                           LoggerService.invokeInfoLogg('user created new account');
                         });
                       },
@@ -269,6 +274,8 @@ class AccountSelectState extends State<AccountSelect> {
                         await lockHelper.provideWithLockChecker(context, () async {
                           hideOverlay();
                           accountCubit.updateActiveAccount(_accountList[index].index!);
+                          await bitcoinCubit.loadDetails(
+                              _accountList[index].bitcoinAddress!);
                         });
                       },
                     );
