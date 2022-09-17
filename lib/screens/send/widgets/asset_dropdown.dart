@@ -19,6 +19,7 @@ class AssetDropdown extends StatelessWidget {
   final bool? isMaxOnly;
   final bool? isFixedWidthAssetSelectorText;
   final String? amountInUsd;
+  final void Function()? hideOverlay;
 
   const AssetDropdown({
     Key? key,
@@ -36,6 +37,7 @@ class AssetDropdown extends StatelessWidget {
     this.isFixedWidthAssetSelectorText = false,
     this.isMaxOnly = false,
     this.amountInUsd = '0.0',
+    this.hideOverlay,
   }) : super(key: key);
 
   @override
@@ -55,6 +57,7 @@ class AssetDropdown extends StatelessWidget {
         Expanded(
           flex: SettingsHelper.isBitcoin() ? 2 : 1,
           child: DecorationTextField(
+            hideOverlay: hideOverlay,
             controller: amountController,
             focusNode: focusNode,
             focusModel: focusModel,

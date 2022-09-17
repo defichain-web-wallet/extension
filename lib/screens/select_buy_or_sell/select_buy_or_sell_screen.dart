@@ -71,12 +71,9 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                         Container(
                           child: Text(
                             'Your limit',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline2!
-                                .apply(
-                              fontFamily: 'IBM Plex Sans',
-                            ),
+                            style: Theme.of(context).textTheme.headline2!.apply(
+                                  fontFamily: 'IBM Plex Sans',
+                                ),
                           ),
                         ),
                         SizedBox(
@@ -85,12 +82,9 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                         Container(
                           child: Text(
                             '${balancesHelper.numberStyling(fiatState.limit! / 100)}€ / Day',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline1!
-                                .apply(
-                              fontFamily: 'IBM Plex Medium',
-                            ),
+                            style: Theme.of(context).textTheme.headline1!.apply(
+                                  fontFamily: 'IBM Plex Medium',
+                                ),
                           ),
                         ),
                         SizedBox(
@@ -142,37 +136,34 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                   Expanded(
                     child: fiatState.history.length > 0
                         ? ListView.builder(
-                        itemCount: fiatState.history.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            leading: Column(
-                              mainAxisAlignment:
-                              MainAxisAlignment.center,
-                              children: [
-                                if (fiatState.history[index].type! ==
-                                    'Withdrawal')
-                                  SvgPicture.asset(
-                                      'assets/images/withdrawal.svg')
-                                else
-                                  SvgPicture.asset(
-                                      'assets/images/deposit.svg')
-                              ],
-                            ),
-                            title: Text(fiatState.history[index].type!),
-                            subtitle:
-                            Text(fiatState.history[index].date!),
-                            trailing: (fiatState
-                                .history[index].buyAsset !=
-                                null)
-                                ? Text(
-                                '${toFixed(fiatState.history[index].buyAmount!, 4)} ${fiatState.history[index].buyAsset}')
-                                : Text(
-                                '${toFixed(fiatState.history[index].sellAmount!, 4)} ${fiatState.history[index].sellAsset}'),
-                          );
-                        })
+                            itemCount: fiatState.history.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return ListTile(
+                                leading: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    if (fiatState.history[index].type! ==
+                                        'Buy')
+                                      SvgPicture.asset(
+                                          'assets/images/withdrawal.svg')
+                                    else
+                                      SvgPicture.asset(
+                                          'assets/images/deposit.svg')
+                                  ],
+                                ),
+                                title: Text(fiatState.history[index].type!),
+                                subtitle: Text(fiatState.history[index].date!),
+                                trailing: (fiatState.history[index].inputAsset !=
+                                        null)
+                                    ? Text(
+                                        '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
+                                    : Text(
+                                        '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
+                              );
+                            })
                         : Center(
-                      child: Text('Not yet any transaction'),
-                    ),
+                            child: Text('Not yet any transaction'),
+                          ),
                   ),
                   SvgPicture.asset('assets/powered_of_dfx.svg'),
                 ],
@@ -204,8 +195,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
       Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                SearchBuyToken(),
+            pageBuilder: (context, animation1, animation2) => SearchBuyToken(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ));
@@ -221,7 +211,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) =>
-          isSkipKyc ? Selling() : AccountTypeSell(),
+              isSkipKyc ? Selling() : AccountTypeSell(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ));

@@ -80,34 +80,40 @@ class _SendConfirmState extends State<SendTokenSelector> {
   Widget build(BuildContext context) =>
       BlocBuilder<TransactionCubit, TransactionState>(
         builder: (context, state) => ScaffoldConstrainedBox(
-            child: LayoutBuilder(builder: (context, constraints) {
-          if (constraints.maxWidth < ScreenSizes.medium) {
-            return Scaffold(
-              appBar: MainAppBar(
-                title: 'Send',
-                hideOverlay: () => hideOverlay(),
-                isShowBottom: !(state is TransactionInitialState),
-                height: !(state is TransactionInitialState)
-                    ? toolbarHeightWithBottom
-                    : toolbarHeight,
-              ),
-              body: _buildBody(context, state),
-            );
-          } else {
-            return Container(
-              padding: const EdgeInsets.only(top: 20),
-              child: Scaffold(
-                appBar: MainAppBar(
-                  title: 'Send',
-                  hideOverlay: () => hideOverlay(),
-                  action: null,
-                  isSmall: true,
-                ),
-                body: _buildBody(context, state, isCustomBgColor: true),
-              ),
-            );
-          }
-        })),
+          child: GestureDetector(
+            onTap: hideOverlay,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < ScreenSizes.medium) {
+                  return Scaffold(
+                    appBar: MainAppBar(
+                      title: 'Send',
+                      hideOverlay: () => hideOverlay(),
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight,
+                    ),
+                    body: _buildBody(context, state),
+                  );
+                } else {
+                  return Container(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Scaffold(
+                      appBar: MainAppBar(
+                        title: 'Send',
+                        hideOverlay: () => hideOverlay(),
+                        action: null,
+                        isSmall: true,
+                      ),
+                      body: _buildBody(context, state, isCustomBgColor: true),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+        ),
       );
 
   Widget _buildBody(context, transactionState, {isCustomBgColor = false}) =>
@@ -123,7 +129,6 @@ class _SendConfirmState extends State<SendTokenSelector> {
                     .loadAvailableBalance(state.activeAccount!.bitcoinAddress!);
                 iterator++;
               }
-
               String theme =
                   SettingsHelper.settings.theme == 'Light' ? 'dark' : 'light';
 

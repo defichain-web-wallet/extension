@@ -6,9 +6,14 @@ import 'package:flutter/material.dart';
 class AddressField extends StatefulWidget {
   final TextEditingController? addressController;
   final Function(String)? onChanged;
+  final void Function()? hideOverlay;
 
-  const AddressField({Key? key, this.addressController, this.onChanged})
-      : super(key: key);
+  const AddressField({
+    Key? key,
+    this.addressController,
+    this.onChanged,
+    this.hideOverlay,
+  }) : super(key: key);
 
   @override
   State<AddressField> createState() => _AddressFieldState();
@@ -16,6 +21,7 @@ class AddressField extends StatefulWidget {
 
 class _AddressFieldState extends State<AddressField> {
   bool isPinkIcon = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -38,6 +44,7 @@ class _AddressFieldState extends State<AddressField> {
           });
         },
         child: TextField(
+          onTap: widget.hideOverlay,
           textAlignVertical: TextAlignVertical.center,
           style: Theme.of(context).textTheme.button,
           decoration: InputDecoration(
@@ -62,9 +69,12 @@ class _AddressFieldState extends State<AddressField> {
               icon: Image(
                 image: isPinkIcon
                     ? AssetImage('assets/images/address_book_pink.png')
-                    : SettingsHelper.settings.theme == 'Light' ? AssetImage('assets/images/address_book_gray.png') : AssetImage('assets/images/address_book_white.png'),
+                    : SettingsHelper.settings.theme == 'Light'
+                        ? AssetImage('assets/images/address_book_gray.png')
+                        : AssetImage('assets/images/address_book_white.png'),
               ),
               onPressed: () {
+                widget.hideOverlay!();
                 Navigator.push(
                   context,
                   PageRouteBuilder(
