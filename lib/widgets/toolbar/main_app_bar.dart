@@ -36,12 +36,13 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       bottom: isShowBottom ? OngoingTransaction() : null,
+      shadowColor: Colors.transparent,
       shape: !isSmall!
           ? null
           : RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
               ),
             ),
       leadingWidth: leadingWidth,
@@ -74,20 +75,20 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           : customTitle,
       actions: [
         action == null
-            ? CancelButton(
-                callback: () {
-                  if (hideOverlay != null) {
-                    hideOverlay!();
-                  }
-                  Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) => HomeScreen(),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    ),
-                  );
-                })
+            ? CancelButton(callback: () {
+                if (hideOverlay != null) {
+                  hideOverlay!();
+                }
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) =>
+                        HomeScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                );
+              })
             : action!
       ],
     );

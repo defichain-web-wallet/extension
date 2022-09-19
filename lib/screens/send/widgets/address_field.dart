@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 class AddressField extends StatefulWidget {
   final TextEditingController? addressController;
   final Function(String)? onChanged;
+  final bool isBorder;
   final void Function()? hideOverlay;
 
   const AddressField({
     Key? key,
     this.addressController,
     this.onChanged,
+    this.isBorder = false,
     this.hideOverlay,
   }) : super(key: key);
 
@@ -29,13 +31,6 @@ class _AddressFieldState extends State<AddressField> {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 3,
-          ),
-        ],
       ),
       child: Focus(
         onFocusChange: (focused) {
@@ -55,7 +50,8 @@ class _AddressFieldState extends State<AddressField> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                  color: Theme.of(context).textTheme.button!.decorationColor!),
+                color: Colors.transparent,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),

@@ -92,7 +92,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Widget _buildBody(state, {isFullSize = false}) => Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -105,6 +105,13 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                     Container(
                       padding: EdgeInsets.only(top: 44.0, bottom: 18),
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          side: BorderSide(
+                            color: Colors.transparent,
+                          ),
+                        ),
+                        shadowColor: Colors.transparent,
                         color: Colors.white,
                         child: QrImage(
                           data: destinationAddress,
@@ -224,17 +231,11 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                             left: 20, right: 20, bottom: 15, top: 15),
                         width: 274,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).backgroundColor,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.all(Radius.circular(10)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).shadowColor,
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset:
-                                  Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
+                          border: Border.all(
+                            color: Colors.transparent,
+                          ),
                         ),
                         child: Text(
                           'This is your personal wallet address. \nYou can use it to get DFI and DST tokens like dBTC, dETH, dTSLA & more. ',
@@ -271,7 +272,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   cutAddress(String s) {
-    return s.substring(0,16) + '...' + s.substring(26,42);
+    return s.substring(0, 16) + '...' + s.substring(26, 42);
   }
 
   updateAccountDetails(context, state) async {

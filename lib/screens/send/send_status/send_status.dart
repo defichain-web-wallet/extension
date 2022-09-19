@@ -83,7 +83,7 @@ class SendStatusScreen extends StatelessWidget {
     }
     String tokenName = (token != 'DFI') ? 'd' + token : token;
     return Container(
-      color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+      color: Theme.of(context).dialogBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
       child: Center(
         child: Column(

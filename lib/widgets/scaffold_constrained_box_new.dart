@@ -9,6 +9,8 @@ class ScaffoldConstrainedBoxNew extends StatefulWidget {
 
   const ScaffoldConstrainedBoxNew({Key? key, this.child, this.appBar, this.hideOverlay}) : super(key: key);
 
+
+
   @override
   State<ScaffoldConstrainedBoxNew> createState() => _ScaffoldConstrainedBoxState();
 }
@@ -30,7 +32,7 @@ class _ScaffoldConstrainedBoxState extends State<ScaffoldConstrainedBoxNew> {
                   return Scaffold(
                     appBar: widget.appBar,
                     body: Container(
-                      color: null,
+                      color: Theme.of(context).dialogBackgroundColor,
                       padding:
                       const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
                       child: Center(

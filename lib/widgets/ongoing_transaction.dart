@@ -19,16 +19,17 @@ class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
   Widget build(BuildContext context) {
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
-    AccountCubit accountCubit =
-        BlocProvider.of<AccountCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     return BlocBuilder<TransactionCubit, TransactionState>(
         builder: (context, state) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         height: height,
         decoration: BoxDecoration(
-            border:
-                Border(top: BorderSide(color: Theme.of(context).dividerColor))),
+          border: Border(
+            top: BorderSide(color: Colors.transparent),
+          ),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

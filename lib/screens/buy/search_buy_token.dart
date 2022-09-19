@@ -104,9 +104,7 @@ class _SearchBuyTokenState extends State<SearchBuyToken> {
             return Container();
           } else {
             return Container(
-              color: isCustomBgColor
-                  ? Theme.of(context).dialogBackgroundColor
-                  : null,
+              color: Theme.of(context).dialogBackgroundColor,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Center(
                 child: StretchBox(
@@ -122,6 +120,7 @@ class _SearchBuyTokenState extends State<SearchBuyToken> {
                           ),
                           SizedBox(height: 8),
                           SearchField(
+                            isBorder: isCustomBgColor,
                             controller: _searchController,
                             onChanged: (value) {
                               FiatCubit fiat =
@@ -215,7 +214,7 @@ class _SearchBuyTokenState extends State<SearchBuyToken> {
         return Container(
           color: symbol == availableTokens[index].name
               ? Theme.of(context).textTheme.bodyText1!.decorationColor
-              : Theme.of(context).scaffoldBackgroundColor,
+              : Theme.of(context).cardColor,
           child: ListTile(
             leading: SvgPicture.asset(
               tokenHelper.getImageNameByTokenName(tokenName),

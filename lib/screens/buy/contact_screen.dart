@@ -98,7 +98,7 @@ class _ContactScreenState extends State<ContactScreen> {
       return Container();
     } else {
       return Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
         const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -142,12 +142,14 @@ class _ContactScreenState extends State<ContactScreen> {
                           child: Column(
                             children: [
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 addressController: _emailController,
                                 validationRule: 'email',
                                 hintText: 'Email address (optional)',
                               ),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 addressController: _phoneController,
                                 hintText: 'Phone number (optional)',
                               ),

@@ -48,10 +48,12 @@ class AppTheme {
         backgroundColor: Colors.white,
         actionTextColor: Colors.black,
       ),
+      scaffoldBackgroundColor: Color(0xffEDEDED),
+      dialogBackgroundColor: Color(0xffFAFAFA),
       primaryColorLight: Color(0xFF5D5D5D),
-      scaffoldBackgroundColor: Color(0xffFAFAFA),
-      dialogBackgroundColor: Color(0xffFFFFFF),
+
       selectedRowColor: Color(0xFFFAFAFA),
+
       shadowColor: Colors.grey[300]!,
       cardColor: Colors.white,
       backgroundColor: Colors.white,
@@ -166,7 +168,7 @@ class AppTheme {
       dialogBackgroundColor: Color(0xFF1C1D1F),
       selectedRowColor: Color(0xFF1C1D1F),
       shadowColor: Colors.transparent,
-      cardColor: Color(0xff1C1D1F),
+      cardColor: Color(0xff333436),
       colorScheme: ColorScheme.dark(
         primary: pinkColor,
         primaryVariant: pinkColor,

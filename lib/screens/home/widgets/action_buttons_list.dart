@@ -164,6 +164,7 @@ class ActionButton extends StatelessWidget {
             border: Border.all(color: AppTheme.pinkColor, width: 1.5),
           ),
           child: IconButton(
+            splashRadius: 1,
             iconSize: 22,
             icon: Image(
               image: AssetImage(iconPath!),

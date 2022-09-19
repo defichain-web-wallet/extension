@@ -90,7 +90,7 @@ class _SecureScreenState extends State<SecureScreen> {
       );
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
-        color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Center(

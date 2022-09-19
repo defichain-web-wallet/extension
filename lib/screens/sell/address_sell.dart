@@ -67,7 +67,7 @@ class _AddressSellState extends State<AddressSell> {
   }
 
   Widget _buildBody(state, fiatState, {isFullSize = false}) => Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -107,16 +107,19 @@ class _AddressSellState extends State<AddressSell> {
                           child: Column(
                             children: [
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 hintText: 'Street adress',
                                 addressController: _streetAdressController,
                               ),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 hintText: 'City',
                                 addressController: _cityController,
                               ),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               CustomTextFormField(
+                                isBorder: isFullSize,
                                 hintText: 'Zip code',
                                 addressController: _zipCodeController,
                               ),

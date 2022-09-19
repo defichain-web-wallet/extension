@@ -42,7 +42,7 @@ class SellInitiated extends StatelessWidget {
 
     transactionCubit.setOngoingTransaction(txResponse!.txid!);
     return Container(
-      color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+      color: Theme.of(context).dialogBackgroundColor,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
         child: Center(

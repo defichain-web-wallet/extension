@@ -13,6 +13,10 @@ import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 
 // ignore: must_be_immutable
 class AssetList extends StatelessWidget {
+  AssetList({
+    Key? key,
+  }) : super(key: key);
+
   TokensHelper tokenHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 
@@ -57,13 +61,6 @@ class AssetList extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Theme.of(context).cardColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context).shadowColor,
-                            blurRadius: 2,
-                            spreadRadius: 2,
-                          )
-                        ],
                       ),
                       child: ListTile(
                         leading: _buildTokenIcon(balances[index]),

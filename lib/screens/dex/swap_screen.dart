@@ -210,8 +210,7 @@ class _SwapScreenState extends State<SwapScreen> {
         }
 
         return Container(
-          color:
-              isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+          color: Theme.of(context).dialogBackgroundColor,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Center(
             child: StretchBox(
@@ -222,6 +221,7 @@ class _SwapScreenState extends State<SwapScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AmountSelectorField(
+                        isBorder: isCustomBgColor,
                         label: 'Swap from',
                         selectedAsset: assetFrom,
                         assets: assets,
@@ -244,17 +244,21 @@ class _SwapScreenState extends State<SwapScreen> {
                           ),
                           child: SizedBox(
                             width: 40,
-                            child: TextButton(
-                              child:
-                                  Text('MAX', style: TextStyle(fontSize: 10)),
-                              onPressed: () {
-                                double maxAmount = getAvailableAmount(
-                                    accountState, assetFrom, dexState);
-                                amountFromController.text =
-                                    maxAmount.toString();
-                                onChangeFromAsset(amountFromController.text,
-                                    accountState, dexCubit, tokensState);
-                              },
+
+                            child: Container(
+                              color: Theme.of(context).cardColor,
+                              child: TextButton(
+                                child:
+                                    Text('MAX', style: TextStyle(fontSize: 10)),
+                                onPressed: () {
+                                  double maxAmount = getAvailableAmount(
+                                      accountState, assetFrom, dexState);
+                                  amountFromController.text =
+                                      maxAmount.toString();
+                                  onChangeFromAsset(amountFromController.text,
+                                      accountState, dexCubit, tokensState);
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -271,6 +275,7 @@ class _SwapScreenState extends State<SwapScreen> {
                       ),
                       SizedBox(height: 14),
                       AmountSelectorField(
+                        isBorder: isCustomBgColor,
                         label: 'Swap to',
                         selectedAsset: assetTo,
                         assets: tokensForSwap,
@@ -319,6 +324,22 @@ class _SwapScreenState extends State<SwapScreen> {
                                       ],
                                       controller: slippageController,
                                       decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: Theme.of(context).cardColor,
+                                        hoverColor: Colors.transparent,
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          borderSide: BorderSide(
+                                            color: Colors.transparent,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          borderSide: BorderSide(
+                                              color: AppTheme.pinkColor),
+                                        ),
                                         contentPadding: const EdgeInsets.all(8),
                                         hintText: 'Type in percent..',
                                         suffixIcon: IconButton(
@@ -349,6 +370,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                     child: Row(
                                       children: [
                                         SlippageButton(
+                                          isBorder: isCustomBgColor,
                                           label: '0.5%',
                                           isActive: slippage == 0.005,
                                           callback: () =>
@@ -358,6 +380,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                           width: 6,
                                         ),
                                         SlippageButton(
+                                          isBorder: isCustomBgColor,
                                           label: '1%',
                                           isActive: slippage == 0.01,
                                           callback: () =>
@@ -367,6 +390,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                           width: 6,
                                         ),
                                         SlippageButton(
+                                          isBorder: isCustomBgColor,
                                           label: '3%',
                                           isActive: slippage == 0.03,
                                           callback: () =>
@@ -376,6 +400,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                           width: 6,
                                         ),
                                         SlippageButton(
+                                          isBorder: isCustomBgColor,
                                           label: '5%',
                                           isActive: slippage == 0.05,
                                           callback: () =>
@@ -387,16 +412,22 @@ class _SwapScreenState extends State<SwapScreen> {
                                         SizedBox(
                                           height: 22,
                                           width: 30,
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
+                                          child: TextButton(
+                                            style: TextButton.styleFrom(
+                                              backgroundColor: Theme.of(context).cardColor,
                                               padding: const EdgeInsets.all(0),
                                               elevation: 2,
+                                              shadowColor: Colors.transparent,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(5),
+                                                side: BorderSide(
+                                                  color: Colors.transparent,
+                                                ),
                                               ),
                                             ),
                                             child: Icon(
+
                                               Icons.edit,
                                               size: 16,
                                             ),

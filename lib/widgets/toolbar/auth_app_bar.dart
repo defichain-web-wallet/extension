@@ -34,12 +34,13 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      shadowColor: Colors.transparent,
       shape: isSmall!
           ? null
           : RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
               ),
             ),
       toolbarHeight: toolbarHeight,
@@ -56,7 +57,8 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) => AuthScreen(),
+                        pageBuilder: (context, animation1, animation2) =>
+                            AuthScreen(),
                         transitionDuration: Duration.zero,
                         reverseTransitionDuration: Duration.zero,
                       ),

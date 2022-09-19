@@ -69,17 +69,17 @@ class TabBarBody extends StatelessWidget {
                       ),
                       onPressed: () async {
                         await lockHelper.provideWithLockChecker(
+                          context,
+                          () => Navigator.push(
                             context,
-                            () => Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            History(),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                ));
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  History(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   )

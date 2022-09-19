@@ -13,6 +13,7 @@ class AddressBookCard extends StatefulWidget {
   final int id;
   final Function() editCallback;
   final Function() deleteCallback;
+  final bool isBorder;
 
   const AddressBookCard({
     Key? key,
@@ -21,6 +22,7 @@ class AddressBookCard extends StatefulWidget {
     required this.id,
     required this.editCallback,
     required this.deleteCallback,
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -44,6 +46,13 @@ class _AddressBookCardState extends State<AddressBookCard> {
       isFirstBuild = !isFirstBuild;
     }
     return Card(
+      shadowColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        side: BorderSide(
+          color: Colors.transparent,
+        ),
+      ),
       margin: EdgeInsets.only(top: 0, bottom: 10, left: 0, right: 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

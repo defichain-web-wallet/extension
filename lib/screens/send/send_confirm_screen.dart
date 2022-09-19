@@ -26,7 +26,8 @@ class SendConfirmScreen extends StatefulWidget {
   final double amount;
   final int fee;
 
-  const SendConfirmScreen(this.address, this.token, this.amount, {this.fee = 0});
+  const SendConfirmScreen(this.address, this.token, this.amount,
+      {this.fee = 0});
 
   @override
   State<SendConfirmScreen> createState() => _SendConfirmState();
@@ -83,9 +84,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                 if (state.status == AccountStatusList.success &&
                     tokensState.status == TokensStatusList.success) {
                   return Container(
-                    color: isCustomBgColor
-                        ? Theme.of(context).dialogBackgroundColor
-                        : null,
+                    color: Theme.of(context).dialogBackgroundColor,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 24),
                     child: Center(
@@ -164,8 +163,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                         setState(() {
                                           isEnable = false;
                                         });
-                                        submitSend(
-                                            parent, state, tokensState, bitcoinState);
+                                        submitSend(parent, state, tokensState);
                                       },
                                     ),
                                   ),
@@ -186,37 +184,13 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         );
       });
 
-  submitSend(parent, state, tokensState, bitcoinState) async {
+  submitSend(parent, state, tokensState) async {
     parent.emitPending(true);
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
 
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
-        if (SettingsHelper.isBitcoin()) {
-          var a = await transactionService.createBTCTransaction(
-            account: state.activeAccount,
-            destinationAddress: widget.address,
-            amount: balancesHelper.toSatoshi(widget.amount.toString()),
-            satPerByte: widget.fee,
-          );
-          print(a);
-          var txResponse = await bitcoinCubit.sendTransaction(a);
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-                  txResponse: txResponse,
-                  amount: widget.amount,
-                  token: 'BTC',
-                  address: widget.address),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
-        } else {
-          await _sendTransaction(
-              context, tokensState, widget.token, state.activeAccount);
-        }
+        await _sendTransaction(
+            context, tokensState, widget.token, state.activeAccount);
       }
     } catch (_) {
       print(_);

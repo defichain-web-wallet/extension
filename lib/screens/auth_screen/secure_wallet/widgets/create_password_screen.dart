@@ -71,7 +71,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       );
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
-        color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Center(
@@ -273,11 +273,12 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
         Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => widget.showDoneScreen
-                ? SecureDoneScreen()
-                : HomeScreen(
-                    isLoadTokens: true,
-                  ),
+            pageBuilder: (context, animation1, animation2) =>
+                widget.showDoneScreen
+                    ? SecureDoneScreen()
+                    : HomeScreen(
+                        isLoadTokens: true,
+                      ),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ),

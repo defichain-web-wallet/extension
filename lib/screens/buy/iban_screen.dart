@@ -32,6 +32,7 @@ class _IbanScreenState extends State<IbanScreen> {
   final _ibanController = TextEditingController();
   final GlobalKey<IbanSelectorState> selectKeyIban =
       GlobalKey<IbanSelectorState>();
+
   @override
   void dispose() {
     _ibanController.dispose();
@@ -83,8 +84,8 @@ class _IbanScreenState extends State<IbanScreen> {
       List<IbanModel> ibanList =
           state.ibanList.where((element) => element.type == "Wallet").toList();
 
-      List<String> stringIbans =[];
-      List<IbanModel> uniqueIbans =[];
+      List<String> stringIbans = [];
+      List<IbanModel> uniqueIbans = [];
 
       state.ibanList!.forEach((element) {
         stringIbans.add(element.iban!);
@@ -97,7 +98,7 @@ class _IbanScreenState extends State<IbanScreen> {
       });
 
       return Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -140,11 +141,13 @@ class _IbanScreenState extends State<IbanScreen> {
                             children: [
                               widget.isNewIban || state.activeIban == null
                                   ? IbanField(
+                                      isBorder: isFullSize,
                                       ibanController: _ibanController,
                                       hintText: 'DE89 37XX XXXX XXXX XXXX XX',
                                       maskFormat: 'AA## #### #### #### #### ##',
                                     )
                                   : IbanSelector(
+                                isBorder: isFullSize,
                                       asset: widget.asset,
                                       key: selectKeyIban,
                                       onAnotherSelect: hideOverlay,
@@ -176,8 +179,7 @@ class _IbanScreenState extends State<IbanScreen> {
                           isCheckLock: false,
                           callback: () {
                             hideOverlay();
-                            submit(
-                                context, accountState, state);
+                            submit(context, accountState, state);
                           }),
                     ),
                   ],

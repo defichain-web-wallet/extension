@@ -62,10 +62,11 @@ class _HistoryState extends State<History> {
                   appBar: MainAppBar(
                       title: 'History',
                       action: Padding(
-                          padding: const EdgeInsets.only(right: 14),
-                          child: FilterList(
-                            onSelect: () {},
-                          )),
+                        padding: const EdgeInsets.only(right: 14),
+                        child: FilterList(
+                          onSelect: () {},
+                        ),
+                      ),
                       isShowBottom: !(state is TransactionInitialState),
                       height: !(state is TransactionInitialState)
                           ? toolbarHeightWithBottom
@@ -185,9 +186,7 @@ class _HistoryState extends State<History> {
 
                   if (historyList.length > 0 || testnetHistoryList.length > 0) {
                     return Container(
-                      color: isCustomBgColor
-                          ? Theme.of(context).dialogBackgroundColor
-                          : null,
+                      color: Theme.of(context).dialogBackgroundColor,
                       child: Center(
                         child: StretchBox(
                           child: Container(

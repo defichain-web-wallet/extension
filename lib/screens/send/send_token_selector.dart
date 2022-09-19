@@ -50,6 +50,9 @@ class _SendConfirmState extends State<SendTokenSelector> {
   AddressesHelper addressHelper = AddressesHelper();
   TextEditingController addressController = TextEditingController();
   BtcRequests btcRequests = BtcRequests();
+  bool isFailed = false;
+  bool isFailedAddress = false;
+  bool _isBalanceError = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   String assetFrom = '';
@@ -150,9 +153,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                 }
 
                 return Container(
-                  color: isCustomBgColor
-                      ? Theme.of(context).dialogBackgroundColor
-                      : null,
+                  color: Theme.of(context).dialogBackgroundColor,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Center(

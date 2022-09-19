@@ -35,35 +35,39 @@ class SearchTokenState extends State<SearchToken> {
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<TransactionCubit, TransactionState>(
-          builder: (context, state) => ScaffoldConstrainedBox(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth < ScreenSizes.medium) {
-                  return Scaffold(
+        builder: (context, state) => ScaffoldConstrainedBox(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < ScreenSizes.medium) {
+                return Scaffold(
+                  appBar: MainAppBar(
+                      title: 'Add Tokens',
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight),
+                  body: _buildBody(context),
+                );
+              } else {
+                return Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Scaffold(
                     appBar: MainAppBar(
-                        title: 'Add Tokens',
-                        isShowBottom: !(state is TransactionInitialState),
-                        height: !(state is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight),
-                    body: _buildBody(context),
-                  );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Scaffold(
-                      appBar: MainAppBar(
-                        title: 'Add Tokens',
-                        isShowBottom: !(state is TransactionInitialState),
-                        height: !(state is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight,
-                        isSmall: true,
-                      ),
-                      body: _buildBody(context, isCustomBgColor: true),
+                      title: 'Add Tokens',
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight,
+                      isSmall: true,
                     ),
-                  );
-                }
-              })));
+                    body: _buildBody(context, isCustomBgColor: true),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      );
 
   Widget _buildBody(context, {isCustomBgColor = false}) => BlocBuilder<
           AccountCubit, AccountState>(
@@ -80,9 +84,7 @@ class SearchTokenState extends State<SearchToken> {
             } else if (tokenState.status == TokensStatusList.success &&
                 state.status == AccountStatusList.success) {
               return Container(
-                color: isCustomBgColor
-                    ? Theme.of(context).dialogBackgroundColor
-                    : null,
+                color: Theme.of(context).dialogBackgroundColor,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: Center(
@@ -99,6 +101,7 @@ class SearchTokenState extends State<SearchToken> {
                             ),
                             SizedBox(height: 8),
                             SearchField(
+                              isBorder: isCustomBgColor,
                               controller: _searchController,
                               onChanged: (value) {
                                 TokensCubit token =
@@ -154,10 +157,12 @@ class SearchTokenState extends State<SearchToken> {
                                       Navigator.push(
                                         context,
                                         PageRouteBuilder(
-                                          pageBuilder: (context, animation1, animation2) =>
+                                          pageBuilder: (context, animation1,
+                                                  animation2) =>
                                               AddToken(arguments: symbols),
                                           transitionDuration: Duration.zero,
-                                          reverseTransitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                              Duration.zero,
                                         ),
                                       );
                                     }
@@ -186,7 +191,6 @@ class SearchTokenState extends State<SearchToken> {
           accountState.activeAccount.balanceList
               .firstWhere((token) => token.token == el.symbol);
         } catch (err) {
-
           if (SettingsHelper.settings.network == "mainnet") {
             availableTokens.add(el);
           } else if (el.symbol != "TSLA") {
@@ -203,14 +207,15 @@ class SearchTokenState extends State<SearchToken> {
         return Container(
           color: symbols.contains(availableTokens[index].symbol)
               ? Theme.of(context).textTheme.bodyText1!.decorationColor
-              : Theme.of(context).scaffoldBackgroundColor,
+              : Theme.of(context).cardColor,
           child: ListTile(
             leading: SvgPicture.asset(
               tokenHelper.getImageNameByTokenName(tokenName),
               height: 30,
               width: 30,
             ),
-            title: Text(tokenHelper.getTokenWithPrefix(tokenName),
+            title: Text(
+              tokenHelper.getTokenWithPrefix(tokenName),
               style: Theme.of(context).textTheme.bodyText1,
             ),
             onTap: () {

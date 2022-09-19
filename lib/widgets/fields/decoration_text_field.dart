@@ -10,6 +10,7 @@ class DecorationTextField extends StatefulWidget {
   final FocusModel? focusModel;
   final ValueChanged<String>? onChanged;
   final Widget? suffixIcon;
+  final bool isBorder;
   final void Function()? hideOverlay;
 
   const DecorationTextField({
@@ -19,6 +20,7 @@ class DecorationTextField extends StatefulWidget {
     this.focusModel,
     this.onChanged,
     this.suffixIcon,
+    this.isBorder = false,
     this.hideOverlay,
   }) : super(key: key);
 
@@ -30,19 +32,15 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: SettingsHelper.settings.theme == 'Light' ? 46 : 44,
+      height: 48,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(14),
-          bottomRight: Radius.circular(14),
+        border: Border.all(
+          color: Colors.transparent,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withOpacity(0.5),
-            blurRadius: 5,
-            offset: Offset(3, 3),
-          ),
-        ],
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(10),
+          bottomRight: Radius.circular(10),
+        ),
       ),
       child: FocusScope(
         child: Focus(
@@ -50,22 +48,16 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
               setState(() => widget.focusModel!.isFocus = focus),
           child: Container(
             decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: widget.focusModel!.isFocus
-                      ? AppTheme.pinkColor
-                      : Theme.of(context).textTheme.button!.decorationColor!,
-                  spreadRadius: 1,
-                  blurRadius: 0,
-                  offset: Offset(0, 0), // changes position of shadow
-                ),
-              ],
               borderRadius: BorderRadius.only(
-                topRight: Radius.circular(
-                    SettingsHelper.settings.theme == 'Light' ? 16 : 15),
-                bottomRight: Radius.circular(
-                    SettingsHelper.settings.theme == 'Light' ? 16 : 15),
+                topRight: Radius.circular(10),
+                bottomRight: Radius.circular(10),
               ),
+              border: Border.all(
+                color: widget.focusModel!.isFocus
+                    ? AppTheme.pinkColor
+                    : Colors.transparent,
+              ),
+              color: Theme.of(context).cardColor,
             ),
             child: TextField(
               textAlign: TextAlign.center,
@@ -77,20 +69,20 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
               ],
               style: Theme.of(context).textTheme.button,
               decoration: InputDecoration(
-                filled: true,
+                filled: false,
                 fillColor: Theme.of(context).cardColor,
                 hoverColor: Colors.transparent,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(14),
-                    bottomRight: Radius.circular(14),
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
                   ),
                   borderSide: BorderSide(color: Colors.transparent),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(14),
-                    bottomRight: Radius.circular(14),
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
                   ),
                   borderSide: BorderSide(color: Colors.transparent),
                 ),
