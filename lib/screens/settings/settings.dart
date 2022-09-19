@@ -269,55 +269,6 @@ class _SettingsState extends State<Settings> {
                             ),
                             Column(
                               children: [
-                                Text('Network'),
-                                ListTile(
-                                  title: SettingsLabel(
-                                    label: 'Testnet',
-                                    callback: () {
-                                      setState(() {
-                                        localSettings.network = 'testnet';
-                                      });
-                                    },
-                                  ),
-                                  leading: Radio<String>(
-                                    value: 'testnet',
-                                    groupValue: localSettings.network,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        localSettings.network = value;
-                                      });
-                                    },
-                                    activeColor: Color(0xFFFF00A3),
-                                  ),
-                                ),
-                                ListTile(
-                                  title: SettingsLabel(
-                                    label: 'Mainnet',
-                                    callback: () {
-                                      setState(() {
-                                        localSettings.network = 'mainnet';
-                                      });
-                                    },
-                                  ),
-                                  leading: Radio<String>(
-                                    value: 'mainnet',
-                                    groupValue: localSettings.network,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        localSettings.network = value;
-                                      });
-                                    },
-                                    activeColor: Color(0xFFFF00A3),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Divider(),
-                            ),
-                            Column(
-                              children: [
                                 Text('API'),
                                 ListTile(
                                   title: SettingsLabel(

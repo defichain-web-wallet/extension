@@ -138,7 +138,6 @@ class _SendConfirmState extends State<SendTokenSelector> {
               if (state.status == AccountStatusList.success &&
                   (bitcoinState.status == BitcoinStatusList.success ||
                       !SettingsHelper.isBitcoin())) {
-                print(bitcoinState.history);
                 List<String> assets = [];
                 if (SettingsHelper.isBitcoin()) {
                   assetFrom = 'BTC';
@@ -173,6 +172,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 SizedBox(height: 12),
                                 AddressField(
                                   addressController: addressController,
+                                  hideOverlay: hideOverlay,
                                 ),
                                 SizedBox(height: 8),
                                 Divider(),
