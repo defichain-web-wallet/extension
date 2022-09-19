@@ -52,6 +52,11 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
                 topRight: Radius.circular(10),
                 bottomRight: Radius.circular(10),
               ),
+              border: Border.all(
+                color: widget.focusModel!.isFocus
+                    ? AppTheme.pinkColor
+                    : Colors.transparent,
+              ),
               color: Theme.of(context).cardColor,
             ),
             child: TextField(
@@ -79,7 +84,7 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
                     topRight: Radius.circular(10),
                     bottomRight: Radius.circular(10),
                   ),
-                  borderSide: BorderSide(color: AppTheme.pinkColor),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
                 suffixIcon: widget.suffixIcon ?? null,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 10),
