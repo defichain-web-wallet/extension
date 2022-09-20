@@ -85,8 +85,7 @@ class _SellingState extends State<Selling> {
 
     return BlocBuilder<AccountCubit, AccountState>(
         builder: (accountContext, accountState) {
-      // fiatCubit.loadIbanList(accountState.accessToken!);
-      fiatCubit.loadAllAssets(accountState.accessToken!);
+      fiatCubit.loadAllAssets();
       return BlocBuilder<FiatCubit, FiatState>(
         builder: (BuildContext context, fiatState) {
           return BlocBuilder<TokensCubit, TokensState>(

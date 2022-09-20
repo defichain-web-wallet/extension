@@ -33,10 +33,11 @@ class _EarnScreenState extends State<EarnScreen> {
     super.initState();
     StakingCubit stakingCubit = BlocProvider.of<StakingCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       await stakingCubit.loadStakingRouteBalance(
-          accountCubit.state.accessToken!,
+          fiatCubit.state.accessToken!,
           accountCubit.state.activeAccount!.addressList![0].address!);
     });
   }
@@ -124,7 +125,7 @@ class _EarnScreenState extends State<EarnScreen> {
                                 children: [
                                   EarnCard(
                                     isBorder: isFullSize,
-                                    title: 'STAKING',
+                                    title: 'STAKING (COMING SOON)',
                                     titleWidget: Row(
                                       children: [
                                         SvgPicture.asset(
@@ -153,8 +154,6 @@ class _EarnScreenState extends State<EarnScreen> {
                                     status: 'staked',
                                     firstBtnTitle: 'STAKE',
                                     secondBtnTitle: 'UNSTAKE',
-                                    firstBtnCallback: () =>
-                                        stakingCallback(context),
                                     isCheckLockSecond: false,
                                   ),
                                   SizedBox(
@@ -194,7 +193,7 @@ class _EarnScreenState extends State<EarnScreen> {
                                 Row(
                                   children: [
                                     EarnCard(
-                                      title: 'STAKING',
+                                      title: 'STAKING (COMING SOON)',
                                       titleWidget: Row(
                                         children: [
                                           SvgPicture.asset(
@@ -223,8 +222,6 @@ class _EarnScreenState extends State<EarnScreen> {
                                       status: 'staked',
                                       firstBtnTitle: 'STAKE',
                                       secondBtnTitle: 'UNSTAKE',
-                                      firstBtnCallback: () =>
-                                          stakingCallback(context),
                                       isCheckLockSecond: false,
                                       isSmall: true,
                                     ),

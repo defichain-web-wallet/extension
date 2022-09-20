@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/address_book.dart';
 import 'package:defi_wallet/screens/send/send_token_selector.dart';
@@ -169,8 +170,13 @@ class _AddNewAddressState extends State<AddNewAddress> {
                     controller: addressController,
                     onChanged: (value) async {
                       checkButtonStatus();
-                      isValidAddress = await addressHelper
-                          .validateAddress(addressController.text);
+                      if (SettingsHelper.isBitcoin()) {
+                        isValidAddress = await addressHelper
+                            .validateBtcAddress(addressController.text);
+                      } else {
+                        isValidAddress = await addressHelper
+                            .validateAddress(addressController.text);
+                      }
                     },
                     validator: (value) {
                       if (widget.address != addressController.text) {

@@ -4,7 +4,6 @@ enum AccountStatusList { initial, loading, success, restore, failure }
 
 class AccountState extends Equatable {
   final AccountStatusList status;
-  final String? accessToken;
   final List<String>? mnemonic;
   final Uint8List? seed;
   final List<AccountModel>? accounts;
@@ -19,7 +18,6 @@ class AccountState extends Equatable {
 
   AccountState({
     this.status = AccountStatusList.initial,
-    this.accessToken,
     this.mnemonic,
     this.seed,
     this.accounts,
@@ -36,7 +34,6 @@ class AccountState extends Equatable {
   @override
   List<Object?> get props => [
         status,
-        accessToken,
         mnemonic,
         seed,
         accounts,
@@ -52,7 +49,6 @@ class AccountState extends Equatable {
 
   AccountState copyWith({
     AccountStatusList? status,
-    String? accessToken,
     List<String>? mnemonic,
     Uint8List? seed,
     List<AccountModel>? accounts,
@@ -67,7 +63,6 @@ class AccountState extends Equatable {
   }) {
     return AccountState(
       status: status ?? this.status,
-      accessToken: accessToken ?? this.accessToken,
       mnemonic: mnemonic ?? this.mnemonic,
       seed: seed ?? this.seed,
       accounts: accounts ?? this.accounts,

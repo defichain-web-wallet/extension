@@ -5,6 +5,7 @@ enum BitcoinStatusList { initial, loading, success, failure }
 class BitcoinState extends Equatable {
   final BitcoinStatusList status;
   final int totalBalance;
+  final int unconfirmedBalance;
   final int availableBalance;
   final int activeFee;
   final NetworkFeeModel? networkFee;
@@ -13,6 +14,7 @@ class BitcoinState extends Equatable {
   BitcoinState({
     this.status = BitcoinStatusList.initial,
     this.totalBalance = 0,
+    this.unconfirmedBalance = 0,
     this.availableBalance = 0,
     this.activeFee = 0,
     this.networkFee,
@@ -22,6 +24,7 @@ class BitcoinState extends Equatable {
   BitcoinState copyWith({
     BitcoinStatusList? status,
     int? totalBalance,
+    int? unconfirmedBalance,
     int? availableBalance,
     int? activeFee,
     NetworkFeeModel? networkFee,
@@ -30,6 +33,7 @@ class BitcoinState extends Equatable {
     return BitcoinState(
       status: status ?? this.status,
       totalBalance: totalBalance ?? this.totalBalance,
+      unconfirmedBalance: unconfirmedBalance ?? this.unconfirmedBalance,
       availableBalance: availableBalance ?? this.availableBalance,
       activeFee: activeFee ?? this.activeFee,
       networkFee: networkFee ?? this.networkFee,
@@ -41,6 +45,7 @@ class BitcoinState extends Equatable {
   List<Object?> get props => [
     status,
     totalBalance,
+    unconfirmedBalance,
     availableBalance,
     activeFee,
     networkFee,

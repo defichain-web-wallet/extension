@@ -33,7 +33,6 @@ class _SelectAddressFromAddressBookState
         builder: (context, addressBookState) {
       AddressBookCubit addressBookCubit =
           BlocProvider.of<AddressBookCubit>(context);
-      addressBookCubit.loadAddressBook();
       if (iterator == 0) {
         addressBookCubit.loadAddressBook();
         iterator++;
@@ -67,9 +66,6 @@ class _SelectAddressFromAddressBookState
   }
 
   Widget _buildBody(addressBookState, {isFullSize = false}) {
-    AddressBookCubit addressBookCubit =
-        BlocProvider.of<AddressBookCubit>(context);
-    addressBookCubit.loadAddressBook();
     return Container(
       color: Theme.of(context).dialogBackgroundColor,
       padding: const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),

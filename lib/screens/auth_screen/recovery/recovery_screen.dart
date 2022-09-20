@@ -41,8 +41,9 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     } else {
       mnemonic = widget.mnemonic!.split(',');
     }
+    var s = 'donate match runway virtual knee vicious useful crack bubble climb stable combine speak rescue lend army walk coral february cigar child claw gift join'.split(' ');
     controllers = List.generate(
-        fieldsLength, (i) => TextEditingController(text: mnemonic[i]));
+        fieldsLength, (i) => TextEditingController(text: s[i]));
     focusNodes = List.generate(fieldsLength, (i) => FocusNode());
   }
 
