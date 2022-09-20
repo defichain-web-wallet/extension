@@ -205,7 +205,6 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
         null,
         state.accounts,
         state.masterKeyPair,
-        state.accessToken,
         state.mnemonic,
       );
     } else {
@@ -214,7 +213,6 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
         state.masterKeyPair,
         null,
         null,
-        state.accessToken,
         state.mnemonic,
       );
     }

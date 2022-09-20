@@ -57,7 +57,7 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
       builder: (context, state) {
         FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
         StakingCubit stakingCubit = BlocProvider.of<StakingCubit>(context);
-        fiatCubit.loadAllAssets(state.accessToken!, isSell: true);
+        fiatCubit.loadAllAssets(isSell: true);
         return BlocBuilder<FiatCubit, FiatState>(builder: (context, fiatState) {
           return BlocBuilder<StakingCubit, StakingState>(
             builder: (context, stakingState) {

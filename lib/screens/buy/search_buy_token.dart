@@ -46,7 +46,7 @@ class _SearchBuyTokenState extends State<SearchBuyToken> {
     return BlocBuilder<AccountCubit, AccountState>(
       builder: (context, accountState) {
         if (iterator == 0) {
-          fiatCubit.loadAvailableAssets(accountState.accessToken!);
+          fiatCubit.loadAvailableAssets();
           iterator++;
         }
         return BlocBuilder<TransactionCubit, TransactionState>(
@@ -170,7 +170,7 @@ class _SearchBuyTokenState extends State<SearchBuyToken> {
                                     );
                                   } else {
                                     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-                                    await fiatCubit.loadIbanList(state.accessToken!);
+                                    await fiatCubit.loadIbanList();
 
                                     Navigator.push(
                                         context,

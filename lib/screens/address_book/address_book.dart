@@ -91,7 +91,10 @@ class _AddressBookState extends State<AddressBook> {
   Widget _buildBody(addressBookState, {isFullSize = false}) {
     AddressBookCubit addressBookCubit =
         BlocProvider.of<AddressBookCubit>(context);
-    addressBookCubit.loadAddressBook();
+    if (iterator == 0) {
+      iterator++;
+      addressBookCubit.loadAddressBook();
+    }
     return Container(
       color: Theme.of(context).dialogBackgroundColor,
       padding: const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),

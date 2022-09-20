@@ -75,7 +75,7 @@ class _NetworkSelectorState extends State<NetworkSelector> {
             content: Builder(
               builder: (context) {
                 var width = widget.isFullSize
-                    ? MediaQuery.of(context).size.width * 0.5
+                    ? MediaQuery.of(context).size.width * 0.3
                     : MediaQuery.of(context).size.width;
 
                 return Container(
@@ -186,16 +186,16 @@ class _NetworkSelectorState extends State<NetworkSelector> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: Theme.of(context).secondaryHeaderColor,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(6),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 10,
-                  height: 10,
+                  width: 6,
+                  height: 6,
                   decoration: BoxDecoration(
                     color: Colors.green.shade500,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(6),
                     border: Border.all(color: Colors.black),
                   ),
                 ),
@@ -204,7 +204,7 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                 ),
                 Text(
                   networkType,
-                  style: Theme.of(context).textTheme.headline4,
+                  style: Theme.of(context).textTheme.subtitle2,
                 )
               ],
             ),

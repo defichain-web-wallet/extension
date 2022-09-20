@@ -30,6 +30,7 @@ class SelectBuyOrSellScreen extends StatefulWidget {
 
 class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
   BalancesHelper balancesHelper = BalancesHelper();
+  int iterator = 0;
 
   @override
   void initState() {
@@ -38,7 +39,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
-      await fiatCubit.loadUserDetails(accountCubit.state.accessToken!);
+      await fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
     });
   }
 

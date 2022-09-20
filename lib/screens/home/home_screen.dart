@@ -13,7 +13,6 @@ import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/wallet_details.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -43,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool isFullSizeScreen = false;
   double assetsTabBodyHeight = 0;
   double historyTabBodyHeight = 0;
-  double minDefaultTabBodyHeight = 275;
+  double minDefaultTabBodyHeight = 255;
   double maxDefaultTabBodyHeight = 475;
   double maxHistoryEntries = 30;
   double heightListEntry = 74;
@@ -57,18 +56,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   setTabBody({int tabIndex = 0}) {
     AccountState accountState = BlocProvider.of<AccountCubit>(context).state;
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     double countAssets = 0;
     double countTransactions = 0;
 
-    countAssets = accountState.activeAccount!.balanceList!
-        .where((el) => !el.isHidden!)
-        .length
-        .toDouble();
+    if (SettingsHelper.isBitcoin()) {
+      countAssets = 1;
+    } else {
+      countAssets = accountState.activeAccount!.balanceList!
+          .where((el) => !el.isHidden!)
+          .length
+          .toDouble();
+    }
     assetsTabBodyHeight =
         countAssets * heightListEntry + heightAdditionalAction;
 
-    countTransactions = (SettingsHelper.isBitcoin()) ? 0 :
-        accountState.activeAccount!.historyList!.length.toDouble();
+    countTransactions = (SettingsHelper.isBitcoin())
+        ? bitcoinCubit.state.history!.length.toDouble()
+        : accountState.activeAccount!.historyList!.length.toDouble();
     if (countTransactions < maxHistoryEntries) {
       historyTabBodyHeight =
           countTransactions * heightListEntry + heightAdditionalAction;
@@ -220,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             child: NetworkSelector(isFullSize: isFullSize,),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 8, top: 40),
+                            padding: const EdgeInsets.only(bottom: 8, top: 8),
                             child: WalletDetails(),
                           ),
                           Padding(
@@ -287,11 +292,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
 
     if (SettingsHelper.isBitcoin()) {
-      return bitcoinCubit.state.history!.length > 0;
+      return bitcoinCubit.state.history!.length > 30;
     } else if (SettingsHelper.settings.network == 'mainnet') {
-      return state.activeAccount.historyList!.length > 0;
+      return state.activeAccount.historyList!.length > 30;
     } else {
-      return state.activeAccount.testnetHistoryList!.length > 0;
+      return state.activeAccount.testnetHistoryList!.length > 30;
     }
   }
 

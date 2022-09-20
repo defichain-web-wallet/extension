@@ -244,7 +244,8 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 SizedBox(height: 22),
                                 if (SettingsHelper.isBitcoin()) Text("Fees"),
                                 SizedBox(height: 12),
-                                if (bitcoinState.networkFee != null)
+                                if (bitcoinState.networkFee != null &&
+                                    SettingsHelper.isBitcoin())
                                   Column(
                                     children: [
                                       FeeCard(

@@ -58,7 +58,7 @@ class TabBarBody extends StatelessWidget {
         Column(
           children: [
             Expanded(child: TransactionHistory()),
-            !isEmptyList
+            isEmptyList
                 ? Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: TextButton(

@@ -14,12 +14,13 @@ class BitcoinCubit extends Cubit<BitcoinState> {
   BtcRequests btcRequests = BtcRequests();
 
   loadDetails(AddressModel address) async {
-    int balance;
+    List<int> balance;
     List<dynamic> history;
 
     emit(state.copyWith(
       status: BitcoinStatusList.loading,
       totalBalance: state.totalBalance,
+      unconfirmedBalance: state.unconfirmedBalance,
       availableBalance: state.availableBalance,
       activeFee: state.activeFee,
       networkFee: state.networkFee,
@@ -32,7 +33,8 @@ class BitcoinCubit extends Cubit<BitcoinState> {
 
       emit(state.copyWith(
         status: BitcoinStatusList.success,
-        totalBalance: balance,
+        totalBalance: balance[0],
+        unconfirmedBalance: balance[1],
         availableBalance: state.availableBalance,
         activeFee: state.activeFee,
         networkFee: state.networkFee,
@@ -42,6 +44,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
       emit(state.copyWith(
         status: BitcoinStatusList.failure,
         totalBalance: 0,
+        unconfirmedBalance: 0,
         availableBalance: 0,
         activeFee: 0,
         networkFee: state.networkFee,
@@ -57,6 +60,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
     emit(state.copyWith(
       status: BitcoinStatusList.loading,
       totalBalance: state.totalBalance,
+      unconfirmedBalance: state.unconfirmedBalance,
       availableBalance: state.availableBalance,
       activeFee: fee ?? state.activeFee,
       networkFee: state.networkFee,
@@ -79,6 +83,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
       emit(state.copyWith(
         status: BitcoinStatusList.success,
         totalBalance: state.totalBalance,
+        unconfirmedBalance: state.unconfirmedBalance,
         availableBalance: availableBalance,
         activeFee: fee ?? networkFee.low,
         networkFee: networkFee,
@@ -88,6 +93,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
       emit(state.copyWith(
         status: BitcoinStatusList.failure,
         totalBalance: state.totalBalance,
+        unconfirmedBalance: state.unconfirmedBalance,
         availableBalance: state.availableBalance,
         activeFee: state.activeFee,
         networkFee: state.networkFee ??
@@ -103,6 +109,15 @@ class BitcoinCubit extends Cubit<BitcoinState> {
 
   changeActiveFee(AddressModel address, int fee) async {
     int availableBalance = 0;
+    emit(state.copyWith(
+      status: BitcoinStatusList.success,
+      totalBalance: state.totalBalance,
+      unconfirmedBalance: state.unconfirmedBalance,
+      availableBalance: state.availableBalance,
+      activeFee: fee,
+      networkFee: state.networkFee,
+      history: state.history ?? [],
+    ));
     try {
       availableBalance = await btcRequests.getAvailableBalance(
           address: address, feePerByte: fee);
@@ -110,6 +125,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
       emit(state.copyWith(
         status: BitcoinStatusList.success,
         totalBalance: state.totalBalance,
+        unconfirmedBalance: state.unconfirmedBalance,
         availableBalance: availableBalance,
         activeFee: fee,
         networkFee: state.networkFee,
@@ -119,6 +135,7 @@ class BitcoinCubit extends Cubit<BitcoinState> {
       emit(state.copyWith(
         status: BitcoinStatusList.failure,
         totalBalance: state.totalBalance,
+        unconfirmedBalance: state.unconfirmedBalance,
         availableBalance: state.availableBalance,
         activeFee: state.activeFee,
         networkFee: state.networkFee,
