@@ -11,6 +11,8 @@ class DecorationTextFieldNew extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final Widget? suffixIcon;
   final bool isBorder;
+  final String amountInUsd;
+  final String selectedAsset;
   final void Function()? hideOverlay;
 
   const DecorationTextFieldNew({
@@ -21,6 +23,8 @@ class DecorationTextFieldNew extends StatefulWidget {
     this.onChanged,
     this.suffixIcon,
     this.isBorder = false,
+    this.amountInUsd = '0.0',
+    this.selectedAsset = 'DFI',
     this.hideOverlay,
   }) : super(key: key);
 
@@ -34,6 +38,7 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
 
   @override
   Widget build(BuildContext context) {
+    String currency = SettingsHelper.settings.currency!;
     return Container(
       height: _containerHeight,
       decoration: BoxDecoration(
@@ -105,7 +110,10 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('ETH'),
+                              Text(
+                                widget.selectedAsset,
+                                style: Theme.of(context).textTheme.headline4,
+                              ),
                               SizedBox(height: 2,)
                             ],
                           ),
@@ -129,7 +137,7 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '23223.23 USD',
+                              '${widget.amountInUsd} $currency',
                               style:
                               Theme.of(context).textTheme.headline4!.apply(
                                 color: Theme.of(context)

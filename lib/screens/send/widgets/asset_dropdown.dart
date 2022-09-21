@@ -152,6 +152,8 @@ class AssetDropdown extends StatelessWidget {
                         ),
                 )
               : DecorationTextFieldNew(
+                  selectedAsset: assetFrom!,
+                  amountInUsd: amountInUsd!,
                   isBorder: isBorder,
                   hideOverlay: hideOverlay,
                   controller: amountController,
