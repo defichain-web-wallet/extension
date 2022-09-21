@@ -1,7 +1,7 @@
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
-import 'package:defi_wallet/screens/home/widgets/asset_select_new.dart';
+import 'package:defi_wallet/screens/home/widgets/asset_select_field.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field_new.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +62,7 @@ class AssetDropdown extends StatelessWidget {
                   onSelect: onSelect!,
                   isFixedWidthText: isFixedWidthAssetSelectorText!,
                 )
-              : AssetSelectNew(
+              : AssetSelectField(
             accountState: accountState,
                   amountInUsd: amountInUsd,
                   isBorder: isBorder,

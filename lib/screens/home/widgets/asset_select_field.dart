@@ -9,7 +9,7 @@ import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class AssetSelectNew extends StatefulWidget {
+class AssetSelectField extends StatefulWidget {
   final List<String> tokensForSwap;
   String selectedToken;
   final void Function(String) onSelect;
@@ -22,7 +22,7 @@ class AssetSelectNew extends StatefulWidget {
   final String? amountInUsd;
   final accountState;
 
-  AssetSelectNew({
+  AssetSelectField({
     Key? key,
     required this.tokensForSwap,
     required this.selectedToken,
@@ -38,10 +38,10 @@ class AssetSelectNew extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<AssetSelectNew> createState() => AssetSelectNewState();
+  State<AssetSelectField> createState() => AssetSelectFieldState();
 }
 
-class AssetSelectNewState extends State<AssetSelectNew> {
+class AssetSelectFieldState extends State<AssetSelectField> {
   var tokenHelper = TokensHelper();
   GlobalKey _selectKey = GlobalKey();
   bool _isOpen = false;
