@@ -183,6 +183,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 ),
                                 SizedBox(height: 12),
                                 AssetDropdown(
+                                  accountState: state,
                                   selectKeyFrom: _selectKeyFrom,
                                   amountController: _amountController,
                                   focusNode: _amountFocusNode,
