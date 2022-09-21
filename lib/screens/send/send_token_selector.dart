@@ -183,6 +183,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 ),
                                 SizedBox(height: 12),
                                 AssetDropdown(
+                                  accountState: state,
                                   selectKeyFrom: _selectKeyFrom,
                                   amountController: _amountController,
                                   focusNode: _amountFocusNode,
@@ -191,22 +192,20 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   assetFrom: assetFrom,
                                   amountInUsd: amountInUsd,
                                   onChanged: (String value) {
-                                    if (SettingsHelper.isBitcoin()) {
-                                      try {
-                                        var amount = tokenHelper.getAmountByUsd(
-                                          tokensCubit.state.tokensPairs!,
-                                          double.parse(
-                                              value.replaceAll(',', '.')),
-                                          'BTC',
-                                        );
-                                        setState(() {
-                                          amountInUsd = balancesHelper
-                                              .numberStyling(amount,
-                                                  fixedCount: 2, fixed: true);
-                                        });
-                                      } catch (err) {
-                                        print(err);
-                                      }
+                                    try {
+                                      var amount = tokenHelper.getAmountByUsd(
+                                        tokensCubit.state.tokensPairs!,
+                                        double.parse(
+                                            value.replaceAll(',', '.')),
+                                        assetFrom,
+                                      );
+                                      setState(() {
+                                        amountInUsd = balancesHelper
+                                            .numberStyling(amount,
+                                            fixedCount: 2, fixed: true);
+                                      });
+                                    } catch (err) {
+                                      print(err);
                                     }
                                   },
                                   onSelect: (String asset) {
