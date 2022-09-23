@@ -8,7 +8,6 @@ import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/earn_screen/widgets/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
-import 'package:defi_wallet/screens/staking/number_of_coins_to_stake.dart';
 import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
@@ -36,6 +35,7 @@ class _EarnScreenState extends State<EarnScreen> {
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
       await stakingCubit.loadStakingRouteBalance(
           fiatCubit.state.accessToken!,
           accountCubit.state.activeAccount!.addressList![0].address!);

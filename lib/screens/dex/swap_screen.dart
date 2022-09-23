@@ -17,7 +17,6 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/models/test_pool_swap_model.dart';
 import 'package:defi_wallet/screens/dex/review_swap_screen.dart';
-import 'package:defi_wallet/screens/dex/swap_status.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -28,9 +27,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/models/focus_model.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import './widgets/amount_selector_field.dart';
-import './widgets/swap_price_details.dart';
 
 class SwapScreen extends StatefulWidget {
   const SwapScreen({Key? key}) : super(key: key);
@@ -65,7 +62,8 @@ class _SwapScreenState extends State<SwapScreen> {
   String assetFrom = '';
   String assetTo = '';
   String address = '';
-  String swapFieldMsg = '';
+  String swapFromMsg = '';
+  String swapToMsg = '';
   int iteratorUpdate = 0;
   bool inputFromFocus = false;
   bool inputToFocus = false;
@@ -79,6 +77,8 @@ class _SwapScreenState extends State<SwapScreen> {
   double toolbarHeightWithBottom = 105;
   double slippage = 0.03; //3%
   String stabilizationFee = '';
+  String amountFromInUsd = '0.0';
+  String amountToInUsd = '0.0';
 
   @override
   void initState() {
@@ -123,6 +123,7 @@ class _SwapScreenState extends State<SwapScreen> {
                 }
               }
             }
+
 
             return BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, transactionState) => ScaffoldConstrainedBox(
@@ -176,6 +177,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildBody(
       context, dexState, dexCubit, accountState, tokensState, transactionState,
       {isCustomBgColor = false}) {
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     bool isShowStabilizationFee = assetFrom == 'DUSD' && assetTo == 'DFI' ||
         assetFrom == 'DUSD' && assetTo == 'USDT' ||
         assetFrom == 'DUSD' && assetTo == 'USDC';
@@ -208,7 +210,6 @@ class _SwapScreenState extends State<SwapScreen> {
             print(err);
           }
         }
-
         return Container(
           color: Theme.of(context).dialogBackgroundColor,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -217,262 +218,316 @@ class _SwapScreenState extends State<SwapScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AmountSelectorField(
-                        isBorder: isCustomBgColor,
-                        label: 'Swap from',
-                        selectedAsset: assetFrom,
-                        assets: assets,
-                        selectKey: selectKeyFrom,
-                        amountController: amountFromController,
-                        onAnotherSelect: hideOverlay,
-                        onSelect: (String asset) {
-                          onSelectFromAsset(
-                              asset, tokensState, accountState, dexCubit);
-                        },
-                        onChanged: (value) => onChangeFromAsset(
-                            value, accountState, dexCubit, tokensState),
-                        focusNode: focusFrom,
-                        focusModel: focusAmountFromModel,
-                        suffixIcon: Container(
-                          padding: EdgeInsets.only(
-                            top: 8,
-                            bottom: 8,
-                            right: 6,
-                          ),
-                          child: SizedBox(
-                            width: 40,
-
-                            child: Container(
-                              color: Theme.of(context).cardColor,
-                              child: TextButton(
-                                child:
-                                    Text('MAX', style: TextStyle(fontSize: 10)),
-                                onPressed: () {
-                                  double maxAmount = getAvailableAmount(
-                                      accountState, assetFrom, dexState);
-                                  amountFromController.text =
-                                      maxAmount.toString();
-                                  onChangeFromAsset(amountFromController.text,
-                                      accountState, dexCubit, tokensState);
-                                },
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AmountSelectorField(
+                            isSwap: true,
+                            isBorder: isCustomBgColor,
+                            label: 'Swap from',
+                            selectedAsset: assetFrom,
+                            assets: assets,
+                            selectKey: selectKeyFrom,
+                            amountController: amountFromController,
+                            onAnotherSelect: hideOverlay,
+                            amountInUsd: amountFromInUsd,
+                            onSelect: (String asset) {
+                              onSelectFromAsset(
+                                  asset, tokensState, accountState, dexCubit);
+                            },
+                            onChanged: (value)
+                            {
+                              try {
+                                var amount = tokensHelper.getAmountByUsd(
+                                  tokensCubit.state.tokensPairs!,
+                                  double.parse(
+                                      value.replaceAll(',', '.')),
+                                  assetFrom,
+                                );
+                                setState(() {
+                                  amountFromInUsd = balancesHelper
+                                      .numberStyling(amount,
+                                      fixedCount: 2, fixed: true);
+                                });
+                              } catch (err) {
+                                print(err);
+                              }
+                              onChangeFromAsset(
+                                  value, accountState, dexCubit, tokensState);
+                            },
+                            focusNode: focusFrom,
+                            focusModel: focusAmountFromModel,
+                            suffixIcon: Container(
+                              padding: EdgeInsets.only(
+                                top: 8,
+                                bottom: 8,
+                                right: 6,
+                              ),
+                              child: SizedBox(
+                                width: 40,
+                                child: Container(
+                                  color: Theme.of(context).cardColor,
+                                  child: TextButton(
+                                    child: Text('MAX',
+                                        style: TextStyle(fontSize: 10)),
+                                    onPressed: () {
+                                      double maxAmount = getAvailableAmount(
+                                          accountState, assetFrom, dexState);
+                                      amountFromController.text =
+                                          maxAmount.toString();
+                                      onChangeFromAsset(
+                                          amountFromController.text,
+                                          accountState,
+                                          dexCubit,
+                                          tokensState);
+                                    },
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        swapFieldMsg,
-                        style: Theme.of(context).textTheme.headline4!.apply(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline4!
-                                .color!
-                                .withOpacity(0.5)),
-                      ),
-                      SizedBox(height: 14),
-                      AmountSelectorField(
-                        isBorder: isCustomBgColor,
-                        label: 'Swap to',
-                        selectedAsset: assetTo,
-                        assets: tokensForSwap,
-                        selectKey: selectKeyTo,
-                        amountController: amountToController,
-                        onAnotherSelect: hideOverlay,
-                        onSelect: (String asset) {
-                          onSelectToAsset(
-                              asset, tokensState, accountState, dexCubit);
-                        },
-                        onChanged: (value) => onChangeToAsset(
-                            value, accountState, dexCubit, tokensState),
-                        focusNode: focusTo,
-                        focusModel: focusAmountToModel,
-                        suffixIcon: Container(
-                          padding: EdgeInsets.only(
-                            top: 8,
-                            bottom: 8,
-                            right: 6,
+                          SizedBox(height: 6),
+                          Text(
+                            'Available balance: $swapFromMsg',
+                            style: Theme.of(context).textTheme.headline4!.apply(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline4!
+                                    .color!
+                                    .withOpacity(0.5)),
                           ),
-                          child: SizedBox(
-                            width: 40,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 24),
-                      SizedBox(
-                        height: 30,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Slippage tolerance',
-                              style: Theme.of(context).textTheme.headline6,
+                          SizedBox(height: 30),
+                          AmountSelectorField(
+                            isSwap: true,
+                            isBorder: isCustomBgColor,
+                            label: 'Swap to',
+                            selectedAsset: assetTo,
+                            assets: tokensForSwap,
+                            selectKey: selectKeyTo,
+                            amountController: amountToController,
+                            onAnotherSelect: hideOverlay,
+                            amountInUsd: amountToInUsd,
+                            onSelect: (String asset) {
+                              onSelectToAsset(
+                                  asset, tokensState, accountState, dexCubit);
+                            },
+                            onChanged: (value)
+                            {
+                              try {
+                                var amount = tokensHelper.getAmountByUsd(
+                                  tokensCubit.state.tokensPairs!,
+                                  double.parse(
+                                      value.replaceAll(',', '.')),
+                                  assetTo,
+                                );
+                                setState(() {
+                                  amountToInUsd = balancesHelper
+                                      .numberStyling(amount,
+                                      fixedCount: 2, fixed: true);
+                                });
+                              } catch (err) {
+                                print(err);
+                              }
+                              onChangeToAsset(
+                                  value, accountState, dexCubit, tokensState);
+                            },
+                            focusNode: focusTo,
+                            focusModel: focusAmountToModel,
+                            suffixIcon: Container(
+                              padding: EdgeInsets.only(
+                                top: 8,
+                                bottom: 8,
+                                right: 6,
+                              ),
+                              child: SizedBox(
+                                width: 40,
+                              ),
                             ),
-                            isShowSlippageField
-                                ? SizedBox(
-                                    height: 30,
-                                    width: 140,
-                                    child: TextField(
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.allow(
-                                            RegExp(r'(^-?\d*\.?d*\,?\d*)')),
-                                      ],
-                                      controller: slippageController,
-                                      decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Theme.of(context).cardColor,
-                                        hoverColor: Colors.transparent,
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          borderSide: BorderSide(
-                                              color: AppTheme.pinkColor),
-                                        ),
-                                        contentPadding: const EdgeInsets.all(8),
-                                        hintText: 'Type in percent..',
-                                        suffixIcon: IconButton(
-                                          splashRadius: 16,
-                                          icon: Icon(
-                                            Icons.clear,
-                                            size: 14,
-                                          ),
-                                          onPressed: () => setState(() {
-                                            slippage = 0.03;
-                                            isShowSlippageField = false;
-                                          }),
-                                        ),
-                                      ),
-                                      onChanged: (String value) {
-                                        setState(() {
-                                          try {
-                                            slippage =
-                                                double.parse(value) / 100;
-                                          } catch (err) {
-                                            slippage = 0.03;
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  )
-                                : Container(
-                                    child: Row(
-                                      children: [
-                                        SlippageButton(
-                                          isBorder: isCustomBgColor,
-                                          label: '0.5%',
-                                          isActive: slippage == 0.005,
-                                          callback: () =>
-                                              setState(() => slippage = 0.005),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        SlippageButton(
-                                          isBorder: isCustomBgColor,
-                                          label: '1%',
-                                          isActive: slippage == 0.01,
-                                          callback: () =>
-                                              setState(() => slippage = 0.01),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        SlippageButton(
-                                          isBorder: isCustomBgColor,
-                                          label: '3%',
-                                          isActive: slippage == 0.03,
-                                          callback: () =>
-                                              setState(() => slippage = 0.03),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        SlippageButton(
-                                          isBorder: isCustomBgColor,
-                                          label: '5%',
-                                          isActive: slippage == 0.05,
-                                          callback: () =>
-                                              setState(() => slippage = 0.05),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        SizedBox(
-                                          height: 22,
-                                          width: 30,
-                                          child: TextButton(
-                                            style: TextButton.styleFrom(
-                                              backgroundColor: Theme.of(context).cardColor,
-                                              padding: const EdgeInsets.all(0),
-                                              elevation: 2,
-                                              shadowColor: Colors.transparent,
-                                              shape: RoundedRectangleBorder(
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            'Available balance: $swapToMsg',
+                            style: Theme.of(context).textTheme.headline4!.apply(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline4!
+                                    .color!
+                                    .withOpacity(0.5)),
+                          ),
+                          SizedBox(height: 24),
+                          SizedBox(
+                            height: 30,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    'Slippage tolerance',
+                                    style: Theme.of(context).textTheme.headline2,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: isShowSlippageField
+                                      ? Container(
+                                          height: 30,
+                                          child: TextField(
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'(^-?\d*\.?d*\,?\d*)')),
+                                            ],
+                                            controller: slippageController,
+                                            decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor:
+                                                  Theme.of(context).cardColor,
+                                              hoverColor: Colors.transparent,
+                                              enabledBorder: OutlineInputBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(5),
-                                                side: BorderSide(
+                                                    BorderRadius.circular(10),
+                                                borderSide: BorderSide(
                                                   color: Colors.transparent,
                                                 ),
                                               ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                    color: AppTheme.pinkColor),
+                                              ),
+                                              contentPadding:
+                                                  const EdgeInsets.all(8),
+                                              hintText: 'Type in percent..',
+                                              suffixIcon: IconButton(
+                                                splashRadius: 16,
+                                                icon: Icon(
+                                                  Icons.clear,
+                                                  size: 14,
+                                                ),
+                                                onPressed: () => setState(() {
+                                                  slippage = 0.03;
+                                                  isShowSlippageField = false;
+                                                }),
+                                              ),
                                             ),
-                                            child: Icon(
-
-                                              Icons.edit,
-                                              size: 16,
-                                            ),
-                                            onPressed: () => setState(() =>
-                                                isShowSlippageField = true),
+                                            onChanged: (String value) {
+                                              setState(() {
+                                                try {
+                                                  slippage =
+                                                      double.parse(value) / 100;
+                                                } catch (err) {
+                                                  slippage = 0.03;
+                                                }
+                                              });
+                                            },
                                           ),
                                         )
-                                      ],
-                                    ),
-                                  )
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 22),
-                      // TODO: must be constant so as not to be updated
-                      SwapPriceDetails(
-                        feeDetails: createFeeString(dexState),
-                        priceFromDetails:
-                            createPriceString(dexState, assetFrom, assetTo),
-                        priceToDetails:
-                            createPriceString(dexState, assetTo, assetFrom),
-                      ),
-                      if (isShowStabilizationFee)
-                        Container(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 12),
-                                child: SvgPicture.asset(
-                                  'assets/important.svg',
-                                  height: 20,
+                                      : Container(
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: SlippageButton(
+                                                  isFirst: true,
+                                                  isBorder: isCustomBgColor,
+                                                  label: '0.5%',
+                                                  isActive: slippage == 0.005,
+                                                  callback: () => setState(
+                                                      () => slippage = 0.005),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 1,
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: SlippageButton(
+                                                  isBorder: isCustomBgColor,
+                                                  label: '1%',
+                                                  isActive: slippage == 0.01,
+                                                  callback: () => setState(
+                                                      () => slippage = 0.01),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 1,
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: SlippageButton(
+                                                  isBorder: isCustomBgColor,
+                                                  label: '3%',
+                                                  isActive: slippage == 0.03,
+                                                  callback: () => setState(
+                                                      () => slippage = 0.03),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 1,
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: SlippageButton(
+                                                  isBorder: isCustomBgColor,
+                                                  label: '5%',
+                                                  isActive: slippage == 0.05,
+                                                  callback: () => setState(
+                                                      () => slippage = 0.05),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 1,
+                                              ),
+                                              Expanded(
+                                                child: Container(
+                                                  height: 20,
+                                                  child: TextButton(
+                                                    style: TextButton.styleFrom(
+                                                      backgroundColor:
+                                                          Theme.of(context)
+                                                              .cardColor,
+                                                      padding:
+                                                          const EdgeInsets.all(0),
+                                                      elevation: 2,
+                                                      shadowColor:
+                                                          Colors.transparent,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                              topRight: Radius.circular(10),
+                                                              bottomRight: Radius.circular(10),
+                                                            ),
+                                                        side: BorderSide(
+                                                          color: Colors.transparent,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.edit,
+                                                      size: 16,
+                                                    ),
+                                                    onPressed: () => setState(() =>
+                                                        isShowSlippageField = true),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
                                 ),
-                              ),
-                              Flexible(
-                                child: Text(
-                                  'There is currently a high DEX stabilization fee imposed on DUSD-DFI, DUSD-USDT, and DUSD-USDC swaps due to DFIP 2206-D and DFIP 2207-B. In order to execute the swap, you need to set your Slippage to at least $stabilizationFee%',
-                                  textAlign: TextAlign.justify,
-                                  style: TextStyle(fontSize: 13, height: 1.1),
-                                ),
-                              )
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                    ],
+                          SizedBox(height: 22),
+                          // TODO: must be constant so as not to be updated
+
+                        ],
+                      ),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
@@ -500,7 +555,10 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   stateInit(accountState, dexState, tokensState) {
-    getFieldMsg(accountState, dexState);
+    getFieldMsg(
+      accountState,
+      dexState,
+    );
     accountState.activeAccount.balanceList!.forEach((el) {
       if (tokensState.tokensForSwap[el.token] != null &&
           !assets.contains(el.token) &&
@@ -646,10 +704,17 @@ class _SwapScreenState extends State<SwapScreen> {
     onToInputChanged(valueFormat, dexCubit, accountState, tokensState);
   }
 
-  getFieldMsg(accountState, dexState) {
-    var availableAmount = getAvailableAmount(accountState, assetFrom, dexState);
-    swapFieldMsg =
-        '${balancesHelper.numberStyling(availableAmount)} $assetFrom available to swap';
+  getFieldMsg(
+    accountState,
+    dexState,
+  ) {
+    var availableAmountFrom =
+        getAvailableAmount(accountState, assetFrom, dexState);
+    var availableAmountTo = getAvailableAmount(accountState, assetTo, dexState);
+    swapFromMsg =
+        '${balancesHelper.numberStyling(availableAmountFrom)} $assetFrom';
+    swapToMsg =
+        '${balancesHelper.numberStyling(availableAmountTo)} $assetTo';
   }
 
   bool isNumeric(String string) {

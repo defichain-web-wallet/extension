@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/buy/contact_screen.dart';
 import 'package:defi_wallet/screens/buy/search_buy_token.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
@@ -183,20 +184,30 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                                   if (fiatState.history[index].type! ==
                                       'Withdrawal')
                                     SvgPicture.asset(
-                                        'assets/images/withdrawal.svg')
+                                      'assets/images/withdrawal.svg',
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color,
+                                    )
                                   else
                                     SvgPicture.asset(
-                                        'assets/images/deposit.svg')
+                                      'assets/images/deposit.svg',
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color,
+                                    )
                                 ],
                               ),
                               title: Text(fiatState.history[index].type!),
                               subtitle: Text(fiatState.history[index].date!),
                               trailing: (fiatState.history[index].inputAsset !=
-                                  null)
+                                      null)
                                   ? Text(
-                                  '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
+                                      '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
                                   : Text(
-                                  '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
+                                      '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
                             );
                           },
                         )
@@ -204,7 +215,9 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                           child: Text('Not yet any transaction'),
                         ),
                 ),
-                SvgPicture.asset('assets/powered_of_dfx.svg'),
+                SettingsHelper.settings.theme == 'Light'
+                    ? SvgPicture.asset('assets/powered_of_dfx.svg')
+                    : SvgPicture.asset('assets/powered_of_dfx_dark.svg'),
               ],
             ),
           ),
@@ -230,7 +243,6 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
           reverseTransitionDuration: Duration.zero,
         ),
       );
-
     }
   }
 
