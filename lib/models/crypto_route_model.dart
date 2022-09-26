@@ -1,3 +1,5 @@
+import 'package:defi_wallet/utils/convert.dart';
+
 class CryptoRouteModel {
   String? blockchainFrom;
   String? blockchainTo;
@@ -5,7 +7,7 @@ class CryptoRouteModel {
   String? assetTo;
   String? address;
   int? minDeposit;
-  int? fee;
+  double? fee;
 
   CryptoRouteModel(
       {this.blockchainFrom,
@@ -22,7 +24,7 @@ class CryptoRouteModel {
     this.assetFrom = 'BTC';
     this.assetTo = json["asset"]['dBTC'];
     this.address = json["deposit"]['address'];
-    this.minDeposit = json["minDeposits"][0]['amount'];
+    this.minDeposit = convertToSatoshi(json["minDeposits"][0]['amount']);
     this.fee = json["fee"];
 
   }
