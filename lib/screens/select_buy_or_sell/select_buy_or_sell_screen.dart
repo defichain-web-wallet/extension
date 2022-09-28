@@ -36,62 +36,57 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
   @override
   void initState() {
     super.initState();
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
-      await fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    if (iterator == 0) {
+      try {
+        fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
+      } catch (err) {
+        print(err);
+      }
+      iterator++;
+    }
     return BlocBuilder<FiatCubit, FiatState>(
       builder: (BuildContext context, fiatState) {
-        if (fiatState.status == FiatStatusList.success) {
-          return ScaffoldConstrainedBox(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth < ScreenSizes.medium) {
-                  return Scaffold(
+        return ScaffoldConstrainedBox(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < ScreenSizes.medium) {
+                return Scaffold(
+                  appBar: MainAppBar(
+                    title: 'Buy & Sell with DFX Swiss',
+                  ),
+                  body: _buildBody(fiatState),
+                );
+              } else {
+                return Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Scaffold(
                     appBar: MainAppBar(
                       title: 'Buy & Sell with DFX Swiss',
+                      isSmall: true,
                     ),
-                    body: _buildBody(fiatState),
-                  );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Scaffold(
-                      appBar: MainAppBar(
-                        title: 'Buy & Sell with DFX Swiss',
-                        isSmall: true,
-                      ),
-                      body: _buildBody(fiatState, isFullSize: true),
-                    ),
-                  );
-                }
-              },
-            ),
-          );
-        } else {
-          return ScaffoldConstrainedBox(
-            child: Scaffold(
-              appBar: MainAppBar(
-                title: 'Buy & Sell with DFX Swiss',
-              ),
-              body: Loader(),
-            ),
-          );
-        }
+                    body: _buildBody(fiatState, isFullSize: true),
+                  ),
+                );
+              }
+            },
+          ),
+        );
       },
     );
   }
 
-  Widget _buildBody(fiatState, {isFullSize = false}) => Container(
+  Widget _buildBody(fiatState, {isFullSize = false}) {
+    if (fiatState.status == FiatStatusList.success) {
+      return Container(
         color: Theme.of(context).dialogBackgroundColor,
         padding:
-            const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+        const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
           child: StretchBox(
             child: Column(
@@ -113,8 +108,8 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                         child: Text(
                           'Your limit',
                           style: Theme.of(context).textTheme.headline2!.apply(
-                                fontFamily: 'IBM Plex Sans',
-                              ),
+                            fontFamily: 'IBM Plex Sans',
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -124,8 +119,8 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                         child: Text(
                           '${balancesHelper.numberStyling(fiatState.limit! / 100)}€ / Day',
                           style: Theme.of(context).textTheme.headline1!.apply(
-                                fontFamily: 'IBM Plex Medium',
-                              ),
+                            fontFamily: 'IBM Plex Medium',
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -175,45 +170,45 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                 Expanded(
                   child: fiatState.history.length > 0
                       ? ListView.builder(
-                          itemCount: fiatState.history.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return ListTile(
-                              leading: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (fiatState.history[index].type! ==
-                                      'Withdrawal')
-                                    SvgPicture.asset(
-                                      'assets/images/withdrawal.svg',
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color,
-                                    )
-                                  else
-                                    SvgPicture.asset(
-                                      'assets/images/deposit.svg',
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color,
-                                    )
-                                ],
-                              ),
-                              title: Text(fiatState.history[index].type!),
-                              subtitle: Text(fiatState.history[index].date!),
-                              trailing: (fiatState.history[index].inputAsset !=
-                                      null)
-                                  ? Text(
-                                      '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
-                                  : Text(
-                                      '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
-                            );
-                          },
-                        )
-                      : Center(
-                          child: Text('Not yet any transaction'),
+                    itemCount: fiatState.history.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        leading: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (fiatState.history[index].type! ==
+                                'Withdrawal')
+                              SvgPicture.asset(
+                                'assets/images/withdrawal.svg',
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .color,
+                              )
+                            else
+                              SvgPicture.asset(
+                                'assets/images/deposit.svg',
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .color,
+                              )
+                          ],
                         ),
+                        title: Text(fiatState.history[index].type!),
+                        subtitle: Text(fiatState.history[index].date!),
+                        trailing: (fiatState.history[index].inputAsset !=
+                            null)
+                            ? Text(
+                            '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
+                            : Text(
+                            '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
+                      );
+                    },
+                  )
+                      : Center(
+                    child: Text('Not yet any transaction'),
+                  ),
                 ),
                 SettingsHelper.settings.theme == 'Light'
                     ? SvgPicture.asset('assets/powered_of_dfx.svg')
@@ -223,6 +218,10 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
           ),
         ),
       );
+    } else {
+      return Loader();
+    }
+  }
 
   buyCallback(context, state) {
     if (state.isShowTutorial) {

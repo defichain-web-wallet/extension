@@ -1,8 +1,11 @@
+import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field_swap.dart';
 import 'package:defi_wallet/widgets/network/network_selector.dart';
+import 'package:defi_wallet/widgets/swap/swap_account_selector.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 
@@ -12,10 +15,12 @@ import '../../home/widgets/asset_select_swap.dart';
 class AmountSelectorField extends StatefulWidget {
   final String? label;
   final String? selectedAsset;
+  final AccountModel? account;
   final List<String>? assets;
   final GlobalKey<AssetSelectState>? selectKey;
   final TextEditingController? amountController;
   final Function(String)? onSelect;
+  final Function(int)? onChangeAccount;
   final Function()? onAnotherSelect;
   final Function(String)? onChanged;
   final FocusNode? focusNode;
@@ -31,10 +36,12 @@ class AmountSelectorField extends StatefulWidget {
     Key? key,
     this.label,
     this.selectedAsset,
+    this.account,
     this.assets,
     this.selectKey,
     this.amountController,
     this.onSelect,
+    this.onChangeAccount,
     this.onAnotherSelect,
     this.onChanged,
     this.focusNode,
@@ -67,38 +74,47 @@ class _AmountSelectorFieldState extends State<AmountSelectorField> {
                 style: Theme.of(context).textTheme.headline2,
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                height: 20,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
+            if (SettingsHelper.isBitcoin())
+              ...[
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    height: 20,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.label == 'Swap from' ? 'Sender' : 'Receiver',
+                          style: Theme.of(context).textTheme.subtitle2,
+                        )
+                      ],
+                    ),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.label == 'Swap from' ? 'Sender' : 'Receiver',
-                      style: Theme.of(context).textTheme.subtitle2,
-                    )
-                  ],
+                SizedBox(
+                  width: 1,
                 ),
-              ),
-            ),
-            SizedBox(
-              width: 1,
-            ),
-            Expanded(
-              flex: 2,
-              child: NetworkSelectorSwap(
-                isFullSize: false,
-              ),
-            ),
+                Expanded(
+                  flex: 2,
+                  child: SwapAccountSelector(
+                    isFullSize: widget.isBorder,
+                    account: widget.account!,
+                    callback: (int index) {
+                      if (widget.onChangeAccount != null) {
+                        widget.onChangeAccount!(index);
+                      }
+                    },
+                  ),
+                ),
+              ],
           ],
         ),
         SizedBox(height: 6),

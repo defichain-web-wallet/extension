@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
@@ -22,9 +23,10 @@ class ReviewSwapScreen extends StatefulWidget {
   final double amountFrom;
   final double amountTo;
   final double slippage;
+  final String btcTx;
 
   const ReviewSwapScreen(this.assetFrom, this.assetTo, this.amountFrom,
-      this.amountTo, this.slippage);
+      this.amountTo, this.slippage, {this.btcTx = ''});
 
   @override
   _ReviewSwapScreenState createState() => _ReviewSwapScreenState();
@@ -155,6 +157,22 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
       parent.emitPending(true);
 
       try {
+        if (widget.btcTx != '') {
+          BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+          var txResponse = await bitcoinCubit.sendTransaction(widget.btcTx);
+          Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) =>
+                    SwapStatusScreen(
+                        txResponse: txResponse,
+                        amount: widget.amountFrom,
+                        assetFrom: widget.assetFrom,
+                        assetTo: widget.assetTo),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ));
+        }
         if (widget.assetFrom != widget.assetTo) {
           var txResponse = await transactionService.createAndSendSwap(
               account: state.activeAccount,

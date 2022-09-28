@@ -117,6 +117,7 @@ class DfxRequests {
   }
 
   Future<CryptoRouteModel> createCryptoRoute(String accessToken) async {
+    print('1');
     try {
       String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
 
@@ -128,20 +129,24 @@ class DfxRequests {
       };
 
 
-      final response = await http.post(url, headers: headers, body: {
+      final body = jsonEncode({
         "type": "Wallet",
         "blockchain": "Bitcoin",
         "asset": {
           "id": 2}
       });
+      final response = await http.post(url, headers: headers, body: body);
+      print(response);
       if (response.statusCode == 200) {
         dynamic data = jsonDecode(response.body);
 
         return CryptoRouteModel.fromJson(data);
       } else {
+        print(2);
         throw Error.safeToString(response.statusCode);
       }
     } catch (err) {
+      print(3);
       throw err;
     }
   }

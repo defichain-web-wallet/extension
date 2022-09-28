@@ -6,6 +6,7 @@ import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
+import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
@@ -729,6 +730,57 @@ class FiatCubit extends Cubit<FiatState> {
         limit: state.limit,
         history: state.history,
         accessToken: state.accessToken,
+      ));
+    }
+  }
+
+  Future<void> loadCryptoRoute(AccountModel account) async {
+    emit(state.copyWith(
+      status: FiatStatusList.loading,
+      accessToken: state.accessToken,
+    ));
+    try {
+      String accessToken = state.accessToken ?? await getAccessToken(account);
+      Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
+
+      CryptoRouteModel? route;
+      if (data['kycDataComplete']) {
+        route = await dfxRequests.getCryptoRoutes(accessToken);
+        if (route == null) {
+          route = await dfxRequests.createCryptoRoute(accessToken);
+        }
+      }
+      emit(state.copyWith(
+        status: FiatStatusList.success,
+        cryptoRoute: route,
+        accessToken: accessToken,
+        kycHash: data['kycHash'],
+        isKycDataComplete: data['kycDataComplete'],
+      ));
+    } catch (err) {
+      emit(state.copyWith(
+        status: FiatStatusList.failure,
+        phone: state.phone,
+        countryCode: state.countryCode,
+        phoneWithoutPrefix: state.phoneWithoutPrefix,
+        numberPrefix: state.numberPrefix,
+        email: state.email,
+        currentIban: state.currentIban,
+        ibansList: state.ibansList,
+        ibanList: state.ibanList,
+        assets: state.assets,
+        activeIban: state.activeIban,
+        foundAssets: state.foundAssets,
+        personalInfo: state.personalInfo,
+        countryList: state.countryList,
+        fiatList: state.fiatList,
+        isShowTutorial: state.isShowTutorial,
+        kycHash: state.kycHash,
+        isKycDataComplete: state.isKycDataComplete,
+        limit: state.limit,
+        history: state.history,
+        accessToken: state.accessToken,
+        cryptoRoute: state.cryptoRoute,
       ));
     }
   }

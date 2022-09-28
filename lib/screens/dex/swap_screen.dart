@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -27,6 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/models/focus_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 import './widgets/amount_selector_field.dart';
 
 class SwapScreen extends StatefulWidget {
@@ -59,12 +65,15 @@ class _SwapScreenState extends State<SwapScreen> {
 
   List<String> tokensForSwap = [];
   List<String> assets = [];
+  late AccountModel accountFrom;
+  late AccountModel accountTo;
   String assetFrom = '';
   String assetTo = '';
   String address = '';
   String swapFromMsg = '';
   String swapToMsg = '';
   int iteratorUpdate = 0;
+  int iterator = 0;
   bool inputFromFocus = false;
   bool inputToFocus = false;
   bool isFailed = false;
@@ -102,7 +111,6 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget build(BuildContext context) =>
       BlocBuilder<DexCubit, DexState>(builder: (dexContext, dexState) {
         DexCubit dexCubit = BlocProvider.of<DexCubit>(dexContext);
-
         return BlocBuilder<AccountCubit, AccountState>(
             builder: (accountContext, accountState) {
           if (accountState.activeToken!.contains('-')) {
@@ -118,13 +126,13 @@ class _SwapScreenState extends State<SwapScreen> {
                 }
                 if (iteratorUpdate == 0) {
                   iteratorUpdate++;
+                  accountFrom = accountState.accounts![0];
+                  accountTo = accountState.accounts![0];
                   dexCubit.updateDex(assetFrom, assetTo, 0, 0, address,
                       accountState.activeAccount!.addressList!, tokensState);
                 }
               }
             }
-
-
             return BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, transactionState) => ScaffoldConstrainedBox(
                 child: GestureDetector(
@@ -228,6 +236,7 @@ class _SwapScreenState extends State<SwapScreen> {
                             isBorder: isCustomBgColor,
                             label: 'Swap from',
                             selectedAsset: assetFrom,
+                            account: accountFrom,
                             assets: assets,
                             selectKey: selectKeyFrom,
                             amountController: amountFromController,
@@ -237,25 +246,28 @@ class _SwapScreenState extends State<SwapScreen> {
                               onSelectFromAsset(
                                   asset, tokensState, accountState, dexCubit);
                             },
-                            onChanged: (value)
-                            {
+                            onChanged: (value) {
                               try {
                                 var amount = tokensHelper.getAmountByUsd(
                                   tokensCubit.state.tokensPairs!,
-                                  double.parse(
-                                      value.replaceAll(',', '.')),
+                                  double.parse(value.replaceAll(',', '.')),
                                   assetFrom,
                                 );
                                 setState(() {
-                                  amountFromInUsd = balancesHelper
-                                      .numberStyling(amount,
-                                      fixedCount: 2, fixed: true);
+                                  amountFromInUsd =
+                                      balancesHelper.numberStyling(amount,
+                                          fixedCount: 2, fixed: true);
+                                  if (SettingsHelper.isBitcoin()) {
+                                    amountToInUsd = getUdsAmount(double.parse(value), tokensState);
+                                  } else {
+                                    amountToInUsd = amountFromInUsd;
+                                  }
                                 });
                               } catch (err) {
                                 print(err);
                               }
-                              onChangeFromAsset(
-                                  value, accountState, dexCubit, tokensState);
+                              onChangeFromAsset(value, accountState, dexState,
+                                  dexCubit, tokensState);
                             },
                             focusNode: focusFrom,
                             focusModel: focusAmountFromModel,
@@ -280,6 +292,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                       onChangeFromAsset(
                                           amountFromController.text,
                                           accountState,
+                                          dexState,
                                           dexCubit,
                                           tokensState);
                                     },
@@ -287,6 +300,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                 ),
                               ),
                             ),
+                            onChangeAccount: (index) {
+                              setState(() {
+                                accountFrom = accountState.accounts[index];
+                              });
+                            },
                           ),
                           SizedBox(height: 6),
                           Text(
@@ -304,6 +322,7 @@ class _SwapScreenState extends State<SwapScreen> {
                             isBorder: isCustomBgColor,
                             label: 'Swap to',
                             selectedAsset: assetTo,
+                            account: accountTo,
                             assets: tokensForSwap,
                             selectKey: selectKeyTo,
                             amountController: amountToController,
@@ -313,25 +332,29 @@ class _SwapScreenState extends State<SwapScreen> {
                               onSelectToAsset(
                                   asset, tokensState, accountState, dexCubit);
                             },
-                            onChanged: (value)
-                            {
+                            onChanged: (value) {
                               try {
                                 var amount = tokensHelper.getAmountByUsd(
                                   tokensCubit.state.tokensPairs!,
-                                  double.parse(
-                                      value.replaceAll(',', '.')),
+                                  double.parse(value.replaceAll(',', '.')),
                                   assetTo,
                                 );
                                 setState(() {
-                                  amountToInUsd = balancesHelper
-                                      .numberStyling(amount,
-                                      fixedCount: 2, fixed: true);
+                                  amountToInUsd = balancesHelper.numberStyling(
+                                      amount,
+                                      fixedCount: 2,
+                                      fixed: true);
+                                  if (SettingsHelper.isBitcoin()) {
+                                    amountFromInUsd = getUdsAmount(double.parse(value), tokensState);
+                                  } else {
+                                    amountFromInUsd = amountToInUsd;
+                                  }
                                 });
                               } catch (err) {
                                 print(err);
                               }
-                              onChangeToAsset(
-                                  value, accountState, dexCubit, tokensState);
+                              onChangeToAsset(value, accountState, dexState,
+                                  dexCubit, tokensState);
                             },
                             focusNode: focusTo,
                             focusModel: focusAmountToModel,
@@ -345,6 +368,14 @@ class _SwapScreenState extends State<SwapScreen> {
                                 width: 40,
                               ),
                             ),
+                            onChangeAccount: (index) {
+                              FiatCubit fiatCubit =
+                                  BlocProvider.of<FiatCubit>(context);
+                              setState(() {
+                                accountTo = accountState.accounts[index];
+                              });
+                              fiatCubit.loadCryptoRoute(accountTo);
+                            },
                           ),
                           SizedBox(height: 6),
                           Text(
@@ -366,7 +397,8 @@ class _SwapScreenState extends State<SwapScreen> {
                                   flex: 2,
                                   child: Text(
                                     'Slippage tolerance',
-                                    style: Theme.of(context).textTheme.headline2,
+                                    style:
+                                        Theme.of(context).textTheme.headline2,
                                   ),
                                 ),
                                 Expanded(
@@ -376,9 +408,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                           height: 30,
                                           child: TextField(
                                             keyboardType: TextInputType.number,
-                                            inputFormatters: <TextInputFormatter>[
+                                            inputFormatters: <
+                                                TextInputFormatter>[
                                               FilteringTextInputFormatter.allow(
-                                                  RegExp(r'(^-?\d*\.?d*\,?\d*)')),
+                                                  RegExp(
+                                                      r'(^-?\d*\.?d*\,?\d*)')),
                                             ],
                                             controller: slippageController,
                                             decoration: InputDecoration(
@@ -491,18 +525,25 @@ class _SwapScreenState extends State<SwapScreen> {
                                                           Theme.of(context)
                                                               .cardColor,
                                                       padding:
-                                                          const EdgeInsets.all(0),
+                                                          const EdgeInsets.all(
+                                                              0),
                                                       elevation: 2,
                                                       shadowColor:
                                                           Colors.transparent,
-                                                      shape: RoundedRectangleBorder(
+                                                      shape:
+                                                          RoundedRectangleBorder(
                                                         borderRadius:
                                                             BorderRadius.only(
-                                                              topRight: Radius.circular(10),
-                                                              bottomRight: Radius.circular(10),
-                                                            ),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  10),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  10),
+                                                        ),
                                                         side: BorderSide(
-                                                          color: Colors.transparent,
+                                                          color: Colors
+                                                              .transparent,
                                                         ),
                                                       ),
                                                     ),
@@ -510,8 +551,10 @@ class _SwapScreenState extends State<SwapScreen> {
                                                       Icons.edit,
                                                       size: 16,
                                                     ),
-                                                    onPressed: () => setState(() =>
-                                                        isShowSlippageField = true),
+                                                    onPressed: () => setState(
+                                                        () =>
+                                                            isShowSlippageField =
+                                                                true),
                                                   ),
                                                 ),
                                               )
@@ -524,7 +567,6 @@ class _SwapScreenState extends State<SwapScreen> {
                           ),
                           SizedBox(height: 22),
                           // TODO: must be constant so as not to be updated
-
                         ],
                       ),
                     ),
@@ -533,15 +575,85 @@ class _SwapScreenState extends State<SwapScreen> {
                     padding: const EdgeInsets.only(top: 12),
                     child: Column(
                       children: [
-                        PendingButton(
-                          'Review Swap',
-                          isCheckLock: false,
-                          key: pendingButton,
-                          callback: !isDisableSubmit()
-                              ? (parent) => submitReviewSwap(parent,
-                                  accountState, transactionState, context)
-                              : null,
-                        ),
+                        BlocBuilder<FiatCubit, FiatState>(
+                            builder: (context, fiatState) {
+                          FiatCubit fiatCubit =
+                              BlocProvider.of<FiatCubit>(context);
+                          if (iterator == 0 && SettingsHelper.isBitcoin()) {
+                            fiatCubit.loadCryptoRoute(accountTo);
+                            iterator++;
+                          }
+                          if (fiatState.status == FiatStatusList.success &&
+                              SettingsHelper.isBitcoin()) {
+                            return Column(
+                              children: [
+                                if (!fiatState.isKycDataComplete!)
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 14.0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        String kycHash = fiatState.kycHash!;
+                                        launch(
+                                            'https://payment.dfx.swiss/kyc?code=$kycHash');
+                                      },
+                                      child: RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                                text:
+                                                    'If you want swap in BTC network, please complete the ',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline3
+                                                    ?.apply()),
+                                            TextSpan(
+                                              text: 'KYC process here.',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline3
+                                                  ?.apply(
+                                                      color:
+                                                          AppTheme.pinkColor),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                PendingButton(
+                                  'Review Swap',
+                                  isCheckLock: false,
+                                  key: pendingButton,
+                                  callback: !isDisableSubmit() &&
+                                              fiatState.isKycDataComplete!
+                                      ? (parent) => submitReviewSwap(
+                                            parent,
+                                            accountState,
+                                            transactionState,
+                                            context,
+                                            cryptoRoute: fiatState.cryptoRoute,
+                                          )
+                                      : null,
+                                ),
+                              ],
+                            );
+                          } else {
+                            return PendingButton(
+                              'Review Swap',
+                              isCheckLock: false,
+                              key: pendingButton,
+                              callback: !isDisableSubmit()
+                                  ? (parent) => submitReviewSwap(
+                                        parent,
+                                        accountState,
+                                        transactionState,
+                                        context,
+                                      )
+                                  : null,
+                            );
+                          }
+                        }),
                       ],
                     ),
                   ),
@@ -559,19 +671,25 @@ class _SwapScreenState extends State<SwapScreen> {
       accountState,
       dexState,
     );
-    accountState.activeAccount.balanceList!.forEach((el) {
-      if (tokensState.tokensForSwap[el.token] != null &&
-          !assets.contains(el.token) &&
-          !el.isHidden) {
-        assets.add(el.token!);
-      }
-    });
-    assetFrom = (assetFrom.isEmpty) ? accountState.activeToken : assetFrom;
-    address = accountState.activeAccount.getActiveAddress(isChange: false);
-    tokensForSwap = tokensState.tokensForSwap[assetFrom].cast<String>();
-    assetTo = (assetTo.isEmpty || !tokensForSwap.contains(assetTo))
-        ? tokensForSwap[0]
-        : assetTo;
+    if (SettingsHelper.isBitcoin()) {
+      assetFrom = 'BTC';
+      assetTo = 'BTC';
+      assets = [];
+    } else {
+      accountState.activeAccount.balanceList!.forEach((el) {
+        if (tokensState.tokensForSwap[el.token] != null &&
+            !assets.contains(el.token) &&
+            !el.isHidden) {
+          assets.add(el.token!);
+        }
+      });
+      assetFrom = (assetFrom.isEmpty) ? accountState.activeToken : assetFrom;
+      address = accountState.activeAccount.getActiveAddress(isChange: false);
+      tokensForSwap = tokensState.tokensForSwap[assetFrom].cast<String>();
+      assetTo = (assetTo.isEmpty || !tokensForSwap.contains(assetTo))
+          ? tokensForSwap[0]
+          : assetTo;
+    }
   }
 
   dexInit(dexState) {
@@ -590,6 +708,12 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   bool isEnoughBalance(state) {
+    if (SettingsHelper.isBitcoin()) {
+      BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+      var amount = convertFromSatoshi(bitcoinCubit.state.availableBalance);
+      return amount <
+          double.parse(amountFromController.text);
+    }
     int balance = state.activeAccount.balanceList!
         .firstWhere((el) => el.token! == assetFrom && !el.isHidden)
         .balance!;
@@ -597,7 +721,8 @@ class _SwapScreenState extends State<SwapScreen> {
         double.parse(amountFromController.text);
   }
 
-  submitReviewSwap(parent, state, transactionState, context) {
+  submitReviewSwap(parent, state, transactionState, context,
+      {CryptoRouteModel? cryptoRoute}) async {
     hideOverlay();
     if (transactionState is TransactionLoadingState) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -624,19 +749,56 @@ class _SwapScreenState extends State<SwapScreen> {
       return;
     }
     if (isNumeric(amountFromController.text)) {
-      Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => ReviewSwapScreen(
-              assetFrom,
-              assetTo,
-              double.parse(amountFromController.text),
-              double.parse(amountToController.text),
-              slippage,
+      if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
+        try {
+          var tx = await transactionService.createBTCTransaction(
+            account: state.activeAccount,
+            destinationAddress: cryptoRoute.address!,
+            amount: balancesHelper.toSatoshi(amountFromController.text),
+            satPerByte: int.parse(cryptoRoute.fee!.toString()),
+          );
+          Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) =>
+                    ReviewSwapScreen(
+                  assetFrom,
+                  assetTo,
+                  double.parse(amountFromController.text),
+                  double.parse(amountToController.text),
+                  slippage,
+                  btcTx: tx,
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ));
+        } catch (err) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Something went wrong',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+              backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
             ),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ));
+          );
+        }
+      } else {
+        Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  ReviewSwapScreen(
+                assetFrom,
+                assetTo,
+                double.parse(amountFromController.text),
+                double.parse(amountToController.text),
+                slippage,
+              ),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ));
+      }
     }
   }
 
@@ -676,7 +838,7 @@ class _SwapScreenState extends State<SwapScreen> {
     }
   }
 
-  onChangeFromAsset(value, accountState, dexCubit, tokensState) {
+  onChangeFromAsset(value, accountState, dexState, dexCubit, tokensState) {
     String valueFormat = value.replaceAll(',', '.');
     if (isFailed) {
       setState(() {
@@ -687,10 +849,11 @@ class _SwapScreenState extends State<SwapScreen> {
     amountFromController.text = valueFormat;
     amountFromController.selection = TextSelection.fromPosition(
         TextPosition(offset: amountFromController.text.length));
-    onFromInputChanged(valueFormat, dexCubit, accountState, tokensState);
+    onFromInputChanged(
+        valueFormat, dexState, dexCubit, accountState, tokensState);
   }
 
-  onChangeToAsset(value, accountState, dexCubit, tokensState) {
+  onChangeToAsset(value, accountState, dexState, dexCubit, tokensState) {
     String valueFormat = value.replaceAll(',', '.');
     if (isFailed) {
       setState(() {
@@ -701,20 +864,38 @@ class _SwapScreenState extends State<SwapScreen> {
     amountToController.text = valueFormat;
     amountToController.selection = TextSelection.fromPosition(
         TextPosition(offset: amountToController.text.length));
-    onToInputChanged(valueFormat, dexCubit, accountState, tokensState);
+    onToInputChanged(
+        valueFormat, dexState, dexCubit, accountState, tokensState);
   }
 
   getFieldMsg(
     accountState,
     dexState,
   ) {
-    var availableAmountFrom =
-        getAvailableAmount(accountState, assetFrom, dexState);
-    var availableAmountTo = getAvailableAmount(accountState, assetTo, dexState);
-    swapFromMsg =
-        '${balancesHelper.numberStyling(availableAmountFrom)} $assetFrom';
-    swapToMsg =
-        '${balancesHelper.numberStyling(availableAmountTo)} $assetTo';
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+
+    var availableAmountFrom;
+    var availableAmountTo;
+    if (SettingsHelper.isBitcoin()) {
+      double balance = convertFromSatoshi(bitcoinCubit.state.availableBalance);
+      String balanceFormat;
+      if (balance > 0) {
+        balanceFormat =
+            balancesHelper.numberStyling(balance, fixed: true, fixedCount: 6);
+      } else {
+        balanceFormat =
+            balancesHelper.numberStyling(0, fixed: true, fixedCount: 6);
+      }
+      swapFromMsg = '$balanceFormat $assetFrom';
+      swapToMsg = '$balanceFormat $assetTo';
+    } else {
+      availableAmountFrom =
+          getAvailableAmount(accountState, assetFrom, dexState);
+      availableAmountTo = getAvailableAmount(accountState, assetTo, dexState);
+      swapFromMsg =
+          '${balancesHelper.numberStyling(availableAmountFrom)} $assetFrom';
+      swapToMsg = '${balancesHelper.numberStyling(availableAmountTo)} $assetTo';
+    }
   }
 
   bool isNumeric(String string) {
@@ -744,14 +925,29 @@ class _SwapScreenState extends State<SwapScreen> {
     return '${balancesHelper.numberStyling(convertFromSatoshi(fee))} DFI';
   }
 
-  onFromInputChanged(String query, dexCubit, accountState, tokensState) {
+  onFromInputChanged(
+      String query, dexState, dexCubit, accountState, tokensState) {
     double amount = (query == '') ? 0 : double.parse(query);
 
     if (debounce?.isActive ?? false) debounce?.cancel();
     debounce = Timer(const Duration(milliseconds: 800), () {
       waitingFrom = true;
       if (assetFrom == assetTo) {
-        amountToController.text = amountFromController.text;
+        if (SettingsHelper.isBitcoin()) {
+          FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+          double amount = double.parse(amountFromController.text);
+
+          amountToController.text =
+              (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+                  .toString();
+          amountToController.text = balancesHelper.numberStyling(
+            double.parse(amountToController.text),
+            fixedCount: 4,
+            fixed: true,
+          );
+        } else {
+          amountToController.text = amountFromController.text;
+        }
       } else {
         dexCubit.updateDex(assetFrom, assetTo, amount, null, address,
             accountState.activeAccount.addressList!, tokensState);
@@ -760,18 +956,52 @@ class _SwapScreenState extends State<SwapScreen> {
     });
   }
 
-  onToInputChanged(String query, dexCubit, accountState, tokensState) {
+  onToInputChanged(
+      String query, dexState, dexCubit, accountState, tokensState) {
     double amount = (query == '') ? 0 : double.parse(query);
     if (debounce?.isActive ?? false) debounce?.cancel();
     debounce = Timer(const Duration(milliseconds: 800), () {
       waitingTo = true;
       if (assetFrom == assetTo) {
-        amountFromController.text = amountToController.text;
+        if (SettingsHelper.isBitcoin()) {
+          FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+          double amount = double.parse(amountToController.text);
+
+          amountFromController.text =
+              (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+                  .toString();
+          amountFromController.text = balancesHelper.numberStyling(
+            double.parse(amountToController.text),
+            fixedCount: 4,
+            fixed: true,
+          );
+        } else {
+          amountFromController.text = amountToController.text;
+        }
       } else {
         dexCubit.updateDex(assetFrom, assetTo, null, amount, address,
             accountState.activeAccount.addressList!, tokensState);
       }
     });
+  }
+
+  String getUdsAmount(double amount, tokensState) {
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+
+    var targetAmount =
+        (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+            .toString();
+
+    var result = tokensHelper.getAmountByUsd(
+      tokensState.tokensPairs!,
+      double.parse(targetAmount.replaceAll(',', '.')),
+      assetTo,
+    );
+    return balancesHelper.numberStyling(
+      result,
+      fixedCount: 2,
+      fixed: true,
+    );
   }
 
   onFocusToChange() {
