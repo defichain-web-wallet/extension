@@ -44,6 +44,7 @@ Where `/build/web` is directory with ready extension
 Start the Virtual Machine (TODO: Make a public virtual machine!)
 Run Speculos using this command
    
+   cd ~/speculos
    SPECULOS_APPNAME=DeFiChain:2.3.1 ./speculos.py ~/ledger-app-builder/app-bitcoin-new/bin/app.elf --apdu-port 9999  -s "SEED_PHRASE" 
 
 Change the adapter in the ledger-base.ts to use the SpeculosTransport by uncommenting the code and change the ip address.
