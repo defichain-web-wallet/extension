@@ -19,6 +19,7 @@ import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:defi_wallet/utils/secure_storage.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 
 part 'account_state.dart';
@@ -40,11 +41,14 @@ class AccountCubit extends Cubit<AccountState> {
   BalanceRequests balanceRequests = BalanceRequests();
   HistoryRequests historyRequests = HistoryRequests();
 
+  SecureMemoryStorage secureMemoryStorage = SecureMemoryStorage();
+
   createAccount(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: AccountStatusList.loading));
     var box = await Hive.openBox(HiveBoxes.client);
+    String encryptedPassword = encryptHelper.getEncryptedSha256(password);
     var encryptMnemonic =
-        encryptHelper.getEncryptedData(mnemonic.join(','), password);
+        encryptHelper.getEncryptedData(mnemonic.join(','), encryptedPassword);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     await box.close();
 
@@ -145,7 +149,17 @@ class AccountCubit extends Cubit<AccountState> {
     String key;
 
     if (password == '') {
-      key = stringToBase64.decode(box.get(HiveNames.password));
+      String? savedPassword = await secureMemoryStorage.getField(HiveNames.password);
+      if (savedPassword == null) {
+        key = stringToBase64.decode(box.get(HiveNames.password));
+        String decryptedKey = encryptHelper.getEncryptedSha256(key);
+        await secureMemoryStorage.updateField(HiveNames.password, decryptedKey);
+        String? newPassword = await secureMemoryStorage.getField(
+            HiveNames.password);
+        key = newPassword!;
+      } else {
+        key = savedPassword;
+      }
     } else {
       key = password;
     }
@@ -301,8 +315,10 @@ class AccountCubit extends Cubit<AccountState> {
     var box = await Hive.openBox(HiveBoxes.client);
     await box.put(HiveNames.kycStatus, 'show');
     await box.put(HiveNames.tutorialStatus, 'show');
+    await secureMemoryStorage.deleteField(HiveNames.password);
+    String encryptedPassword = encryptHelper.getEncryptedSha256(password);
     var encryptMnemonic =
-        encryptHelper.getEncryptedData(mnemonic.join(','), password);
+        encryptHelper.getEncryptedData(mnemonic.join(','), encryptedPassword);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     await box.close();
     SettingsHelper settingsHelper = SettingsHelper();
@@ -368,17 +384,30 @@ class AccountCubit extends Cubit<AccountState> {
     var encodedPassword = await box.get(HiveNames.password);
     var savedMnemonic;
     var mnemonic;
-    var password = stringToBase64.decode(encodedPassword);
+    String? password;
+    String decodePassword;
+    String key;
+
+
+    password = await secureMemoryStorage.getField(HiveNames.password);
+
+    if (password == null) {
+      decodePassword = stringToBase64.decode(encodedPassword);
+      password = encryptHelper.getEncryptedSha256(decodePassword);
+      key = decodePassword;
+    } else {
+      key = password;
+    }
 
     try {
       savedMnemonic = await box.get(HiveNames.savedMnemonic);
       if (savedMnemonic.split(',').length == 24) {
         var encryptMnemonic =
-            encryptHelper.getEncryptedData(savedMnemonic, password);
+            encryptHelper.getEncryptedData(savedMnemonic, key);
         await box.put(HiveNames.savedMnemonic, encryptMnemonic);
-        mnemonic = encryptHelper.getDecryptedData(encryptMnemonic, password);
+        mnemonic = encryptHelper.getDecryptedData(encryptMnemonic, key);
       } else {
-        mnemonic = encryptHelper.getDecryptedData(savedMnemonic, password);
+        mnemonic = encryptHelper.getDecryptedData(savedMnemonic, key);
       }
     } catch (err) {
       mnemonic = '';
@@ -395,9 +424,9 @@ class AccountCubit extends Cubit<AccountState> {
     var savedAccounts = box.get(accountsName);
 
     var decryptedMasterKey =
-        encryptHelper.getDecryptedData(savedMasterKey, password);
+        encryptHelper.getDecryptedData(savedMasterKey, key);
     var decryptedAccounts =
-        encryptHelper.getDecryptedData(savedAccounts, password);
+        encryptHelper.getDecryptedData(savedAccounts, key);
 
     var networkType = networkHelper.getNetworkType(network);
     final masterKeyPair =

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
 class EncryptHelper {
@@ -48,5 +51,11 @@ class EncryptHelper {
      } else {
        return key;
      }
+  }
+
+  String getEncryptedSha256(String target) {
+    var appleInBytes = utf8.encode(target);
+    Digest value = sha256.convert(appleInBytes);
+    return value.toString();
   }
 }
