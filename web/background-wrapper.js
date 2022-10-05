@@ -1,4 +1,5 @@
 let openRequest = indexedDB.open("rates", 1);
+let openStoreRequest = indexedDB.open("store", 1);
 
 async function setupRates() {
     var tokensMainnetResponse = await fetch('https://ocean.defichain.com/v0/mainnet/tokens?size=200')
@@ -73,4 +74,54 @@ openRequest.onsuccess = async () => {
     })();
 
     setInterval(async () => await setupRates(), tickerForLoadData)
+};
+
+openStoreRequest.onupgradeneeded = function() {
+    let db = openStoreRequest.result;
+    if (!db.objectStoreNames.contains('box')) {
+        db.createObjectStore('box', {keyPath: 'key'});
+    }
+};
+
+openStoreRequest.onerror = function() {
+    console.error("Error", openRequest.error);
+};
+
+openStoreRequest.onsuccess = (event) => {
+    const tickerForLoadData = 300000;
+
+    (function foo() {
+        let db = openStoreRequest.result;
+        let transaction = db.transaction("box", "readwrite");
+
+        let store = transaction.objectStore("box");
+        let hash = {
+            key: 'auth_time',
+            data: '111'
+        };
+        store.put(hash);
+    })();
+
+    setInterval(() => {
+        let db = openStoreRequest.result;
+        let transaction = db.transaction("box", "readwrite");
+
+        let store = transaction.objectStore("box");
+        let openTime = store.get('auth_time');
+//        if (openTime.result.data === '222') {
+//            let hash = {
+//                key: 'auth_time',
+//                data: ''
+//            };
+//            store.put(hash);
+//        }
+        openTime.onsuccess = (e) => {
+            console.log(e.target.result);
+        };
+
+        openTime.onerror = (e) => {
+            console.log("Error Getting: ", e);
+        };
+//        console.log(openTime.result);
+    }, 5000)
 };

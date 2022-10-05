@@ -51,6 +51,7 @@ class _WalletCheckerState extends State<WalletChecker> {
       }
       await settingsHelper.loadSettings();
       await box.close();
+      lockHelper.updateAuthTimer();
 
       if (masterKeyPair != null) {
         if (password != null) {

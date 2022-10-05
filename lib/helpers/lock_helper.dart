@@ -1,19 +1,24 @@
+import 'dart:convert';
+
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
+import 'package:defi_wallet/utils/secure_storage.dart';
 import 'package:defi_wallet/utils/theme_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class LockHelper {
   Future<void> provideWithLockChecker(context, Function() callback) async {
+    SecureMemoryStorage secureMemoryStorage = SecureMemoryStorage();
+    var passwordSha256 = await secureMemoryStorage.getField(HiveNames.password);
     var box = await Hive.openBox(HiveBoxes.client);
     var openTime = await box.get(HiveNames.openTime);
     await box.close();
 
     if (openTime != null &&
         openTime + TickerTimes.tickerBeforeLockMilliseconds <
-            DateTime.now().millisecondsSinceEpoch) {
+            DateTime.now().millisecondsSinceEpoch || passwordSha256 == '') {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
@@ -38,6 +43,26 @@ class LockHelper {
     try {
       var box = await Hive.openBox(HiveBoxes.client);
       await box.put(HiveNames.openTime, DateTime.now().millisecondsSinceEpoch);
+      await box.close();
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  Future<void> updateAuthTimer() async {
+    try {
+      var box = await Hive.openBox('store');
+      await box.put('auth_time', '222');
+      // var openTime = await box.get('auth_time');
+
+      // print('----');
+      // print(openTime);
+      // print('----');
+      //
+      // if (openTime['data'] == '111') {
+      //   await box.put('auth_time', '222');
+      //   print('success');
+      // }
       await box.close();
     } catch (err) {
       print(err);

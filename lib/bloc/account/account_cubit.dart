@@ -49,6 +49,7 @@ class AccountCubit extends Cubit<AccountState> {
     String encryptedPassword = encryptHelper.getEncryptedSha256(password);
     var encryptMnemonic =
         encryptHelper.getEncryptedData(mnemonic.join(','), encryptedPassword);
+    await secureMemoryStorage.updateField(HiveNames.password, encryptedPassword);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     await box.close();
 
@@ -74,8 +75,7 @@ class AccountCubit extends Cubit<AccountState> {
 
 
     await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet,
-        accountsTestnet, masterKeyPairTestnet, mnemonic,
-        password: password);
+        accountsTestnet, masterKeyPairTestnet, mnemonic);
 
     try {
       emit(state.copyWith(
@@ -317,6 +317,7 @@ class AccountCubit extends Cubit<AccountState> {
     await box.put(HiveNames.tutorialStatus, 'show');
     await secureMemoryStorage.deleteField(HiveNames.password);
     String encryptedPassword = encryptHelper.getEncryptedSha256(password);
+    await secureMemoryStorage.updateField(HiveNames.password, encryptedPassword);
     var encryptMnemonic =
         encryptHelper.getEncryptedData(mnemonic.join(','), encryptedPassword);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
@@ -357,8 +358,7 @@ class AccountCubit extends Cubit<AccountState> {
       });
       final balances = accountsMainnet[0].balanceList!;
       await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet,
-          accountsTestnet, masterKeyPairTestnet, mnemonic,
-          password: password);
+          accountsTestnet, masterKeyPairTestnet, mnemonic);
 
       emit(state.copyWith(
         status: AccountStatusList.success,
@@ -375,7 +375,7 @@ class AccountCubit extends Cubit<AccountState> {
     }
   }
 
-  Future<List<dynamic>> restoreAccountFromStorage(String network) async {
+  Future<List<dynamic>> restoreAccountFromStorage(String network, {String password = ''}) async {
     List<AccountModel> accounts = [];
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     var masterKeyName;
@@ -384,19 +384,21 @@ class AccountCubit extends Cubit<AccountState> {
     var encodedPassword = await box.get(HiveNames.password);
     var savedMnemonic;
     var mnemonic;
-    String? password;
+    String? savedPassword;
     String decodePassword;
     String key;
 
+    savedPassword = await secureMemoryStorage.getField(HiveNames.password);
 
-    password = await secureMemoryStorage.getField(HiveNames.password);
-
-    if (password == null) {
+    if (savedPassword == null) {
       decodePassword = stringToBase64.decode(encodedPassword);
-      password = encryptHelper.getEncryptedSha256(decodePassword);
+      savedPassword = encryptHelper.getEncryptedSha256(decodePassword);
       key = decodePassword;
+    } else if (savedPassword == '' && password != '') {
+      savedPassword = encryptHelper.getEncryptedSha256(password);
+      key = savedPassword;
     } else {
-      key = password;
+      key = savedPassword;
     }
 
     try {
@@ -453,9 +455,13 @@ class AccountCubit extends Cubit<AccountState> {
 
     if(needToStoreBTCAddress){
       if (SettingsHelper.settings.network! == 'testnet') {
-        await saveAccountsToStorage(null, null, accounts, masterKeyPair, mnemonic.split(','), password: password);
+        await saveAccountsToStorage(
+            null, null, accounts, masterKeyPair, mnemonic.split(','),
+            password: savedPassword);
       } else {
-        await saveAccountsToStorage(accounts, masterKeyPair, null, null, mnemonic.split(','), password: password);
+        await saveAccountsToStorage(
+            accounts, masterKeyPair, null, null, mnemonic.split(','),
+            password: savedPassword);
       }
     }
     await box.close();
