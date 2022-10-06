@@ -14,6 +14,7 @@ import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -39,6 +40,10 @@ class _SendConfirmState extends State<SendConfirmScreen> {
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   bool isEnable = true;
+  bool isLoader = false;
+  String secondStepLoaderText =
+      'Did you know Jellywallet is compatible with DeFiChain Wallet, if you use it without ledger? Just use your seed across the wallets!';
+  dynamic localeParrent;
 
   @override
   Widget build(BuildContext context) =>
@@ -89,89 +94,111 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                         horizontal: 16, vertical: 24),
                     child: Center(
                       child: StretchBox(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text(
-                                    'Do you really want to send',
-                                    style:
-                                        Theme.of(context).textTheme.headline6,
-                                  ),
-                                ),
-                                SizedBox(height: 32),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        '${balancesHelper.numberStyling(widget.amount)} ',
-                                        overflow: TextOverflow.ellipsis,
+                        child: isLoader
+                            ? LoaderNew(
+                                callback: () async {
+                                  await submitSend(
+                                      localeParrent, state, tokensState);
+                                },
+                                secondStepLoaderText: secondStepLoaderText,
+                              )
+                            : Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'Do you really want to send',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline6,
+                                        ),
+                                      ),
+                                      SizedBox(height: 32),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              '${balancesHelper.numberStyling(widget.amount)} ',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline1,
+                                            ),
+                                          ),
+                                          Text(
+                                            (widget.token != 'DFI')
+                                                ? 'd' + widget.token
+                                                : widget.token,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline1,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 28),
+                                      Text(
+                                        'To',
                                         style: Theme.of(context)
                                             .textTheme
-                                            .headline1,
+                                            .headline6,
                                       ),
-                                    ),
-                                    Text(
-                                      (widget.token != 'DFI')
-                                          ? 'd' + widget.token
-                                          : widget.token,
-                                      style:
-                                          Theme.of(context).textTheme.headline1,
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 28),
-                                Text(
-                                  'To',
-                                  style: Theme.of(context).textTheme.headline6,
-                                ),
-                                SizedBox(height: 28),
-                                Text(
-                                  'Address:',
-                                  style: Theme.of(context).textTheme.headline6,
-                                ),
-                                SizedBox(height: 16),
-                                Text(
-                                  widget.address,
-                                  style: Theme.of(context).textTheme.headline2,
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    child: AccentButton(
-                                      label: 'Cancel',
-                                      callback: isEnable
-                                          ? () => Navigator.of(context).pop()
-                                          : null,
-                                    ),
+                                      SizedBox(height: 28),
+                                      Text(
+                                        'Address:',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6,
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        widget.address,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline2,
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(width: 16),
-                                  Expanded(
-                                    child: PendingButton(
-                                      'Send',
-                                      isCheckLock: false,
-                                      callback: (parent) {
-                                        setState(() {
-                                          isEnable = false;
-                                        });
-                                        submitSend(parent, state, tokensState);
-                                      },
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: AccentButton(
+                                            label: 'Cancel',
+                                            callback: isEnable
+                                                ? () =>
+                                                    Navigator.of(context).pop()
+                                                : null,
+                                          ),
+                                        ),
+                                        SizedBox(width: 16),
+                                        Expanded(
+                                          child: PendingButton(
+                                            'Send',
+                                            isCheckLock: false,
+                                            callback: (parent) {
+                                              setState(() {
+                                                isEnable = false;
+                                                localeParrent = parent;
+                                                isLoader = true;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                   );
@@ -184,9 +211,15 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         );
       });
 
-  submitSend(parent, state, tokensState) async {
-    parent.emitPending(true);
+  simpleFunc() {
+    print('123123');
+  }
 
+
+  submitSend(parent, state, tokensState) async {
+    print('submitSend');
+    // parent.emitPending(true);
+    print('submitSend3');
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
         await _sendTransaction(
@@ -202,8 +235,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         ),
       );
     }
-
-    parent.emitPending(false);
+    // parent.emitPending(false);
+    print('submitSend2');
   }
 
   Future _sendTransaction(

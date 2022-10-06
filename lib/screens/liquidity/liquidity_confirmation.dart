@@ -12,6 +12,7 @@ import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair_details.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_status.dart';
+import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -51,9 +52,14 @@ class LiquidityConfirmation extends StatefulWidget {
 
 class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
   String submitLabel = '';
+  String secondStepLoaderTextAdd =
+      'Did you know that DeFiChain is working without smart contracts? It\'s all based on so called custom-transactions. Makes things more secure!';
+  String secondStepLoaderTextRemove =
+      'Do you like Jellywallet? Leave us a review on the Google Store to support us!';
   TokensHelper tokenHelper = TokensHelper();
   bool isEnable = true;
   bool isPending = false;
+  bool isLoader = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
 
@@ -106,195 +112,223 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Center(
                 child: StretchBox(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        child: Column(
+                  child: isLoader
+                      ? LoaderNew(
+                          secondStepLoaderText: widget.removeLT == 0
+                              ? secondStepLoaderTextAdd
+                              : secondStepLoaderTextRemove,
+                          callback: () {
+                            submitLiquidityAction(
+                              state,
+                              tokensState,
+                              transactionState,
+                            );
+                            // testFunc();
+                          },
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('You will receive',
-                                style: Theme.of(context).textTheme.headline6),
-                            widget.removeLT == 0
-                                ? Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 28),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '${widget.amount.toStringAsFixed(8)}',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .apply(fontSizeDelta: 12),
-                                        ),
-                                        Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 8)),
-                                        AssetPair(
-                                          pair: widget.assetPair.symbol!,
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                : Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 28),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
+                            Container(
+                              child: Column(
+                                children: [
+                                  Text('You will receive',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6),
+                                  widget.removeLT == 0
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 28),
                                           child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 8),
-                                                child: SvgPicture.asset(
-                                                  tokenHelper
-                                                      .getImageNameByTokenName(
-                                                          widget.assetPair
-                                                              .tokenA),
-                                                  height: 25,
-                                                  width: 25,
-                                                ),
-                                              ),
                                               Text(
-                                                  '${widget.baseAmount.toStringAsFixed(4)}',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline6
-                                                      ?.apply(fontSizeDelta: 4))
-                                            ],
-                                          ),
-                                        ),
-                                        Text(' + ',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline6
-                                                ?.apply(fontSizeDelta: 4)),
-                                        Container(
-                                          child: Row(
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 8),
-                                                child: SvgPicture.asset(
-                                                  tokenHelper
-                                                      .getImageNameByTokenName(
-                                                          widget.assetPair
-                                                              .tokenB),
-                                                  height: 25,
-                                                  width: 25,
-                                                ),
+                                                '${widget.amount.toStringAsFixed(8)}',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline6!
+                                                    .apply(fontSizeDelta: 12),
                                               ),
-                                              Text(
-                                                  '${widget.quoteAmount.toStringAsFixed(4)}',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline6
-                                                      ?.apply(fontSizeDelta: 4))
+                                              Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 8)),
+                                              AssetPair(
+                                                pair: widget.assetPair.symbol!,
+                                              )
                                             ],
                                           ),
                                         )
-                                      ],
-                                    ),
-                                  ),
-                            widget.removeLT != 0
-                                ? Text(
-                                    'exchanging for ${getLiquidityToken()} ${TokensHelper().getTokenFormat(widget.assetPair.symbol)} liquidity tokens',
-                                    style:
-                                        Theme.of(context).textTheme.headline5)
-                                : Column(
-                                    children: [
-                                      Text(
-                                          '${TokensHelper().getTokenFormat(widget.assetPair.symbol)} liquidity tokens',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6),
-                                      Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12)),
-                                      Text(
-                                          '${widget.shareOfPool.toStringAsFixed(8)}% share of pool',
+                                      : Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 28),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                child: Row(
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8),
+                                                      child: SvgPicture.asset(
+                                                        tokenHelper
+                                                            .getImageNameByTokenName(
+                                                                widget.assetPair
+                                                                    .tokenA),
+                                                        height: 25,
+                                                        width: 25,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                        '${widget.baseAmount.toStringAsFixed(4)}',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline6
+                                                            ?.apply(
+                                                                fontSizeDelta:
+                                                                    4))
+                                                  ],
+                                                ),
+                                              ),
+                                              Text(' + ',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline6
+                                                      ?.apply(
+                                                          fontSizeDelta: 4)),
+                                              Container(
+                                                child: Row(
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8),
+                                                      child: SvgPicture.asset(
+                                                        tokenHelper
+                                                            .getImageNameByTokenName(
+                                                                widget.assetPair
+                                                                    .tokenB),
+                                                        height: 25,
+                                                        width: 25,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                        '${widget.quoteAmount.toStringAsFixed(4)}',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline6
+                                                            ?.apply(
+                                                                fontSizeDelta:
+                                                                    4))
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                  widget.removeLT != 0
+                                      ? Text(
+                                          'exchanging for ${getLiquidityToken()} ${TokensHelper().getTokenFormat(widget.assetPair.symbol)} liquidity tokens',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5)
-                                    ],
+                                      : Column(
+                                          children: [
+                                            Text(
+                                                '${TokensHelper().getTokenFormat(widget.assetPair.symbol)} liquidity tokens',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline6),
+                                            Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 12)),
+                                            Text(
+                                                '${widget.shareOfPool.toStringAsFixed(8)}% share of pool',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5)
+                                          ],
+                                        ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 42.0),
+                                    child: AssetPairDetails(
+                                        assetPair: widget.assetPair,
+                                        isRemove: widget.removeLT != 0,
+                                        amountA: widget.baseAmount,
+                                        amountB: widget.quoteAmount,
+                                        balanceA: widget.balanceA,
+                                        balanceB: widget.balanceB,
+                                        totalBalanceInUsd: widget.balanceUSD,
+                                        totalAmountInUsd: widget.amountUSD),
                                   ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 42.0),
-                              child: AssetPairDetails(
-                                  assetPair: widget.assetPair,
-                                  isRemove: widget.removeLT != 0,
-                                  amountA: widget.baseAmount,
-                                  amountB: widget.quoteAmount,
-                                  balanceA: widget.balanceA,
-                                  balanceB: widget.balanceB,
-                                  totalBalanceInUsd: widget.balanceUSD,
-                                  totalAmountInUsd: widget.amountUSD),
+                                  Container(
+                                      padding: const EdgeInsets.only(top: 24),
+                                      child: RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                                text: 'Note: ',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline6),
+                                            TextSpan(
+                                                text:
+                                                    'Liquidity tokens represent a share of the liquidity pool',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5)
+                                          ],
+                                        ),
+                                      ))
+                                ],
+                              ),
                             ),
                             Container(
-                                padding: const EdgeInsets.only(top: 24),
-                                child: RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                          text: 'Note: ',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6),
-                                      TextSpan(
-                                          text:
-                                              'Liquidity tokens represent a share of the liquidity pool',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5)
-                                    ],
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      child: AccentButton(
+                                        label: 'Cancel',
+                                        callback: isEnable
+                                            ? () => Navigator.of(context).pop()
+                                            : null,
+                                      ),
+                                    ),
                                   ),
-                                ))
-                          ],
-                        ),
-                      ),
-                      Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              child: Container(
-                                child: AccentButton(
-                                  label: 'Cancel',
-                                  callback: isEnable
-                                      ? () => Navigator.of(context).pop()
-                                      : null,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: PrimaryButton(
-                                    label:
-                                        isPending ? 'Pending...' : submitLabel,
-                                    isCheckLock: false,
-                                    callback: !isPending
-                                        ? () {
-                                            isEnable = false;
-                                            submitLiquidityAction(
-                                                state, tokensState, transactionState);
-                                          }
-                                        : null),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      child: PrimaryButton(
+                                          label: isPending
+                                              ? 'Pending...'
+                                              : submitLabel,
+                                          isCheckLock: false,
+                                          callback: !isPending
+                                              ? () {
+                                                  isEnable = false;
+                                                  setState(() {
+                                                    isLoader = true;
+                                                  });
+                                                }
+                                              : null),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             );
@@ -306,20 +340,19 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
     });
   }
 
+  testFunc() {
+    print('123123123');
+  }
+
   submitLiquidityAction(state, tokensState, transactionState) async {
     if (transactionState is TransactionLoadingState) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'Wait for the previous transaction to complete',
-            style: Theme.of(context)
-                .textTheme
-                .headline5,
+            style: Theme.of(context).textTheme.headline5,
           ),
-          backgroundColor: Theme.of(context)
-              .snackBarTheme
-              .backgroundColor,
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
         ),
       );
       return;
@@ -327,9 +360,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
     try {
       var txser = TransactionService();
       var txError;
-      setState(() {
-        isPending = true;
-      });
+
       if (widget.removeLT != 0) {
         txError = await txser.removeLiqudity(
             account: state.activeAccount,
@@ -384,27 +415,16 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
           ),
         );
       }
-      setState(() {
-        isPending = false;
-      });
     } catch (err) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'Something went wrong. Please, try later',
-            style: Theme.of(context)
-                .textTheme
-                .headline5,
+            style: Theme.of(context).textTheme.headline5,
           ),
-          backgroundColor: Theme.of(context)
-              .snackBarTheme
-              .backgroundColor,
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
         ),
       );
-      setState(() {
-        isPending = false;
-      });
     }
   }
 

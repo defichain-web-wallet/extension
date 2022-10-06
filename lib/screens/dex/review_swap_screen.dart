@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
@@ -34,53 +35,66 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
   BalancesHelper balancesHelper = BalancesHelper();
   TransactionService transactionService = TransactionService();
   bool isFailed = false;
+  bool isLoader = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
-
+  String secondStepLoaderText =
+      'Did you know Jellywallet does not store your private key, if you use it together with your hardware wallet? This makes Jellywallet bullet proof!';
+  dynamic submitSwapState;
+  dynamic submitSwapTokensState;
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<TransactionCubit, TransactionState>(
-        builder: (context, state) => ScaffoldConstrainedBox(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth < ScreenSizes.medium) {
-                return Scaffold(
-                  body: _buildBody(context),
-                  appBar: MainAppBar(
-                      title: 'Decentralized Exchange',
-                      isShowBottom: !(state is TransactionInitialState),
-                      height: !(state is TransactionInitialState)
-                          ? toolbarHeightWithBottom
-                          : toolbarHeight),
-                );
-              } else {
-                return Container(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Scaffold(
-                    body: _buildBody(context, isCustomBgColor: true),
-                    appBar: MainAppBar(
-                      title: 'Decentralized Exchange',
-                      action: null,
-                      isShowBottom: !(state is TransactionInitialState),
-                      height: !(state is TransactionInitialState)
-                          ? toolbarHeightWithBottom
-                          : toolbarHeight,
-                      isSmall: true,
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
-        ),
+        builder: (context, state) =>
+            ScaffoldConstrainedBox(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < ScreenSizes.medium) {
+                    return Scaffold(
+                      body: _buildBody(context),
+                      appBar: MainAppBar(
+                          title: 'Decentralized Exchange',
+                          isShowBottom: !(state is TransactionInitialState),
+                          height: !(state is TransactionInitialState)
+                              ? toolbarHeightWithBottom
+                              : toolbarHeight),
+                    );
+                  } else {
+                    return Container(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Scaffold(
+                        body: _buildBody(context, isCustomBgColor: true),
+                        appBar: MainAppBar(
+                          title: 'Decentralized Exchange',
+                          action: null,
+                          isShowBottom: !(state is TransactionInitialState),
+                          height: !(state is TransactionInitialState)
+                              ? toolbarHeightWithBottom
+                              : toolbarHeight,
+                          isSmall: true,
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
       );
 
-  Widget _buildBody(context, {isCustomBgColor = false}) => Container(
-        color: Theme.of(context).dialogBackgroundColor,
+  Widget _buildBody(context, {isCustomBgColor = false}) =>
+      Container(
+        color: Theme
+            .of(context)
+            .dialogBackgroundColor,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Center(
           child: StretchBox(
-            child: Column(
+            child: isLoader
+                ? LoaderNew(
+              secondStepLoaderText: secondStepLoaderText, callback: () {
+              submitSwap(submitSwapState, submitSwapTokensState,);
+            },)
+                : Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
@@ -88,38 +102,48 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                   children: [
                     Text(
                       'From',
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .headline6,
                     ),
                     SizedBox(height: 12),
                     ReviewDetails(
-                      tokenImgUrl:
-                          tokenHelper.getImageNameByTokenName(widget.assetFrom),
+                      tokenImgUrl: tokenHelper
+                          .getImageNameByTokenName(widget.assetFrom),
                       amountStyling:
-                          balancesHelper.numberStyling(widget.amountFrom),
+                      balancesHelper.numberStyling(widget.amountFrom),
                       currency: widget.assetFrom,
                     ),
                     SizedBox(height: 24),
                     Text(
                       'To',
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .headline6,
                     ),
                     SizedBox(height: 12),
                     ReviewDetails(
-                      tokenImgUrl:
-                          tokenHelper.getImageNameByTokenName(widget.assetTo),
+                      tokenImgUrl: tokenHelper
+                          .getImageNameByTokenName(widget.assetTo),
                       amountStyling:
-                          balancesHelper.numberStyling(widget.amountTo),
+                      balancesHelper.numberStyling(widget.amountTo),
                       currency: widget.assetTo,
                     ),
                     SizedBox(height: 8),
                     Center(
                       child: Text(
                         'Some error. Please try later',
-                        style: Theme.of(context).textTheme.headline4!.copyWith(
-                              color: isFailed
-                                  ? AppTheme.redErrorColor
-                                  : Colors.transparent,
-                            ),
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .headline4!
+                            .copyWith(
+                          color: isFailed
+                              ? AppTheme.redErrorColor
+                              : Colors.transparent,
+                        ),
                       ),
                     ),
                   ],
@@ -128,21 +152,28 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                   padding: const EdgeInsets.only(top: 16),
                   child: BlocBuilder<AccountCubit, AccountState>(
                       builder: (context, state) {
-                    return BlocBuilder<TokensCubit, TokensState>(
-                      builder: (context, tokensState) {
-                        if (tokensState.status == TokensStatusList.success) {
-                          return PendingButton(
-                            'SWAP',
-                            isCheckLock: false,
-                            callback: (parent) =>
-                                submitSwap(state, tokensState, parent),
-                          );
-                        } else {
-                          return Container();
-                        }
-                      },
-                    );
-                  }),
+                        return BlocBuilder<TokensCubit, TokensState>(
+                          builder: (context, tokensState) {
+                            if (tokensState.status ==
+                                TokensStatusList.success) {
+                              return PendingButton(
+                                'SWAP',
+                                isCheckLock: false,
+                                callback: (parent) {
+                                  setState(() {
+                                    submitSwapTokensState = tokensState;
+                                    submitSwapState = state;
+                                    isLoader = true;
+                                  });
+
+                                },
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        );
+                      }),
                 )
               ],
             ),
@@ -150,9 +181,9 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
         ),
       );
 
-  submitSwap(state, tokenState, parent) async {
+  submitSwap(state, tokenState,) async {
     if (state.status == AccountStatusList.success) {
-      parent.emitPending(true);
+      // parent.emitPending(true);
 
       try {
         if (widget.assetFrom != widget.assetTo) {
@@ -184,7 +215,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
         });
       }
 
-      parent.emitPending(false);
+      // parent.emitPending(false);
     }
   }
 }
