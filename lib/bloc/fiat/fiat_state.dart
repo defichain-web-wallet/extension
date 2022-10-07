@@ -24,6 +24,7 @@ class FiatState extends Equatable {
   final bool? isShowTutorial;
   final bool? isKycDataComplete;
   final int? limit;
+  final CryptoRouteModel? cryptoRoute;
 
   FiatState({
     this.status = FiatStatusList.initial,
@@ -47,6 +48,7 @@ class FiatState extends Equatable {
     this.isShowTutorial = true,
     this.isKycDataComplete,
     this.limit,
+    this.cryptoRoute,
   });
 
   @override
@@ -72,6 +74,7 @@ class FiatState extends Equatable {
     isShowTutorial,
     isKycDataComplete,
     limit,
+    cryptoRoute,
   ];
 
   FiatState copyWith({
@@ -96,6 +99,7 @@ class FiatState extends Equatable {
     bool? isShowTutorial,
     bool? isKycDataComplete,
     int? limit,
+    CryptoRouteModel? cryptoRoute,
   }) {
     return FiatState(
       status: status ?? this.status,
@@ -119,6 +123,7 @@ class FiatState extends Equatable {
       isShowTutorial: isShowTutorial ?? this.isShowTutorial,
       isKycDataComplete: isKycDataComplete ?? this.isKycDataComplete,
       limit: limit ?? this.limit,
+      cryptoRoute: cryptoRoute ?? this.cryptoRoute,
     );
   }
 }

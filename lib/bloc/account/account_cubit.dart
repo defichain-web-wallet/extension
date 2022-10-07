@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
@@ -39,6 +40,7 @@ class AccountCubit extends Cubit<AccountState> {
 
   BalanceRequests balanceRequests = BalanceRequests();
   HistoryRequests historyRequests = HistoryRequests();
+  FiatCubit fiatCubit = FiatCubit();
 
   createAccount(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: AccountStatusList.loading));
@@ -72,6 +74,7 @@ class AccountCubit extends Cubit<AccountState> {
     await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet,
         accountsTestnet, masterKeyPairTestnet, mnemonic,
         password: password);
+    await fiatCubit.loadUserDetails(accountMainnet);
 
     try {
       emit(state.copyWith(
@@ -343,6 +346,7 @@ class AccountCubit extends Cubit<AccountState> {
       await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet,
           accountsTestnet, masterKeyPairTestnet, mnemonic,
           password: password);
+      await fiatCubit.loadUserDetails(accountsMainnet[0]);
 
       emit(state.copyWith(
         status: AccountStatusList.success,

@@ -186,11 +186,34 @@ class _SendConfirmState extends State<SendConfirmScreen> {
 
   submitSend(parent, state, tokensState) async {
     parent.emitPending(true);
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
 
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
-        await _sendTransaction(
-            context, tokensState, widget.token, state.activeAccount);
+        if (SettingsHelper.isBitcoin()) {
+          var tx = await transactionService.createBTCTransaction(
+            account: state.activeAccount,
+            destinationAddress: widget.address,
+            amount: balancesHelper.toSatoshi(widget.amount.toString()),
+            satPerByte: widget.fee,
+          );
+          var txResponse = await bitcoinCubit.sendTransaction(tx);
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => SendStatusScreen(
+                  txResponse: txResponse,
+                  amount: widget.amount,
+                  token: 'BTC',
+                  address: widget.address),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        } else {
+          await _sendTransaction(
+              context, tokensState, widget.token, state.activeAccount);
+        }
       }
     } catch (_) {
       print(_);

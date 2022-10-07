@@ -48,7 +48,6 @@ class AssetDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Row(
       children: [
         Expanded(
@@ -63,7 +62,7 @@ class AssetDropdown extends StatelessWidget {
                   isFixedWidthText: isFixedWidthAssetSelectorText!,
                 )
               : AssetSelectField(
-            accountState: accountState,
+                  accountState: accountState,
                   amountInUsd: amountInUsd,
                   isBorder: isBorder,
                   onAnotherSelect: onAnotherSelect,

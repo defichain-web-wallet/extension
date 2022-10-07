@@ -20,7 +20,6 @@ class ActionButtonsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     var receiveCallback = () async {
       hideOverlay();
       Navigator.push(
@@ -46,11 +45,11 @@ class ActionButtonsList extends StatelessWidget {
     };
 
     var swapCallback = () {
-      if (SettingsHelper.isBitcoin()) {
+      if (SettingsHelper.isBitcoin() && SettingsHelper.settings.network == 'testnet') {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Not allowed for bitcoin',
+              'Not allowed for testnet bitcoin',
               style: Theme.of(context).textTheme.headline5,
             ),
             backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
