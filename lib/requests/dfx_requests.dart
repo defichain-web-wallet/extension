@@ -4,6 +4,7 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
+import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
@@ -85,6 +86,68 @@ class DfxRequests {
       final response = await http.put(url, headers: headers, body: body);
 
     } catch (_) {
+    }
+  }
+
+  Future<CryptoRouteModel?> getCryptoRoutes(String accessToken) async {
+    try {
+      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
+
+      final Uri url = Uri.parse('https://api.dfx.swiss/v1/cryptoRoute');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $decryptedAccessToken'
+      };
+
+
+      final response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        if(data.length == 0){
+          return null;
+        }
+        return CryptoRouteModel.fromJson(data[0]);
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  Future<CryptoRouteModel> createCryptoRoute(String accessToken) async {
+    print('1');
+    try {
+      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
+
+      final Uri url = Uri.parse('https://api.dfx.swiss/v1/cryptoRoute');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $decryptedAccessToken'
+      };
+
+
+      final body = jsonEncode({
+        "type": "Wallet",
+        "blockchain": "Bitcoin",
+        "asset": {
+          "id": 2}
+      });
+      final response = await http.post(url, headers: headers, body: body);
+      print(response);
+      if (response.statusCode == 200) {
+        dynamic data = jsonDecode(response.body);
+
+        return CryptoRouteModel.fromJson(data);
+      } else {
+        print(2);
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (err) {
+      print(3);
+      throw err;
     }
   }
 

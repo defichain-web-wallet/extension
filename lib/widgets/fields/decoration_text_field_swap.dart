@@ -1,11 +1,10 @@
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
-import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class DecorationTextFieldNew extends StatefulWidget {
+class DecorationTextFieldSwap extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final FocusModel? focusModel;
@@ -16,7 +15,7 @@ class DecorationTextFieldNew extends StatefulWidget {
   final String selectedAsset;
   final void Function()? hideOverlay;
 
-  const DecorationTextFieldNew({
+  const DecorationTextFieldSwap({
     Key? key,
     this.controller,
     this.focusNode,
@@ -30,11 +29,11 @@ class DecorationTextFieldNew extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _DecorationTextFieldNewState createState() => _DecorationTextFieldNewState();
+  _DecorationTextFieldSwapState createState() => _DecorationTextFieldSwapState();
 }
 
-class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
-  double _containerHeight = 94;
+class _DecorationTextFieldSwapState extends State<DecorationTextFieldSwap> {
+  double _containerHeight = 71;
   bool _focus = false;
 
   @override
@@ -53,12 +52,11 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
       ),
       child: FocusScope(
         child: Focus(
-          onFocusChange: (focus) => setState(
-            () {
-              widget.focusModel!.isFocus = focus;
-              _focus = focus;
-            },
-          ),
+          onFocusChange: (focus) =>
+              setState(() {
+                widget.focusModel!.isFocus = focus;
+                _focus = focus;
+              },),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
@@ -77,6 +75,7 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
                 right: 10,
               ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Column(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -109,8 +108,19 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
                             borderSide: BorderSide(color: Colors.transparent),
                           ),
                           suffixText: widget.selectedAsset,
+                          // suffixIcon: Column(
+                          //   mainAxisAlignment: MainAxisAlignment.center,
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     Text(
+                          //       widget.selectedAsset,
+                          //       style: Theme.of(context).textTheme.headline4,
+                          //     ),
+                          //     SizedBox(height: 2,)
+                          //   ],
+                          // ),
                           contentPadding:
-                              const EdgeInsets.only(left: 10),
+                          const EdgeInsets.only(top: 5, bottom: 5),
                         ),
                         onChanged: widget.onChanged ?? null,
                         controller: widget.controller,
@@ -119,30 +129,28 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
                       ),
                     ],
                   ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${widget.amountInUsd} $currency',
-                              style:
-                                  Theme.of(context).textTheme.headline4!.apply(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .color!
-                                            .withOpacity(0.5),
-                                      ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${widget.amountInUsd} $currency',
+                            style:
+                            Theme.of(context).textTheme.headline4!.apply(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!
+                                  .withOpacity(0.5),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -153,5 +161,7 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
     );
   }
 
-  void _focusChange(bool focus) {}
+  void _focusChange(bool focus) {
+
+  }
 }

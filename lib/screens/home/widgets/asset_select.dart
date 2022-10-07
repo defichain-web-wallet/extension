@@ -174,7 +174,7 @@ class AssetSelectState extends State<AssetSelect> {
                         ? 'assets/arrow_up.svg'
                         : 'assets/arrow_down.svg'
                         : 'assets/arrow_down.svg'),
-                    color: Theme.of(context).textTheme.button!.color,
+                    color: Theme.of(context).textTheme.headline5!.color,
                   ),
               ],
             ),

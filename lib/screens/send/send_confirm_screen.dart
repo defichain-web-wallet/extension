@@ -211,19 +211,34 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         );
       });
 
-  simpleFunc() {
-    print('123123');
-  }
-
-
   submitSend(parent, state, tokensState) async {
-    print('submitSend');
-    // parent.emitPending(true);
-    print('submitSend3');
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
-        await _sendTransaction(
-            context, tokensState, widget.token, state.activeAccount);
+        if (SettingsHelper.isBitcoin()) {
+          var tx = await transactionService.createBTCTransaction(
+            account: state.activeAccount,
+            destinationAddress: widget.address,
+            amount: balancesHelper.toSatoshi(widget.amount.toString()),
+            satPerByte: widget.fee,
+          );
+          var txResponse = await bitcoinCubit.sendTransaction(tx);
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => SendStatusScreen(
+                  txResponse: txResponse,
+                  amount: widget.amount,
+                  token: 'BTC',
+                  address: widget.address),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        } else {
+          await _sendTransaction(
+              context, tokensState, widget.token, state.activeAccount);
+        }
       }
     } catch (_) {
       print(_);
@@ -235,8 +250,6 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         ),
       );
     }
-    // parent.emitPending(false);
-    print('submitSend2');
   }
 
   Future _sendTransaction(

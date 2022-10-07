@@ -39,7 +39,11 @@ class FiatHistoryModel {
     }
     this.inputAsset = json["inputAsset"];
     this.outputAsset = json["outputAsset"];
-    this.date = formatter.format(DateTime.parse(json["date"]));
+    if (json["date"] != null) {
+      this.date = formatter.format(DateTime.parse(json["date"]));
+    } else {
+      this.date = formatter.format(DateTime.now());
+    }
     this.txid = json["txid"];
     this.almCheck = json["almCheck"];
     this.isComplete =json["isComplete"];
