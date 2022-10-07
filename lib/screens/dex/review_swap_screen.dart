@@ -91,12 +91,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Center(
           child: StretchBox(
-            child: isLoader
-                ? LoaderNew(
-              secondStepLoaderText: secondStepLoaderText, callback: () {
-              submitSwap(submitSwapState, submitSwapTokensState,);
-            },)
-                : Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
@@ -163,9 +158,17 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                                 isCheckLock: false,
                                 callback: (parent) {
                                   setState(() {
-                                    submitSwapTokensState = tokensState;
-                                    submitSwapState = state;
-                                    isLoader = true;
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation1, animation2) => LoaderNew(
+                                          secondStepLoaderText: secondStepLoaderText, callback: () {
+                                          submitSwap(state, tokensState,);
+                                        },),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration: Duration.zero,
+                                      ),
+                                    );
                                   });
 
                                 },

@@ -94,15 +94,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                         horizontal: 16, vertical: 24),
                     child: Center(
                       child: StretchBox(
-                        child: isLoader
-                            ? LoaderNew(
-                                callback: () async {
-                                  await submitSend(
-                                      localeParrent, state, tokensState);
-                                },
-                                secondStepLoaderText: secondStepLoaderText,
-                              )
-                            : Column(
+                        child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
@@ -189,7 +181,20 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                               setState(() {
                                                 isEnable = false;
                                                 localeParrent = parent;
-                                                isLoader = true;
+                                                Navigator.push(
+                                                  context,
+                                                  PageRouteBuilder(
+                                                    pageBuilder: (context, animation1, animation2) => LoaderNew(
+                                                      callback: () async {
+                                                        await submitSend(
+                                                            localeParrent, state, tokensState);
+                                                      },
+                                                      secondStepLoaderText: secondStepLoaderText,
+                                                    ),
+                                                    transitionDuration: Duration.zero,
+                                                    reverseTransitionDuration: Duration.zero,
+                                                  ),
+                                                );
                                               });
                                             },
                                           ),

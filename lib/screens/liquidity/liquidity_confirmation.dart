@@ -112,21 +112,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Center(
                 child: StretchBox(
-                  child: isLoader
-                      ? LoaderNew(
-                          secondStepLoaderText: widget.removeLT == 0
-                              ? secondStepLoaderTextAdd
-                              : secondStepLoaderTextRemove,
-                          callback: () {
-                            submitLiquidityAction(
-                              state,
-                              tokensState,
-                              transactionState,
-                            );
-                            // testFunc();
-                          },
-                        )
-                      : Column(
+                  child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
@@ -317,9 +303,26 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                                           callback: !isPending
                                               ? () {
                                                   isEnable = false;
-                                                  setState(() {
-                                                    isLoader = true;
-                                                  });
+                                                  Navigator.push(
+                                                    context,
+                                                    PageRouteBuilder(
+                                                      pageBuilder: (context, animation1, animation2) => LoaderNew(
+                                                        secondStepLoaderText: widget.removeLT == 0
+                                                            ? secondStepLoaderTextAdd
+                                                            : secondStepLoaderTextRemove,
+                                                        callback: () {
+                                                          submitLiquidityAction(
+                                                            state,
+                                                            tokensState,
+                                                            transactionState,
+                                                          );
+                                                          // testFunc();
+                                                        },
+                                                      ),
+                                                      transitionDuration: Duration.zero,
+                                                      reverseTransitionDuration: Duration.zero,
+                                                    ),
+                                                  );
                                                 }
                                               : null),
                                     ),
