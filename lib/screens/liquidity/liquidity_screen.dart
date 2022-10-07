@@ -130,6 +130,10 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
               }
             });
 
+            if (tokensPairsList.length == 0) {
+              redirectToAddLiquidity();
+            }
+
             return Container(
                 color:
                     isFullSize ? Theme.of(context).dialogBackgroundColor : null,
@@ -172,43 +176,20 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                             ),
                           )
                         else
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                'Not yet any asset pairs',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .apply(color: Colors.grey.shade600),
+                          Expanded(child: Loader()),
+                        if (tokensPairsList.length != 0)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                child: Text(
+                                  ' +  Add liquidity ',
+                                  style: Theme.of(context).textTheme.headline6,
+                                ),
+                                onPressed: redirectToAddLiquidity,
                               ),
-                            ),
+                            ],
                           ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                              child: Text(
-                                ' +  Add liquidity ',
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
-                              onPressed: () async {
-                                await lockHelper.provideWithLockChecker(
-                                    context,
-                                    () => Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                    animation2) =>
-                                                LiquidityPoolList(),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
-                                          ),
-                                        ));
-                              },
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -223,5 +204,19 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
         },
       );
     });
+  }
+
+  redirectToAddLiquidity() async {
+    await lockHelper.provideWithLockChecker(
+      context,
+      () => Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => LiquidityPoolList(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      ),
+    );
   }
 }
