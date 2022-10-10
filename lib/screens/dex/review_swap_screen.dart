@@ -38,13 +38,10 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
   BalancesHelper balancesHelper = BalancesHelper();
   TransactionService transactionService = TransactionService();
   bool isFailed = false;
-  bool isLoader = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   String secondStepLoaderText =
       'Did you know Jellywallet does not store your private key, if you use it together with your hardware wallet? This makes Jellywallet bullet proof!';
-  dynamic submitSwapState;
-  dynamic submitSwapTokensState;
 
   @override
   Widget build(BuildContext context) =>
@@ -144,7 +141,6 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                             'SWAP',
                             isCheckLock: false,
                             callback: (parent) {
-                              setState(() {
                                 Navigator.push(
                                   context,
                                   PageRouteBuilder(
@@ -164,7 +160,6 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                                     reverseTransitionDuration: Duration.zero,
                                   ),
                                 );
-                              });
                             },
                           );
                         } else {

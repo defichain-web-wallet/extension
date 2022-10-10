@@ -39,11 +39,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
   TransactionService transactionService = TransactionService();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
-  bool isEnable = true;
-  bool isLoader = false;
   String secondStepLoaderText =
       'Did you know Jellywallet is compatible with DeFiChain Wallet, if you use it without ledger? Just use your seed across the wallets!';
-  dynamic localeParrent;
 
   @override
   Widget build(BuildContext context) =>
@@ -154,9 +151,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                   Expanded(
                                     child: AccentButton(
                                       label: 'Cancel',
-                                      callback: isEnable
-                                          ? () => Navigator.of(context).pop()
-                                          : null,
+                                      callback: () => Navigator.of(context).pop(),
                                     ),
                                   ),
                                   SizedBox(width: 16),
@@ -165,9 +160,6 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                       'Send',
                                       isCheckLock: false,
                                       callback: (parent) {
-                                        setState(() {
-                                          isEnable = false;
-                                          localeParrent = parent;
                                           Navigator.push(
                                             context,
                                             PageRouteBuilder(
@@ -176,7 +168,6 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                                   LoaderNew(
                                                 callback: () async {
                                                   await submitSend(
-                                                      localeParrent,
                                                       state,
                                                       tokensState);
                                                 },
@@ -188,7 +179,6 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                                   Duration.zero,
                                             ),
                                           );
-                                        });
                                       },
                                     ),
                                   ),
@@ -209,7 +199,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         );
       });
 
-  submitSend(parent, state, tokensState) async {
+  submitSend(state, tokensState) async {
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {

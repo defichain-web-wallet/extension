@@ -57,9 +57,6 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
   String secondStepLoaderTextRemove =
       'Do you like Jellywallet? Leave us a review on the Google Store to support us!';
   TokensHelper tokenHelper = TokensHelper();
-  bool isEnable = true;
-  bool isPending = false;
-  bool isLoader = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
 
@@ -272,9 +269,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                               child: Container(
                                 child: AccentButton(
                                   label: 'Cancel',
-                                  callback: isEnable
-                                      ? () => Navigator.of(context).pop()
-                                      : null,
+                                  callback: () => Navigator.of(context).pop(),
                                 ),
                               ),
                             ),
@@ -284,12 +279,9 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                             Expanded(
                               child: Container(
                                 child: PrimaryButton(
-                                    label:
-                                        isPending ? 'Pending...' : submitLabel,
+                                    label: submitLabel,
                                     isCheckLock: false,
-                                    callback: !isPending
-                                        ? () {
-                                            isEnable = false;
+                                    callback: () {
                                             Navigator.push(
                                               context,
                                               PageRouteBuilder(
@@ -317,7 +309,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                                               ),
                                             );
                                           }
-                                        : null),
+                                        ),
                               ),
                             ),
                           ],
@@ -334,10 +326,6 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
         },
       );
     });
-  }
-
-  testFunc() {
-    print('123123123');
   }
 
   submitLiquidityAction(state, tokensState, transactionState) async {

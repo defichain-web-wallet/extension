@@ -30,6 +30,7 @@ class _LoaderNewState extends State<LoaderNew> {
   String secondStepText = '';
   String thirdStepText = 'Argh... Blockchains are not the fastest!';
   String currentText = '';
+  double loaderImageWidth = 180;
   Timer? timer;
 
   @override
@@ -90,7 +91,7 @@ class _LoaderNewState extends State<LoaderNew> {
                           : widget.isFullSize
                               ? 'assets/images/ledger_loading_dark.gif'
                               : 'assets/images/ledger_loading_dark.gif',
-                      width: 180,
+                      width: loaderImageWidth,
                     ),
                   ],
                 ),
