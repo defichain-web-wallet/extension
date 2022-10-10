@@ -712,8 +712,9 @@ class _SwapScreenState extends State<SwapScreen> {
   bool isEnoughBalance(state) {
     if (SettingsHelper.isBitcoin()) {
       BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-      var amount = convertFromSatoshi(bitcoinCubit.state.availableBalance);
-      return amount < double.parse(amountFromController.text);
+      var amount = convertFromSatoshi(bitcoinCubit.state.totalBalance);
+      return amount <
+          double.parse(amountFromController.text);
     }
     int balance = state.activeAccount.balanceList!
         .firstWhere((el) => el.token! == assetFrom && !el.isHidden)
@@ -878,7 +879,7 @@ class _SwapScreenState extends State<SwapScreen> {
     var availableAmountFrom;
     var availableAmountTo;
     if (SettingsHelper.isBitcoin()) {
-      double balance = convertFromSatoshi(bitcoinCubit.state.availableBalance);
+      double balance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
       String balanceFormat;
       if (balance > 0) {
         balanceFormat =
