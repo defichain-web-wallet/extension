@@ -14,6 +14,7 @@ import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -38,7 +39,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
   TransactionService transactionService = TransactionService();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
-  bool isEnable = true;
+  String secondStepLoaderText =
+      'Did you know Jellywallet is compatible with DeFiChain Wallet, if you use it without ledger? Just use your seed across the wallets!';
 
   @override
   Widget build(BuildContext context) =>
@@ -149,9 +151,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                   Expanded(
                                     child: AccentButton(
                                       label: 'Cancel',
-                                      callback: isEnable
-                                          ? () => Navigator.of(context).pop()
-                                          : null,
+                                      callback: () => Navigator.of(context).pop(),
                                     ),
                                   ),
                                   SizedBox(width: 16),
@@ -160,10 +160,25 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                       'Send',
                                       isCheckLock: false,
                                       callback: (parent) {
-                                        setState(() {
-                                          isEnable = false;
-                                        });
-                                        submitSend(parent, state, tokensState);
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation1,
+                                                      animation2) =>
+                                                  LoaderNew(
+                                                callback: () async {
+                                                  await submitSend(
+                                                      state,
+                                                      tokensState);
+                                                },
+                                                secondStepLoaderText:
+                                                    secondStepLoaderText,
+                                              ),
+                                              transitionDuration: Duration.zero,
+                                              reverseTransitionDuration:
+                                                  Duration.zero,
+                                            ),
+                                          );
                                       },
                                     ),
                                   ),
@@ -184,10 +199,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         );
       });
 
-  submitSend(parent, state, tokensState) async {
-    parent.emitPending(true);
+  submitSend(state, tokensState) async {
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
         if (SettingsHelper.isBitcoin()) {
@@ -201,11 +214,12 @@ class _SendConfirmState extends State<SendConfirmScreen> {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-                  txResponse: txResponse,
-                  amount: widget.amount,
-                  token: 'BTC',
-                  address: widget.address),
+              pageBuilder: (context, animation1, animation2) =>
+                  SendStatusScreen(
+                      txResponse: txResponse,
+                      amount: widget.amount,
+                      token: 'BTC',
+                      address: widget.address),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),
@@ -225,8 +239,6 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         ),
       );
     }
-
-    parent.emitPending(false);
   }
 
   Future _sendTransaction(

@@ -258,7 +258,8 @@ class _SwapScreenState extends State<SwapScreen> {
                                       balancesHelper.numberStyling(amount,
                                           fixedCount: 2, fixed: true);
                                   if (SettingsHelper.isBitcoin()) {
-                                    amountToInUsd = getUdsAmount(double.parse(value), tokensState);
+                                    amountToInUsd = getUdsAmount(
+                                        double.parse(value), tokensState);
                                   } else {
                                     amountToInUsd = amountFromInUsd;
                                   }
@@ -345,7 +346,8 @@ class _SwapScreenState extends State<SwapScreen> {
                                       fixedCount: 2,
                                       fixed: true);
                                   if (SettingsHelper.isBitcoin()) {
-                                    amountFromInUsd = getUdsAmount(double.parse(value), tokensState);
+                                    amountFromInUsd = getUdsAmount(
+                                        double.parse(value), tokensState);
                                   } else {
                                     amountFromInUsd = amountToInUsd;
                                   }
@@ -626,7 +628,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                   isCheckLock: false,
                                   key: pendingButton,
                                   callback: !isDisableSubmit() &&
-                                              fiatState.isKycDataComplete!
+                                          fiatState.isKycDataComplete!
                                       ? (parent) => submitReviewSwap(
                                             parent,
                                             accountState,
