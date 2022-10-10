@@ -95,115 +95,108 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                     child: Center(
                       child: StretchBox(
                         child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 8.0),
-                                        child: Text(
-                                          'Do you really want to send',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6,
-                                        ),
-                                      ),
-                                      SizedBox(height: 32),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Flexible(
-                                            child: Text(
-                                              '${balancesHelper.numberStyling(widget.amount)} ',
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline1,
-                                            ),
-                                          ),
-                                          Text(
-                                            (widget.token != 'DFI')
-                                                ? 'd' + widget.token
-                                                : widget.token,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline1,
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 28),
-                                      Text(
-                                        'To',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6,
-                                      ),
-                                      SizedBox(height: 28),
-                                      Text(
-                                        'Address:',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6,
-                                      ),
-                                      SizedBox(height: 16),
-                                      Text(
-                                        widget.address,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline2,
-                                      ),
-                                    ],
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    'Do you really want to send',
+                                    style:
+                                        Theme.of(context).textTheme.headline6,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 16),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: AccentButton(
-                                            label: 'Cancel',
-                                            callback: isEnable
-                                                ? () =>
-                                                    Navigator.of(context).pop()
-                                                : null,
-                                          ),
-                                        ),
-                                        SizedBox(width: 16),
-                                        Expanded(
-                                          child: PendingButton(
-                                            'Send',
-                                            isCheckLock: false,
-                                            callback: (parent) {
-                                              setState(() {
-                                                isEnable = false;
-                                                localeParrent = parent;
-                                                Navigator.push(
-                                                  context,
-                                                  PageRouteBuilder(
-                                                    pageBuilder: (context, animation1, animation2) => LoaderNew(
-                                                      callback: () async {
-                                                        await submitSend(
-                                                            localeParrent, state, tokensState);
-                                                      },
-                                                      secondStepLoaderText: secondStepLoaderText,
-                                                    ),
-                                                    transitionDuration: Duration.zero,
-                                                    reverseTransitionDuration: Duration.zero,
-                                                  ),
-                                                );
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                      ],
+                                ),
+                                SizedBox(height: 32),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        '${balancesHelper.numberStyling(widget.amount)} ',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline1,
+                                      ),
+                                    ),
+                                    Text(
+                                      (widget.token != 'DFI')
+                                          ? 'd' + widget.token
+                                          : widget.token,
+                                      style:
+                                          Theme.of(context).textTheme.headline1,
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 28),
+                                Text(
+                                  'To',
+                                  style: Theme.of(context).textTheme.headline6,
+                                ),
+                                SizedBox(height: 28),
+                                Text(
+                                  'Address:',
+                                  style: Theme.of(context).textTheme.headline6,
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  widget.address,
+                                  style: Theme.of(context).textTheme.headline2,
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: AccentButton(
+                                      label: 'Cancel',
+                                      callback: isEnable
+                                          ? () => Navigator.of(context).pop()
+                                          : null,
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: PendingButton(
+                                      'Send',
+                                      isCheckLock: false,
+                                      callback: (parent) {
+                                        setState(() {
+                                          isEnable = false;
+                                          localeParrent = parent;
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation1,
+                                                      animation2) =>
+                                                  LoaderNew(
+                                                callback: () async {
+                                                  await submitSend(
+                                                      localeParrent,
+                                                      state,
+                                                      tokensState);
+                                                },
+                                                secondStepLoaderText:
+                                                    secondStepLoaderText,
+                                              ),
+                                              transitionDuration: Duration.zero,
+                                              reverseTransitionDuration:
+                                                  Duration.zero,
+                                            ),
+                                          );
+                                        });
+                                      },
                                     ),
                                   ),
                                 ],
                               ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -231,11 +224,12 @@ class _SendConfirmState extends State<SendConfirmScreen> {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-                  txResponse: txResponse,
-                  amount: widget.amount,
-                  token: 'BTC',
-                  address: widget.address),
+              pageBuilder: (context, animation1, animation2) =>
+                  SendStatusScreen(
+                      txResponse: txResponse,
+                      amount: widget.amount,
+                      token: 'BTC',
+                      address: widget.address),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),

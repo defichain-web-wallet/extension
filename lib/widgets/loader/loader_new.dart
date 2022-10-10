@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -66,7 +65,6 @@ class _LoaderNewState extends State<LoaderNew> {
     }
     if (widget.currentStatus == 'first-step') {
       timer = Timer.periodic(Duration(seconds: 3), (_timer) {
-        print('timer step');
         getStatusText(widget.currentStatus, _timer);
         if (widget.currentStatus == 'third-step') {
           _timer.cancel();
@@ -118,7 +116,6 @@ class _LoaderNewState extends State<LoaderNew> {
   }
 
   getStatusText(currentStatus, timer) async {
-    print(widget.currentStatus);
     if (currentStatus == 'first-step') {
       setState(() {
         widget.currentStatus = 'second-step';

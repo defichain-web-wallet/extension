@@ -86,7 +86,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
       return Container(
         color: Theme.of(context).dialogBackgroundColor,
         padding:
-        const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+            const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
           child: StretchBox(
             child: Column(
@@ -108,8 +108,8 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                         child: Text(
                           'Your limit',
                           style: Theme.of(context).textTheme.headline2!.apply(
-                            fontFamily: 'IBM Plex Sans',
-                          ),
+                                fontFamily: 'IBM Plex Sans',
+                              ),
                         ),
                       ),
                       SizedBox(
@@ -119,8 +119,8 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                         child: Text(
                           '${balancesHelper.numberStyling(fiatState.limit! / 100)}€ / Day',
                           style: Theme.of(context).textTheme.headline1!.apply(
-                            fontFamily: 'IBM Plex Medium',
-                          ),
+                                fontFamily: 'IBM Plex Medium',
+                              ),
                         ),
                       ),
                       SizedBox(
@@ -170,45 +170,45 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                 Expanded(
                   child: fiatState.history.length > 0
                       ? ListView.builder(
-                    itemCount: fiatState.history.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        leading: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (fiatState.history[index].type! ==
-                                'Withdrawal')
-                              SvgPicture.asset(
-                                'assets/images/withdrawal.svg',
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .color,
-                              )
-                            else
-                              SvgPicture.asset(
-                                'assets/images/deposit.svg',
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .color,
-                              )
-                          ],
-                        ),
-                        title: Text(fiatState.history[index].type!),
-                        subtitle: Text(fiatState.history[index].date!),
-                        trailing: (fiatState.history[index].inputAsset !=
-                            null)
-                            ? Text(
-                            '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
-                            : Text(
-                            '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
-                      );
-                    },
-                  )
+                          itemCount: fiatState.history.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+                              leading: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (fiatState.history[index].type! ==
+                                      'Withdrawal')
+                                    SvgPicture.asset(
+                                      'assets/images/withdrawal.svg',
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color,
+                                    )
+                                  else
+                                    SvgPicture.asset(
+                                      'assets/images/deposit.svg',
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color,
+                                    )
+                                ],
+                              ),
+                              title: Text(fiatState.history[index].type!),
+                              subtitle: Text(fiatState.history[index].date!),
+                              trailing: (fiatState.history[index].inputAsset !=
+                                      null)
+                                  ? Text(
+                                      '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
+                                  : Text(
+                                      '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
+                            );
+                          },
+                        )
                       : Center(
-                    child: Text('Not yet any transaction'),
-                  ),
+                          child: Text('Not yet any transaction'),
+                        ),
                 ),
                 SettingsHelper.settings.theme == 'Light'
                     ? SvgPicture.asset('assets/powered_of_dfx.svg')

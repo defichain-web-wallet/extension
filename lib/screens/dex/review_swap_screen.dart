@@ -27,7 +27,8 @@ class ReviewSwapScreen extends StatefulWidget {
   final String btcTx;
 
   const ReviewSwapScreen(this.assetFrom, this.assetTo, this.amountFrom,
-      this.amountTo, this.slippage, {this.btcTx = ''});
+      this.amountTo, this.slippage,
+      {this.btcTx = ''});
 
   @override
   _ReviewSwapScreenState createState() => _ReviewSwapScreenState();
@@ -44,50 +45,47 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
       'Did you know Jellywallet does not store your private key, if you use it together with your hardware wallet? This makes Jellywallet bullet proof!';
   dynamic submitSwapState;
   dynamic submitSwapTokensState;
+
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<TransactionCubit, TransactionState>(
-        builder: (context, state) =>
-            ScaffoldConstrainedBox(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  if (constraints.maxWidth < ScreenSizes.medium) {
-                    return Scaffold(
-                      body: _buildBody(context),
-                      appBar: MainAppBar(
-                          title: 'Decentralized Exchange',
-                          isShowBottom: !(state is TransactionInitialState),
-                          height: !(state is TransactionInitialState)
-                              ? toolbarHeightWithBottom
-                              : toolbarHeight),
-                    );
-                  } else {
-                    return Container(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Scaffold(
-                        body: _buildBody(context, isCustomBgColor: true),
-                        appBar: MainAppBar(
-                          title: 'Decentralized Exchange',
-                          action: null,
-                          isShowBottom: !(state is TransactionInitialState),
-                          height: !(state is TransactionInitialState)
-                              ? toolbarHeightWithBottom
-                              : toolbarHeight,
-                          isSmall: true,
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
+        builder: (context, state) => ScaffoldConstrainedBox(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < ScreenSizes.medium) {
+                return Scaffold(
+                  body: _buildBody(context),
+                  appBar: MainAppBar(
+                      title: 'Decentralized Exchange',
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight),
+                );
+              } else {
+                return Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Scaffold(
+                    body: _buildBody(context, isCustomBgColor: true),
+                    appBar: MainAppBar(
+                      title: 'Decentralized Exchange',
+                      action: null,
+                      isShowBottom: !(state is TransactionInitialState),
+                      height: !(state is TransactionInitialState)
+                          ? toolbarHeightWithBottom
+                          : toolbarHeight,
+                      isSmall: true,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
       );
 
-  Widget _buildBody(context, {isCustomBgColor = false}) =>
-      Container(
-        color: Theme
-            .of(context)
-            .dialogBackgroundColor,
+  Widget _buildBody(context, {isCustomBgColor = false}) => Container(
+        color: Theme.of(context).dialogBackgroundColor,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Center(
           child: StretchBox(
@@ -99,48 +97,38 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                   children: [
                     Text(
                       'From',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .headline6,
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                     SizedBox(height: 12),
                     ReviewDetails(
-                      tokenImgUrl: tokenHelper
-                          .getImageNameByTokenName(widget.assetFrom),
+                      tokenImgUrl:
+                          tokenHelper.getImageNameByTokenName(widget.assetFrom),
                       amountStyling:
-                      balancesHelper.numberStyling(widget.amountFrom),
+                          balancesHelper.numberStyling(widget.amountFrom),
                       currency: widget.assetFrom,
                     ),
                     SizedBox(height: 24),
                     Text(
                       'To',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .headline6,
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                     SizedBox(height: 12),
                     ReviewDetails(
-                      tokenImgUrl: tokenHelper
-                          .getImageNameByTokenName(widget.assetTo),
+                      tokenImgUrl:
+                          tokenHelper.getImageNameByTokenName(widget.assetTo),
                       amountStyling:
-                      balancesHelper.numberStyling(widget.amountTo),
+                          balancesHelper.numberStyling(widget.amountTo),
                       currency: widget.assetTo,
                     ),
                     SizedBox(height: 8),
                     Center(
                       child: Text(
                         'Some error. Please try later',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .headline4!
-                            .copyWith(
-                          color: isFailed
-                              ? AppTheme.redErrorColor
-                              : Colors.transparent,
-                        ),
+                        style: Theme.of(context).textTheme.headline4!.copyWith(
+                              color: isFailed
+                                  ? AppTheme.redErrorColor
+                                  : Colors.transparent,
+                            ),
                       ),
                     ),
                   ],
@@ -149,36 +137,42 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                   padding: const EdgeInsets.only(top: 16),
                   child: BlocBuilder<AccountCubit, AccountState>(
                       builder: (context, state) {
-                        return BlocBuilder<TokensCubit, TokensState>(
-                          builder: (context, tokensState) {
-                            if (tokensState.status ==
-                                TokensStatusList.success) {
-                              return PendingButton(
-                                'SWAP',
-                                isCheckLock: false,
-                                callback: (parent) {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation1, animation2) => LoaderNew(
-                                          secondStepLoaderText: secondStepLoaderText, callback: () {
-                                          submitSwap(state, tokensState,);
-                                        },),
-                                        transitionDuration: Duration.zero,
-                                        reverseTransitionDuration: Duration.zero,
-                                      ),
-                                    );
-                                  });
-
-                                },
-                              );
-                            } else {
-                              return Container();
-                            }
-                          },
-                        );
-                      }),
+                    return BlocBuilder<TokensCubit, TokensState>(
+                      builder: (context, tokensState) {
+                        if (tokensState.status == TokensStatusList.success) {
+                          return PendingButton(
+                            'SWAP',
+                            isCheckLock: false,
+                            callback: (parent) {
+                              setState(() {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            LoaderNew(
+                                      secondStepLoaderText:
+                                          secondStepLoaderText,
+                                      callback: () {
+                                        submitSwap(
+                                          state,
+                                          tokensState,
+                                        );
+                                      },
+                                    ),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ),
+                                );
+                              });
+                            },
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    );
+                  }),
                 )
               ],
             ),
@@ -186,10 +180,11 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
         ),
       );
 
-  submitSwap(state, tokenState,) async {
+  submitSwap(
+    state,
+    tokenState,
+  ) async {
     if (state.status == AccountStatusList.success) {
-      // parent.emitPending(true);
-
       try {
         if (widget.btcTx != '') {
           BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
@@ -235,8 +230,6 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
           isFailed = true;
         });
       }
-
-      // parent.emitPending(false);
     }
   }
 }
