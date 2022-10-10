@@ -58,8 +58,7 @@ class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
                       state is TransactionLoadingState
                           ? 'Waiting for transaction'
                           : 'Transaction done',
-                      style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.headline4!.apply(fontWeightDelta: 2),
                     ),
                     Padding(padding: const EdgeInsets.symmetric(vertical: 2)),
                     SingleChildScrollView(
