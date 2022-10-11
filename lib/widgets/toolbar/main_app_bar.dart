@@ -70,7 +70,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: customTitle == null
           ? Text(
               title!,
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.headline3!.apply(fontFamily: 'IBM Plex Sans'),
             )
           : customTitle,
       actions: [
