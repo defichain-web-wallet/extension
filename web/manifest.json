@@ -10,15 +10,15 @@
         "128":"/icons/jelly_logo.png"
     },
     "description": "Jellywallet Beta extension",
-    "content_security_policy": {
-        "extension_pages": "script-src 'self'; object-src 'self'"
-    },
-    "action": {
-        "default_popup": "index.html",
-        "default_icon": "/icons/jelly_logo.png"
+    "content_security_policy": "script-src 'self'; object-src 'self'",
+    "browser_action": {
+        "browser_style": true,
+        "default_icon": "/icons/jelly_logo.png",
+        "default_title": "Jellywallet Beta",
+        "default_popup": "/index.html"
     },
     "background": {
-        "service_worker": "background-wrapper.js"
+        "scripts":  ["background-wrapper.js" ]
     },
-    "manifest_version": 3
+    "manifest_version": 2
 }
