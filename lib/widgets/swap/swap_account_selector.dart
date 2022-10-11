@@ -1,5 +1,4 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/widgets/network/list_entry.dart';
 import 'package:flutter/material.dart';
@@ -23,27 +22,6 @@ class SwapAccountSelector extends StatefulWidget {
 }
 
 class _SwapAccountSelectorState extends State<SwapAccountSelector> {
-  SettingsHelper settingsHelper = SettingsHelper();
-
-  String getNetworkType() {
-    if (SettingsHelper.isBitcoin()) {
-      switch (SettingsHelper.settings.network) {
-        case 'testnet':
-          return "Bitcoin Testnet";
-        case 'mainnet':
-          return "Bitcoin Mainnet";
-      }
-    }
-    switch (SettingsHelper.settings.network) {
-      case 'testnet':
-        return "DeFiChain Testnet";
-      case 'mainnet':
-        return "DeFiChain Mainnet";
-      default:
-        return "DeFi-Meta-Chain Testnet";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
@@ -69,7 +47,7 @@ class _SwapAccountSelectorState extends State<SwapAccountSelector> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
                     "Select the account you want to swap from",
-                    style: Theme.of(context).textTheme.headline4,
+                    style: Theme.of(context).textTheme.headline3,
                   )
                 ])
               ],
@@ -77,7 +55,7 @@ class _SwapAccountSelectorState extends State<SwapAccountSelector> {
             content: Builder(
               builder: (context) {
                 var width = widget.isFullSize
-                    ? MediaQuery.of(context).size.width * 0.3
+                    ? MediaQuery.of(context).size.width * 0.4
                     : MediaQuery.of(context).size.width;
 
                 return Container(
