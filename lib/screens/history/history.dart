@@ -180,7 +180,7 @@ class _HistoryState extends State<History> {
                     }
                   }
 
-                  final DateFormat formatter = DateFormat('yyyy.MM.dd HH:mm');
+                  final DateFormat formatter = DateFormat('dd-MM-yyyy');
 
                   String currency = SettingsHelper.settings.currency!;
 
@@ -281,14 +281,6 @@ class _HistoryState extends State<History> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           color: Theme.of(context).cardColor,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Theme.of(context).shadowColor,
-                                              blurRadius: 2,
-                                              spreadRadius: 2,
-                                            )
-                                          ],
                                         ),
                                         child: ListTile(
                                           leading: Container(
