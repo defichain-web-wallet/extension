@@ -190,6 +190,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
               PageRouteBuilder(
                 pageBuilder: (context, animation1, animation2) =>
                     SwapStatusScreen(
+                        appBarTitle: appBarTitle,
                         txResponse: txResponse,
                         amount: widget.amountFrom,
                         assetFrom: widget.assetFrom,
@@ -212,6 +213,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
                   SwapStatusScreen(
+                      appBarTitle: appBarTitle,
                       txResponse: txResponse,
                       amount: widget.amountFrom,
                       assetFrom: widget.assetFrom,

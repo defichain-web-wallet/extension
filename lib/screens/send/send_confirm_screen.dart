@@ -218,6 +218,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
                   SendStatusScreen(
+                      appBarTitle: appBarTitle,
                       txResponse: txResponse,
                       amount: widget.amount,
                       token: 'BTC',
@@ -264,6 +265,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) => SendStatusScreen(
+            appBarTitle: appBarTitle,
             txResponse: txResponse,
             amount: widget.amount,
             token: token,
