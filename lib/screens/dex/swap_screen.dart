@@ -140,14 +140,13 @@ class _SwapScreenState extends State<SwapScreen> {
                     if (constraints.maxWidth < ScreenSizes.medium) {
                       return Scaffold(
                         appBar: MainAppBar(
-                            title: 'Decentralized Exchange',
-                            hideOverlay: () => hideOverlay(),
-                            isShowBottom:
-                                !(transactionState is TransactionInitialState),
-                            height:
-                                !(transactionState is TransactionInitialState)
-                                    ? toolbarHeightWithBottom
-                                    : toolbarHeight,
+                          title: 'Decentralized Exchange',
+                          hideOverlay: () => hideOverlay(),
+                          isShowBottom:
+                              !(transactionState is TransactionInitialState),
+                          height: !(transactionState is TransactionInitialState)
+                              ? toolbarHeightWithBottom
+                              : toolbarHeight,
                           action: Container(),
                         ),
                         body: _buildBody(context, dexState, dexCubit,
@@ -223,7 +222,7 @@ class _SwapScreenState extends State<SwapScreen> {
         }
         return Container(
           color: Theme.of(context).dialogBackgroundColor,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
           child: Center(
             child: StretchBox(
               child: Column(
@@ -393,185 +392,191 @@ class _SwapScreenState extends State<SwapScreen> {
                                     .withOpacity(0.5)),
                           ),
                           SizedBox(height: 24),
-                          SizedBox(
-                            height: 30,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    'Slippage tolerance',
-                                    style:
-                                        Theme.of(context).textTheme.headline2,
+                          if (!SettingsHelper.isBitcoin())
+                            SizedBox(
+                              height: 30,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      'Slippage tolerance',
+                                      style:
+                                          Theme.of(context).textTheme.headline2,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: isShowSlippageField
-                                      ? Container(
-                                          height: 30,
-                                          child: TextField(
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: <
-                                                TextInputFormatter>[
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(
-                                                      r'(^-?\d*\.?d*\,?\d*)')),
-                                            ],
-                                            controller: slippageController,
-                                            decoration: InputDecoration(
-                                              filled: true,
-                                              fillColor:
-                                                  Theme.of(context).cardColor,
-                                              hoverColor: Colors.transparent,
-                                              enabledBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                borderSide: BorderSide(
-                                                  color: Colors.transparent,
-                                                ),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                borderSide: BorderSide(
-                                                    color: AppTheme.pinkColor),
-                                              ),
-                                              contentPadding:
-                                                  const EdgeInsets.all(8),
-                                              hintText: 'Type in percent..',
-                                              suffixIcon: IconButton(
-                                                splashRadius: 16,
-                                                icon: Icon(
-                                                  Icons.clear,
-                                                  size: 14,
-                                                ),
-                                                onPressed: () => setState(() {
-                                                  slippage = 0.03;
-                                                  isShowSlippageField = false;
-                                                }),
-                                              ),
-                                            ),
-                                            onChanged: (String value) {
-                                              setState(() {
-                                                try {
-                                                  slippage =
-                                                      double.parse(value) / 100;
-                                                } catch (err) {
-                                                  slippage = 0.03;
-                                                }
-                                              });
-                                            },
-                                          ),
-                                        )
-                                      : Container(
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: SlippageButton(
-                                                  isFirst: true,
-                                                  isBorder: isCustomBgColor,
-                                                  label: '0.5%',
-                                                  isActive: slippage == 0.005,
-                                                  callback: () => setState(
-                                                      () => slippage = 0.005),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 1,
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: SlippageButton(
-                                                  isBorder: isCustomBgColor,
-                                                  label: '1%',
-                                                  isActive: slippage == 0.01,
-                                                  callback: () => setState(
-                                                      () => slippage = 0.01),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 1,
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: SlippageButton(
-                                                  isBorder: isCustomBgColor,
-                                                  label: '3%',
-                                                  isActive: slippage == 0.03,
-                                                  callback: () => setState(
-                                                      () => slippage = 0.03),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 1,
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: SlippageButton(
-                                                  isBorder: isCustomBgColor,
-                                                  label: '5%',
-                                                  isActive: slippage == 0.05,
-                                                  callback: () => setState(
-                                                      () => slippage = 0.05),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 1,
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                  height: 20,
-                                                  child: TextButton(
-                                                    style: TextButton.styleFrom(
-                                                      backgroundColor:
-                                                          Theme.of(context)
-                                                              .cardColor,
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              0),
-                                                      elevation: 2,
-                                                      shadowColor:
-                                                          Colors.transparent,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.only(
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  10),
-                                                          bottomRight:
-                                                              Radius.circular(
-                                                                  10),
-                                                        ),
-                                                        side: BorderSide(
-                                                          color: Colors
-                                                              .transparent,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.edit,
-                                                      size: 16,
-                                                    ),
-                                                    onPressed: () => setState(
-                                                        () =>
-                                                            isShowSlippageField =
-                                                                true),
+                                  Expanded(
+                                    flex: 3,
+                                    child: isShowSlippageField
+                                        ? Container(
+                                            height: 30,
+                                            child: TextField(
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              inputFormatters: <
+                                                  TextInputFormatter>[
+                                                FilteringTextInputFormatter
+                                                    .allow(RegExp(
+                                                        r'(^-?\d*\.?d*\,?\d*)')),
+                                              ],
+                                              controller: slippageController,
+                                              decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor:
+                                                    Theme.of(context).cardColor,
+                                                hoverColor: Colors.transparent,
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  borderSide: BorderSide(
+                                                    color: Colors.transparent,
                                                   ),
                                                 ),
-                                              )
-                                            ],
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  borderSide: BorderSide(
+                                                      color:
+                                                          AppTheme.pinkColor),
+                                                ),
+                                                contentPadding:
+                                                    const EdgeInsets.all(8),
+                                                hintText: 'Type in percent..',
+                                                suffixIcon: IconButton(
+                                                  splashRadius: 16,
+                                                  icon: Icon(
+                                                    Icons.clear,
+                                                    size: 14,
+                                                  ),
+                                                  onPressed: () => setState(() {
+                                                    slippage = 0.03;
+                                                    isShowSlippageField = false;
+                                                  }),
+                                                ),
+                                              ),
+                                              onChanged: (String value) {
+                                                setState(() {
+                                                  try {
+                                                    slippage =
+                                                        double.parse(value) /
+                                                            100;
+                                                  } catch (err) {
+                                                    slippage = 0.03;
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                          )
+                                        : Container(
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: SlippageButton(
+                                                    isFirst: true,
+                                                    isBorder: isCustomBgColor,
+                                                    label: '0.5%',
+                                                    isActive: slippage == 0.005,
+                                                    callback: () => setState(
+                                                        () => slippage = 0.005),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 1,
+                                                ),
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: SlippageButton(
+                                                    isBorder: isCustomBgColor,
+                                                    label: '1%',
+                                                    isActive: slippage == 0.01,
+                                                    callback: () => setState(
+                                                        () => slippage = 0.01),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 1,
+                                                ),
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: SlippageButton(
+                                                    isBorder: isCustomBgColor,
+                                                    label: '3%',
+                                                    isActive: slippage == 0.03,
+                                                    callback: () => setState(
+                                                        () => slippage = 0.03),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 1,
+                                                ),
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: SlippageButton(
+                                                    isBorder: isCustomBgColor,
+                                                    label: '5%',
+                                                    isActive: slippage == 0.05,
+                                                    callback: () => setState(
+                                                        () => slippage = 0.05),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    height: 20,
+                                                    child: TextButton(
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        backgroundColor:
+                                                            Theme.of(context)
+                                                                .cardColor,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(0),
+                                                        elevation: 2,
+                                                        shadowColor:
+                                                            Colors.transparent,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    10),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    10),
+                                                          ),
+                                                          side: BorderSide(
+                                                            color: Colors
+                                                                .transparent,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.edit,
+                                                        size: 16,
+                                                      ),
+                                                      onPressed: () => setState(
+                                                          () =>
+                                                              isShowSlippageField =
+                                                                  true),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
                           SizedBox(height: 22),
-                          // TODO: must be constant so as not to be updated
                         ],
                       ),
                     ),
@@ -627,7 +632,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                     ),
                                   ),
                                 PendingButton(
-                                  'Review Swap',
+                                  'Next',
                                   isCheckLock: false,
                                   key: pendingButton,
                                   callback: !isDisableSubmit() &&
@@ -645,7 +650,7 @@ class _SwapScreenState extends State<SwapScreen> {
                             );
                           } else {
                             return PendingButton(
-                              'Review Swap',
+                              'Next',
                               isCheckLock: false,
                               key: pendingButton,
                               callback: !isDisableSubmit()
@@ -678,7 +683,7 @@ class _SwapScreenState extends State<SwapScreen> {
     );
     if (SettingsHelper.isBitcoin()) {
       assetFrom = 'BTC';
-      assetTo = 'BTC';
+      assetTo = 'dBTC';
       assets = [];
     } else {
       accountState.activeAccount.balanceList!.forEach((el) {
@@ -716,8 +721,7 @@ class _SwapScreenState extends State<SwapScreen> {
     if (SettingsHelper.isBitcoin()) {
       BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
       var amount = convertFromSatoshi(bitcoinCubit.state.totalBalance);
-      return amount <
-          double.parse(amountFromController.text);
+      return amount < double.parse(amountFromController.text);
     }
     int balance = state.activeAccount.balanceList!
         .firstWhere((el) => el.token! == assetFrom && !el.isHidden)

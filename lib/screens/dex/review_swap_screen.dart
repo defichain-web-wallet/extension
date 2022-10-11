@@ -84,7 +84,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
         color: Theme.of(context).dialogBackgroundColor,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
         child: Center(
           child: StretchBox(
             child: Column(
