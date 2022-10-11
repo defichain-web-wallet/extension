@@ -147,7 +147,9 @@ class _SwapScreenState extends State<SwapScreen> {
                             height:
                                 !(transactionState is TransactionInitialState)
                                     ? toolbarHeightWithBottom
-                                    : toolbarHeight),
+                                    : toolbarHeight,
+                          action: Container(),
+                        ),
                         body: _buildBody(context, dexState, dexCubit,
                             accountState, tokensState, transactionState),
                       );
@@ -168,6 +170,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                     ? toolbarHeightWithBottom
                                     : toolbarHeight,
                             isSmall: true,
+                            action: Container(),
                           ),
                         ),
                       );

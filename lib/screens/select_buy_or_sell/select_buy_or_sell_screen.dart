@@ -59,6 +59,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                 return Scaffold(
                   appBar: MainAppBar(
                     title: 'Buy & Sell with DFX Swiss',
+                    action: Container(),
                   ),
                   body: _buildBody(fiatState),
                 );
@@ -68,6 +69,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                   child: Scaffold(
                     appBar: MainAppBar(
                       title: 'Buy & Sell with DFX Swiss',
+                      action: Container(),
                       isSmall: true,
                     ),
                     body: _buildBody(fiatState, isFullSize: true),

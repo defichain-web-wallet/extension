@@ -52,7 +52,6 @@ class _SendConfirmState extends State<SendTokenSelector> {
   BtcRequests btcRequests = BtcRequests();
   bool isFailed = false;
   bool isFailedAddress = false;
-  bool _isBalanceError = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   String assetFrom = '';
@@ -96,6 +95,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                       height: !(state is TransactionInitialState)
                           ? toolbarHeightWithBottom
                           : toolbarHeight,
+                      action: Container(),
                     ),
                     body: _buildBody(context, state),
                   );
@@ -106,7 +106,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                       appBar: MainAppBar(
                         title: 'Send',
                         hideOverlay: () => hideOverlay(),
-                        action: null,
+                        action: Container(),
                         isSmall: true,
                       ),
                       body: _buildBody(context, state, isCustomBgColor: true),
