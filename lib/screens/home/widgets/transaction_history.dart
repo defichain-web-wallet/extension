@@ -48,7 +48,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           if (state.status == AccountStatusList.success &&
               tokensState.status == TokensStatusList.success) {
             var historyList;
-            DateFormat formatter = DateFormat('yyyy.MM.dd HH:mm');
+            DateFormat formatter = DateFormat('dd-MM-yyyy');
             var balancesHelper = BalancesHelper();
             TokensHelper tokenHelper = TokensHelper();
             HistoryHelper historyHelper = HistoryHelper();
