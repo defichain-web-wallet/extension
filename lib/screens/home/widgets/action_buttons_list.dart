@@ -1,4 +1,3 @@
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -10,7 +9,6 @@ import 'package:defi_wallet/screens/send/send_token_selector.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ActionButtonsList extends StatelessWidget {
   final Function() hideOverlay;
@@ -77,28 +75,15 @@ class ActionButtonsList extends StatelessWidget {
           ));
     };
     var buySellCallback = (state) {
-      if (SettingsHelper.settings.network == 'testnet') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Forbidden to testnet',
-              style: Theme.of(context).textTheme.headline5,
-            ),
-            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-          ),
-        );
-        return;
-      } else {
-        hideOverlay();
-        Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SelectBuyOrSellScreen(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ));
-      }
+      hideOverlay();
+      Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                SelectBuyOrSellScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ));
     };
     return BlocBuilder<FiatCubit, FiatState>(
       builder: (BuildContext context, state) {
@@ -122,11 +107,12 @@ class ActionButtonsList extends StatelessWidget {
                 label: 'Swap',
                 onPressed: swapCallback,
               ),
-              ActionButton(
-                iconPath: 'assets/images/buy_sell.png',
-                label: 'Buy/Sell',
-                onPressed: () => buySellCallback(state),
-              ),
+              if (!SettingsHelper.isBitcoin())
+                ActionButton(
+                  iconPath: 'assets/images/buy_sell.png',
+                  label: 'Buy/Sell',
+                  onPressed: () => buySellCallback(state),
+                ),
               if (!SettingsHelper.isBitcoin())
                 ActionButton(
                   iconPath: 'assets/images/earn.png',
