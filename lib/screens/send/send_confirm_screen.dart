@@ -39,8 +39,9 @@ class _SendConfirmState extends State<SendConfirmScreen> {
   TransactionService transactionService = TransactionService();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+  String appBarTitle = 'Send';
   String secondStepLoaderText =
-      'Did you know Jellywallet is compatible with DeFiChain Wallet, if you use it without ledger? Just use your seed across the wallets!';
+      'One second, Jelly is preparing your transaction!';
 
   @override
   Widget build(BuildContext context) =>
@@ -50,7 +51,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
           if (constraints.maxWidth < ScreenSizes.medium) {
             return Scaffold(
               appBar: MainAppBar(
-                  title: 'Send',
+                  title: appBarTitle,
                   isShowBottom: !(state is TransactionInitialState),
                   height: !(state is TransactionInitialState)
                       ? toolbarHeightWithBottom
@@ -62,7 +63,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
               padding: const EdgeInsets.only(top: 20),
               child: Scaffold(
                 appBar: MainAppBar(
-                  title: 'Send',
+                  title: appBarTitle,
                   action: null,
                   isShowBottom: !(state is TransactionInitialState),
                   height: !(state is TransactionInitialState)
@@ -151,7 +152,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                   Expanded(
                                     child: AccentButton(
                                       label: 'Cancel',
-                                      callback: () => Navigator.of(context).pop(),
+                                      callback: () =>
+                                          Navigator.of(context).pop(),
                                     ),
                                   ),
                                   SizedBox(width: 16),
@@ -160,25 +162,25 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                       'Send',
                                       isCheckLock: false,
                                       callback: (parent) {
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation1,
-                                                      animation2) =>
-                                                  LoaderNew(
-                                                callback: () async {
-                                                  await submitSend(
-                                                      state,
-                                                      tokensState);
-                                                },
-                                                secondStepLoaderText:
-                                                    secondStepLoaderText,
-                                              ),
-                                              transitionDuration: Duration.zero,
-                                              reverseTransitionDuration:
-                                                  Duration.zero,
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LoaderNew(
+                                              title: appBarTitle,
+                                              callback: () async {
+                                                await submitSend(
+                                                    state, tokensState);
+                                              },
+                                              secondStepLoaderText:
+                                                  secondStepLoaderText,
                                             ),
-                                          );
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
+                                          ),
+                                        );
                                       },
                                     ),
                                   ),

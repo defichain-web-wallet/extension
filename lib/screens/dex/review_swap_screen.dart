@@ -41,7 +41,8 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   String secondStepLoaderText =
-      'Did you know Jellywallet does not store your private key, if you use it together with your hardware wallet? This makes Jellywallet bullet proof!';
+      'One second, Jelly is preparing your transaction!';
+  String appBarTitle = 'Decentralized Exchange';
 
   @override
   Widget build(BuildContext context) =>
@@ -53,7 +54,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                 return Scaffold(
                   body: _buildBody(context),
                   appBar: MainAppBar(
-                      title: 'Decentralized Exchange',
+                      title: appBarTitle,
                       isShowBottom: !(state is TransactionInitialState),
                       height: !(state is TransactionInitialState)
                           ? toolbarHeightWithBottom
@@ -65,7 +66,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                   child: Scaffold(
                     body: _buildBody(context, isCustomBgColor: true),
                     appBar: MainAppBar(
-                      title: 'Decentralized Exchange',
+                      title: appBarTitle,
                       action: null,
                       isShowBottom: !(state is TransactionInitialState),
                       height: !(state is TransactionInitialState)
@@ -141,25 +142,25 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                             'SWAP',
                             isCheckLock: false,
                             callback: (parent) {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            LoaderNew(
-                                      secondStepLoaderText:
-                                          secondStepLoaderText,
-                                      callback: () {
-                                        submitSwap(
-                                          state,
-                                          tokensState,
-                                        );
-                                      },
-                                    ),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          LoaderNew(
+                                    title: appBarTitle,
+                                    secondStepLoaderText: secondStepLoaderText,
+                                    callback: () {
+                                      submitSwap(
+                                        state,
+                                        tokensState,
+                                      );
+                                    },
                                   ),
-                                );
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
+                              );
                             },
                           );
                         } else {

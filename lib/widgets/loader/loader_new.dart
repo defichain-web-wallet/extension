@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 class LoaderNew extends StatefulWidget {
   final String secondStepLoaderText;
+  final String title;
   bool isFullSize;
   String currentStatus;
   Function()? callback;
@@ -16,6 +17,7 @@ class LoaderNew extends StatefulWidget {
   LoaderNew({
     Key? key,
     required this.secondStepLoaderText,
+    required this.title,
     this.callback,
     this.isFullSize = false,
     this.currentStatus = 'first-step',
@@ -39,7 +41,9 @@ class _LoaderNewState extends State<LoaderNew> {
           if (constraints.maxWidth < ScreenSizes.medium) {
             return Scaffold(
               appBar: MainAppBar(
-                title: 'Send',
+                isShowNavButton: false,
+                title: widget.title,
+                action: null,
               ),
               body: _buildBody(context),
             );
@@ -48,7 +52,8 @@ class _LoaderNewState extends State<LoaderNew> {
               padding: const EdgeInsets.only(top: 20),
               child: Scaffold(
                 appBar: MainAppBar(
-                  title: 'Send',
+                  isShowNavButton: false,
+                  title: widget.title,
                   action: null,
                   isSmall: true,
                 ),

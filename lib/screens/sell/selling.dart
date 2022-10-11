@@ -67,6 +67,7 @@ class _SellingState extends State<Selling> {
   TransactionService transactionService = TransactionService();
 
   List<String> assets = [];
+  String appBarTitle = 'Selling';
   String assetFrom = '';
   String sellFieldMsg = '';
   String secondStepLoaderText =
@@ -100,7 +101,7 @@ class _SellingState extends State<Selling> {
                     return Scaffold(
                       key: _scaffoldKey,
                       appBar: MainAppBar(
-                        title: 'Selling',
+                        title: appBarTitle,
                         hideOverlay: () => hideOverlay(),
                       ),
                       body: _buildBody(
@@ -115,7 +116,7 @@ class _SellingState extends State<Selling> {
                             context, accountState, fiatState, tokensState,
                             isCustomBgColor: true),
                         appBar: MainAppBar(
-                          title: 'Selling',
+                          title: appBarTitle,
                           hideOverlay: () => hideOverlay(),
                           isSmall: true,
                         ),
@@ -369,6 +370,7 @@ class _SellingState extends State<Selling> {
                                     pageBuilder:
                                         (context, animation1, animation2) =>
                                             LoaderNew(
+                                      title: appBarTitle,
                                       secondStepLoaderText:
                                           secondStepLoaderText,
                                       callback: () async {
