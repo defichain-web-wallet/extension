@@ -51,6 +51,7 @@ class LiquidityConfirmation extends StatefulWidget {
 }
 
 class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
+  String appBarTitle = 'Confirmation';
   String submitLabel = '';
   String secondStepLoaderTextAdd =
       'Did you know that DeFiChain is working without smart contracts? It\'s all based on so called custom-transactions. Makes things more secure!';
@@ -68,7 +69,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
           if (constraints.maxWidth < ScreenSizes.medium) {
             return Scaffold(
               appBar: MainAppBar(
-                  title: 'Confirmation',
+                  title: appBarTitle,
                   isShowBottom: !(state is TransactionInitialState),
                   height: !(state is TransactionInitialState)
                       ? toolbarHeightWithBottom
@@ -80,7 +81,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
               padding: const EdgeInsets.only(top: 20),
               child: Scaffold(
                 appBar: MainAppBar(
-                  title: 'Confirmation',
+                  title: appBarTitle,
                   action: null,
                   isShowBottom: !(state is TransactionInitialState),
                   height: !(state is TransactionInitialState)
@@ -282,34 +283,32 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                                     label: submitLabel,
                                     isCheckLock: false,
                                     callback: () {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    LoaderNew(
-                                                  secondStepLoaderText: widget
-                                                              .removeLT ==
-                                                          0
-                                                      ? secondStepLoaderTextAdd
-                                                      : secondStepLoaderTextRemove,
-                                                  callback: () {
-                                                    submitLiquidityAction(
-                                                      state,
-                                                      tokensState,
-                                                      transactionState,
-                                                    );
-                                                  },
-                                                ),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
-                                          }
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1,
+                                                  animation2) =>
+                                              LoaderNew(
+                                            title: appBarTitle,
+                                            secondStepLoaderText: widget
+                                                        .removeLT ==
+                                                    0
+                                                ? secondStepLoaderTextAdd
+                                                : secondStepLoaderTextRemove,
+                                            callback: () {
+                                              submitLiquidityAction(
+                                                state,
+                                                tokensState,
+                                                transactionState,
+                                              );
+                                            },
+                                          ),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                              Duration.zero,
                                         ),
+                                      );
+                                    }),
                               ),
                             ),
                           ],
