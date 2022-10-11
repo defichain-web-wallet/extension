@@ -1,12 +1,15 @@
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/widgets/status/status_transaction.dart';
 import 'package:defi_wallet/widgets/toolbar/icon_app_bar.dart';
+import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,54 +22,47 @@ class SendStatusScreen extends StatelessWidget {
   final double amount;
   final String token;
   final String address;
+  final String appBarTitle;
+  double homeButtonWidth;
 
-  SendStatusScreen(
-      {Key? key,
-      required this.txResponse,
-      required this.amount,
-      required this.token,
-      required this.address})
-      : super(key: key);
+  SendStatusScreen({
+    Key? key,
+    required this.txResponse,
+    required this.amount,
+    required this.token,
+    required this.address,
+    required this.appBarTitle,
+    this.homeButtonWidth = 150,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => ScaffoldConstrainedBox(
-          child: LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth < ScreenSizes.medium) {
-          return Scaffold(
-            appBar: IconAppBar(
-              title: 'Send',
-              cancel: () => Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) => HomeScreen(),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < ScreenSizes.medium) {
+              return Scaffold(
+                appBar: MainAppBar(
+                  title: appBarTitle,
+                  isShowNavButton: false,
                 ),
-              ),
-            ),
-            body: _buildBody(context),
-          );
-        } else {
-          return Container(
-            padding: const EdgeInsets.only(top: 20),
-            child: Scaffold(
-              appBar: IconAppBar(
-                title: 'Send',
-                isSmall: true,
-                cancel: () => Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => HomeScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
+                body: _buildBody(context),
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.only(top: 20),
+                child: Scaffold(
+                  appBar: MainAppBar(
+                    title: appBarTitle,
+                    isSmall: true,
+                    isShowNavButton: false,
                   ),
+                  body: _buildBody(context, isCustomBgColor: true),
                 ),
-              ),
-              body: _buildBody(context, isCustomBgColor: true),
-            ),
-          );
-        }
-      }));
+              );
+            }
+          },
+        ),
+      );
 
   Widget _buildBody(context, {isCustomBgColor = false}) {
     if (txResponse!.isError) {
@@ -76,7 +72,7 @@ class SendStatusScreen extends StatelessWidget {
       LoggerService.invokeInfoLogg('user was send token successfully');
       if (!SettingsHelper.isBitcoin()) {
         TransactionCubit transactionCubit =
-          BlocProvider.of<TransactionCubit>(context);
+            BlocProvider.of<TransactionCubit>(context);
 
         transactionCubit.setOngoingTransaction(txResponse!.txid!);
       }
@@ -89,54 +85,8 @@ class SendStatusScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Image.asset(
-              txResponse!.isError
-                  ? 'assets/error_gif.gif'
-                  : 'assets/success_gif.gif',
-              height: 126,
-              width: 124,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          '${balancesHelper.numberStyling(amount)} ',
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.headline1,
-                        ),
-                      ),
-                      Text(
-                        tokenName,
-                        style: Theme.of(context).textTheme.headline1,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24),
-                  Text(
-                    txResponse!.isError
-                        ? 'Were not sent successfully'
-                        : 'Have been sent successfully!',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Address',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '$address',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline4,
-                  ),
-                ],
-              ),
+            StatusTransaction(
+              txResponse: txResponse,
             ),
             Flexible(
               child: txResponse!.isError
@@ -147,31 +97,58 @@ class SendStatusScreen extends StatelessWidget {
                           : txResponse!.error.toString(),
                       style: Theme.of(context).textTheme.button,
                     )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        SvgPicture.asset(
-                          'assets/explorer_icon.svg',
-                          color: AppTheme.pinkColor,
-                        ),
-                        SizedBox(width: 10),
-                        InkWell(
-                          child: Text(
-                            'View on Explorer',
-                            style: AppTheme.defiUnderlineText,
+                        SizedBox(
+                          width: homeButtonWidth,
+                          child: PrimaryButton(
+                            label: 'Home',
+                            callback: () => Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        HomeScreen(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            ),
                           ),
-                          onTap: () {
-                            if (SettingsHelper.isBitcoin()) {
-                              if (SettingsHelper.settings.network! == 'mainnet') {
-                                launch('https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
-                              } else {
-                                launch('https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
-                              }
-                            } else {
-                              launch(
-                                  'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
-                            }
-                          },
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/explorer_icon.svg',
+                              color: AppTheme.pinkColor,
+                            ),
+                            SizedBox(width: 10),
+                            InkWell(
+                              child: Text(
+                                'View on Explorer',
+                                style: AppTheme.defiUnderlineText,
+                              ),
+                              onTap: () {
+                                if (SettingsHelper.isBitcoin()) {
+                                  if (SettingsHelper.settings.network! ==
+                                      'mainnet') {
+                                    launch(
+                                        'https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
+                                  } else {
+                                    launch(
+                                        'https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
+                                  }
+                                } else {
+                                  launch(
+                                      'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
