@@ -38,8 +38,8 @@ class _SwapAccountSelectorState extends State<SwapAccountSelector> {
               children: [
                 SvgPicture.asset(
                   'assets/tokens/bitcoin.svg',
-                  height: 32,
-                  width: 32,
+                  height: 26,
+                  width: 26,
                 ),
                 SizedBox(
                   width: 16,
