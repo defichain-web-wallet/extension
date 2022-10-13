@@ -234,13 +234,6 @@ class _SendConfirmState extends State<SendConfirmScreen> {
       }
     } catch (_err) {
       print(_err);
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text(_err.toString(),
-      //         style: Theme.of(context).textTheme.headline5),
-      //     backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-      //   ),
-      // );
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
