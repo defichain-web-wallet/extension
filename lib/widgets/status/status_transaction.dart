@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 
 class StatusTransaction extends StatelessWidget {
   TxErrorModel? txResponse;
+  bool isBTCError;
 
   StatusTransaction({
     Key? key,
     this.txResponse,
+    this.isBTCError = false,
   }) : super(key: key);
 
   @override
@@ -15,9 +17,11 @@ class StatusTransaction extends StatelessWidget {
       child: Column(
         children: [
           Image.asset(
-            txResponse!.isError
-                ? 'assets/error_gif.gif'
-                : 'assets/status_reload_icon.png',
+            !isBTCError
+                ? txResponse!.isError
+                    ? 'assets/error_gif.gif'
+                    : 'assets/status_reload_icon.png'
+                : 'assets/error_gif.gif',
             height: 106,
             width: 104,
           ),
@@ -27,18 +31,22 @@ class StatusTransaction extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  txResponse!.isError
-                      ? 'Transaction failed'
-                      : 'Transaction successful!',
+                  !isBTCError
+                      ? txResponse!.isError
+                          ? 'Transaction failed'
+                          : 'Transaction successful!'
+                      : 'Transaction failed',
                   style: Theme.of(context).textTheme.headline1!.apply(
-                    fontSizeFactor: 0.9,
-                  ),
+                        fontSizeFactor: 0.9,
+                      ),
                 ),
                 SizedBox(height: 24),
                 Text(
-                  txResponse!.isError
-                      ? 'Were not transaction successfully'
-                      : 'Your transaction will now be processed in the background. Your account balance will be updated in a few minutes.',
+                  !isBTCError
+                      ? txResponse!.isError
+                          ? 'Were not transaction successfully'
+                          : 'Your transaction will now be processed in the background. Your account balance will be updated in a few minutes.'
+                      : 'Were not transaction successfully',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headline5!,
                 ),

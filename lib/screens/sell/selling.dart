@@ -402,7 +402,7 @@ class _SellingState extends State<Selling> {
                                                 await dfxRequests.sell(
                                                     iban,
                                                     selectedFiat,
-                                                    accountState.accessToken);
+                                                    fiatState.accessToken);
                                             address = sellDetails["deposit"]
                                                 ["address"];
                                           } else {

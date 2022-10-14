@@ -232,13 +232,20 @@ class _SendConfirmState extends State<SendConfirmScreen> {
               context, tokensState, widget.token, state.activeAccount);
         }
       }
-    } catch (_) {
-      print(_);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Some error. Please try later',
-              style: Theme.of(context).textTheme.headline5),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+    } catch (_err) {
+      print(_err);
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
+              errorBTC: _err.toString(),
+              appBarTitle: appBarTitle,
+              txResponse: null,
+              amount: widget.amount,
+              token: 'BTC',
+              address: widget.address),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
         ),
       );
     }
