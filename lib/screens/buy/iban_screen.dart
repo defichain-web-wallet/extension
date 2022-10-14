@@ -1,4 +1,3 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
@@ -41,43 +40,40 @@ class _IbanScreenState extends State<IbanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AccountCubit, AccountState>(
-        builder: (BuildContext context, accountState) {
-      return BlocBuilder<FiatCubit, FiatState>(
-        builder: (BuildContext context, state) {
-          return ScaffoldConstrainedBox(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth < ScreenSizes.medium) {
-                  return Scaffold(
+    return BlocBuilder<FiatCubit, FiatState>(
+      builder: (BuildContext context, state) {
+        return ScaffoldConstrainedBox(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < ScreenSizes.medium) {
+                return Scaffold(
+                  appBar: MainAppBar(
+                    title: 'Buying Token with Fiat',
+                    hideOverlay: () => hideOverlay(),
+                  ),
+                  body: _buildBody(state),
+                );
+              } else {
+                return Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Scaffold(
                     appBar: MainAppBar(
                       title: 'Buying Token with Fiat',
                       hideOverlay: () => hideOverlay(),
+                      isSmall: true,
                     ),
-                    body: _buildBody(state, accountState),
-                  );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Scaffold(
-                      appBar: MainAppBar(
-                        title: 'Buying Token with Fiat',
-                        hideOverlay: () => hideOverlay(),
-                        isSmall: true,
-                      ),
-                      body: _buildBody(state, accountState, isFullSize: true),
-                    ),
-                  );
-                }
-              },
-            ),
-          );
-        },
-      );
-    });
+                    body: _buildBody(state, isFullSize: true),
+                  ),
+                );
+              }
+            },
+          ),
+        );
+      },
+    );
   }
 
-  Widget _buildBody(state, accountState, {isFullSize = false}) {
+  Widget _buildBody(state, {isFullSize = false}) {
     if (state.status == FiatStatusList.loading) {
       return Loader();
     } else {
@@ -179,7 +175,7 @@ class _IbanScreenState extends State<IbanScreen> {
                           isCheckLock: false,
                           callback: () {
                             hideOverlay();
-                            submit(context, accountState, state);
+                            submit(context, state);
                           }),
                     ),
                   ],
@@ -192,7 +188,7 @@ class _IbanScreenState extends State<IbanScreen> {
     }
   }
 
-  submit(context, accountState, fiatState) async {
+  submit(context, fiatState) async {
     if (_formKey.currentState!.validate()) {
       FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
       String iban = (widget.isNewIban || fiatState.activeIban == null)
@@ -200,7 +196,7 @@ class _IbanScreenState extends State<IbanScreen> {
           : fiatState.activeIban.iban;
       print(_ibanController.text);
       await fiatCubit.saveBuyDetails(
-          iban, widget.asset, accountState.accessToken!);
+          iban, widget.asset, fiatState.accessToken!);
       Navigator.push(
           context,
           PageRouteBuilder(
