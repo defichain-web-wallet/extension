@@ -111,6 +111,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget build(BuildContext context) =>
       BlocBuilder<DexCubit, DexState>(builder: (dexContext, dexState) {
         DexCubit dexCubit = BlocProvider.of<DexCubit>(dexContext);
+        BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
         return BlocBuilder<AccountCubit, AccountState>(
             builder: (accountContext, accountState) {
           if (accountState.activeToken!.contains('-')) {
@@ -128,8 +129,11 @@ class _SwapScreenState extends State<SwapScreen> {
                   iteratorUpdate++;
                   accountFrom = accountState.accounts![0];
                   accountTo = accountState.accounts![0];
+                  bitcoinCubit
+                      .loadAvailableBalance(accountFrom.bitcoinAddress!);
                   dexCubit.updateDex(assetFrom, assetTo, 0, 0, address,
                       accountState.activeAccount!.addressList!, tokensState);
+
                 }
               }
             }
@@ -304,8 +308,11 @@ class _SwapScreenState extends State<SwapScreen> {
                               ),
                             ),
                             onChangeAccount: (index) {
+                              BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
                               setState(() {
                                 accountFrom = accountState.accounts[index];
+                                bitcoinCubit
+                                    .loadAvailableBalance(accountFrom.bitcoinAddress!);
                               });
                             },
                           ),
@@ -760,11 +767,16 @@ class _SwapScreenState extends State<SwapScreen> {
     if (isNumeric(amountFromController.text)) {
       if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
         try {
+          BitcoinCubit bitcoinCubit =
+            BlocProvider.of<BitcoinCubit>(context);
+
+          print(bitcoinCubit.state.networkFee!.medium);
+          print(cryptoRoute.address);
           var tx = await transactionService.createBTCTransaction(
             account: state.activeAccount,
             destinationAddress: cryptoRoute.address!,
             amount: balancesHelper.toSatoshi(amountFromController.text),
-            satPerByte: int.parse(cryptoRoute.fee!.toString()),
+            satPerByte: bitcoinCubit.state.networkFee!.medium!,
           );
           Navigator.push(
               context,
@@ -782,6 +794,7 @@ class _SwapScreenState extends State<SwapScreen> {
                 reverseTransitionDuration: Duration.zero,
               ));
         } catch (err) {
+          print(err);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
