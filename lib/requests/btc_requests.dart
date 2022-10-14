@@ -114,7 +114,7 @@ class BtcRequests {
     }
   }
 
-  Future<int> getBalance({required AddressModel address}) async {
+  Future<List<int>> getBalance({required AddressModel address}) async {
     try {
       final Uri url = Uri.parse('$host/btc/${SettingsHelper.settings.network == 'mainnet' ? 'main' : 'test3'}/addrs/${address.address}/balance');
 
@@ -122,7 +122,7 @@ class BtcRequests {
 
       if (response.statusCode == 200) {
         dynamic data = jsonDecode(response.body);
-        return data['final_balance'];
+        return [data['final_balance'], data['unconfirmed_balance']];
       } else {
         throw Error.safeToString(response.statusCode);
       }
@@ -132,10 +132,10 @@ class BtcRequests {
   }
 
   Future<int> getAvailableBalance({required AddressModel address,required int feePerByte}) async {
-    var balance = await  getBalance(address: address);
+    List<int> balance = await getBalance(address: address);
     var utxos = await getUTXOs(address:address);
     var fee = TransactionService().calculateBTCFee(utxos.length,1 ,feePerByte);
-    return balance - fee;
+    return balance[0] - fee;
   }
 
   Future<TxErrorModel> sendTxHex(String txHex) async {

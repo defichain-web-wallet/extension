@@ -4,46 +4,62 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ListEntry extends StatelessWidget {
-  final String iconUrl;
+  final String? iconUrl;
   final String label;
   final Function() callback;
   final bool disabled;
+  final bool updateTokens;
 
   const ListEntry({
     Key? key,
-    required this.iconUrl,
+    this.iconUrl,
     required this.label,
     required this.callback,
     this.disabled = false,
+    this.updateTokens = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
 
-    return ListTile(
-      onTap: () async {
-        if (!disabled) {
-          await callback();
-          await tokensCubit.loadTokensFromStorage();
-        }
-      },
-      contentPadding: const EdgeInsets.only(left: 60),
-      leading: SvgPicture.asset(
-        iconUrl,
-        height: 24,
-        width: 24,
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
       ),
-      title: Text(
-        label,
-        style: Theme.of(context).textTheme.headline4!.apply(
-            color: disabled ? Theme
-                .of(context)
-                .secondaryHeaderColor : Theme
-                .of(context)
-                .textTheme
-                .headline4!
-                .color
+      child: ListTile(
+        style: ListTileStyle.list,
+        onTap: () async {
+          if (!disabled) {
+            await callback();
+            if (updateTokens) {
+              await tokensCubit.loadTokensFromStorage();
+            }
+          }
+        },
+        contentPadding: EdgeInsets.only(left: (iconUrl != null) ? 60 : 0),
+        leading: (iconUrl != null)
+            ? SvgPicture.asset(
+                iconUrl!,
+                height: 24,
+                width: 24,
+              )
+            : null,
+        title: Text(
+          label,
+          textAlign: iconUrl == null ? TextAlign.center : null,
+          style: Theme.of(context).textTheme.headline3!.apply(
+              color: disabled ? Theme
+                  .of(context)
+                  .dividerColor : Theme
+                  .of(context)
+                  .textTheme
+                  .headline3!
+                  .color
+          ),
         ),
       ),
     );

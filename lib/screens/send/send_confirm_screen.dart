@@ -14,6 +14,7 @@ import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -38,7 +39,9 @@ class _SendConfirmState extends State<SendConfirmScreen> {
   TransactionService transactionService = TransactionService();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
-  bool isEnable = true;
+  String appBarTitle = 'Send';
+  String secondStepLoaderText =
+      'One second, Jelly is preparing your transaction!';
 
   @override
   Widget build(BuildContext context) =>
@@ -48,7 +51,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
           if (constraints.maxWidth < ScreenSizes.medium) {
             return Scaffold(
               appBar: MainAppBar(
-                  title: 'Send',
+                  title: appBarTitle,
                   isShowBottom: !(state is TransactionInitialState),
                   height: !(state is TransactionInitialState)
                       ? toolbarHeightWithBottom
@@ -60,7 +63,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
               padding: const EdgeInsets.only(top: 20),
               child: Scaffold(
                 appBar: MainAppBar(
-                  title: 'Send',
+                  title: appBarTitle,
                   action: null,
                   isShowBottom: !(state is TransactionInitialState),
                   height: !(state is TransactionInitialState)
@@ -149,9 +152,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                   Expanded(
                                     child: AccentButton(
                                       label: 'Cancel',
-                                      callback: isEnable
-                                          ? () => Navigator.of(context).pop()
-                                          : null,
+                                      callback: () =>
+                                          Navigator.of(context).pop(),
                                     ),
                                   ),
                                   SizedBox(width: 16),
@@ -160,10 +162,25 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                       'Send',
                                       isCheckLock: false,
                                       callback: (parent) {
-                                        setState(() {
-                                          isEnable = false;
-                                        });
-                                        submitSend(parent, state, tokensState);
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LoaderNew(
+                                              title: appBarTitle,
+                                              callback: () async {
+                                                await submitSend(
+                                                    state, tokensState);
+                                              },
+                                              secondStepLoaderText:
+                                                  secondStepLoaderText,
+                                            ),
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
+                                          ),
+                                        );
                                       },
                                     ),
                                   ),
@@ -184,26 +201,54 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         );
       });
 
-  submitSend(parent, state, tokensState) async {
-    parent.emitPending(true);
-
+  submitSend(state, tokensState) async {
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
-        await _sendTransaction(
-            context, tokensState, widget.token, state.activeAccount);
+        if (SettingsHelper.isBitcoin()) {
+          var tx = await transactionService.createBTCTransaction(
+            account: state.activeAccount,
+            destinationAddress: widget.address,
+            amount: balancesHelper.toSatoshi(widget.amount.toString()),
+            satPerByte: widget.fee,
+          );
+          var txResponse = await bitcoinCubit.sendTransaction(tx);
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  SendStatusScreen(
+                      appBarTitle: appBarTitle,
+                      txResponse: txResponse,
+                      amount: widget.amount,
+                      token: 'BTC',
+                      address: widget.address),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        } else {
+          await _sendTransaction(
+              context, tokensState, widget.token, state.activeAccount);
+        }
       }
-    } catch (_) {
-      print(_);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Some error. Please try later',
-              style: Theme.of(context).textTheme.headline5),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+    } catch (_err) {
+      print(_err);
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
+              errorBTC: _err.toString(),
+              appBarTitle: appBarTitle,
+              txResponse: null,
+              amount: widget.amount,
+              token: 'BTC',
+              address: widget.address),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
         ),
       );
     }
-
-    parent.emitPending(false);
   }
 
   Future _sendTransaction(
@@ -227,6 +272,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) => SendStatusScreen(
+            appBarTitle: appBarTitle,
             txResponse: txResponse,
             amount: widget.amount,
             token: token,

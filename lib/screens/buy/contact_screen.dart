@@ -43,7 +43,7 @@ class _ContactScreenState extends State<ContactScreen> {
 
     return BlocBuilder<AccountCubit, AccountState>(
         builder: (BuildContext context, accountState) {
-          fiatCubit.loadUserDetails(accountState.accessToken!);
+          fiatCubit.loadUserDetails(accountState.activeAccount!);
           return BlocBuilder<FiatCubit, FiatState>(
         builder: (BuildContext context, state) {
           if (state.email != null) {
@@ -169,7 +169,7 @@ class _ContactScreenState extends State<ContactScreen> {
                     callback: isEnable
                         ? () async {
                       await _authenticateWithEmailAndPassword(
-                          context, state, accountState);
+                          context, state);
                     }
                         : null,
                   ),
@@ -182,14 +182,14 @@ class _ContactScreenState extends State<ContactScreen> {
     }
   }
 
-  _authenticateWithEmailAndPassword(context, state, accountState) async {
+  _authenticateWithEmailAndPassword(context, state) async {
     if (_formKey.currentState!.validate()) {
       FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
       await fiatCubit.createUser(
         _emailController.text,
         _phoneController.text,
-        accountState.accessToken,
+        state.accessToken,
       );
       Navigator.push(
         context,

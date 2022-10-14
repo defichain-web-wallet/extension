@@ -94,20 +94,12 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                   horizontal: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).backgroundColor,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(10),
                       topRight: Radius.circular(10),
                       bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).shadowColor,
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
+                      bottomRight: Radius.circular(10),),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -36,10 +36,12 @@ class _WalletDetailsState extends State<WalletDetails> {
                   if (state.status == AccountStatusList.success &&
                       tokensState.status == TokensStatusList.success) {
                     late double totalBalance;
+                    late double unconfirmedBalance;
                     late double totalBalanceInFiat;
                     if (SettingsHelper.isBitcoin()) {
                       activeAsset = AssetList.btc;
                       totalBalance = convertFromSatoshi(bitcoinState.totalBalance);
+                      unconfirmedBalance = convertFromSatoshi(bitcoinState.unconfirmedBalance);
                       totalBalanceInFiat = tokensHelper.getAmountByUsd(
                         tokensState.tokensPairs!,
                         totalBalance,
@@ -172,7 +174,17 @@ class _WalletDetailsState extends State<WalletDetails> {
                                 ),
                               ),
                             ),
-                          )
+                          ),
+                          if (SettingsHelper.isBitcoin())
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Center(
+                                child: Text(
+                                  '(${balancesHelper.numberStyling(unconfirmedBalance, fixed: true, fixedCount: 6)} BTC UNCONFIRMED)',
+                                  style: Theme.of(context).textTheme.subtitle2,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     );

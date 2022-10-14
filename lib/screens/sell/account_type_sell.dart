@@ -1,4 +1,3 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
@@ -39,41 +38,38 @@ class _AccountTypeSellState extends State<AccountTypeSell> {
   Widget build(BuildContext context) {
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
-    return BlocBuilder<AccountCubit, AccountState>(
-        builder: (context, accountState) {
-      fiatCubit.loadCountryList(accountState.accessToken!);
-      return BlocBuilder<FiatCubit, FiatState>(
-          builder: (BuildContext context, state) {
-        if (state.personalInfo != null) {
-          _nameController.text = state.personalInfo!.firstname!;
-          _surnameController.text = state.personalInfo!.surname!;
-        }
-        return ScaffoldConstrainedBox(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth < ScreenSizes.medium) {
-                return Scaffold(
+    fiatCubit.loadCountryList();
+    return BlocBuilder<FiatCubit, FiatState>(
+        builder: (BuildContext context, state) {
+      if (state.personalInfo != null) {
+        _nameController.text = state.personalInfo!.firstname!;
+        _surnameController.text = state.personalInfo!.surname!;
+      }
+      return ScaffoldConstrainedBox(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < ScreenSizes.medium) {
+              return Scaffold(
+                appBar: MainAppBar(
+                  title: '1/4',
+                ),
+                body: _buildBody(state),
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.only(top: 20),
+                child: Scaffold(
                   appBar: MainAppBar(
                     title: '1/4',
+                    isSmall: true,
                   ),
-                  body: _buildBody(state),
-                );
-              } else {
-                return Container(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Scaffold(
-                    appBar: MainAppBar(
-                      title: '1/4',
-                      isSmall: true,
-                    ),
-                    body: _buildBody(state, isFullSize: true),
-                  ),
-                );
-              }
-            },
-          ),
-        );
-      });
+                  body: _buildBody(state, isFullSize: true),
+                ),
+              );
+            }
+          },
+        ),
+      );
     });
   }
 
@@ -84,12 +80,10 @@ class _AccountTypeSellState extends State<AccountTypeSell> {
       Future.microtask(() => Navigator.pushReplacement(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                LockScreen(),
+            pageBuilder: (context, animation1, animation2) => LockScreen(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
-          ))
-      );
+          )));
       return Container();
     } else {
       return Container(
@@ -157,7 +151,8 @@ class _AccountTypeSellState extends State<AccountTypeSell> {
                   callback: () {
                     if (_formKey.currentState!.validate()) {
                       lockHelper.provideWithLockChecker(context, () {
-                        FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+                        FiatCubit fiatCubit =
+                            BlocProvider.of<FiatCubit>(context);
                         fiatCubit.setUserName(
                             _nameController.text, _surnameController.text);
                         Navigator.push(

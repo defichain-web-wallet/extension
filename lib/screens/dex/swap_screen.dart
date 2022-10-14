@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -17,7 +22,6 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/models/test_pool_swap_model.dart';
 import 'package:defi_wallet/screens/dex/review_swap_screen.dart';
-import 'package:defi_wallet/screens/dex/swap_status.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -28,9 +32,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/models/focus_model.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 import './widgets/amount_selector_field.dart';
-import './widgets/swap_price_details.dart';
 
 class SwapScreen extends StatefulWidget {
   const SwapScreen({Key? key}) : super(key: key);
@@ -62,11 +65,15 @@ class _SwapScreenState extends State<SwapScreen> {
 
   List<String> tokensForSwap = [];
   List<String> assets = [];
+  late AccountModel accountFrom;
+  late AccountModel accountTo;
   String assetFrom = '';
   String assetTo = '';
   String address = '';
-  String swapFieldMsg = '';
+  String swapFromMsg = '';
+  String swapToMsg = '';
   int iteratorUpdate = 0;
+  int iterator = 0;
   bool inputFromFocus = false;
   bool inputToFocus = false;
   bool isFailed = false;
@@ -79,6 +86,8 @@ class _SwapScreenState extends State<SwapScreen> {
   double toolbarHeightWithBottom = 105;
   double slippage = 0.03; //3%
   String stabilizationFee = '';
+  String amountFromInUsd = '0.0';
+  String amountToInUsd = '0.0';
 
   @override
   void initState() {
@@ -102,7 +111,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget build(BuildContext context) =>
       BlocBuilder<DexCubit, DexState>(builder: (dexContext, dexState) {
         DexCubit dexCubit = BlocProvider.of<DexCubit>(dexContext);
-
+        BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
         return BlocBuilder<AccountCubit, AccountState>(
             builder: (accountContext, accountState) {
           if (accountState.activeToken!.contains('-')) {
@@ -118,12 +127,16 @@ class _SwapScreenState extends State<SwapScreen> {
                 }
                 if (iteratorUpdate == 0) {
                   iteratorUpdate++;
+                  accountFrom = accountState.accounts![0];
+                  accountTo = accountState.accounts![0];
+                  bitcoinCubit
+                      .loadAvailableBalance(accountFrom.bitcoinAddress!);
                   dexCubit.updateDex(assetFrom, assetTo, 0, 0, address,
                       accountState.activeAccount!.addressList!, tokensState);
+
                 }
               }
             }
-
             return BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, transactionState) => ScaffoldConstrainedBox(
                 child: GestureDetector(
@@ -131,14 +144,15 @@ class _SwapScreenState extends State<SwapScreen> {
                     if (constraints.maxWidth < ScreenSizes.medium) {
                       return Scaffold(
                         appBar: MainAppBar(
-                            title: 'Decentralized Exchange',
-                            hideOverlay: () => hideOverlay(),
-                            isShowBottom:
-                                !(transactionState is TransactionInitialState),
-                            height:
-                                !(transactionState is TransactionInitialState)
-                                    ? toolbarHeightWithBottom
-                                    : toolbarHeight),
+                          title: 'Decentralized Exchange',
+                          hideOverlay: () => hideOverlay(),
+                          isShowBottom:
+                              !(transactionState is TransactionInitialState),
+                          height: !(transactionState is TransactionInitialState)
+                              ? toolbarHeightWithBottom
+                              : toolbarHeight,
+                          action: Container(),
+                        ),
                         body: _buildBody(context, dexState, dexCubit,
                             accountState, tokensState, transactionState),
                       );
@@ -159,6 +173,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                     ? toolbarHeightWithBottom
                                     : toolbarHeight,
                             isSmall: true,
+                            action: Container(),
                           ),
                         ),
                       );
@@ -176,6 +191,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildBody(
       context, dexState, dexCubit, accountState, tokensState, transactionState,
       {isCustomBgColor = false}) {
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     bool isShowStabilizationFee = assetFrom == 'DUSD' && assetTo == 'DFI' ||
         assetFrom == 'DUSD' && assetTo == 'USDT' ||
         assetFrom == 'DUSD' && assetTo == 'USDC';
@@ -208,285 +224,453 @@ class _SwapScreenState extends State<SwapScreen> {
             print(err);
           }
         }
-
         return Container(
           color: Theme.of(context).dialogBackgroundColor,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
           child: Center(
             child: StretchBox(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AmountSelectorField(
-                        isBorder: isCustomBgColor,
-                        label: 'Swap from',
-                        selectedAsset: assetFrom,
-                        assets: assets,
-                        selectKey: selectKeyFrom,
-                        amountController: amountFromController,
-                        onAnotherSelect: hideOverlay,
-                        onSelect: (String asset) {
-                          onSelectFromAsset(
-                              asset, tokensState, accountState, dexCubit);
-                        },
-                        onChanged: (value) => onChangeFromAsset(
-                            value, accountState, dexCubit, tokensState),
-                        focusNode: focusFrom,
-                        focusModel: focusAmountFromModel,
-                        suffixIcon: Container(
-                          padding: EdgeInsets.only(
-                            top: 8,
-                            bottom: 8,
-                            right: 6,
-                          ),
-                          child: SizedBox(
-                            width: 40,
-
-                            child: Container(
-                              color: Theme.of(context).cardColor,
-                              child: TextButton(
-                                child:
-                                    Text('MAX', style: TextStyle(fontSize: 10)),
-                                onPressed: () {
-                                  double maxAmount = getAvailableAmount(
-                                      accountState, assetFrom, dexState);
-                                  amountFromController.text =
-                                      maxAmount.toString();
-                                  onChangeFromAsset(amountFromController.text,
-                                      accountState, dexCubit, tokensState);
-                                },
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AmountSelectorField(
+                            isSwap: true,
+                            isBorder: isCustomBgColor,
+                            label: 'Swap from',
+                            selectedAsset: assetFrom,
+                            account: accountFrom,
+                            assets: assets,
+                            selectKey: selectKeyFrom,
+                            amountController: amountFromController,
+                            onAnotherSelect: hideOverlay,
+                            amountInUsd: amountFromInUsd,
+                            onSelect: (String asset) {
+                              onSelectFromAsset(
+                                  asset, tokensState, accountState, dexCubit);
+                            },
+                            onChanged: (value) {
+                              try {
+                                var amount = tokensHelper.getAmountByUsd(
+                                  tokensCubit.state.tokensPairs!,
+                                  double.parse(value.replaceAll(',', '.')),
+                                  assetFrom,
+                                );
+                                setState(() {
+                                  amountFromInUsd =
+                                      balancesHelper.numberStyling(amount,
+                                          fixedCount: 2, fixed: true);
+                                  if (SettingsHelper.isBitcoin()) {
+                                    amountToInUsd = getUdsAmount(
+                                        double.parse(value), tokensState);
+                                  } else {
+                                    amountToInUsd = amountFromInUsd;
+                                  }
+                                });
+                              } catch (err) {
+                                print(err);
+                              }
+                              onChangeFromAsset(value, accountState, dexState,
+                                  dexCubit, tokensState);
+                            },
+                            focusNode: focusFrom,
+                            focusModel: focusAmountFromModel,
+                            suffixIcon: Container(
+                              padding: EdgeInsets.only(
+                                top: 8,
+                                bottom: 8,
+                                right: 6,
+                              ),
+                              child: SizedBox(
+                                width: 40,
+                                child: Container(
+                                  color: Theme.of(context).cardColor,
+                                  child: TextButton(
+                                    child: Text('MAX',
+                                        style: TextStyle(fontSize: 10)),
+                                    onPressed: () {
+                                      double maxAmount = getAvailableAmount(
+                                          accountState, assetFrom, dexState);
+                                      amountFromController.text =
+                                          maxAmount.toString();
+                                      onChangeFromAsset(
+                                          amountFromController.text,
+                                          accountState,
+                                          dexState,
+                                          dexCubit,
+                                          tokensState);
+                                    },
+                                  ),
+                                ),
                               ),
                             ),
+                            onChangeAccount: (index) {
+                              BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+                              setState(() {
+                                accountFrom = accountState.accounts[index];
+                                bitcoinCubit
+                                    .loadAvailableBalance(accountFrom.bitcoinAddress!);
+                              });
+                            },
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        swapFieldMsg,
-                        style: Theme.of(context).textTheme.headline4!.apply(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline4!
-                                .color!
-                                .withOpacity(0.5)),
-                      ),
-                      SizedBox(height: 14),
-                      AmountSelectorField(
-                        isBorder: isCustomBgColor,
-                        label: 'Swap to',
-                        selectedAsset: assetTo,
-                        assets: tokensForSwap,
-                        selectKey: selectKeyTo,
-                        amountController: amountToController,
-                        onAnotherSelect: hideOverlay,
-                        onSelect: (String asset) {
-                          onSelectToAsset(
-                              asset, tokensState, accountState, dexCubit);
-                        },
-                        onChanged: (value) => onChangeToAsset(
-                            value, accountState, dexCubit, tokensState),
-                        focusNode: focusTo,
-                        focusModel: focusAmountToModel,
-                        suffixIcon: Container(
-                          padding: EdgeInsets.only(
-                            top: 8,
-                            bottom: 8,
-                            right: 6,
+                          SizedBox(height: 6),
+                          Text(
+                            'Available balance: $swapFromMsg',
+                            style: Theme.of(context).textTheme.headline4!.apply(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline4!
+                                    .color!
+                                    .withOpacity(0.5)),
                           ),
-                          child: SizedBox(
-                            width: 40,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 24),
-                      SizedBox(
-                        height: 30,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Slippage tolerance',
-                              style: Theme.of(context).textTheme.headline6,
+                          SizedBox(height: 30),
+                          AmountSelectorField(
+                            isSwap: true,
+                            isBorder: isCustomBgColor,
+                            label: 'Swap to',
+                            selectedAsset: assetTo,
+                            account: accountTo,
+                            assets: tokensForSwap,
+                            selectKey: selectKeyTo,
+                            amountController: amountToController,
+                            onAnotherSelect: hideOverlay,
+                            amountInUsd: amountToInUsd,
+                            onSelect: (String asset) {
+                              onSelectToAsset(
+                                  asset, tokensState, accountState, dexCubit);
+                            },
+                            onChanged: (value) {
+                              try {
+                                var amount = tokensHelper.getAmountByUsd(
+                                  tokensCubit.state.tokensPairs!,
+                                  double.parse(value.replaceAll(',', '.')),
+                                  assetTo,
+                                );
+                                setState(() {
+                                  amountToInUsd = balancesHelper.numberStyling(
+                                      amount,
+                                      fixedCount: 2,
+                                      fixed: true);
+                                  if (SettingsHelper.isBitcoin()) {
+                                    amountFromInUsd = getUdsAmount(
+                                        double.parse(value), tokensState);
+                                  } else {
+                                    amountFromInUsd = amountToInUsd;
+                                  }
+                                });
+                              } catch (err) {
+                                print(err);
+                              }
+                              onChangeToAsset(value, accountState, dexState,
+                                  dexCubit, tokensState);
+                            },
+                            focusNode: focusTo,
+                            focusModel: focusAmountToModel,
+                            suffixIcon: Container(
+                              padding: EdgeInsets.only(
+                                top: 8,
+                                bottom: 8,
+                                right: 6,
+                              ),
+                              child: SizedBox(
+                                width: 40,
+                              ),
                             ),
-                            isShowSlippageField
-                                ? SizedBox(
-                                    height: 30,
-                                    width: 140,
-                                    child: TextField(
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.allow(
-                                            RegExp(r'(^-?\d*\.?d*\,?\d*)')),
-                                      ],
-                                      controller: slippageController,
-                                      decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Theme.of(context).cardColor,
-                                        hoverColor: Colors.transparent,
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          borderSide: BorderSide(
-                                              color: AppTheme.pinkColor),
-                                        ),
-                                        contentPadding: const EdgeInsets.all(8),
-                                        hintText: 'Type in percent..',
-                                        suffixIcon: IconButton(
-                                          splashRadius: 16,
-                                          icon: Icon(
-                                            Icons.clear,
-                                            size: 14,
-                                          ),
-                                          onPressed: () => setState(() {
-                                            slippage = 0.03;
-                                            isShowSlippageField = false;
-                                          }),
-                                        ),
-                                      ),
-                                      onChanged: (String value) {
-                                        setState(() {
-                                          try {
-                                            slippage =
-                                                double.parse(value) / 100;
-                                          } catch (err) {
-                                            slippage = 0.03;
-                                          }
-                                        });
-                                      },
+                            onChangeAccount: (index) {
+                              FiatCubit fiatCubit =
+                                  BlocProvider.of<FiatCubit>(context);
+                              setState(() {
+                                accountTo = accountState.accounts[index];
+                              });
+                              fiatCubit.loadCryptoRoute(accountTo);
+                            },
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            'Available balance: $swapToMsg',
+                            style: Theme.of(context).textTheme.headline4!.apply(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline4!
+                                    .color!
+                                    .withOpacity(0.5)),
+                          ),
+                          SizedBox(height: 24),
+                          if (!SettingsHelper.isBitcoin())
+                            SizedBox(
+                              height: 30,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      'Slippage tolerance',
+                                      style:
+                                          Theme.of(context).textTheme.headline2,
                                     ),
-                                  )
-                                : Container(
-                                    child: Row(
-                                      children: [
-                                        SlippageButton(
-                                          isBorder: isCustomBgColor,
-                                          label: '0.5%',
-                                          isActive: slippage == 0.005,
-                                          callback: () =>
-                                              setState(() => slippage = 0.005),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        SlippageButton(
-                                          isBorder: isCustomBgColor,
-                                          label: '1%',
-                                          isActive: slippage == 0.01,
-                                          callback: () =>
-                                              setState(() => slippage = 0.01),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        SlippageButton(
-                                          isBorder: isCustomBgColor,
-                                          label: '3%',
-                                          isActive: slippage == 0.03,
-                                          callback: () =>
-                                              setState(() => slippage = 0.03),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        SlippageButton(
-                                          isBorder: isCustomBgColor,
-                                          label: '5%',
-                                          isActive: slippage == 0.05,
-                                          callback: () =>
-                                              setState(() => slippage = 0.05),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        SizedBox(
-                                          height: 22,
-                                          width: 30,
-                                          child: TextButton(
-                                            style: TextButton.styleFrom(
-                                              backgroundColor: Theme.of(context).cardColor,
-                                              padding: const EdgeInsets.all(0),
-                                              elevation: 2,
-                                              shadowColor: Colors.transparent,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                                side: BorderSide(
-                                                  color: Colors.transparent,
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: isShowSlippageField
+                                        ? Container(
+                                            height: 30,
+                                            child: TextField(
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              inputFormatters: <
+                                                  TextInputFormatter>[
+                                                FilteringTextInputFormatter
+                                                    .allow(RegExp(
+                                                        r'(^-?\d*\.?d*\,?\d*)')),
+                                              ],
+                                              controller: slippageController,
+                                              decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor:
+                                                    Theme.of(context).cardColor,
+                                                hoverColor: Colors.transparent,
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  borderSide: BorderSide(
+                                                    color: Colors.transparent,
+                                                  ),
+                                                ),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  borderSide: BorderSide(
+                                                      color:
+                                                          AppTheme.pinkColor),
+                                                ),
+                                                contentPadding:
+                                                    const EdgeInsets.all(8),
+                                                hintText: 'Type in percent..',
+                                                suffixIcon: IconButton(
+                                                  splashRadius: 16,
+                                                  icon: Icon(
+                                                    Icons.clear,
+                                                    size: 14,
+                                                  ),
+                                                  onPressed: () => setState(() {
+                                                    slippage = 0.03;
+                                                    isShowSlippageField = false;
+                                                  }),
                                                 ),
                                               ),
+                                              onChanged: (String value) {
+                                                setState(() {
+                                                  try {
+                                                    slippage =
+                                                        double.parse(value) /
+                                                            100;
+                                                  } catch (err) {
+                                                    slippage = 0.03;
+                                                  }
+                                                });
+                                              },
                                             ),
-                                            child: Icon(
-
-                                              Icons.edit,
-                                              size: 16,
+                                          )
+                                        : Container(
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: SlippageButton(
+                                                    isFirst: true,
+                                                    isBorder: isCustomBgColor,
+                                                    label: '0.5%',
+                                                    isActive: slippage == 0.005,
+                                                    callback: () => setState(
+                                                        () => slippage = 0.005),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 1,
+                                                ),
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: SlippageButton(
+                                                    isBorder: isCustomBgColor,
+                                                    label: '1%',
+                                                    isActive: slippage == 0.01,
+                                                    callback: () => setState(
+                                                        () => slippage = 0.01),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 1,
+                                                ),
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: SlippageButton(
+                                                    isBorder: isCustomBgColor,
+                                                    label: '3%',
+                                                    isActive: slippage == 0.03,
+                                                    callback: () => setState(
+                                                        () => slippage = 0.03),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 1,
+                                                ),
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: SlippageButton(
+                                                    isBorder: isCustomBgColor,
+                                                    label: '5%',
+                                                    isActive: slippage == 0.05,
+                                                    callback: () => setState(
+                                                        () => slippage = 0.05),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    height: 20,
+                                                    child: TextButton(
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        backgroundColor:
+                                                            Theme.of(context)
+                                                                .cardColor,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(0),
+                                                        elevation: 2,
+                                                        shadowColor:
+                                                            Colors.transparent,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    10),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    10),
+                                                          ),
+                                                          side: BorderSide(
+                                                            color: Colors
+                                                                .transparent,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.edit,
+                                                        size: 16,
+                                                      ),
+                                                      onPressed: () => setState(
+                                                          () =>
+                                                              isShowSlippageField =
+                                                                  true),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
                                             ),
-                                            onPressed: () => setState(() =>
-                                                isShowSlippageField = true),
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                  )
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 22),
-                      // TODO: must be constant so as not to be updated
-                      SwapPriceDetails(
-                        feeDetails: createFeeString(dexState),
-                        priceFromDetails:
-                            createPriceString(dexState, assetFrom, assetTo),
-                        priceToDetails:
-                            createPriceString(dexState, assetTo, assetFrom),
-                      ),
-                      if (isShowStabilizationFee)
-                        Container(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 12),
-                                child: SvgPicture.asset(
-                                  'assets/important.svg',
-                                  height: 20,
-                                ),
+                                  ),
+                                ],
                               ),
-                              Flexible(
-                                child: Text(
-                                  'There is currently a high DEX stabilization fee imposed on DUSD-DFI, DUSD-USDT, and DUSD-USDC swaps due to DFIP 2206-D and DFIP 2207-B. In order to execute the swap, you need to set your Slippage to at least $stabilizationFee%',
-                                  textAlign: TextAlign.justify,
-                                  style: TextStyle(fontSize: 13, height: 1.1),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                    ],
+                            ),
+                          SizedBox(height: 22),
+                        ],
+                      ),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Column(
                       children: [
-                        PendingButton(
-                          'Review Swap',
-                          isCheckLock: false,
-                          key: pendingButton,
-                          callback: !isDisableSubmit()
-                              ? (parent) => submitReviewSwap(parent,
-                                  accountState, transactionState, context)
-                              : null,
-                        ),
+                        BlocBuilder<FiatCubit, FiatState>(
+                            builder: (context, fiatState) {
+                          FiatCubit fiatCubit =
+                              BlocProvider.of<FiatCubit>(context);
+                          if (iterator == 0 && SettingsHelper.isBitcoin()) {
+                            fiatCubit.loadCryptoRoute(accountTo);
+                            iterator++;
+                          }
+                          if (fiatState.status == FiatStatusList.success &&
+                              SettingsHelper.isBitcoin()) {
+                            return Column(
+                              children: [
+                                if (!fiatState.isKycDataComplete!)
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 14.0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        String kycHash = fiatState.kycHash!;
+                                        launch(
+                                            'https://payment.dfx.swiss/kyc?code=$kycHash');
+                                      },
+                                      child: RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                                text:
+                                                    'If you want swap in BTC network, please complete the ',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline3
+                                                    ?.apply()),
+                                            TextSpan(
+                                              text: 'KYC process here.',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline3
+                                                  ?.apply(
+                                                      color:
+                                                          AppTheme.pinkColor),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                PendingButton(
+                                  'Next',
+                                  isCheckLock: false,
+                                  key: pendingButton,
+                                  callback: !isDisableSubmit() &&
+                                          fiatState.isKycDataComplete!
+                                      ? (parent) => submitReviewSwap(
+                                            parent,
+                                            accountState,
+                                            transactionState,
+                                            context,
+                                            cryptoRoute: fiatState.cryptoRoute,
+                                          )
+                                      : null,
+                                ),
+                              ],
+                            );
+                          } else {
+                            return PendingButton(
+                              'Next',
+                              isCheckLock: false,
+                              key: pendingButton,
+                              callback: !isDisableSubmit()
+                                  ? (parent) => submitReviewSwap(
+                                        parent,
+                                        accountState,
+                                        transactionState,
+                                        context,
+                                      )
+                                  : null,
+                            );
+                          }
+                        }),
                       ],
                     ),
                   ),
@@ -500,20 +684,29 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   stateInit(accountState, dexState, tokensState) {
-    getFieldMsg(accountState, dexState);
-    accountState.activeAccount.balanceList!.forEach((el) {
-      if (tokensState.tokensForSwap[el.token] != null &&
-          !assets.contains(el.token) &&
-          !el.isHidden) {
-        assets.add(el.token!);
-      }
-    });
-    assetFrom = (assetFrom.isEmpty) ? accountState.activeToken : assetFrom;
-    address = accountState.activeAccount.getActiveAddress(isChange: false);
-    tokensForSwap = tokensState.tokensForSwap[assetFrom].cast<String>();
-    assetTo = (assetTo.isEmpty || !tokensForSwap.contains(assetTo))
-        ? tokensForSwap[0]
-        : assetTo;
+    getFieldMsg(
+      accountState,
+      dexState,
+    );
+    if (SettingsHelper.isBitcoin()) {
+      assetFrom = 'BTC';
+      assetTo = 'dBTC';
+      assets = [];
+    } else {
+      accountState.activeAccount.balanceList!.forEach((el) {
+        if (tokensState.tokensForSwap[el.token] != null &&
+            !assets.contains(el.token) &&
+            !el.isHidden) {
+          assets.add(el.token!);
+        }
+      });
+      assetFrom = (assetFrom.isEmpty) ? accountState.activeToken : assetFrom;
+      address = accountState.activeAccount.getActiveAddress(isChange: false);
+      tokensForSwap = tokensState.tokensForSwap[assetFrom].cast<String>();
+      assetTo = (assetTo.isEmpty || !tokensForSwap.contains(assetTo))
+          ? tokensForSwap[0]
+          : assetTo;
+    }
   }
 
   dexInit(dexState) {
@@ -532,6 +725,11 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   bool isEnoughBalance(state) {
+    if (SettingsHelper.isBitcoin()) {
+      BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+      var amount = convertFromSatoshi(bitcoinCubit.state.totalBalance);
+      return amount < double.parse(amountFromController.text);
+    }
     int balance = state.activeAccount.balanceList!
         .firstWhere((el) => el.token! == assetFrom && !el.isHidden)
         .balance!;
@@ -539,7 +737,8 @@ class _SwapScreenState extends State<SwapScreen> {
         double.parse(amountFromController.text);
   }
 
-  submitReviewSwap(parent, state, transactionState, context) {
+  submitReviewSwap(parent, state, transactionState, context,
+      {CryptoRouteModel? cryptoRoute}) async {
     hideOverlay();
     if (transactionState is TransactionLoadingState) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -566,19 +765,62 @@ class _SwapScreenState extends State<SwapScreen> {
       return;
     }
     if (isNumeric(amountFromController.text)) {
-      Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => ReviewSwapScreen(
-              assetFrom,
-              assetTo,
-              double.parse(amountFromController.text),
-              double.parse(amountToController.text),
-              slippage,
+      if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
+        try {
+          BitcoinCubit bitcoinCubit =
+            BlocProvider.of<BitcoinCubit>(context);
+
+          print(bitcoinCubit.state.networkFee!.medium);
+          print(cryptoRoute.address);
+          var tx = await transactionService.createBTCTransaction(
+            account: state.activeAccount,
+            destinationAddress: cryptoRoute.address!,
+            amount: balancesHelper.toSatoshi(amountFromController.text),
+            satPerByte: bitcoinCubit.state.networkFee!.medium!,
+          );
+          Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) =>
+                    ReviewSwapScreen(
+                  assetFrom,
+                  assetTo,
+                  double.parse(amountFromController.text),
+                  double.parse(amountToController.text),
+                  slippage,
+                  btcTx: tx,
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ));
+        } catch (err) {
+          print(err);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Something went wrong',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+              backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
             ),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ));
+          );
+        }
+      } else {
+        Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  ReviewSwapScreen(
+                assetFrom,
+                assetTo,
+                double.parse(amountFromController.text),
+                double.parse(amountToController.text),
+                slippage,
+              ),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ));
+      }
     }
   }
 
@@ -618,7 +860,7 @@ class _SwapScreenState extends State<SwapScreen> {
     }
   }
 
-  onChangeFromAsset(value, accountState, dexCubit, tokensState) {
+  onChangeFromAsset(value, accountState, dexState, dexCubit, tokensState) {
     String valueFormat = value.replaceAll(',', '.');
     if (isFailed) {
       setState(() {
@@ -629,10 +871,11 @@ class _SwapScreenState extends State<SwapScreen> {
     amountFromController.text = valueFormat;
     amountFromController.selection = TextSelection.fromPosition(
         TextPosition(offset: amountFromController.text.length));
-    onFromInputChanged(valueFormat, dexCubit, accountState, tokensState);
+    onFromInputChanged(
+        valueFormat, dexState, dexCubit, accountState, tokensState);
   }
 
-  onChangeToAsset(value, accountState, dexCubit, tokensState) {
+  onChangeToAsset(value, accountState, dexState, dexCubit, tokensState) {
     String valueFormat = value.replaceAll(',', '.');
     if (isFailed) {
       setState(() {
@@ -643,13 +886,38 @@ class _SwapScreenState extends State<SwapScreen> {
     amountToController.text = valueFormat;
     amountToController.selection = TextSelection.fromPosition(
         TextPosition(offset: amountToController.text.length));
-    onToInputChanged(valueFormat, dexCubit, accountState, tokensState);
+    onToInputChanged(
+        valueFormat, dexState, dexCubit, accountState, tokensState);
   }
 
-  getFieldMsg(accountState, dexState) {
-    var availableAmount = getAvailableAmount(accountState, assetFrom, dexState);
-    swapFieldMsg =
-        '${balancesHelper.numberStyling(availableAmount)} $assetFrom available to swap';
+  getFieldMsg(
+    accountState,
+    dexState,
+  ) {
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+
+    var availableAmountFrom;
+    var availableAmountTo;
+    if (SettingsHelper.isBitcoin()) {
+      double balance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
+      String balanceFormat;
+      if (balance > 0) {
+        balanceFormat =
+            balancesHelper.numberStyling(balance, fixed: true, fixedCount: 6);
+      } else {
+        balanceFormat =
+            balancesHelper.numberStyling(0, fixed: true, fixedCount: 6);
+      }
+      swapFromMsg = '$balanceFormat $assetFrom';
+      swapToMsg = '$balanceFormat $assetTo';
+    } else {
+      availableAmountFrom =
+          getAvailableAmount(accountState, assetFrom, dexState);
+      availableAmountTo = getAvailableAmount(accountState, assetTo, dexState);
+      swapFromMsg =
+          '${balancesHelper.numberStyling(availableAmountFrom)} $assetFrom';
+      swapToMsg = '${balancesHelper.numberStyling(availableAmountTo)} $assetTo';
+    }
   }
 
   bool isNumeric(String string) {
@@ -679,14 +947,29 @@ class _SwapScreenState extends State<SwapScreen> {
     return '${balancesHelper.numberStyling(convertFromSatoshi(fee))} DFI';
   }
 
-  onFromInputChanged(String query, dexCubit, accountState, tokensState) {
+  onFromInputChanged(
+      String query, dexState, dexCubit, accountState, tokensState) {
     double amount = (query == '') ? 0 : double.parse(query);
 
     if (debounce?.isActive ?? false) debounce?.cancel();
     debounce = Timer(const Duration(milliseconds: 800), () {
       waitingFrom = true;
       if (assetFrom == assetTo) {
-        amountToController.text = amountFromController.text;
+        if (SettingsHelper.isBitcoin()) {
+          FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+          double amount = double.parse(amountFromController.text);
+
+          amountToController.text =
+              (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+                  .toString();
+          amountToController.text = balancesHelper.numberStyling(
+            double.parse(amountToController.text),
+            fixedCount: 4,
+            fixed: true,
+          );
+        } else {
+          amountToController.text = amountFromController.text;
+        }
       } else {
         dexCubit.updateDex(assetFrom, assetTo, amount, null, address,
             accountState.activeAccount.addressList!, tokensState);
@@ -695,18 +978,52 @@ class _SwapScreenState extends State<SwapScreen> {
     });
   }
 
-  onToInputChanged(String query, dexCubit, accountState, tokensState) {
+  onToInputChanged(
+      String query, dexState, dexCubit, accountState, tokensState) {
     double amount = (query == '') ? 0 : double.parse(query);
     if (debounce?.isActive ?? false) debounce?.cancel();
     debounce = Timer(const Duration(milliseconds: 800), () {
       waitingTo = true;
       if (assetFrom == assetTo) {
-        amountFromController.text = amountToController.text;
+        if (SettingsHelper.isBitcoin()) {
+          FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+          double amount = double.parse(amountToController.text);
+
+          amountFromController.text =
+              (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+                  .toString();
+          amountFromController.text = balancesHelper.numberStyling(
+            double.parse(amountToController.text),
+            fixedCount: 4,
+            fixed: true,
+          );
+        } else {
+          amountFromController.text = amountToController.text;
+        }
       } else {
         dexCubit.updateDex(assetFrom, assetTo, null, amount, address,
             accountState.activeAccount.addressList!, tokensState);
       }
     });
+  }
+
+  String getUdsAmount(double amount, tokensState) {
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+
+    var targetAmount =
+        (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+            .toString();
+
+    var result = tokensHelper.getAmountByUsd(
+      tokensState.tokensPairs!,
+      double.parse(targetAmount.replaceAll(',', '.')),
+      assetTo,
+    );
+    return balancesHelper.numberStyling(
+      result,
+      fixedCount: 2,
+      fixed: true,
+    );
   }
 
   onFocusToChange() {

@@ -35,38 +35,36 @@ class _AddressSellState extends State<AddressSell> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      return BlocBuilder<FiatCubit, FiatState>(builder: (context, fiatState) {
-        return ScaffoldConstrainedBox(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth < ScreenSizes.medium) {
-                return Scaffold(
+    return BlocBuilder<FiatCubit, FiatState>(builder: (context, fiatState) {
+      return ScaffoldConstrainedBox(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < ScreenSizes.medium) {
+              return Scaffold(
+                appBar: MainAppBar(
+                  title: '3/4',
+                ),
+                body: _buildBody(fiatState),
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.only(top: 20),
+                child: Scaffold(
                   appBar: MainAppBar(
                     title: '3/4',
+                    isSmall: true,
                   ),
-                  body: _buildBody(state, fiatState),
-                );
-              } else {
-                return Container(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Scaffold(
-                    appBar: MainAppBar(
-                      title: '3/4',
-                      isSmall: true,
-                    ),
-                    body: _buildBody(state, fiatState, isFullSize: true),
-                  ),
-                );
-              }
-            },
-          ),
-        );
-      });
+                  body: _buildBody(fiatState, isFullSize: true),
+                ),
+              );
+            }
+          },
+        ),
+      );
     });
   }
 
-  Widget _buildBody(state, fiatState, {isFullSize = false}) => Container(
+  Widget _buildBody(fiatState, {isFullSize = false}) => Container(
         color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
@@ -139,7 +137,7 @@ class _AddressSellState extends State<AddressSell> {
                         _streetAdressController.text,
                         _cityController.text,
                         _zipCodeController.text,
-                        state.accessToken,
+                        fiatState.accessToken,
                       );
                       Navigator.push(
                           context,

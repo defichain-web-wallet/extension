@@ -15,6 +15,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
   final bool isShowBottom;
   final bool? isSmall;
+  final bool isShowNavButton;
 
   const MainAppBar(
       {Key? key,
@@ -24,6 +25,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.hideOverlay,
       this.height = toolbarHeight,
       this.isShowBottom = false,
+      this.isShowNavButton = true,
       this.isSmall = false})
       : super(key: key);
 
@@ -47,7 +49,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
       leadingWidth: leadingWidth,
       toolbarHeight: toolbarHeight,
-      leading: Padding(
+      automaticallyImplyLeading: false,
+      leading: isShowNavButton ? Padding(
         padding: const EdgeInsets.only(left: 8),
         child: Row(
           children: [
@@ -65,15 +68,15 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ],
         ),
-      ),
+      ) : null,
       centerTitle: true,
       title: customTitle == null
           ? Text(
               title!,
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.headline3!.apply(fontFamily: 'IBM Plex Sans'),
             )
           : customTitle,
-      actions: [
+      actions: isShowNavButton ? [
         action == null
             ? CancelButton(callback: () {
                 if (hideOverlay != null) {
@@ -90,7 +93,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 );
               })
             : action!
-      ],
+      ] : null,
     );
   }
 }

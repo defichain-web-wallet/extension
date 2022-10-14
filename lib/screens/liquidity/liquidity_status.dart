@@ -5,6 +5,7 @@ import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair_details.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
@@ -38,7 +39,8 @@ class LiquidityStatus extends StatefulWidget {
       required this.balanceA,
       required this.balanceB,
       required this.txError,
-      this.isBalanceDetails = true})
+      this.isBalanceDetails = true,
+      })
       : super(key: key);
 
   @override
@@ -46,6 +48,9 @@ class LiquidityStatus extends StatefulWidget {
 }
 
 class _LiquidityStatusState extends State<LiquidityStatus> {
+  String appBarTitle = 'Add Recipient';
+  double homeButtonWidth = 150;
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldConstrainedBox(
@@ -53,7 +58,8 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
         if (constraints.maxWidth < ScreenSizes.medium) {
           return Scaffold(
             appBar: MainAppBar(
-              title: 'Add Recipient',
+              isShowNavButton: false,
+              title: appBarTitle,
             ),
             body: _buildBody(context),
           );
@@ -62,7 +68,8 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
             padding: const EdgeInsets.only(top: 20),
             child: Scaffold(
                 appBar: MainAppBar(
-                  title: 'Add Recipient',
+                  isShowNavButton: false,
+                  title: appBarTitle,
                   isSmall: true,
                 ),
               body: _buildBody(context),
@@ -95,65 +102,89 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: Column(
-                        children: [
-                          widget.txError.isError
-                              ? Image.asset(
-                            'assets/error_gif.gif',
-                            height: 126,
-                            width: 124,
-                          )
-                              : Image.asset(
-                            'assets/status_reload_icon.png',
-                            height: 126,
-                            width: 124,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 32),
-                            child: Text(
-                              widget.txError.isError
-                                  ? 'Something went wrong!'
-                                  : widget.isRemove
-                                  ? 'Liquidity has been removed successfully!'
-                                  : 'Liquidity has been added successfully!',
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme
+              Expanded(
+                child: Container(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(top: 24),
+                        child: Column(
+                          children: [
+                            widget.txError.isError
+                                ? Image.asset(
+                              'assets/error_gif.gif',
+                              height: 106,
+                              width: 104,
+                            )
+                                : Image.asset(
+                              'assets/status_reload_icon.png',
+                              height: 106,
+                              width: 104,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 32),
+                              child: Text(
+                                widget.txError.isError
+                                    ? 'Something went wrong!'
+                                    : widget.isRemove
+                                    ? 'Liquidity has been removed successfully!'
+                                    : 'Liquidity has been added successfully!',
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .headline6,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text('Your account balance will be updated in a few minutes.', style: Theme
                                   .of(context)
                                   .textTheme
-                                  .headline6,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text('Your account balance will be updated in a few minutes.', style: Theme
-                                .of(context)
-                                .textTheme
-                                .headline4!.apply(color: Color(0xFFC4C4C4), fontWeightDelta: 2)),
-                          )
-                        ],
+                                  .headline4!.apply(color: Color(0xFFC4C4C4), fontWeightDelta: 2)),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 42),
-                      child: AssetPairDetails(
-                        assetPair: widget.assetPair,
-                        isRemove: widget.isRemove,
-                        amountA: widget.amountA,
-                        amountB: widget.amountB,
-                        balanceA: widget.balanceA,
-                        balanceB: widget.balanceB,
-                        totalAmountInUsd: widget.amountUSD,
-                        totalBalanceInUsd: widget.balanceUSD,
-                        isBalanceDetails: widget.isBalanceDetails,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 22),
+                        child: AssetPairDetails(
+                          assetPair: widget.assetPair,
+                          isRemove: widget.isRemove,
+                          amountA: widget.amountA,
+                          amountB: widget.amountB,
+                          balanceA: widget.balanceA,
+                          balanceB: widget.balanceB,
+                          totalAmountInUsd: widget.amountUSD,
+                          totalBalanceInUsd: widget.balanceUSD,
+                          isBalanceDetails: widget.isBalanceDetails,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                width: homeButtonWidth,
+                child: PrimaryButton(
+                  label: 'Home',
+                  callback: () => Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder:
+                          (context, animation1, animation2) =>
+                          HomeScreen(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 15,
               ),
               widget.txError.isError ? Text(
                 widget.txError.error.toString() ==

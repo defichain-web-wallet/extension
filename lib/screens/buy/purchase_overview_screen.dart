@@ -47,7 +47,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
     return BlocBuilder<AccountCubit, AccountState>(
       builder: (BuildContext context, state) {
         if (iterator == 0) {
-          fiatCubit.loadIbanList(state.accessToken!, asset: widget.asset);
+          fiatCubit.loadIbanList(asset: widget.asset);
           iterator++;
         }
         return BlocBuilder<FiatCubit, FiatState>(

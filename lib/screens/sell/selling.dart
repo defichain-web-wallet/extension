@@ -22,6 +22,7 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/selectors/currency_selector.dart';
@@ -66,8 +67,11 @@ class _SellingState extends State<Selling> {
   TransactionService transactionService = TransactionService();
 
   List<String> assets = [];
+  String appBarTitle = 'Selling';
   String assetFrom = '';
   String sellFieldMsg = '';
+  String secondStepLoaderText =
+      'Did you know that Jellywallet is open source? Everyone can check and verify the code!';
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   bool isPending = false;
@@ -85,8 +89,7 @@ class _SellingState extends State<Selling> {
 
     return BlocBuilder<AccountCubit, AccountState>(
         builder: (accountContext, accountState) {
-      // fiatCubit.loadIbanList(accountState.accessToken!);
-      fiatCubit.loadAllAssets(accountState.accessToken!);
+      fiatCubit.loadAllAssets();
       return BlocBuilder<FiatCubit, FiatState>(
         builder: (BuildContext context, fiatState) {
           return BlocBuilder<TokensCubit, TokensState>(
@@ -98,7 +101,7 @@ class _SellingState extends State<Selling> {
                     return Scaffold(
                       key: _scaffoldKey,
                       appBar: MainAppBar(
-                        title: 'Selling',
+                        title: appBarTitle,
                         hideOverlay: () => hideOverlay(),
                       ),
                       body: _buildBody(
@@ -113,7 +116,7 @@ class _SellingState extends State<Selling> {
                             context, accountState, fiatState, tokensState,
                             isCustomBgColor: true),
                         appBar: MainAppBar(
-                          title: 'Selling',
+                          title: appBarTitle,
                           hideOverlay: () => hideOverlay(),
                           isSmall: true,
                         ),
@@ -361,63 +364,81 @@ class _SellingState extends State<Selling> {
                             hideOverlay();
                             if (_formKey.currentState!.validate()) {
                               if (isEnough) {
-                                parent.emitPending(true);
-                                setState(() {
-                                  isPending = true;
-                                });
-                                try {
-                                  String address;
-                                  double amount = double.parse(amountController
-                                      .text
-                                      .replaceAll(',', '.'));
-                                  IbanModel? foundedIban;
-                                  try {
-                                    foundedIban = fiatState.ibanList.firstWhere(
-                                        (el) =>
-                                            el.active &&
-                                            el.type == "Sell" &&
-                                            el.iban ==
-                                                fiatState.activeIban.iban &&
-                                            el.fiat.name == selectedFiat.name);
-                                  } catch (_) {
-                                    print(_);
-                                  }
-                                  String iban = widget.isNewIban
-                                      ? _ibanController.text
-                                      : fiatState.activeIban.iban;
-                                  if (foundedIban == null || widget.isNewIban) {
-                                    Map sellDetails = await dfxRequests.sell(
-                                        iban,
-                                        selectedFiat,
-                                        accountState.accessToken);
-                                    address = sellDetails["deposit"]["address"];
-                                  } else {
-                                    address = foundedIban.deposit["address"];
-                                  }
-                                  await _sendTransaction(
-                                    context,
-                                    tokensState,
-                                    assetFrom,
-                                    accountState.activeAccount,
-                                    address,
-                                    amount,
-                                  );
-                                  parent.emitPending(false);
-                                } catch (err) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        err.toString(),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline5,
-                                      ),
-                                      backgroundColor: Theme.of(context)
-                                          .snackBarTheme
-                                          .backgroundColor,
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            LoaderNew(
+                                      title: appBarTitle,
+                                      secondStepLoaderText:
+                                          secondStepLoaderText,
+                                      callback: () async {
+                                        try {
+                                          String address;
+                                          double amount = double.parse(
+                                              amountController.text
+                                                  .replaceAll(',', '.'));
+                                          IbanModel? foundedIban;
+                                          try {
+                                            foundedIban = fiatState.ibanList
+                                                .firstWhere((el) =>
+                                                    el.active &&
+                                                    el.type == "Sell" &&
+                                                    el.iban ==
+                                                        fiatState
+                                                            .activeIban.iban &&
+                                                    el.fiat.name ==
+                                                        selectedFiat.name);
+                                          } catch (_) {
+                                            print(_);
+                                          }
+                                          String iban = widget.isNewIban
+                                              ? _ibanController.text
+                                              : fiatState.activeIban.iban;
+                                          if (foundedIban == null ||
+                                              widget.isNewIban) {
+                                            Map sellDetails =
+                                                await dfxRequests.sell(
+                                                    iban,
+                                                    selectedFiat,
+                                                    fiatState.accessToken);
+                                            address = sellDetails["deposit"]
+                                                ["address"];
+                                          } else {
+                                            address =
+                                                foundedIban.deposit["address"];
+                                          }
+                                          await _sendTransaction(
+                                            context,
+                                            tokensState,
+                                            assetFrom,
+                                            accountState.activeAccount,
+                                            address,
+                                            amount,
+                                          );
+                                        } catch (err) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                err.toString(),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5,
+                                              ),
+                                              backgroundColor: Theme.of(context)
+                                                  .snackBarTheme
+                                                  .backgroundColor,
+                                            ),
+                                          );
+                                        }
+                                      },
                                     ),
-                                  );
-                                }
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ),
+                                );
                               } else {
                                 if (double.parse(amountController.text
                                         .replaceAll(',', '.')) ==

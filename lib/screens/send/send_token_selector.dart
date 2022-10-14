@@ -52,7 +52,6 @@ class _SendConfirmState extends State<SendTokenSelector> {
   BtcRequests btcRequests = BtcRequests();
   bool isFailed = false;
   bool isFailedAddress = false;
-  bool _isBalanceError = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   String assetFrom = '';
@@ -96,6 +95,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                       height: !(state is TransactionInitialState)
                           ? toolbarHeightWithBottom
                           : toolbarHeight,
+                      action: Container(),
                     ),
                     body: _buildBody(context, state),
                   );
@@ -106,7 +106,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                       appBar: MainAppBar(
                         title: 'Send',
                         hideOverlay: () => hideOverlay(),
-                        action: null,
+                        action: Container(),
                         isSmall: true,
                       ),
                       body: _buildBody(context, state, isCustomBgColor: true),
@@ -183,6 +183,7 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 ),
                                 SizedBox(height: 12),
                                 AssetDropdown(
+                                  accountState: state,
                                   selectKeyFrom: _selectKeyFrom,
                                   amountController: _amountController,
                                   focusNode: _amountFocusNode,
@@ -191,22 +192,20 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                   assetFrom: assetFrom,
                                   amountInUsd: amountInUsd,
                                   onChanged: (String value) {
-                                    if (SettingsHelper.isBitcoin()) {
-                                      try {
-                                        var amount = tokenHelper.getAmountByUsd(
-                                          tokensCubit.state.tokensPairs!,
-                                          double.parse(
-                                              value.replaceAll(',', '.')),
-                                          'BTC',
-                                        );
-                                        setState(() {
-                                          amountInUsd = balancesHelper
-                                              .numberStyling(amount,
-                                                  fixedCount: 2, fixed: true);
-                                        });
-                                      } catch (err) {
-                                        print(err);
-                                      }
+                                    try {
+                                      var amount = tokenHelper.getAmountByUsd(
+                                        tokensCubit.state.tokensPairs!,
+                                        double.parse(
+                                            value.replaceAll(',', '.')),
+                                        assetFrom,
+                                      );
+                                      setState(() {
+                                        amountInUsd = balancesHelper
+                                            .numberStyling(amount,
+                                            fixedCount: 2, fixed: true);
+                                      });
+                                    } catch (err) {
+                                      print(err);
                                     }
                                   },
                                   onSelect: (String asset) {
@@ -244,7 +243,8 @@ class _SendConfirmState extends State<SendTokenSelector> {
                                 SizedBox(height: 22),
                                 if (SettingsHelper.isBitcoin()) Text("Fees"),
                                 SizedBox(height: 12),
-                                if (bitcoinState.networkFee != null)
+                                if (bitcoinState.networkFee != null &&
+                                    SettingsHelper.isBitcoin())
                                   Column(
                                     children: [
                                       FeeCard(

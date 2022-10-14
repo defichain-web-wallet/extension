@@ -46,153 +46,153 @@ class AssetSelectState extends State<AssetSelect> {
 
   @override
   Widget build(BuildContext context) => MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          child: Container(
-            key: _selectKey,
-            height: _tileHeight,
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: widget.isBorderRadiusAll
-                  ? BorderRadius.only(
-                      topLeft: _isOpen &&
-                              widget.isTopPosition == true &&
-                              MediaQuery.of(context).size.width <
-                                  ScreenSizes.medium
-                          ? Radius.circular(0)
-                          : Radius.circular(10),
-                      topRight: _isOpen &&
-                              widget.isTopPosition == true &&
-                              MediaQuery.of(context).size.width <
-                                  ScreenSizes.medium
-                          ? Radius.circular(0)
-                          : Radius.circular(10),
-                      bottomLeft: _isOpen && widget.isTopPosition == false
-                          ? Radius.circular(0)
-                          : _isOpen &&
-                                  widget.isTopPosition == true &&
-                                  MediaQuery.of(context).size.width >
-                                      ScreenSizes.medium
-                              ? Radius.circular(0)
-                              : Radius.circular(10),
-                      bottomRight: _isOpen && widget.isTopPosition == false
-                          ? Radius.circular(0)
-                          : _isOpen &&
-                                  widget.isTopPosition == true &&
-                                  MediaQuery.of(context).size.width >
-                                      ScreenSizes.medium
-                              ? Radius.circular(0)
-                              : Radius.circular(10),
-                    )
-                  : BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      bottomLeft:
-                          _isOpen ? Radius.circular(0) : Radius.circular(10),
-                    ),
-              border: Border.all(color: Colors.transparent),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16, right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    cursor: SystemMouseCursors.click,
+    child: GestureDetector(
+      child: Container(
+        key: _selectKey,
+        height: _tileHeight,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: widget.isBorderRadiusAll
+              ? BorderRadius.only(
+            topLeft: _isOpen &&
+                widget.isTopPosition == true &&
+                MediaQuery.of(context).size.width <
+                    ScreenSizes.medium
+                ? Radius.circular(0)
+                : Radius.circular(10),
+            topRight: _isOpen &&
+                widget.isTopPosition == true &&
+                MediaQuery.of(context).size.width <
+                    ScreenSizes.medium
+                ? Radius.circular(0)
+                : Radius.circular(10),
+            bottomLeft: _isOpen && widget.isTopPosition == false
+                ? Radius.circular(0)
+                : _isOpen &&
+                widget.isTopPosition == true &&
+                MediaQuery.of(context).size.width >
+                    ScreenSizes.medium
+                ? Radius.circular(0)
+                : Radius.circular(10),
+            bottomRight: _isOpen && widget.isTopPosition == false
+                ? Radius.circular(0)
+                : _isOpen &&
+                widget.isTopPosition == true &&
+                MediaQuery.of(context).size.width >
+                    ScreenSizes.medium
+                ? Radius.circular(0)
+                : Radius.circular(10),
+          )
+              : BorderRadius.only(
+            topLeft: Radius.circular(10),
+            bottomLeft:
+            _isOpen ? Radius.circular(0) : Radius.circular(10),
+          ),
+          border: Border.all(color: Colors.transparent),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        SvgPicture.asset(
-                          tokenHelper
-                              .getImageNameByTokenName(widget.selectedToken),
-                          height: 24,
-                          width: 24,
-                        ),
-                        SizedBox(width: 16),
-                        if (widget.isFixedWidthText)
-                          TickerText(
-                            child: Text(
-                              SettingsHelper.isBitcoin()
-                                  ? widget.selectedToken
-                                  : tokenHelper
-                                      .getTokenWithPrefix(widget.selectedToken),
-                              overflow: TextOverflow.ellipsis,
-                              style:
-                                  Theme.of(context).textTheme.headline6!.apply(
-                                        color: _isOpen
-                                            ? Theme.of(context)
-                                                .textTheme
-                                                .headline6!
-                                                .color!
-                                                .withOpacity(0.5)
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .headline6!
-                                                .color!,
-                                      ),
-                            ),
-                          )
-                        else
-                          Container(
-                            width: 70,
-                            child: TickerText(
-                              child: Text(
-                                SettingsHelper.isBitcoin()
-                                    ? widget.selectedToken
-                                    : tokenHelper
-                                    .getTokenWithPrefix(widget.selectedToken),
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline6!
-                                    .apply(
-                                      color: _isOpen
-                                          ? Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .color!
-                                              .withOpacity(0.5)
-                                          : Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .color!,
-                                    ),
-                              ),
-                            ),
-                          )
-                      ],
+                    SvgPicture.asset(
+                      tokenHelper
+                          .getImageNameByTokenName(widget.selectedToken),
+                      height: 24,
+                      width: 24,
                     ),
-                    if (widget.tokensForSwap.isNotEmpty)
-                      SvgPicture.asset(
-                        _isOpen
-                            ? (widget.isTopPosition
-                                ? MediaQuery.of(context).size.width <
-                                        ScreenSizes.medium
-                                    ? 'assets/arrow_down.svg'
-                                    : 'assets/arrow_up.svg'
-                                : 'assets/arrow_up.svg')
-                            : (widget.isTopPosition
-                                ? MediaQuery.of(context).size.width <
-                                        ScreenSizes.medium
-                                    ? 'assets/arrow_up.svg'
-                                    : 'assets/arrow_down.svg'
-                                : 'assets/arrow_down.svg'),
-                        color: Theme.of(context).textTheme.button!.color,
-                      ),
+                    SizedBox(width: 16),
+                    if (widget.isFixedWidthText)
+                      TickerText(
+                        child: Text(
+                          SettingsHelper.isBitcoin()
+                              ? widget.selectedToken
+                              : tokenHelper
+                              .getTokenWithPrefix(widget.selectedToken),
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                          Theme.of(context).textTheme.headline6!.apply(
+                            color: _isOpen
+                                ? Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .color!
+                                .withOpacity(0.5)
+                                : Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .color!,
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 70,
+                        child: TickerText(
+                          child: Text(
+                            SettingsHelper.isBitcoin()
+                                ? widget.selectedToken
+                                : tokenHelper
+                                .getTokenWithPrefix(widget.selectedToken),
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .apply(
+                              color: _isOpen
+                                  ? Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!
+                                  .withOpacity(0.5)
+                                  : Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!,
+                            ),
+                          ),
+                        ),
+                      )
                   ],
                 ),
-              ),
+                if (widget.tokensForSwap.isNotEmpty)
+                  SvgPicture.asset(
+                    _isOpen
+                        ? (widget.isTopPosition
+                        ? MediaQuery.of(context).size.width <
+                        ScreenSizes.medium
+                        ? 'assets/arrow_down.svg'
+                        : 'assets/arrow_up.svg'
+                        : 'assets/arrow_up.svg')
+                        : (widget.isTopPosition
+                        ? MediaQuery.of(context).size.width <
+                        ScreenSizes.medium
+                        ? 'assets/arrow_up.svg'
+                        : 'assets/arrow_down.svg'
+                        : 'assets/arrow_down.svg'),
+                    color: Theme.of(context).textTheme.headline5!.color,
+                  ),
+              ],
             ),
           ),
-          onTap: () async {
-            await lockHelper.provideWithLockChecker(context, () {
-              if (!_isOpen && widget.onAnotherSelect != null) {
-                widget.onAnotherSelect!();
-              }
-              if (widget.tokensForSwap.isNotEmpty) {
-                _showOverlay();
-              }
-            });
-          },
         ),
-      );
+      ),
+      onTap: () async {
+        await lockHelper.provideWithLockChecker(context, () {
+          if (!_isOpen && widget.onAnotherSelect != null) {
+            widget.onAnotherSelect!();
+          }
+          if (widget.tokensForSwap.isNotEmpty) {
+            _showOverlay();
+          }
+        });
+      },
+    ),
+  );
 
   void hideOverlay() {
     if (_overlayEntry != null) {
@@ -221,12 +221,12 @@ class AssetSelectState extends State<AssetSelect> {
       _overlayEntry = OverlayEntry(builder: (context) {
         return Positioned(
           top: widget.isTopPosition &&
-                  MediaQuery.of(context).size.width < ScreenSizes.medium
+              MediaQuery.of(context).size.width < ScreenSizes.medium
               ? (pos.dy -
-                  ((widget.tokensForSwap.length > 5
-                          ? (_tileHeight + 6) * 5
-                          : widget.tokensForSwap.length * (_tileHeight + 1)) +
-                      2))
+              ((widget.tokensForSwap.length > 5
+                  ? (_tileHeight + 6) * 5
+                  : widget.tokensForSwap.length * (_tileHeight + 1)) +
+                  2))
               : (pos.dy + box.size.height),
           left: pos.dx,
           child: MouseRegion(
@@ -234,21 +234,21 @@ class AssetSelectState extends State<AssetSelect> {
             child: Container(
               width: box.size.width,
               height: (widget.tokensForSwap.length > 5
-                      ? (_tileHeight + 6) * 5
-                      : widget.tokensForSwap.length * (_tileHeight + 1)) +
+                  ? (_tileHeight + 6) * 5
+                  : widget.tokensForSwap.length * (_tileHeight + 1)) +
                   2,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: widget.isTopPosition &&
-                        MediaQuery.of(context).size.width < ScreenSizes.medium
+                    MediaQuery.of(context).size.width < ScreenSizes.medium
                     ? BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10),
-                      )
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                )
                     : BorderRadius.only(
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10),
-                      ),
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
                 border: Border.all(
                   color: Colors.transparent,
                 ),
@@ -290,13 +290,13 @@ class AssetSelectState extends State<AssetSelect> {
                                             widget.tokensForSwap[index]),
                                         overflow: TextOverflow.ellipsis,
                                         style: widget.tokensForSwap[index] ==
-                                                widget.selectedToken
+                                            widget.selectedToken
                                             ? Theme.of(context)
-                                                .textTheme
-                                                .headline6!
+                                            .textTheme
+                                            .headline6!
                                             : Theme.of(context)
-                                                .textTheme
-                                                .headline5!),
+                                            .textTheme
+                                            .headline5!),
                                   )
                                 else
                                   Container(
@@ -307,20 +307,20 @@ class AssetSelectState extends State<AssetSelect> {
                                               widget.tokensForSwap[index]),
                                           overflow: TextOverflow.ellipsis,
                                           style: widget.tokensForSwap[index] ==
-                                                  widget.selectedToken
+                                              widget.selectedToken
                                               ? Theme.of(context)
-                                                  .textTheme
-                                                  .headline6!
+                                              .textTheme
+                                              .headline6!
                                               : Theme.of(context)
-                                                  .textTheme
-                                                  .headline5!),
+                                              .textTheme
+                                              .headline5!),
                                     ),
                                   )
                               ],
                             ),
                             SvgPicture.asset(
                               widget.tokensForSwap[index] ==
-                                      widget.selectedToken
+                                  widget.selectedToken
                                   ? 'assets/wallet_enable_pink.svg'
                                   : 'assets/wallet_disable.svg',
                               color: AppTheme.pinkColor,

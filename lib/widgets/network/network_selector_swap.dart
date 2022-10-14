@@ -2,19 +2,21 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/widgets/network/list_entry.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class NetworkSelector extends StatefulWidget {
+class NetworkSelectorSwap extends StatefulWidget {
   final bool isFullSize;
 
-  const NetworkSelector({Key? key, required this.isFullSize}) : super(key: key);
+  const NetworkSelectorSwap({Key? key, required this.isFullSize})
+      : super(key: key);
 
   @override
-  State<NetworkSelector> createState() => _NetworkSelectorState();
+  State<NetworkSelectorSwap> createState() => _NetworkSelectorSwapState();
 }
 
-class _NetworkSelectorState extends State<NetworkSelector> {
+class _NetworkSelectorSwapState extends State<NetworkSelectorSwap> {
   SettingsHelper settingsHelper = SettingsHelper();
 
   String getNetworkType() {
@@ -177,40 +179,38 @@ class _NetworkSelectorState extends State<NetworkSelector> {
       );
     }
 
-    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-      MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () => _showMyDialog(),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: Theme.of(context).secondaryHeaderColor,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade500,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.black),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _showMyDialog(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Container(
+                height: 20,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
                   ),
                 ),
-                SizedBox(
-                  width: 4,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      networkType,
+                      style: Theme.of(context).textTheme.subtitle2,
+                    )
+                  ],
                 ),
-                Text(
-                  networkType,
-                  style: Theme.of(context).textTheme.subtitle2,
-                )
-              ],
+              ),
             ),
-          ),
+          ],
         ),
-      )
-    ]);
+      ),
+    );
   }
 }
