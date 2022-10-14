@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 class AssetDropdown extends StatelessWidget {
   final GlobalKey<AssetSelectState>? selectKeyFrom;
+  final GlobalKey<AssetSelectFieldState>? selectKeyFieldFrom;
   final TextEditingController? amountController;
   final FocusNode? focusNode;
   final FocusModel? focusModel;
@@ -28,6 +29,7 @@ class AssetDropdown extends StatelessWidget {
   const AssetDropdown({
     Key? key,
     this.selectKeyFrom,
+    this.selectKeyFieldFrom,
     this.amountController,
     this.focusNode,
     this.focusModel,
@@ -66,7 +68,7 @@ class AssetDropdown extends StatelessWidget {
                   amountInUsd: amountInUsd,
                   isBorder: isBorder,
                   onAnotherSelect: onAnotherSelect,
-                  key: selectKeyFrom,
+                  key: selectKeyFieldFrom,
                   tokensForSwap: assets!,
                   selectedToken: assetFrom!,
                   onSelect: onSelect!,

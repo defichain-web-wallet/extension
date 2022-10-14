@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
+import 'package:defi_wallet/screens/home/widgets/asset_select_field.dart';
 import 'package:defi_wallet/screens/send/send_form.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -13,12 +14,17 @@ class SendNew extends StatefulWidget {
 }
 
 class _SendNewState extends State<SendNew> {
-  GlobalKey<AssetSelectState> _selectKeyFrom = GlobalKey<AssetSelectState>();
+  GlobalKey<AssetSelectState> selectKeyFrom = GlobalKey<AssetSelectState>();
+  GlobalKey<AssetSelectFieldState> selectKeyFieldFrom = GlobalKey<AssetSelectFieldState>();
+  GlobalKey globalKey = GlobalKey();
 
   void hideOverlay() {
     try {
-      _selectKeyFrom.currentState!.hideOverlay();
-    } catch (_) {}
+      selectKeyFieldFrom.currentState?.hideOverlay();
+      selectKeyFrom.currentState?.hideOverlay();
+    } catch (_) {
+      print(_);
+    }
   }
 
   @override
@@ -33,7 +39,7 @@ class _SendNewState extends State<SendNew> {
     ) {
       return Scaffold(
         appBar: MainAppBar(
-          title: 'Send',
+          title: 'Send2',
           hideOverlay: () => hideOverlay(),
           isShowBottom: !(txState is TransactionInitialState),
           height: !(txState is TransactionInitialState)
@@ -42,9 +48,10 @@ class _SendNewState extends State<SendNew> {
           isSmall: isFullScreen,
         ),
         body: SendForm(
-          selectKeyFrom: _selectKeyFrom,
+          selectKeyFrom: selectKeyFrom,
+          selectKeyFieldFrom: selectKeyFieldFrom,
           hideOverlay: hideOverlay,
-          isFullSizeMode: isFullScreen,
+          isFullScreen: isFullScreen,
         ),
       );
     });

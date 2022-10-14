@@ -10,6 +10,7 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/requests/btc_requests.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
+import 'package:defi_wallet/screens/home/widgets/asset_select_field.dart';
 import 'package:defi_wallet/screens/send/send_confirm_screen.dart';
 import 'package:defi_wallet/screens/send/widgets/address_field.dart';
 import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
@@ -25,14 +26,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SendForm extends StatefulWidget {
   final GlobalKey<AssetSelectState> selectKeyFrom;
+  final GlobalKey<AssetSelectFieldState> selectKeyFieldFrom;
   final Function() hideOverlay;
-  final bool isFullSizeMode;
+  final bool isFullScreen;
 
   SendForm({
     Key? key,
     required this.selectKeyFrom,
+    required this.selectKeyFieldFrom,
     required this.hideOverlay,
-    required this.isFullSizeMode,
+    required this.isFullScreen,
   }) : super(key: key);
 
   @override
@@ -69,7 +72,8 @@ class _SendFormState extends State<SendForm> {
         builder: (context, bitcoinState) {
           return BlocBuilder<AccountCubit, AccountState>(
             builder: (context, state) {
-              BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+              BitcoinCubit bitcoinCubit =
+              BlocProvider.of<BitcoinCubit>(context);
               TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
               if (iterator == 0 && SettingsHelper.isBitcoin()) {
                 bitcoinCubit
@@ -77,7 +81,7 @@ class _SendFormState extends State<SendForm> {
                 iterator++;
               }
               String theme =
-                  SettingsHelper.settings.theme == 'Light' ? 'dark' : 'light';
+              SettingsHelper.settings.theme == 'Light' ? 'dark' : 'light';
 
               if (state.status == AccountStatusList.success &&
                   (bitcoinState.status == BitcoinStatusList.success ||
@@ -88,7 +92,7 @@ class _SendFormState extends State<SendForm> {
                   assets = [];
                 } else {
                   assetFrom =
-                      (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
+                  (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
                   state.activeAccount!.balanceList!.forEach((el) {
                     if (!el.isHidden!) {
                       assets.add(el.token!);
@@ -99,7 +103,7 @@ class _SendFormState extends State<SendForm> {
                 return Container(
                   color: Theme.of(context).dialogBackgroundColor,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Center(
                     child: StretchBox(
                       child: Column(
@@ -111,7 +115,8 @@ class _SendFormState extends State<SendForm> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Recipient Address',
-                                    style: Theme.of(context).textTheme.headline6),
+                                    style:
+                                    Theme.of(context).textTheme.headline6),
                                 SizedBox(height: 12),
                                 AddressField(
                                   addressController: addressController,
@@ -126,7 +131,9 @@ class _SendFormState extends State<SendForm> {
                                 ),
                                 SizedBox(height: 12),
                                 AssetDropdown(
+                                  accountState: state,
                                   selectKeyFrom: widget.selectKeyFrom,
+                                  selectKeyFieldFrom: widget.selectKeyFieldFrom,
                                   amountController: _amountController,
                                   focusNode: _amountFocusNode,
                                   focusModel: _amountFocusModel,
@@ -134,22 +141,20 @@ class _SendFormState extends State<SendForm> {
                                   assetFrom: assetFrom,
                                   amountInUsd: amountInUsd,
                                   onChanged: (String value) {
-                                    if (SettingsHelper.isBitcoin()) {
-                                      try {
-                                        var amount = tokenHelper.getAmountByUsd(
-                                          tokensCubit.state.tokensPairs!,
-                                          double.parse(
-                                              value.replaceAll(',', '.')),
-                                          'BTC',
-                                        );
-                                        setState(() {
-                                          amountInUsd =
-                                              balancesHelper.numberStyling(amount,
-                                                  fixedCount: 2, fixed: true);
-                                        });
-                                      } catch (err) {
-                                        print(err);
-                                      }
+                                    try {
+                                      var amount = tokenHelper.getAmountByUsd(
+                                        tokensCubit.state.tokensPairs!,
+                                        double.parse(
+                                            value.replaceAll(',', '.')),
+                                        assetFrom,
+                                      );
+                                      setState(() {
+                                        amountInUsd = balancesHelper
+                                            .numberStyling(amount,
+                                            fixedCount: 2, fixed: true);
+                                      });
+                                    } catch (err) {
+                                      print(err);
                                     }
                                   },
                                   onSelect: (String asset) {
@@ -160,16 +165,18 @@ class _SendFormState extends State<SendForm> {
                                       int balance = state
                                           .activeAccount!.balanceList!
                                           .firstWhere((el) =>
-                                              el.token! == assetFrom &&
-                                              !el.isHidden!)
+                                      el.token! == assetFrom &&
+                                          !el.isHidden!)
                                           .balance!;
                                       final int fee = 3000;
                                       double amount =
-                                          convertFromSatoshi(balance - fee);
-                                      _amountController.text = amount.toString();
+                                      convertFromSatoshi(balance - fee);
+                                      _amountController.text =
+                                          amount.toString();
                                     });
                                   },
-                                  isFixedWidthAssetSelectorText: widget.isFullSizeMode,
+                                  isFixedWidthAssetSelectorText:
+                                  widget.isFullScreen,
                                 ),
                                 SizedBox(height: 12),
                                 if (SettingsHelper.isBitcoin())
@@ -179,13 +186,14 @@ class _SendFormState extends State<SendForm> {
                                         .textTheme
                                         .headline4!
                                         .apply(
-                                          color: Colors.grey,
-                                        ),
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                 SizedBox(height: 22),
                                 if (SettingsHelper.isBitcoin()) Text("Fees"),
                                 SizedBox(height: 12),
-                                if (bitcoinState.networkFee != null)
+                                if (bitcoinState.networkFee != null &&
+                                    SettingsHelper.isBitcoin())
                                   Column(
                                     children: [
                                       FeeCard(
@@ -194,8 +202,8 @@ class _SendFormState extends State<SendForm> {
                                         label: 'Slow',
                                         callback: () async {
                                           bitcoinCubit.changeActiveFee(
-                                              state
-                                                  .activeAccount!.bitcoinAddress!,
+                                              state.activeAccount!
+                                                  .bitcoinAddress!,
                                               bitcoinState.networkFee!.low!);
                                         },
                                         isActive: bitcoinState.activeFee ==
@@ -208,8 +216,8 @@ class _SendFormState extends State<SendForm> {
                                         label: 'Medium',
                                         callback: () async {
                                           bitcoinCubit.changeActiveFee(
-                                              state
-                                                  .activeAccount!.bitcoinAddress!,
+                                              state.activeAccount!
+                                                  .bitcoinAddress!,
                                               bitcoinState.networkFee!.medium!);
                                         },
                                         isActive: bitcoinState.activeFee ==
@@ -222,8 +230,8 @@ class _SendFormState extends State<SendForm> {
                                         label: 'Fast',
                                         callback: () async {
                                           bitcoinCubit.changeActiveFee(
-                                              state
-                                                  .activeAccount!.bitcoinAddress!,
+                                              state.activeAccount!
+                                                  .bitcoinAddress!,
                                               bitcoinState.networkFee!.high!);
                                         },
                                         isActive: bitcoinState.activeFee ==
