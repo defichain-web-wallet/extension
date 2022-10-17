@@ -24,7 +24,7 @@ import { crypto } from "bitcoinjs-lib";
 export class JellyWalletLedger {
 
   async appLedgerDefichain(): Promise<AppDfi> {
-    // const transport = await SpeculosTransport.open({ baseURL: "172.24.233.207:5000" });
+    // const transport = await SpeculosTransport.open({ baseURL: "172.31.137.192:5000" });
     const transport = await TransportWebUSB.create();
 
     listen((log) => console.log(log));
@@ -87,8 +87,7 @@ export class JellyWalletLedger {
       additionals: ["bech32"],
       transactionVersion: 2,
       lockTime: 0,
-      useTrustedInputForSegwit: true,
-      changePath: changePath
+      useTrustedInputForSegwit: true
     });
 
     return txOut;

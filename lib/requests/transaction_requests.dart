@@ -71,6 +71,11 @@ class TransactionRequests {
         throw HttpError(errorCode: _response.statusCode);
       }
 
+      if (_response.body.contains("error")) {
+        var errorData = jsonDecode(_response.body)['error'];
+        throw HttpError(errorCode: errorData.code);
+      }
+
       var data = jsonDecode(_response.body)['data'];
 
       return data;

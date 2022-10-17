@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "hw-app-dfi": "^7.0.25",
+    "hw-app-dfi": "^7.0.26",
     "@ledgerhq/hw-transport-webhid": "6.24.1",
     "@ledgerhq/hw-transport-webusb": "6.24.1",
     "hw-transport-node-speculos-http": "6.27.4",
