@@ -34,8 +34,8 @@ class AssetByFiatModel {
   }
 
   AssetByFiatModel.fromJson(Map<String, dynamic> json) {
-    this.id = json["id"].toInt();
-    this.chainId = json["chainId"].toInt();
+    this.id = int.parse(json["id"].toString());
+    this.chainId = int.parse(json["chainId"]);
     this.name = json["name"];
     this.dexName = json["dexName"];
     this.type = json["type"];
