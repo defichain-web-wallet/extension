@@ -23,6 +23,7 @@ class SendStatusScreen extends StatelessWidget {
   final String token;
   final String address;
   final String appBarTitle;
+  final String? errorBTC;
   double homeButtonWidth;
 
   SendStatusScreen({
@@ -32,6 +33,7 @@ class SendStatusScreen extends StatelessWidget {
     required this.token,
     required this.address,
     required this.appBarTitle,
+    this.errorBTC = '',
     this.homeButtonWidth = 150,
   }) : super(key: key);
 
@@ -65,19 +67,20 @@ class SendStatusScreen extends StatelessWidget {
       );
 
   Widget _buildBody(context, {isCustomBgColor = false}) {
-    if (txResponse!.isError) {
-      LoggerService.invokeInfoLogg(
-          'user was send token failed: ${txResponse!.error}');
-    } else {
-      LoggerService.invokeInfoLogg('user was send token successfully');
-      if (!SettingsHelper.isBitcoin()) {
-        TransactionCubit transactionCubit =
-            BlocProvider.of<TransactionCubit>(context);
+    if (errorBTC!.isEmpty) {
+      if (txResponse!.isError) {
+        LoggerService.invokeInfoLogg(
+            'user was send token failed: ${txResponse!.error}');
+      } else {
+        LoggerService.invokeInfoLogg('user was send token successfully');
+        if (!SettingsHelper.isBitcoin()) {
+          TransactionCubit transactionCubit =
+              BlocProvider.of<TransactionCubit>(context);
 
-        transactionCubit.setOngoingTransaction(txResponse!.txid!);
+          transactionCubit.setOngoingTransaction(txResponse!.txid!);
+        }
       }
     }
-    String tokenName = (token != 'DFI') ? 'd' + token : token;
     return Container(
       color: Theme.of(context).dialogBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
@@ -86,20 +89,110 @@ class SendStatusScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             StatusTransaction(
+              isBTCError: errorBTC!.isNotEmpty,
               txResponse: txResponse,
             ),
-            Flexible(
-              child: txResponse!.isError
-                  ? Text(
-                      txResponse!.error.toString() ==
-                              'txn-mempool-conflict (code 18)'
-                          ? 'Wait for approval the previous tx'
-                          : txResponse!.error.toString(),
-                      style: Theme.of(context).textTheme.button,
-                    )
-                  : Column(
+            errorBTC!.isEmpty
+                ? Flexible(
+                    child: txResponse!.isError
+                        ? Flexible(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  txResponse!.error.toString() ==
+                                          'txn-mempool-conflict (code 18)'
+                                      ? 'Wait for approval the previous tx'
+                                      : txResponse!.error.toString(),
+                                  style: Theme.of(context).textTheme.button,
+                                ),
+                                SizedBox(
+                                  width: homeButtonWidth,
+                                  child: PrimaryButton(
+                                    label: 'Home',
+                                    callback: () => Navigator.pushReplacement(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder:
+                                            (context, animation1, animation2) =>
+                                                HomeScreen(),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration:
+                                            Duration.zero,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                              ],
+                            ),
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SizedBox(
+                                width: homeButtonWidth,
+                                child: PrimaryButton(
+                                  label: 'Home',
+                                  callback: () => Navigator.pushReplacement(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (context, animation1, animation2) =>
+                                              HomeScreen(),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/explorer_icon.svg',
+                                    color: AppTheme.pinkColor,
+                                  ),
+                                  SizedBox(width: 10),
+                                  InkWell(
+                                    child: Text(
+                                      'View on Explorer',
+                                      style: AppTheme.defiUnderlineText,
+                                    ),
+                                    onTap: () {
+                                      if (SettingsHelper.isBitcoin()) {
+                                        if (SettingsHelper.settings.network! ==
+                                            'mainnet') {
+                                          launch(
+                                              'https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
+                                        } else {
+                                          launch(
+                                              'https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
+                                        }
+                                      } else {
+                                        launch(
+                                            'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                  )
+                : Flexible(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        Text(
+                          errorBTC!,
+                          style: Theme.of(context).textTheme.button,
+                        ),
                         SizedBox(
                           width: homeButtonWidth,
                           child: PrimaryButton(
@@ -119,40 +212,9 @@ class SendStatusScreen extends StatelessWidget {
                         SizedBox(
                           height: 15,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/explorer_icon.svg',
-                              color: AppTheme.pinkColor,
-                            ),
-                            SizedBox(width: 10),
-                            InkWell(
-                              child: Text(
-                                'View on Explorer',
-                                style: AppTheme.defiUnderlineText,
-                              ),
-                              onTap: () {
-                                if (SettingsHelper.isBitcoin()) {
-                                  if (SettingsHelper.settings.network! ==
-                                      'mainnet') {
-                                    launch(
-                                        'https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
-                                  } else {
-                                    launch(
-                                        'https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
-                                  }
-                                } else {
-                                  launch(
-                                      'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
-                                }
-                              },
-                            ),
-                          ],
-                        ),
                       ],
                     ),
-            ),
+                  ),
           ],
         ),
       ),

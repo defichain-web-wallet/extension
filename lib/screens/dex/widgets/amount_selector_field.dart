@@ -92,7 +92,7 @@ class _AmountSelectorFieldState extends State<AmountSelectorField> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          widget.label == 'Swap from' ? 'Sender' : 'Receiver',
+                          widget.label == 'Swap from' ? 'Bitcoin' : 'Defichain',
                           style: Theme.of(context).textTheme.subtitle2,
                         )
                       ],

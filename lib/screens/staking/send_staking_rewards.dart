@@ -364,12 +364,12 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                                           element.rewardType == rewardType &&
                                           element.paybackType == paybackType);
                                   await stakingCubit.createStaking(
-                                      state.accessToken!,
+                                      fiatState.accessToken!,
                                       isActive: true,
                                       id: foundedRoute.id!);
                                 } catch (err) {
                                   await stakingCubit
-                                      .createStaking(state.accessToken!);
+                                      .createStaking(fiatState.accessToken!);
                                 }
                               } else {
                                 stakingCubit.updateRewardInfo(
