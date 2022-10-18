@@ -133,7 +133,6 @@ class _SwapScreenState extends State<SwapScreen> {
                       .loadAvailableBalance(accountFrom.bitcoinAddress!);
                   dexCubit.updateDex(assetFrom, assetTo, 0, 0, address,
                       accountState.activeAccount!.addressList!, tokensState);
-
                 }
               }
             }
@@ -144,7 +143,7 @@ class _SwapScreenState extends State<SwapScreen> {
                     if (constraints.maxWidth < ScreenSizes.medium) {
                       return Scaffold(
                         appBar: MainAppBar(
-                          title: 'Decentralized Exchange',
+                          title: 'Swap',
                           hideOverlay: () => hideOverlay(),
                           isShowBottom:
                               !(transactionState is TransactionInitialState),
@@ -164,7 +163,7 @@ class _SwapScreenState extends State<SwapScreen> {
                               accountState, tokensState, transactionState,
                               isCustomBgColor: true),
                           appBar: MainAppBar(
-                            title: 'Decentralized Exchange',
+                            title: 'Swap',
                             hideOverlay: () => hideOverlay(),
                             isShowBottom:
                                 !(transactionState is TransactionInitialState),
@@ -254,9 +253,10 @@ class _SwapScreenState extends State<SwapScreen> {
                             },
                             onChanged: (value) {
                               try {
+                                double dValue = double.parse(value.replaceAll(',', '.'));
                                 var amount = tokensHelper.getAmountByUsd(
                                   tokensCubit.state.tokensPairs!,
-                                  double.parse(value.replaceAll(',', '.')),
+                                  dValue,
                                   assetFrom,
                                 );
                                 setState(() {
@@ -264,8 +264,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                       balancesHelper.numberStyling(amount,
                                           fixedCount: 2, fixed: true);
                                   if (SettingsHelper.isBitcoin()) {
-                                    amountToInUsd = getUdsAmount(
-                                        double.parse(value), tokensState);
+                                    amountToInUsd = getUdsAmount(dValue, tokensState);
                                   } else {
                                     amountToInUsd = amountFromInUsd;
                                   }
@@ -308,11 +307,12 @@ class _SwapScreenState extends State<SwapScreen> {
                               ),
                             ),
                             onChangeAccount: (index) {
-                              BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+                              BitcoinCubit bitcoinCubit =
+                                  BlocProvider.of<BitcoinCubit>(context);
                               setState(() {
                                 accountFrom = accountState.accounts[index];
-                                bitcoinCubit
-                                    .loadAvailableBalance(accountFrom.bitcoinAddress!);
+                                bitcoinCubit.loadAvailableBalance(
+                                    accountFrom.bitcoinAddress!);
                               });
                             },
                           ),
@@ -389,15 +389,19 @@ class _SwapScreenState extends State<SwapScreen> {
                             },
                           ),
                           SizedBox(height: 6),
-                          Text(
-                            'Available balance: $swapToMsg',
-                            style: Theme.of(context).textTheme.headline4!.apply(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .headline4!
-                                    .color!
-                                    .withOpacity(0.5)),
-                          ),
+                          if (!SettingsHelper.isBitcoin())
+                            Text(
+                              'Available balance: $swapToMsg',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline4!
+                                  .apply(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline4!
+                                          .color!
+                                          .withOpacity(0.5)),
+                            ),
                           SizedBox(height: 24),
                           if (!SettingsHelper.isBitcoin())
                             SizedBox(
@@ -740,6 +744,21 @@ class _SwapScreenState extends State<SwapScreen> {
   submitReviewSwap(parent, state, transactionState, context,
       {CryptoRouteModel? cryptoRoute}) async {
     hideOverlay();
+    if (SettingsHelper.isBitcoin()) {
+      double minDeposit = convertFromSatoshi(cryptoRoute!.minDeposit!);
+      if (minDeposit >= double.parse(amountFromController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Min amount must be more than $minDeposit BTC',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+          ),
+        );
+        return;
+      }
+    }
     if (transactionState is TransactionLoadingState) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -767,11 +786,8 @@ class _SwapScreenState extends State<SwapScreen> {
     if (isNumeric(amountFromController.text)) {
       if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
         try {
-          BitcoinCubit bitcoinCubit =
-            BlocProvider.of<BitcoinCubit>(context);
+          BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
 
-          print(bitcoinCubit.state.networkFee!.medium);
-          print(cryptoRoute.address);
           var tx = await transactionService.createBTCTransaction(
             account: state.activeAccount,
             destinationAddress: cryptoRoute.address!,
@@ -955,24 +971,26 @@ class _SwapScreenState extends State<SwapScreen> {
     debounce = Timer(const Duration(milliseconds: 800), () {
       waitingFrom = true;
       if (assetFrom == assetTo) {
+        amountToController.text = amountFromController.text;
+      } else {
         if (SettingsHelper.isBitcoin()) {
           FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
           double amount = double.parse(amountFromController.text);
 
-          amountToController.text =
-              (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
-                  .toString();
+          var a =
+          (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+              .toString();
           amountToController.text = balancesHelper.numberStyling(
-            double.parse(amountToController.text),
+            double.parse(a),
             fixedCount: 4,
             fixed: true,
           );
+          dexCubit.updateBtcDex(assetFrom, assetTo, amount,
+              double.parse(amountToController.text));
         } else {
-          amountToController.text = amountFromController.text;
+          dexCubit.updateDex(assetFrom, assetTo, amount, null, address,
+              accountState.activeAccount.addressList!, tokensState);
         }
-      } else {
-        dexCubit.updateDex(assetFrom, assetTo, amount, null, address,
-            accountState.activeAccount.addressList!, tokensState);
       }
       //TODO: add validation
     });
@@ -1017,7 +1035,7 @@ class _SwapScreenState extends State<SwapScreen> {
     var result = tokensHelper.getAmountByUsd(
       tokensState.tokensPairs!,
       double.parse(targetAmount.replaceAll(',', '.')),
-      assetTo,
+      'BTC',
     );
     return balancesHelper.numberStyling(
       result,
