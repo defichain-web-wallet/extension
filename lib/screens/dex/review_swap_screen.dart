@@ -42,7 +42,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
   double toolbarHeightWithBottom = 105;
   String secondStepLoaderText =
       'One second, Jelly is preparing your transaction!';
-  String appBarTitle = 'Decentralized Exchange';
+  String appBarTitle = 'Swap';
 
   @override
   Widget build(BuildContext context) =>
@@ -104,6 +104,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                       amountStyling:
                           balancesHelper.numberStyling(widget.amountFrom),
                       currency: widget.assetFrom,
+                      isBtc: widget.btcTx != '',
                     ),
                     SizedBox(height: 24),
                     Text(
