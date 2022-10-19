@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 typedef ScaffoldWrapperBuilder = Widget Function(
-    BuildContext context, bool isFullScreen, TransactionState txState);
+  BuildContext context,
+  bool isFullScreen,
+  TransactionState txState,
+);
 
 class ScaffoldWrapper extends StatefulWidget {
   final ScaffoldWrapperBuilder builder;
@@ -25,21 +28,24 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
         alignment: Alignment.center,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: ScreenSizes.medium),
-          child: LayoutBuilder(builder: (context, constraints) {
-            return BlocBuilder<TransactionCubit, TransactionState>(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return BlocBuilder<TransactionCubit, TransactionState>(
                 builder: (context, txState) {
-              bool isFullScreenMode =
-                  constraints.maxWidth == ScreenSizes.medium;
-              return Container(
-                padding: EdgeInsets.only(top: isFullScreenMode ? 20 : 0),
-                child: widget.builder(
-                  context,
-                  isFullScreenMode,
-                  txState,
-                ),
+                  bool isFullScreenMode =
+                      constraints.maxWidth == ScreenSizes.medium;
+                  return Container(
+                    padding: EdgeInsets.only(top: isFullScreenMode ? 20 : 0),
+                    child: widget.builder(
+                      context,
+                      isFullScreenMode,
+                      txState,
+                    ),
+                  );
+                },
               );
-            });
-          }),
+            },
+          ),
         ),
       ),
     );

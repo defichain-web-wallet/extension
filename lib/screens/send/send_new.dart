@@ -15,7 +15,8 @@ class SendNew extends StatefulWidget {
 
 class _SendNewState extends State<SendNew> {
   GlobalKey<AssetSelectState> selectKeyFrom = GlobalKey<AssetSelectState>();
-  GlobalKey<AssetSelectFieldState> selectKeyFieldFrom = GlobalKey<AssetSelectFieldState>();
+  GlobalKey<AssetSelectFieldState> selectKeyFieldFrom =
+      GlobalKey<AssetSelectFieldState>();
   GlobalKey globalKey = GlobalKey();
 
   void hideOverlay() {
@@ -32,28 +33,30 @@ class _SendNewState extends State<SendNew> {
     double toolbarHeight = 55;
     double toolbarHeightWithBottom = 105;
 
-    return ScaffoldWrapper(builder: (
-      BuildContext context,
-      bool isFullScreen,
-      TransactionState txState,
-    ) {
-      return Scaffold(
-        appBar: MainAppBar(
-          title: 'Send2',
-          hideOverlay: () => hideOverlay(),
-          isShowBottom: !(txState is TransactionInitialState),
-          height: !(txState is TransactionInitialState)
-              ? toolbarHeightWithBottom
-              : toolbarHeight,
-          isSmall: isFullScreen,
-        ),
-        body: SendForm(
-          selectKeyFrom: selectKeyFrom,
-          selectKeyFieldFrom: selectKeyFieldFrom,
-          hideOverlay: hideOverlay,
-          isFullScreen: isFullScreen,
-        ),
-      );
-    });
+    return ScaffoldWrapper(
+      builder: (
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState txState,
+      ) {
+        return Scaffold(
+          appBar: MainAppBar(
+            title: 'Send',
+            hideOverlay: () => hideOverlay(),
+            isShowBottom: !(txState is TransactionInitialState),
+            height: !(txState is TransactionInitialState)
+                ? toolbarHeightWithBottom
+                : toolbarHeight,
+            isSmall: isFullScreen,
+          ),
+          body: SendForm(
+            selectKeyFrom: selectKeyFrom,
+            selectKeyFieldFrom: selectKeyFieldFrom,
+            hideOverlay: hideOverlay,
+            isFullScreen: isFullScreen,
+          ),
+        );
+      },
+    );
   }
 }
