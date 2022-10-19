@@ -23,7 +23,6 @@ class ListEntry extends StatelessWidget {
   Widget build(BuildContext context) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
 
-
     return Theme(
       data: Theme.of(context).copyWith(
         splashColor: Colors.transparent,
@@ -42,24 +41,22 @@ class ListEntry extends StatelessWidget {
         },
         contentPadding: EdgeInsets.only(left: (iconUrl != null) ? 60 : 0),
         leading: (iconUrl != null)
-            ? SvgPicture.asset(
-                iconUrl!,
-                height: 24,
-                width: 24,
+            ? Opacity(
+                opacity: disabled ? 0.3 : 1,
+                child: SvgPicture.asset(
+                  iconUrl!,
+                  height: 24,
+                  width: 24,
+                ),
               )
             : null,
         title: Text(
           label,
           textAlign: iconUrl == null ? TextAlign.center : null,
           style: Theme.of(context).textTheme.headline3!.apply(
-              color: disabled ? Theme
-                  .of(context)
-                  .dividerColor : Theme
-                  .of(context)
-                  .textTheme
-                  .headline3!
-                  .color
-          ),
+              color: disabled
+                  ? Color(0xFF7D7D7D)
+                  : Theme.of(context).textTheme.headline3!.color),
         ),
       ),
     );

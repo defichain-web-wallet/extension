@@ -131,8 +131,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
             });
 
             return Container(
-                color:
-                    isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+                color: Theme.of(context).dialogBackgroundColor,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: Center(

@@ -74,47 +74,51 @@ class _AmountSelectorFieldState extends State<AmountSelectorField> {
                 style: Theme.of(context).textTheme.headline2,
               ),
             ),
-            if (SettingsHelper.isBitcoin())
-              ...[
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    height: 20,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        bottomLeft: Radius.circular(10),
+            if (SettingsHelper.isBitcoin()) ...[
+              Expanded(
+                flex: 2,
+                child: Container(
+                  height: 20,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.label == 'Swap from'
+                            ? 'Bitcoin Mainnet'
+                            : 'Defichain Mainnet',
+                        style: Theme.of(context).textTheme.subtitle2!.apply(
+                              color: Theme.of(context).textSelectionColor,
+                            ),
                       ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          widget.label == 'Swap from' ? 'Bitcoin' : 'Defichain',
-                          style: Theme.of(context).textTheme.subtitle2,
-                        )
-                      ],
-                    ),
+                    ],
                   ),
                 ),
-                SizedBox(
-                  width: 1,
+              ),
+              SizedBox(
+                width: 1,
+              ),
+              Expanded(
+                flex: 2,
+                child: SwapAccountSelector(
+                  isFullSize: widget.isBorder,
+                  account: widget.account!,
+                  callback: (int index) {
+                    if (widget.onChangeAccount != null) {
+                      widget.onChangeAccount!(index);
+                    }
+                  },
                 ),
-                Expanded(
-                  flex: 2,
-                  child: SwapAccountSelector(
-                    isFullSize: widget.isBorder,
-                    account: widget.account!,
-                    callback: (int index) {
-                      if (widget.onChangeAccount != null) {
-                        widget.onChangeAccount!(index);
-                      }
-                    },
-                  ),
-                ),
-              ],
+              ),
+            ],
           ],
         ),
         SizedBox(height: 6),
