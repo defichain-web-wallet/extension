@@ -252,26 +252,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                   asset, tokensState, accountState, dexCubit);
                             },
                             onChanged: (value) {
-                              try {
-                                double dValue = double.parse(value.replaceAll(',', '.'));
-                                var amount = tokensHelper.getAmountByUsd(
-                                  tokensCubit.state.tokensPairs!,
-                                  dValue,
-                                  assetFrom,
-                                );
-                                setState(() {
-                                  amountFromInUsd =
-                                      balancesHelper.numberStyling(amount,
-                                          fixedCount: 2, fixed: true);
-                                  if (SettingsHelper.isBitcoin()) {
-                                    amountToInUsd = getUdsAmount(dValue, tokensState);
-                                  } else {
-                                    amountToInUsd = amountFromInUsd;
-                                  }
-                                });
-                              } catch (err) {
-                                print(err);
-                              }
+                              calculateSecondAmount(value, tokensState);
                               onChangeFromAsset(value, accountState, dexState,
                                   dexCubit, tokensState);
                             },
@@ -317,14 +298,23 @@ class _SwapScreenState extends State<SwapScreen> {
                             },
                           ),
                           SizedBox(height: 6),
-                          Text(
-                            'Available balance: $swapFromMsg',
-                            style: Theme.of(context).textTheme.headline4!.apply(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .headline4!
-                                    .color!
-                                    .withOpacity(0.5)),
+                          InkWell(
+                            onTap: () => putAvailableBalance(
+                              assetFrom,
+                              amountFromController,
+                              tokensState,
+                              accountState,
+                              dexState,
+                            ),
+                            child: Text(
+                              'Available balance: $swapFromMsg',
+                              style: Theme.of(context).textTheme.headline4!.apply(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .headline4!
+                                      .color!
+                                      .withOpacity(0.5)),
+                            ),
                           ),
                           SizedBox(height: 30),
                           AmountSelectorField(
@@ -390,17 +380,26 @@ class _SwapScreenState extends State<SwapScreen> {
                           ),
                           SizedBox(height: 6),
                           if (!SettingsHelper.isBitcoin())
-                            Text(
-                              'Available balance: $swapToMsg',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline4!
-                                  .apply(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline4!
-                                          .color!
-                                          .withOpacity(0.5)),
+                            InkWell(
+                              onTap: () => putAvailableBalance(
+                                assetTo,
+                                amountToController,
+                                tokensState,
+                                accountState,
+                                dexState,
+                              ),
+                              child: Text(
+                                'Available balance: $swapToMsg',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline4!
+                                    .apply(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .headline4!
+                                            .color!
+                                            .withOpacity(0.5)),
+                              ),
                             ),
                           SizedBox(height: 24),
                           if (!SettingsHelper.isBitcoin())
@@ -612,34 +611,10 @@ class _SwapScreenState extends State<SwapScreen> {
                                   Padding(
                                     padding:
                                         const EdgeInsets.only(bottom: 14.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        String kycHash = fiatState.kycHash!;
-                                        launch(
-                                            'https://payment.dfx.swiss/kyc?code=$kycHash');
-                                      },
-                                      child: RichText(
-                                        text: TextSpan(
-                                          children: [
-                                            TextSpan(
-                                                text:
-                                                    'If you want swap in BTC network, please complete the ',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline3
-                                                    ?.apply()),
-                                            TextSpan(
-                                              text: 'KYC process here.',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline3
-                                                  ?.apply(
-                                                      color:
-                                                          AppTheme.pinkColor),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                    child: Text(
+                                      'Please complete the KYC process to enable this feature',
+                                      style:
+                                          Theme.of(context).textTheme.headline3,
                                     ),
                                   ),
                                 PendingButton(
@@ -684,6 +659,58 @@ class _SwapScreenState extends State<SwapScreen> {
           ),
         );
       }
+    }
+  }
+
+  putAvailableBalance(
+    String asset,
+    TextEditingController controller,
+    TokensState tokensState,
+    AccountState accountState,
+    DexState dexState,
+  ) {
+    DexCubit dexCubit = BlocProvider.of<DexCubit>(context);
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+    late double balance;
+    if (SettingsHelper.isBitcoin()) {
+      balance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
+      amountFromController.text = balance.toString();
+    } else {
+      balance =
+          getAvailableAmount(accountState, asset, dexState);
+    }
+
+    calculateSecondAmount(balance.toString(), tokensState);
+    if (asset == assetFrom) {
+      onChangeFromAsset(balance.toString(), accountState, dexState,
+          dexCubit, tokensState);
+    } else {
+      onChangeToAsset(balance.toString(), accountState, dexState,
+          dexCubit, tokensState);
+    }
+  }
+
+  calculateSecondAmount(String value, TokensState tokensState) {
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+    try {
+      double dValue = double.parse(value.replaceAll(',', '.'));
+      var amount = tokensHelper.getAmountByUsd(
+        tokensCubit.state.tokensPairs!,
+        dValue,
+        assetFrom,
+      );
+      setState(() {
+        amountFromInUsd =
+            balancesHelper.numberStyling(amount,
+                fixedCount: 2, fixed: true);
+        if (SettingsHelper.isBitcoin()) {
+          amountToInUsd = getUdsAmount(dValue, tokensState);
+        } else {
+          amountToInUsd = amountFromInUsd;
+        }
+      });
+    } catch (err) {
+      print(err);
     }
   }
 
@@ -800,7 +827,7 @@ class _SwapScreenState extends State<SwapScreen> {
                 pageBuilder: (context, animation1, animation2) =>
                     ReviewSwapScreen(
                   assetFrom,
-                  assetTo,
+                  assetTo.replaceAll('d', ''),
                   double.parse(amountFromController.text),
                   double.parse(amountToController.text),
                   slippage,
