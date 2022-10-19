@@ -29,6 +29,7 @@ class SendForm extends StatefulWidget {
   final GlobalKey<AssetSelectFieldState> selectKeyFieldFrom;
   final Function() hideOverlay;
   final bool isFullScreen;
+  final String selectedAddress;
 
   SendForm({
     Key? key,
@@ -36,6 +37,7 @@ class SendForm extends StatefulWidget {
     required this.selectKeyFieldFrom,
     required this.hideOverlay,
     required this.isFullScreen,
+    this.selectedAddress = '',
   }) : super(key: key);
 
   @override
@@ -64,6 +66,12 @@ class _SendFormState extends State<SendForm> {
   double btcAvailableBalance = 0;
   String amountInUsd = '0.0';
   int iterator = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    addressController.text = widget.selectedAddress;
+  }
 
   @override
   Widget build(BuildContext context) {

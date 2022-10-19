@@ -7,7 +7,12 @@ import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class SendNew extends StatefulWidget {
-  const SendNew({Key? key}) : super(key: key);
+  final String selectedAddress;
+
+  const SendNew({
+    Key? key,
+    this.selectedAddress = '',
+  }) : super(key: key);
 
   @override
   State<SendNew> createState() => _SendNewState();
@@ -50,6 +55,7 @@ class _SendNewState extends State<SendNew> {
             isSmall: isFullScreen,
           ),
           body: SendForm(
+            selectedAddress: widget.selectedAddress,
             selectKeyFrom: selectKeyFrom,
             selectKeyFieldFrom: selectKeyFieldFrom,
             hideOverlay: hideOverlay,

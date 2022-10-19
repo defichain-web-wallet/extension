@@ -2,7 +2,7 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/add_new_address.dart';
-import 'package:defi_wallet/screens/send/send_token_selector.dart';
+import 'package:defi_wallet/screens/send/send_new.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -142,7 +142,7 @@ class _SelectAddressFromAddressBookState
                                             PageRouteBuilder(
                                               pageBuilder: (context, animation1,
                                                       animation2) =>
-                                                  SendTokenSelector(
+                                                  SendNew(
                                                 selectedAddress:
                                                     _filterList[index].address!,
                                               ),
@@ -234,7 +234,7 @@ class _SelectAddressFromAddressBookState
                                                   pageBuilder: (context,
                                                           animation1,
                                                           animation2) =>
-                                                      SendTokenSelector(
+                                                      SendNew(
                                                     selectedAddress:
                                                         addressBookState
                                                             .addressBookList![

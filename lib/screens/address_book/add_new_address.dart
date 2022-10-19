@@ -4,12 +4,11 @@ import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/address_book.dart';
-import 'package:defi_wallet/screens/send/send_token_selector.dart';
+import 'package:defi_wallet/screens/send/send_new.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -255,7 +254,7 @@ class _AddNewAddressState extends State<AddNewAddress> {
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
-                  SendTokenSelector(
+                  SendNew(
                     selectedAddress: addressController.text,
                   ),
               transitionDuration: Duration.zero,
