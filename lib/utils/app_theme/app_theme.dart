@@ -65,6 +65,7 @@ class AppTheme {
       iconTheme: IconThemeData(
         color: Colors.black,
       ),
+      textSelectionColor: Color(0xFF7D7D7D),
       textTheme: TextTheme(
         headline1: TextStyle(
             fontSize: 30,
@@ -95,7 +96,7 @@ class AppTheme {
             fontWeight: FontWeight.normal,
             fontFamily: 'IBM Plex Sans'),
         subtitle2: TextStyle(
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: FontWeight.normal,
             fontFamily: 'IBM Plex Sans'),
         button: TextStyle(
@@ -176,6 +177,7 @@ class AppTheme {
       iconTheme: IconThemeData(
         color: Colors.white,
       ),
+      textSelectionColor: Color(0xFFF0F0F0),
       textTheme: TextTheme(
         headline1: TextStyle(
             fontSize: 30,
