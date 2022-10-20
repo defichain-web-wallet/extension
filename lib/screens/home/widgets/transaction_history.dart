@@ -156,7 +156,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                               style: Theme.of(context).textTheme.headline6,
                             ),
                             Text(
-                              '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 6)} $tokenName',
+                              '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 8)} $tokenName',
                               style: Theme.of(context).textTheme.headline4,
                             ),
                           ],

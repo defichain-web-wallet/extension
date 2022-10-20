@@ -126,7 +126,7 @@ class _EmailAndPhoneSellState extends State<EmailAndPhoneSell> {
                           CustomTextFormField(
                             isBorder: isFullSize,
                             addressController: _phoneController,
-                            hintText: 'Phone number (optional)',
+                            hintText: 'Phone number',
                           ),
                         ],
                       ),
