@@ -84,18 +84,12 @@ class ColumnTextFields extends StatefulWidget {
 
 class _ColumnTextFieldsState extends State<ColumnTextFields> {
   static List<String> mnemonic = [];
-  var s = 'soul step reunion vendor rather jewel effort tonight pulse salmon drama language aware pen scrub also flag life enhance kidney health mix leader swift'.split(' ');
 
 
   @override
   void initState() {
     super.initState();
     mnemonic = List.generate(widget.controllers!.length, (index) => '');
-    int i = 0;
-    widget.controllers!.forEach((element) {
-      element.text = s[i];
-      i++;
-    });
   }
 
   @override
