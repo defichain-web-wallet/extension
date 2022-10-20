@@ -9,14 +9,14 @@ import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 
 import 'package:flutter/material.dart';
 
-class LoaderNew extends StatefulWidget {
+class LoaderScreen extends StatefulWidget {
   final String secondStepLoaderText;
   final String title;
   bool isFullSize;
   String currentStatus;
   Function()? callback;
 
-  LoaderNew({
+  LoaderScreen({
     Key? key,
     required this.secondStepLoaderText,
     required this.title,
@@ -26,10 +26,10 @@ class LoaderNew extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<LoaderNew> createState() => _LoaderNewState();
+  State<LoaderScreen> createState() => _LoaderScreenState();
 }
 
-class _LoaderNewState extends State<LoaderNew> {
+class _LoaderScreenState extends State<LoaderScreen> {
   String firstStepText = 'One second, Jelly is preparing your transaction!';
   String secondStepText = '';
   String thirdStepText = 'Argh... Blockchains are not the fastest!';
@@ -38,34 +38,6 @@ class _LoaderNewState extends State<LoaderNew> {
   Timer? timer;
 
   @override
-  // Widget build(BuildContext context) => ScaffoldConstrainedBox(
-  //       child: LayoutBuilder(builder: (context, constraints) {
-  //         if (constraints.maxWidth < ScreenSizes.medium) {
-  //           return Scaffold(
-  //             appBar: MainAppBar(
-  //               isShowNavButton: false,
-  //               title: widget.title,
-  //               action: null,
-  //             ),
-  //             body: _buildBody(context),
-  //           );
-  //         } else {
-  //           return Container(
-  //             padding: const EdgeInsets.only(top: 20),
-  //             child: Scaffold(
-  //               appBar: MainAppBar(
-  //                 isShowNavButton: false,
-  //                 title: widget.title,
-  //                 action: null,
-  //                 isSmall: true,
-  //               ),
-  //               body: _buildBody(context, isCustomBgColor: true),
-  //             ),
-  //           );
-  //         }
-  //       }),
-  //     );
-
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       builder: (
@@ -94,7 +66,7 @@ class _LoaderNewState extends State<LoaderNew> {
             height: !(txState is TransactionInitialState)
                 ? ToolbarSizes.toolbarHeightWithBottom
                 : ToolbarSizes.toolbarHeight,
-            isSmall: !isFullScreen,
+            isSmall: isFullScreen,
           ),
           body: Container(
             color: Theme.of(context).dialogBackgroundColor,

@@ -369,7 +369,7 @@ class _SellingState extends State<Selling> {
                                   PageRouteBuilder(
                                     pageBuilder:
                                         (context, animation1, animation2) =>
-                                            LoaderNew(
+                                            LoaderScreen(
                                       title: appBarTitle,
                                       secondStepLoaderText:
                                           secondStepLoaderText,

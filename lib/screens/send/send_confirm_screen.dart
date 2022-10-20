@@ -163,7 +163,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                                     pageBuilder: (context,
                                                             animation1,
                                                             animation2) =>
-                                                        LoaderNew(
+                                                        LoaderScreen(
                                                       title: appBarTitle,
                                                       callback: () async {
                                                         await submitSend(

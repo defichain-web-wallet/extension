@@ -288,7 +288,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                                         PageRouteBuilder(
                                           pageBuilder: (context, animation1,
                                                   animation2) =>
-                                              LoaderNew(
+                                              LoaderScreen(
                                             title: appBarTitle,
                                             secondStepLoaderText: widget
                                                         .removeLT ==

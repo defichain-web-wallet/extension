@@ -148,7 +148,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                                 PageRouteBuilder(
                                   pageBuilder:
                                       (context, animation1, animation2) =>
-                                          LoaderNew(
+                                          LoaderScreen(
                                     title: appBarTitle,
                                     secondStepLoaderText: secondStepLoaderText,
                                     callback: () {
