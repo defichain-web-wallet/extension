@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/address_book_add_screen.dart';
 import 'package:defi_wallet/screens/send/send_screen.dart';
@@ -24,8 +25,6 @@ class _AddressBookSelectorScreenState extends State<AddressBookSelectorScreen> {
   final List<AddressBookModel> _filterList = [];
   String searchValue = '';
   int iterator = 0;
-  double toolbarHeight = 55;
-  double toolbarHeightWithBottom = 105;
 
   Widget build(BuildContext context) {
 
@@ -40,8 +39,8 @@ class _AddressBookSelectorScreenState extends State<AddressBookSelectorScreen> {
             title: "Select address from Address book",
             isShowBottom: !(txState is TransactionInitialState),
             height: !(txState is TransactionInitialState)
-                ? toolbarHeightWithBottom
-                : toolbarHeight,
+                ? ToolbarSizes.toolbarHeightWithBottom
+                : ToolbarSizes.toolbarHeight,
             isSmall: isFullScreen,
           ),
           body: BlocBuilder<AddressBookCubit, AddressBookState>(

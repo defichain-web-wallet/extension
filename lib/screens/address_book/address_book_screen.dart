@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/address_book/address_book_add_screen.dart';
 import 'package:defi_wallet/widgets/address_book/address_book_card.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -17,8 +18,6 @@ class AddressBookScreen extends StatefulWidget {
 
 class _AddressBookScreenState extends State<AddressBookScreen> {
   int iterator = 0;
-  double toolbarHeight = 55;
-  double toolbarHeightWithBottom = 105;
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +57,8 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
             ),
             isShowBottom: !(txState is TransactionInitialState),
             height: !(txState is TransactionInitialState)
-                ? toolbarHeightWithBottom
-                : toolbarHeight,
+                ? ToolbarSizes.toolbarHeightWithBottom
+                : ToolbarSizes.toolbarHeight,
             isSmall: isFullScreen,
           ),
           body: BlocBuilder<AddressBookCubit, AddressBookState>(

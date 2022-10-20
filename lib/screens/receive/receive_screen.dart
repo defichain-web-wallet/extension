@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
@@ -33,8 +34,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   bool firstBuild = true;
   double x = 0.0;
   double y = 0.0;
-  double toolbarHeight = 55;
-  double toolbarHeightWithBottom = 105;
   late String destinationAddress;
 
   @override
@@ -68,8 +67,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                   hideOverlay: () => hideOverlay(),
                   isShowBottom: !(txState is TransactionInitialState),
                   height: !(txState is TransactionInitialState)
-                      ? toolbarHeightWithBottom
-                      : toolbarHeight,
+                      ? ToolbarSizes.toolbarHeightWithBottom
+                      : ToolbarSizes.toolbarHeight,
                   isSmall: !isFullScreen,
                 ),
                 body: Container(

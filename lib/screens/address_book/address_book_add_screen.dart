@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
@@ -42,8 +43,7 @@ class _AddressBookAddScreenState extends State<AddressBookAddScreen> {
   bool isEnable = false;
   bool isValidAddress = false;
   int counter = 0;
-  double toolbarHeight = 55;
-  double toolbarHeightWithBottom = 105;
+
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +67,8 @@ class _AddressBookAddScreenState extends State<AddressBookAddScreen> {
             title: 'Add new address',
             isShowBottom: !(txState is TransactionInitialState),
             height: !(txState is TransactionInitialState)
-                ? toolbarHeightWithBottom
-                : toolbarHeight,
+                ? ToolbarSizes.toolbarHeightWithBottom
+                : ToolbarSizes.toolbarHeight,
             isSmall: isFullScreen,
           ),
           body: Container(

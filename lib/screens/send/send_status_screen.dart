@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
@@ -37,9 +38,6 @@ class SendStatusScreen extends StatelessWidget {
     this.homeButtonWidth = 150,
   }) : super(key: key);
 
-  final double toolbarHeight = 55;
-  final double toolbarHeightWithBottom = 105;
-
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
@@ -68,8 +66,8 @@ class SendStatusScreen extends StatelessWidget {
             isShowNavButton: false,
             isShowBottom: !(txState is TransactionInitialState),
             height: !(txState is TransactionInitialState)
-                ? toolbarHeightWithBottom
-                : toolbarHeight,
+                ? ToolbarSizes.toolbarHeightWithBottom
+                : ToolbarSizes.toolbarHeight,
             isSmall: isFullScreen,
           ),
           body: Container(

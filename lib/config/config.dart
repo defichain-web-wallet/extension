@@ -17,3 +17,8 @@ class ScreenSizes {
 class TickerTimes {
   static const int tickerBeforeLockMilliseconds = 60000 * 5;
 }
+
+class ToolbarSizes {
+  static const double toolbarHeight = 55;
+  static const double toolbarHeightWithBottom = 105;
+}

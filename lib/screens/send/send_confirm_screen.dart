@@ -38,8 +38,6 @@ class SendConfirmScreen extends StatefulWidget {
 class _SendConfirmState extends State<SendConfirmScreen> {
   BalancesHelper balancesHelper = BalancesHelper();
   TransactionService transactionService = TransactionService();
-  double toolbarHeight = 55;
-  double toolbarHeightWithBottom = 105;
   String appBarTitle = 'Send';
   String secondStepLoaderText =
       'One second, Jelly is preparing your transaction!';
@@ -56,8 +54,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
               title: appBarTitle,
               isShowBottom: !(txState is TransactionInitialState),
               height: !(txState is TransactionInitialState)
-                  ? toolbarHeightWithBottom
-                  : toolbarHeight,
+                  ? ToolbarSizes.toolbarHeightWithBottom
+                  : ToolbarSizes.toolbarHeight,
               isSmall: isFullScreen,
             ),
             body: BlocBuilder<AccountCubit, AccountState>(

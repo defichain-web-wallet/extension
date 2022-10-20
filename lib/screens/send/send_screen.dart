@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_field.dart';
 import 'package:defi_wallet/screens/send/forms/send_form.dart';
@@ -23,8 +24,7 @@ class _SendScreenState extends State<SendScreen> {
   GlobalKey<AssetSelectFieldState> selectKeyFieldFrom =
       GlobalKey<AssetSelectFieldState>();
   GlobalKey globalKey = GlobalKey();
-  double toolbarHeight = 55;
-  double toolbarHeightWithBottom = 105;
+
 
   void hideOverlay() {
     try {
@@ -49,8 +49,8 @@ class _SendScreenState extends State<SendScreen> {
             hideOverlay: () => hideOverlay(),
             isShowBottom: !(txState is TransactionInitialState),
             height: !(txState is TransactionInitialState)
-                ? toolbarHeightWithBottom
-                : toolbarHeight,
+                ? ToolbarSizes.toolbarHeightWithBottom
+                : ToolbarSizes.toolbarHeight,
             isSmall: isFullScreen,
           ),
           body: SendForm(
