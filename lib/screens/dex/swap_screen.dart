@@ -611,10 +611,23 @@ class _SwapScreenState extends State<SwapScreen> {
                                   Padding(
                                     padding:
                                         const EdgeInsets.only(bottom: 14.0),
-                                    child: Text(
-                                      'Please complete the KYC process to enable this feature',
-                                      style:
-                                          Theme.of(context).textTheme.headline3,
+                                    child: InkWell(
+                                      onTap: () {
+                                        String kycHash = fiatState.kycHash!;
+                                        launch(
+                                            'https://payment.dfx.swiss/kyc?code=$kycHash');
+                                      },
+                                      child: RichText(
+                                        text: TextSpan(
+                                          text: 'Please complete the KYC process to enable this feature',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline3
+                                              ?.apply(
+                                              color:
+                                              AppTheme.pinkColor),
+                                        ),
+                                      )
                                     ),
                                   ),
                                 PendingButton(

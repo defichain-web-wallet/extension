@@ -6,6 +6,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/buy/contact_screen.dart';
 import 'package:defi_wallet/screens/buy/search_buy_token.dart';
+import 'package:defi_wallet/screens/buy/tutorials/first_step_buy_screen.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
 import 'package:defi_wallet/screens/sell/account_type_sell.dart';
 import 'package:defi_wallet/screens/sell/selling.dart';
@@ -169,6 +170,20 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                     ],
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 24, bottom: 12),
+                  child: Text(
+                    'Latest transactions',
+                    style: Theme.of(context).textTheme.headline6!.apply(
+                          color: Theme.of(context)
+                              .textTheme
+                              .headline6!
+                              .color!
+                              .withOpacity(0.6),
+                          fontWeightDelta: 2,
+                        ),
+                  ),
+                ),
                 Expanded(
                   child: fiatState.history.length > 0
                       ? ListView.builder(
@@ -202,9 +217,9 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                               trailing: (fiatState.history[index].inputAsset !=
                                       null)
                                   ? Text(
-                                      '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
+                                      '${toFixed(fiatState.history[index].inputAmount!, 6)} ${fiatState.history[index].inputAsset}')
                                   : Text(
-                                      '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
+                                      '${toFixed(fiatState.history[index].outputAmount!, 6)} ${fiatState.history[index].outputAsset}'),
                             );
                           },
                         )
@@ -230,7 +245,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => ContactScreen(),
+          pageBuilder: (context, animation1, animation2) => FirstStepBuyScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),

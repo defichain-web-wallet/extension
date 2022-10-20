@@ -17,14 +17,14 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isSavedMnemonic;
   final bool isShowFullScreen;
   final bool? isSmall;
-  final Widget? widgetBack;
+  final bool isWidgetBack;
 
   const AuthAppBar({
     Key? key,
     this.isSavedMnemonic = false,
     this.isShowFullScreen = false,
     this.isSmall = true,
-    this.widgetBack,
+    this.isWidgetBack = true,
     this.controllers,
   }) : super(key: key);
 
@@ -45,7 +45,8 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
       toolbarHeight: toolbarHeight,
       leadingWidth: leadingWidth,
-      leading: Padding(
+      automaticallyImplyLeading: false,
+      leading: isWidgetBack ? Padding(
         padding: const EdgeInsets.only(left: 8),
         child: Row(
           children: [
@@ -67,14 +68,14 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
                 : backButton(context)
           ],
         ),
-      ),
+      ) : null,
       centerTitle: true,
       title: SvgPicture.asset(
         'assets/jelly_logo_wallet.svg',
         height: iconHeight,
       ),
       actions: [
-        isShowFullScreen
+        isShowFullScreen && isWidgetBack
             ? isSmall!
                 ? Padding(
                     padding: const EdgeInsets.only(right: 12.0),
