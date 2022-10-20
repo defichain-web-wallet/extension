@@ -33,7 +33,7 @@ class _SecondStepBuyScreenState extends State<SecondStepBuyScreen> {
                 if (constraints.maxWidth < ScreenSizes.medium) {
                   return Scaffold(
                     appBar: MainAppBar(
-                      title: 'Fiat to crypto: how it works?',
+                      title: 'How does it work?',
                     ),
                     body: _buildBody(state),
                   );
@@ -42,7 +42,7 @@ class _SecondStepBuyScreenState extends State<SecondStepBuyScreen> {
                     padding: const EdgeInsets.only(top: 20),
                     child: Scaffold(
                       appBar: MainAppBar(
-                        title: 'Fiat to crypto: how it works?',
+                        title: 'How does it work?',
                         isSmall: true,
                       ),
                       body: _buildBody(state, isFullSize: true),

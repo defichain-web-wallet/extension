@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/screens/buy/contact_screen.dart';
 import 'package:defi_wallet/screens/buy/search_buy_token.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
@@ -34,7 +35,7 @@ class _ThirdStepBuyScreenState extends State<ThirdStepBuyScreen> {
                 if (constraints.maxWidth < ScreenSizes.medium) {
                   return Scaffold(
                     appBar: MainAppBar(
-                      title: 'Fiat to crypto: how it works?',
+                      title: 'How does it work?',
                     ),
                     body: _buildBody(state),
                   );
@@ -43,7 +44,7 @@ class _ThirdStepBuyScreenState extends State<ThirdStepBuyScreen> {
                     padding: const EdgeInsets.only(top: 20),
                     child: Scaffold(
                       appBar: MainAppBar(
-                        title: 'Fiat to crypto: how it works?',
+                        title: 'How does it work?',
                         isSmall: true,
                       ),
                       body: _buildBody(state, isFullSize: true),
@@ -121,7 +122,7 @@ class _ThirdStepBuyScreenState extends State<ThirdStepBuyScreen> {
                             context,
                             PageRouteBuilder(
                               pageBuilder: (context, animation1, animation2) =>
-                                  SearchBuyToken(),
+                                  ContactScreen(),
                               transitionDuration: Duration.zero,
                               reverseTransitionDuration: Duration.zero,
                             ),
