@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:defi_wallet/screens/address_book/add_new_address_screen.dart';
+import 'package:defi_wallet/screens/address_book/address_book_add_screen.dart';
 import 'package:defi_wallet/widgets/address_book/address_book_buttons.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +121,7 @@ class _AddressBookCardState extends State<AddressBookCard> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation1, animation2) =>
-                        AddNewAddressScreen(
+                        AddressBookAddScreen(
                       name: widget.name,
                       address: widget.address,
                       id: widget.id,

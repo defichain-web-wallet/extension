@@ -1,6 +1,6 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/screens/address_book/add_new_address_screen.dart';
+import 'package:defi_wallet/screens/address_book/address_book_add_screen.dart';
 import 'package:defi_wallet/widgets/address_book/address_book_card.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -48,7 +48,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation1, animation2) =>
-                        AddNewAddressScreen(),
+                        AddressBookAddScreen(),
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),
@@ -88,7 +88,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                                       PageRouteBuilder(
                                         pageBuilder:
                                             (context, animation1, animation2) =>
-                                                AddNewAddressScreen(
+                                                AddressBookAddScreen(
                                           name: addressBookState
                                               .addressBookList![index].name!,
                                           address: addressBookState

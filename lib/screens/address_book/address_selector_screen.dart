@@ -1,7 +1,7 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
-import 'package:defi_wallet/screens/address_book/add_new_address_screen.dart';
+import 'package:defi_wallet/screens/address_book/address_book_add_screen.dart';
 import 'package:defi_wallet/screens/send/send_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -372,7 +372,7 @@ class _AddressSelectorScreenState extends State<AddressSelectorScreen> {
                                                           pageBuilder: (context,
                                                                   animation1,
                                                                   animation2) =>
-                                                              AddNewAddressScreen(
+                                                              AddressBookAddScreen(
                                                             isRedirect: true,
                                                           ),
                                                           transitionDuration:
@@ -411,7 +411,7 @@ class _AddressSelectorScreenState extends State<AddressSelectorScreen> {
                                                       pageBuilder: (context,
                                                               animation1,
                                                               animation2) =>
-                                                          AddNewAddressScreen(
+                                                          AddressBookAddScreen(
                                                         isRedirect: true,
                                                       ),
                                                       transitionDuration:

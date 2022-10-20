@@ -1,6 +1,5 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
@@ -9,20 +8,19 @@ import 'package:defi_wallet/screens/send/send_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AddNewAddressScreen extends StatefulWidget {
+class AddressBookAddScreen extends StatefulWidget {
   final String? name;
   final String? address;
   final int? id;
   final bool isRedirect;
 
-  const AddNewAddressScreen({
+  const AddressBookAddScreen({
     Key? key,
     this.name,
     this.address,
@@ -31,10 +29,10 @@ class AddNewAddressScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _AddNewAddressScreenState createState() => _AddNewAddressScreenState();
+  _AddressBookAddScreenState createState() => _AddressBookAddScreenState();
 }
 
-class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
+class _AddressBookAddScreenState extends State<AddressBookAddScreen> {
   AddressesHelper addressHelper = AddressesHelper();
   final _formKey = GlobalKey<FormState>();
   final _focusNode = FocusNode();
