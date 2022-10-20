@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:defi_wallet/screens/address_book/add_new_address.dart';
-import 'package:defi_wallet/screens/address_book/widgets/address_book_buttons.dart';
+import 'package:defi_wallet/screens/address_book/add_new_address_screen.dart';
+import 'package:defi_wallet/widgets/address_book/address_book_buttons.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +13,6 @@ class AddressBookCard extends StatefulWidget {
   final int id;
   final Function() editCallback;
   final Function() deleteCallback;
-  final bool isBorder;
 
   const AddressBookCard({
     Key? key,
@@ -22,7 +21,6 @@ class AddressBookCard extends StatefulWidget {
     required this.id,
     required this.editCallback,
     required this.deleteCallback,
-    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -123,7 +121,7 @@ class _AddressBookCardState extends State<AddressBookCard> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation1, animation2) =>
-                        AddNewAddress(
+                        AddNewAddressScreen(
                       name: widget.name,
                       address: widget.address,
                       id: widget.id,
