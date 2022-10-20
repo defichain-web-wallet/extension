@@ -41,9 +41,8 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     } else {
       mnemonic = widget.mnemonic!.split(',');
     }
-    var s = 'guess cushion behind crop eager chimney moment citizen power connect debate obvious better swift sea interest symptom bonus dish fragile believe inch open wage'.split(' ');
     controllers = List.generate(
-        fieldsLength, (i) => TextEditingController(text: s[i]));
+        fieldsLength, (i) => TextEditingController(text: mnemonic[i]));
     focusNodes = List.generate(fieldsLength, (i) => FocusNode());
   }
 
