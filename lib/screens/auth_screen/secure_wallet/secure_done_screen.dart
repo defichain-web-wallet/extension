@@ -14,7 +14,9 @@ class SecureDoneScreen extends StatelessWidget {
         child: LayoutBuilder(builder: (context, constraints) {
           if (constraints.maxWidth < ScreenSizes.medium) {
             return Scaffold(
-              appBar: AuthAppBar(),
+              appBar: AuthAppBar(
+                isWidgetBack: false,
+              ),
               body: _buildBody(context),
             );
           } else {
@@ -23,6 +25,7 @@ class SecureDoneScreen extends StatelessWidget {
               child: Scaffold(
                 appBar: AuthAppBar(
                   isSmall: false,
+                  isWidgetBack: false,
                 ),
                 body: _buildBody(context, isCustomBgColor: true),
               ),
