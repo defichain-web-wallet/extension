@@ -11,14 +11,14 @@ import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AddressSelectorScreen extends StatefulWidget {
-  const AddressSelectorScreen({Key? key}) : super(key: key);
+class AddressBookSelectorScreen extends StatefulWidget {
+  const AddressBookSelectorScreen({Key? key}) : super(key: key);
 
   @override
-  _AddressSelectorScreenState createState() => _AddressSelectorScreenState();
+  _AddressBookSelectorScreenState createState() => _AddressBookSelectorScreenState();
 }
 
-class _AddressSelectorScreenState extends State<AddressSelectorScreen> {
+class _AddressBookSelectorScreenState extends State<AddressBookSelectorScreen> {
   TextEditingController searchController = TextEditingController();
   bool isPinkIcon = false;
   final List<AddressBookModel> _filterList = [];

@@ -1,5 +1,5 @@
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/screens/address_book/address_selector_screen.dart';
+import 'package:defi_wallet/screens/address_book/address_book_selector_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -75,7 +75,7 @@ class _AddressFieldState extends State<AddressField> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation1, animation2) =>
-                        AddressSelectorScreen(),
+                        AddressBookSelectorScreen(),
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),
