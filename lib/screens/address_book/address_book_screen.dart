@@ -6,8 +6,9 @@ import 'package:defi_wallet/widgets/address_book/address_book_card.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:flutter/material.dart';
 
 class AddressBookScreen extends StatefulWidget {
   const AddressBookScreen({Key? key}) : super(key: key);

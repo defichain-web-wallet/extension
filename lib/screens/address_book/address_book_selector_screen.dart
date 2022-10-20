@@ -9,14 +9,16 @@ import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:flutter/material.dart';
 
 class AddressBookSelectorScreen extends StatefulWidget {
   const AddressBookSelectorScreen({Key? key}) : super(key: key);
 
   @override
-  _AddressBookSelectorScreenState createState() => _AddressBookSelectorScreenState();
+  _AddressBookSelectorScreenState createState() =>
+      _AddressBookSelectorScreenState();
 }
 
 class _AddressBookSelectorScreenState extends State<AddressBookSelectorScreen> {
@@ -27,7 +29,6 @@ class _AddressBookSelectorScreenState extends State<AddressBookSelectorScreen> {
   int iterator = 0;
 
   Widget build(BuildContext context) {
-
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
