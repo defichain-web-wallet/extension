@@ -29,7 +29,11 @@ class HistoryNew {
     this.blankId = json["blk_id"];
     this.txid = json["tx_id"];
     this.category = json["cat"];
-    this.value = json["value"];
+    if (this.tokens![0].code == 'BTC') {
+      this.value = this.tokens![0].qty;
+    } else {
+      this.value = json["value"];
+    }
     this.feeQty = json["fee_qty"];
     this.feeValue = json["fee_value"];
   }

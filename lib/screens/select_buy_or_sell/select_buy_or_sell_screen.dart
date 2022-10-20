@@ -170,6 +170,20 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                     ],
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 24, bottom: 12),
+                  child: Text(
+                    'Latest transactions',
+                    style: Theme.of(context).textTheme.headline6!.apply(
+                          color: Theme.of(context)
+                              .textTheme
+                              .headline6!
+                              .color!
+                              .withOpacity(0.6),
+                          fontWeightDelta: 2,
+                        ),
+                  ),
+                ),
                 Expanded(
                   child: fiatState.history.length > 0
                       ? ListView.builder(
@@ -203,9 +217,9 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                               trailing: (fiatState.history[index].inputAsset !=
                                       null)
                                   ? Text(
-                                      '${toFixed(fiatState.history[index].inputAmount!, 4)} ${fiatState.history[index].inputAsset}')
+                                      '${toFixed(fiatState.history[index].inputAmount!, 6)} ${fiatState.history[index].inputAsset}')
                                   : Text(
-                                      '${toFixed(fiatState.history[index].outputAmount!, 4)} ${fiatState.history[index].outputAsset}'),
+                                      '${toFixed(fiatState.history[index].outputAmount!, 6)} ${fiatState.history[index].outputAsset}'),
                             );
                           },
                         )
