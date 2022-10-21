@@ -370,6 +370,7 @@ class AccountCubit extends Cubit<AccountState> {
     var accountsName;
     var box = await Hive.openBox(HiveBoxes.client);
     var encodedPassword = await box.get(HiveNames.password);
+    var swapTutorialStatus = await box.get(HiveNames.swapTutorialStatus);
     var savedMnemonic;
     var mnemonic;
     var password = stringToBase64.decode(encodedPassword);
@@ -443,6 +444,7 @@ class AccountCubit extends Cubit<AccountState> {
       masterKeyPair: masterKeyPair,
       activeAccount: accounts[0],
       activeToken: balances[0].token,
+      swapTutorialStatus: swapTutorialStatus,
     ));
 
     return [
@@ -613,5 +615,20 @@ class AccountCubit extends Cubit<AccountState> {
       historyFilterBy: state.historyFilterBy,
     ));
     await restoreAccountFromStorage(network);
+  }
+
+  updateSwapTutorialStatus(String status) {
+    emit(state.copyWith(
+      status: AccountStatusList.success,
+      mnemonic: state.mnemonic,
+      seed: state.seed,
+      accounts: state.accounts,
+      balances: state.balances,
+      masterKeyPair: state.masterKeyPair,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+      historyFilterBy: state.historyFilterBy,
+      swapTutorialStatus: status,
+    ));
   }
 }
