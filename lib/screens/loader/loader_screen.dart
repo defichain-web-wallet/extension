@@ -32,7 +32,7 @@ class LoaderScreen extends StatefulWidget {
 class _LoaderScreenState extends State<LoaderScreen> {
   String firstStepText = 'One second, Jelly is preparing your transaction!';
   String secondStepText = '';
-  String thirdStepText = 'Argh... Blockchains are not the fastest!';
+  String thirdStepText = 'Almost done!';
   String currentText = '';
   double loaderImageWidth = 180;
   Timer? timer;

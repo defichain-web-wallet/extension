@@ -15,6 +15,7 @@ class AccountState extends Equatable {
   final int? needRestore;
   final int? restored;
   final Exception? exception;
+  final String swapTutorialStatus;
 
   AccountState({
     this.status = AccountStatusList.initial,
@@ -29,6 +30,7 @@ class AccountState extends Equatable {
     this.needRestore,
     this.restored,
     this.exception,
+    this.swapTutorialStatus = 'show',
   });
 
   @override
@@ -45,6 +47,7 @@ class AccountState extends Equatable {
         needRestore,
         restored,
         exception,
+        swapTutorialStatus,
       ];
 
   AccountState copyWith({
@@ -60,6 +63,7 @@ class AccountState extends Equatable {
     int? needRestore,
     int? restored,
     Exception? exception,
+    String? swapTutorialStatus,
   }) {
     return AccountState(
       status: status ?? this.status,
@@ -74,6 +78,7 @@ class AccountState extends Equatable {
       needRestore: needRestore ?? this.needRestore,
       restored: restored ?? this.restored,
       exception: exception ?? this.exception,
+      swapTutorialStatus: swapTutorialStatus ?? this.swapTutorialStatus,
     );
   }
 }
