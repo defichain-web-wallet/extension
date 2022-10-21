@@ -2,7 +2,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
-import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
+import 'package:defi_wallet/widgets/send/asset_dropdown.dart';
 import 'package:defi_wallet/screens/staking/staking_confirm_transaction.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
