@@ -28,15 +28,16 @@ class SwapGuideScreen extends StatefulWidget {
 class _SwapGuideScreenState extends State<SwapGuideScreen> {
   bool isConfirm = false;
   double headerSectionWidth = 300;
+  double textSectionWidth = 350;
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       builder: (
-          BuildContext context,
-          bool isFullScreen,
-          TransactionState txState,
-          ) {
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState txState,
+      ) {
         return Scaffold(
           appBar: MainAppBar(
             title: 'How does it works?',
@@ -49,7 +50,7 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
           body: Container(
             color: Theme.of(context).dialogBackgroundColor,
             padding:
-            const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+                const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
             child: Center(
               child: StretchBox(
                 child: Column(
@@ -66,10 +67,17 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
                                 top: 44,
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset('assets/btc_origin.svg'),
-                                  SvgPicture.asset('assets/arrow_right_long.svg'),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  SvgPicture.asset(
+                                      'assets/arrow_right_long.svg'),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
                                   SvgPicture.asset('assets/btc_dfx.svg'),
                                 ],
                               ),
@@ -78,33 +86,37 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
                               child: SvgPicture.asset('assets/dfx_logo.svg'),
                             ),
                             Container(
+                              width: isFullScreen ? double.infinity : textSectionWidth,
                               padding: EdgeInsets.only(
                                 top: 44,
                               ),
                               child: RichText(
                                 textAlign: TextAlign.center,
                                 text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: 'This service is provided by DFX Swiss. ',
-                                      style: Theme.of(context).textTheme.headline2?.apply(
-                                        fontSizeFactor: 1.6,
-                                      ),
+                                    style: isFullScreen ? Theme.of(context)
+                                        .textTheme
+                                        .headline2
+                                        ?.apply(
+                                          fontSizeFactor: 1.6,
+                                        ) : Theme.of(context)
+                                        .textTheme
+                                        .headline2
+                                        ?.apply(
+                                      fontSizeFactor: 1.4,
                                     ),
-                                    TextSpan(
-                                      text: 'Swaps may take up to 4 hours to be processed. ',
-                                      style: Theme.of(context).textTheme.headline2?.apply(
-                                        fontSizeFactor: 1.6,
+                                    children: [
+                                      TextSpan(
+                                        text:
+                                            'This service is provided by DFX Swiss. \n',
                                       ),
-                                    ),
-                                    TextSpan(
-                                      text: 'You will not be redirected.',
-                                      style: Theme.of(context).textTheme.headline2?.apply(
-                                        fontSizeFactor: 1.6,
+                                      TextSpan(
+                                        text:
+                                            'Swaps may take up to 4 hours to be processed. ',
                                       ),
-                                    ),
-                                  ]
-                                ),
+                                      TextSpan(
+                                        text: 'You will not be redirected.',
+                                      ),
+                                    ]),
                               ),
                             ),
                             Container(
@@ -125,12 +137,16 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
                             label: 'Next',
                             isCheckLock: false,
                             callback: () async {
-                              AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-                              String swapTutorialStatus = isConfirm ? 'skip' : 'show';
+                              AccountCubit accountCubit =
+                                  BlocProvider.of<AccountCubit>(context);
+                              String swapTutorialStatus =
+                                  isConfirm ? 'skip' : 'show';
                               var box = await Hive.openBox(HiveBoxes.client);
-                              await box.put(HiveNames.swapTutorialStatus, swapTutorialStatus);
+                              await box.put(HiveNames.swapTutorialStatus,
+                                  swapTutorialStatus);
                               await box.close();
-                              accountCubit.updateSwapTutorialStatus(swapTutorialStatus);
+                              accountCubit
+                                  .updateSwapTutorialStatus(swapTutorialStatus);
                               print(swapTutorialStatus);
                               Navigator.push(
                                 context,
@@ -150,14 +166,19 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
                             child: StretchBox(
                               child: Row(
                                 children: [
-                                  Checkbox(
-                                    value: isConfirm,
-                                    activeColor: AppTheme.pinkColor,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        isConfirm = !isConfirm;
-                                      });
-                                    },
+                                  Theme(
+                                    child: Checkbox(
+                                      value: isConfirm,
+                                      activeColor: AppTheme.pinkColor,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          isConfirm = !isConfirm;
+                                        });
+                                      },
+                                    ),
+                                    data: ThemeData(
+                                      unselectedWidgetColor: AppTheme.pinkColor,
+                                    ),
                                   ),
                                   Flexible(
                                     child: MouseRegion(
@@ -168,7 +189,7 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
                                             children: [
                                               TextSpan(
                                                 text:
-                                                'Don´t show this guide next time',
+                                                    'Don´t show this guide next time',
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .subtitle1,
@@ -178,7 +199,7 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
                                         ),
                                         onTap: () {
                                           setState(
-                                                () {
+                                            () {
                                               isConfirm = !isConfirm;
                                             },
                                           );
