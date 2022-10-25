@@ -58,56 +58,56 @@ class _FilterListState extends State<FilterList> {
                   children: menuItems
                       .map(
                         (item) => item['name'] == 'arrow'
-                            ? Container(height: 10)
-                            : Column(
-                                children: [
-                                  MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      onTap: () {
-                                        controller.hideMenu();
-                                        accountCubit.setHistoryFilterBy(item['name']);
-                                      },
-                                      child: Container(
-                                        height: 40,
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16),
-                                          child: Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    item['name'],
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline4,
-                                                  ),
-                                                  (state.historyFilterBy ==
-                                                          item['name'])
-                                                      ? Icon(
-                                                          Icons.done,
-                                                          color:
-                                                              Color(0xffFF00A3),
-                                                        )
-                                                      : Container()
-                                                ],
-                                              )),
+                        ? Container(height: 10)
+                        : Column(
+                      children: [
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              controller.hideMenu();
+                              accountCubit.setHistoryFilterBy(item['name']);
+                            },
+                            child: Container(
+                              height: 40,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16),
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment
+                                          .spaceBetween,
+                                      children: [
+                                        Text(
+                                          item['name'],
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline4,
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                  Divider(
-                                    height: item == menuItems.last ? 0 : 1,
-                                    color: AppTheme.lightGreyColor,
-                                  ),
-                                ],
+                                        (state.historyFilterBy ==
+                                            item['name'])
+                                            ? Icon(
+                                          Icons.done,
+                                          color:
+                                          Color(0xffFF00A3),
+                                        )
+                                            : Container()
+                                      ],
+                                    )),
                               ),
-                      )
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: item == menuItems.last ? 0 : 1,
+                          color: AppTheme.lightGreyColor,
+                        ),
+                      ],
+                    ),
+                  )
                       .toList(),
                 ),
               ),
@@ -161,7 +161,6 @@ class ArrowPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
-    canvas.drawShadow(path, Colors.grey.withOpacity(0.5), 5, false);
     canvas.drawPath(path, paint);
   }
 

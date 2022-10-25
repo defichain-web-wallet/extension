@@ -16,6 +16,8 @@ class IbanSelector extends StatefulWidget {
   IbanModel selectedIban;
   void Function()? onAnotherSelect;
   final Widget? routeWidget;
+  final bool isShowAsset;
+  final bool isBorder;
 
   IbanSelector({
     Key? key,
@@ -24,6 +26,8 @@ class IbanSelector extends StatefulWidget {
     required this.selectedIban,
     this.onAnotherSelect,
     this.routeWidget,
+    this.isShowAsset = false,
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -62,13 +66,6 @@ class IbanSelectorState extends State<IbanSelector> {
                 key: _selectKey,
                 height: _tileHeight,
                 decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.shadowColor.withOpacity(0.1),
-                      spreadRadius: 2,
-                      blurRadius: 3,
-                    ),
-                  ],
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(10),
@@ -78,7 +75,9 @@ class IbanSelectorState extends State<IbanSelector> {
                     bottomLeft:
                         _isOpen ? Radius.circular(0) : Radius.circular(10),
                   ),
-                  border: Border.all(color: Theme.of(context).dividerColor),
+                  border: Border.all(
+                    color: Colors.transparent,
+                  ),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: Padding(
@@ -171,7 +170,9 @@ class IbanSelectorState extends State<IbanSelector> {
                   bottomLeft: Radius.circular(10),
                   bottomRight: Radius.circular(10),
                 ),
-                border: Border.all(color: Theme.of(context).dividerColor),
+                border: Border.all(
+                  color: Colors.transparent,
+                ),
               ),
               child: ListView.separated(
                 itemCount: widget.ibanList.length + 1,
@@ -179,22 +180,27 @@ class IbanSelectorState extends State<IbanSelector> {
                   if (index == widget.ibanList.length) {
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(0),
-                          shadowColor: Colors.transparent,
-                          primary: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10.0),
-                                  bottomRight: Radius.circular(10.0))),
-                          side: BorderSide(
-                            color: Colors.transparent,
-                          )),
+                        padding: const EdgeInsets.all(0),
+                        shadowColor: Colors.transparent,
+                        primary: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(10.0),
+                            bottomRight: Radius.circular(10.0),
+                          ),
+                        ),
+                        side: BorderSide(
+                          color: Colors.transparent,
+                        ),
+                      ),
                       child: Container(
                         height: _tileHeight,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10.0),
-                                bottomRight: Radius.circular(10.0))),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(10.0),
+                            bottomRight: Radius.circular(10.0),
+                          ),
+                        ),
                         child: Center(
                           child: Text(
                             '+ Add new IBAN',
@@ -209,23 +215,27 @@ class IbanSelectorState extends State<IbanSelector> {
                         hideOverlay();
                         if (widget.asset != null) {
                           Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) =>
-                                    IbanScreen(
-                                      asset: widget.asset!,
-                                      isNewIban: true,
-                                      routeWidget: widget.routeWidget,
-                                    ),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ));
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  IbanScreen(
+                                asset: widget.asset!,
+                                isNewIban: true,
+                                routeWidget: widget.routeWidget,
+                              ),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          );
                         } else {
                           Navigator.push(
                               context,
                               PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) =>
-                                    Selling(isNewIban: true,),
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        Selling(
+                                  isNewIban: true,
+                                ),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ));
@@ -233,12 +243,6 @@ class IbanSelectorState extends State<IbanSelector> {
                       },
                     );
                   } else {
-                    String assetName;
-                    if (widget.ibanList[index].asset != null) {
-                      assetName = widget.ibanList[index].asset!.name!;
-                    } else {
-                      assetName = widget.ibanList[index].fiat!.name!;
-                    }
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(0),
@@ -260,25 +264,15 @@ class IbanSelectorState extends State<IbanSelector> {
                               Row(
                                 children: [
                                   Container(
-                                    width: 100,
+                                    width: 78,
                                     padding: EdgeInsets.only(
                                         top: 12.0,
                                         bottom: 12.0,
                                         left: 22,
                                         right: 22),
-                                    child: Text(
-                                      '$assetName',
-                                      softWrap: true,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline2!
-                                          .apply(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .headline3!
-                                                  .color!),
-                                    ),
+                                    child: Text(widget.isShowAsset
+                                        ? widget.ibanList[index].fiat!.name!
+                                        : ''),
                                   ),
                                   Text(
                                     '${fiatHelper.getIbanFormat(widget.ibanList[index].iban!)}',

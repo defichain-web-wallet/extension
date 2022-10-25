@@ -31,7 +31,7 @@ class NotSecureScreen extends StatelessWidget {
       );
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
-        color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Center(
@@ -46,7 +46,7 @@ class NotSecureScreen extends StatelessWidget {
                         Column(
                           children: [
                             Text(
-                              '1/3',
+                              '1/4',
                               style: Theme.of(context).textTheme.headline2,
                             ),
                             SizedBox(height: 8),
@@ -123,7 +123,8 @@ class NotSecureScreen extends StatelessWidget {
                           callback: () => Navigator.push(
                             context,
                             PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) => SecureScreen(),
+                              pageBuilder: (context, animation1, animation2) =>
+                                  SecureScreen(),
                               transitionDuration: Duration.zero,
                               reverseTransitionDuration: Duration.zero,
                             ),

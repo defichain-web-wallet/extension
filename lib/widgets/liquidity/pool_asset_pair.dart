@@ -4,6 +4,7 @@ import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -32,14 +33,6 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
         decoration: BoxDecoration(
           color: Theme.of(context).backgroundColor,
           borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor,
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -58,16 +51,21 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 4.0),
-                          child: Text(
-                              TokensHelper()
-                                  .getTokenFormat(widget.assetPair.symbol!),
-                              overflow: TextOverflow.ellipsis,
-                              style: widget.isFullSize
-                                  ? Theme.of(context).textTheme.headline6
-                                  : Theme.of(context)
-                                      .textTheme
-                                      .headline4
-                                      ?.apply(fontWeightDelta: 2)),
+                          child: Container(
+                            width: widget.isFullSize ? 123 : 73,
+                            child: TickerText(
+                              child: Text(
+                                  TokensHelper()
+                                      .getTokenFormat(widget.assetPair.symbol!),
+                                  overflow: TextOverflow.ellipsis,
+                                  style: widget.isFullSize
+                                      ? Theme.of(context).textTheme.headline6
+                                      : Theme.of(context)
+                                          .textTheme
+                                          .headline4
+                                          ?.apply(fontWeightDelta: 2)),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -84,18 +82,19 @@ class _PoolAssetPairState extends State<PoolAssetPair> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Yield',
-                            style: widget.isFullSize
-                                ? Theme.of(context)
-                                    .textTheme
-                                    .headline5
-                                    ?.apply(fontWeightDelta: 2)
-                                : Theme.of(context)
-                                    .textTheme
-                                    .headline4
-                                    ?.apply(fontWeightDelta: 2)),
                         Text(
-                            TokensHelper().getAprFormat(widget.assetPair.apr!),
+                          'Yield',
+                          style: widget.isFullSize
+                              ? Theme.of(context)
+                                  .textTheme
+                                  .headline5
+                                  ?.apply(fontWeightDelta: 2)
+                              : Theme.of(context)
+                                  .textTheme
+                                  .headline4
+                                  ?.apply(fontWeightDelta: 2),
+                        ),
+                        Text(TokensHelper().getAprFormat(widget.assetPair.apr!),
                             style: Theme.of(context).textTheme.headline4)
                       ],
                     ),

@@ -48,9 +48,12 @@ class AppTheme {
         backgroundColor: Colors.white,
         actionTextColor: Colors.black,
       ),
-      scaffoldBackgroundColor: Color(0xffFAFAFA),
-      dialogBackgroundColor: Color(0xffFFFFFF),
+      scaffoldBackgroundColor: Color(0xffEDEDED),
+      dialogBackgroundColor: Color(0xffFAFAFA),
+      primaryColorLight: Color(0xFF5D5D5D),
+
       selectedRowColor: Color(0xFFFAFAFA),
+
       shadowColor: Colors.grey[300]!,
       cardColor: Colors.white,
       backgroundColor: Colors.white,
@@ -62,6 +65,7 @@ class AppTheme {
       iconTheme: IconThemeData(
         color: Colors.black,
       ),
+      textSelectionColor: Color(0xFF7D7D7D),
       textTheme: TextTheme(
         headline1: TextStyle(
             fontSize: 30,
@@ -92,7 +96,7 @@ class AppTheme {
             fontWeight: FontWeight.normal,
             fontFamily: 'IBM Plex Sans'),
         subtitle2: TextStyle(
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: FontWeight.normal,
             fontFamily: 'IBM Plex Sans'),
         button: TextStyle(
@@ -158,13 +162,14 @@ class AppTheme {
         backgroundColor: Color(0xff333436),
         actionTextColor: Colors.white,
       ),
+      primaryColorLight: Color(0xFF545556),
       backgroundColor: Color(0xff333436),
       secondaryHeaderColor: Color(0xff333436),
       scaffoldBackgroundColor: AppTheme.shadowColor,
       dialogBackgroundColor: Color(0xFF1C1D1F),
       selectedRowColor: Color(0xFF1C1D1F),
       shadowColor: Colors.transparent,
-      cardColor: Color(0xff1C1D1F),
+      cardColor: Color(0xff333436),
       colorScheme: ColorScheme.dark(
         primary: pinkColor,
         primaryVariant: pinkColor,
@@ -172,6 +177,7 @@ class AppTheme {
       iconTheme: IconThemeData(
         color: Colors.white,
       ),
+      textSelectionColor: Color(0xFFF0F0F0),
       textTheme: TextTheme(
         headline1: TextStyle(
             fontSize: 30,

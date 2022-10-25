@@ -1,12 +1,15 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
-import 'package:defi_wallet/screens/send/widgets/asset_dropdown.dart';
-import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
+import 'package:defi_wallet/widgets/send/asset_dropdown.dart';
+import 'package:defi_wallet/screens/staking/staking_confirm_transaction.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
+import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -49,11 +52,56 @@ class _NumberOfCoinsToStakeScreenState
             }
           });
 
-          return ScaffoldConstrainedBoxNew(
-            appBar: MainAppBar(
-              hideOverlay: hideOverlay,
-              title: 'Staking',
+          return ScaffoldConstrainedBox(
+            child: GestureDetector(
+              onTap: () => hideOverlay(),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < ScreenSizes.medium) {
+                    return Scaffold(
+                      appBar: MainAppBar(
+                        hideOverlay: hideOverlay,
+                        title: 'Staking',
+                      ),
+                      body: _buildBody(state, assets),
+                    );
+                  } else {
+                    return Container(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Scaffold(
+                        appBar: MainAppBar(
+                        hideOverlay: hideOverlay,
+                        title: 'Staking',
+                          isSmall: true,
+                      ),
+                        body: _buildBody(
+                          state,
+                          assets,
+                          isFullSize: true,
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
+          );
+        } else {
+          return Loader();
+        }
+      },
+    );
+  }
+
+  Widget _buildBody(
+      state, assets,
+      {isFullSize = false}) =>
+      Container(
+        height: double.infinity,
+        color: Theme.of(context).dialogBackgroundColor,
+        padding: EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+        child: Center(
+          child: StretchBox(
             child: GestureDetector(
               onTap: () {
                 hideOverlay();
@@ -71,7 +119,7 @@ class _NumberOfCoinsToStakeScreenState
                             Container(
                               padding: EdgeInsets.only(top: 15),
                               child:
-                                  SvgPicture.asset('assets/staking_logo.svg'),
+                              SvgPicture.asset('assets/staking_logo.svg'),
                             ),
                             Container(
                               padding: EdgeInsets.only(top: 30),
@@ -106,12 +154,12 @@ class _NumberOfCoinsToStakeScreenState
                                     int balance = state
                                         .activeAccount!.balanceList!
                                         .firstWhere((el) =>
-                                            el.token! == assetFrom &&
-                                            !el.isHidden!)
+                                    el.token! == assetFrom &&
+                                        !el.isHidden!)
                                         .balance!;
                                     final int fee = 3000;
                                     double amount =
-                                        convertFromSatoshi(balance - fee);
+                                    convertFromSatoshi(balance - fee);
                                     _amountController.text = amount.toString();
                                   });
                                 },
@@ -120,12 +168,12 @@ class _NumberOfCoinsToStakeScreenState
                                     int balance = state
                                         .activeAccount!.balanceList!
                                         .firstWhere((el) =>
-                                            el.token! == assetFrom &&
-                                            !el.isHidden!)
+                                    el.token! == assetFrom &&
+                                        !el.isHidden!)
                                         .balance!;
                                     final int fee = 3000;
                                     double amount =
-                                        (convertFromSatoshi(balance - fee) / 2);
+                                    (convertFromSatoshi(balance - fee) / 2);
                                     _amountController.text = amount.toString();
                                   });
                                 },
@@ -159,7 +207,10 @@ class _NumberOfCoinsToStakeScreenState
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation1, animation2) =>
-                                        SendStakingRewardsScreen(),
+                                    StakingConfirmTransaction(
+                                      amount: double.parse(_amountController.text.replaceAll(',', '.')),
+                                      assetName: assetFrom,
+                                    ),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ),
@@ -172,11 +223,7 @@ class _NumberOfCoinsToStakeScreenState
                 ],
               ),
             ),
-          );
-        } else {
-          return Loader();
-        }
-      },
-    );
-  }
+          ),
+        ),
+      );
 }

@@ -81,8 +81,7 @@ class _SettingsState extends State<Settings> {
         AccountState accountCubit =
             BlocProvider.of<AccountCubit>(context).state;
         return Container(
-          color:
-              isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+          color: Theme.of(context).dialogBackgroundColor,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           child: Center(
               child: StretchBox(
@@ -257,125 +256,6 @@ class _SettingsState extends State<Settings> {
                                     onChanged: (value) {
                                       setState(() {
                                         localSettings.theme = value;
-                                      });
-                                    },
-                                    activeColor: Color(0xFFFF00A3),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Divider(),
-                            ),
-                            Column(
-                              children: [
-                                Text('Network'),
-                                ListTile(
-                                  title: SettingsLabel(
-                                    label: 'Testnet',
-                                    callback: () {
-                                      setState(() {
-                                        localSettings.network = 'testnet';
-                                      });
-                                    },
-                                  ),
-                                  leading: Radio<String>(
-                                    value: 'testnet',
-                                    groupValue: localSettings.network,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        localSettings.network = value;
-                                      });
-                                    },
-                                    activeColor: Color(0xFFFF00A3),
-                                  ),
-                                ),
-                                ListTile(
-                                  title: SettingsLabel(
-                                    label: 'Mainnet',
-                                    callback: () {
-                                      setState(() {
-                                        localSettings.network = 'mainnet';
-                                      });
-                                    },
-                                  ),
-                                  leading: Radio<String>(
-                                    value: 'mainnet',
-                                    groupValue: localSettings.network,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        localSettings.network = value;
-                                      });
-                                    },
-                                    activeColor: Color(0xFFFF00A3),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Divider(),
-                            ),
-                            Column(
-                              children: [
-                                Text('API'),
-                                ListTile(
-                                  title: SettingsLabel(
-                                    label: 'Auto',
-                                    hint: '(recommended)',
-                                    callback: () {
-                                      setState(() {
-                                        localSettings.apiName = ApiName.auto;
-                                      });
-                                    },
-                                  ),
-                                  leading: Radio<ApiName>(
-                                    value: ApiName.auto,
-                                    groupValue: localSettings.apiName,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        localSettings.apiName = value;
-                                      });
-                                    },
-                                    activeColor: Color(0xFFFF00A3),
-                                  ),
-                                ),
-                                ListTile(
-                                  title: SettingsLabel(
-                                    label: 'Ocean',
-                                    callback: () {
-                                      setState(() {
-                                        localSettings.apiName = ApiName.ocean;
-                                      });
-                                    },
-                                  ),
-                                  leading: Radio<ApiName>(
-                                    value: ApiName.ocean,
-                                    groupValue: localSettings.apiName,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        localSettings.apiName = value;
-                                      });
-                                    },
-                                    activeColor: Color(0xFFFF00A3),
-                                  ),
-                                ),
-                                ListTile(
-                                  title: SettingsLabel(
-                                    label: 'MyDefichain',
-                                    callback: () {
-                                      setState(() {
-                                        localSettings.apiName = ApiName.myDefi;
-                                      });
-                                    },
-                                  ),
-                                  leading: Radio<ApiName>(
-                                    value: ApiName.myDefi,
-                                    groupValue: localSettings.apiName,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        localSettings.apiName = value;
                                       });
                                     },
                                     activeColor: Color(0xFFFF00A3),

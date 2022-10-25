@@ -42,7 +42,7 @@ class SellInitiated extends StatelessWidget {
 
     transactionCubit.setOngoingTransaction(txResponse!.txid!);
     return Container(
-      color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+      color: Theme.of(context).dialogBackgroundColor,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
         child: Center(
@@ -57,9 +57,9 @@ class SellInitiated extends StatelessWidget {
                       Image.asset(
                         txResponse!.isError
                             ? 'assets/error_gif.gif'
-                            : 'assets/success_gif.gif',
-                        height: 126,
-                        width: 124,
+                            : 'assets/status_reload_icon.png',
+                        height: 106,
+                        width: 104,
                       ),
                       Container(
                         padding: EdgeInsets.only(top: 60),
@@ -85,7 +85,7 @@ class SellInitiated extends StatelessWidget {
                   ),
                 ),
                 PrimaryButton(
-                  label: 'Done ',
+                  label: 'Home',
                   callback: () {
                     Navigator.pushReplacement(
                         context,

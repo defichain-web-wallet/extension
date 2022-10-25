@@ -14,7 +14,9 @@ class SecureDoneScreen extends StatelessWidget {
         child: LayoutBuilder(builder: (context, constraints) {
           if (constraints.maxWidth < ScreenSizes.medium) {
             return Scaffold(
-              appBar: AuthAppBar(),
+              appBar: AuthAppBar(
+                isWidgetBack: false,
+              ),
               body: _buildBody(context),
             );
           } else {
@@ -23,6 +25,7 @@ class SecureDoneScreen extends StatelessWidget {
               child: Scaffold(
                 appBar: AuthAppBar(
                   isSmall: false,
+                  isWidgetBack: false,
                 ),
                 body: _buildBody(context, isCustomBgColor: true),
               ),
@@ -32,7 +35,7 @@ class SecureDoneScreen extends StatelessWidget {
       );
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
-        color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Center(
@@ -85,7 +88,8 @@ class SecureDoneScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomeScreen(
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomeScreen(
                               isLoadTokens: true,
                             ),
                             transitionDuration: Duration.zero,

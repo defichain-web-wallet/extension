@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -53,70 +55,62 @@ class AccountSelectState extends State<AccountSelect> {
         return MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
-            child: Container(
-              key: _selectKey,
-              height: _tileHeight,
-              width: widget.width,
-              decoration: BoxDecoration(
-                color: Theme.of(context).appBarTheme.backgroundColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.shadowColor.withOpacity(0.1),
-                    spreadRadius: 2,
-                    blurRadius: 3,
+              child: Container(
+                key: _selectKey,
+                height: _tileHeight,
+                width: widget.width,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).appBarTheme.backgroundColor,
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor,
                   ),
-                ],
-                border: Border.all(
-                    color:
-                        Theme.of(context).textTheme.button!.decorationColor!),
-                borderRadius: _isOpen
-                    ? BorderRadius.only(
-                        topLeft: Radius.circular(10.0),
-                        topRight: Radius.circular(10.0))
-                    : BorderRadius.circular(10),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _isOpen ? 'Select account' : _activeAccount.name!,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.headline4!.apply(
-                              color: _isOpen
-                                  ? Theme.of(context)
-                                      .textTheme
-                                      .headline4!
-                                      .color!
-                                      .withOpacity(0.5)
-                                  : Theme.of(context)
-                                      .textTheme
-                                      .headline4!
-                                      .color!,
-                            ),
-                      ),
-                      Icon(
-                        _isOpen
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                        color: Theme.of(context)
-                            .appBarTheme
-                            .actionsIconTheme!
-                            .color,
-                      ),
-                    ],
+                  borderRadius: _isOpen
+                      ? BorderRadius.only(
+                          topLeft: Radius.circular(10.0),
+                          topRight: Radius.circular(10.0))
+                      : BorderRadius.circular(10),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _isOpen ? 'Select account' : _activeAccount.name!,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.headline4!.apply(
+                                color: _isOpen
+                                    ? Theme.of(context)
+                                        .textTheme
+                                        .headline4!
+                                        .color!
+                                        .withOpacity(0.5)
+                                    : Theme.of(context)
+                                        .textTheme
+                                        .headline4!
+                                        .color!,
+                              ),
+                        ),
+                        Icon(
+                          _isOpen
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: Theme.of(context)
+                              .appBarTheme
+                              .actionsIconTheme!
+                              .color,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            onTap: () async {
-              await lockHelper.provideWithLockChecker(context, () async {
-                _showOverlay(context, _accountList, _activeAccount, state);
-              });
-            }
-          ),
+              onTap: () async {
+                await lockHelper.provideWithLockChecker(context, () async {
+                  _showOverlay(context, _accountList, _activeAccount, state);
+                });
+              }),
         );
       } else {
         return Container();
@@ -141,8 +135,8 @@ class AccountSelectState extends State<AccountSelect> {
 
   void _showOverlay(
       BuildContext context, _accountList, _activeAccount, state) async {
-    AccountCubit accountCubit =
-      BlocProvider.of<AccountCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     if (_isOpen) {
       hideOverlay();
     } else {
@@ -168,20 +162,12 @@ class AccountSelectState extends State<AccountSelect> {
                   2,
               decoration: BoxDecoration(
                 color: Theme.of(context).appBarTheme.backgroundColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.shadowColor.withOpacity(0.1),
-                    spreadRadius: 2,
-                    blurRadius: 3,
-                    offset: Offset(0, 3),
-                  ),
-                ],
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(10.0),
                     bottomRight: Radius.circular(10.0)),
                 border: Border.all(
-                    color:
-                        Theme.of(context).textTheme.button!.decorationColor!),
+                  color: Theme.of(context).dividerColor,
+                ),
               ),
               child: ListView.builder(
                 itemCount: _accountList.length + 1,
@@ -216,25 +202,33 @@ class AccountSelectState extends State<AccountSelect> {
                         ),
                       ),
                       onPressed: () async {
-                        await lockHelper.provideWithLockChecker(context, () async {
+                        await lockHelper.provideWithLockChecker(context,
+                            () async {
                           hideOverlay();
-                          accountCubit.addAccount();
-                          LoggerService.invokeInfoLogg('user created new account');
+                          AccountModel account =
+                              await accountCubit.addAccount();
+                          if (SettingsHelper.isBitcoin()) {
+                            await bitcoinCubit
+                                .loadDetails(account.bitcoinAddress!);
+                          }
+                          LoggerService.invokeInfoLogg(
+                              'user created new account');
                         });
                       },
                     );
                   } else {
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(0),
-                          shadowColor: Colors.transparent,
-                          primary: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                          ),
-                          side: BorderSide(
-                            color: Colors.transparent,
-                          )),
+                        padding: const EdgeInsets.all(0),
+                        shadowColor: Colors.transparent,
+                        primary: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(0),
+                        ),
+                        side: BorderSide(
+                          color: Colors.transparent,
+                        ),
+                      ),
                       child: Container(
                         height: _tileHeight,
                         decoration: BoxDecoration(
@@ -266,9 +260,13 @@ class AccountSelectState extends State<AccountSelect> {
                         ),
                       ),
                       onPressed: () async {
-                        await lockHelper.provideWithLockChecker(context, () async {
+                        await lockHelper.provideWithLockChecker(context,
+                            () async {
                           hideOverlay();
-                          accountCubit.updateActiveAccount(_accountList[index].index!);
+                          accountCubit
+                              .updateActiveAccount(_accountList[index].index!);
+                          await bitcoinCubit
+                              .loadDetails(_accountList[index].bitcoinAddress!);
                         });
                       },
                     );

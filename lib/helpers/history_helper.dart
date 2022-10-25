@@ -19,6 +19,8 @@ class HistoryHelper {
         return 'UtxosToAccount';
       case 'AccountToUtxos':
         return 'AccountToUtxos';
+      case 'AccountToAccount':
+        return 'AccountToAccount';
       case 'PoolSwap':
         return 'Swap';
       case 'SEND':

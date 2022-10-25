@@ -30,7 +30,7 @@ class _FirstStepBuyScreenState extends State<FirstStepBuyScreen> {
                 if (constraints.maxWidth < ScreenSizes.medium) {
                   return Scaffold(
                     appBar: MainAppBar(
-                      title: 'Fiat to crypto: how it works?',
+                      title: 'How does it work?',
                     ),
                     body: _buildBody(state),
                   );
@@ -39,7 +39,7 @@ class _FirstStepBuyScreenState extends State<FirstStepBuyScreen> {
                     padding: const EdgeInsets.only(top: 20),
                     child: Scaffold(
                       appBar: MainAppBar(
-                        title: 'Fiat to crypto: how it works?',
+                        title: 'How does it work?',
                         isSmall: true,
                       ),
                       body: _buildBody(state, isFullSize: true),
@@ -56,7 +56,7 @@ class _FirstStepBuyScreenState extends State<FirstStepBuyScreen> {
   }
 
   Widget _buildBody(state, {isFullSize = false}) => Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -114,7 +114,9 @@ class _FirstStepBuyScreenState extends State<FirstStepBuyScreen> {
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation1, animation2) =>
-                                        SecondStepBuyScreen(isConfirm: isConfirm,),
+                                        SecondStepBuyScreen(
+                                  isConfirm: isConfirm,
+                                ),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ));

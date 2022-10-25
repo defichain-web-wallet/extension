@@ -15,4 +15,11 @@ class AddressesHelper {
     return Address.validateAddress(
         address, networkHelper.getNetwork(SettingsHelper.settings.network!));
   }
+
+  Future<bool> validateBtcAddress(String address) async {
+    NetworkType type = SettingsHelper.settings.network == 'mainnet'
+        ? networkHelper.getNetwork('bitcoin')
+        : networkHelper.getNetwork('bitcoin_testnet');
+    return Address.validateAddress(address, type);
+  }
 }

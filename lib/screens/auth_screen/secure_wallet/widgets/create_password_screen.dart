@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/secure_done_screen.dart';
@@ -71,7 +72,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       );
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
-        color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Center(
@@ -82,7 +83,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                   Column(
                     children: [
                       Text(
-                        widget.showStep ? '3/3' : '',
+                        widget.showStep ? '4/4' : '',
                         style: Theme.of(context).textTheme.headline2,
                       ),
                       SizedBox(height: 8),
@@ -241,6 +242,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
         isFailed = false;
       });
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+      FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
       var box = await Hive.openBox(HiveBoxes.client);
       box.put(HiveNames.password, stringToBase64.encode(password));
 
@@ -273,11 +275,12 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
         Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => widget.showDoneScreen
-                ? SecureDoneScreen()
-                : HomeScreen(
-                    isLoadTokens: true,
-                  ),
+            pageBuilder: (context, animation1, animation2) =>
+                widget.showDoneScreen
+                    ? SecureDoneScreen()
+                    : HomeScreen(
+                        isLoadTokens: true,
+                      ),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ),

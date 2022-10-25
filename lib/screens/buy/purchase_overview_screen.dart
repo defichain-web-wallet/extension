@@ -13,11 +13,9 @@ import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:simple_tooltip/simple_tooltip.dart';
 
 class PurchaseOverviewScreen extends StatefulWidget {
@@ -49,7 +47,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
     return BlocBuilder<AccountCubit, AccountState>(
       builder: (BuildContext context, state) {
         if (iterator == 0) {
-          fiatCubit.loadIbanList(state.accessToken!, widget.asset);
+          fiatCubit.loadIbanList(asset: widget.asset);
           iterator++;
         }
         return BlocBuilder<FiatCubit, FiatState>(
@@ -99,7 +97,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
       );
     } else {
       return Container(
-        color: isFullSize ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding:
             const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
         child: Center(
@@ -269,7 +267,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
                                             .headline2,
                                       ),
                                       Text(
-                                        fiatState.activeIban.asset.name,
+                                        widget.asset.name!,
                                         style: Theme.of(context)
                                             .textTheme
                                             .headline3,
@@ -301,7 +299,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: 70,
+                                  height: 80,
                                   decoration: BoxDecoration(
                                     border: Border(
                                       bottom: BorderSide(
