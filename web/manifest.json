@@ -5,15 +5,15 @@
         "storage"
     ],
     "icons": {
-        "16":"/icons/jelly_logo.png",
-        "48": "/icons/jelly_logo.png",
-        "128":"/icons/jelly_logo.png"
+        "16":"/icons/16.png",
+        "48": "/icons/48.png",
+        "128":"/icons/128.png"
     },
     "description": "Jellywallet Beta extension",
     "content_security_policy": "script-src 'self'; object-src 'self'",
     "browser_action": {
         "browser_style": true,
-        "default_icon": "/icons/jelly_logo.png",
+        "default_icon": "/icons/128.png",
         "default_title": "Jellywallet Beta",
         "default_popup": "/index.html"
     },
