@@ -1,6 +1,7 @@
 import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'address_model.dart';
 
@@ -34,7 +35,11 @@ class AccountModel {
     this.index = jsonModel["index"];
     this.name = jsonModel["name"];
     this.activeToken = jsonModel["activeToken"];
-    this.bitcoinAddress = AddressModel.fromJson(jsonModel["bitcoinAddress"]);
+    if (jsonModel["bitcoinAddress"] == null) {
+      this.bitcoinAddress = null;
+    } else {
+      this.bitcoinAddress = AddressModel.fromJson(jsonModel["bitcoinAddress"]);
+    }
 
     List<AddressModel> addressList = [];
     jsonModel["addressList"]
