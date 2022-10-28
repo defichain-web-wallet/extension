@@ -11,6 +11,7 @@ import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
 import 'package:defi_wallet/screens/sell/account_type_sell.dart';
 import 'package:defi_wallet/screens/sell/selling.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -41,10 +42,10 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       builder: (
-        BuildContext context,
-        bool isFullScreen,
-        TransactionState txState,
-      ) {
+          BuildContext context,
+          bool isFullScreen,
+          TransactionState txState,
+          ) {
         FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
         if (iterator == 0) {
@@ -81,7 +82,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                             padding: EdgeInsets.only(top: 20, bottom: 30),
                             decoration: BoxDecoration(
                               color:
-                                  Theme.of(context).appBarTheme.backgroundColor,
+                              Theme.of(context).appBarTheme.backgroundColor,
                               border: Border.all(
                                 color: Colors.transparent,
                               ),
@@ -97,8 +98,8 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                                         .textTheme
                                         .headline2!
                                         .apply(
-                                          fontFamily: 'IBM Plex Sans',
-                                        ),
+                                      fontFamily: 'IBM Plex Sans',
+                                    ),
                                   ),
                                 ),
                                 SizedBox(
@@ -111,8 +112,8 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                                         .textTheme
                                         .headline1!
                                         .apply(
-                                          fontFamily: 'IBM Plex Medium',
-                                        ),
+                                      fontFamily: 'IBM Plex Medium',
+                                    ),
                                   ),
                                 ),
                                 SizedBox(
@@ -166,76 +167,86 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                             child: Text(
                               'Latest transactions',
                               style:
-                                  Theme.of(context).textTheme.headline6!.apply(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .color!
-                                            .withOpacity(0.6),
-                                        fontWeightDelta: 2,
-                                      ),
+                              Theme.of(context).textTheme.headline6!.apply(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .color!
+                                    .withOpacity(0.6),
+                                fontWeightDelta: 2,
+                              ),
                             ),
                           ),
                           Expanded(
                             child: fiatState.history.length > 0
                                 ? ListView.builder(
-                                    itemCount: fiatState.history.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return ListTile(
-                                        leading: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            if (fiatState
-                                                    .history[index].type! ==
-                                                'Withdrawal')
-                                              SvgPicture.asset(
-                                                'assets/images/withdrawal.svg',
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color,
-                                              )
-                                            else
-                                              SvgPicture.asset(
-                                                'assets/images/deposit.svg',
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color,
-                                              )
-                                          ],
-                                        ),
-                                        title: Text(
-                                            fiatState.history[index].type!),
-                                        subtitle: Text(
-                                            fiatState.history[index].date!),
-                                        trailing: (fiatState.history[index]
-                                                    .inputAsset !=
-                                                null)
-                                            ? Text(
-                                                '${toFixed(fiatState.history[index].inputAmount!, 6)} ${fiatState.history[index].inputAsset}')
-                                            : Text(
-                                                '${toFixed(fiatState.history[index].outputAmount!, 6)} ${fiatState.history[index].outputAsset}'),
-                                      );
-                                    },
-                                  )
-                                : Center(
-                                    child: Text('Not yet any transaction'),
+                              itemCount: fiatState.history.length,
+                              itemBuilder:
+                                  (BuildContext context, int index) {
+                                return ListTile(
+                                  leading: Column(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    children: [
+                                      if (fiatState
+                                          .history[index].type! ==
+                                          'Withdrawal')
+                                        SvgPicture.asset(
+                                          'assets/images/withdrawal.svg',
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .color,
+                                        )
+                                      else
+                                        SvgPicture.asset(
+                                          'assets/images/deposit.svg',
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .color,
+                                        )
+                                    ],
                                   ),
+                                  title: Text(
+                                      fiatState.history[index].type!),
+                                  subtitle: Text(
+                                      fiatState.history[index].date!),
+                                  trailing: (fiatState.history[index]
+                                      .inputAsset !=
+                                      null)
+                                      ? Text(
+                                      '${toFixed(fiatState.history[index].inputAmount!, 6)} ${fiatState.history[index].inputAsset}')
+                                      : Text(
+                                      '${toFixed(fiatState.history[index].outputAmount!, 6)} ${fiatState.history[index].outputAsset}'),
+                                );
+                              },
+                            )
+                                : Center(
+                              child: Text('Not yet any transaction'),
+                            ),
                           ),
                           SettingsHelper.settings.theme == 'Light'
                               ? SvgPicture.asset('assets/powered_of_dfx.svg')
                               : SvgPicture.asset(
-                                  'assets/powered_of_dfx_dark.svg'),
+                              'assets/powered_of_dfx_dark.svg'),
                         ],
                       ),
                     ),
                   ),
                 ),
               );
-            } else {
+            } else if (fiatState.status == FiatStatusList.failure) {
+              return Container(
+                child: Center(
+                  child: ErrorPlaceholder(
+                    description: 'Please check again later',
+                    message: 'API is under maintenance',
+                  ),
+                ),
+              );
+            }
+            else {
               return Loader();
             }
           },
@@ -276,7 +287,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) =>
-            isSkipKyc ? Selling() : AccountTypeSell(),
+        isSkipKyc ? Selling() : AccountTypeSell(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),
