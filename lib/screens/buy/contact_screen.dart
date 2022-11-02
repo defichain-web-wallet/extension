@@ -29,6 +29,8 @@ class _ContactScreenState extends State<ContactScreen> {
   String countryCode = 'US';
   String numberPrefix = '+1';
   bool isEnable = true;
+  double contentWidth = 320;
+  double buttonWidth = 217;
 
   @override
   void dispose() {
@@ -80,8 +82,7 @@ class _ContactScreenState extends State<ContactScreen> {
                     ),
                     body: Container(
                       color: Theme.of(context).dialogBackgroundColor,
-                      padding: const EdgeInsets.only(
-                          left: 18, right: 12, top: 24, bottom: 24),
+                      padding: AppTheme.screenPadding,
                       child: Center(
                         child: StretchBox(
                           child: Column(
@@ -97,11 +98,12 @@ class _ContactScreenState extends State<ContactScreen> {
                                       ),
                                       child: Image(
                                         image: AssetImage(
-                                            'assets/buying_crypto_logo.png'),
+                                          'assets/buying_crypto_logo.png',
+                                        ),
                                       ),
                                     ),
                                     Container(
-                                      width: 320,
+                                      width: contentWidth,
                                       padding: EdgeInsets.only(
                                         top: 44,
                                       ),
@@ -118,7 +120,7 @@ class _ContactScreenState extends State<ContactScreen> {
                                       ),
                                     ),
                                     Container(
-                                      width: 320,
+                                      width: contentWidth,
                                       padding: EdgeInsets.only(
                                         top: 44,
                                       ),
@@ -150,7 +152,7 @@ class _ContactScreenState extends State<ContactScreen> {
                                 ),
                               ),
                               Container(
-                                width: 217,
+                                width: buttonWidth,
                                 padding: EdgeInsets.only(bottom: 88),
                                 child: PrimaryButton(
                                   label: 'Next',

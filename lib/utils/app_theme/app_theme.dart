@@ -10,6 +10,13 @@ class AppTheme {
 
   static const String mainFontFamily = 'IBM Plex Sans';
 
+  static const EdgeInsets screenPadding = const EdgeInsets.only(
+    left: 18,
+    right: 12,
+    top: 24,
+    bottom: 24,
+  );
+
   // Текст - ссылка в стиле DEFI (розовая с нижним подчеркиванием)
   static TextStyle get defiUnderlineText {
     return TextStyle(

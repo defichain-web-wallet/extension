@@ -11,6 +11,7 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/send/send_status_screen.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/screens/loader/loader_screen.dart';
@@ -67,10 +68,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                             tokensState.status == TokensStatusList.success) {
                           return Container(
                             color: Theme.of(context).dialogBackgroundColor,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 24,
-                            ),
+                            padding: AppTheme.screenPadding,
                             child: Center(
                               child: StretchBox(
                                 child: Column(

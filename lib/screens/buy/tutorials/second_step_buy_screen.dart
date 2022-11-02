@@ -1,15 +1,12 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/buy/tutorials/third_step_buy_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SecondStepBuyScreen extends StatefulWidget {
   bool isConfirm;
@@ -24,6 +21,10 @@ class SecondStepBuyScreen extends StatefulWidget {
 }
 
 class _SecondStepBuyScreenState extends State<SecondStepBuyScreen> {
+  double smallSizeLogoWidth = 200;
+  double fullSizeLogoWidth = 400;
+  double buttonWidth = 217;
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
@@ -42,8 +43,7 @@ class _SecondStepBuyScreenState extends State<SecondStepBuyScreen> {
           ),
           body: Container(
             color: Theme.of(context).dialogBackgroundColor,
-            padding:
-                const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+            padding: AppTheme.screenPadding,
             child: Center(
               child: StretchBox(
                 child: Column(
@@ -55,13 +55,16 @@ class _SecondStepBuyScreenState extends State<SecondStepBuyScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              width: !isFullScreen ? 200 : 400,
+                              width: !isFullScreen
+                                  ? smallSizeLogoWidth
+                                  : fullSizeLogoWidth,
                               padding: EdgeInsets.only(
                                 top: 44,
                               ),
                               child: Image(
                                 image: AssetImage(
-                                    'assets/second_step_buy_logo.png'),
+                                  'assets/second_step_buy_logo.png',
+                                ),
                               ),
                             ),
                             Container(
@@ -91,7 +94,7 @@ class _SecondStepBuyScreenState extends State<SecondStepBuyScreen> {
                       ),
                     ),
                     Container(
-                      width: 217,
+                      width: buttonWidth,
                       child: Column(
                         children: [
                           PrimaryButton(
@@ -99,16 +102,17 @@ class _SecondStepBuyScreenState extends State<SecondStepBuyScreen> {
                             isCheckLock: false,
                             callback: () {
                               Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            ThirdStepBuyScreen(
-                                      isConfirm: widget.isConfirm,
-                                    ),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ));
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          ThirdStepBuyScreen(
+                                    isConfirm: widget.isConfirm,
+                                  ),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
+                              );
                             },
                           ),
                           Container(

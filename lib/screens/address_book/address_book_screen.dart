@@ -2,12 +2,12 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/address_book/address_book_add_screen.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/address_book/address_book_card.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:flutter/material.dart';
 
 class AddressBookScreen extends StatefulWidget {
@@ -66,8 +66,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
             builder: (context, addressBookState) {
               return Container(
                 color: Theme.of(context).dialogBackgroundColor,
-                padding: const EdgeInsets.only(
-                    left: 18, right: 12, top: 24, bottom: 24),
+                padding: AppTheme.screenPadding,
                 child: Center(
                   child: StretchBox(
                     child: addressBookState.addressBookList != null

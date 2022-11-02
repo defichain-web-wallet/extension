@@ -12,6 +12,7 @@ import 'package:defi_wallet/requests/btc_requests.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_field.dart';
 import 'package:defi_wallet/screens/send/send_confirm_screen.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/send/address_field.dart';
 import 'package:defi_wallet/widgets/send/asset_dropdown.dart';
 import 'package:defi_wallet/widgets/send/fee_card.dart';
@@ -112,8 +113,7 @@ class _SendFormState extends State<SendForm> {
 
                   return Container(
                     color: Theme.of(context).dialogBackgroundColor,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 24),
+                    padding: AppTheme.screenPadding,
                     child: Center(
                       child: StretchBox(
                         child: Column(
@@ -124,10 +124,11 @@ class _SendFormState extends State<SendForm> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Recipient Address',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline6),
+                                  Text(
+                                    'Recipient Address',
+                                    style:
+                                        Theme.of(context).textTheme.headline6,
+                                  ),
                                   SizedBox(height: 12),
                                   AddressField(
                                     addressController: addressController,

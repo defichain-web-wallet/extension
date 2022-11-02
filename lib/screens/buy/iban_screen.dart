@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
@@ -31,6 +32,7 @@ class _IbanScreenState extends State<IbanScreen> {
   final _ibanController = TextEditingController();
   final GlobalKey<IbanSelectorState> selectKeyIban =
       GlobalKey<IbanSelectorState>();
+  double contentWidth = 380;
 
   @override
   void dispose() {
@@ -73,8 +75,7 @@ class _IbanScreenState extends State<IbanScreen> {
                 ),
                 body: Container(
                   color: Theme.of(context).dialogBackgroundColor,
-                  padding: const EdgeInsets.only(
-                      left: 18, right: 12, top: 24, bottom: 24),
+                  padding: AppTheme.screenPadding,
                   child: Center(
                     child: StretchBox(
                       child: Column(
@@ -90,11 +91,12 @@ class _IbanScreenState extends State<IbanScreen> {
                                   ),
                                   child: Image(
                                     image: AssetImage(
-                                        'assets/buying_crypto_logo.png'),
+                                      'assets/buying_crypto_logo.png',
+                                    ),
                                   ),
                                 ),
                                 Container(
-                                  width: 380,
+                                  width: contentWidth,
                                   padding: EdgeInsets.only(
                                     top: 44,
                                   ),
@@ -107,7 +109,6 @@ class _IbanScreenState extends State<IbanScreen> {
                                   ),
                                 ),
                                 Container(
-                                  // width: 320,
                                   padding: EdgeInsets.only(
                                     top: 44,
                                   ),

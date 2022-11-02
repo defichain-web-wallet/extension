@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
-
 import 'package:flutter/material.dart';
 
 class LoaderScreen extends StatefulWidget {
@@ -70,7 +70,7 @@ class _LoaderScreenState extends State<LoaderScreen> {
           ),
           body: Container(
             color: Theme.of(context).dialogBackgroundColor,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            padding: AppTheme.screenPadding,
             child: Center(
               child: StretchBox(
                 child: Column(

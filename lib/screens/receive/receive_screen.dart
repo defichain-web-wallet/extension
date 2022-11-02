@@ -36,6 +36,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   bool firstBuild = true;
   double x = 0.0;
   double y = 0.0;
+  double qrWidth = 170;
+  double infoWidth = 274;
   late String destinationAddress;
 
   @override
@@ -75,8 +77,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 ),
                 body: Container(
                   color: Theme.of(context).dialogBackgroundColor,
-                  padding: const EdgeInsets.only(
-                      left: 18, right: 12, top: 24, bottom: 24),
+                  padding: AppTheme.screenPadding,
                   child: Center(
                     child: StretchBox(
                       child: Column(
@@ -98,7 +99,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                                   color: Colors.white,
                                   child: QrImage(
                                     data: destinationAddress,
-                                    size: 170,
+                                    size: qrWidth,
                                   ),
                                 ),
                               ),
@@ -189,7 +190,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                             children: [
                               Container(
                                 padding: EdgeInsets.only(left: 20),
-                                width: 274,
+                                width: infoWidth,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
@@ -222,7 +223,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                                   ),
                                   padding: EdgeInsets.only(
                                       left: 20, right: 20, bottom: 15, top: 15),
-                                  width: 274,
+                                  width: infoWidth,
                                   decoration: BoxDecoration(
                                     color: Theme.of(context).cardColor,
                                     borderRadius:

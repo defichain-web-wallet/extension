@@ -40,6 +40,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
   bool isShowTooltipFourth = false;
   double x = 0.0;
   double y = 0.0;
+  double buttonWidth = 320;
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +78,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
                     ),
                     body: Container(
                       color: Theme.of(context).dialogBackgroundColor,
-                      padding: const EdgeInsets.only(
-                          left: 18, right: 12, top: 24, bottom: 24),
+                      padding: AppTheme.screenPadding,
                       child: Center(
                         child: StretchBox(
                           child: Column(
@@ -98,7 +98,8 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
                                           ),
                                           child: Image(
                                             image: AssetImage(
-                                                'assets/buying_crypto_logo.png'),
+                                              'assets/buying_crypto_logo.png',
+                                            ),
                                           ),
                                         ),
                                         Container(
@@ -289,12 +290,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
                                         ),
                                         Container(
                                           color: Theme.of(context).cardColor,
-                                          padding: EdgeInsets.only(
-                                            top: 10,
-                                            left: 10,
-                                            right: 10,
-                                            bottom: 10,
-                                          ),
+                                          padding: EdgeInsets.all(10),
                                           child: Column(
                                             children: [
                                               Container(
@@ -840,7 +836,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
                                 ),
                               ),
                               Container(
-                                width: 320,
+                                width: buttonWidth,
                                 padding: EdgeInsets.only(top: 15),
                                 child: PrimaryButton(
                                   label: 'Complete purchase',

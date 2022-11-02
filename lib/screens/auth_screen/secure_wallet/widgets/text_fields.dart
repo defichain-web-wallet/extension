@@ -85,7 +85,6 @@ class ColumnTextFields extends StatefulWidget {
 class _ColumnTextFieldsState extends State<ColumnTextFields> {
   static List<String> mnemonic = [];
 
-
   @override
   void initState() {
     super.initState();

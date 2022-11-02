@@ -73,8 +73,7 @@ class _AddressBookAddScreenState extends State<AddressBookAddScreen> {
           ),
           body: Container(
             color: Theme.of(context).dialogBackgroundColor,
-            padding:
-                const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+            padding: AppTheme.screenPadding,
             child: Center(
               child: StretchBox(
                 child: Column(

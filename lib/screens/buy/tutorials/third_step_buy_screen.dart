@@ -26,6 +26,10 @@ class ThirdStepBuyScreen extends StatefulWidget {
 }
 
 class _ThirdStepBuyScreenState extends State<ThirdStepBuyScreen> {
+  double smallSizeLogoWidth = 200;
+  double fullSizeLogoWidth = 400;
+  double buttonWidth = 217;
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
@@ -44,8 +48,7 @@ class _ThirdStepBuyScreenState extends State<ThirdStepBuyScreen> {
           ),
           body: Container(
             color: Theme.of(context).dialogBackgroundColor,
-            padding:
-                const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+            padding: AppTheme.screenPadding,
             child: Center(
               child: StretchBox(
                 child: Column(
@@ -57,13 +60,16 @@ class _ThirdStepBuyScreenState extends State<ThirdStepBuyScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              width: !isFullScreen ? 200 : 400,
+                              width: !isFullScreen
+                                  ? smallSizeLogoWidth
+                                  : fullSizeLogoWidth,
                               padding: EdgeInsets.only(
                                 top: 44,
                               ),
                               child: Image(
                                 image: AssetImage(
-                                    'assets/third_step_buy_logo.png'),
+                                  'assets/third_step_buy_logo.png',
+                                ),
                               ),
                             ),
                             Container(
@@ -93,7 +99,7 @@ class _ThirdStepBuyScreenState extends State<ThirdStepBuyScreen> {
                       ),
                     ),
                     Container(
-                      width: 217,
+                      width: buttonWidth,
                       child: Column(
                         children: [
                           PrimaryButton(
