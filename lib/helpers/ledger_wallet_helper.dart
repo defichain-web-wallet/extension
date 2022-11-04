@@ -1,5 +1,9 @@
+import 'dart:js_util';
+import 'dart:typed_data';
+
 import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
@@ -9,12 +13,15 @@ import 'package:defi_wallet/requests/balance_requests.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
+import 'package:hex/hex.dart';
 
-class WalletsHelper {
+class LedgerWalletsHelper {
   HDWalletService _hdWalletService = HDWalletService();
   HistoryRequests _historyRequests = HistoryRequests();
   BalanceRequests _balanceRequests = BalanceRequests();
   final SettingsHelper settingsHelper = SettingsHelper();
+
+  static const int MaxIndexCheck = 2;
 
   Future<AccountModel> createNewAccount(bip32.BIP32 masterKeyPair, String network, {int accountIndex = 0}) async {
     AccountModel account = AccountModel(index: accountIndex);
@@ -27,22 +34,33 @@ class WalletsHelper {
     account.testnetHistoryList = [];
     account.index = accountIndex;
     account.activeToken = 'DFI';
-    account.bitcoinAddress = await _hdWalletService.getAddressModelFromKeyPair(
-        masterKeyPair, accountIndex, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
-    account.bitcoinAddress!.blockchain = 'BTC';
     return account;
   }
 
-//TODO: restore for HD-wallets.
-  Future<List<AccountModel>> restoreWallet(bip32.BIP32 masterKeyPair, String network, Function(int, int) statusBar) async {
+  Future<AddressModel> getAccountModelFromLedger(String network, int index) async {
+    var path = HDWalletService.derivePath(index);
+
+    var ledgerAddress = await promiseToFuture(getAddress(path, false));
+    var pubKey = ledgerAddress.publicKey;
+    var address = ledgerAddress.bitcoinAddress;
+
+    final pubKeyUint = Uint8List.fromList(HEX.decoder.convert(pubKey));
+
+    return AddressModel(account: index, address: address, index: 0, isChange: false, pubKey: pubKeyUint);
+  }
+
+  Future<List<AccountModel>> restoreWallet(String network, Function(int, int) statusBar) async {
     List<AccountModel> accountList = [];
     int lastIndexWithHistory = 0;
-    for (var accountIndex = 0; accountIndex < 10; accountIndex++) {
+    for (var accountIndex = 0; accountIndex < MaxIndexCheck; accountIndex++) {
       statusBar(10, accountIndex);
       List<AddressModel> addressList = [];
       List<HistoryNew> historyList = [];
       List<HistoryModel> testnetHistoryList = [];
-      addressList.add(await _hdWalletService.getAddressModelFromKeyPair(masterKeyPair, accountIndex, network));
+
+      jellyLedgerInit();
+
+      addressList.add(await getAccountModelFromLedger(network, accountIndex));
       var balances = await _balanceRequests.getBalanceListByAddressList(addressList, network);
 
       if (network == 'mainnet') {
@@ -57,11 +75,6 @@ class WalletsHelper {
       } else {
         lastIndexWithHistory = accountIndex;
       }
-
-      var bitcoinAddress = await _hdWalletService.getAddressModelFromKeyPair(
-          masterKeyPair, accountIndex, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
-      bitcoinAddress.blockchain = 'BTC';
-
       accountList.add(AccountModel(
         index: accountIndex,
         addressList: addressList,
@@ -71,7 +84,6 @@ class WalletsHelper {
         transactionNext: '',
         historyNext: '',
         activeToken: balances[0].token,
-        bitcoinAddress: bitcoinAddress
       ));
     }
     List<AccountModel> resultList = [];

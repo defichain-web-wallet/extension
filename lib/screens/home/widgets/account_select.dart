@@ -41,7 +41,7 @@ class AccountSelectState extends State<AccountSelect> {
 
   @override
   void dispose() {
-    hideOverlay();
+    // hideOverlay();
     super.dispose();
   }
 
@@ -125,9 +125,10 @@ class AccountSelectState extends State<AccountSelect> {
       } catch (_) {}
     }
     try {
-      setState(() {
-        _isOpen = false;
-      });
+      if (this.mounted)
+        setState(() {
+          _isOpen = false;
+        });
     } catch (error) {
       log(error.toString());
     }
@@ -137,6 +138,7 @@ class AccountSelectState extends State<AccountSelect> {
       BuildContext context, _accountList, _activeAccount, state) async {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+
     if (_isOpen) {
       hideOverlay();
     } else {
@@ -156,10 +158,7 @@ class AccountSelectState extends State<AccountSelect> {
             cursor: SystemMouseCursors.click,
             child: Container(
               width: box.size.width,
-              height: (_accountList.length > 5
-                      ? (_tileHeight) * 6
-                      : (_accountList.length + 1) * (_tileHeight)) +
-                  2,
+              height: (_accountList.length > 5 ? (_tileHeight) * 6 : (_accountList.length + 1) * (_tileHeight)) + 2,
               decoration: BoxDecoration(
                 color: Theme.of(context).appBarTheme.backgroundColor,
                 borderRadius: BorderRadius.only(
@@ -178,26 +177,17 @@ class AccountSelectState extends State<AccountSelect> {
                           padding: const EdgeInsets.all(0),
                           shadowColor: Colors.transparent,
                           primary: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10.0),
-                                  bottomRight: Radius.circular(10.0))),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10.0), bottomRight: Radius.circular(10.0))),
                           side: BorderSide(
                             color: Colors.transparent,
                           )),
                       child: Container(
                         height: _tileHeight,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10.0),
-                                bottomRight: Radius.circular(10.0))),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10.0), bottomRight: Radius.circular(10.0))),
                         child: Center(
                           child: Text(
                             '+ Create new account',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline4!
-                                .apply(color: AppTheme.pinkColor),
+                            style: Theme.of(context).textTheme.headline4!.apply(color: AppTheme.pinkColor),
                           ),
                         ),
                       ),
@@ -231,11 +221,7 @@ class AccountSelectState extends State<AccountSelect> {
                       ),
                       child: Container(
                         height: _tileHeight,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    color: Theme.of(context).dividerColor,
-                                    width: 1.0))),
+                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1.0))),
                         child: Padding(
                           padding: const EdgeInsets.only(left: 16, right: 8),
                           child: Row(

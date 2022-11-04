@@ -11,6 +11,21 @@ class LockHelper {
     var openTime = await box.get(HiveNames.openTime);
     await box.close();
 
+    // if (openTime != null &&
+    //     openTime + TickerTimes.tickerBeforeLockMilliseconds <
+    //         DateTime.now().millisecondsSinceEpoch) {
+    //   Navigator.pushReplacement(
+    //     context,
+    //     PageRouteBuilder(
+    //       pageBuilder: (context, animation1, animation2)  => ThemeChecker(LockScreen()),
+    //       transitionDuration: Duration.zero,
+    //       reverseTransitionDuration: Duration.zero,
+    //     ),
+    //   );
+    // } else {
+    //   callback();
+    // }
+
     if (openTime != null &&
         openTime + TickerTimes.tickerBeforeLockMilliseconds <
             DateTime.now().millisecondsSinceEpoch) {

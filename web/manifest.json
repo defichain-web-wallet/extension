@@ -1,24 +1,22 @@
 {
-    "name": "Jellywallet Beta",
-    "version": "0.0.9.1",
-    "permissions": [
-        "storage"
-    ],
-    "icons": {
-        "16":"/icons/jelly_logo.png",
-        "48": "/icons/jelly_logo.png",
-        "128":"/icons/jelly_logo.png"
-    },
-    "description": "Jellywallet Beta extension",
-    "content_security_policy": {
-        "extension_pages": "script-src 'self'; object-src 'self'"
-    },
-    "action": {
-        "default_popup": "index.html",
-        "default_icon": "/icons/jelly_logo.png"
-    },
-    "background": {
-        "service_worker": "background-wrapper.js"
-    },
-    "manifest_version": 3
+  "name": "Jellywallet Beta",
+  "version": "0.8.1",
+  "permissions": ["storage"],
+  "icons": [
+    { "src": "/icons/jelly_logo.png", "sizes": "16x16" },
+    { "src": "/icons/jelly_logo.png", "sizes": "48x48" },
+    { "src": "/icons/jelly_logo.png", "sizes": "128x128" }
+  ],
+  "description": "Jellywallet Beta extension",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": "/icons/jelly_logo.png"
+  },
+  "background": {
+    "service_worker": "background-wrapper.js"
+  },
+  "manifest_version": 3
 }

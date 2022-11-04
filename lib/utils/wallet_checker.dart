@@ -42,8 +42,7 @@ class _WalletCheckerState extends State<WalletChecker> {
       bool isSavedMnemonic = await box.get(HiveNames.openedMnemonic) != null;
       String? savedMnemonic = await box.get(HiveNames.openedMnemonic);
 
-      bool isRecoveryMnemonic =
-          await box.get(HiveNames.recoveryMnemonic) != null;
+      bool isRecoveryMnemonic = await box.get(HiveNames.recoveryMnemonic) != null;
       String? recoveryMnemonic = await box.get(HiveNames.recoveryMnemonic);
 
       if (password != null) {
@@ -64,8 +63,7 @@ class _WalletCheckerState extends State<WalletChecker> {
             await Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(HomeScreen(
+                pageBuilder: (context, animation1, animation2) => ThemeChecker(HomeScreen(
                   isLoadTokens: true,
                 )),
                 transitionDuration: Duration.zero,
@@ -74,13 +72,11 @@ class _WalletCheckerState extends State<WalletChecker> {
             );
           });
         } else {
-          await accountCubit
-              .restoreAccountFromStorage(SettingsHelper.settings.network!);
+          await accountCubit.restoreAccountFromStorage(SettingsHelper.settings.network!);
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => ThemeChecker(
-                  CreatePasswordScreen(showStep: false, showDoneScreen: false)),
+              pageBuilder: (context, animation1, animation2) => ThemeChecker(CreatePasswordScreen(showStep: false, showDoneScreen: false)),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),
@@ -91,8 +87,7 @@ class _WalletCheckerState extends State<WalletChecker> {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  ThemeChecker(SecureScreen(mnemonic: savedMnemonic)),
+              pageBuilder: (context, animation1, animation2) => ThemeChecker(SecureScreen(mnemonic: savedMnemonic)),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),
@@ -102,8 +97,7 @@ class _WalletCheckerState extends State<WalletChecker> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(RecoveryScreen(
+                pageBuilder: (context, animation1, animation2) => ThemeChecker(RecoveryScreen(
                   mnemonic: recoveryMnemonic,
                 )),
                 transitionDuration: Duration.zero,
@@ -114,8 +108,7 @@ class _WalletCheckerState extends State<WalletChecker> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(AuthScreen()),
+                pageBuilder: (context, animation1, animation2) => ThemeChecker(AuthScreen()),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),

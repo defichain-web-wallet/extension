@@ -8,16 +8,18 @@ class UtxoModel {
   int? value;
   ECPair? keyPair;
 
-  UtxoModel(
-      {this.mintIndex,
-        this.mintTxId,
-        this.address,
-        this.value,
-        this.keyPair});
+  UtxoModel({
+    this.mintIndex,
+    this.mintTxId,
+    this.address,
+    this.value,
+    this.keyPair,
+  });
 
-  UtxoModel.fromJson(Map<String, dynamic> json) {
+  UtxoModel.fromJson(dynamic json) {
+    print(json);
     this.mintTxId = json["vout"]['txid'];
-    this.mintIndex = json["vout"]['n'];
+    this.mintIndex = json["vout"]['n'].toInt();
     this.address = json["address"];
     this.value = convertToSatoshi(double.parse(json["vout"]["value"]));
   }

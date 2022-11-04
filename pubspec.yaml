@@ -30,13 +30,13 @@ dependencies:
   #crypto
   defichaindart:
     git:
-      url: https://github.com/Jellywallet/DeFiChain-dart
-      ref: 091cee22ee53716e8565f5f0871e83b9162bc705
+      url: https://github.com/p3root/DeFiChain-dart
+      ref: 655734e
   crypto: ^3.0.1
 
   #databases
-  hive: ^2.0.4
-  hive_flutter: ^1.0.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
   shared_preferences: ^2.0.6
 
   #bloc
@@ -77,11 +77,13 @@ dependencies:
 
   percent_indicator: ^4.0.0
 
+  js: ^0.6.4
   email_validator: ^2.0.1
   mask_text_input_formatter: ^2.3.0
   intl_phone_field: ^3.1.0
   iban_form_field: ^0.2.2
   country_list_pick: ^1.0.1+6
+  retry: ^3.1.0 
 
 dev_dependencies:
   flutter_test:

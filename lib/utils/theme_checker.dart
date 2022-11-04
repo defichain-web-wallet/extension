@@ -22,9 +22,7 @@ class _ThemeCheckerState extends State<ThemeChecker> {
       if (SettingsHelper.settings.theme == 'Auto') {
         currentTheme = theme == Brightness.dark ? AppTheme.darkTheme : AppTheme.lightTheme;
       } else {
-        currentTheme = SettingsHelper.settings.theme == 'Dark'
-            ? AppTheme.darkTheme
-            : AppTheme.lightTheme;
+        currentTheme = SettingsHelper.settings.theme == 'Dark' ? AppTheme.darkTheme : AppTheme.lightTheme;
       }
       return MaterialApp(
         theme: currentTheme,

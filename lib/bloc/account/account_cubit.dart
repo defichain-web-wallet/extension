@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:js_util';
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
@@ -7,9 +8,11 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
 import 'package:defi_wallet/helpers/history_new.dart';
+import 'package:defi_wallet/helpers/ledger_wallet_helper.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/wallets_helper.dart';
+import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
@@ -31,10 +34,14 @@ class AccountCubit extends Cubit<AccountState> {
   String mainnet = "mainnet";
   String testnet = "testnet";
 
+  static const String ledgerWalletType = "ledger";
+  static const String localWalletType = "local";
+
   HDWalletService hdWalletService = HDWalletService();
   DfxRequests dfxRequests = DfxRequests();
 
   WalletsHelper walletsHelper = WalletsHelper();
+  LedgerWalletsHelper ledgerWalletsHelper = LedgerWalletsHelper();
   EncryptHelper encryptHelper = EncryptHelper();
   NetworkHelper networkHelper = NetworkHelper();
   HistoryHelper historyHelper = HistoryHelper();
@@ -46,8 +53,7 @@ class AccountCubit extends Cubit<AccountState> {
   createAccount(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: AccountStatusList.loading));
     var box = await Hive.openBox(HiveBoxes.client);
-    var encryptMnemonic =
-        encryptHelper.getEncryptedData(mnemonic.join(','), password);
+    var encryptMnemonic = encryptHelper.getEncryptedData(mnemonic.join(','), password);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     await box.close();
 
@@ -56,15 +62,11 @@ class AccountCubit extends Cubit<AccountState> {
     List<AccountModel> accountsMainnet = [];
     List<AccountModel> accountsTestnet = [];
 
-    final masterKeyPairTestnet =
-        hdWalletService.getMasterKeypairFormSeed(seed, testnet);
-    final accountTestnet =
-        await walletsHelper.createNewAccount(masterKeyPairTestnet, testnet);
+    final masterKeyPairTestnet = hdWalletService.getMasterKeypairFormSeed(seed, testnet);
+    final accountTestnet = await walletsHelper.createNewAccount(masterKeyPairTestnet, testnet);
 
-    final masterKeyPairMainnet =
-        hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
-    final accountMainnet =
-        await walletsHelper.createNewAccount(masterKeyPairMainnet, mainnet);
+    final masterKeyPairMainnet = hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
+    final accountMainnet = await walletsHelper.createNewAccount(masterKeyPairMainnet, mainnet);
 
     final activeToken = accountMainnet.balanceList![0].token!;
 
@@ -89,8 +91,7 @@ class AccountCubit extends Cubit<AccountState> {
         activeToken: activeToken,
       ));
     } on Exception catch (exception) {
-      emit(state.copyWith(
-          status: AccountStatusList.failure, exception: exception));
+      emit(state.copyWith(status: AccountStatusList.failure, exception: exception));
     }
   }
 
@@ -161,13 +162,18 @@ class AccountCubit extends Cubit<AccountState> {
 
       var jsonString = json.encode(accountsJson);
       var encryptedAccounts = encryptHelper.getEncryptedData(jsonString, key);
-      var encryptedMasterKey =
-          encryptHelper.getEncryptedData(masterKeyPairMainnet!.toBase58(), key);
-      await box.put(HiveNames.masterKeyPairMainnet, encryptedMasterKey);
+
+      if (masterKeyPairMainnet != null) {
+        var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairMainnet.toBase58(), key);
+        await box.put(HiveNames.masterKeyPairMainnet, encryptedMasterKey);
+      }
+
       await box.put(HiveNames.accountsMainnet, encryptedAccounts);
-      var encryptMnemonic =
-          encryptHelper.getEncryptedData(mnemonic.join(','), key);
-      await box.put(HiveNames.savedMnemonic, encryptMnemonic);
+
+      if (mnemonic.length > 0) {
+        var encryptMnemonic = encryptHelper.getEncryptedData(mnemonic.join(','), key);
+        await box.put(HiveNames.savedMnemonic, encryptMnemonic);
+      }
     }
 
     if (accountsTestnet != null) {
@@ -176,23 +182,22 @@ class AccountCubit extends Cubit<AccountState> {
       }
 
       var jsonStringTestnet = json.encode(accountsJsonTestnet);
-      var encryptedAccounts =
-          encryptHelper.getEncryptedData(jsonStringTestnet, key);
-      var encryptedMasterKey =
-          encryptHelper.getEncryptedData(masterKeyPairTestnet!.toBase58(), key);
-      await box.put(HiveNames.masterKeyPairTestnet, encryptedMasterKey);
+      var encryptedAccounts = encryptHelper.getEncryptedData(jsonStringTestnet, key);
+
+      if (masterKeyPairTestnet != null) {
+        var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairTestnet.toBase58(), key);
+        await box.put(HiveNames.masterKeyPairTestnet, encryptedMasterKey);
+      }
       await box.put(HiveNames.accountsTestnet, encryptedAccounts);
     }
     await box.close();
   }
 
-  Future<List<AccountModel>> loadAccountDetails(
-      List<AccountModel> accounts) async {
+  Future<List<AccountModel>> loadAccountDetails(List<AccountModel> accounts) async {
     bool needUpdate = true;
 
     for (var i = 0; i < accounts.length; i++) {
-      var balanceList = await balanceRequests.getBalanceListByAddressList(
-          accounts[i].addressList!, SettingsHelper.settings.network!);
+      var balanceList = await balanceRequests.getBalanceListByAddressList(accounts[i].addressList!, SettingsHelper.settings.network!);
 
       balanceList.forEach((newBalance) {
         bool findBalance = false;
@@ -229,10 +234,7 @@ class AccountCubit extends Cubit<AccountState> {
         TxListModel testnetTxListModel;
         try {
           if (SettingsHelper.settings.network! == 'mainnet') {
-            txListModel = await historyRequests.getHistory(
-                accounts[i].addressList![0],
-                'DFI',
-                SettingsHelper.settings.network!);
+            txListModel = await historyRequests.getHistory(accounts[i].addressList![0], 'DFI', SettingsHelper.settings.network!);
             List<String> txids = [];
             accounts[i].historyList!.forEach((history) {
               txids.add(history.txid!);
@@ -244,10 +246,7 @@ class AccountCubit extends Cubit<AccountState> {
               }
             });
           } else {
-            testnetTxListModel = await historyRequests.getFullHistoryList(
-                accounts[i].addressList![0],
-                'DFI',
-                SettingsHelper.settings.network!);
+            testnetTxListModel = await historyRequests.getFullHistoryList(accounts[i].addressList![0], 'DFI', SettingsHelper.settings.network!);
             List<String> txids = [];
             accounts[i].testnetHistoryList!.forEach((history) {
               txids.add(history.txid!);
@@ -274,9 +273,7 @@ class AccountCubit extends Cubit<AccountState> {
     List<AccountModel> accounts = state.accounts!;
     int newAccountIndex = accounts.length;
 
-    final account = await walletsHelper.createNewAccount(
-        state.masterKeyPair!, SettingsHelper.settings.network!,
-        accountIndex: newAccountIndex);
+    final account = await walletsHelper.createNewAccount(state.masterKeyPair!, SettingsHelper.settings.network!, accountIndex: newAccountIndex);
 
     final balances = account.balanceList!;
     final activeToken = balances[0].token;
@@ -305,8 +302,7 @@ class AccountCubit extends Cubit<AccountState> {
     var box = await Hive.openBox(HiveBoxes.client);
     await box.put(HiveNames.kycStatus, 'show');
     await box.put(HiveNames.tutorialStatus, 'show');
-    var encryptMnemonic =
-        encryptHelper.getEncryptedData(mnemonic.join(','), password);
+    var encryptMnemonic = encryptHelper.getEncryptedData(mnemonic.join(','), password);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     await box.close();
     SettingsHelper settingsHelper = SettingsHelper();
@@ -322,10 +318,8 @@ class AccountCubit extends Cubit<AccountState> {
     try {
       final seed = convertMnemonicToSeed(mnemonic);
 
-      final masterKeyPairMainnet =
-          hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
-      List<AccountModel> accountsMainnet = await walletsHelper
-          .restoreWallet(masterKeyPairMainnet, mainnet, (need, restored) {
+      final masterKeyPairMainnet = hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
+      List<AccountModel> accountsMainnet = await walletsHelper.restoreWallet(masterKeyPairMainnet, mainnet, (need, restored) {
         emit(state.copyWith(
           status: AccountStatusList.restore,
           needRestore: need + 10,
@@ -333,10 +327,8 @@ class AccountCubit extends Cubit<AccountState> {
         ));
       });
 
-      final masterKeyPairTestnet =
-          hdWalletService.getMasterKeypairFormSeed(seed, testnet);
-      List<AccountModel> accountsTestnet = await walletsHelper
-          .restoreWallet(masterKeyPairTestnet, testnet, (need, restored) {
+      final masterKeyPairTestnet = hdWalletService.getMasterKeypairFormSeed(seed, testnet);
+      List<AccountModel> accountsTestnet = await walletsHelper.restoreWallet(masterKeyPairTestnet, testnet, (need, restored) {
         emit(state.copyWith(
           status: AccountStatusList.restore,
           needRestore: need + 10,
@@ -344,6 +336,7 @@ class AccountCubit extends Cubit<AccountState> {
         ));
       });
       final balances = accountsMainnet[0].balanceList!;
+
       await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet,
           accountsTestnet, masterKeyPairTestnet, mnemonic,
           password: password);
@@ -365,10 +358,71 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<List<dynamic>> restoreAccountFromStorage(String network) async {
-    List<AccountModel> accounts = [];
+    var box = await Hive.openBox(HiveBoxes.client);
+
+    try {
+      var walletType = await box.get(HiveNames.walletType);
+
+      if (walletType == ledgerWalletType) {
+        return await _restoreAccountsFromStorageLedger(network);
+      }
+      return await _restoreAccountsFromStorageLocal(network);
+    } finally {
+      await box.close();
+    }
+  }
+
+  Future<List<dynamic>> _restoreAccountsFromStorageLedger(String network) async {
+    var box = await Hive.openBox(HiveBoxes.client);
+
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
+    var encodedPassword = await box.get(HiveNames.password);
+    var password = stringToBase64.decode(encodedPassword);
+    var accountsName;
+    List<AccountModel> accounts = [];
+
+    if (network == testnet) {
+      accountsName = HiveNames.accountsTestnet;
+    } else {
+      accountsName = HiveNames.accountsMainnet;
+    }
+
+    var savedAccounts = box.get(accountsName);
+
+    var decryptedAccounts = encryptHelper.getDecryptedData(savedAccounts, password);
+
+    final jsonString = decryptedAccounts;
+
+    List<dynamic> jsonFromString = json.decode(jsonString);
+    for (var account in jsonFromString) {
+      accounts.add(AccountModel.fromJson(account));
+    }
+    var accountList = await loadAccountDetails(accounts);
+    accounts = accountList;
+
+    final balances = accounts[0].balanceList!;
+
+    await box.close();
+    emit(state.copyWith(
+      status: AccountStatusList.success,
+      mnemonic: [],
+      seed: Uint8List(24),
+      accounts: accounts,
+      balances: balances,
+      masterKeyPair: null,
+      activeAccount: accounts[0],
+      activeToken: balances[0].token,
+    ));
+
+    return [[], [], accounts, balances, null, accounts[0], balances[0].token];
+  }
+
+  Future<List<dynamic>> _restoreAccountsFromStorageLocal(String network) async {
     var masterKeyName;
     var accountsName;
+    List<AccountModel> accounts = [];
+
+    Codec<String, String> stringToBase64 = utf8.fuse(base64);
     var box = await Hive.openBox(HiveBoxes.client);
     var encodedPassword = await box.get(HiveNames.password);
     var swapTutorialStatus = await box.get(HiveNames.swapTutorialStatus);
@@ -379,8 +433,7 @@ class AccountCubit extends Cubit<AccountState> {
     try {
       savedMnemonic = await box.get(HiveNames.savedMnemonic);
       if (savedMnemonic.split(',').length == 24) {
-        var encryptMnemonic =
-            encryptHelper.getEncryptedData(savedMnemonic, password);
+        var encryptMnemonic = encryptHelper.getEncryptedData(savedMnemonic, password);
         await box.put(HiveNames.savedMnemonic, encryptMnemonic);
         mnemonic = encryptHelper.getDecryptedData(encryptMnemonic, password);
       } else {
@@ -400,14 +453,11 @@ class AccountCubit extends Cubit<AccountState> {
     var savedMasterKey = box.get(masterKeyName);
     var savedAccounts = box.get(accountsName);
 
-    var decryptedMasterKey =
-        encryptHelper.getDecryptedData(savedMasterKey, password);
-    var decryptedAccounts =
-        encryptHelper.getDecryptedData(savedAccounts, password);
+    var decryptedMasterKey = encryptHelper.getDecryptedData(savedMasterKey, password);
+    var decryptedAccounts = encryptHelper.getDecryptedData(savedAccounts, password);
 
     var networkType = networkHelper.getNetworkType(network);
-    final masterKeyPair =
-        bip32.BIP32.fromBase58(decryptedMasterKey, networkType);
+    final masterKeyPair = bip32.BIP32.fromBase58(decryptedMasterKey, networkType);
     final jsonString = decryptedAccounts;
 
     List<dynamic> jsonFromString = json.decode(jsonString);
@@ -448,15 +498,7 @@ class AccountCubit extends Cubit<AccountState> {
       swapTutorialStatus: swapTutorialStatus,
     ));
 
-    return [
-      [],
-      [],
-      accounts,
-      balances,
-      masterKeyPair,
-      accounts[0],
-      balances[0].token
-    ];
+    return [[], [], accounts, balances, masterKeyPair, accounts[0], balances[0].token];
   }
 
   updateActiveAccount(int accountIndex) async {
@@ -471,8 +513,7 @@ class AccountCubit extends Cubit<AccountState> {
       activeToken: state.activeToken,
     ));
 
-    AccountModel account =
-        state.accounts!.firstWhere((el) => el.index == accountIndex);
+    AccountModel account = state.accounts!.firstWhere((el) => el.index == accountIndex);
     final balances = account.balanceList!;
 
     emit(state.copyWith(
@@ -567,10 +608,7 @@ class AccountCubit extends Cubit<AccountState> {
     TxListModel txListModel;
     if (SettingsHelper.settings.network! == 'mainnet') {
       try {
-        history = await historyRequests.getHistory(
-            activeAccount.addressList![0],
-            'DFI',
-            SettingsHelper.settings.network!);
+        history = await historyRequests.getHistory(activeAccount.addressList![0], 'DFI', SettingsHelper.settings.network!);
       } catch (err) {
         history = [];
       }
@@ -578,15 +616,11 @@ class AccountCubit extends Cubit<AccountState> {
       activeAccount.historyList = newHistory;
     } else {
       try {
-        txListModel = await historyRequests.getFullHistoryList(
-            activeAccount.addressList![0],
-            'DFI',
-            SettingsHelper.settings.network!);
+        txListModel = await historyRequests.getFullHistoryList(activeAccount.addressList![0], 'DFI', SettingsHelper.settings.network!);
       } catch (err) {
         txListModel = TxListModel();
       }
-      var newHistory = activeAccount.testnetHistoryList!
-        ..addAll(txListModel.list!);
+      var newHistory = activeAccount.testnetHistoryList!..addAll(txListModel.list!);
       activeAccount.testnetHistoryList = newHistory;
     }
 
@@ -631,5 +665,66 @@ class AccountCubit extends Cubit<AccountState> {
       historyFilterBy: state.historyFilterBy,
       swapTutorialStatus: status,
     ));
+  }
+  getDfxAccessTokenLedger(AccountModel account, String password) async {
+    try {
+      // String accessToken = await dfxRequests.signIn(account);
+      return encryptHelper.getEncryptedData("asdf", password);
+    } catch (_) {
+      return '';
+    }
+  }
+
+  restoreLedgerAccount(password) async {
+    var box = await Hive.openBox(HiveBoxes.client);
+    await box.put(HiveNames.kycStatus, 'show');
+    await box.put(HiveNames.tutorialStatus, 'show');
+    await box.close();
+    SettingsHelper settingsHelper = SettingsHelper();
+
+    settingsHelper.initSetting();
+
+    emit(state.copyWith(
+      status: AccountStatusList.restore,
+      needRestore: 20,
+      restored: 0,
+    ));
+
+    try {
+      List<AccountModel> accountsMainnet = await ledgerWalletsHelper.restoreWallet(mainnet, (need, restored) {
+        emit(state.copyWith(
+          status: AccountStatusList.restore,
+          needRestore: need + 10,
+          restored: restored,
+        ));
+      });
+
+      List<AccountModel> accountsTestnet = await ledgerWalletsHelper.restoreWallet(testnet, (need, restored) {
+        emit(state.copyWith(
+          status: AccountStatusList.restore,
+          needRestore: need + 10,
+          restored: restored + 10,
+        ));
+      });
+      final balances = accountsMainnet[0].balanceList!;
+      await saveAccountsToStorage(accountsMainnet, null, accountsTestnet, null, [], password: password);
+
+      emit(state.copyWith(
+        status: AccountStatusList.success,
+        mnemonic: [],
+        seed: null,
+        accounts: accountsMainnet,
+        balances: balances,
+        masterKeyPair: null,
+        activeAccount: accountsMainnet[0],
+        activeToken: balances[0].token,
+      ));
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  createLedgerAccount() async {
+    var address = await promiseToFuture(getAddress("1129/0/0/0", false));
   }
 }
