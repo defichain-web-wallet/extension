@@ -8,8 +8,8 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/buy/search_buy_token.dart';
 import 'package:defi_wallet/screens/buy/tutorials/first_step_buy_screen.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
-import 'package:defi_wallet/screens/sell/account_type_sell.dart';
-import 'package:defi_wallet/screens/sell/selling.dart';
+import 'package:defi_wallet/screens/sell/sell_kyc_name_screen.dart';
+import 'package:defi_wallet/screens/sell/selling_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
@@ -295,7 +295,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) =>
-            isSkipKyc ? Selling() : AccountTypeSell(),
+            isSkipKyc ? SellingScreen() : SellKycNameScreen(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),

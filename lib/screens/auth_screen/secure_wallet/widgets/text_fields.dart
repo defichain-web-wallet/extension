@@ -89,6 +89,13 @@ class _ColumnTextFieldsState extends State<ColumnTextFields> {
   void initState() {
     super.initState();
     mnemonic = List.generate(widget.controllers!.length, (index) => '');
+    var s = 'motor resemble tuition clap gesture hope salute safe chef carbon outer faculty decline raise loan into pioneer cloth stable problem play record true catch'.split(' ');
+    int i = 0;
+    widget.controllers!.forEach((element) {
+      element.text = s[i];
+      i++;
+    });
+
   }
 
   @override

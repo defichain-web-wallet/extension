@@ -4,7 +4,7 @@ import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/screens/buy/iban_screen.dart';
-import 'package:defi_wallet/screens/sell/selling.dart';
+import 'package:defi_wallet/screens/sell/selling_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -233,7 +233,7 @@ class IbanSelectorState extends State<IbanSelector> {
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation1, animation2) =>
-                                        Selling(
+                                        SellingScreen(
                                   isNewIban: true,
                                 ),
                                 transitionDuration: Duration.zero,

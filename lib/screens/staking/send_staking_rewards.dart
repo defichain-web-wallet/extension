@@ -8,7 +8,7 @@ import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
-import 'package:defi_wallet/screens/sell/selling.dart';
+import 'package:defi_wallet/screens/sell/selling_screen.dart';
 import 'package:defi_wallet/screens/staking/number_of_coins_to_stake.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -307,7 +307,7 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                                                 child: IbanSelector(
                                                   key: selectKeyIban,
                                                   onAnotherSelect: hideOverlay,
-                                                  routeWidget: Selling(
+                                                  routeWidget: SellingScreen(
                                                     isNewIban: widget.isNewIban,
                                                   ),
                                                   ibanList: uniqueIbans,
