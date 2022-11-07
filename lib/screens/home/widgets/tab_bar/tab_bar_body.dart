@@ -2,7 +2,7 @@ import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/history_model.dart';
-import 'package:defi_wallet/screens/history/history.dart';
+import 'package:defi_wallet/screens/history/history_screen.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
 import 'package:defi_wallet/screens/home/widgets/transaction_history.dart';
 import 'package:defi_wallet/screens/tokens/search_token.dart';
@@ -74,7 +74,7 @@ class TabBarBody extends StatelessWidget {
                             context,
                             PageRouteBuilder(
                               pageBuilder: (context, animation1, animation2) =>
-                                  History(),
+                                  HistoryScreen(),
                               transitionDuration: Duration.zero,
                               reverseTransitionDuration: Duration.zero,
                             ),

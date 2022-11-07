@@ -5,7 +5,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/screens/history/widgets/icon_history_type.dart';
+import 'package:defi_wallet/widgets/history/icon_history_type.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
