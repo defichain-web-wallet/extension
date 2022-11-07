@@ -418,19 +418,56 @@ class TokensHelper {
     }
   }
 
-  double getPairsAmountByUsd(
-      List<dynamic> tokensPairs, double amount, String symbol) {
+  double getAmountByDfi(
+      List<dynamic> tokensPairs, double amount, String baseAsset) {
+    try {
+      // TODO: //
+      if (baseAsset == 'DFI') {
+        return amount;
+      } else {
+        AssetPairModel assetPair =
+        tokensPairs.firstWhere((element) => element.tokenA! == baseAsset);
+        return assetPair.reserveBDivReserveA! * amount;
+      }
+    } catch (err) {
+      return 0.00;
+    }
+  }
+
+  double getPairsAmountByAsset(
+    List<dynamic> tokensPairs,
+    double amount,
+    String symbol,
+    String resultAsset,
+  ) {
     AssetPairModel assetPair =
       tokensPairs.firstWhere((element) => element.symbol! == symbol);
     double baseBalance = getBaseBalance(amount, assetPair);
     double quoteBalance = getQuoteBalance(amount, assetPair);
+    double baseBalanceByAsset;
+    double quoteBalanceByAsset;
 
-    double baseBalanceByUsd =
-      getAmountByUsd(tokensPairs, baseBalance, symbol.split('-')[0]);
-    double quoteBalanceByUsd =
-      getAmountByUsd(tokensPairs, quoteBalance, symbol.split('-')[1]);
+    String baseAsset = symbol.split('-')[0];
+    String quoteAsset = symbol.split('-')[1];
 
-    return baseBalanceByUsd + quoteBalanceByUsd;
+    if (resultAsset == 'USD') {
+      baseBalanceByAsset =
+          getAmountByUsd(tokensPairs, baseBalance, baseAsset);
+      quoteBalanceByAsset =
+          getAmountByUsd(tokensPairs, quoteBalance, quoteAsset);
+    } else if (resultAsset == 'BTC') {
+      baseBalanceByAsset =
+        getAmountByBtc(tokensPairs, baseBalance, baseAsset);
+      quoteBalanceByAsset =
+        getAmountByBtc(tokensPairs, quoteBalance, quoteAsset);
+    } else {
+      baseBalanceByAsset =
+          getAmountByDfi(tokensPairs, baseBalance, baseAsset);
+      quoteBalanceByAsset =
+          getAmountByDfi(tokensPairs, quoteBalance, quoteAsset);
+    }
+
+    return baseBalanceByAsset + quoteBalanceByAsset;
   }
 
   double getBaseBalance(balance, assetPair) {

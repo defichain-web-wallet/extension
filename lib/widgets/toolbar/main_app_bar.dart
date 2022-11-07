@@ -15,6 +15,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
   final bool isShowBottom;
   final bool? isSmall;
+  final bool isShowNavButton;
 
   const MainAppBar(
       {Key? key,
@@ -24,6 +25,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.hideOverlay,
       this.height = toolbarHeight,
       this.isShowBottom = false,
+      this.isShowNavButton = true,
       this.isSmall = false})
       : super(key: key);
 
@@ -36,17 +38,19 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       bottom: isShowBottom ? OngoingTransaction() : null,
+      shadowColor: Colors.transparent,
       shape: !isSmall!
           ? null
           : RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
               ),
             ),
       leadingWidth: leadingWidth,
       toolbarHeight: toolbarHeight,
-      leading: Padding(
+      automaticallyImplyLeading: false,
+      leading: isShowNavButton ? Padding(
         padding: const EdgeInsets.only(left: 8),
         child: Row(
           children: [
@@ -64,32 +68,32 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ],
         ),
-      ),
+      ) : null,
       centerTitle: true,
       title: customTitle == null
           ? Text(
               title!,
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.headline3!.apply(fontFamily: 'IBM Plex Sans'),
             )
           : customTitle,
-      actions: [
+      actions: isShowNavButton ? [
         action == null
-            ? CancelButton(
-                callback: () {
-                  if (hideOverlay != null) {
-                    hideOverlay!();
-                  }
-                  Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) => HomeScreen(),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    ),
-                  );
-                })
+            ? CancelButton(callback: () {
+                if (hideOverlay != null) {
+                  hideOverlay!();
+                }
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) =>
+                        HomeScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                );
+              })
             : action!
-      ],
+      ] : null,
     );
   }
 }

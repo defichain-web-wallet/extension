@@ -13,9 +13,10 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      shadowColor: Colors.transparent,
       automaticallyImplyLeading: false,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      toolbarHeight: toolbarHeight,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
+    toolbarHeight: toolbarHeight,
       elevation: 0,
       title: Center(
         child: SvgPicture.asset(

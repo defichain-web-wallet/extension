@@ -12,8 +12,17 @@ class AddressModel {
   bool? isChange;
   int? index;
   Uint8List? pubKey;
+  ECPair? keyPair;
+  String? blockchain;
 
-  AddressModel({this.address, this.account, this.isChange, this.index, this.pubKey});
+  AddressModel(
+      {this.address,
+        this.account,
+        this.isChange,
+        this.index,
+        this.pubKey,
+        this.keyPair,
+        this.blockchain});
 
   String getPath() {
     return HDWalletService.derivePath(this.index!);
@@ -23,8 +32,11 @@ class AddressModel {
     this.address = json["address"];
     this.account = json["account"];
     this.isChange = json["isChange"];
+    this.blockchain = json["blockchain"] == null ? 'DFI' : json["blockchain"];
     this.index = json["index"];
     if (json.containsKey("pubKey")) this.pubKey = Uint8List.fromList(HEX.decode(json["pubKey"]!));
+    this.keyPair = hdWalletService.getKeypairFromWIF(
+        json["keyPair"], json["blockchain"] == 'BTC' ? SettingsHelper.settings.network! == 'testnet' ? 'bitcoin_testnet' : 'bitcoin' : SettingsHelper.settings.network!);
   }
 
   Map<String, dynamic> toJson() {
@@ -34,6 +46,8 @@ class AddressModel {
     data["isChange"] = this.isChange;
     data["index"] = this.index;
     if (this.pubKey != null) data["pubKey"] = HEX.encode(this.pubKey!);
+    if (this.blockchain != null) data["blockchain"] = this.blockchain;
+    if (this.keyPair != null) data["keyPair"] = this.keyPair!.toWIF();
     return data;
   }
 }

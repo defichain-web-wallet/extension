@@ -37,6 +37,11 @@ class SettingsHelper {
     await box.close();
   }
 
+  static bool isBitcoin() {
+    return settings.isBitcoin != null && settings.isBitcoin!;
+  }
+
+
   Future<void> initSetting() async {
     settings = SettingsModel();
   }

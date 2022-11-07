@@ -1,5 +1,6 @@
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
@@ -15,6 +16,7 @@ class AssetSelect extends StatefulWidget {
   bool isSmallText;
   bool isBorderRadiusAll;
   bool isTopPosition;
+  final bool isBorder;
 
   AssetSelect({
     Key? key,
@@ -26,6 +28,7 @@ class AssetSelect extends StatefulWidget {
     this.isSmallText = false,
     this.isBorderRadiusAll = false,
     this.isTopPosition = false,
+    this.isBorder = false,
   }) : super(key: key);
 
   @override
@@ -43,151 +46,153 @@ class AssetSelectState extends State<AssetSelect> {
 
   @override
   Widget build(BuildContext context) => MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          child: Container(
-            key: _selectKey,
-            height: _tileHeight,
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.shadowColor.withOpacity(0.5),
-                  blurRadius: 5,
-                  offset: Offset(-3, 3),
-                )
-              ],
-              borderRadius: widget.isBorderRadiusAll
-                  ? BorderRadius.only(
-                      topLeft: _isOpen &&
-                              widget.isTopPosition == true &&
-                              MediaQuery.of(context).size.width <
-                                  ScreenSizes.medium
-                          ? Radius.circular(0)
-                          : Radius.circular(14),
-                      topRight: _isOpen &&
-                              widget.isTopPosition == true &&
-                              MediaQuery.of(context).size.width <
-                                  ScreenSizes.medium
-                          ? Radius.circular(0)
-                          : Radius.circular(14),
-                      bottomLeft: _isOpen && widget.isTopPosition == false
-                          ? Radius.circular(0)
-                          : _isOpen && widget.isTopPosition == true && MediaQuery.of(context).size.width >
-                          ScreenSizes.medium
-                              ? Radius.circular(0)
-                              : Radius.circular(14),
-                      bottomRight: _isOpen && widget.isTopPosition == false
-                          ? Radius.circular(0)
-                          : _isOpen && widget.isTopPosition == true && MediaQuery.of(context).size.width >
-                          ScreenSizes.medium
-                          ? Radius.circular(0)
-                          : Radius.circular(14),
-                    )
-                  : BorderRadius.only(
-                      topLeft: Radius.circular(14),
-                      bottomLeft:
-                          _isOpen ? Radius.circular(0) : Radius.circular(14),
-                    ),
-              border: Border.all(
-                  color: Theme.of(context).textTheme.button!.decorationColor!),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16, right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    cursor: SystemMouseCursors.click,
+    child: GestureDetector(
+      child: Container(
+        key: _selectKey,
+        height: _tileHeight,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: widget.isBorderRadiusAll
+              ? BorderRadius.only(
+            topLeft: _isOpen &&
+                widget.isTopPosition == true &&
+                MediaQuery.of(context).size.width <
+                    ScreenSizes.medium
+                ? Radius.circular(0)
+                : Radius.circular(10),
+            topRight: _isOpen &&
+                widget.isTopPosition == true &&
+                MediaQuery.of(context).size.width <
+                    ScreenSizes.medium
+                ? Radius.circular(0)
+                : Radius.circular(10),
+            bottomLeft: _isOpen && widget.isTopPosition == false
+                ? Radius.circular(0)
+                : _isOpen &&
+                widget.isTopPosition == true &&
+                MediaQuery.of(context).size.width >
+                    ScreenSizes.medium
+                ? Radius.circular(0)
+                : Radius.circular(10),
+            bottomRight: _isOpen && widget.isTopPosition == false
+                ? Radius.circular(0)
+                : _isOpen &&
+                widget.isTopPosition == true &&
+                MediaQuery.of(context).size.width >
+                    ScreenSizes.medium
+                ? Radius.circular(0)
+                : Radius.circular(10),
+          )
+              : BorderRadius.only(
+            topLeft: Radius.circular(10),
+            bottomLeft:
+            _isOpen ? Radius.circular(0) : Radius.circular(10),
+          ),
+          border: Border.all(color: Colors.transparent),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        SvgPicture.asset(
-                          tokenHelper
-                              .getImageNameByTokenName(widget.selectedToken),
-                          height: 24,
-                          width: 24,
-                        ),
-                        SizedBox(width: 16),
-                        if(widget.isFixedWidthText)
-                          TickerText(
-                            child: Text(
-                              tokenHelper
-                                  .getTokenWithPrefix(widget.selectedToken),
-                              overflow: TextOverflow.ellipsis,
-                              style:
-                              Theme.of(context).textTheme.headline6!.apply(
-                                color: _isOpen
-                                    ? Theme.of(context)
-                                    .textTheme
-                                    .headline6!
-                                    .color!
-                                    .withOpacity(0.5)
-                                    : Theme.of(context)
-                                    .textTheme
-                                    .headline6!
-                                    .color!,
-                              ),
-                            ),
-                          )
-                        else
-                          Container(
-                            width: 70,
-                            child: TickerText(
-                              child: Text(
-                                tokenHelper
-                                    .getTokenWithPrefix(widget.selectedToken),
-                                overflow: TextOverflow.ellipsis,
-                                style:
-                                Theme.of(context).textTheme.headline6!.apply(
-                                  color: _isOpen
-                                      ? Theme.of(context)
-                                      .textTheme
-                                      .headline6!
-                                      .color!
-                                      .withOpacity(0.5)
-                                      : Theme.of(context)
-                                      .textTheme
-                                      .headline6!
-                                      .color!,
-                                ),
-                              ),
-                            ),
-                          )
-                      ],
-                    ),
                     SvgPicture.asset(
-                      _isOpen
-                          ? (widget.isTopPosition
-                              ? MediaQuery.of(context).size.width <
-                                      ScreenSizes.medium
-                                  ? 'assets/arrow_down.svg'
-                                  : 'assets/arrow_up.svg'
-                              : 'assets/arrow_up.svg')
-                          : (widget.isTopPosition
-                              ? MediaQuery.of(context).size.width <
-                                      ScreenSizes.medium
-                                  ? 'assets/arrow_up.svg'
-                                  : 'assets/arrow_down.svg'
-                              : 'assets/arrow_down.svg'),
-                      // MediaQuery.of(context).size.width < ScreenSizes.medium
-                      //     ? 'assets/arrow_up.svg'
-                      //     : 'assets/arrow_down.svg',
-                      color: Theme.of(context).textTheme.button!.color,
+                      tokenHelper
+                          .getImageNameByTokenName(widget.selectedToken),
+                      height: 24,
+                      width: 24,
                     ),
+                    SizedBox(width: 16),
+                    if (widget.isFixedWidthText)
+                      TickerText(
+                        child: Text(
+                          SettingsHelper.isBitcoin()
+                              ? widget.selectedToken
+                              : tokenHelper
+                              .getTokenWithPrefix(widget.selectedToken),
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                          Theme.of(context).textTheme.headline6!.apply(
+                            color: _isOpen
+                                ? Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .color!
+                                .withOpacity(0.5)
+                                : Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .color!,
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 70,
+                        child: TickerText(
+                          child: Text(
+                            SettingsHelper.isBitcoin()
+                                ? widget.selectedToken
+                                : tokenHelper
+                                .getTokenWithPrefix(widget.selectedToken),
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .apply(
+                              color: _isOpen
+                                  ? Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!
+                                  .withOpacity(0.5)
+                                  : Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!,
+                            ),
+                          ),
+                        ),
+                      )
                   ],
                 ),
-              ),
+                if (widget.tokensForSwap.isNotEmpty)
+                  SvgPicture.asset(
+                    _isOpen
+                        ? (widget.isTopPosition
+                        ? MediaQuery.of(context).size.width <
+                        ScreenSizes.medium
+                        ? 'assets/arrow_down.svg'
+                        : 'assets/arrow_up.svg'
+                        : 'assets/arrow_up.svg')
+                        : (widget.isTopPosition
+                        ? MediaQuery.of(context).size.width <
+                        ScreenSizes.medium
+                        ? 'assets/arrow_up.svg'
+                        : 'assets/arrow_down.svg'
+                        : 'assets/arrow_down.svg'),
+                    color: Theme.of(context).textTheme.headline5!.color,
+                  ),
+              ],
             ),
           ),
-          onTap: () async {
-            await lockHelper.provideWithLockChecker(context, () {
-              if (!_isOpen && widget.onAnotherSelect != null) {
-                widget.onAnotherSelect!();
-              }
-              _showOverlay();
-            });
-          },
         ),
-      );
+      ),
+      onTap: () async {
+        await lockHelper.provideWithLockChecker(context, () {
+          if (!_isOpen && widget.onAnotherSelect != null) {
+            widget.onAnotherSelect!();
+          }
+          if (widget.tokensForSwap.isNotEmpty) {
+            _showOverlay();
+          }
+        });
+      },
+    ),
+  );
 
   void hideOverlay() {
     if (_overlayEntry != null) {
@@ -216,12 +221,12 @@ class AssetSelectState extends State<AssetSelect> {
       _overlayEntry = OverlayEntry(builder: (context) {
         return Positioned(
           top: widget.isTopPosition &&
-                  MediaQuery.of(context).size.width < ScreenSizes.medium
+              MediaQuery.of(context).size.width < ScreenSizes.medium
               ? (pos.dy -
-                  ((widget.tokensForSwap.length > 5
-                          ? (_tileHeight + 6) * 5
-                          : widget.tokensForSwap.length * (_tileHeight + 1)) +
-                      2))
+              ((widget.tokensForSwap.length > 5
+                  ? (_tileHeight + 6) * 5
+                  : widget.tokensForSwap.length * (_tileHeight + 1)) +
+                  2))
               : (pos.dy + box.size.height),
           left: pos.dx,
           child: MouseRegion(
@@ -229,33 +234,24 @@ class AssetSelectState extends State<AssetSelect> {
             child: Container(
               width: box.size.width,
               height: (widget.tokensForSwap.length > 5
-                      ? (_tileHeight + 6) * 5
-                      : widget.tokensForSwap.length * (_tileHeight + 1)) +
+                  ? (_tileHeight + 6) * 5
+                  : widget.tokensForSwap.length * (_tileHeight + 1)) +
                   2,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.shadowColor.withOpacity(0.5),
-                    blurRadius: 5,
-                    offset:
-                        widget.isTopPosition && MediaQuery.of(context).size.width <
-                            ScreenSizes.medium ? Offset(-3, -3) : Offset(-3, 3),
-                  ),
-                ],
                 borderRadius: widget.isTopPosition &&
-                        MediaQuery.of(context).size.width < ScreenSizes.medium
+                    MediaQuery.of(context).size.width < ScreenSizes.medium
                     ? BorderRadius.only(
-                        topLeft: Radius.circular(14),
-                        topRight: Radius.circular(14),
-                      )
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                )
                     : BorderRadius.only(
-                        bottomLeft: Radius.circular(14),
-                        bottomRight: Radius.circular(14),
-                      ),
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
                 border: Border.all(
-                    color:
-                        Theme.of(context).textTheme.button!.decorationColor!),
+                  color: Colors.transparent,
+                ),
               ),
               child: ListView.separated(
                 itemCount: widget.tokensForSwap.length,
@@ -324,7 +320,7 @@ class AssetSelectState extends State<AssetSelect> {
                             ),
                             SvgPicture.asset(
                               widget.tokensForSwap[index] ==
-                                      widget.selectedToken
+                                  widget.selectedToken
                                   ? 'assets/wallet_enable_pink.svg'
                                   : 'assets/wallet_disable.svg',
                               color: AppTheme.pinkColor,

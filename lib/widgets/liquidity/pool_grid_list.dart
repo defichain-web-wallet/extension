@@ -25,6 +25,9 @@ class PoolGridList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             itemBuilder: (BuildContext ctx, index) {
               return InkWell(
+                highlightColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                splashColor: Colors.transparent,
                 onTap: () async {
                   Navigator.push(
                     context,

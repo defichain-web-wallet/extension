@@ -1,3 +1,4 @@
+import 'package:defichaindart/defichaindart.dart';
 import 'package:defi_wallet/utils/convert.dart';
 
 class UtxoModel {
@@ -5,8 +6,9 @@ class UtxoModel {
   String? mintTxId;
   String? address;
   int? value;
+  ECPair? keyPair;
 
-  UtxoModel({this.mintIndex, this.mintTxId, this.address, this.value});
+  UtxoModel({this.mintIndex, this.mintTxId, this.address, this.value, this.keyPair});
 
   UtxoModel.fromJson(dynamic json) {
     print(json);

@@ -1,24 +1,29 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
 import 'package:defi_wallet/screens/dex/swap_screen.dart';
-import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
+import 'package:defi_wallet/screens/earn_screen/earn_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/select_buy_or_sell_screen.dart';
-import 'package:defi_wallet/screens/send/send_token_selector.dart';
+import 'package:defi_wallet/screens/send/send_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ActionButtonsList extends StatelessWidget {
   final Function() hideOverlay;
+  final String swapTutorialStatus;
 
-  const ActionButtonsList({Key? key, required this.hideOverlay})
-      : super(key: key);
+  const ActionButtonsList({
+    Key? key,
+    required this.hideOverlay,
+    this.swapTutorialStatus = 'show',
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    print(swapTutorialStatus);
     var receiveCallback = () async {
       hideOverlay();
       Navigator.push(
@@ -36,7 +41,7 @@ class ActionButtonsList extends StatelessWidget {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendTokenSelector(),
+          pageBuilder: (context, animation1, animation2) => SendScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
@@ -44,48 +49,60 @@ class ActionButtonsList extends StatelessWidget {
     };
 
     var swapCallback = () {
-      hideOverlay();
-      Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => SwapScreen(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ));
-    };
-    var liquidityCallback = () {
-      hideOverlay();
-      Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => LiquidityScreen(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ));
-    };
-    var buySellCallback = (state) {
-      if (SettingsHelper.settings.network == 'testnet') {
+      if (SettingsHelper.isBitcoin() &&
+          SettingsHelper.settings.network == 'testnet') {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Forbidden to testnet',
+              'Not allowed for testnet bitcoin',
               style: Theme.of(context).textTheme.headline5,
             ),
             backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
           ),
         );
         return;
+      }
+      hideOverlay();
+      if (swapTutorialStatus == 'show' && SettingsHelper.isBitcoin()) {
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                SwapGuideScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
       } else {
-        hideOverlay();
         Navigator.push(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SelectBuyOrSellScreen(),
+              pageBuilder: (context, animation1, animation2) => SwapScreen(),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ));
       }
+    };
+    var liquidityCallback = () {
+      hideOverlay();
+      Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) => EarnScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ));
+    };
+    var buySellCallback = (state) {
+      hideOverlay();
+      Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                SelectBuyOrSellScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ));
     };
     return BlocBuilder<FiatCubit, FiatState>(
       builder: (BuildContext context, state) {
@@ -109,16 +126,18 @@ class ActionButtonsList extends StatelessWidget {
                 label: 'Swap',
                 onPressed: swapCallback,
               ),
-              ActionButton(
-                iconPath: 'assets/images/buy_sell.png',
-                label: 'Buy/Sell',
-                onPressed: () => buySellCallback(state),
-              ),
-              ActionButton(
-                iconPath: 'assets/images/earn.png',
-                label: 'Earn',
-                onPressed: liquidityCallback,
-              ),
+              if (!SettingsHelper.isBitcoin())
+                ActionButton(
+                  iconPath: 'assets/images/buy_sell.png',
+                  label: 'Buy/Sell',
+                  onPressed: () => buySellCallback(state),
+                ),
+              if (!SettingsHelper.isBitcoin())
+                ActionButton(
+                  iconPath: 'assets/images/earn.png',
+                  label: 'Earn',
+                  onPressed: liquidityCallback,
+                ),
             ],
           ),
         );
@@ -149,6 +168,7 @@ class ActionButton extends StatelessWidget {
             border: Border.all(color: AppTheme.pinkColor, width: 1.5),
           ),
           child: IconButton(
+            splashRadius: 1,
             iconSize: 22,
             icon: Image(
               image: AssetImage(iconPath!),

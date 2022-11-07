@@ -22,6 +22,7 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/selectors/currency_selector.dart';
@@ -66,8 +67,11 @@ class _SellingState extends State<Selling> {
   TransactionService transactionService = TransactionService();
 
   List<String> assets = [];
+  String appBarTitle = 'Selling';
   String assetFrom = '';
   String sellFieldMsg = '';
+  String secondStepLoaderText =
+      'Did you know that Jellywallet is open source? Everyone can check and verify the code!';
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   bool isPending = false;
@@ -85,7 +89,7 @@ class _SellingState extends State<Selling> {
 
     return BlocBuilder<AccountCubit, AccountState>(
         builder: (accountContext, accountState) {
-      fiatCubit.loadAllAssets(accountState.accessToken!);
+      fiatCubit.loadAllAssets();
       return BlocBuilder<FiatCubit, FiatState>(
         builder: (BuildContext context, fiatState) {
           return BlocBuilder<TokensCubit, TokensState>(
@@ -97,7 +101,7 @@ class _SellingState extends State<Selling> {
                     return Scaffold(
                       key: _scaffoldKey,
                       appBar: MainAppBar(
-                        title: 'Selling',
+                        title: appBarTitle,
                         hideOverlay: () => hideOverlay(),
                       ),
                       body: _buildBody(
@@ -112,7 +116,7 @@ class _SellingState extends State<Selling> {
                             context, accountState, fiatState, tokensState,
                             isCustomBgColor: true),
                         appBar: MainAppBar(
-                          title: 'Selling',
+                          title: appBarTitle,
                           hideOverlay: () => hideOverlay(),
                           isSmall: true,
                         ),
@@ -143,7 +147,6 @@ class _SellingState extends State<Selling> {
           )));
       return Container();
     } else {
-      FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
       IbanModel? currentIban;
       if (iterator == 0) {
         selectedFiat = fiatState.fiatList![0];
@@ -158,24 +161,21 @@ class _SellingState extends State<Selling> {
         getFieldMsg(accountState);
         iterator++;
       }
-      List<IbanModel> ibanList = fiatState.ibanList
-          .where((element) =>
-              element.type == "Sell" && element.fiat.name == selectedFiat.name)
-          .toList();
-      try {
-        if (fiatState.activeIban != null) {
-          currentIban = fiatState.activeIban;
-        } else {
-          IbanModel iban =
-          ibanList.firstWhere((el) => el.fiat!.name == selectedFiat.name);
-          fiatCubit.changeCurrentIban(iban);
-          currentIban = fiatState.activeIban;
-        }
-      } catch (_) {
-        currentIban = null;
-      }
+      List<String> stringIbans = [];
+      List<IbanModel> uniqueIbans = [];
+
+      fiatState.ibanList!.forEach((element) {
+        stringIbans.add(element.iban!);
+      });
+
+      var stringUniqueIbans = Set<String>.from(stringIbans).toList();
+
+      stringUniqueIbans.forEach((element) {
+        uniqueIbans
+            .add(fiatState.ibanList.firstWhere((el) => el.iban == element));
+      });
       return Container(
-        color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+        color: Theme.of(context).dialogBackgroundColor,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Center(
           child: StretchBox(
@@ -187,6 +187,7 @@ class _SellingState extends State<Selling> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AmountSelectorField(
+                        isBorder: isCustomBgColor,
                         label: 'Your asset',
                         selectedAsset: assetFrom,
                         assets: assets,
@@ -240,6 +241,7 @@ class _SellingState extends State<Selling> {
                             Expanded(
                               child: Container(
                                 child: CurrencySelector(
+                                    isBorder: isCustomBgColor,
                                     onAnotherSelect: hideOverlay,
                                     currencies: fiatState.fiatList,
                                     key: _selectKeyCurrency,
@@ -268,19 +270,22 @@ class _SellingState extends State<Selling> {
                         key: _formKey,
                         child: Container(
                             padding: EdgeInsets.only(top: 20),
-                            child: widget.isNewIban || currentIban == null
+                            child: widget.isNewIban ||
+                                    fiatState.activeIban == null
                                 ? IbanField(
+                                    isBorder: isCustomBgColor,
                                     ibanController: _ibanController,
-                                    hintText: 'DE89 3704 0044 0532 0130 00',
+                                    hintText: 'DE89 37XX XXXX XXXX XXXX XX',
                                     maskFormat: 'AA## #### #### #### #### ##',
                                   )
                                 : IbanSelector(
+                                    isBorder: isCustomBgColor,
                                     key: selectKeyIban,
                                     onAnotherSelect: hideOverlay,
                                     routeWidget: Selling(
                                       isNewIban: widget.isNewIban,
                                     ),
-                                    ibanList: ibanList,
+                                    ibanList: uniqueIbans,
                                     selectedIban: fiatState.activeIban,
                                   )),
                       ),
@@ -339,7 +344,8 @@ class _SellingState extends State<Selling> {
                           TransactionCubit transactionCubit =
                               BlocProvider.of<TransactionCubit>(context);
                           lockHelper.provideWithLockChecker(context, () async {
-                            if (transactionCubit.state is TransactionLoadingState) {
+                            if (transactionCubit.state
+                                is TransactionLoadingState) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -358,49 +364,81 @@ class _SellingState extends State<Selling> {
                             hideOverlay();
                             if (_formKey.currentState!.validate()) {
                               if (isEnough) {
-                                parent.emitPending(true);
-                                setState(() {
-                                  isPending = true;
-                                });
-                                try {
-                                  String address;
-                                  double amount = double.parse(amountController
-                                      .text
-                                      .replaceAll(',', '.'));
-                                  if (_ibanController.text == '') {
-                                    address =
-                                        fiatState.activeIban.deposit["address"];
-                                  } else {
-                                    Map sellDetails = await dfxRequests.sell(
-                                        _ibanController.text,
-                                        selectedFiat,
-                                        accountState.accessToken);
-                                    address = sellDetails["deposit"]["address"];
-                                  }
-                                  await _sendTransaction(
-                                    context,
-                                    tokensState,
-                                    assetFrom,
-                                    accountState.activeAccount,
-                                    address,
-                                    amount,
-                                  );
-                                  parent.emitPending(false);
-                                } catch (err) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        err.toString(),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline5,
-                                      ),
-                                      backgroundColor: Theme.of(context)
-                                          .snackBarTheme
-                                          .backgroundColor,
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            LoaderNew(
+                                      title: appBarTitle,
+                                      secondStepLoaderText:
+                                          secondStepLoaderText,
+                                      callback: () async {
+                                        try {
+                                          String address;
+                                          double amount = double.parse(
+                                              amountController.text
+                                                  .replaceAll(',', '.'));
+                                          IbanModel? foundedIban;
+                                          try {
+                                            foundedIban = fiatState.ibanList
+                                                .firstWhere((el) =>
+                                                    el.active &&
+                                                    el.type == "Sell" &&
+                                                    el.iban ==
+                                                        fiatState
+                                                            .activeIban.iban &&
+                                                    el.fiat.name ==
+                                                        selectedFiat.name);
+                                          } catch (_) {
+                                            print(_);
+                                          }
+                                          String iban = widget.isNewIban
+                                              ? _ibanController.text
+                                              : fiatState.activeIban.iban;
+                                          if (foundedIban == null ||
+                                              widget.isNewIban) {
+                                            Map sellDetails =
+                                                await dfxRequests.sell(
+                                                    iban,
+                                                    selectedFiat,
+                                                    fiatState.accessToken);
+                                            address = sellDetails["deposit"]
+                                                ["address"];
+                                          } else {
+                                            address =
+                                                foundedIban.deposit["address"];
+                                          }
+                                          await _sendTransaction(
+                                            context,
+                                            tokensState,
+                                            assetFrom,
+                                            accountState.activeAccount,
+                                            address,
+                                            amount,
+                                          );
+                                        } catch (err) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                err.toString(),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5,
+                                              ),
+                                              backgroundColor: Theme.of(context)
+                                                  .snackBarTheme
+                                                  .backgroundColor,
+                                            ),
+                                          );
+                                        }
+                                      },
                                     ),
-                                  );
-                                }
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ),
+                                );
                               } else {
                                 if (double.parse(amountController.text
                                         .replaceAll(',', '.')) ==
@@ -490,19 +528,23 @@ class _SellingState extends State<Selling> {
   _sendTransaction(context, tokensState, String token, AccountModel account,
       String address, double amount) async {
     TxErrorModel? txResponse;
-    if (token == 'DFI') {
-      txResponse = await transactionService.createAndSendTransaction(
-          account: account,
-          destinationAddress: address,
-          amount: balancesHelper.toSatoshi(amount.toString()),
-          tokens: tokensState.tokens);
-    } else {
-      txResponse = await transactionService.createAndSendToken(
-          account: account,
-          token: token,
-          destinationAddress: address,
-          amount: balancesHelper.toSatoshi(amount.toString()),
-          tokens: tokensState.tokens);
+    try {
+      if (token == 'DFI') {
+        txResponse = await transactionService.createAndSendTransaction(
+            account: account,
+            destinationAddress: address,
+            amount: balancesHelper.toSatoshi(amount.toString()),
+            tokens: tokensState.tokens);
+      } else {
+        txResponse = await transactionService.createAndSendToken(
+            account: account,
+            token: token,
+            destinationAddress: address,
+            amount: balancesHelper.toSatoshi(amount.toString()),
+            tokens: tokensState.tokens);
+      }
+    } catch (err) {
+      print(err);
     }
     await Navigator.pushReplacement(
         context,

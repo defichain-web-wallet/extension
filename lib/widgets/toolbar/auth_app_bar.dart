@@ -17,14 +17,14 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isSavedMnemonic;
   final bool isShowFullScreen;
   final bool? isSmall;
-  final Widget? widgetBack;
+  final bool isWidgetBack;
 
   const AuthAppBar({
     Key? key,
     this.isSavedMnemonic = false,
     this.isShowFullScreen = false,
     this.isSmall = true,
-    this.widgetBack,
+    this.isWidgetBack = true,
     this.controllers,
   }) : super(key: key);
 
@@ -34,17 +34,19 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      shadowColor: Colors.transparent,
       shape: isSmall!
           ? null
           : RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
               ),
             ),
       toolbarHeight: toolbarHeight,
       leadingWidth: leadingWidth,
-      leading: Padding(
+      automaticallyImplyLeading: false,
+      leading: isWidgetBack ? Padding(
         padding: const EdgeInsets.only(left: 8),
         child: Row(
           children: [
@@ -56,7 +58,8 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) => AuthScreen(),
+                        pageBuilder: (context, animation1, animation2) =>
+                            AuthScreen(),
                         transitionDuration: Duration.zero,
                         reverseTransitionDuration: Duration.zero,
                       ),
@@ -65,14 +68,14 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
                 : backButton(context)
           ],
         ),
-      ),
+      ) : null,
       centerTitle: true,
       title: SvgPicture.asset(
         'assets/jelly_logo_wallet.svg',
         height: iconHeight,
       ),
       actions: [
-        isShowFullScreen
+        isShowFullScreen && isWidgetBack
             ? isSmall!
                 ? Padding(
                     padding: const EdgeInsets.only(right: 12.0),

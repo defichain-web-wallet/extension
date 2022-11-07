@@ -1,11 +1,10 @@
 import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
@@ -14,15 +13,14 @@ import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/wallet_details.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/network/network_selector.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 import 'dart:async';
 
 class HomeScreen extends StatefulWidget {
@@ -44,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool isFullSizeScreen = false;
   double assetsTabBodyHeight = 0;
   double historyTabBodyHeight = 0;
-  double minDefaultTabBodyHeight = 275;
+  double minDefaultTabBodyHeight = 255;
   double maxDefaultTabBodyHeight = 475;
   double maxHistoryEntries = 30;
   double heightListEntry = 74;
@@ -58,18 +56,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   setTabBody({int tabIndex = 0}) {
     AccountState accountState = BlocProvider.of<AccountCubit>(context).state;
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     double countAssets = 0;
     double countTransactions = 0;
 
-    countAssets = accountState.activeAccount!.balanceList!
-        .where((el) => !el.isHidden!)
-        .length
-        .toDouble();
+    if (SettingsHelper.isBitcoin()) {
+      countAssets = 1;
+    } else {
+      countAssets = accountState.activeAccount!.balanceList!
+          .where((el) => !el.isHidden!)
+          .length
+          .toDouble();
+    }
     assetsTabBodyHeight =
         countAssets * heightListEntry + heightAdditionalAction;
 
-    countTransactions =
-        accountState.activeAccount!.historyList!.length.toDouble();
+    countTransactions = (SettingsHelper.isBitcoin())
+        ? bitcoinCubit.state.history!.length.toDouble()
+        : accountState.activeAccount!.historyList!.length.toDouble();
     if (countTransactions < maxHistoryEntries) {
       historyTabBodyHeight =
           countTransactions * heightListEntry + heightAdditionalAction;
@@ -105,13 +109,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     tabController!.addListener(tabListener);
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
     transactionCubit.checkOngoingTransaction();
 
-    if (widget.isLoadTokens && SettingsHelper.settings.network == 'mainnet') {
-      fiatCubit.loadUserDetails(accountCubit.state.accessToken!);
-    }
+    lockHelper.updateTimer();
   }
 
   @override
@@ -128,17 +129,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> saveOpenTime() async {
-    var box = await Hive.openBox(HiveBoxes.client);
-    await box.put(HiveNames.openTime, DateTime.now().millisecondsSinceEpoch);
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (!isSaveOpenTime) {
-      saveOpenTime();
-      isSaveOpenTime = true;
-    }
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     if (widget.isLoadTokens) {
       tokensCubit.loadTokensFromStorage();
@@ -218,23 +210,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return BlocBuilder<HomeCubit, HomeState>(
         builder: (context, homeState) {
           return Container(
+            color: Theme.of(context).dialogBackgroundColor,
             child: Center(
               child: StretchBox(
                 maxWidth: ScreenSizes.medium,
                 child: ListView(
                   children: [
                     Container(
-                      color: Theme.of(context).dialogBackgroundColor,
+                      color: null,
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 8, top: 40),
+                            padding: const EdgeInsets.all(10),
+                            child: NetworkSelector(isFullSize: isFullSize,),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8, top: 8),
                             child: WalletDetails(),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 40),
                             child: ActionButtonsList(
                               hideOverlay: () => hideOverlay(),
+                              swapTutorialStatus: state.swapTutorialStatus,
                             ),
                           ),
                         ],
@@ -248,13 +246,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           decoration: BoxDecoration(
                             color:
                                 Theme.of(context).appBarTheme.backgroundColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.shadowColor.withOpacity(0.1),
-                                spreadRadius: 2,
-                                blurRadius: 3,
-                              ),
-                            ],
                           ),
                           child: TabBarHeader(
                             tabController: tabController,
@@ -267,18 +258,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             height: assetsTabBodyHeight,
                             child: TabBarBody(
                               tabController: tabController,
-                              historyList: state.activeAccount.historyList!,
-                              testnetHistoryList:
-                                  state.activeAccount.testnetHistoryList!,
+                              isEmptyList: isExistHistory(state),
                             ),
                           )
                         : SizedBox(
                             height: historyTabBodyHeight,
                             child: TabBarBody(
                               tabController: tabController,
-                              historyList: state.activeAccount.historyList!,
-                              testnetHistoryList:
-                                  state.activeAccount.testnetHistoryList!,
+                              isEmptyList: isExistHistory(state),
                             ),
                           ),
                   ],
@@ -299,6 +286,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
     } else {
       return Container();
+    }
+  }
+
+  bool isExistHistory(state) {
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+
+    if (SettingsHelper.isBitcoin()) {
+      return bitcoinCubit.state.history!.length > 30;
+    } else if (SettingsHelper.settings.network == 'mainnet') {
+      return state.activeAccount.historyList!.length > 30;
+    } else {
+      return state.activeAccount.testnetHistoryList!.length > 30;
     }
   }
 

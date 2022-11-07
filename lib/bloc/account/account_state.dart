@@ -4,7 +4,6 @@ enum AccountStatusList { initial, loading, success, restore, failure }
 
 class AccountState extends Equatable {
   final AccountStatusList status;
-  final String? accessToken;
   final List<String>? mnemonic;
   final Uint8List? seed;
   final List<AccountModel>? accounts;
@@ -16,10 +15,10 @@ class AccountState extends Equatable {
   final int? needRestore;
   final int? restored;
   final Exception? exception;
+  final String swapTutorialStatus;
 
   AccountState({
     this.status = AccountStatusList.initial,
-    this.accessToken,
     this.mnemonic,
     this.seed,
     this.accounts,
@@ -31,12 +30,12 @@ class AccountState extends Equatable {
     this.needRestore,
     this.restored,
     this.exception,
+    this.swapTutorialStatus = 'show',
   });
 
   @override
   List<Object?> get props => [
         status,
-        accessToken,
         mnemonic,
         seed,
         accounts,
@@ -48,11 +47,11 @@ class AccountState extends Equatable {
         needRestore,
         restored,
         exception,
+        swapTutorialStatus,
       ];
 
   AccountState copyWith({
     AccountStatusList? status,
-    String? accessToken,
     List<String>? mnemonic,
     Uint8List? seed,
     List<AccountModel>? accounts,
@@ -64,10 +63,10 @@ class AccountState extends Equatable {
     int? needRestore,
     int? restored,
     Exception? exception,
+    String? swapTutorialStatus,
   }) {
     return AccountState(
       status: status ?? this.status,
-      accessToken: accessToken ?? this.accessToken,
       mnemonic: mnemonic ?? this.mnemonic,
       seed: seed ?? this.seed,
       accounts: accounts ?? this.accounts,
@@ -79,6 +78,7 @@ class AccountState extends Equatable {
       needRestore: needRestore ?? this.needRestore,
       restored: restored ?? this.restored,
       exception: exception ?? this.exception,
+      swapTutorialStatus: swapTutorialStatus ?? this.swapTutorialStatus,
     );
   }
 }

@@ -1,12 +1,15 @@
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/widgets/status/status_transaction.dart';
 import 'package:defi_wallet/widgets/toolbar/icon_app_bar.dart';
+import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,112 +22,71 @@ class SwapStatusScreen extends StatelessWidget {
   final double amount;
   final String assetFrom;
   final String assetTo;
+  final String appBarTitle;
+  double homeButtonWidth;
 
-  SwapStatusScreen(
-      {Key? key,
-      required this.txResponse,
-      required this.amount,
-      required this.assetFrom,
-      required this.assetTo})
-      : super(key: key);
+  SwapStatusScreen({
+    Key? key,
+    required this.txResponse,
+    required this.amount,
+    required this.assetFrom,
+    required this.assetTo,
+    required this.appBarTitle,
+    this.homeButtonWidth = 150,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => ScaffoldConstrainedBox(
-          child: LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth < ScreenSizes.medium) {
-          return Scaffold(
-            body: _buildBody(context),
-            appBar: IconAppBar(
-              title: 'Decentralized Exchange',
-              cancel: () => Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) => HomeScreen(),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < ScreenSizes.medium) {
+              return Scaffold(
+                body: _buildBody(context),
+                appBar: MainAppBar(
+                  title: appBarTitle,
+                  isShowNavButton: false,
                 ),
-              ),
-              isShownLogo: false,
-            ),
-          );
-        } else {
-          return Container(
-            padding: const EdgeInsets.only(top: 20),
-            child: Scaffold(
-              body: _buildBody(context, isCustomBgColor: true),
-              appBar: IconAppBar(
-                title: 'Decentralized Exchange',
-                isSmall: true,
-                isShownLogo: false,
-                cancel: () => Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => HomeScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.only(top: 20),
+                child: Scaffold(
+                  body: _buildBody(context, isCustomBgColor: true),
+                  appBar: MainAppBar(
+                    title: appBarTitle,
+                    isSmall: true,
+                    isShowNavButton: false,
                   ),
                 ),
-              ),
-            ),
-          );
-        }
-      }));
+              );
+            }
+          },
+        ),
+      );
 
   Widget _buildBody(context, {isCustomBgColor = false}) {
     if (txResponse!.isError) {
-      LoggerService.invokeInfoLogg('user was swap token failed ${txResponse!.error}');
+      LoggerService.invokeInfoLogg(
+          'user was swap token failed ${txResponse!.error}');
     } else {
       LoggerService.invokeInfoLogg('user was swap token successfully');
 
-      TransactionCubit transactionCubit =
-        BlocProvider.of<TransactionCubit>(context);
+      if (!SettingsHelper.isBitcoin()) {
+        TransactionCubit transactionCubit =
+          BlocProvider.of<TransactionCubit>(context);
 
-      transactionCubit.setOngoingTransaction(txResponse!.txid!);
+        transactionCubit.setOngoingTransaction(txResponse!.txid!);
+      }
     }
     return Container(
-      color: isCustomBgColor ? Theme.of(context).dialogBackgroundColor : null,
+      color: Theme.of(context).dialogBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              child: Column(
-                children: [
-                  Image.asset(
-                    txResponse!.isError
-                        ? 'assets/error_gif.gif'
-                        : 'assets/status_reload_icon.png',
-                    height: 126,
-                    width: 124,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 32, top: 30),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          txResponse!.isError
-                              ? 'Swap failed'
-                              : 'Swap successful!',
-                          style: Theme.of(context).textTheme.headline1,
-                        ),
-                        SizedBox(height: 24),
-                        Text(
-                          txResponse!.isError
-                              ? 'Were not swapped successfully'
-                              : 'Your transaction will now be processed in the background. Your account balance will be updated in a few minutes.',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline5!.apply(
-                            fontWeightDelta: 2,
-                            color: Color(0xFFC4C4C4)
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            StatusTransaction(
+              txResponse: txResponse,
             ),
             Flexible(
               child: txResponse!.isError
@@ -135,21 +97,58 @@ class SwapStatusScreen extends StatelessWidget {
                           : txResponse!.error.toString(),
                       style: Theme.of(context).textTheme.button,
                     )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        SvgPicture.asset(
-                          'assets/explorer_icon.svg',
-                          color: AppTheme.pinkColor,
-                        ),
-                        SizedBox(width: 10),
-                        InkWell(
-                          child: Text(
-                            'View on Explorer',
-                            style: AppTheme.defiUnderlineText,
+                        SizedBox(
+                          width: homeButtonWidth,
+                          child: PrimaryButton(
+                            label: 'Home',
+                            callback: () => Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        HomeScreen(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            ),
                           ),
-                          onTap: () => launch(
-                              'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}'),
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/explorer_icon.svg',
+                              color: AppTheme.pinkColor,
+                            ),
+                            SizedBox(width: 10),
+                            InkWell(
+                              child: Text(
+                                'View on Explorer',
+                                style: AppTheme.defiUnderlineText,
+                              ),
+                              onTap: () {
+                                if (SettingsHelper.isBitcoin()) {
+                                  if (SettingsHelper.settings.network! ==
+                                      'mainnet') {
+                                    launch(
+                                        'https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
+                                  } else {
+                                    launch(
+                                        'https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
+                                  }
+                                } else {
+                                  launch(
+                                      'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),

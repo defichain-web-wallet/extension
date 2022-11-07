@@ -1,26 +1,38 @@
+import 'dart:convert';
+
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/models/fiat_model.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
+import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/models/available_asset_model.dart';
+import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
-import 'package:defi_wallet/screens/staking/staking_confirm_transaction.dart';
+import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
+import 'package:defi_wallet/screens/sell/selling.dart';
+import 'package:defi_wallet/screens/staking/number_of_coins_to_stake.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
-import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
+import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/selectors/currency_selector.dart';
 import 'package:defi_wallet/widgets/selectors/iban_selector.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SendStakingRewardsScreen extends StatefulWidget {
   final bool isNewIban;
+  final bool isPayment;
 
-  const SendStakingRewardsScreen({Key? key, this.isNewIban = false})
-      : super(key: key);
+  const SendStakingRewardsScreen({
+    Key? key,
+    this.isPayment = false,
+    this.isNewIban = false,
+  }) : super(key: key);
 
   @override
   _SendStakingRewardsScreenState createState() =>
@@ -35,32 +47,90 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
   final GlobalKey<IbanSelectorState> selectKeyIban =
       GlobalKey<IbanSelectorState>();
 
-  FiatModel selectedFiat = FiatModel(name: "EUR", enable: true, id: 2);
   String assetFrom = '';
 
-  bool isReinvest = true;
-  bool isWallet = false;
-  bool isAutoSell = false;
+  StakingType type = StakingType.Reinvest;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AccountCubit, AccountState>(
       builder: (context, state) {
-        if (state.status == AccountStatusList.success) {
-          assetFrom = (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
-          List<String> assets = [];
-          state.activeAccount!.balanceList!.forEach((el) {
-            if (!el.isHidden!) {
-              assets.add(el.token!);
-            }
-          });
+        FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+        StakingCubit stakingCubit = BlocProvider.of<StakingCubit>(context);
+        fiatCubit.loadAllAssets(isSell: true);
+        return BlocBuilder<FiatCubit, FiatState>(builder: (context, fiatState) {
+          return BlocBuilder<StakingCubit, StakingState>(
+            builder: (context, stakingState) {
+              if (state.status == AccountStatusList.success &&
+                  fiatState.status == FiatStatusList.success) {
+                List<IbanModel> uniqueIbans =
+                    fiatState.ibanList!.where((el) => el.fiat != null).toList();
 
-          return ScaffoldConstrainedBoxNew(
-            hideOverlay: hideOverlay,
-            appBar: MainAppBar(
-              hideOverlay: hideOverlay,
-              title: 'Staking',
-            ),
+                assetFrom =
+                    (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
+                List<String> assets = [];
+                fiatState.assets!.forEach((el) {
+                  assets.add(el.dexName!);
+                });
+
+                return ScaffoldConstrainedBox(
+                  child: GestureDetector(
+                    onTap: () => hideOverlay(),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth < ScreenSizes.medium) {
+                          return Scaffold(
+                            appBar: MainAppBar(
+                              hideOverlay: hideOverlay,
+                              title: 'Staking',
+                            ),
+                            body: _buildBody(state, fiatState, stakingState,
+                                stakingCubit, uniqueIbans, assets),
+                          );
+                        } else {
+                          return Container(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Scaffold(
+                              appBar: MainAppBar(
+                                hideOverlay: hideOverlay,
+                                title: 'Staking',
+                                isSmall: true,
+                              ),
+                              body: _buildBody(
+                                state,
+                                fiatState,
+                                stakingState,
+                                stakingCubit,
+                                uniqueIbans,
+                                assets,
+                                isFullSize: true,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                );
+              } else {
+                return Loader();
+              }
+            },
+          );
+        });
+      },
+    );
+  }
+
+  Widget _buildBody(
+          state, fiatState, stakingState, stakingCubit, uniqueIbans, assets,
+          {isFullSize = false}) =>
+      Container(
+        color: Theme.of(context).dialogBackgroundColor,
+        padding:
+            const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+        child: Center(
+          child: StretchBox(
             child: GestureDetector(
               onTap: () {
                 hideOverlay();
@@ -83,7 +153,9 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                             Container(
                               padding: EdgeInsets.only(top: 30),
                               child: Text(
-                                'Where should we send your staking rewards?',
+                                widget.isPayment
+                                    ? 'Where should we send your staking rewards?'
+                                    : 'Where do you want to receive your staking rewards?',
                                 style: Theme.of(context).textTheme.headline6,
                               ),
                             ),
@@ -104,31 +176,23 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           border: Border.all(
-                                            color: isReinvest
+                                            color: type == StakingType.Reinvest
                                                 ? AppTheme.pinkColor
-                                                : Theme.of(context)
-                                                    .dividerColor,
+                                                : Colors.transparent,
                                             width: 1,
                                             style: BorderStyle.solid,
                                           ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: AppTheme.shadowColor
-                                                  .withOpacity(0.1),
-                                              spreadRadius: 2,
-                                              blurRadius: 3,
-                                            ),
-                                          ],
                                         ),
                                         child: Center(child: Text('Reinvest')),
                                       ),
                                       onTap: () {
                                         hideOverlay();
-                                        setState(() {
-                                          isReinvest = true;
-                                          isWallet = false;
-                                          isAutoSell = false;
-                                        });
+                                        type = StakingType.Reinvest;
+                                        if (widget.isPayment) {
+                                          stakingCubit.setPaymentType(type);
+                                        } else {
+                                          stakingCubit.setRewardType(type);
+                                        }
                                       },
                                     ),
                                   ),
@@ -143,31 +207,23 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           border: Border.all(
-                                            color: isWallet
+                                            color: type == StakingType.Wallet
                                                 ? AppTheme.pinkColor
-                                                : Theme.of(context)
-                                                    .dividerColor,
+                                                : Colors.transparent,
                                             width: 1,
                                             style: BorderStyle.solid,
                                           ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: AppTheme.shadowColor
-                                                  .withOpacity(0.1),
-                                              spreadRadius: 2,
-                                              blurRadius: 3,
-                                            ),
-                                          ],
                                         ),
                                         child: Center(child: Text('Wallet')),
                                       ),
                                       onTap: () {
                                         hideOverlay();
-                                        setState(() {
-                                          isReinvest = false;
-                                          isWallet = true;
-                                          isAutoSell = false;
-                                        });
+                                        type = StakingType.Wallet;
+                                        if (widget.isPayment) {
+                                          stakingCubit.setPaymentType(type);
+                                        } else {
+                                          stakingCubit.setRewardType(type);
+                                        }
                                       },
                                     ),
                                   ),
@@ -182,38 +238,31 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           border: Border.all(
-                                            color: isAutoSell
-                                                ? AppTheme.pinkColor
-                                                : Theme.of(context)
-                                                    .dividerColor,
+                                            color:
+                                                type == StakingType.BankAccount
+                                                    ? AppTheme.pinkColor
+                                                    : Colors.transparent,
                                             width: 1,
                                             style: BorderStyle.solid,
                                           ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: AppTheme.shadowColor
-                                                  .withOpacity(0.1),
-                                              spreadRadius: 2,
-                                              blurRadius: 3,
-                                            ),
-                                          ],
                                         ),
                                         child: Center(child: Text('Auto sell')),
                                       ),
                                       onTap: () {
                                         hideOverlay();
-                                        setState(() {
-                                          isReinvest = false;
-                                          isWallet = false;
-                                          isAutoSell = true;
-                                        });
+                                        type = StakingType.BankAccount;
+                                        if (widget.isPayment) {
+                                          stakingCubit.setPaymentType(type);
+                                        } else {
+                                          stakingCubit.setRewardType(type);
+                                        }
                                       },
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            isWallet
+                            type == StakingType.Wallet
                                 ? Container(
                                     padding: EdgeInsets.only(top: 30),
                                     child: Column(
@@ -245,60 +294,26 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                                       ],
                                     ),
                                   )
-                                : isAutoSell
+                                : type == StakingType.BankAccount
                                     ? Container(
                                         padding: EdgeInsets.only(top: 30),
                                         child: Column(
                                           children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Container(
-                                                    child: CurrencySelector(
-                                                        onAnotherSelect:
-                                                            hideOverlay,
-                                                        currencies: [
-                                                          FiatModel(
-                                                            name: "CHF",
-                                                            enable: true,
-                                                            id: 1,
-                                                          ),
-                                                          FiatModel(
-                                                            name: "EUR",
-                                                            enable: true,
-                                                            id: 2,
-                                                          ),
-                                                        ],
-                                                        key: _selectKeyCurrency,
-                                                        selectedCurrency:
-                                                            selectedFiat,
-                                                        onSelect: (FiatModel
-                                                            selected) {
-                                                          setState(() {
-                                                            selectedFiat =
-                                                                selected;
-                                                          });
-                                                        }),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Container(),
-                                                ),
-                                              ],
-                                            ),
                                             Form(
                                               key: _formKey,
                                               child: Container(
                                                 padding:
                                                     EdgeInsets.only(top: 10),
-                                                child: IbanField(
-                                                  onFocus: hideOverlay,
-                                                  ibanController:
-                                                      TextEditingController(),
-                                                  hintText:
-                                                      'DE89 3704 0044 0532 0130 00',
-                                                  maskFormat:
-                                                      'AA## #### #### #### #### ##',
+                                                child: IbanSelector(
+                                                  key: selectKeyIban,
+                                                  onAnotherSelect: hideOverlay,
+                                                  routeWidget: Selling(
+                                                    isNewIban: widget.isNewIban,
+                                                  ),
+                                                  ibanList: uniqueIbans,
+                                                  selectedIban:
+                                                      fiatState.activeIban!,
+                                                  isShowAsset: true,
                                                 ),
                                               ),
                                             ),
@@ -326,17 +341,66 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                         child: PrimaryButton(
                           label: 'Next',
                           isCheckLock: false,
-                          callback: () {
+                          callback: () async {
                             hideOverlay();
-                            Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          StakingConfirmTransaction(),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ));
+                            AssetByFiatModel foundAsset = fiatState.assets!
+                                .firstWhere(
+                                    (element) => element.dexName == assetFrom);
+
+                            try {
+                              if (widget.isPayment) {
+                                stakingCubit.updatePaymentInfo(
+                                    type, foundAsset, fiatState.activeIban!);
+                                String rewardType = stakingState.rewardType
+                                    .toString()
+                                    .split('.')[1];
+                                String paybackType = stakingState.paymentType
+                                    .toString()
+                                    .split('.')[1];
+                                try {
+                                  var foundedRoute = stakingState.routes!
+                                      .firstWhere((element) =>
+                                          element.active! &&
+                                          element.rewardType == rewardType &&
+                                          element.paybackType == paybackType);
+                                  await stakingCubit.createStaking(
+                                      fiatState.accessToken!,
+                                      isActive: true,
+                                      id: foundedRoute.id!);
+                                } catch (err) {
+                                  await stakingCubit
+                                      .createStaking(fiatState.accessToken!);
+                                }
+                              } else {
+                                stakingCubit.updateRewardInfo(
+                                    type, foundAsset, fiatState.activeIban!);
+                              }
+                              Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            widget.isPayment
+                                                ? NumberOfCoinsToStakeScreen()
+                                                : SendStakingRewardsScreen(
+                                                    isPayment: true),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ));
+                            } catch (err) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    err.toString().replaceAll("\"", ''),
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
+                                  ),
+                                  backgroundColor: Theme.of(context)
+                                      .snackBarTheme
+                                      .backgroundColor,
+                                ),
+                              );
+                            }
                           },
                         ),
                       ),
@@ -345,19 +409,19 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
                 ],
               ),
             ),
-          );
-        } else {
-          return Loader();
-        }
-      },
-    );
-  }
+          ),
+        ),
+      );
 
   hideOverlay() {
     try {
       _selectKeyFrom.currentState!.hideOverlay();
-    } catch (_) {}try {
+    } catch (_) {}
+    try {
       _selectKeyCurrency.currentState!.hideOverlay();
+    } catch (_) {}
+    try {
+      selectKeyIban.currentState!.hideOverlay();
     } catch (_) {}
   }
 }

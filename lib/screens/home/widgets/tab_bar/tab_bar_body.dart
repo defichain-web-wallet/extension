@@ -1,5 +1,6 @@
 import 'package:defi_wallet/helpers/history_new.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/screens/history/history.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
@@ -10,14 +11,12 @@ import 'package:flutter/material.dart';
 
 class TabBarBody extends StatelessWidget {
   final TabController? tabController;
-  final List<HistoryNew> historyList;
-  final List<HistoryModel> testnetHistoryList;
+  final bool isEmptyList;
 
   const TabBarBody({
     Key? key,
     this.tabController,
-    required this.historyList,
-    required this.testnetHistoryList,
+    required this.isEmptyList,
   }) : super(key: key);
 
   @override
@@ -30,34 +29,36 @@ class TabBarBody extends StatelessWidget {
         Column(
           children: [
             Expanded(child: AssetList()),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: TextButton(
-                child: Text(
-                  ' +  Add token ',
-                  style: Theme.of(context).textTheme.headline6,
+            if (!SettingsHelper.isBitcoin())
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: TextButton(
+                  child: Text(
+                    ' +  Add token ',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  onPressed: () async {
+                    await lockHelper.provideWithLockChecker(
+                        context,
+                        () => Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        SearchToken(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            ));
+                  },
                 ),
-                onPressed: () async {
-                  await lockHelper.provideWithLockChecker(
-                      context,
-                      () => Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) =>
-                                  SearchToken(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),
-                          ));
-                },
               ),
-            ),
           ],
         ),
         Column(
           children: [
             Expanded(child: TransactionHistory()),
-            historyList.length > 0 || testnetHistoryList.length > 0
+            isEmptyList
                 ? Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: TextButton(
@@ -68,17 +69,17 @@ class TabBarBody extends StatelessWidget {
                       ),
                       onPressed: () async {
                         await lockHelper.provideWithLockChecker(
+                          context,
+                          () => Navigator.push(
                             context,
-                            () => Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            History(),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                ));
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  History(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   )

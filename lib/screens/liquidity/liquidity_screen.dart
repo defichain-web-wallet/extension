@@ -143,6 +143,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                           Padding(
                             padding: const EdgeInsets.only(bottom: 18),
                             child: LiquidityHeader(
+                              isBorder: isFullSize,
                               allAssetPairs: tokensState.tokensPairs,
                               assetPairs: tokensPairsList,
                               totalTokensBalance: totalTokensBalance,
@@ -162,6 +163,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                                 var tokenPairs = List.from(foundedAssetPair)[0];
 
                                 return MainLiquidityPair(
+                                  isBorder: isFullSize,
                                   balance: tokensPairsList[index].balance,
                                   assetPair: tokenPairs,
                                 );

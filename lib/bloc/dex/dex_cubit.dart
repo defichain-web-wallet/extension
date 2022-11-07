@@ -24,4 +24,11 @@ class DexCubit extends Cubit<DexState> {
       }
     }
   }
+
+  Future<void> updateBtcDex(String tokenFrom, String tokenTo, double amountFrom,
+      double amountTo) async {
+    TestPoolSwapModel dexModel = TestPoolSwapModel(
+        tokenFrom: tokenFrom, tokenTo: tokenTo, amountFrom: amountFrom, amountTo: amountTo, priceFrom: 1, priceTo: 1);
+    emit(DexLoadedState(dexModel));
+  }
 }

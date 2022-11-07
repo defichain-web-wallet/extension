@@ -141,9 +141,7 @@ class _SelectPoolState extends State<SelectPool> {
                 }
 
                 return Container(
-                  color: isFullSize
-                      ? Theme.of(context).dialogBackgroundColor
-                      : null,
+                  color: Theme.of(context).dialogBackgroundColor,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Center(
@@ -163,59 +161,54 @@ class _SelectPoolState extends State<SelectPool> {
                                       Row(
                                         children: [
                                           Expanded(
-                                              child: Container(
-                                            height: 46,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 22),
-                                            decoration: BoxDecoration(
+                                            child: Container(
+                                              height: 46,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 22),
+                                              decoration: BoxDecoration(
                                                 color:
                                                     Theme.of(context).cardColor,
                                                 borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(14),
+                                                  topLeft: Radius.circular(10),
                                                   bottomLeft:
-                                                      Radius.circular(14),
+                                                      Radius.circular(10),
                                                 ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: AppTheme.shadowColor
-                                                        .withOpacity(0.5),
-                                                    blurRadius: 5,
-                                                    offset: Offset(3, 3),
-                                                  ),
-                                                ],
                                                 border: Border.all(
-                                                    color: Theme.of(context)
-                                                        .textTheme
-                                                        .button!
-                                                        .decorationColor!)),
-                                            child: Container(
-                                              child: Row(
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    tokenHelper
-                                                        .getImageNameByTokenName(
-                                                            assetFrom),
-                                                    height: 24,
-                                                    width: 24,
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 12.0),
-                                                    child: Text(
-                                                        TokensHelper()
-                                                            .getTokenFormat(
-                                                                assetFrom),
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline6),
-                                                  )
-                                                ],
+                                                  color: Colors.transparent,
+                                                ),
+                                              ),
+                                              child: Container(
+                                                child: Row(
+                                                  children: [
+                                                    SvgPicture.asset(
+                                                      tokenHelper
+                                                          .getImageNameByTokenName(
+                                                              assetFrom),
+                                                      height: 24,
+                                                      width: 24,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 12.0),
+                                                      child: Text(
+                                                          TokensHelper()
+                                                              .getTokenFormat(
+                                                                  assetFrom),
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline6),
+                                                    )
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          )),
+                                          ),
                                           Expanded(
                                             child: DecorationTextField(
+                                              isBorder: isFullSize,
                                               controller: _amountBaseController,
                                               focusNode: _focusBase,
                                               focusModel: _baseAmountFocusModel,
@@ -271,41 +264,32 @@ class _SelectPoolState extends State<SelectPool> {
                                   ),
                                 ),
                                 Container(
-                                    padding: const EdgeInsets.only(top: 24),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                                child: Container(
+                                  padding: const EdgeInsets.only(top: 24),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
                                               height: 46,
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 22),
                                               decoration: BoxDecoration(
-                                                  color: Theme.of(context)
-                                                      .cardColor,
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(14),
-                                                    bottomLeft:
-                                                        Radius.circular(14),
-                                                  ),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: AppTheme
-                                                          .shadowColor
-                                                          .withOpacity(0.5),
-                                                      blurRadius: 5,
-                                                      offset: Offset(3, 3),
-                                                    ),
-                                                  ],
-                                                  border: Border.all(
-                                                      color: Theme.of(context)
-                                                          .textTheme
-                                                          .button!
-                                                          .decorationColor!)),
+                                                color:
+                                                    Theme.of(context).cardColor,
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  bottomLeft:
+                                                      Radius.circular(10),
+                                                ),
+                                                border: Border.all(
+                                                  color: isFullSize
+                                                      ? Theme.of(context)
+                                                          .dividerColor
+                                                      : Colors.transparent,
+                                                ),
+                                              ),
                                               child: Container(
                                                 child: Row(
                                                   children: [
@@ -332,66 +316,68 @@ class _SelectPoolState extends State<SelectPool> {
                                                   ],
                                                 ),
                                               ),
-                                            )),
-                                            Expanded(
-                                              child: DecorationTextField(
-                                                controller:
-                                                    _amountQuoteController,
-                                                focusNode: _focusQuote,
-                                                focusModel:
-                                                    _quoteAmountFocusModel,
-                                                suffixIcon: Container(
-                                                  padding: EdgeInsets.only(
-                                                    top: 8,
-                                                    bottom: 8,
-                                                    right: 6,
-                                                  ),
-                                                  child: SizedBox(
-                                                    width: 40,
-                                                    child: TextButton(
-                                                      child: Text('MAX',
-                                                          style: TextStyle(
-                                                              fontSize: 10)),
-                                                      onPressed: () => setMaxAmount(
-                                                          _amountQuoteController,
-                                                          _amountBaseController,
-                                                          assetTo,
-                                                          widget.assetPair
-                                                              .reserveADivReserveB!,
-                                                          accountState,
-                                                          tokensState),
-                                                    ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: DecorationTextField(
+                                              isBorder: isFullSize,
+                                              controller:
+                                                  _amountQuoteController,
+                                              focusNode: _focusQuote,
+                                              focusModel:
+                                                  _quoteAmountFocusModel,
+                                              suffixIcon: Container(
+                                                padding: EdgeInsets.only(
+                                                  top: 8,
+                                                  bottom: 8,
+                                                  right: 6,
+                                                ),
+                                                child: SizedBox(
+                                                  width: 40,
+                                                  child: TextButton(
+                                                    child: Text('MAX',
+                                                        style: TextStyle(
+                                                            fontSize: 10)),
+                                                    onPressed: () => setMaxAmount(
+                                                        _amountQuoteController,
+                                                        _amountBaseController,
+                                                        assetTo,
+                                                        widget.assetPair
+                                                            .reserveADivReserveB!,
+                                                        accountState,
+                                                        tokensState),
                                                   ),
                                                 ),
-                                                onChanged: (value) => onChanged(
-                                                    _amountBaseController,
-                                                    value,
-                                                    widget.assetPair
-                                                        .reserveADivReserveB!,
-                                                    tokensState),
                                               ),
+                                              onChanged: (value) => onChanged(
+                                                  _amountBaseController,
+                                                  value,
+                                                  widget.assetPair
+                                                      .reserveADivReserveB!,
+                                                  tokensState),
                                             ),
-                                          ],
-                                        ),
-                                        Container(
-                                          width: double.infinity,
-                                          padding:
-                                              const EdgeInsets.only(top: 12),
-                                          child: Text(
-                                              getAvailableAmount(
-                                                  balanceTo, assetTo),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline4!
-                                                  .apply(
-                                                      color: Theme.of(context)
-                                                          .textTheme
-                                                          .headline4!
-                                                          .color!
-                                                          .withOpacity(0.5))),
-                                        )
-                                      ],
-                                    )),
+                                          ),
+                                        ],
+                                      ),
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.only(top: 12),
+                                        child: Text(
+                                            getAvailableAmount(
+                                                balanceTo, assetTo),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline4!
+                                                .apply(
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline4!
+                                                        .color!
+                                                        .withOpacity(0.5))),
+                                      )
+                                    ],
+                                  ),
+                                ),
                                 Container(
                                   child: Padding(
                                     padding: const EdgeInsets.only(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -28,6 +29,7 @@ class _WalletCheckerState extends State<WalletChecker> {
   Widget build(BuildContext context) {
     Future<void> checkWallets() async {
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+      BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
       var box = await Hive.openBox(HiveBoxes.client);
       var masterKeyPairName;
       if (SettingsHelper.settings.network! == 'testnet') {
@@ -52,7 +54,13 @@ class _WalletCheckerState extends State<WalletChecker> {
       if (masterKeyPair != null) {
         if (password != null) {
           lockHelper.provideWithLockChecker(context, () async {
-            await accountCubit.restoreAccountFromStorage(SettingsHelper.settings.network!);
+            await accountCubit
+                .restoreAccountFromStorage(SettingsHelper.settings.network!);
+            if (SettingsHelper.isBitcoin()) {
+              await bitcoinCubit
+                  .loadDetails(accountCubit.state.accounts![0].bitcoinAddress!);
+            }
+
             await Navigator.pushReplacement(
               context,
               PageRouteBuilder(

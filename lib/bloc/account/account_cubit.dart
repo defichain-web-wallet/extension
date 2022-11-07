@@ -3,6 +3,7 @@ import 'dart:js_util';
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
@@ -13,6 +14,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/wallets_helper.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/models/account_model.dart';
+import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/models/tx_list_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
@@ -46,6 +48,7 @@ class AccountCubit extends Cubit<AccountState> {
 
   BalanceRequests balanceRequests = BalanceRequests();
   HistoryRequests historyRequests = HistoryRequests();
+  FiatCubit fiatCubit = FiatCubit();
 
   createAccount(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: AccountStatusList.loading));
@@ -70,14 +73,15 @@ class AccountCubit extends Cubit<AccountState> {
     accountsMainnet.add(accountMainnet);
     accountsTestnet.add(accountTestnet);
 
-    final String accessToken = await getAccessToken(accountMainnet, password);
 
-    await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet, accountsTestnet, masterKeyPairTestnet, accessToken, mnemonic, password: password);
+    await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet,
+        accountsTestnet, masterKeyPairTestnet, mnemonic,
+        password: password);
+    await fiatCubit.loadUserDetails(accountMainnet);
 
     try {
       emit(state.copyWith(
         status: AccountStatusList.success,
-        accessToken: accessToken,
         mnemonic: mnemonic,
         seed: seed,
         accounts: accountsMainnet,
@@ -94,7 +98,6 @@ class AccountCubit extends Cubit<AccountState> {
   updateAccountDetails({bool isChangeActiveToken = false}) async {
     emit(state.copyWith(
       status: AccountStatusList.loading,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: state.accounts,
@@ -116,14 +119,13 @@ class AccountCubit extends Cubit<AccountState> {
     state.activeAccount!.activeToken = activeToken;
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(null, null, accounts, state.masterKeyPair, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(null, null, accounts, state.masterKeyPair, state.mnemonic!);
     } else {
-      await saveAccountsToStorage(accounts, state.masterKeyPair, null, null, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(accounts, state.masterKeyPair, null, null, state.mnemonic!);
     }
 
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: accounts,
@@ -134,8 +136,12 @@ class AccountCubit extends Cubit<AccountState> {
     ));
   }
 
-  saveAccountsToStorage(List<AccountModel>? accountsMainnet, bip32.BIP32? masterKeyPairMainnet, List<AccountModel>? accountsTestnet, bip32.BIP32? masterKeyPairTestnet,
-      String accessToken, List<String> mnemonic,
+  saveAccountsToStorage(
+      List<AccountModel>? accountsMainnet,
+      bip32.BIP32? masterKeyPairMainnet,
+      List<AccountModel>? accountsTestnet,
+      bip32.BIP32? masterKeyPairTestnet,
+      List<String> mnemonic,
       {String password = ""}) async {
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     final accountsJson = [];
@@ -149,43 +155,48 @@ class AccountCubit extends Cubit<AccountState> {
       key = password;
     }
 
-    if (accountsMainnet != null) {
-      for (var account in accountsMainnet) {
-        accountsJson.add(account.toJson());
+    try {
+      if (accountsMainnet != null) {
+        for (var account in accountsMainnet) {
+          accountsJson.add(account.toJson());
+        }
+
+        var jsonString = json.encode(accountsJson);
+        var encryptedAccounts = encryptHelper.getEncryptedData(jsonString, key);
+
+        if (masterKeyPairMainnet != null) {
+          var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairMainnet.toBase58(), key);
+          await box.put(HiveNames.masterKeyPairMainnet, encryptedMasterKey);
+        }
+
+        await box.put(HiveNames.accountsMainnet, encryptedAccounts);
+        if (mnemonic.length > 0) {
+          var encryptMnemonic =
+            encryptHelper.getEncryptedData(mnemonic.join(','), key);
+          await box.put(HiveNames.savedMnemonic, encryptMnemonic);
+        }
       }
 
-      var jsonString = json.encode(accountsJson);
-      var encryptedAccounts = encryptHelper.getEncryptedData(jsonString, key);
+      if (accountsTestnet != null) {
+        for (var account in accountsTestnet) {
+          accountsJsonTestnet.add(account.toJson());
+        }
 
-      if (masterKeyPairMainnet != null) {
-        var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairMainnet.toBase58(), key);
-        await box.put(HiveNames.masterKeyPairMainnet, encryptedMasterKey);
+        var jsonStringTestnet = json.encode(accountsJsonTestnet);
+        var encryptedAccounts = encryptHelper.getEncryptedData(jsonStringTestnet, key);
+
+        if (masterKeyPairTestnet != null) {
+          var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairTestnet.toBase58(), key);
+          await box.put(HiveNames.masterKeyPairTestnet, encryptedMasterKey);
+        }
+        await box.put(HiveNames.accountsTestnet, encryptedAccounts);
       }
-
-      await box.put(HiveNames.accountsMainnet, encryptedAccounts);
-      await box.put(HiveNames.accessToken, accessToken);
-
-      if (mnemonic.length > 0) {
-        var encryptMnemonic = encryptHelper.getEncryptedData(mnemonic.join(','), key);
-        await box.put(HiveNames.savedMnemonic, encryptMnemonic);
-      }
+      await box.close();
+    } catch (err) {
+      print('*****');
+      print(err);
+      print('*****');
     }
-
-    if (accountsTestnet != null) {
-      for (var account in accountsTestnet) {
-        accountsJsonTestnet.add(account.toJson());
-      }
-
-      var jsonStringTestnet = json.encode(accountsJsonTestnet);
-      var encryptedAccounts = encryptHelper.getEncryptedData(jsonStringTestnet, key);
-
-      if (masterKeyPairTestnet != null) {
-        var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairTestnet.toBase58(), key);
-        await box.put(HiveNames.masterKeyPairTestnet, encryptedMasterKey);
-      }
-      await box.put(HiveNames.accountsTestnet, encryptedAccounts);
-    }
-    await box.close();
   }
 
   Future<List<AccountModel>> loadAccountDetails(List<AccountModel> accounts) async {
@@ -264,7 +275,7 @@ class AccountCubit extends Cubit<AccountState> {
     return accounts;
   }
 
-  addAccount() async {
+  Future<AccountModel> addAccount() async {
     List<AccountModel> accounts = state.accounts!;
     int newAccountIndex = accounts.length;
 
@@ -275,14 +286,13 @@ class AccountCubit extends Cubit<AccountState> {
     accounts.add(account);
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(null, null, accounts, state.masterKeyPair!, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(null, null, accounts, state.masterKeyPair!, state.mnemonic!);
     } else {
-      await saveAccountsToStorage(accounts, state.masterKeyPair!, null, null, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(accounts, state.masterKeyPair!, null, null, state.mnemonic!);
     }
 
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: accounts,
@@ -291,6 +301,7 @@ class AccountCubit extends Cubit<AccountState> {
       activeAccount: account,
       activeToken: activeToken,
     ));
+    return account;
   }
 
   restoreAccount(List<String> mnemonic, String password) async {
@@ -331,12 +342,13 @@ class AccountCubit extends Cubit<AccountState> {
         ));
       });
       final balances = accountsMainnet[0].balanceList!;
-      final String accessToken = await getAccessToken(accountsMainnet[0], password);
-      await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet, accountsTestnet, masterKeyPairTestnet, accessToken, mnemonic, password: password);
+      await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnet,
+          accountsTestnet, masterKeyPairTestnet, mnemonic,
+          password: password);
+      await fiatCubit.loadUserDetails(accountsMainnet[0]);
 
       emit(state.copyWith(
         status: AccountStatusList.success,
-        accessToken: accessToken,
         mnemonic: mnemonic,
         seed: seed,
         accounts: accountsMainnet,
@@ -366,6 +378,7 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<List<dynamic>> _restoreAccountsFromStorageLedger(String network) async {
+    print(network);
     var box = await Hive.openBox(HiveBoxes.client);
 
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
@@ -391,7 +404,6 @@ class AccountCubit extends Cubit<AccountState> {
       accounts.add(AccountModel.fromJson(account));
     }
     var accountList = await loadAccountDetails(accounts);
-    final String accessToken = encryptHelper.getEncryptedData("TODO!", password);
     accounts = accountList;
 
     final balances = accounts[0].balanceList!;
@@ -399,7 +411,6 @@ class AccountCubit extends Cubit<AccountState> {
     await box.close();
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accessToken: accessToken,
       mnemonic: [],
       seed: Uint8List(24),
       accounts: accounts,
@@ -419,6 +430,7 @@ class AccountCubit extends Cubit<AccountState> {
 
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     var box = await Hive.openBox(HiveBoxes.client);
+    var swapTutorialStatus = await box.get(HiveNames.swapTutorialStatus);
     var savedMnemonic;
     var mnemonic;
     var encodedPassword = await box.get(HiveNames.password);
@@ -455,19 +467,33 @@ class AccountCubit extends Cubit<AccountState> {
     final jsonString = decryptedAccounts;
 
     List<dynamic> jsonFromString = json.decode(jsonString);
+    var needToStoreBTCAddress = false;
     for (var account in jsonFromString) {
-      accounts.add(AccountModel.fromJson(account));
+      var accountModel = AccountModel.fromJson(account);
+      if(accountModel.bitcoinAddress == null){
+        needToStoreBTCAddress = true;
+        accountModel.bitcoinAddress = await HDWalletService().getAddressModelFromKeyPair(
+            masterKeyPair, accountModel.index, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
+        accountModel.bitcoinAddress!.blockchain = 'BTC';
+      }
+      accounts.add(accountModel);
     }
+
     var accountList = await loadAccountDetails(accounts);
-    final String accessToken = await getAccessToken(accountList[0], password);
     accounts = accountList;
 
     final balances = accounts[0].balanceList!;
 
+    if(needToStoreBTCAddress){
+      if (SettingsHelper.settings.network! == 'testnet') {
+        await saveAccountsToStorage(null, null, accounts, masterKeyPair, mnemonic.split(','), password: password);
+      } else {
+        await saveAccountsToStorage(accounts, masterKeyPair, null, null, mnemonic.split(','), password: password);
+      }
+    }
     await box.close();
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accessToken: accessToken,
       mnemonic: mnemonic != '' ? mnemonic.split(',') : [],
       seed: Uint8List(24),
       accounts: accounts,
@@ -475,20 +501,15 @@ class AccountCubit extends Cubit<AccountState> {
       masterKeyPair: masterKeyPair,
       activeAccount: accounts[0],
       activeToken: balances[0].token,
+      swapTutorialStatus: swapTutorialStatus,
     ));
 
     return [[], [], accounts, balances, masterKeyPair, accounts[0], balances[0].token];
   }
 
   updateActiveAccount(int accountIndex) async {
-    Codec<String, String> stringToBase64 = utf8.fuse(base64);
-    var box = await Hive.openBox(HiveBoxes.client);
-    var encodedPassword = await box.get(HiveNames.password);
-    var password = stringToBase64.decode(encodedPassword);
-    final String accessToken = await getAccessToken(state.accounts![accountIndex], password);
     emit(state.copyWith(
       status: AccountStatusList.loading,
-      accessToken: accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: state.accounts,
@@ -503,7 +524,6 @@ class AccountCubit extends Cubit<AccountState> {
 
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: state.accounts,
@@ -517,7 +537,6 @@ class AccountCubit extends Cubit<AccountState> {
   updateActiveToken(String activeToken) {
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: state.accounts,
@@ -532,7 +551,6 @@ class AccountCubit extends Cubit<AccountState> {
     final AccountModel activeAccount = state.activeAccount!;
     emit(state.copyWith(
       status: AccountStatusList.loading,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: state.accounts,
@@ -546,14 +564,15 @@ class AccountCubit extends Cubit<AccountState> {
     activeAccount.balanceList!.add(newBalance);
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(null, null, state.accounts, state.masterKeyPair, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(null, null, state.accounts,
+          state.masterKeyPair, state.mnemonic!);
     } else {
-      await saveAccountsToStorage(state.accounts, state.masterKeyPair, null, null, state.accessToken!, state.mnemonic!);
+      await saveAccountsToStorage(state.accounts, state.masterKeyPair, null,
+          null, state.mnemonic!);
     }
 
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: state.accounts,
@@ -567,7 +586,6 @@ class AccountCubit extends Cubit<AccountState> {
   setHistoryFilterBy(filter) {
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: state.accounts,
@@ -582,7 +600,6 @@ class AccountCubit extends Cubit<AccountState> {
   loadHistoryNext() async {
     emit(state.copyWith(
       status: AccountStatusList.loading,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: state.accounts,
@@ -615,7 +632,6 @@ class AccountCubit extends Cubit<AccountState> {
 
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accessToken: state.accessToken,
       mnemonic: state.mnemonic,
       seed: state.seed,
       accounts: state.accounts,
@@ -627,16 +643,18 @@ class AccountCubit extends Cubit<AccountState> {
     ));
   }
 
-  Future<String> getAccessToken(AccountModel account, String password) async {
-    try {
-      String accessToken = await dfxRequests.signIn(account);
-      return encryptHelper.getEncryptedData(accessToken, password);
-    } catch (_) {
-      return '';
-    }
-  }
-
   changeNetwork(String network) async {
+    // emit(state.copyWith(
+    //   status: AccountStatusList.loading,
+    //   mnemonic: state.mnemonic,
+    //   seed: state.seed,
+    //   accounts: state.accounts,
+    //   balances: state.balances,
+    //   masterKeyPair: state.masterKeyPair,
+    //   activeAccount: state.activeAccount,
+    //   activeToken: state.activeToken,
+    //   historyFilterBy: state.historyFilterBy,
+    // ));
     await restoreAccountFromStorage(network);
   }
 
@@ -681,12 +699,10 @@ class AccountCubit extends Cubit<AccountState> {
         ));
       });
       final balances = accountsMainnet[0].balanceList!;
-      final String accessToken = await getDfxAccessTokenLedger(accountsMainnet[0], password);
-      await saveAccountsToStorage(accountsMainnet, null, accountsTestnet, null, accessToken, [], password: password);
+      await saveAccountsToStorage(accountsMainnet, null, accountsTestnet, null, [], password: password);
 
       emit(state.copyWith(
         status: AccountStatusList.success,
-        accessToken: accessToken,
         mnemonic: [],
         seed: null,
         accounts: accountsMainnet,
@@ -696,11 +712,29 @@ class AccountCubit extends Cubit<AccountState> {
         activeToken: balances[0].token,
       ));
     } catch (err) {
+      print('-------');
+      print(err);
+      print('-------');
       throw err;
     }
   }
 
   createLedgerAccount() async {
     var address = await promiseToFuture(getAddress("1129/0/0/0", false));
+  }
+
+  updateSwapTutorialStatus(String status) {
+    emit(state.copyWith(
+      status: AccountStatusList.success,
+      mnemonic: state.mnemonic,
+      seed: state.seed,
+      accounts: state.accounts,
+      balances: state.balances,
+      masterKeyPair: state.masterKeyPair,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+      historyFilterBy: state.historyFilterBy,
+      swapTutorialStatus: status,
+    ));
   }
 }

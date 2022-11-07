@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const double leadingWidth = 120;
   static const double toolbarHeight = 55;
-  static const double accountSelectSmallHeight = 220;
+  static const double accountSelectSmallHeight = 170;
   static const double accountSelectMediumHeight = 270;
 
   final GlobalKey<AccountSelectState>? selectKey;
@@ -47,13 +47,14 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     LockHelper lockHelper = LockHelper();
 
     return AppBar(
+      shadowColor: Colors.transparent,
       bottom: isShowBottom ? OngoingTransaction() : null,
       shape: isSmall
           ? null
           : RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
               ),
             ),
       automaticallyImplyLeading: false,

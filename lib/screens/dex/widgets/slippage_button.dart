@@ -5,23 +5,40 @@ class SlippageButton extends StatelessWidget {
   final String label;
   final bool isActive;
   final Function() callback;
+  final bool isBorder;
+  final bool isFirst;
+  final bool isLast;
 
   const SlippageButton({
     Key? key,
     required this.label,
     required this.isActive,
     required this.callback,
+    this.isBorder = false,
+    this.isFirst = false,
+    this.isLast = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 22,
-      width: 30,
+    return Container(
+      height: 20,
       child: TextButton(
         style: TextButton.styleFrom(
+          shadowColor: Colors.transparent,
           padding: const EdgeInsets.all(0),
           elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: isFirst
+                ? BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                  )
+                : BorderRadius.circular(0),
+            side: BorderSide(
+              color: Colors.transparent,
+            ),
+          ),
           backgroundColor:
               isActive ? AppTheme.pinkColor : Theme.of(context).backgroundColor,
         ),

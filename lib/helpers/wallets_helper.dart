@@ -27,6 +27,9 @@ class WalletsHelper {
     account.testnetHistoryList = [];
     account.index = accountIndex;
     account.activeToken = 'DFI';
+    account.bitcoinAddress = await _hdWalletService.getAddressModelFromKeyPair(
+        masterKeyPair, accountIndex, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
+    account.bitcoinAddress!.blockchain = 'BTC';
     return account;
   }
 
@@ -54,6 +57,11 @@ class WalletsHelper {
       } else {
         lastIndexWithHistory = accountIndex;
       }
+
+      var bitcoinAddress = await _hdWalletService.getAddressModelFromKeyPair(
+          masterKeyPair, accountIndex, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
+      bitcoinAddress.blockchain = 'BTC';
+
       accountList.add(AccountModel(
         index: accountIndex,
         addressList: addressList,
@@ -63,6 +71,7 @@ class WalletsHelper {
         transactionNext: '',
         historyNext: '',
         activeToken: balances[0].token,
+        bitcoinAddress: bitcoinAddress
       ));
     }
     List<AccountModel> resultList = [];
