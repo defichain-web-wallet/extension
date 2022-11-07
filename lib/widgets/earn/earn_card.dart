@@ -1,4 +1,3 @@
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/small_primary_button.dart';
 import 'package:flutter/material.dart';
 
@@ -53,7 +52,6 @@ class _EarnCardState extends State<EarnCard> {
           left: 20,
           bottom: 20,
         ),
-        // width: 280,
         height: 180,
         decoration: BoxDecoration(
           color: Theme.of(context).appBarTheme.backgroundColor,
@@ -94,7 +92,7 @@ class _EarnCardState extends State<EarnCard> {
                                   .textTheme
                                   .headline5!
                                   .apply(fontWeightDelta: 2),
-                            )
+                            ),
                           ],
                         )
                       : Row(
@@ -143,7 +141,7 @@ class _EarnCardState extends State<EarnCard> {
                                     ),
                               ),
                             ],
-                    )
+                    ),
                   ],
                 ),
               ],
@@ -163,7 +161,7 @@ class _EarnCardState extends State<EarnCard> {
                   label: widget.secondBtnTitle,
                   callback: widget.secondBtnCallback,
                   isCheckLock: widget.isCheckLockSecond,
-                )
+                ),
               ],
             ),
           ],

@@ -3,7 +3,7 @@ import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
 import 'package:defi_wallet/screens/dex/swap_screen.dart';
-import 'package:defi_wallet/screens/earn_screen/earn_screen.dart';
+import 'package:defi_wallet/screens/earn/earn_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/select_buy_or_sell_screen.dart';
 import 'package:defi_wallet/screens/send/send_screen.dart';
