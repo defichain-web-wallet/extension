@@ -1,5 +1,5 @@
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/screens/address_book/address_book_selector_screen.dart';
+import 'package:defi_wallet/screens/settings/address_book/address_book_selector_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 

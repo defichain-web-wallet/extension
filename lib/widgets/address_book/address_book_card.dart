@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:defi_wallet/screens/address_book/address_book_add_screen.dart';
+import 'package:defi_wallet/screens/settings/address_book/address_book_add_screen.dart';
 import 'package:defi_wallet/widgets/address_book/address_book_buttons.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';

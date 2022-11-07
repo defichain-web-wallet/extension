@@ -2,7 +2,7 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
-import 'package:defi_wallet/screens/address_book/address_book_add_screen.dart';
+import 'package:defi_wallet/screens/settings/address_book/address_book_add_screen.dart';
 import 'package:defi_wallet/screens/send/send_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
