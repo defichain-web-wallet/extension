@@ -3,7 +3,7 @@ import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/screens/settings/address_book/address_book_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
-import 'package:defi_wallet/screens/settings/accounts/rename_accounts.dart';
+import 'package:defi_wallet/screens/settings/accounts/rename_accounts_screen.dart';
 import 'package:defi_wallet/screens/settings/settings.dart';
 import 'package:defi_wallet/screens/settings/favorite_tokens/my_favorite_tokens.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ class _SettingsListState extends State<SettingsList> {
   MenuHelper menuHelper = MenuHelper();
   final List<dynamic> menuItems = [
     {'name': 'arrow'},
-    {'name': 'Rename accounts', 'value': (context, animation1, animation2) => RenameAccounts()},
+    {'name': 'Rename accounts', 'value': (context, animation1, animation2) => RenameAccountsScreen()},
     {'name': 'My tokens', 'value': (context, animation1, animation2) => MyFavoriteTokens()},
     {'name': 'Address book', 'value': (context, animation1, animation2) => AddressBookScreen()},
     {'name': 'Settings', 'value': (context, animation1, animation2) => Settings()},
