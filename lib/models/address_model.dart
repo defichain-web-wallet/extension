@@ -29,14 +29,22 @@ class AddressModel {
   }
 
   AddressModel.fromJson(Map<String, dynamic> json) {
-    this.address = json["address"];
-    this.account = json["account"];
-    this.isChange = json["isChange"];
+    this.address = json["address"] ?? null;
+    this.account = json["account"] ?? null;
+    this.isChange = json["isChange"] ?? null;
     this.blockchain = json["blockchain"] == null ? 'DFI' : json["blockchain"];
-    this.index = json["index"];
-    if (json.containsKey("pubKey")) this.pubKey = Uint8List.fromList(HEX.decode(json["pubKey"]!));
-    this.keyPair = hdWalletService.getKeypairFromWIF(
-        json["keyPair"], json["blockchain"] == 'BTC' ? SettingsHelper.settings.network! == 'testnet' ? 'bitcoin_testnet' : 'bitcoin' : SettingsHelper.settings.network!);
+    this.index = json["index"] ?? null;
+    if (json.containsKey("pubKey") && json["pubKey"] != null)
+      this.pubKey = Uint8List.fromList(HEX.decode(json["pubKey"]!));
+    if (json["keyPair"] != null) {
+      this.keyPair = hdWalletService.getKeypairFromWIF(
+          json["keyPair"],
+          json["blockchain"] == 'BTC'
+              ? SettingsHelper.settings.network! == 'testnet'
+                  ? 'bitcoin_testnet'
+                  : 'bitcoin'
+              : SettingsHelper.settings.network!);
+    }
   }
 
   Map<String, dynamic> toJson() {

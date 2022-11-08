@@ -155,48 +155,42 @@ class AccountCubit extends Cubit<AccountState> {
       key = password;
     }
 
-    try {
-      if (accountsMainnet != null) {
-        for (var account in accountsMainnet) {
-          accountsJson.add(account.toJson());
-        }
-
-        var jsonString = json.encode(accountsJson);
-        var encryptedAccounts = encryptHelper.getEncryptedData(jsonString, key);
-
-        if (masterKeyPairMainnet != null) {
-          var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairMainnet.toBase58(), key);
-          await box.put(HiveNames.masterKeyPairMainnet, encryptedMasterKey);
-        }
-
-        await box.put(HiveNames.accountsMainnet, encryptedAccounts);
-        if (mnemonic.length > 0) {
-          var encryptMnemonic =
-            encryptHelper.getEncryptedData(mnemonic.join(','), key);
-          await box.put(HiveNames.savedMnemonic, encryptMnemonic);
-        }
+    if (accountsMainnet != null) {
+      for (var account in accountsMainnet) {
+        accountsJson.add(account.toJson());
       }
 
-      if (accountsTestnet != null) {
-        for (var account in accountsTestnet) {
-          accountsJsonTestnet.add(account.toJson());
-        }
+      var jsonString = json.encode(accountsJson);
+      var encryptedAccounts = encryptHelper.getEncryptedData(jsonString, key);
 
-        var jsonStringTestnet = json.encode(accountsJsonTestnet);
-        var encryptedAccounts = encryptHelper.getEncryptedData(jsonStringTestnet, key);
-
-        if (masterKeyPairTestnet != null) {
-          var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairTestnet.toBase58(), key);
-          await box.put(HiveNames.masterKeyPairTestnet, encryptedMasterKey);
-        }
-        await box.put(HiveNames.accountsTestnet, encryptedAccounts);
+      if (masterKeyPairMainnet != null) {
+        var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairMainnet.toBase58(), key);
+        await box.put(HiveNames.masterKeyPairMainnet, encryptedMasterKey);
       }
-      await box.close();
-    } catch (err) {
-      print('*****');
-      print(err);
-      print('*****');
+
+      await box.put(HiveNames.accountsMainnet, encryptedAccounts);
+      if (mnemonic.length > 0) {
+        var encryptMnemonic =
+        encryptHelper.getEncryptedData(mnemonic.join(','), key);
+        await box.put(HiveNames.savedMnemonic, encryptMnemonic);
+      }
     }
+
+    if (accountsTestnet != null) {
+      for (var account in accountsTestnet) {
+        accountsJsonTestnet.add(account.toJson());
+      }
+
+      var jsonStringTestnet = json.encode(accountsJsonTestnet);
+      var encryptedAccounts = encryptHelper.getEncryptedData(jsonStringTestnet, key);
+
+      if (masterKeyPairTestnet != null) {
+        var encryptedMasterKey = encryptHelper.getEncryptedData(masterKeyPairTestnet.toBase58(), key);
+        await box.put(HiveNames.masterKeyPairTestnet, encryptedMasterKey);
+      }
+      await box.put(HiveNames.accountsTestnet, encryptedAccounts);
+    }
+    await box.close();
   }
 
   Future<List<AccountModel>> loadAccountDetails(List<AccountModel> accounts) async {
@@ -644,17 +638,17 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   changeNetwork(String network) async {
-    // emit(state.copyWith(
-    //   status: AccountStatusList.loading,
-    //   mnemonic: state.mnemonic,
-    //   seed: state.seed,
-    //   accounts: state.accounts,
-    //   balances: state.balances,
-    //   masterKeyPair: state.masterKeyPair,
-    //   activeAccount: state.activeAccount,
-    //   activeToken: state.activeToken,
-    //   historyFilterBy: state.historyFilterBy,
-    // ));
+    emit(state.copyWith(
+      status: AccountStatusList.loading,
+      mnemonic: state.mnemonic,
+      seed: state.seed,
+      accounts: state.accounts,
+      balances: state.balances,
+      masterKeyPair: state.masterKeyPair,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+      historyFilterBy: state.historyFilterBy,
+    ));
     await restoreAccountFromStorage(network);
   }
 
@@ -712,9 +706,6 @@ class AccountCubit extends Cubit<AccountState> {
         activeToken: balances[0].token,
       ));
     } catch (err) {
-      print('-------');
-      print(err);
-      print('-------');
       throw err;
     }
   }
