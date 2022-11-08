@@ -2,8 +2,8 @@ import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
-import 'package:defi_wallet/screens/liquidity/remove_liquidity.dart';
-import 'package:defi_wallet/screens/liquidity/select_pool.dart';
+import 'package:defi_wallet/screens/liquidity/remove_liquidity_screen.dart';
+import 'package:defi_wallet/screens/liquidity/select_pool_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/liquidity_asset_pair.dart';
@@ -52,7 +52,7 @@ class MainLiquidityPair extends StatelessWidget {
                     context,
                     PageRouteBuilder(
                       pageBuilder: (context, animation1, animation2) =>
-                          SelectPool(
+                          SelectPoolScreen(
                         assetPair: assetPair!,
                       ),
                       transitionDuration: Duration.zero,
@@ -100,7 +100,7 @@ class MainLiquidityPair extends StatelessWidget {
                     context,
                     PageRouteBuilder(
                       pageBuilder: (context, animation1, animation2) =>
-                          RemoveLiquidity(
+                          RemoveLiquidityScreen(
                         assetPair: assetPair!,
                         balance: balance!,
                       ),

@@ -1,5 +1,5 @@
 import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/screens/liquidity/remove_liquidity.dart';
+import 'package:defi_wallet/screens/liquidity/remove_liquidity_screen.dart';
 import 'package:defi_wallet/screens/staking/unstake_confirm.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
