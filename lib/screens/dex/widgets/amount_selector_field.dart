@@ -96,7 +96,7 @@ class _AmountSelectorFieldState extends State<AmountSelectorField> {
                             ? 'Bitcoin Mainnet'
                             : 'Defichain Mainnet',
                         style: Theme.of(context).textTheme.subtitle2!.apply(
-                              color: Theme.of(context).textSelectionColor,
+                              color: Theme.of(context).textSelectionTheme.selectionColor,
                             ),
                       ),
                     ],
