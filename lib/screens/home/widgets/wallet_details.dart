@@ -95,7 +95,6 @@ class _WalletDetailsState extends State<WalletDetails> {
                         totalBalance *= tokensState.eurRate!;
                       }
                     }
-
                     activeAssetName = activeAsset == AssetList.fiat
                         ? SettingsHelper.settings.currency!
                         : activeAsset.name;
