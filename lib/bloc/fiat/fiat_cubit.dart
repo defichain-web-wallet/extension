@@ -12,6 +12,7 @@ import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -131,7 +132,7 @@ class FiatCubit extends Cubit<FiatState> {
         accessToken: state.accessToken,
       ));
 
-  loadUserDetails(AccountModel account) async {
+  loadUserDetails(AccountModel account, ECPair keyPair) async {
     var box = await Hive.openBox(HiveBoxes.client);
     String? tutorialStatus = await box.get(HiveNames.tutorialStatus);
     bool isShowTutorial;
@@ -161,7 +162,7 @@ class FiatCubit extends Cubit<FiatState> {
     ));
 
     try {
-      String accessToken = state.accessToken ?? await getAccessToken(account);
+      String accessToken = state.accessToken ?? await getAccessToken(account, keyPair);
       Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
       List<FiatHistoryModel> history = await dfxRequests.getHistory(accessToken);
 
@@ -734,13 +735,13 @@ class FiatCubit extends Cubit<FiatState> {
     }
   }
 
-  Future<void> loadCryptoRoute(AccountModel account) async {
+  Future<void> loadCryptoRoute(AccountModel account, ECPair keyPair) async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
       accessToken: state.accessToken,
     ));
     try {
-      String accessToken = state.accessToken ?? await getAccessToken(account);
+      String accessToken = state.accessToken ?? await getAccessToken(account, keyPair);
       Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
 
       CryptoRouteModel? route;
@@ -785,13 +786,13 @@ class FiatCubit extends Cubit<FiatState> {
     }
   }
 
-  Future<String> getAccessToken(AccountModel account) async {
+  Future<String> getAccessToken(AccountModel account, ECPair keyPair) async {
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     var box = await Hive.openBox(HiveBoxes.client);
     var encodedPassword = await box.get(HiveNames.password);
     var password = stringToBase64.decode(encodedPassword);
     try {
-      String accessToken = await dfxRequests.signIn(account);
+      String accessToken = await dfxRequests.signIn(account, keyPair);
       return encryptHelper.getEncryptedData(accessToken, password);
     } catch (err) {
       throw err;

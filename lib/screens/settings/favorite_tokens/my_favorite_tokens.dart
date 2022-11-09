@@ -203,17 +203,21 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
       await accountCubit.saveAccountsToStorage(
         null,
         null,
+        null,
         state.accounts,
-        state.masterKeyPair,
-        state.mnemonic,
+        null,
+        null,
+        null
       );
     } else {
       await accountCubit.saveAccountsToStorage(
         state.accounts,
-        state.masterKeyPair,
         null,
         null,
-        state.mnemonic,
+        null,
+        null,
+        null,
+        null
       );
     }
 

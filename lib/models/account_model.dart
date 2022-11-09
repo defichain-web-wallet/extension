@@ -4,6 +4,7 @@ import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'address_model.dart';
+import 'package:bip32_defichain/bip32.dart' as bip32;
 
 class AccountModel {
   @required int? index;

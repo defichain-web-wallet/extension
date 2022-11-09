@@ -11,7 +11,9 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/crypto_route_model.dart';
+import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -28,6 +30,7 @@ import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -375,7 +378,7 @@ class _SwapScreenState extends State<SwapScreen> {
                               setState(() {
                                 accountTo = accountState.accounts[index];
                               });
-                              fiatCubit.loadCryptoRoute(accountTo);
+                              // fiatCubit.loadCryptoRoute(accountTo);
                             },
                           ),
                           SizedBox(height: 6),
@@ -600,7 +603,7 @@ class _SwapScreenState extends State<SwapScreen> {
                           FiatCubit fiatCubit =
                               BlocProvider.of<FiatCubit>(context);
                           if (iterator == 0 && SettingsHelper.isBitcoin()) {
-                            fiatCubit.loadCryptoRoute(accountTo);
+                            // fiatCubit.loadCryptoRoute(accountTo);
                             iterator++;
                           }
                           if (fiatState.status == FiatStatusList.success &&
@@ -825,42 +828,64 @@ class _SwapScreenState extends State<SwapScreen> {
     }
     if (isNumeric(amountFromController.text)) {
       if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
-        try {
-          BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-
-          var tx = await transactionService.createBTCTransaction(
-            account: state.activeAccount,
-            destinationAddress: cryptoRoute.address!,
-            amount: balancesHelper.toSatoshi(amountFromController.text),
-            satPerByte: bitcoinCubit.state.networkFee!.medium!,
-          );
-          Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ReviewSwapScreen(
-                  assetFrom,
-                  assetTo.replaceAll('d', ''),
-                  double.parse(amountFromController.text),
-                  double.parse(amountToController.text),
-                  slippage,
-                  btcTx: tx,
-                ),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ));
-        } catch (err) {
-          print(err);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Something went wrong',
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-            ),
-          );
-        }
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1,
+                animation2) =>
+                LockScreen(callback: (password) async {
+                  try {
+                    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(
+                        context);
+                    ECPair keyPair = await HDWalletService()
+                        .getKeypairFromStorage(
+                        password, state.activeAccount.index!);
+                    var tx = await transactionService.createBTCTransaction(
+                      keyPair: keyPair,
+                      account: state.activeAccount,
+                      destinationAddress: cryptoRoute.address!,
+                      amount: balancesHelper.toSatoshi(
+                          amountFromController.text),
+                      satPerByte: bitcoinCubit.state.networkFee!.medium!,
+                    );
+                    Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) =>
+                              ReviewSwapScreen(
+                                assetFrom,
+                                assetTo.replaceAll('d', ''),
+                                double.parse(amountFromController.text),
+                                double.parse(amountToController.text),
+                                slippage,
+                                btcTx: tx,
+                              ),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
+                        ));
+                  } catch (err) {
+                    print(err);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Something went wrong',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .headline5,
+                        ),
+                        backgroundColor: Theme
+                            .of(context)
+                            .snackBarTheme
+                            .backgroundColor,
+                      ),
+                    );
+                  }
+                }),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                  ),
+                  );
       } else {
         Navigator.push(
             context,

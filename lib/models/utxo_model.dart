@@ -6,14 +6,12 @@ class UtxoModel {
   String? mintTxId;
   String? address;
   int? value;
-  ECPair? keyPair;
 
   UtxoModel(
       {this.mintIndex,
         this.mintTxId,
         this.address,
-        this.value,
-        this.keyPair});
+        this.value});
 
   UtxoModel.fromJson(Map<String, dynamic> json) {
     this.mintTxId = json["vout"]['txid'];

@@ -11,6 +11,7 @@ import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/staking_model.dart';
 import 'package:defi_wallet/services/dfx_service.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,9 +19,9 @@ class DfxRequests {
   DFXService dfxService = DFXService();
   EncryptHelper encryptHelper = EncryptHelper();
 
-  Future<String> signUp(AccountModel account) async {
+  Future<String> signUp(AccountModel account, ECPair keyPair) async {
     try {
-      dynamic data = dfxService.getAddressAndSignature(account);
+      dynamic data = dfxService.getAddressAndSignature(account, keyPair);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/auth/signUp');
 
@@ -42,9 +43,9 @@ class DfxRequests {
     }
   }
 
-  Future<String> signIn(AccountModel account) async {
+  Future<String> signIn(AccountModel account, ECPair keyPair) async {
     try {
-      dynamic data = dfxService.getAddressAndSignature(account);
+      dynamic data = dfxService.getAddressAndSignature(account, keyPair);
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/auth/signIn');
 
@@ -59,7 +60,7 @@ class DfxRequests {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body)['accessToken'];
       } else {
-        return await signUp(account);
+        return await signUp(account, keyPair);
       }
     } catch (_) {
       return '';

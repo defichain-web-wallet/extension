@@ -7,6 +7,7 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/settings/preview_seed.dart';
+import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/modal_dialog.dart';
@@ -100,7 +101,7 @@ class _SettingsState extends State<Settings> {
                                 SizedBox(
                                   height: 6,
                                 ),
-                                if (accountCubit.mnemonic!.length > 0)
+                                // if (accountCubit.mnemonic!.length > 0)
                                   ListTile(
                                     onTap: () {
                                       Navigator.push(
@@ -109,9 +110,7 @@ class _SettingsState extends State<Settings> {
                                           pageBuilder: (context, animation1,
                                                   animation2) =>
                                               LockScreen(
-                                            redirectTo: PreviewSeed(
-                                              mnemonic: accountCubit.mnemonic!,
-                                            ),
+                                            callback: (password) => showMnemonic(password),
                                           ),
                                           transitionDuration: Duration.zero,
                                           reverseTransitionDuration:
@@ -130,16 +129,16 @@ class _SettingsState extends State<Settings> {
                                     ),
                                     subtitle:
                                         Text('Click to show recovery seed'),
-                                  )
-                                else
-                                  Container(
-                                    padding: const EdgeInsets.only(top: 12),
-                                    child: Text(
-                                      'To access this feature, you need to reinstall the wallet.',
-                                      style:
-                                          Theme.of(context).textTheme.headline4,
-                                    ),
                                   ),
+                                // else
+                                //   Container(
+                                //     padding: const EdgeInsets.only(top: 12),
+                                //     child: Text(
+                                //       'To access this feature, you need to reinstall the wallet.',
+                                //       style:
+                                //           Theme.of(context).textTheme.headline4,
+                                //     ),
+                                //   ),
                                 SizedBox(
                                   height: 6,
                                 ),
@@ -322,6 +321,20 @@ class _SettingsState extends State<Settings> {
       }
     });
   }
+  showMnemonic(password) async {
+    var mnemonic = await getMnemonic(password);
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) =>
+            PreviewSeed(
+              mnemonic: mnemonic,
+            ),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
+}
 
   submit() async {
     setState(() {

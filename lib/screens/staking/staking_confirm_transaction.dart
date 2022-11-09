@@ -6,7 +6,9 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_initiated.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
@@ -14,6 +16,7 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -265,18 +268,29 @@ class _StakingConfirmTransactionState extends State<StakingConfirmTransaction> {
                         label: 'Staking',
                         isCheckLock: false,
                         callback: () async {
-                          TokensState tokensState =
-                              BlocProvider.of<TokensCubit>(context).state;
-                          await _sendTransaction(
-                            context,
-                            tokensState,
-                            widget.assetName,
-                            accountState.activeAccount!,
-                            state.depositAddress!,
-                            widget.amount,
-                          );
-                        },
-                      ),
+                          Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                  pageBuilder: (context,
+                                      animation1,
+                                      animation2) =>
+                                      LockScreen(callback:
+                                          (password) async {
+                                        TokensState tokensState =
+                                            BlocProvider
+                                                .of<TokensCubit>(context)
+                                                .state;
+                                        await _sendTransaction(
+                                          context,
+                                          tokensState,
+                                          widget.assetName,
+                                          accountState.activeAccount!,
+                                          state.depositAddress!,
+                                          widget.amount,
+                                          password
+                                        );
+                                      })));
+                        }),
                     ),
                   ],
                 ),
@@ -287,17 +301,21 @@ class _StakingConfirmTransactionState extends State<StakingConfirmTransaction> {
       );
 
   _sendTransaction(context, tokensState, String token, AccountModel account,
-      String address, double amount) async {
+      String address, double amount, String password) async {
     TxErrorModel? txResponse;
     try {
+      ECPair keyPair =
+      await HDWalletService().getKeypairFromStorage(password, account.index!);
       if (token == 'DFI') {
         txResponse = await transactionService.createAndSendTransaction(
+          keyPair: keyPair,
             account: account,
             destinationAddress: address,
             amount: balancesHelper.toSatoshi(amount.toString()),
             tokens: tokensState.tokens);
       } else {
         txResponse = await transactionService.createAndSendToken(
+          keyPair: keyPair,
             account: account,
             token: token,
             destinationAddress: address,

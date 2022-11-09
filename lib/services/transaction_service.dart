@@ -37,6 +37,7 @@ class TransactionService {
 
   Future<TxErrorModel> removeLiqudity(
       {required AccountModel account,
+        required ECPair keyPair,
       required AssetPairModel token,
       required int amount}) async {
     await _getUtxoList(account);
@@ -52,6 +53,7 @@ class TransactionService {
         for (var balance in balances) {
           if (balance.token == token.symbol!) {
             var authTxidModel = await _createAuthTx(
+                keyPair: keyPair,
                 utxoList:
                 accountUtxoList,
                 destinationAddress: element,
@@ -69,6 +71,7 @@ class TransactionService {
               sumAmount += balance.balance!;
             }
              var responseModel = await createTransaction(
+               keyPair: keyPair,
                 utxoList: [authTxidModel.utxo!],
                 isAuth: false,
                 account: account,
@@ -89,6 +92,7 @@ class TransactionService {
     return response;
   }
   Future<String> createBTCTransaction({
+    required ECPair keyPair,
     required AccountModel account,
     required String destinationAddress,
     required int amount,
@@ -110,7 +114,7 @@ class TransactionService {
     var amountUtxo = 0;
     selectedUtxo.forEach((utxo) {
       amountUtxo += utxo.value!;
-      _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: account.bitcoinAddress!.keyPair!.publicKey), network: networkType).data!.output);
+      _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: keyPair.publicKey), network: networkType).data!.output);
     });
 
     _txb.addOutput(destinationAddress, amount);
@@ -120,7 +124,7 @@ class TransactionService {
     selectedUtxo.asMap().forEach((index, utxo) {
     _txb.sign(
         vin: index,
-        keyPair: account.bitcoinAddress!.keyPair!,
+        keyPair: keyPair,
         witnessValue: utxo.value);
     });
 
@@ -138,6 +142,7 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendLiqudity(
       {required AccountModel account,
+        required ECPair keyPair,
       required String tokenA,
       required String tokenB,
       required int amountA,
@@ -180,6 +185,7 @@ class TransactionService {
 
       if (tokenDFIBalanceOnAddress < tokenDFIbalanceAll) {
         var sendDFITokenTxid = await createAndSendToken(
+            keyPair: keyPair,
             account: account,
             token: 'DFI',
             destinationAddress: addressDFI.address!,
@@ -191,6 +197,7 @@ class TransactionService {
 
       if (tokenDFIbalanceAll < amountDFI) {
         var responseModel = await createTransaction(
+          keyPair: keyPair,
             utxoList: accountUtxoList,
             isAuth: false,
             account: account,
@@ -238,6 +245,7 @@ class TransactionService {
     }
     if (tokenABalanceOnAddress < amountA) {
       var sendTokenATxid = await createAndSendToken(
+          keyPair: keyPair,
           account: account,
           token: tokenA,
           destinationAddress: account.addressList![0].address!,
@@ -253,6 +261,7 @@ class TransactionService {
       }
       if (tokenBBalanceOnAddress < amountB) {
         var sendTokenBTxid = await createAndSendToken(
+            keyPair: keyPair,
             account: account,
             token: tokenB,
             destinationAddress: account.addressList![0].address!,
@@ -264,6 +273,7 @@ class TransactionService {
     }
 
     var authResponseA = await _createAuthTx(
+        keyPair: keyPair,
         utxoList: accountUtxoList,
         destinationAddress: account.addressList![0],
         account: account);
@@ -274,6 +284,7 @@ class TransactionService {
     selectedUtxoList.add(authResponseA.utxo!);
 
     var authResponseB = await _createAuthTx(
+        keyPair: keyPair,
         utxoList: accountUtxoList
             .where((utxo) =>
         !(utxo.mintTxId == authResponseA.utxo!.mintTxId &&
@@ -291,6 +302,7 @@ class TransactionService {
     var tokenBId = await tokensRequests.getTokenID(tokenB, tokens);
 
     var responseModel = await createTransaction(
+      keyPair: keyPair,
         utxoList: selectedUtxoList,
         isAuth: false,
         destinationAddress: account.addressList![0].address!,
@@ -313,6 +325,7 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendTransaction(
       {required AccountModel account,
+        required ECPair keyPair,
       required String destinationAddress,
       required int amount, required List<TokensModel> tokens}) async {
     var tokenId = await tokensRequests.getTokenID('DFI', tokens);
@@ -328,6 +341,7 @@ class TransactionService {
         if (balance.token == 'DFI' && balance.balance! > 0) {
           if (balance.balance! >= DUST) {
             var authTxidModel = await _createAuthTx(
+                keyPair: keyPair,
                 utxoList: _utxoSelectorForSendToken(
                     accountUtxoList, txAuthList),
                 destinationAddress: element,
@@ -337,6 +351,7 @@ class TransactionService {
             }
 
             responseModel = await createTransaction(
+              keyPair: keyPair,
                 utxoList: [authTxidModel.utxo!],
                 isAuth: false,
                 destinationAddress: destinationAddress,
@@ -375,6 +390,7 @@ class TransactionService {
     }
 
     var responseTxModel = await createTransaction(
+      keyPair: keyPair,
         utxoList: accountUtxoList,
         isAuth: false,
         destinationAddress: destinationAddress,
@@ -390,6 +406,7 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendToken(
       {required AccountModel account,
+        required ECPair keyPair,
       required String token,
       required String destinationAddress,
       required int amount, required List<TokensModel> tokens}) async {
@@ -410,6 +427,7 @@ class TransactionService {
         for (var balance in balances) {
           if (balance.token == token) {
             var authTxidModel = await _createAuthTx(
+                keyPair: keyPair,
                 utxoList:
                     _utxoSelectorForSendToken(accountUtxoList, txAuthList),
                 destinationAddress: element,
@@ -439,6 +457,7 @@ class TransactionService {
     }
 
     var responseModel = await createTransaction(
+      keyPair:keyPair,
         utxoList: selectedUtxoList,
         isAuth: false,
         destinationAddress: destinationAddress,
@@ -462,6 +481,7 @@ class TransactionService {
 //TODO: Need refactoring this function  #fastest_programing
   Future<TxErrorModel> createAndSendSwap(
       {required AccountModel account,
+        required ECPair keyPair,
       required String tokenFrom,
       required String tokenTo,
       required int amount, required int amountTo, required List<TokensModel> tokens, double slippage = 0.03}) async {
@@ -494,6 +514,7 @@ class TransactionService {
                     _utxoSelectorForSendToken(accountUtxoList, txAuthList);
 
                 var authTxidModel = await _createAuthTx(
+                    keyPair: keyPair,
                     utxoList: utxoList,
                     destinationAddress: element.addressModel!,
                     account: account);
@@ -525,6 +546,7 @@ class TransactionService {
         var selectedUtxo = _utxoSelector(accountUtxoList, FEE, needAmount);
         var activeAddress = account.getActiveAddress(isChange: false);
         var responseModel = await createTransaction(
+          keyPair: keyPair,
             utxoList: selectedUtxo,
             isAuth: false,
             account: account,
@@ -561,6 +583,7 @@ class TransactionService {
                     _utxoSelectorForSendToken(accountUtxoList, txAuthList);
 
                 var authTxidModel = await _createAuthTx(
+                    keyPair: keyPair,
                     utxoList: utxoList,
                     destinationAddress: element.addressModel!,
                     account: account);
@@ -601,6 +624,7 @@ class TransactionService {
                   _utxoSelectorForSendToken(accountUtxoList, txAuthList);
 
               var authTxidModel = await _createAuthTx(
+                keyPair: keyPair,
                   utxoList: utxoList,
                   destinationAddress: element,
                   account: account);
@@ -635,6 +659,7 @@ class TransactionService {
 
     for(var i = 0; i<txAuthList.length; i++) {
        responseModel = await createTransaction(
+         keyPair: keyPair,
           utxoList: [selectedUtxoList[i]],
           isAuth: false,
           destinationAddress: account.getActiveAddress(isChange: false),
@@ -663,7 +688,8 @@ class TransactionService {
   }
 
   Future<TxResponseModel> createTransaction(
-      {required List<UtxoModel> utxoList,
+      {required ECPair keyPair,
+      required List<UtxoModel> utxoList,
       required String destinationAddress,
       required String changeAddress,
       required int amount,
@@ -690,7 +716,7 @@ class TransactionService {
 
     selectedUTXO.forEach((utxo) {
       print('input: ${utxo.value!}');
-      _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: utxo.keyPair!.publicKey), network: networkHelper.getNetwork(SettingsHelper.settings.network!)).data!.output);
+      _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: keyPair.publicKey), network: networkHelper.getNetwork(SettingsHelper.settings.network!)).data!.output);
       sum += utxo.value!;
     });
 
@@ -745,24 +771,17 @@ class TransactionService {
 
     selectedUTXO.asMap().forEach((index, utxo) {
       final _p2wpkh = P2WPKH(
-              data: PaymentData(pubkey: utxo.keyPair!.publicKey),
+              data: PaymentData(pubkey: keyPair.publicKey),
               network:
                   networkHelper.getNetwork(SettingsHelper.settings.network!))
           .data;
       final _redeemScript = _p2wpkh!.output;
       _txb.sign(
           vin: index,
-          keyPair: utxo.keyPair!,
+          keyPair: keyPair,
           witnessValue: utxo.value);
     });
 
-    for (var i = 0; i < newUTXO.length; i++) {
-      account.addressList!.forEach((address) {
-        if (newUTXO[i].address == address.address) {
-          newUTXO[i].keyPair = address.keyPair;
-        }
-      });
-    }
 
     TxResponseModel responseModel = TxResponseModel(
         hex: _txb.build().toHex(),
@@ -844,7 +863,6 @@ class TransactionService {
     responseModel.newUTXO.forEach((element) {
       accountUtxoList.add(UtxoModel(
           address: element.address!,
-          keyPair: element.keyPair!,
           mintIndex: element.mintIndex,
           mintTxId: txid,
           value: element.value));
@@ -853,10 +871,12 @@ class TransactionService {
 
   Future<TxErrorModel> _createAuthTx({
     required List<UtxoModel> utxoList,
+    required ECPair keyPair,
     required AddressModel destinationAddress,
     required AccountModel account,
   }) async {
     var authResponse = await createTransaction(
+      keyPair: keyPair,
         utxoList: utxoList,
         isAuth: true,
         destinationAddress: destinationAddress.address!,
@@ -875,7 +895,6 @@ class TransactionService {
 
     utxoToAccTxid.utxo = UtxoModel(
         address: destinationAddress.address!,
-        keyPair: destinationAddress.keyPair!,
         mintIndex: 1,
         mintTxId: utxoToAccTxid.txid,
         value: authResponse.amount);
@@ -897,7 +916,7 @@ class TransactionService {
 
     if (!txid!.isError) {
       _updateUtxoList(responseModel, txid.txid!);
-    }
+  }
 
     return txid;
   }

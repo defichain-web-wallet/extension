@@ -33,9 +33,9 @@ class _WalletCheckerState extends State<WalletChecker> {
       var box = await Hive.openBox(HiveBoxes.client);
       var masterKeyPairName;
       if (SettingsHelper.settings.network! == 'testnet') {
-        masterKeyPairName = HiveNames.masterKeyPairTestnet;
+        masterKeyPairName = HiveNames.masterKeyPairTestnetPrivate;
       } else {
-        masterKeyPairName = HiveNames.masterKeyPairMainnet;
+        masterKeyPairName = HiveNames.masterKeyPairMainnetPrivate;
       }
       var masterKeyPair = await box.get(masterKeyPairName);
       var password = await box.get(HiveNames.password);
@@ -46,9 +46,6 @@ class _WalletCheckerState extends State<WalletChecker> {
           await box.get(HiveNames.recoveryMnemonic) != null;
       String? recoveryMnemonic = await box.get(HiveNames.recoveryMnemonic);
 
-      if (password != null) {
-        password = stringToBase64.decode(password);
-      }
       await settingsHelper.loadSettings();
       await box.close();
 
