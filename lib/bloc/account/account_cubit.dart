@@ -159,8 +159,6 @@ class AccountCubit extends Cubit<AccountState> {
       var encryptedMasterKeyPairPublic = stringToBase64.encode(masterKeyPairMainnetPublicKey!.toBase58());
       await box.put(HiveNames.masterKeyPairMainnetPublic, encryptedMasterKeyPairPublic);
       if (password != '') {
-        print(masterKeyPairMainnetPrivateKey!.derivePath("1129/0/0/1").privateKey);
-        print(bip32.BIP32.fromBase58(masterKeyPairMainnetPrivateKey!.toBase58())!.derivePath("1129/0/0/1").privateKey);
         var encryptedMasterKey =
         encryptHelper.getEncryptedData(masterKeyPairMainnetPrivateKey!.toBase58(), password);
         await box.put(HiveNames.masterKeyPairMainnetPrivate, encryptedMasterKey);
@@ -189,6 +187,7 @@ class AccountCubit extends Cubit<AccountState> {
         await box.put(HiveNames.masterKeyPairTestnetPrivate, encryptedMasterKey);
       }
     }
+    await box.put(HiveNames.storageVersion, '1');
     await box.close();
   }
 

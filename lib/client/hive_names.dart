@@ -23,4 +23,5 @@ class HiveNames {
   static const String tutorialStatus = 'tutorial_status';
   static const String swapTutorialStatus = 'swap_tutorial_status';
   static const String kycStatus = 'kyc_status';
+  static const String storageVersion = 'storage_version';
 }

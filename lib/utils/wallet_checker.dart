@@ -8,6 +8,7 @@ import 'package:defi_wallet/screens/auth_screen/auth_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/secure_wallet_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/create_password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/services/storage_service.dart';
 import 'package:defi_wallet/utils/theme_checker.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,8 @@ class _WalletCheckerState extends State<WalletChecker> {
   @override
   Widget build(BuildContext context) {
     Future<void> checkWallets() async {
+      await StorageService.updateExistUsers();
+
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
       BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
       var box = await Hive.openBox(HiveBoxes.client);
