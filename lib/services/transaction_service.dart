@@ -278,7 +278,6 @@ class TransactionService {
                 additional: (txb, nw, newUtxo) {
                   final mintingStartsAt = txb.tx!.ins.length + 1;
                   newUtxo.add(UtxoModel(address: element.address!, value: balance.balance!, mintIndex: newUtxo.length + 1));
-                  txb.addOutput(element.address!, balance.balance!);
                   txb.addAccountToUtxoOutput(tokenId, element.address!, balance.balance!, mintingStartsAt);
                 },
                 useAllUtxo: true);
