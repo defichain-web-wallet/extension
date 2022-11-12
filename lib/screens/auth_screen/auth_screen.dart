@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:defi_wallet/screens/auth_screen/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/not_secure_screen.dart';
+import 'package:defi_wallet/screens/skeleton-loader/home_screen_s_l.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
@@ -12,6 +15,7 @@ import 'package:hive/hive.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 
 class AuthScreen extends StatelessWidget {
+  Timer? timer;
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: WelcomeAppBar(),

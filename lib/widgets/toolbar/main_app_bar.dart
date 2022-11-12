@@ -4,7 +4,7 @@ import 'package:defi_wallet/widgets/ongoing_transaction.dart';
 import 'package:flutter/material.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
-  static const double toolbarHeight = 50;
+  static const double toolbarHeight = 55;
   static const double leadingWidth = 60;
   static const double iconHeight = 20;
 

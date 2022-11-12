@@ -4,19 +4,24 @@ import 'package:flutter_svg/flutter_svg.dart';
 class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const double toolbarHeight = 50;
   static const double iconHeight = 30;
+  bool isBgWhite;
 
-  const WelcomeAppBar({Key? key}) : super(key: key);
+  WelcomeAppBar({
+    Key? key,
+    this.isBgWhite = false,
+  }) : super(key: key);
 
   @override
-  Size get preferredSize => const Size.fromHeight(toolbarHeight);
+  Size get preferredSize => Size.fromHeight(toolbarHeight);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       shadowColor: Colors.transparent,
       automaticallyImplyLeading: false,
-      backgroundColor: Theme.of(context).dialogBackgroundColor,
-    toolbarHeight: toolbarHeight,
+      backgroundColor:
+          isBgWhite ? null : Theme.of(context).dialogBackgroundColor,
+      toolbarHeight: toolbarHeight,
       elevation: 0,
       title: Center(
         child: SvgPicture.asset(

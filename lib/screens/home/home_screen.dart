@@ -19,6 +19,7 @@ import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/network/network_selector.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
+import 'package:defi_wallet/screens/skeleton-loader/home_screen_s_l.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
@@ -47,6 +48,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   double maxHistoryEntries = 30;
   double heightListEntry = 74;
   double heightAdditionalAction = 60;
+  Color _color = Colors.blue;
+  Timer? _skeletonTimer;
 
   tabListener() {
     HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
@@ -103,6 +106,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    // _skeletonTimer = Timer.periodic(Duration(milliseconds: 300), (timer) {
+    //   setState(() {
+    //     _color = _color == Colors.blue ? Colors.deepOrange : Colors.blue;
+    //     print('ssss');
+    //   });
+    // });
     super.initState();
     setTabBody();
     tabController = TabController(length: 2, vsync: this);
@@ -148,12 +157,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       tokensState.status == TokensStatusList.loading) {
                     return Container(
                       child: Center(
-                        child: Loader(),
+                        child: HomeScreenSL(
+                          isDarkTheme: SettingsHelper.settings.theme == 'Dark',
+                          timer: _skeletonTimer,
+                        ),
                       ),
                     );
                   }
 
+                  if(_skeletonTimer != null){
+                    _skeletonTimer!.cancel();
+                  }
+
                   if (constraints.maxWidth < ScreenSizes.medium) {
+
                     return Scaffold(
                       appBar: HomeAppBar(
                         selectKey: selectKey,
