@@ -1,3 +1,4 @@
+import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
@@ -20,8 +21,12 @@ class StorageService {
       Codec<String, String> stringToBase64 = utf8.fuse(base64);
       var box = await Hive.openBox(HiveBoxes.client);
       var encodedPassword = await box.get(HiveNames.password);
+      print('encodedPassword $encodedPassword');
       var mnemonic;
       var password = stringToBase64.decode(encodedPassword);
+      print('encodedPassword $password');
+      encodedPassword  = Crypt.sha256(password).toString();
+
       try {
         var savedMnemonic = await box.get(HiveNames.savedMnemonic);
         if (savedMnemonic.split(',').length == 24) {
@@ -39,7 +44,7 @@ class StorageService {
       if (mnemonic == '') {
         //TODO: message "please restore your wallet from seed"
       }
-      final seed = convertMnemonicToSeed(mnemonic);
+      final seed = convertMnemonicToSeed(mnemonic.split(','));
 
       //mainnet start
       final masterKeyPairMainnet =
@@ -99,7 +104,7 @@ class StorageService {
       accountList = await AccountCubit().loadAccountDetails(accountsTestnet);
       accountsTestnet = accountList;
       //testnet end
-
+      box.put(HiveNames.password, encodedPassword);
       //TODO: move functions saveAccountsToStorage and restore from cubit
       await AccountCubit().saveAccountsToStorage(
           accountsMainnet,
@@ -108,7 +113,7 @@ class StorageService {
           accountsTestnet,
           masterKeyPairTestnetPublicKey,
           masterKeyPairTestnet,
-          mnemonic,
+          mnemonic.split(','),
           password: password);
     }
   }

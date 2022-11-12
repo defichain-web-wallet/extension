@@ -28,7 +28,7 @@ class HDWalletService {
 
   ECPair getKeypairForPathPrivateKey(
       bip32.BIP32 masterKeypair, String path, String networkString) {
-    print(masterKeypair.derivePath(path).publicKey!);
+    // print(masterKeypair.derivePath(path).publicKey!);
     return ECPair.fromPrivateKey(masterKeypair.derivePath(path).privateKey!,
         network: networkHelper.getNetwork(networkString));
   }
