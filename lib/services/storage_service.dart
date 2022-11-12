@@ -17,14 +17,15 @@ class StorageService {
   static updateExistUsers() async {
     var box = await Hive.openBox(HiveBoxes.client);
     var storageVersion = await box.get(HiveNames.storageVersion);
-    if (storageVersion == null) {
+    var accounts = await box.get(HiveNames.accountsMainnet);
+    if (storageVersion == null && accounts != null) {
       Codec<String, String> stringToBase64 = utf8.fuse(base64);
       var box = await Hive.openBox(HiveBoxes.client);
       var encodedPassword = await box.get(HiveNames.password);
-      print('encodedPassword $encodedPassword');
+
       var mnemonic;
       var password = stringToBase64.decode(encodedPassword);
-      print('encodedPassword $password');
+
       encodedPassword  = Crypt.sha256(password).toString();
 
       try {
@@ -104,6 +105,8 @@ class StorageService {
       accountList = await AccountCubit().loadAccountDetails(accountsTestnet);
       accountsTestnet = accountList;
       //testnet end
+      box.delete(HiveNames.masterKeyPairTestnet);
+      box.delete(HiveNames.masterKeyPairMainnet);
       box.put(HiveNames.password, encodedPassword);
       //TODO: move functions saveAccountsToStorage and restore from cubit
       await AccountCubit().saveAccountsToStorage(
