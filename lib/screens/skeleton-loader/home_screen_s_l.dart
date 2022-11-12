@@ -28,8 +28,18 @@ class HomeScreenSL extends StatefulWidget {
 class _HomeScreenSLState extends State<HomeScreenSL> {
   Color _color = Color(0xffEDEDED);
   Color _colorDark = Color(0xff2a2929);
-  BorderRadiusGeometry _borderRadius = BorderRadius.circular(8);
-  double actionBtnSpace = 28;
+  BorderRadiusGeometry borderRadiusSix = BorderRadius.circular(6);
+  BorderRadiusGeometry borderRadiusEight = BorderRadius.circular(8);
+  BorderRadiusGeometry borderRadiusTen = BorderRadius.circular(10);
+  SizedBox actionBtnSpace = SizedBox(
+    width: 28,
+  );
+  SizedBox currencyBtnSpace = SizedBox(
+    width: 8,
+  );
+  SizedBox tokenContainerSpace = SizedBox(
+    height: 10,
+  );
 
   @override
   void initState() {
@@ -94,19 +104,31 @@ class _HomeScreenSLState extends State<HomeScreenSL> {
       width: 40,
       height: 16,
       color: widget.isDarkTheme ? _colorDark : _color,
-      borderRadius: _borderRadius,
+      borderRadius: borderRadiusEight,
     );
     SkeletonContainer actionBtnText = SkeletonContainer(
       width: 35,
       height: 12,
       color: widget.isDarkTheme ? _colorDark : _color,
-      borderRadius: _borderRadius,
+      borderRadius: borderRadiusEight,
     );
     SkeletonContainer actionBtn = SkeletonContainer(
       width: 35,
       height: 35,
       color: widget.isDarkTheme ? _colorDark : _color,
       shape: BoxShape.circle,
+    );
+    SkeletonContainer balanceText = SkeletonContainer(
+      width: 210,
+      height: 24,
+      color: widget.isDarkTheme ? _colorDark : _color,
+      borderRadius: borderRadiusTen,
+    );
+    SkeletonContainer networkSelector = SkeletonContainer(
+      width: 105,
+      height: 16,
+      color: widget.isDarkTheme ? _colorDark : _color,
+      borderRadius: borderRadiusSix,
     );
     SkeletonTokenContainer tokenContainer = SkeletonTokenContainer(
       color: widget.isDarkTheme ? _colorDark : _color,
@@ -129,14 +151,7 @@ class _HomeScreenSLState extends State<HomeScreenSL> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          SkeletonContainer(
-                            width: 105,
-                            height: 16,
-                            color: widget.isDarkTheme ? _colorDark : _color,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(6),
-                            ),
-                          ),
+                          networkSelector,
                         ],
                       ),
                     ),
@@ -148,33 +163,20 @@ class _HomeScreenSLState extends State<HomeScreenSL> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               currencyBtn,
-                              SizedBox(
-                                width: 8,
-                              ),
+                              currencyBtnSpace,
                               currencyBtn,
-                              SizedBox(
-                                width: 8,
-                              ),
+                              currencyBtnSpace,
                               currencyBtn,
                             ],
                           ),
                           SizedBox(
                             height: 20,
                           ),
-                          SkeletonContainer(
-                            width: 210,
-                            height: 24,
-                            color: widget.isDarkTheme ? _colorDark : _color,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
-                            ),
-                          ),
+                          balanceText,
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
+                    tokenContainerSpace,
                     Column(
                       children: [
                         Column(
@@ -183,13 +185,13 @@ class _HomeScreenSLState extends State<HomeScreenSL> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 actionBtn,
-                                SizedBox(width: actionBtnSpace),
+                                actionBtnSpace,
                                 actionBtn,
-                                SizedBox(width: actionBtnSpace),
+                                actionBtnSpace,
                                 actionBtn,
-                                SizedBox(width: actionBtnSpace),
+                                actionBtnSpace,
                                 actionBtn,
-                                SizedBox(width: actionBtnSpace),
+                                actionBtnSpace,
                                 actionBtn,
                               ],
                             ),
@@ -200,13 +202,13 @@ class _HomeScreenSLState extends State<HomeScreenSL> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 actionBtnText,
-                                SizedBox(width: actionBtnSpace),
+                                actionBtnSpace,
                                 actionBtnText,
-                                SizedBox(width: actionBtnSpace),
+                                actionBtnSpace,
                                 actionBtnText,
-                                SizedBox(width: actionBtnSpace),
+                                actionBtnSpace,
                                 actionBtnText,
-                                SizedBox(width: actionBtnSpace),
+                                actionBtnSpace,
                                 actionBtnText,
                               ],
                             ),
@@ -229,9 +231,6 @@ class _HomeScreenSLState extends State<HomeScreenSL> {
                       height: 48,
                       decoration: BoxDecoration(
                         color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(0),
-                        ),
                       ),
                     ),
                   ),
@@ -246,25 +245,15 @@ class _HomeScreenSLState extends State<HomeScreenSL> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     tokenContainer,
-                    SizedBox(
-                      height: 10,
-                    ),
+                    tokenContainerSpace,
                     tokenContainer,
-                    SizedBox(
-                      height: 10,
-                    ),
+                    tokenContainerSpace,
                     tokenContainer,
-                    SizedBox(
-                      height: 10,
-                    ),
+                    tokenContainerSpace,
                     tokenContainer,
-                    SizedBox(
-                      height: 10,
-                    ),
+                    tokenContainerSpace,
                     tokenContainer,
-                    SizedBox(
-                      height: 10,
-                    ),
+                    tokenContainerSpace,
                     tokenContainer,
                   ],
                 ),
