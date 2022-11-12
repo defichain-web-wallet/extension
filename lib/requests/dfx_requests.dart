@@ -70,13 +70,11 @@ class DfxRequests {
   Future<void> createUser(String email, String phone,
       String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/user');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final body = jsonEncode({
@@ -92,13 +90,11 @@ class DfxRequests {
 
   Future<CryptoRouteModel?> getCryptoRoutes(String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/cryptoRoute');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
 
@@ -120,13 +116,11 @@ class DfxRequests {
   Future<CryptoRouteModel> createCryptoRoute(String accessToken) async {
     print('1');
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/cryptoRoute');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
 
@@ -154,13 +148,11 @@ class DfxRequests {
 
   Future<Map<String, dynamic>> getUserDetails(String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/user');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final response = await http.get(url, headers: headers);
@@ -177,13 +169,11 @@ class DfxRequests {
 
   Future<List<FiatHistoryModel>> getHistory(String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/history');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final response = await http.get(url, headers: headers);
@@ -204,13 +194,11 @@ class DfxRequests {
   Future<List<AssetByFiatModel>> getAvailableAssets(
       String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/asset');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final response = await http.get(url, headers: headers);
@@ -231,13 +219,11 @@ class DfxRequests {
   Future<void> saveBuyDetails(String iban, AssetByFiatModel asset,
       String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/buy');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final body = jsonEncode({
@@ -255,13 +241,11 @@ class DfxRequests {
   Future<List<IbanModel>> getIbanList(
       String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/route');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final response = await http.get(url, headers: headers);
@@ -285,13 +269,11 @@ class DfxRequests {
 
   Future<List<dynamic>> getCountryList(String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/country');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final response = await http.get(url, headers: headers);
@@ -310,13 +292,11 @@ class DfxRequests {
   Future<void> saveKycData(KycModel kyc,
       String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/kyc/data');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final body = jsonEncode(kyc.toJson());
@@ -330,13 +310,11 @@ class DfxRequests {
   Future<List<FiatModel>> getFiatList(
       String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/fiat');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final response = await http.get(url, headers: headers);
@@ -357,13 +335,11 @@ class DfxRequests {
   Future<Map> sell(String iban, FiatModel fiat,
       String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/sell');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final body = jsonEncode({
@@ -392,14 +368,12 @@ class DfxRequests {
     String address,
   ) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse(
           'https://api.dfx.swiss/v1/staking/routeBalance?addresses=$address}');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final response = await http.get(url, headers: headers);
@@ -416,13 +390,11 @@ class DfxRequests {
 
   Future<List<StakingModel>> getStakingRoutes(String accessToken) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/staking');
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final response = await http.get(url, headers: headers);
@@ -451,15 +423,13 @@ class DfxRequests {
     { bool isActive = false, int stakingId = 0 }
   ) async {
     try {
-      String decryptedAccessToken = await getDecryptedAccessToken(accessToken);
-
       final Uri url = Uri.parse(
           'https://api.dfx.swiss/v1/staking/' +
           (isActive ? stakingId.toString() : ''));
 
       final headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer $decryptedAccessToken'
+        'Authorization': 'Bearer $accessToken'
       };
 
       var body = {
@@ -492,13 +462,5 @@ class DfxRequests {
     } catch (err) {
       throw err;
     }
-  }
-
-  Future<String> getDecryptedAccessToken(String accessToken) async {
-    Codec<String, String> stringToBase64 = utf8.fuse(base64);
-    var box = await Hive.openBox(HiveBoxes.client);
-    var encodedPassword = await box.get(HiveNames.password);
-    var password = stringToBase64.decode(encodedPassword);
-    return encryptHelper.getDecryptedData(accessToken, password);
   }
 }

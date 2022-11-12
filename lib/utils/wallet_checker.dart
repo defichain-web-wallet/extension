@@ -55,8 +55,12 @@ class _WalletCheckerState extends State<WalletChecker> {
       if (masterKeyPair != null) {
         if (password != null) {
           lockHelper.provideWithLockChecker(context, () async {
-            await accountCubit
-                .restoreAccountFromStorage(SettingsHelper.settings.network!);
+            try {
+              await accountCubit
+                  .restoreAccountFromStorage(SettingsHelper.settings.network!);
+            } catch (err) {
+              print(err);
+            }
             if (SettingsHelper.isBitcoin()) {
               await bitcoinCubit
                   .loadDetails(accountCubit.state.accounts![0].bitcoinAddress!);
@@ -74,8 +78,12 @@ class _WalletCheckerState extends State<WalletChecker> {
             );
           });
         } else {
-          await accountCubit
-              .restoreAccountFromStorage(SettingsHelper.settings.network!);
+          try {
+            await accountCubit
+                .restoreAccountFromStorage(SettingsHelper.settings.network!);
+          } catch (err) {
+            print(err);
+          }
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(

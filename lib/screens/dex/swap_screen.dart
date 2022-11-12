@@ -378,7 +378,7 @@ class _SwapScreenState extends State<SwapScreen> {
                               setState(() {
                                 accountTo = accountState.accounts[index];
                               });
-                              // fiatCubit.loadCryptoRoute(accountTo);
+                              fiatCubit.loadCryptoRoute(accountTo);
                             },
                           ),
                           SizedBox(height: 6),
@@ -603,7 +603,7 @@ class _SwapScreenState extends State<SwapScreen> {
                           FiatCubit fiatCubit =
                               BlocProvider.of<FiatCubit>(context);
                           if (iterator == 0 && SettingsHelper.isBitcoin()) {
-                            // fiatCubit.loadCryptoRoute(accountTo);
+                            fiatCubit.loadCryptoRoute(accountTo);
                             iterator++;
                           }
                           if (fiatState.status == FiatStatusList.success &&

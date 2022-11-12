@@ -46,7 +46,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     if (iterator == 0) {
       try {
-        // fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
+        fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
       } catch (err) {
         print(err);
       }
