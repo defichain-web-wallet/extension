@@ -73,7 +73,7 @@ class AccountCubit extends Cubit<AccountState> {
 
     String base58mainnet = masterKeyPairMainnetPublicKey.toBase58();
     print('mainnet: $base58mainnet');
-    bip32.BIP32.fromBase58(base58, networkHelper.getNetworkType(mainnet));
+    bip32.BIP32.fromBase58(base58mainnet, networkHelper.getNetworkType(mainnet));
     final masterKeyPairMainnetPrivateKey = HDWalletService().getKeypairForPathPrivateKey(masterKeyPairMainnet, HDWalletService().derivePath(0), mainnet);
 
     final accountMainnet =
