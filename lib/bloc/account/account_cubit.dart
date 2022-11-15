@@ -58,10 +58,8 @@ class AccountCubit extends Cubit<AccountState> {
 
     final masterKeyPairTestnet =
         hdWalletService.getMasterKeypairFormSeed(seed, testnet);
-    final masterKeyPairTestnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairTestnet.publicKey, masterKeyPairTestnet.chainCode);
-    String base58 = masterKeyPairTestnetPublicKey.toBase58();
-    print('testnet: $base58');
-    bip32.BIP32.fromBase58(base58, networkHelper.getNetworkType(testnet));
+    final masterKeyPairTestnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairTestnet.publicKey, masterKeyPairTestnet.chainCode, networkHelper.getNetworkType(testnet));
+
     final accountTestnet =
         await walletsHelper.createNewAccount(masterKeyPairTestnet, testnet);
 
@@ -69,11 +67,8 @@ class AccountCubit extends Cubit<AccountState> {
     final masterKeyPairMainnet =
         hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
 
-    final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairMainnet.publicKey, masterKeyPairMainnet.chainCode);
+    final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairMainnet.publicKey, masterKeyPairMainnet.chainCode, networkHelper.getNetworkType(mainnet));
 
-    String base58mainnet = masterKeyPairMainnetPublicKey.toBase58();
-    print('mainnet: $base58mainnet');
-    bip32.BIP32.fromBase58(base58mainnet, networkHelper.getNetworkType(mainnet));
     final masterKeyPairMainnetPrivateKey = HDWalletService().getKeypairForPathPrivateKey(masterKeyPairMainnet, HDWalletService().derivePath(0), mainnet);
 
     final accountMainnet =
@@ -308,7 +303,7 @@ class AccountCubit extends Cubit<AccountState> {
 
       var masterKeyPairMainnet =
           hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
-      final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairMainnet.publicKey, masterKeyPairMainnet.chainCode);
+      final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairMainnet.publicKey, masterKeyPairMainnet.chainCode, networkHelper.getNetworkType(mainnet));
       final masterKeyPairMainnetPrivateKey = HDWalletService().getKeypairForPathPrivateKey(masterKeyPairMainnet, HDWalletService().derivePath(0), mainnet);
 
       List<AccountModel> accountsMainnet = await walletsHelper
@@ -322,7 +317,7 @@ class AccountCubit extends Cubit<AccountState> {
 
       final masterKeyPairTestnet =
           hdWalletService.getMasterKeypairFormSeed(seed, testnet);
-      final masterKeyPairTestnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairTestnet.publicKey, masterKeyPairTestnet.chainCode);
+      final masterKeyPairTestnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairTestnet.publicKey, masterKeyPairTestnet.chainCode, networkHelper.getNetworkType(testnet));
 
       List<AccountModel> accountsTestnet = await walletsHelper
           .restoreWallet(masterKeyPairTestnetPublicKey, testnet, (need, restored) {
