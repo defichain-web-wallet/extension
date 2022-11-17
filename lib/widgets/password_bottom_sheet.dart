@@ -3,8 +3,6 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/fields/password_field.dart';
-import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 
 class PasswordBottomSheet {
@@ -13,12 +11,18 @@ class PasswordBottomSheet {
   static GlobalKey<FormState> _formKey = GlobalKey();
 
   static void provideWithPassword(
-      BuildContext context, AccountModel account, Function(String) callback) {
+    BuildContext context,
+    AccountModel account,
+    Function(String) callback,
+  ) {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isDismissible: false,
       enableDrag: false,
+      constraints: BoxConstraints(
+        maxWidth: ScreenSizes.medium,
+      ),
       builder: (BuildContext context) {
         return Container(
           padding: const EdgeInsets.only(
@@ -57,11 +61,10 @@ class PasswordBottomSheet {
                       String password = _passwordController.text;
                       try {
                         await HDWalletService().getKeypairFromStorage(password, account.index!);
-                        _passwordController.text = '';
-                        Navigator.pop(context);
+                        closeSheet(context);
                         callback(password);
                       } catch (error) {
-                        Navigator.pop(context);
+                        closeSheet(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -81,5 +84,10 @@ class PasswordBottomSheet {
         );
       },
     );
+  }
+
+  static void closeSheet(BuildContext context) {
+    _passwordController.text = '';
+    Navigator.pop(context);
   }
 }

@@ -349,7 +349,10 @@ class AccountCubit extends Cubit<AccountState> {
     }
   }
 
-  Future<List<dynamic>> restoreAccountFromStorage(String network) async {
+  Future<List<dynamic>> restoreAccountFromStorage(
+    String network, {
+    String password = '',
+  }) async {
     List<AccountModel> accounts = [];
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     var masterKeyName;
@@ -387,6 +390,22 @@ class AccountCubit extends Cubit<AccountState> {
         accountModel.bitcoinAddress = await HDWalletService().getAddressModelFromKeyPair(
             masterKeyPair, accountModel.index, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
         accountModel.bitcoinAddress!.blockchain = 'BTC';
+      }
+      if (password != '') {
+        try {
+          var keyPair = await HDWalletService().getKeypairFromStorage(
+            password,
+            accountModel.index!,
+          );
+          String accessToken = await fiatCubit.getAccessToken(
+            accountModel,
+            keyPair,
+            needRefresh: true,
+          );
+          accountModel.accessToken = accessToken;
+        } catch (err) {
+          print(err);
+        }
       }
       accounts.add(accountModel);
     }
