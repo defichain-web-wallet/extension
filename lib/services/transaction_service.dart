@@ -704,11 +704,21 @@ class TransactionService {
     List<UtxoModel> selectedUTXO = [];
     List<UtxoModel> newUTXO = [];
 
+    if(selectedUTXO.length == 0){
+      return TxResponseModel(
+          isError: true,
+          error: 'Not enough balance. Wait for approval the previous tx',
+          usingUTXO: [],
+          newUTXO: [],
+          hex: '');
+    }
+
     if (useAllUtxo) {
       selectedUTXO = utxoList;
     } else {
       selectedUTXO = _utxoSelector(utxoList, FEE, amount);
     }
+
 
     final _txb = TransactionBuilder(
         network: networkHelper.getNetwork(SettingsHelper.settings.network!));
