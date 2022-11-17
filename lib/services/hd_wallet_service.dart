@@ -60,9 +60,9 @@ class HDWalletService {
 
     var box = await Hive.openBox(HiveBoxes.client);
     var encryptedMasterKey = await box.get(boxKey);
-    var masterKey =
-    EncryptHelper().getDecryptedData(encryptedMasterKey, password);
-    return getKeypairForPathPrivateKey(bip32.BIP32.fromBase58(masterKey),derivePath(accountIndex),network);
+    var masterKey = EncryptHelper().getDecryptedData(encryptedMasterKey, password);
+
+    return getKeypairForPathPrivateKey(bip32.BIP32.fromBase58(masterKey, networkHelper.getNetworkType(network)),derivePath(accountIndex),network);
   }
 
   String derivePath(int account) {
