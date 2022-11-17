@@ -24,6 +24,7 @@ import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/selectors/currency_selector.dart';
@@ -366,99 +367,75 @@ class _SellingState extends State<Selling> {
                             hideOverlay();
                             if (_formKey.currentState!.validate()) {
                               if (isEnough) {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, animation1,
-                                            animation2) =>
-                                        LockScreen(callback: (password) async {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              LoaderNew(
-                                            title: appBarTitle,
-                                            secondStepLoaderText:
-                                                secondStepLoaderText,
-                                            callback: () async {
-                                              try {
-                                                String address;
-                                                double amount = double.parse(
-                                                    amountController.text
-                                                        .replaceAll(',', '.'));
-                                                IbanModel? foundedIban;
-                                                try {
-                                                  foundedIban = fiatState
-                                                      .ibanList
-                                                      .firstWhere((el) =>
-                                                          el.active &&
-                                                          el.type == "Sell" &&
-                                                          el.iban ==
-                                                              fiatState
-                                                                  .activeIban
-                                                                  .iban &&
-                                                          el.fiat.name ==
-                                                              selectedFiat
-                                                                  .name);
-                                                } catch (_) {
-                                                  print(_);
-                                                }
-                                                String iban = widget.isNewIban
-                                                    ? _ibanController.text
-                                                    : fiatState.activeIban.iban;
-                                                if (foundedIban == null ||
-                                                    widget.isNewIban) {
-                                                  Map sellDetails =
-                                                      await dfxRequests.sell(
-                                                          iban,
-                                                          selectedFiat,
-                                                          fiatState
-                                                              .accessToken);
-                                                  address =
-                                                      sellDetails["deposit"]
-                                                          ["address"];
-                                                } else {
-                                                  address = foundedIban
-                                                      .deposit["address"];
-                                                }
-                                                await _sendTransaction(
-                                                    context,
-                                                    tokensState,
-                                                    assetFrom,
-                                                    accountState.activeAccount,
-                                                    address,
-                                                    amount,
-                                                    password);
-                                              } catch (err) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      err.toString(),
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .headline5,
-                                                    ),
-                                                    backgroundColor:
-                                                        Theme.of(context)
-                                                            .snackBarTheme
-                                                            .backgroundColor,
-                                                  ),
-                                                );
-                                              }
-                                            },
+                                PasswordBottomSheet.provideWithPassword(
+                                    context, accountState.activeAccount,
+                                    (password) async {
+                                  LoaderNew(
+                                    title: appBarTitle,
+                                    secondStepLoaderText: secondStepLoaderText,
+                                    callback: () async {
+                                      try {
+                                        String address;
+                                        double amount = double.parse(
+                                            amountController.text
+                                                .replaceAll(',', '.'));
+                                        IbanModel? foundedIban;
+                                        try {
+                                          foundedIban = fiatState.ibanList
+                                              .firstWhere((el) =>
+                                                  el.active &&
+                                                  el.type == "Sell" &&
+                                                  el.iban ==
+                                                      fiatState
+                                                          .activeIban.iban &&
+                                                  el.fiat.name ==
+                                                      selectedFiat.name);
+                                        } catch (_) {
+                                          print(_);
+                                        }
+                                        String iban = widget.isNewIban
+                                            ? _ibanController.text
+                                            : fiatState.activeIban.iban;
+                                        if (foundedIban == null ||
+                                            widget.isNewIban) {
+                                          Map sellDetails =
+                                              await dfxRequests.sell(
+                                                  iban,
+                                                  selectedFiat,
+                                                  fiatState.accessToken);
+                                          address =
+                                              sellDetails["deposit"]["address"];
+                                        } else {
+                                          address =
+                                              foundedIban.deposit["address"];
+                                        }
+                                        await _sendTransaction(
+                                            context,
+                                            tokensState,
+                                            assetFrom,
+                                            accountState.activeAccount,
+                                            address,
+                                            amount,
+                                            password);
+                                      } catch (err) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              err.toString(),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline5,
+                                            ),
+                                            backgroundColor: Theme.of(context)
+                                                .snackBarTheme
+                                                .backgroundColor,
                                           ),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
-                                        ),
-                                      );
-                                    }),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                );
+                                        );
+                                      }
+                                    },
+                                  );
+                                });
                               } else {
                                 if (double.parse(amountController.text
                                         .replaceAll(',', '.')) ==

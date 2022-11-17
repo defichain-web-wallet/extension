@@ -4,9 +4,9 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
@@ -165,36 +165,28 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                                   ),
                                 );
                               } else {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, animation1,
-                                            animation2) =>
-                                        LockScreen(callback: (password) async {
+                                PasswordBottomSheet.provideWithPassword(context,
+                                    state.activeAccount!, (password) async {
                                       Navigator.push(
                                         context,
                                         PageRouteBuilder(
                                           pageBuilder: (context, animation1,
-                                                  animation2) =>
+                                              animation2) =>
                                               LoaderNew(
-                                            title: appBarTitle,
-                                            secondStepLoaderText:
+                                                title: appBarTitle,
+                                                secondStepLoaderText:
                                                 secondStepLoaderText,
-                                            callback: () {
-                                              submitSwap(
-                                                  state, tokensState, password);
-                                            },
-                                          ),
+                                                callback: () {
+                                                  submitSwap(
+                                                      state, tokensState, password,);
+                                                },
+                                              ),
                                           transitionDuration: Duration.zero,
                                           reverseTransitionDuration:
-                                              Duration.zero,
+                                          Duration.zero,
                                         ),
                                       );
-                                    }),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                );
+                                    });
                               }
                             },
                           );

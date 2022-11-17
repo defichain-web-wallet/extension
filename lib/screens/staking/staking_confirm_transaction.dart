@@ -6,15 +6,14 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_initiated.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
@@ -268,29 +267,21 @@ class _StakingConfirmTransactionState extends State<StakingConfirmTransaction> {
                         label: 'Staking',
                         isCheckLock: false,
                         callback: () async {
-                          Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                  pageBuilder: (context,
-                                      animation1,
-                                      animation2) =>
-                                      LockScreen(callback:
-                                          (password) async {
-                                        TokensState tokensState =
-                                            BlocProvider
-                                                .of<TokensCubit>(context)
-                                                .state;
-                                        await _sendTransaction(
-                                          context,
-                                          tokensState,
-                                          widget.assetName,
-                                          accountState.activeAccount!,
-                                          state.depositAddress!,
-                                          widget.amount,
-                                          password
-                                        );
-                                      })));
-                        }),
+                          PasswordBottomSheet.provideWithPassword(
+                                context, state.activeAccount, (password) async {
+                              TokensState tokensState =
+                                  BlocProvider.of<TokensCubit>(context).state;
+                              await _sendTransaction(
+                                context,
+                                tokensState,
+                                widget.assetName,
+                                accountState.activeAccount!,
+                                state.depositAddress!,
+                                widget.amount,
+                                password,
+                              );
+                            });
+                          }),
                     ),
                   ],
                 ),

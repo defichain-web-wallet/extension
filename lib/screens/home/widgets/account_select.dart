@@ -4,10 +4,10 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -205,33 +205,25 @@ class AccountSelectState extends State<AccountSelect> {
                       ),
                       onPressed: () async {
                         hideOverlay();
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                LockScreen(callback: (password) async {
-                                  AccountModel account =
-                                  await accountCubit.addAccount();
-                                  if (SettingsHelper.isBitcoin()) {
-                                    await bitcoinCubit
-                                        .loadDetails(account.bitcoinAddress!);
-                                  }
-                                  LoggerService.invokeInfoLogg(
-                                      'user created new account');
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation1, animation2) =>
-                                          HomeScreen(),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
-                                    ),
-                                  );
-                                }),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
+                        PasswordBottomSheet.provideWithPassword(context, _activeAccount, (password) async {
+                          AccountModel account =
+                          await accountCubit.addAccount();
+                          if (SettingsHelper.isBitcoin()) {
+                            await bitcoinCubit
+                                .loadDetails(account.bitcoinAddress!);
+                          }
+                          LoggerService.invokeInfoLogg(
+                              'user created new account');
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  HomeScreen(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          );
+                        });
                       },
                     );
                   } else {

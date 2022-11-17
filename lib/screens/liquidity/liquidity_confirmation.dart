@@ -5,7 +5,6 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -15,6 +14,7 @@ import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair_details.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_status.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -286,46 +286,35 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                                       label: submitLabel,
                                       isCheckLock: false,
                                       callback: () {
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                    animation2) =>
-                                                LockScreen(
-                                                    callback: (password) async {
-                                              Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                          animation1,
-                                                          animation2) =>
-                                                      LoaderNew(
-                                                    title: appBarTitle,
-                                                    secondStepLoaderText: widget
-                                                                .removeLT ==
-                                                            0
-                                                        ? secondStepLoaderTextAdd
-                                                        : secondStepLoaderTextRemove,
-                                                    callback: () {
-                                                      submitLiquidityAction(
-                                                          state,
-                                                          tokensState,
-                                                          transactionState,
-                                                          password);
-                                                    },
-                                                  ),
-                                                  transitionDuration:
-                                                      Duration.zero,
-                                                  reverseTransitionDuration:
-                                                      Duration.zero,
-                                                ),
-                                              );
-                                            }),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
-                                          ),
-                                        );
+                                        PasswordBottomSheet.provideWithPassword(
+                                            context, state.activeAccount!,
+                                            (password) async {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation1,
+                                                      animation2) =>
+                                                  LoaderNew(
+                                                title: appBarTitle,
+                                                secondStepLoaderText: widget
+                                                            .removeLT ==
+                                                        0
+                                                    ? secondStepLoaderTextAdd
+                                                    : secondStepLoaderTextRemove,
+                                                callback: () {
+                                                  submitLiquidityAction(
+                                                      state,
+                                                      tokensState,
+                                                      transactionState,
+                                                      password);
+                                                },
+                                              ),
+                                              transitionDuration: Duration.zero,
+                                              reverseTransitionDuration:
+                                                  Duration.zero,
+                                            ),
+                                          );
+                                        });
                                       })),
                             )
                           ],

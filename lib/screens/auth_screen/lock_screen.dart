@@ -20,7 +20,6 @@ import 'package:hive/hive.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 
 class LockScreen extends StatefulWidget {
-  // final Widget? redirectTo;
   final callback;
 
   const LockScreen({Key? key, this.callback}) : super(key: key);
@@ -168,15 +167,6 @@ class _LockScreenState extends State<LockScreen> {
         );
       } else {
         widget.callback(password);
-        // Navigator.pushReplacement(
-        //   context,
-        //   PageRouteBuilder(
-        //     pageBuilder: (context, animation1, animation2) =>
-        //         widget.redirectTo!,
-        //     transitionDuration: Duration.zero,
-        //     reverseTransitionDuration: Duration.zero,
-        //   ),
-        // );
       }
     } else {
       setState(() {

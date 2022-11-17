@@ -8,21 +8,23 @@ class PasswordField extends StatelessWidget {
   final Function()? onEditComplete;
   final bool obscureText;
   final bool autofocus;
+  final bool isObscureIcon;
 
-  const PasswordField(
-      {Key? key,
-      this.passwordController,
-      this.hintText,
-      this.onChanged,
-      this.onIconPressed,
-      this.onEditComplete,
-      this.obscureText = false,
-      this.autofocus = false})
-      : super(key: key);
+  const PasswordField({
+    Key? key,
+    this.passwordController,
+    this.hintText,
+    this.onChanged,
+    this.onIconPressed,
+    this.onEditComplete,
+    this.obscureText = false,
+    this.autofocus = false,
+    this.isObscureIcon = true,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       autofocus: autofocus,
       textAlignVertical: TextAlignVertical.center,
       obscureText: obscureText,
@@ -30,14 +32,21 @@ class PasswordField extends StatelessWidget {
       controller: passwordController,
       decoration: InputDecoration(
         hintText: hintText,
-        suffixIcon: IconButton(
-          icon: Icon(
-            obscureText ? Icons.visibility : Icons.visibility_off,
-          ),
-          onPressed: onIconPressed,
-        ),
+        suffixIcon: isObscureIcon
+            ? IconButton(
+                icon: Icon(
+                  obscureText ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: onIconPressed,
+              )
+            : null,
       ),
       onChanged: onChanged,
+        validator: (value) {
+          return value == null || value.isEmpty
+              ? 'Please enter password'
+              : null;
+        }
     );
   }
 }

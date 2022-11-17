@@ -23,7 +23,6 @@ class ActionButtonsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(swapTutorialStatus);
     var receiveCallback = () async {
       hideOverlay();
       Navigator.push(
