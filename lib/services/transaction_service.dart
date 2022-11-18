@@ -704,7 +704,7 @@ class TransactionService {
     List<UtxoModel> selectedUTXO = [];
     List<UtxoModel> newUTXO = [];
 
-    if(selectedUTXO.length == 0){
+    if(utxoList.length == 0){
       return TxResponseModel(
           isError: true,
           error: 'Not enough balance. Wait for approval the previous tx',
