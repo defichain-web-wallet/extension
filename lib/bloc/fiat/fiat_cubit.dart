@@ -785,10 +785,19 @@ class FiatCubit extends Cubit<FiatState> {
     }
   }
 
-  Future<String> getAccessToken(AccountModel account, ECPair keyPair) async {
+  Future<String> getAccessToken(
+    AccountModel account,
+    ECPair keyPair, {
+    bool needRefresh = false,
+  }) async {
     try {
-      String accessToken =
-          state.accessToken ?? await dfxRequests.signIn(account, keyPair);
+      late String accessToken;
+      if (needRefresh) {
+        accessToken = await dfxRequests.signIn(account, keyPair);
+      } else {
+        accessToken =
+            state.accessToken ?? await dfxRequests.signIn(account, keyPair);
+      }
       return accessToken;
     } catch (err) {
       throw err;

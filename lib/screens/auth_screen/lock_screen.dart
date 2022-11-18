@@ -147,8 +147,10 @@ class _LockScreenState extends State<LockScreen> {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
         BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
 
-        await accountCubit
-            .restoreAccountFromStorage(SettingsHelper.settings.network!);
+        await accountCubit.restoreAccountFromStorage(
+          SettingsHelper.settings.network!,
+          password: password,
+        );
         if (SettingsHelper.isBitcoin()) {
           await bitcoinCubit
               .loadDetails(accountCubit.state.activeAccount!.bitcoinAddress!);
