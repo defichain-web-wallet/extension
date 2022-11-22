@@ -1103,20 +1103,16 @@ class _SwapScreenState extends State<SwapScreen> {
 
   onFocusToChange() {
     hideOverlay();
-    setState(() {
-      inputToFocus = focusTo.hasFocus;
-    });
-    amountToController.selection = TextSelection.fromPosition(
-        TextPosition(offset: amountToController.text.length));
+    if (amountToController.text == '0') {
+      amountToController.text = '';
+    }
   }
 
   onFocusFromChange() {
     hideOverlay();
-    setState(() {
-      inputFromFocus = focusFrom.hasFocus;
-    });
-    amountFromController.selection = TextSelection.fromPosition(
-        TextPosition(offset: amountFromController.text.length));
+    if (amountFromController.text == '0') {
+      amountFromController.text = '';
+    }
   }
 
   hideOverlay() {

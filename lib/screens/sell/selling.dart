@@ -370,70 +370,22 @@ class _SellingState extends State<Selling> {
                                 PasswordBottomSheet.provideWithPassword(
                                     context, accountState.activeAccount,
                                     (password) async {
-                                  LoaderNew(
-                                    title: appBarTitle,
-                                    secondStepLoaderText: secondStepLoaderText,
-                                    callback: () async {
-                                      try {
-                                        String address;
-                                        double amount = double.parse(
-                                            amountController.text
-                                                .replaceAll(',', '.'));
-                                        IbanModel? foundedIban;
-                                        try {
-                                          foundedIban = fiatState.ibanList
-                                              .firstWhere((el) =>
-                                                  el.active &&
-                                                  el.type == "Sell" &&
-                                                  el.iban ==
-                                                      fiatState
-                                                          .activeIban.iban &&
-                                                  el.fiat.name ==
-                                                      selectedFiat.name);
-                                        } catch (_) {
-                                          print(_);
-                                        }
-                                        String iban = widget.isNewIban
-                                            ? _ibanController.text
-                                            : fiatState.activeIban.iban;
-                                        if (foundedIban == null ||
-                                            widget.isNewIban) {
-                                          Map sellDetails =
-                                              await dfxRequests.sell(
-                                                  iban,
-                                                  selectedFiat,
-                                                  fiatState.accessToken);
-                                          address =
-                                              sellDetails["deposit"]["address"];
-                                        } else {
-                                          address =
-                                              foundedIban.deposit["address"];
-                                        }
-                                        await _sendTransaction(
-                                            context,
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (context, animation1, animation2) =>
+                                              LoaderNew(
+                                        title: appBarTitle,
+                                        secondStepLoaderText:
+                                            secondStepLoaderText,
+                                        callback: () async => _submitSell(
+                                            accountState,
                                             tokensState,
-                                            assetFrom,
-                                            accountState.activeAccount,
-                                            address,
-                                            amount,
-                                            password);
-                                      } catch (err) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              err.toString(),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline5,
-                                            ),
-                                            backgroundColor: Theme.of(context)
-                                                .snackBarTheme
-                                                .backgroundColor,
-                                          ),
-                                        );
-                                      }
-                                    },
+                                            fiatState,
+                                            password),
+                                      ),
+                                    ),
                                   );
                                 });
                               } else {
@@ -477,6 +429,49 @@ class _SellingState extends State<Selling> {
               ],
             ),
           ),
+        ),
+      );
+    }
+  }
+
+  _submitSell(
+    AccountState accountState,
+    TokensState tokensState,
+    FiatState fiatState,
+    String password,
+  ) async {
+    try {
+      String address;
+      double amount = double.parse(amountController.text.replaceAll(',', '.'));
+      IbanModel? foundedIban;
+      try {
+        foundedIban = fiatState.ibanList!.firstWhere((el) =>
+            el.active! &&
+            el.type == "Sell" &&
+            el.iban == fiatState.activeIban!.iban &&
+            el.fiat!.name == selectedFiat.name);
+      } catch (_) {
+        print(_);
+      }
+      String iban =
+          widget.isNewIban ? _ibanController.text : fiatState.activeIban!.iban!;
+      if (foundedIban == null || widget.isNewIban) {
+        Map sellDetails =
+            await dfxRequests.sell(iban, selectedFiat, fiatState.accessToken!);
+        address = sellDetails["deposit"]["address"];
+      } else {
+        address = foundedIban.deposit["address"];
+      }
+      await _sendTransaction(context, tokensState, assetFrom,
+          accountState.activeAccount!, address, amount, password);
+    } catch (err) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            err.toString(),
+            style: Theme.of(context).textTheme.headline5,
+          ),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
         ),
       );
     }

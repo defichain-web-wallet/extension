@@ -53,30 +53,15 @@ class PasswordBottomSheet {
                   obscureText: true,
                   hintText: 'Password',
                   isObscureIcon: false,
+                  onSubmitted: (value) async => onSubmit(
+                    context,
+                    account,
+                    callback,
+                  ),
                 ),
                 PrimaryButton(
                   label: 'Confirm transaction',
-                  callback: () async {
-                    if (_formKey.currentState!.validate()) {
-                      String password = _passwordController.text;
-                      try {
-                        await HDWalletService().getKeypairFromStorage(password, account.index!);
-                        closeSheet(context);
-                        callback(password);
-                      } catch (error) {
-                        closeSheet(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Wrong password',
-                              style: Theme.of(context).textTheme.headline5,
-                            ),
-                            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-                          ),
-                        );
-                      }
-                    }
-                  },
+                  callback: () async => onSubmit(context, account, callback),
                 ),
               ],
             ),
@@ -86,7 +71,33 @@ class PasswordBottomSheet {
     );
   }
 
-  static void closeSheet(BuildContext context) {
+  static onSubmit(
+    BuildContext context,
+    AccountModel account,
+    Function(String) callback,
+  ) async {
+    if (_formKey.currentState!.validate()) {
+      String password = _passwordController.text;
+      try {
+        await HDWalletService().getKeypairFromStorage(password, account.index!);
+        closeSheet(context);
+        callback(password);
+      } catch (error) {
+        closeSheet(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Wrong password',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+          ),
+        );
+      }
+    }
+  }
+
+  static closeSheet(BuildContext context) {
     _passwordController.text = '';
     Navigator.pop(context);
   }

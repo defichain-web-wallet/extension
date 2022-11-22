@@ -6,6 +6,7 @@ class PasswordField extends StatelessWidget {
   final Function(String text)? onChanged;
   final Function()? onIconPressed;
   final Function()? onEditComplete;
+  final Function(String value)? onSubmitted;
   final bool obscureText;
   final bool autofocus;
   final bool isObscureIcon;
@@ -17,6 +18,7 @@ class PasswordField extends StatelessWidget {
     this.onChanged,
     this.onIconPressed,
     this.onEditComplete,
+    this.onSubmitted,
     this.obscureText = false,
     this.autofocus = false,
     this.isObscureIcon = true,
@@ -26,6 +28,8 @@ class PasswordField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       autofocus: autofocus,
+      maxLines: 1,
+      onFieldSubmitted: onSubmitted,
       textAlignVertical: TextAlignVertical.center,
       obscureText: obscureText,
       onEditingComplete: onEditComplete,
