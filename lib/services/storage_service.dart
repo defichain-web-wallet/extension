@@ -110,13 +110,13 @@ class StorageService {
       box.put(HiveNames.password, encodedPassword);
       //TODO: move functions saveAccountsToStorage and restore from cubit
       await AccountCubit().saveAccountsToStorage(
-          accountsMainnet,
-          masterKeyPairMainnetPublicKey,
-          masterKeyPairMainnet,
-          accountsTestnet,
-          masterKeyPairTestnetPublicKey,
-          masterKeyPairTestnet,
-          mnemonic.split(','),
+          accountsMainnet: accountsMainnet,
+          masterKeyPairMainnetPublicKey: masterKeyPairMainnetPublicKey,
+          masterKeyPairMainnetPrivateKey: masterKeyPairMainnet,
+          accountsTestnet: accountsTestnet,
+          masterKeyPairTestnetPublicKey: masterKeyPairTestnetPublicKey,
+          masterKeyPairTestnetPrivateKey: masterKeyPairTestnet,
+          mnemonic: mnemonic.split(','),
           password: password);
     }
   }

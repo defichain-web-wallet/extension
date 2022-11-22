@@ -82,9 +82,16 @@ class AccountCubit extends Cubit<AccountState> {
 
     String accessToken = await fiatCubit.getAccessToken(accountMainnet, masterKeyPairMainnetPrivateKey);
     accountMainnet.accessToken = accessToken;
-    await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnetPublicKey, masterKeyPairMainnet,
-        accountsTestnet, masterKeyPairTestnetPublicKey, masterKeyPairTestnet, mnemonic,
-        password: password);
+    await saveAccountsToStorage(
+      accountsMainnet: accountsMainnet,
+      masterKeyPairMainnetPublicKey: masterKeyPairMainnetPublicKey,
+      masterKeyPairMainnetPrivateKey: masterKeyPairMainnet,
+      accountsTestnet: accountsTestnet,
+      masterKeyPairTestnetPublicKey: masterKeyPairTestnetPublicKey,
+      masterKeyPairTestnetPrivateKey: masterKeyPairTestnet,
+      mnemonic: mnemonic,
+      password: password,
+    );
 
     try {
       emit(state.copyWith(
@@ -113,15 +120,16 @@ class AccountCubit extends Cubit<AccountState> {
     restoreAccountFromStorage(SettingsHelper.settings.network!);
   }
 
-  saveAccountsToStorage(
-      List<AccountModel>? accountsMainnet,
-      bip32.BIP32? masterKeyPairMainnetPublicKey,
-      bip32.BIP32? masterKeyPairMainnetPrivateKey,
-      List<AccountModel>? accountsTestnet,
-      bip32.BIP32? masterKeyPairTestnetPublicKey,
-      bip32.BIP32? masterKeyPairTestnetPrivateKey,
-      List<String>? mnemonic,
-      {String password = ""}) async {
+  saveAccountsToStorage({
+    List<AccountModel>? accountsMainnet,
+    bip32.BIP32? masterKeyPairMainnetPublicKey,
+    bip32.BIP32? masterKeyPairMainnetPrivateKey,
+    List<AccountModel>? accountsTestnet,
+    bip32.BIP32? masterKeyPairTestnetPublicKey,
+    bip32.BIP32? masterKeyPairTestnetPrivateKey,
+    List<String>? mnemonic,
+    String password = "",
+  }) async {
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     final accountsJson = [];
     final accountsJsonTestnet = [];
@@ -135,13 +143,28 @@ class AccountCubit extends Cubit<AccountState> {
       var jsonString = json.encode(accountsJson);
       var encryptedAccounts = stringToBase64.encode(jsonString);
       await box.put(HiveNames.accountsMainnet, encryptedAccounts);
-      var encryptedMasterKeyPairPublic = stringToBase64.encode(masterKeyPairMainnetPublicKey!.toBase58());
-      await box.put(HiveNames.masterKeyPairMainnetPublic, encryptedMasterKeyPairPublic);
+
+      if (masterKeyPairMainnetPublicKey != null) {
+        var encryptedMasterKeyPairPublic = stringToBase64.encode(
+          masterKeyPairMainnetPublicKey.toBase58(),
+        );
+        await box.put(
+          HiveNames.masterKeyPairMainnetPublic,
+          encryptedMasterKeyPairPublic,
+        );
+      }
+
       if (password != '') {
-        var encryptedMasterKey =
-        encryptHelper.getEncryptedData(masterKeyPairMainnetPrivateKey!.toBase58(), password);
-        await box.put(HiveNames.masterKeyPairMainnetPrivate, encryptedMasterKey);
-        if(mnemonic != null){
+        var encryptedMasterKey = encryptHelper.getEncryptedData(
+          masterKeyPairMainnetPrivateKey!.toBase58(),
+          password,
+        );
+        await box.put(
+          HiveNames.masterKeyPairMainnetPrivate,
+          encryptedMasterKey,
+        );
+
+        if (mnemonic != null) {
           var encryptMnemonic =
           encryptHelper.getEncryptedData(mnemonic.join(','), password);
           await box.put(HiveNames.savedMnemonic, encryptMnemonic);
@@ -157,13 +180,26 @@ class AccountCubit extends Cubit<AccountState> {
       var jsonStringTestnet = json.encode(accountsJsonTestnet);
       var encryptedAccounts = stringToBase64.encode(jsonStringTestnet);
       await box.put(HiveNames.accountsTestnet, encryptedAccounts);
-      var encryptedMasterKeyPairPublic = stringToBase64.encode(masterKeyPairTestnetPublicKey!.toBase58());
-      await box.put(HiveNames.masterKeyPairTestnetPublic, encryptedMasterKeyPairPublic);
+
+      if (masterKeyPairTestnetPublicKey != null) {
+        var encryptedMasterKeyPairPublic = stringToBase64.encode(
+          masterKeyPairTestnetPublicKey.toBase58(),
+        );
+        await box.put(
+          HiveNames.masterKeyPairTestnetPublic,
+          encryptedMasterKeyPairPublic,
+        );
+      }
 
       if (password != '') {
-        var encryptedMasterKey =
-        encryptHelper.getEncryptedData(masterKeyPairTestnetPrivateKey!.toBase58(), password);
-        await box.put(HiveNames.masterKeyPairTestnetPrivate, encryptedMasterKey);
+        var encryptedMasterKey = encryptHelper.getEncryptedData(
+          masterKeyPairTestnetPrivateKey!.toBase58(),
+          password,
+        );
+        await box.put(
+          HiveNames.masterKeyPairTestnetPrivate,
+          encryptedMasterKey,
+        );
       }
     }
     await box.put(HiveNames.storageVersion, '1');
@@ -267,9 +303,15 @@ class AccountCubit extends Cubit<AccountState> {
     accounts.add(account);
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(null, null, null, accounts, state.masterKeyPairPublicKey, null, null);
+      await saveAccountsToStorage(
+        accountsTestnet: accounts,
+        masterKeyPairMainnetPublicKey: state.masterKeyPairPublicKey,
+      );
     } else {
-      await saveAccountsToStorage(accounts, state.masterKeyPairPublicKey, null, null, null, null, null);
+      await saveAccountsToStorage(
+        accountsMainnet: accounts,
+        masterKeyPairTestnetPublicKey: state.masterKeyPairPublicKey,
+      );
     }
 
     emit(state.copyWith(
@@ -332,9 +374,16 @@ class AccountCubit extends Cubit<AccountState> {
         String accessToken = await fiatCubit.getAccessToken(account, masterKeyPairMainnetPrivateKey);
         account.accessToken = accessToken;
       }
-      await saveAccountsToStorage(accountsMainnet, masterKeyPairMainnetPublicKey, masterKeyPairMainnet,
-          accountsTestnet, masterKeyPairTestnetPublicKey, masterKeyPairTestnet, mnemonic,
-          password: password);
+      await saveAccountsToStorage(
+        accountsMainnet: accountsMainnet,
+        masterKeyPairMainnetPublicKey: masterKeyPairMainnetPublicKey,
+        masterKeyPairMainnetPrivateKey: masterKeyPairMainnet,
+        accountsTestnet: accountsTestnet,
+        masterKeyPairTestnetPublicKey: masterKeyPairTestnetPublicKey,
+        masterKeyPairTestnetPrivateKey: masterKeyPairTestnet,
+        mnemonic: mnemonic,
+        password: password,
+      );
 
       emit(state.copyWith(
         status: AccountStatusList.success,
@@ -408,6 +457,18 @@ class AccountCubit extends Cubit<AccountState> {
         }
       }
       accounts.add(accountModel);
+
+      if (SettingsHelper.settings.network! == testnet) {
+        await saveAccountsToStorage(
+          accountsTestnet: accounts,
+          masterKeyPairTestnetPublicKey: state.masterKeyPairPublicKey,
+        );
+      } else {
+        await saveAccountsToStorage(
+          accountsMainnet: accounts,
+          masterKeyPairMainnetPublicKey: state.masterKeyPairPublicKey,
+        );
+      }
     }
 
     var accountList = await loadAccountDetails(accounts);
@@ -417,9 +478,9 @@ class AccountCubit extends Cubit<AccountState> {
 
     if(needToStoreBTCAddress){
       if (SettingsHelper.settings.network! == 'testnet') {
-        await saveAccountsToStorage(null, null, null, accounts, null, null, null);
+        await saveAccountsToStorage(accountsTestnet: accounts);
       } else {
-        await saveAccountsToStorage(accounts, null, null, null, null, null, null);
+        await saveAccountsToStorage(accountsMainnet: accounts);
       }
     }
     await box.close();
@@ -489,9 +550,9 @@ class AccountCubit extends Cubit<AccountState> {
     activeAccount.balanceList!.add(newBalance);
 
     if (SettingsHelper.settings.network! == testnet) {
-      await saveAccountsToStorage(null, null, null, state.accounts, null, null, null);
+      await saveAccountsToStorage(accountsTestnet: state.accounts);
     } else {
-      await saveAccountsToStorage(state.accounts, null, null, null, null, null, null);
+      await saveAccountsToStorage(accountsMainnet: state.accounts);
     }
 
     emit(state.copyWith(
