@@ -54,7 +54,7 @@ class StorageService {
       final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(
           masterKeyPairMainnet.publicKey, masterKeyPairMainnet.chainCode);
 
-    var savedAccounts = box.get(HiveNames.accountsMainnet);
+    var savedAccounts = await box.get(HiveNames.accountsMainnet);
       var decryptedAccounts =
       EncryptHelper().getDecryptedData(savedAccounts, password);
 
@@ -84,7 +84,7 @@ class StorageService {
       final masterKeyPairTestnetPublicKey = bip32.BIP32.fromPublicKey(
           masterKeyPairTestnet.publicKey, masterKeyPairTestnet.chainCode);
 
-       savedAccounts = box.get(HiveNames.accountsTestnet);
+       savedAccounts = await box.get(HiveNames.accountsTestnet);
        decryptedAccounts =
       EncryptHelper().getDecryptedData(savedAccounts, password);
 
@@ -105,19 +105,25 @@ class StorageService {
       accountList = await AccountCubit().loadAccountDetails(accountsTestnet);
       accountsTestnet = accountList;
       //testnet end
-      box.delete(HiveNames.masterKeyPairTestnet);
-      box.delete(HiveNames.masterKeyPairMainnet);
-      box.put(HiveNames.password, encodedPassword);
+      await box.delete(HiveNames.masterKeyPairTestnet);
+      await box.delete(HiveNames.masterKeyPairMainnet);
+      await box.put(HiveNames.password, encodedPassword);
+      await box.close();
       //TODO: move functions saveAccountsToStorage and restore from cubit
       await AccountCubit().saveAccountsToStorage(
-          accountsMainnet: accountsMainnet,
-          masterKeyPairMainnetPublicKey: masterKeyPairMainnetPublicKey,
-          masterKeyPairMainnetPrivateKey: masterKeyPairMainnet,
-          accountsTestnet: accountsTestnet,
-          masterKeyPairTestnetPublicKey: masterKeyPairTestnetPublicKey,
-          masterKeyPairTestnetPrivateKey: masterKeyPairTestnet,
-          mnemonic: mnemonic.split(','),
-          password: password);
+        accountsMainnet: accountsMainnet,
+        masterKeyPairMainnetPublicKey: masterKeyPairMainnetPublicKey,
+        masterKeyPairMainnetPrivateKey: masterKeyPairMainnet,
+        accountsTestnet: accountsTestnet,
+        masterKeyPairTestnetPublicKey: masterKeyPairTestnetPublicKey,
+        masterKeyPairTestnetPrivateKey: masterKeyPairTestnet,
+        mnemonic: mnemonic.split(','),
+        password: password,
+      );
+    }
+
+    if (storageVersion == null) {
+      throw Error.safeToString('need_password');
     }
   }
 }
