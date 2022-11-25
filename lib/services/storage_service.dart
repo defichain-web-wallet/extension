@@ -120,9 +120,8 @@ class StorageService {
         mnemonic: mnemonic.split(','),
         password: password,
       );
-    }
 
-    if (storageVersion == null) {
+      // hack for update storage to existing users
       throw Error.safeToString('need_password');
     }
   }
