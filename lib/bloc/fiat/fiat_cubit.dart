@@ -816,7 +816,11 @@ class FiatCubit extends Cubit<FiatState> {
       for (var account in accountsList) {
         AccountModel accountModel = AccountModel.fromJson(account);
         if (accountModel.index == activeAccount.index) {
-          accessToken = accountModel.accessToken!;
+          if (accountModel.accessToken!.isNotEmpty) {
+            accessToken = accountModel.accessToken!;
+          } else {
+            accessToken = accountsList[0]['accessToken'];
+          }
         }
       }
       return accessToken;

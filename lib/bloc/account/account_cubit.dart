@@ -108,7 +108,7 @@ class AccountCubit extends Cubit<AccountState> {
     }
   }
 
-  updateAccountDetails({bool isChangeActiveToken = false}) async {
+  updateAccountDetails() async {
     emit(state.copyWith(
       status: AccountStatusList.loading,
       accounts: state.accounts,
@@ -117,7 +117,7 @@ class AccountCubit extends Cubit<AccountState> {
       activeToken: state.activeToken,
     ));
 
-    restoreAccountFromStorage(SettingsHelper.settings.network!);
+    await restoreAccountFromStorage(SettingsHelper.settings.network!);
   }
 
   saveAccountsToStorage({
@@ -457,7 +457,12 @@ class AccountCubit extends Cubit<AccountState> {
         }
       }
       accounts.add(accountModel);
+    }
 
+    var accountList = await loadAccountDetails(accounts);
+    accounts = accountList;
+
+    if (password.isNotEmpty) {
       if (SettingsHelper.settings.network! == testnet) {
         await saveAccountsToStorage(
           accountsTestnet: accounts,
@@ -470,9 +475,6 @@ class AccountCubit extends Cubit<AccountState> {
         );
       }
     }
-
-    var accountList = await loadAccountDetails(accounts);
-    accounts = accountList;
 
     final balances = accounts[0].balanceList!;
 

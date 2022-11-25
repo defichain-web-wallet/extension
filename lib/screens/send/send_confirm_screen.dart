@@ -187,7 +187,6 @@ class _SendConfirmState extends State<SendConfirmScreen> {
 
   submit(state, tokensState) {
     PasswordBottomSheet.provideWithPassword(context, state.activeAccount, (password) {
-      print(state.activeAccount.index);
       Navigator.push(
         context,
         PageRouteBuilder(

@@ -10,6 +10,7 @@ import 'package:defi_wallet/screens/earn_screen/widgets/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
 import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -265,6 +266,15 @@ class _EarnScreenState extends State<EarnScreen> {
                 ),
               );
             });
+          } else if (stakingState.status == StakingStatusList.failure) {
+            return Container(
+              child: Center(
+                child: ErrorPlaceholder(
+                  description: 'Please check again later',
+                  message: 'API is under maintenance',
+                ),
+              ),
+            );
           } else {
             return Loader();
           }
