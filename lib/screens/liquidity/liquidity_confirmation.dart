@@ -5,6 +5,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -13,9 +14,11 @@ import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair_details.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_status.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -279,38 +282,41 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                             ),
                             Expanded(
                               child: Container(
-                                child: PrimaryButton(
-                                    label: submitLabel,
-                                    isCheckLock: false,
-                                    callback: () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              LoaderNew(
-                                            title: appBarTitle,
-                                            secondStepLoaderText: widget
-                                                        .removeLT ==
-                                                    0
-                                                ? secondStepLoaderTextAdd
-                                                : secondStepLoaderTextRemove,
-                                            callback: () {
-                                              submitLiquidityAction(
-                                                state,
-                                                tokensState,
-                                                transactionState,
-                                              );
-                                            },
-                                          ),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
-                                        ),
-                                      );
-                                    }),
-                              ),
-                            ),
+                                  child: PrimaryButton(
+                                      label: submitLabel,
+                                      isCheckLock: false,
+                                      callback: () {
+                                        PasswordBottomSheet.provideWithPassword(
+                                            context, state.activeAccount!,
+                                            (password) async {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation1,
+                                                      animation2) =>
+                                                  LoaderNew(
+                                                title: appBarTitle,
+                                                secondStepLoaderText: widget
+                                                            .removeLT ==
+                                                        0
+                                                    ? secondStepLoaderTextAdd
+                                                    : secondStepLoaderTextRemove,
+                                                callback: () {
+                                                  submitLiquidityAction(
+                                                      state,
+                                                      tokensState,
+                                                      transactionState,
+                                                      password);
+                                                },
+                                              ),
+                                              transitionDuration: Duration.zero,
+                                              reverseTransitionDuration:
+                                                  Duration.zero,
+                                            ),
+                                          );
+                                        });
+                                      })),
+                            )
                           ],
                         ),
                       ),
@@ -327,7 +333,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
     });
   }
 
-  submitLiquidityAction(state, tokensState, transactionState) async {
+  submitLiquidityAction(state, tokensState, transactionState, password) async {
     if (transactionState is TransactionLoadingState) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -343,9 +349,11 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
     try {
       var txser = TransactionService();
       var txError;
-
+      ECPair keyPair = await HDWalletService()
+          .getKeypairFromStorage(password, state.activeAccount.index!);
       if (widget.removeLT != 0) {
         txError = await txser.removeLiqudity(
+            keyPair: keyPair,
             account: state.activeAccount,
             token: widget.assetPair,
             amount: convertToSatoshi(widget.removeLT));
@@ -371,6 +379,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
         );
       } else {
         txError = await txser.createAndSendLiqudity(
+            keyPair: keyPair,
             account: state.activeAccount,
             tokenA: widget.assetPair.tokenA!,
             tokenB: widget.assetPair.tokenB!,
