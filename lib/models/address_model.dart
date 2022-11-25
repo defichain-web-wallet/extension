@@ -10,7 +10,6 @@ class AddressModel {
   int? account;
   bool? isChange;
   int? index;
-  ECPair? keyPair;
   String? blockchain;
 
   AddressModel(
@@ -18,8 +17,7 @@ class AddressModel {
       this.account,
       this.isChange,
       this.index,
-      this.blockchain,
-      this.keyPair});
+      this.blockchain});
 
   AddressModel.fromJson(Map<String, dynamic> json)  {
     this.address = json["address"];
@@ -27,8 +25,6 @@ class AddressModel {
     this.isChange = json["isChange"];
     this.blockchain = json["blockchain"] == null ? 'DFI' : json["blockchain"];
     this.index = json["index"];
-    this.keyPair = hdWalletService.getKeypairFromWIF(
-        json["keyPair"], json["blockchain"] == 'BTC' ? SettingsHelper.settings.network! == 'testnet' ? 'bitcoin_testnet' : 'bitcoin' : SettingsHelper.settings.network!);
   }
 
   Map<String, dynamic> toJson() {
@@ -38,7 +34,6 @@ class AddressModel {
     data["isChange"] = this.isChange;
     data["index"] = this.index;
     data["blockchain"] = this.blockchain;
-    data["keyPair"] = this.keyPair!.toWIF();
     return data;
   }
 }

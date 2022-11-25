@@ -147,7 +147,6 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
                               await box.close();
                               accountCubit
                                   .updateSwapTutorialStatus(swapTutorialStatus);
-                              print(swapTutorialStatus);
                               Navigator.push(
                                 context,
                                 PageRouteBuilder(

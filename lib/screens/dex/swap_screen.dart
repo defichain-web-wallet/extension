@@ -12,8 +12,10 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
@@ -28,6 +30,7 @@ import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -825,42 +828,56 @@ class _SwapScreenState extends State<SwapScreen> {
     }
     if (isNumeric(amountFromController.text)) {
       if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
-        try {
-          BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-
-          var tx = await transactionService.createBTCTransaction(
-            account: state.activeAccount,
-            destinationAddress: cryptoRoute.address!,
-            amount: balancesHelper.toSatoshi(amountFromController.text),
-            satPerByte: bitcoinCubit.state.networkFee!.medium!,
-          );
-          Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ReviewSwapScreen(
-                  assetFrom,
-                  assetTo.replaceAll('d', ''),
-                  double.parse(amountFromController.text),
-                  double.parse(amountToController.text),
-                  slippage,
-                  btcTx: tx,
+        PasswordBottomSheet.provideWithPassword(
+            context, state.activeAccount, (password) async {
+          try {
+            BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(
+                context);
+            ECPair keyPair = await HDWalletService()
+                .getKeypairFromStorage(
+                password, state.activeAccount.index!);
+            var tx = await transactionService.createBTCTransaction(
+              keyPair: keyPair,
+              account: state.activeAccount,
+              destinationAddress: cryptoRoute.address!,
+              amount: balancesHelper.toSatoshi(
+                  amountFromController.text),
+              satPerByte: bitcoinCubit.state.networkFee!.medium!,
+            );
+            Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      ReviewSwapScreen(
+                        assetFrom,
+                        assetTo.replaceAll('d', ''),
+                        double.parse(amountFromController.text),
+                        double.parse(amountToController.text),
+                        slippage,
+                        btcTx: tx,
+                      ),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ));
+          } catch (err) {
+            print(err);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Something went wrong',
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .headline5,
                 ),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ));
-        } catch (err) {
-          print(err);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Something went wrong',
-                style: Theme.of(context).textTheme.headline5,
+                backgroundColor: Theme
+                    .of(context)
+                    .snackBarTheme
+                    .backgroundColor,
               ),
-              backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-            ),
-          );
-        }
+            );
+          }
+        });
       } else {
         Navigator.push(
             context,
@@ -1086,20 +1103,16 @@ class _SwapScreenState extends State<SwapScreen> {
 
   onFocusToChange() {
     hideOverlay();
-    setState(() {
-      inputToFocus = focusTo.hasFocus;
-    });
-    amountToController.selection = TextSelection.fromPosition(
-        TextPosition(offset: amountToController.text.length));
+    if (amountToController.text == '0') {
+      amountToController.text = '';
+    }
   }
 
   onFocusFromChange() {
     hideOverlay();
-    setState(() {
-      inputFromFocus = focusFrom.hasFocus;
-    });
-    amountFromController.selection = TextSelection.fromPosition(
-        TextPosition(offset: amountFromController.text.length));
+    if (amountFromController.text == '0') {
+      amountFromController.text = '';
+    }
   }
 
   hideOverlay() {

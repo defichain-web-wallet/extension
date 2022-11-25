@@ -4,7 +4,9 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
@@ -14,6 +16,7 @@ import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import './widgets/review_details.dart';
@@ -143,25 +146,48 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                             'SWAP',
                             isCheckLock: false,
                             callback: (parent) {
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          LoaderNew(
-                                    title: appBarTitle,
-                                    secondStepLoaderText: secondStepLoaderText,
-                                    callback: () {
-                                      submitSwap(
-                                        state,
-                                        tokensState,
-                                      );
-                                    },
+                              if (widget.btcTx != '') {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            LoaderNew(
+                                      title: appBarTitle,
+                                      secondStepLoaderText:
+                                          secondStepLoaderText,
+                                      callback: () {
+                                        submitSwap(state, tokensState, "");
+                                      },
+                                    ),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
                                   ),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
-                              );
+                                );
+                              } else {
+                                PasswordBottomSheet.provideWithPassword(context,
+                                    state.activeAccount!, (password) async {
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1,
+                                              animation2) =>
+                                              LoaderNew(
+                                                title: appBarTitle,
+                                                secondStepLoaderText:
+                                                secondStepLoaderText,
+                                                callback: () {
+                                                  submitSwap(
+                                                      state, tokensState, password,);
+                                                },
+                                              ),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                          Duration.zero,
+                                        ),
+                                      );
+                                    });
+                              }
                             },
                           );
                         } else {
@@ -177,10 +203,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
         ),
       );
 
-  submitSwap(
-    state,
-    tokenState,
-  ) async {
+  submitSwap(state, tokenState, String password) async {
     if (state.status == AccountStatusList.success) {
       try {
         if (widget.btcTx != '') {
@@ -201,7 +224,10 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
               ));
         }
         if (widget.assetFrom != widget.assetTo) {
+          ECPair keyPair = await HDWalletService()
+              .getKeypairFromStorage(password, state.activeAccount.index!);
           var txResponse = await transactionService.createAndSendSwap(
+              keyPair: keyPair,
               account: state.activeAccount,
               tokenFrom: widget.assetFrom,
               tokenTo: widget.assetTo,
