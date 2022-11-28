@@ -264,23 +264,43 @@ class _StakingConfirmTransactionState extends State<StakingConfirmTransaction> {
                     SizedBox(width: 16),
                     Expanded(
                       child: PrimaryButton(
-                        label: 'Staking',
-                        isCheckLock: false,
-                        callback: () async {
-                          PasswordBottomSheet.provideWithPassword(
-                                context, state.activeAccount, (password) async {
-                              TokensState tokensState =
-                                  BlocProvider.of<TokensCubit>(context).state;
-                              await _sendTransaction(
-                                context,
-                                tokensState,
-                                widget.assetName,
-                                accountState.activeAccount!,
-                                state.depositAddress!,
-                                widget.amount,
-                                password,
-                              );
-                            });
+                          label: 'Staking',
+                          isCheckLock: false,
+                          callback: () async {
+                            isFullSize
+                                ? PasswordBottomSheet
+                                    .provideWithPasswordFullScreen(
+                                        context, state.activeAccount,
+                                        (password) async {
+                                    TokensState tokensState =
+                                        BlocProvider.of<TokensCubit>(context)
+                                            .state;
+                                    await _sendTransaction(
+                                      context,
+                                      tokensState,
+                                      widget.assetName,
+                                      accountState.activeAccount!,
+                                      state.depositAddress!,
+                                      widget.amount,
+                                      password,
+                                    );
+                                  })
+                                : PasswordBottomSheet.provideWithPassword(
+                                    context, state.activeAccount,
+                                    (password) async {
+                                    TokensState tokensState =
+                                        BlocProvider.of<TokensCubit>(context)
+                                            .state;
+                                    await _sendTransaction(
+                                      context,
+                                      tokensState,
+                                      widget.assetName,
+                                      accountState.activeAccount!,
+                                      state.depositAddress!,
+                                      widget.amount,
+                                      password,
+                                    );
+                                  });
                           }),
                     ),
                   ],
@@ -295,18 +315,18 @@ class _StakingConfirmTransactionState extends State<StakingConfirmTransaction> {
       String address, double amount, String password) async {
     TxErrorModel? txResponse;
     try {
-      ECPair keyPair =
-      await HDWalletService().getKeypairFromStorage(password, account.index!);
+      ECPair keyPair = await HDWalletService()
+          .getKeypairFromStorage(password, account.index!);
       if (token == 'DFI') {
         txResponse = await transactionService.createAndSendTransaction(
-          keyPair: keyPair,
+            keyPair: keyPair,
             account: account,
             destinationAddress: address,
             amount: balancesHelper.toSatoshi(amount.toString()),
             tokens: tokensState.tokens);
       } else {
         txResponse = await transactionService.createAndSendToken(
-          keyPair: keyPair,
+            keyPair: keyPair,
             account: account,
             token: token,
             destinationAddress: address,

@@ -14,8 +14,13 @@ import 'package:flutter_svg/svg.dart';
 
 class AccountSelect extends StatefulWidget {
   final double width;
+  final isFullScreen;
 
-  const AccountSelect({Key? key, required this.width}) : super(key: key);
+  const AccountSelect({
+    Key? key,
+    required this.width,
+    this.isFullScreen = false,
+  }) : super(key: key);
 
   @override
   State<AccountSelect> createState() => AccountSelectState();
@@ -205,25 +210,49 @@ class AccountSelectState extends State<AccountSelect> {
                       ),
                       onPressed: () async {
                         hideOverlay();
-                        PasswordBottomSheet.provideWithPassword(context, _activeAccount, (password) async {
-                          AccountModel account =
-                          await accountCubit.addAccount();
-                          if (SettingsHelper.isBitcoin()) {
-                            await bitcoinCubit
-                                .loadDetails(account.bitcoinAddress!);
-                          }
-                          LoggerService.invokeInfoLogg(
-                              'user created new account');
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) =>
-                                  HomeScreen(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),
-                          );
-                        });
+                        widget.isFullScreen
+                            ? PasswordBottomSheet.provideWithPasswordFullScreen(
+                                context, _activeAccount, (password) async {
+                                AccountModel account =
+                                    await accountCubit.addAccount();
+                                if (SettingsHelper.isBitcoin()) {
+                                  await bitcoinCubit
+                                      .loadDetails(account.bitcoinAddress!);
+                                }
+                                LoggerService.invokeInfoLogg(
+                                    'user created new account');
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            HomeScreen(),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ),
+                                );
+                              })
+                            : PasswordBottomSheet.provideWithPassword(
+                                context, _activeAccount, (password) async {
+                                AccountModel account =
+                                    await accountCubit.addAccount();
+                                if (SettingsHelper.isBitcoin()) {
+                                  await bitcoinCubit
+                                      .loadDetails(account.bitcoinAddress!);
+                                }
+                                LoggerService.invokeInfoLogg(
+                                    'user created new account');
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            HomeScreen(),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ),
+                                );
+                              });
                       },
                     );
                   } else {

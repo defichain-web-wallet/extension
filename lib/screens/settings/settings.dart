@@ -104,11 +104,19 @@ class _SettingsState extends State<Settings> {
                                 // if (accountCubit.mnemonic!.length > 0)
                                 ListTile(
                                   onTap: () {
-                                    PasswordBottomSheet.provideWithPassword(
-                                        context, state.activeAccount!,
-                                        (password) async {
-                                      showMnemonic(password);
-                                    });
+                                    isCustomBgColor
+                                        ? PasswordBottomSheet
+                                            .provideWithPasswordFullScreen(
+                                                context, state.activeAccount!,
+                                                (password) async {
+                                            showMnemonic(password);
+                                          })
+                                        : PasswordBottomSheet
+                                            .provideWithPassword(
+                                                context, state.activeAccount!,
+                                                (password) async {
+                                            showMnemonic(password);
+                                          });
                                   },
                                   title: Padding(
                                     padding: const EdgeInsets.only(bottom: 4),

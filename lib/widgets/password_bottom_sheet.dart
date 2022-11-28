@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 class PasswordBottomSheet {
   static double _height = 210;
+  static double _width = 410;
   static TextEditingController _passwordController = TextEditingController();
   static GlobalKey<FormState> _formKey = GlobalKey();
 
@@ -78,20 +79,26 @@ class PasswordBottomSheet {
                     ),
                   ],
                 ),
-                PasswordField(
-                  passwordController: _passwordController,
-                  obscureText: true,
-                  hintText: 'Password',
-                  isObscureIcon: false,
-                  onSubmitted: (value) async => onSubmit(
-                    context,
-                    account,
-                    callback,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                  child: PasswordField(
+                    passwordController: _passwordController,
+                    obscureText: true,
+                    hintText: 'Password',
+                    isObscureIcon: false,
+                    onSubmitted: (value) async => onSubmit(
+                      context,
+                      account,
+                      callback,
+                    ),
                   ),
                 ),
-                PrimaryButton(
-                  label: 'Confirm transaction',
-                  callback: () async => onSubmit(context, account, callback),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                  child: PrimaryButton(
+                    label: 'Confirm transaction',
+                    callback: () async => onSubmit(context, account, callback),
+                  ),
                 ),
               ],
             ),
@@ -112,6 +119,7 @@ class PasswordBottomSheet {
       useRootNavigator: false,
       builder: (BuildContext context) {
         return AlertDialog(
+          contentPadding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(10.0),
@@ -119,17 +127,15 @@ class PasswordBottomSheet {
           ),
           content: Container(
             padding: const EdgeInsets.only(
-              top: 10,
-              bottom: 10,
-              left: 10,
-              right: 10,
+              top: 15,
+              bottom: 25,
+              left: 5,
+              right: 5,
             ),
             height: _height,
+            width: _width,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(10.0),
-                topLeft: Radius.circular(10.0),
-              ),
+              borderRadius: BorderRadius.circular(10),
               color: Theme.of(context).dialogBackgroundColor,
             ),
             child: Form(
@@ -169,20 +175,27 @@ class PasswordBottomSheet {
                       ),
                     ],
                   ),
-                  PasswordField(
-                    passwordController: _passwordController,
-                    obscureText: true,
-                    hintText: 'Password',
-                    isObscureIcon: false,
-                    onSubmitted: (value) async => onSubmit(
-                      context,
-                      account,
-                      callback,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                    child: PasswordField(
+                      passwordController: _passwordController,
+                      obscureText: true,
+                      hintText: 'Password',
+                      isObscureIcon: false,
+                      onSubmitted: (value) async => onSubmit(
+                        context,
+                        account,
+                        callback,
+                      ),
                     ),
                   ),
-                  PrimaryButton(
-                    label: 'Confirm transaction',
-                    callback: () async => onSubmit(context, account, callback),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                    child: PrimaryButton(
+                      label: 'Confirm transaction',
+                      callback: () async =>
+                          onSubmit(context, account, callback),
+                    ),
                   ),
                 ],
               ),
