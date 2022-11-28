@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -11,6 +12,7 @@ import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/requests/btc_requests.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_field.dart';
+import 'package:defi_wallet/screens/ledger/ledger_confirm_send.dart';
 import 'package:defi_wallet/screens/send/send_confirm_screen.dart';
 import 'package:defi_wallet/widgets/send/address_field.dart';
 import 'package:defi_wallet/widgets/send/asset_dropdown.dart';
@@ -23,6 +25,7 @@ import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class SendForm extends StatefulWidget {
   final GlobalKey<AssetSelectState> selectKeyFrom;
@@ -286,6 +289,9 @@ class _SendFormState extends State<SendForm> {
   }
 
   submitToConfirm(state, bitcoinState) async {
+    var box = await Hive.openBox(HiveBoxes.client);
+    var walletType = await box.get(HiveNames.walletType);
+    await box.close();
     widget.hideOverlay();
     TransactionState transactionState =
         BlocProvider.of<TransactionCubit>(context).state;
@@ -321,20 +327,35 @@ class _SendFormState extends State<SendForm> {
         if (double.parse(_amountController.text.replaceAll(',', '.')) <
             amount) {
           widget.hideOverlay();
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SendConfirmScreen(
-                addressController.text,
-                assetFrom,
-                double.parse(_amountController.text.replaceAll(',', '.')),
-                fee: bitcoinState.activeFee,
+          if (walletType == AccountCubit.ledgerWalletType) {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) => LedgerConfirmSend(
+                  addressController.text,
+                  assetFrom,
+                  double.parse(_amountController.text.replaceAll(',', '.')),
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
               ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
+            );
+          } else {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) =>
+                    SendConfirmScreen(
+                      addressController.text,
+                      assetFrom,
+                      double.parse(_amountController.text.replaceAll(',', '.')),
+                      fee: bitcoinState.activeFee,
+                    ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

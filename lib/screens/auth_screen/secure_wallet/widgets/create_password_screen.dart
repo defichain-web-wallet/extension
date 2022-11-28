@@ -5,6 +5,7 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/secure_done_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/screens/ledger/ledger_congratulations.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/fields/password_field.dart';
@@ -267,15 +268,20 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
           }
         }
 
+        late Widget redirectScreen;
+        if (this.widget.walletType == AccountCubit.ledgerWalletType) {
+          redirectScreen = LedgerCongratulations();
+        } else if (widget.showDoneScreen) {
+          redirectScreen = SecureDoneScreen();
+        } else {
+          redirectScreen = HomeScreen(
+            isLoadTokens: true,
+          );
+        }
         Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                widget.showDoneScreen
-                    ? SecureDoneScreen()
-                    : HomeScreen(
-                        isLoadTokens: true,
-                      ),
+            pageBuilder: (context, animation1, animation2) => redirectScreen,
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ),
@@ -303,12 +309,6 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
     super.initState();
     _confirmPass = TextEditingController();
     _password = TextEditingController();
-
-    _password.text = "Qwerty123";
-    _confirmPass.text = "Qwerty123";
-
-    password = "Qwerty123";
-    confirmPassword = "Qwerty123";
   }
 
   @override

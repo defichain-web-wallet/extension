@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -12,6 +13,7 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
+import 'package:defi_wallet/screens/ledger/ledger_confirm_swap.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -32,6 +34,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/models/focus_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './widgets/amount_selector_field.dart';
 
@@ -784,6 +787,9 @@ class _SwapScreenState extends State<SwapScreen> {
   submitReviewSwap(parent, state, transactionState, context,
       {CryptoRouteModel? cryptoRoute}) async {
     hideOverlay();
+    var box = await Hive.openBox(HiveBoxes.client);
+    var walletType = await box.get(HiveNames.walletType);
+    await box.close();
     if (SettingsHelper.isBitcoin()) {
       double minDeposit = convertFromSatoshi(cryptoRoute!.minDeposit!);
       if (minDeposit >= double.parse(amountFromController.text)) {
@@ -862,20 +868,37 @@ class _SwapScreenState extends State<SwapScreen> {
           );
         }
       } else {
-        Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  ReviewSwapScreen(
-                assetFrom,
-                assetTo,
-                double.parse(amountFromController.text),
-                double.parse(amountToController.text),
-                slippage,
-              ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ));
+        if (walletType == AccountCubit.ledgerWalletType) {
+          Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) =>
+                    LedgerConfirmSwap(
+                      assetFrom,
+                      assetTo,
+                      double.parse(amountFromController.text),
+                      double.parse(amountToController.text),
+                      slippage,
+                    ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ));
+        } else {
+          Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) =>
+                    ReviewSwapScreen(
+                      assetFrom,
+                      assetTo,
+                      double.parse(amountFromController.text),
+                      double.parse(amountToController.text),
+                      slippage,
+                    ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ));
+        }
       }
     }
   }
