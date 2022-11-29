@@ -23,9 +23,5 @@
     "background": {
         "scripts":  ["background-wrapper.js" ]
     },
-<<<<<<< HEAD
     "manifest_version": 2
-=======
-    "manifest_version": 3
->>>>>>> master
 }
