@@ -64,7 +64,6 @@ class AssetSelectFieldState extends State<AssetSelectField> {
       }
     });
     double tokenBalance = convertFromSatoshi(balance);
-    print(balances);
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(

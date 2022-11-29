@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
+import 'package:defi_wallet/screens/buy/search_buy_token.dart';
 import 'package:defi_wallet/screens/buy/tutorials/first_step_buy_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
@@ -145,13 +146,13 @@ class _ContactScreenState extends State<ContactScreen> {
                                 isBorder: isFullSize,
                                 addressController: _emailController,
                                 validationRule: 'email',
-                                hintText: 'Email address (optional)',
+                                hintText: 'Email address',
                               ),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               CustomTextFormField(
                                 isBorder: isFullSize,
                                 addressController: _phoneController,
-                                hintText: 'Phone number (optional)',
+                                hintText: 'Phone number',
                               ),
                             ],
                           ),
@@ -169,7 +170,7 @@ class _ContactScreenState extends State<ContactScreen> {
                     callback: isEnable
                         ? () async {
                       await _authenticateWithEmailAndPassword(
-                          context, state, accountState);
+                          context, state);
                     }
                         : null,
                   ),
@@ -182,20 +183,20 @@ class _ContactScreenState extends State<ContactScreen> {
     }
   }
 
-  _authenticateWithEmailAndPassword(context, state, accountState) async {
+  _authenticateWithEmailAndPassword(context, state) async {
     if (_formKey.currentState!.validate()) {
       FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
       await fiatCubit.createUser(
         _emailController.text,
         _phoneController.text,
-        accountState.accessToken,
+        state.accessToken,
       );
       Navigator.push(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) =>
-              FirstStepBuyScreen(),
+              SearchBuyToken(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),

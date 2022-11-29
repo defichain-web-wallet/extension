@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const double leadingWidth = 120;
   static const double toolbarHeight = 55;
-  static const double accountSelectSmallHeight = 220;
+  static const double accountSelectSmallHeight = 170;
   static const double accountSelectMediumHeight = 270;
 
   final GlobalKey<AccountSelectState>? selectKey;

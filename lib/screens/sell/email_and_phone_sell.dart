@@ -41,46 +41,42 @@ class _EmailAndPhoneSellState extends State<EmailAndPhoneSell> {
   Widget build(BuildContext context) {
     return BlocBuilder<FiatCubit, FiatState>(
       builder: (context, fiatState) {
-        return BlocBuilder<AccountCubit, AccountState>(
-            builder: (context, state) {
-              if (fiatState.email != null) {
-                _emailController.text = fiatState.email!;
+        if (fiatState.email != null) {
+          _emailController.text = fiatState.email!;
+        }
+        if (fiatState.phone != null) {
+          _phoneController.text = fiatState.phone!;
+        }
+        return ScaffoldConstrainedBox(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < ScreenSizes.medium) {
+                return Scaffold(
+                  appBar: MainAppBar(
+                    title: '4/4',
+                  ),
+                  body: _buildBody(fiatState),
+                );
+              } else {
+                return Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Scaffold(
+                    appBar: MainAppBar(
+                      title: '4/4',
+                      isSmall: true,
+                    ),
+                    body: _buildBody(fiatState, isFullSize: true),
+                  ),
+                );
               }
-              if (fiatState.phone != null) {
-                _phoneController.text = fiatState.phone!;
-              }
-              return ScaffoldConstrainedBox(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (constraints.maxWidth < ScreenSizes.medium) {
-                      return Scaffold(
-                        appBar: MainAppBar(
-                          title: '4/4',
-                        ),
-                        body: _buildBody(state),
-                      );
-                    } else {
-                      return Container(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Scaffold(
-                          appBar: MainAppBar(
-                            title: '4/4',
-                            isSmall: true,
-                          ),
-                          body: _buildBody(state, isFullSize: true),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              );
-            }
+            },
+          ),
         );
       },
     );
   }
 
-  Widget _buildBody(state, {isFullSize = false}) => Container(
+  Widget _buildBody(fiatState, {isFullSize = false}) => Container(
     color: Theme.of(context).dialogBackgroundColor,
     padding:
     const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
@@ -130,7 +126,7 @@ class _EmailAndPhoneSellState extends State<EmailAndPhoneSell> {
                           CustomTextFormField(
                             isBorder: isFullSize,
                             addressController: _phoneController,
-                            hintText: 'Phone number (optional)',
+                            hintText: 'Phone number',
                           ),
                         ],
                       ),
@@ -142,7 +138,7 @@ class _EmailAndPhoneSellState extends State<EmailAndPhoneSell> {
             PrimaryButton(
               label: 'OK',
               callback: () {
-                _authenticateWithEmail(context, state);
+                _authenticateWithEmail(context, fiatState);
               },
             ),
           ],
@@ -150,14 +146,14 @@ class _EmailAndPhoneSellState extends State<EmailAndPhoneSell> {
       ),
     ),
   );
-  _authenticateWithEmail(context, state) async {
+  _authenticateWithEmail(context, fiatState) async {
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
     if (_formKey.currentState!.validate()) {
 
       await fiatCubit.createUser(
         _emailController.text,
         _phoneController.text,
-        state.accessToken,
+        fiatState.accessToken,
       );
       var box = await Hive.openBox(HiveBoxes.client);
       String kycStatus = 'skip';

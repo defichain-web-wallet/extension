@@ -34,7 +34,7 @@ class StakingModel {
   });
 
   StakingModel.fromJson(Map<String, dynamic> json) {
-    this.id = json["id"].toInt();
+    this.id = int.parse(json["id"].toString());
     this.active = json["active"];
     this.isInUse = json["isInUse"];
     this.deposit = json["deposit"];

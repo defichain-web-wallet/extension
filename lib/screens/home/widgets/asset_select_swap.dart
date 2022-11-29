@@ -113,7 +113,7 @@ class AssetSelectSwapState extends State<AssetSelectSwap> {
                                 children: [
                                   SvgPicture.asset(
                                     tokenHelper.getImageNameByTokenName(
-                                        widget.selectedToken),
+                                        widget.selectedToken.replaceAll('d', '')),
                                     height: 24,
                                     width: 24,
                                   ),

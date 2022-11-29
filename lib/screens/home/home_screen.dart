@@ -232,6 +232,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             padding: const EdgeInsets.only(bottom: 40),
                             child: ActionButtonsList(
                               hideOverlay: () => hideOverlay(),
+                              swapTutorialStatus: state.swapTutorialStatus,
                             ),
                           ),
                         ],

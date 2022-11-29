@@ -48,7 +48,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           if (state.status == AccountStatusList.success &&
               tokensState.status == TokensStatusList.success) {
             var historyList;
-            DateFormat formatter = DateFormat('yyyy.MM.dd HH:mm');
+            DateFormat formatter = DateFormat('dd-MM-yyyy');
             var balancesHelper = BalancesHelper();
             TokensHelper tokenHelper = TokensHelper();
             HistoryHelper historyHelper = HistoryHelper();
@@ -156,7 +156,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                               style: Theme.of(context).textTheme.headline6,
                             ),
                             Text(
-                              '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 6)} $tokenName',
+                              '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 8)} $tokenName',
                               style: Theme.of(context).textTheme.headline4,
                             ),
                           ],

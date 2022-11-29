@@ -179,7 +179,7 @@ class FiatCubit extends Cubit<FiatState> {
         isShowTutorial: isShowTutorial,
         accessToken: accessToken,
         isKycDataComplete: data['kycDataComplete'],
-        limit: data['depositLimit'],
+        limit: data['tradingLimit']['limit'],
         history: history,
       ));
     } catch (err) {

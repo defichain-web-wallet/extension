@@ -109,7 +109,7 @@ class _LockScreenState extends State<LockScreen> {
                   if (widget.redirectTo == null)
                     InkWell(
                       child: Text(
-                        'or import using Secret Recovery Phrase',
+                        'Forgot password?',
                         style: AppTheme.defiUnderlineText,
                       ),
                       onTap: isEnable

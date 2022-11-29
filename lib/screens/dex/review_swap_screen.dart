@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
@@ -26,7 +27,8 @@ class ReviewSwapScreen extends StatefulWidget {
   final String btcTx;
 
   const ReviewSwapScreen(this.assetFrom, this.assetTo, this.amountFrom,
-      this.amountTo, this.slippage, {this.btcTx = ''});
+      this.amountTo, this.slippage,
+      {this.btcTx = ''});
 
   @override
   _ReviewSwapScreenState createState() => _ReviewSwapScreenState();
@@ -38,6 +40,9 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
   bool isFailed = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+  String secondStepLoaderText =
+      'One second, Jelly is preparing your transaction!';
+  String appBarTitle = 'Swap';
 
   @override
   Widget build(BuildContext context) =>
@@ -49,7 +54,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                 return Scaffold(
                   body: _buildBody(context),
                   appBar: MainAppBar(
-                      title: 'Decentralized Exchange',
+                      title: appBarTitle,
                       isShowBottom: !(state is TransactionInitialState),
                       height: !(state is TransactionInitialState)
                           ? toolbarHeightWithBottom
@@ -61,7 +66,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                   child: Scaffold(
                     body: _buildBody(context, isCustomBgColor: true),
                     appBar: MainAppBar(
-                      title: 'Decentralized Exchange',
+                      title: appBarTitle,
                       action: null,
                       isShowBottom: !(state is TransactionInitialState),
                       height: !(state is TransactionInitialState)
@@ -79,7 +84,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
 
   Widget _buildBody(context, {isCustomBgColor = false}) => Container(
         color: Theme.of(context).dialogBackgroundColor,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
         child: Center(
           child: StretchBox(
             child: Column(
@@ -99,6 +104,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                       amountStyling:
                           balancesHelper.numberStyling(widget.amountFrom),
                       currency: widget.assetFrom,
+                      isBtc: widget.btcTx != '',
                     ),
                     SizedBox(height: 24),
                     Text(
@@ -136,8 +142,27 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                           return PendingButton(
                             'SWAP',
                             isCheckLock: false,
-                            callback: (parent) =>
-                                submitSwap(state, tokensState, parent),
+                            callback: (parent) {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          LoaderNew(
+                                    title: appBarTitle,
+                                    secondStepLoaderText: secondStepLoaderText,
+                                    callback: () {
+                                      submitSwap(
+                                        state,
+                                        tokensState,
+                                      );
+                                    },
+                                  ),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
+                              );
+                            },
                           );
                         } else {
                           return Container();
@@ -152,10 +177,11 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
         ),
       );
 
-  submitSwap(state, tokenState, parent) async {
+  submitSwap(
+    state,
+    tokenState,
+  ) async {
     if (state.status == AccountStatusList.success) {
-      parent.emitPending(true);
-
       try {
         if (widget.btcTx != '') {
           BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
@@ -165,6 +191,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
               PageRouteBuilder(
                 pageBuilder: (context, animation1, animation2) =>
                     SwapStatusScreen(
+                        appBarTitle: appBarTitle,
                         txResponse: txResponse,
                         amount: widget.amountFrom,
                         assetFrom: widget.assetFrom,
@@ -187,6 +214,7 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
                   SwapStatusScreen(
+                      appBarTitle: appBarTitle,
                       txResponse: txResponse,
                       amount: widget.amountFrom,
                       assetFrom: widget.assetFrom,
@@ -201,8 +229,6 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
           isFailed = true;
         });
       }
-
-      parent.emitPending(false);
     }
   }
 }

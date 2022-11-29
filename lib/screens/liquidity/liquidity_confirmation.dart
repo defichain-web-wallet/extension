@@ -12,6 +12,7 @@ import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair_details.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_status.dart';
+import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -50,10 +51,13 @@ class LiquidityConfirmation extends StatefulWidget {
 }
 
 class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
+  String appBarTitle = 'Confirmation';
   String submitLabel = '';
+  String secondStepLoaderTextAdd =
+      'Did you know that DeFiChain is working without smart contracts? It\'s all based on so called custom-transactions. Makes things more secure!';
+  String secondStepLoaderTextRemove =
+      'Do you like Jellywallet? Leave us a review on the Google Store to support us!';
   TokensHelper tokenHelper = TokensHelper();
-  bool isEnable = true;
-  bool isPending = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
 
@@ -65,7 +69,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
           if (constraints.maxWidth < ScreenSizes.medium) {
             return Scaffold(
               appBar: MainAppBar(
-                  title: 'Confirmation',
+                  title: appBarTitle,
                   isShowBottom: !(state is TransactionInitialState),
                   height: !(state is TransactionInitialState)
                       ? toolbarHeightWithBottom
@@ -77,7 +81,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
               padding: const EdgeInsets.only(top: 20),
               child: Scaffold(
                 appBar: MainAppBar(
-                  title: 'Confirmation',
+                  title: appBarTitle,
                   action: null,
                   isShowBottom: !(state is TransactionInitialState),
                   height: !(state is TransactionInitialState)
@@ -266,9 +270,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                               child: Container(
                                 child: AccentButton(
                                   label: 'Cancel',
-                                  callback: isEnable
-                                      ? () => Navigator.of(context).pop()
-                                      : null,
+                                  callback: () => Navigator.of(context).pop(),
                                 ),
                               ),
                             ),
@@ -278,16 +280,35 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
                             Expanded(
                               child: Container(
                                 child: PrimaryButton(
-                                    label:
-                                        isPending ? 'Pending...' : submitLabel,
+                                    label: submitLabel,
                                     isCheckLock: false,
-                                    callback: !isPending
-                                        ? () {
-                                            isEnable = false;
-                                            submitLiquidityAction(
-                                                state, tokensState, transactionState);
-                                          }
-                                        : null),
+                                    callback: () {
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1,
+                                                  animation2) =>
+                                              LoaderNew(
+                                            title: appBarTitle,
+                                            secondStepLoaderText: widget
+                                                        .removeLT ==
+                                                    0
+                                                ? secondStepLoaderTextAdd
+                                                : secondStepLoaderTextRemove,
+                                            callback: () {
+                                              submitLiquidityAction(
+                                                state,
+                                                tokensState,
+                                                transactionState,
+                                              );
+                                            },
+                                          ),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                              Duration.zero,
+                                        ),
+                                      );
+                                    }),
                               ),
                             ),
                           ],
@@ -308,18 +329,13 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
 
   submitLiquidityAction(state, tokensState, transactionState) async {
     if (transactionState is TransactionLoadingState) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'Wait for the previous transaction to complete',
-            style: Theme.of(context)
-                .textTheme
-                .headline5,
+            style: Theme.of(context).textTheme.headline5,
           ),
-          backgroundColor: Theme.of(context)
-              .snackBarTheme
-              .backgroundColor,
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
         ),
       );
       return;
@@ -327,9 +343,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
     try {
       var txser = TransactionService();
       var txError;
-      setState(() {
-        isPending = true;
-      });
+
       if (widget.removeLT != 0) {
         txError = await txser.removeLiqudity(
             account: state.activeAccount,
@@ -384,27 +398,16 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
           ),
         );
       }
-      setState(() {
-        isPending = false;
-      });
     } catch (err) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'Something went wrong. Please, try later',
-            style: Theme.of(context)
-                .textTheme
-                .headline5,
+            style: Theme.of(context).textTheme.headline5,
           ),
-          backgroundColor: Theme.of(context)
-              .snackBarTheme
-              .backgroundColor,
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
         ),
       );
-      setState(() {
-        isPending = false;
-      });
     }
   }
 
