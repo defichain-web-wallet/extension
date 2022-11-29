@@ -67,12 +67,20 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
       title: isSmall
           ? Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              AccountSelect(key: selectKey, width: accountSelectSmallHeight)
+              AccountSelect(
+                key: selectKey,
+                width: accountSelectSmallHeight,
+                isFullScreen: false,
+              )
             ])
           : Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                AccountSelect(key: selectKey, width: accountSelectMediumHeight)
+                AccountSelect(
+                  key: selectKey,
+                  width: accountSelectMediumHeight,
+                  isFullScreen: true,
+                )
               ],
             ),
       actions: [

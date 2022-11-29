@@ -367,27 +367,50 @@ class _SellingState extends State<Selling> {
                             hideOverlay();
                             if (_formKey.currentState!.validate()) {
                               if (isEnough) {
-                                PasswordBottomSheet.provideWithPassword(
-                                    context, accountState.activeAccount,
-                                    (password) async {
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                              LoaderNew(
-                                        title: appBarTitle,
-                                        secondStepLoaderText:
-                                            secondStepLoaderText,
-                                        callback: () async => _submitSell(
-                                            accountState,
-                                            tokensState,
-                                            fiatState,
-                                            password),
-                                      ),
-                                    ),
-                                  );
-                                });
+                                isCustomBgColor
+                                    ? PasswordBottomSheet
+                                        .provideWithPasswordFullScreen(
+                                            context, accountState.activeAccount,
+                                            (password) async {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LoaderNew(
+                                              title: appBarTitle,
+                                              secondStepLoaderText:
+                                                  secondStepLoaderText,
+                                              callback: () async => _submitSell(
+                                                  accountState,
+                                                  tokensState,
+                                                  fiatState,
+                                                  password),
+                                            ),
+                                          ),
+                                        );
+                                      })
+                                    : PasswordBottomSheet.provideWithPassword(
+                                        context, accountState.activeAccount,
+                                        (password) async {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LoaderNew(
+                                              title: appBarTitle,
+                                              secondStepLoaderText:
+                                                  secondStepLoaderText,
+                                              callback: () async => _submitSell(
+                                                  accountState,
+                                                  tokensState,
+                                                  fiatState,
+                                                  password),
+                                            ),
+                                          ),
+                                        );
+                                      });
                               } else {
                                 if (double.parse(amountController.text
                                         .replaceAll(',', '.')) ==

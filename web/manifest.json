@@ -17,8 +17,15 @@
         "default_title": "Jellywallet Beta",
         "default_popup": "/index.html"
     },
+    "storage": {
+        "managed_schema": "schema.json"
+    },
     "background": {
         "scripts":  ["background-wrapper.js" ]
     },
+<<<<<<< HEAD
     "manifest_version": 2
+=======
+    "manifest_version": 3
+>>>>>>> master
 }
