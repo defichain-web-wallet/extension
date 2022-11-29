@@ -65,7 +65,9 @@ class AppTheme {
       iconTheme: IconThemeData(
         color: Colors.black,
       ),
-      textSelectionColor: Color(0xFF7D7D7D),
+      textSelectionTheme: TextSelectionThemeData(
+        selectionColor: Color(0xFF7D7D7D),
+      ),
       textTheme: TextTheme(
         headline1: TextStyle(
             fontSize: 30,
@@ -177,7 +179,9 @@ class AppTheme {
       iconTheme: IconThemeData(
         color: Colors.white,
       ),
-      textSelectionColor: Color(0xFFF0F0F0),
+      textSelectionTheme: TextSelectionThemeData(
+        selectionColor: Color(0xFFF0F0F0),
+      ),
       textTheme: TextTheme(
         headline1: TextStyle(
             fontSize: 30,
