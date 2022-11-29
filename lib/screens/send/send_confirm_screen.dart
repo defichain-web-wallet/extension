@@ -161,6 +161,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                               callback: (parent) => submit(
                                                 state,
                                                 tokensState,
+                                                isFullScreen,
                                               ),
                                             ),
                                           ),
@@ -185,27 +186,50 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         },
       );
 
-  submit(state, tokensState) {
-    PasswordBottomSheet.provideWithPassword(context, state.activeAccount, (password) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => LoaderNew(
-            title: appBarTitle,
-            callback: () async {
-              await submitSend(
-                state,
-                tokensState,
-                password,
-              );
-            },
-            secondStepLoaderText: secondStepLoaderText,
-          ),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
-    });
+  submit(state, tokensState, isFullScreen) {
+    isFullScreen
+        ? PasswordBottomSheet.provideWithPasswordFullScreen(
+            context, state.activeAccount, (password) {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) => LoaderNew(
+                  title: appBarTitle,
+                  callback: () async {
+                    await submitSend(
+                      state,
+                      tokensState,
+                      password,
+                    );
+                  },
+                  secondStepLoaderText: secondStepLoaderText,
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+          })
+        : PasswordBottomSheet.provideWithPassword(context, state.activeAccount,
+            (password) {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) => LoaderNew(
+                  title: appBarTitle,
+                  callback: () async {
+                    await submitSend(
+                      state,
+                      tokensState,
+                      password,
+                    );
+                  },
+                  secondStepLoaderText: secondStepLoaderText,
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+          });
   }
 
   submitSend(state, tokensState, password) async {

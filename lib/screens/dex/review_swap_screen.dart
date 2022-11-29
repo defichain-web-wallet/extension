@@ -165,28 +165,60 @@ class _ReviewSwapScreenState extends State<ReviewSwapScreen> {
                                   ),
                                 );
                               } else {
-                                PasswordBottomSheet.provideWithPassword(context,
-                                    state.activeAccount!, (password) async {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                              animation2) =>
-                                              LoaderNew(
-                                                title: appBarTitle,
-                                                secondStepLoaderText:
-                                                secondStepLoaderText,
-                                                callback: () {
-                                                  submitSwap(
-                                                      state, tokensState, password,);
-                                                },
-                                              ),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                          Duration.zero,
-                                        ),
-                                      );
-                                    });
+                                isCustomBgColor
+                                    ? PasswordBottomSheet
+                                        .provideWithPasswordFullScreen(
+                                            context, state.activeAccount!,
+                                            (password) async {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LoaderNew(
+                                              title: appBarTitle,
+                                              secondStepLoaderText:
+                                                  secondStepLoaderText,
+                                              callback: () {
+                                                submitSwap(
+                                                  state,
+                                                  tokensState,
+                                                  password,
+                                                );
+                                              },
+                                            ),
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
+                                          ),
+                                        );
+                                      })
+                                    : PasswordBottomSheet.provideWithPassword(
+                                        context, state.activeAccount!,
+                                        (password) async {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LoaderNew(
+                                              title: appBarTitle,
+                                              secondStepLoaderText:
+                                                  secondStepLoaderText,
+                                              callback: () {
+                                                submitSwap(
+                                                  state,
+                                                  tokensState,
+                                                  password,
+                                                );
+                                              },
+                                            ),
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
+                                          ),
+                                        );
+                                      });
                               }
                             },
                           );
