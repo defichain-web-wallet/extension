@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
@@ -19,9 +20,9 @@ import 'package:hive/hive.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 
 class LockScreen extends StatefulWidget {
-  final Widget? redirectTo;
+  final callback;
 
-  const LockScreen({Key? key, this.redirectTo}) : super(key: key);
+  const LockScreen({Key? key, this.callback}) : super(key: key);
 
   @override
   _LockScreenState createState() => _LockScreenState();
@@ -53,7 +54,7 @@ class _LockScreenState extends State<LockScreen> {
                     width: 200,
                   ),
                   Text(
-                    widget.redirectTo == null
+                    widget.callback == null
                         ? 'Welcome Back!'
                         : 'Enter password',
                     style: Theme.of(context).textTheme.headline1,
@@ -99,14 +100,14 @@ class _LockScreenState extends State<LockScreen> {
                   StretchBox(
                     maxWidth: ScreenSizes.xSmall,
                     child: PendingButton(
-                      widget.redirectTo == null ? 'Unlock' : 'Continue',
+                      widget.callback == null ? 'Unlock' : 'Continue',
                       isCheckLock: false,
                       globalKey: globalKey,
                       callback: (parent) => _restoreWallet(parent),
                     ),
                   ),
                   SizedBox(height: 20),
-                  if (widget.redirectTo == null)
+                  if (widget.callback == null)
                     InkWell(
                       child: Text(
                         'Forgot password?',
@@ -138,16 +139,18 @@ class _LockScreenState extends State<LockScreen> {
       isEnable = false;
     });
     var box = await Hive.openBox(HiveBoxes.client);
-    var decodedPassword = stringToBase64.decode(box.get(HiveNames.password));
-    if (password == decodedPassword) {
+    var encodedPassword = box.get(HiveNames.password);
+
+    if (Crypt(encodedPassword).match(password)) {
       parent.emitPending(true);
-      if (widget.redirectTo == null) {
+      if (widget.callback == null) {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
         BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-        FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
-        await accountCubit
-            .restoreAccountFromStorage(SettingsHelper.settings.network!);
+        await accountCubit.restoreAccountFromStorage(
+          SettingsHelper.settings.network!,
+          password: password,
+        );
         if (SettingsHelper.isBitcoin()) {
           await bitcoinCubit
               .loadDetails(accountCubit.state.activeAccount!.bitcoinAddress!);
@@ -165,15 +168,7 @@ class _LockScreenState extends State<LockScreen> {
           ),
         );
       } else {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                widget.redirectTo!,
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ),
-        );
+        widget.callback(password);
       }
     } else {
       setState(() {

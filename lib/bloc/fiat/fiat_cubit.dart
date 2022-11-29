@@ -12,6 +12,7 @@ import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -161,7 +162,7 @@ class FiatCubit extends Cubit<FiatState> {
     ));
 
     try {
-      String accessToken = state.accessToken ?? await getAccessToken(account);
+      String accessToken = state.accessToken ?? await getAccessTokenFromStorage(account);
       Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
       List<FiatHistoryModel> history = await dfxRequests.getHistory(accessToken);
 
@@ -183,7 +184,6 @@ class FiatCubit extends Cubit<FiatState> {
         history: history,
       ));
     } catch (err) {
-      lockHelper.lockWallet();
       emit(state.copyWith(
         status: FiatStatusList.failure,
         phone: state.phone,
@@ -740,7 +740,7 @@ class FiatCubit extends Cubit<FiatState> {
       accessToken: state.accessToken,
     ));
     try {
-      String accessToken = state.accessToken ?? await getAccessToken(account);
+      String accessToken = state.accessToken ?? await getAccessTokenFromStorage(account);
       Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
 
       CryptoRouteModel? route;
@@ -785,16 +785,49 @@ class FiatCubit extends Cubit<FiatState> {
     }
   }
 
-  Future<String> getAccessToken(AccountModel account) async {
-    Codec<String, String> stringToBase64 = utf8.fuse(base64);
-    var box = await Hive.openBox(HiveBoxes.client);
-    var encodedPassword = await box.get(HiveNames.password);
-    var password = stringToBase64.decode(encodedPassword);
+  Future<String> getAccessToken(
+    AccountModel account,
+    ECPair keyPair, {
+    bool needRefresh = false,
+  }) async {
     try {
-      String accessToken = await dfxRequests.signIn(account);
-      return encryptHelper.getEncryptedData(accessToken, password);
+      late String accessToken;
+      if (needRefresh) {
+        accessToken = await dfxRequests.signIn(account, keyPair);
+      } else {
+        accessToken =
+            state.accessToken ?? await dfxRequests.signIn(account, keyPair);
+      }
+      return accessToken;
     } catch (err) {
       throw err;
+    }
+  }
+
+  Future<String> getAccessTokenFromStorage(AccountModel activeAccount) async {
+    Codec<String, String> stringToBase64 = utf8.fuse(base64);
+    late String accessToken;
+    var box = await Hive.openBox(HiveBoxes.client);
+
+    try {
+      var accounts = await box.get(HiveNames.accountsMainnet);
+      var decodeAccounts = stringToBase64.decode(accounts);
+      List<dynamic> accountsList = json.decode(decodeAccounts);
+      for (var account in accountsList) {
+        AccountModel accountModel = AccountModel.fromJson(account);
+        if (accountModel.index == activeAccount.index) {
+          if (accountModel.accessToken!.isNotEmpty) {
+            accessToken = accountModel.accessToken!;
+          } else {
+            accessToken = accountsList[0]['accessToken'];
+          }
+        }
+      }
+      return accessToken;
+    } catch (err) {
+      throw err;
+    } finally {
+      await box.close();
     }
   }
 }

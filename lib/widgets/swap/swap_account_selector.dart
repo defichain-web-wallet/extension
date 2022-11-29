@@ -125,7 +125,7 @@ class _SwapAccountSelectorState extends State<SwapAccountSelector> {
                     Text(
                       widget.account.name!,
                       style: Theme.of(context).textTheme.subtitle2!.apply(
-                        color: Theme.of(context).textSelectionColor,
+                        color: Theme.of(context).textSelectionTheme.selectionColor,
                       ),
                     )
                   ],

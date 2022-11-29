@@ -44,7 +44,7 @@ class _ContactScreenState extends State<ContactScreen> {
 
     return BlocBuilder<AccountCubit, AccountState>(
         builder: (BuildContext context, accountState) {
-          fiatCubit.loadUserDetails(accountState.activeAccount!);
+          // fiatCubit.loadUserDetails(accountState.activeAccount!);
           return BlocBuilder<FiatCubit, FiatState>(
         builder: (BuildContext context, state) {
           if (state.email != null) {

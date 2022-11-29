@@ -4,11 +4,9 @@ enum AccountStatusList { initial, loading, success, restore, failure }
 
 class AccountState extends Equatable {
   final AccountStatusList status;
-  final List<String>? mnemonic;
-  final Uint8List? seed;
   final List<AccountModel>? accounts;
   final List<BalanceModel>? balances;
-  final bip32.BIP32? masterKeyPair;
+  final bip32.BIP32? masterKeyPairPublicKey;
   final AccountModel? activeAccount;
   final String? activeToken;
   final String? historyFilterBy;
@@ -19,11 +17,9 @@ class AccountState extends Equatable {
 
   AccountState({
     this.status = AccountStatusList.initial,
-    this.mnemonic,
-    this.seed,
     this.accounts,
     this.balances,
-    this.masterKeyPair,
+    this.masterKeyPairPublicKey,
     this.activeAccount,
     this.activeToken,
     this.historyFilterBy = 'all',
@@ -36,11 +32,9 @@ class AccountState extends Equatable {
   @override
   List<Object?> get props => [
         status,
-        mnemonic,
-        seed,
         accounts,
         balances,
-        masterKeyPair,
+        masterKeyPairPublicKey,
         activeAccount,
         activeToken,
         historyFilterBy,
@@ -56,7 +50,7 @@ class AccountState extends Equatable {
     Uint8List? seed,
     List<AccountModel>? accounts,
     List<BalanceModel>? balances,
-    bip32.BIP32? masterKeyPair,
+    bip32.BIP32? masterKeyPairPublicKey,
     AccountModel? activeAccount,
     String? activeToken,
     String? historyFilterBy,
@@ -67,11 +61,9 @@ class AccountState extends Equatable {
   }) {
     return AccountState(
       status: status ?? this.status,
-      mnemonic: mnemonic ?? this.mnemonic,
-      seed: seed ?? this.seed,
       accounts: accounts ?? this.accounts,
       balances: balances ?? this.balances,
-      masterKeyPair: masterKeyPair ?? this.masterKeyPair,
+      masterKeyPairPublicKey: masterKeyPairPublicKey ?? this.masterKeyPairPublicKey,
       activeAccount: activeAccount ?? this.activeAccount,
       activeToken: activeToken ?? this.activeToken,
       historyFilterBy: historyFilterBy ?? this.historyFilterBy,

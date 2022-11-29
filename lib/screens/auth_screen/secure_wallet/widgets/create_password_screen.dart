@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
@@ -244,8 +245,8 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
       FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
       var box = await Hive.openBox(HiveBoxes.client);
-      box.put(HiveNames.password, stringToBase64.encode(password));
-
+      var encryptedPassword  = Crypt.sha256(password).toString();
+      box.put(HiveNames.password, encryptedPassword);
       parent.emitPending(true);
 
       Future.delayed(const Duration(milliseconds: 500), () async {

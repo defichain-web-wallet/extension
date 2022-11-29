@@ -37,7 +37,6 @@ class BtcRequests {
         data.map((utxo) {
           var utxoModel = UtxoModel();
           utxoModel.address = address.address;
-          utxoModel.keyPair = address.keyPair;
           utxoModel.mintTxId = utxo['tx_hash'];
           utxoModel.mintIndex = utxo['tx_output_n'];
           utxoModel.value = utxo['value'];

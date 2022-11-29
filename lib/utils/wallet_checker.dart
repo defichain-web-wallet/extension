@@ -5,9 +5,11 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/auth_screen/auth_screen.dart';
+import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/secure_wallet_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/create_password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/services/storage_service.dart';
 import 'package:defi_wallet/utils/theme_checker.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:flutter/material.dart';
@@ -28,14 +30,28 @@ class _WalletCheckerState extends State<WalletChecker> {
   @override
   Widget build(BuildContext context) {
     Future<void> checkWallets() async {
+      try {
+        await StorageService.updateExistUsers();
+      } catch (err) {
+        await Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                ThemeChecker(LockScreen()),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      }
+
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
       BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
       var box = await Hive.openBox(HiveBoxes.client);
       var masterKeyPairName;
       if (SettingsHelper.settings.network! == 'testnet') {
-        masterKeyPairName = HiveNames.masterKeyPairTestnet;
+        masterKeyPairName = HiveNames.masterKeyPairTestnetPrivate;
       } else {
-        masterKeyPairName = HiveNames.masterKeyPairMainnet;
+        masterKeyPairName = HiveNames.masterKeyPairMainnetPrivate;
       }
       var masterKeyPair = await box.get(masterKeyPairName);
       var password = await box.get(HiveNames.password);
@@ -46,17 +62,18 @@ class _WalletCheckerState extends State<WalletChecker> {
           await box.get(HiveNames.recoveryMnemonic) != null;
       String? recoveryMnemonic = await box.get(HiveNames.recoveryMnemonic);
 
-      if (password != null) {
-        password = stringToBase64.decode(password);
-      }
       await settingsHelper.loadSettings();
       await box.close();
 
       if (masterKeyPair != null) {
         if (password != null) {
           lockHelper.provideWithLockChecker(context, () async {
-            await accountCubit
-                .restoreAccountFromStorage(SettingsHelper.settings.network!);
+            try {
+              await accountCubit
+                  .restoreAccountFromStorage(SettingsHelper.settings.network!);
+            } catch (err) {
+              print(err);
+            }
             if (SettingsHelper.isBitcoin()) {
               await bitcoinCubit
                   .loadDetails(accountCubit.state.accounts![0].bitcoinAddress!);
@@ -74,8 +91,12 @@ class _WalletCheckerState extends State<WalletChecker> {
             );
           });
         } else {
-          await accountCubit
-              .restoreAccountFromStorage(SettingsHelper.settings.network!);
+          try {
+            await accountCubit
+                .restoreAccountFromStorage(SettingsHelper.settings.network!);
+          } catch (err) {
+            print(err);
+          }
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
