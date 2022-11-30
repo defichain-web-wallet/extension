@@ -64,8 +64,9 @@ class AppTheme {
       ),
       textTheme: TextTheme(
         headline1: TextStyle(
-            fontSize: 30,
+            fontSize: 10,
             fontWeight: FontWeight.normal,
+            color: Colors.red,
             fontFamily: 'IBM Plex Sans'),
         headline2: TextStyle(
             fontSize: 14,

@@ -1,7 +1,8 @@
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/bloc/theme/theme_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
+// import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,17 +20,19 @@ class _ThemeCheckerState extends State<ThemeChecker> {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeState>(builder: (context, state) {
       var theme = MediaQuery.of(context).platformBrightness;
-      var currentTheme;
+      ThemeMode currentTheme;
       if (SettingsHelper.settings.theme == 'Auto') {
         currentTheme =
-            theme == Brightness.dark ? AppTheme.darkTheme : AppTheme.lightTheme;
+            theme == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
       } else {
         currentTheme = SettingsHelper.settings.theme == 'Dark'
-            ? AppTheme.darkTheme
-            : AppTheme.lightTheme;
+            ? ThemeMode.dark
+            : ThemeMode.light;
       }
       return MaterialApp(
-        theme: currentTheme,
+        theme: createLightTheme(),
+        darkTheme: createDarkTheme(),
+        themeMode: currentTheme,
         debugShowCheckedModeBanner: false,
         home: widget.screen,
       );

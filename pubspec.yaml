@@ -74,7 +74,7 @@ dependencies:
 
   encrypt: ^5.0.1
 
-  sentry_flutter: ^6.3.0
+  sentry_flutter: ^6.17.0
 
   percent_indicator: ^4.0.0
 
