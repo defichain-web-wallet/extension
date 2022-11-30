@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ThemeChecker extends StatefulWidget {
   final Widget screen;
+
   const ThemeChecker(this.screen, {Key? key}) : super(key: key);
 
   @override
@@ -20,7 +21,8 @@ class _ThemeCheckerState extends State<ThemeChecker> {
       var theme = MediaQuery.of(context).platformBrightness;
       var currentTheme;
       if (SettingsHelper.settings.theme == 'Auto') {
-        currentTheme = theme == Brightness.dark ? AppTheme.darkTheme : AppTheme.lightTheme;
+        currentTheme =
+            theme == Brightness.dark ? AppTheme.darkTheme : AppTheme.lightTheme;
       } else {
         currentTheme = SettingsHelper.settings.theme == 'Dark'
             ? AppTheme.darkTheme

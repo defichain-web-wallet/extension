@@ -1,5 +1,6 @@
 import 'package:defi_wallet/screens/auth_screen/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/not_secure_screen.dart';
+import 'package:defi_wallet/screens/ui_kit.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
@@ -73,7 +74,7 @@ class AuthScreen extends StatelessWidget {
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation1, animation2) =>
-                              NotSecureScreen(),
+                              UiKit(),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
                         ),

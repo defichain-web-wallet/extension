@@ -10,7 +10,6 @@ class AppTheme {
 
   static const String mainFontFamily = 'IBM Plex Sans';
 
-  // Текст - ссылка в стиле DEFI (розовая с нижним подчеркиванием)
   static TextStyle get defiUnderlineText {
     return TextStyle(
       color: pinkColor,
@@ -77,9 +76,10 @@ class AppTheme {
             fontWeight: FontWeight.normal,
             fontFamily: 'IBM Plex Sans'),
         headline4: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-            fontFamily: 'IBM Plex Sans'),
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          fontFamily: 'IBM Plex Sans',
+        ),
         headline5: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.normal,
@@ -190,9 +190,10 @@ class AppTheme {
             fontWeight: FontWeight.normal,
             fontFamily: 'IBM Plex Sans'),
         headline4: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-            fontFamily: 'IBM Plex Sans'),
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          fontFamily: 'IBM Plex Sans',
+        ),
         headline5: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.normal,
