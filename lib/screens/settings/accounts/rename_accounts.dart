@@ -1,7 +1,6 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/settings/accounts/account_name_text_form.dart';
@@ -88,13 +87,15 @@ class _RenameAccountsState extends State<RenameAccounts> {
                             AccountCubit accountCubit =
                                 BlocProvider.of<AccountCubit>(context);
                             accountCubit.saveAccountsToStorage(
-                                accountsMainnet: state.accounts,);
+                              accountsMainnet: state.accounts,
+                            );
                           }
                           if (SettingsHelper.settings.network == 'testnet') {
                             AccountCubit accountCubit =
                                 BlocProvider.of<AccountCubit>(context);
                             accountCubit.saveAccountsToStorage(
-                              accountsTestnet: state.accounts,);
+                              accountsTestnet: state.accounts,
+                            );
                           }
                         },
                       ),

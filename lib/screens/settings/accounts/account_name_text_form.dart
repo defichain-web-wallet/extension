@@ -42,13 +42,6 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
       widget.onConfirm!(_textEditingController.text);
   }
 
-  // void _onEdit() => setState(() {
-  //       _focusNode.requestFocus();
-  //       _textEditingController.selection = TextSelection(
-  //           baseOffset: 0, extentOffset: _textEditingController.text.length);
-  //       showConfirmButton = true;
-  //     });
-
   @override
   void dispose() {
     _textEditingController.dispose();
