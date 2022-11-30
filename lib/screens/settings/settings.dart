@@ -5,11 +5,12 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/settings_model.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/settings/preview_seed.dart';
+import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/modal_dialog.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -100,46 +101,42 @@ class _SettingsState extends State<Settings> {
                                 SizedBox(
                                   height: 6,
                                 ),
-                                if (accountCubit.mnemonic!.length > 0)
-                                  ListTile(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              LockScreen(
-                                            redirectTo: PreviewSeed(
-                                              mnemonic: accountCubit.mnemonic!,
-                                            ),
-                                          ),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
-                                        ),
-                                      );
-                                    },
-                                    title: Padding(
-                                      padding: const EdgeInsets.only(bottom: 4),
-                                      child: Text(
-                                        'Recovery seed',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline3,
-                                      ),
-                                    ),
-                                    subtitle:
-                                        Text('Click to show recovery seed'),
-                                  )
-                                else
-                                  Container(
-                                    padding: const EdgeInsets.only(top: 12),
+                                // if (accountCubit.mnemonic!.length > 0)
+                                ListTile(
+                                  onTap: () {
+                                    isCustomBgColor
+                                        ? PasswordBottomSheet
+                                            .provideWithPasswordFullScreen(
+                                                context, state.activeAccount!,
+                                                (password) async {
+                                            showMnemonic(password);
+                                          })
+                                        : PasswordBottomSheet
+                                            .provideWithPassword(
+                                                context, state.activeAccount!,
+                                                (password) async {
+                                            showMnemonic(password);
+                                          });
+                                  },
+                                  title: Padding(
+                                    padding: const EdgeInsets.only(bottom: 4),
                                     child: Text(
-                                      'To access this feature, you need to reinstall the wallet.',
+                                      'Recovery seed',
                                       style:
-                                          Theme.of(context).textTheme.headline4,
+                                          Theme.of(context).textTheme.headline3,
                                     ),
                                   ),
+                                  subtitle: Text('Click to show recovery seed'),
+                                ),
+                                // else
+                                //   Container(
+                                //     padding: const EdgeInsets.only(top: 12),
+                                //     child: Text(
+                                //       'To access this feature, you need to reinstall the wallet.',
+                                //       style:
+                                //           Theme.of(context).textTheme.headline4,
+                                //     ),
+                                //   ),
                                 SizedBox(
                                   height: 6,
                                 ),
@@ -321,6 +318,20 @@ class _SettingsState extends State<Settings> {
         return Loader();
       }
     });
+  }
+
+  showMnemonic(password) async {
+    var mnemonic = await getMnemonic(password);
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) => PreviewSeed(
+          mnemonic: mnemonic,
+        ),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
   }
 
   submit() async {

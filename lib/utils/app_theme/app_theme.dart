@@ -51,9 +51,7 @@ class AppTheme {
       scaffoldBackgroundColor: Color(0xffEDEDED),
       dialogBackgroundColor: Color(0xffFAFAFA),
       primaryColorLight: Color(0xFF5D5D5D),
-
       selectedRowColor: Color(0xFFFAFAFA),
-
       shadowColor: Colors.grey[300]!,
       cardColor: Colors.white,
       backgroundColor: Colors.white,
@@ -65,7 +63,6 @@ class AppTheme {
       iconTheme: IconThemeData(
         color: Colors.black,
       ),
-      textSelectionColor: Color(0xFF7D7D7D),
       textTheme: TextTheme(
         headline1: TextStyle(
             fontSize: 30,
@@ -152,6 +149,8 @@ class AppTheme {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
+      textSelectionTheme:
+          TextSelectionThemeData(selectionColor: Color(0xFF7D7D7D)),
     );
   }
 
@@ -177,7 +176,6 @@ class AppTheme {
       iconTheme: IconThemeData(
         color: Colors.white,
       ),
-      textSelectionColor: Color(0xFFF0F0F0),
       textTheme: TextTheme(
         headline1: TextStyle(
             fontSize: 30,
@@ -263,6 +261,8 @@ class AppTheme {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
+      textSelectionTheme:
+          TextSelectionThemeData(selectionColor: Color(0xFFF0F0F0)),
     );
   }
 }

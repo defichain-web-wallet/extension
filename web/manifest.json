@@ -17,6 +17,9 @@
         "default_popup": "index.html",
         "default_icon": "/icons/jelly_logo.png"
     },
+    "storage": {
+        "managed_schema": "schema.json"
+    },
     "background": {
         "service_worker": "background-wrapper.js"
     },

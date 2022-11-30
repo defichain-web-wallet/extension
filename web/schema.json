@@ -1,0 +1,105 @@
+{
+  "type": "object",
+  "properties": {
+    "accounts_mainnet": {
+      "type": "string"
+    },
+    "accounts_testnet": {
+      "type": "string"
+    },
+    "kyc_status": {
+      "type": "string"
+    },
+    "master_key_pair_mainnet_private": {
+      "type": "string"
+    },"master_key_pair_mainnet_public": {
+      "type": "string"
+    },
+    "master_key_pair_testnet_private": {
+      "type": "string"
+    },
+    "master_key_pair_testnet_public": {
+      "type": "string"
+    },
+    "open_time": {
+      "type": "integer"
+    },"opened_mnemonic": {
+      "type": "boolean"
+    },
+    "password": {
+      "type": "string"
+    },
+    "recovery_mnemonic": {
+      "type": "string"
+    },"saved_mnemonic": {
+      "type": "string"
+    },
+    "storage_version": {
+      "type": "string"
+    },
+    "swap_tutorial_status": {
+      "type": "string"
+    },
+    "tutorial_status": {
+      "type": "string"
+    },
+    "poolpairsMainnet": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "poolpairsTestnet": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "rates": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "tokensMainnet": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "tokensTestnet": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "settings": {
+      "type": "string"
+    }
+  }
+}

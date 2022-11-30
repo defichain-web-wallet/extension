@@ -62,10 +62,24 @@ class _SelectPoolState extends State<SelectPool> {
   void initState() {
     super.initState();
     TokensState tokensState = BlocProvider.of<TokensCubit>(context).state;
+    _focusBase.addListener(onFocusBaseField);
+    _focusQuote.addListener(onFocusQuoteField);
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       _setShareOfPool();
       _setAmount(tokensState);
     });
+  }
+
+  onFocusBaseField() {
+    if (_amountBaseController.text == '0') {
+      _amountBaseController.text = '';
+    }
+  }
+
+  onFocusQuoteField() {
+    if (_amountQuoteController.text == '0') {
+      _amountQuoteController.text = '';
+    }
   }
 
   @override

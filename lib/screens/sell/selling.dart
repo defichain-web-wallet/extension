@@ -16,6 +16,7 @@ import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
 import 'package:defi_wallet/screens/dex/widgets/amount_selector_field.dart';
 import 'package:defi_wallet/screens/sell/sell_initiated.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -23,11 +24,13 @@ import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
+import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/selectors/currency_selector.dart';
 import 'package:defi_wallet/widgets/selectors/iban_selector.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
@@ -364,81 +367,50 @@ class _SellingState extends State<Selling> {
                             hideOverlay();
                             if (_formKey.currentState!.validate()) {
                               if (isEnough) {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            LoaderNew(
-                                      title: appBarTitle,
-                                      secondStepLoaderText:
-                                          secondStepLoaderText,
-                                      callback: () async {
-                                        try {
-                                          String address;
-                                          double amount = double.parse(
-                                              amountController.text
-                                                  .replaceAll(',', '.'));
-                                          IbanModel? foundedIban;
-                                          try {
-                                            foundedIban = fiatState.ibanList
-                                                .firstWhere((el) =>
-                                                    el.active &&
-                                                    el.type == "Sell" &&
-                                                    el.iban ==
-                                                        fiatState
-                                                            .activeIban.iban &&
-                                                    el.fiat.name ==
-                                                        selectedFiat.name);
-                                          } catch (_) {
-                                            print(_);
-                                          }
-                                          String iban = widget.isNewIban
-                                              ? _ibanController.text
-                                              : fiatState.activeIban.iban;
-                                          if (foundedIban == null ||
-                                              widget.isNewIban) {
-                                            Map sellDetails =
-                                                await dfxRequests.sell(
-                                                    iban,
-                                                    selectedFiat,
-                                                    fiatState.accessToken);
-                                            address = sellDetails["deposit"]
-                                                ["address"];
-                                          } else {
-                                            address =
-                                                foundedIban.deposit["address"];
-                                          }
-                                          await _sendTransaction(
-                                            context,
-                                            tokensState,
-                                            assetFrom,
-                                            accountState.activeAccount,
-                                            address,
-                                            amount,
-                                          );
-                                        } catch (err) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                err.toString(),
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5,
-                                              ),
-                                              backgroundColor: Theme.of(context)
-                                                  .snackBarTheme
-                                                  .backgroundColor,
+                                isCustomBgColor
+                                    ? PasswordBottomSheet
+                                        .provideWithPasswordFullScreen(
+                                            context, accountState.activeAccount,
+                                            (password) async {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LoaderNew(
+                                              title: appBarTitle,
+                                              secondStepLoaderText:
+                                                  secondStepLoaderText,
+                                              callback: () async => _submitSell(
+                                                  accountState,
+                                                  tokensState,
+                                                  fiatState,
+                                                  password),
                                             ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                );
+                                          ),
+                                        );
+                                      })
+                                    : PasswordBottomSheet.provideWithPassword(
+                                        context, accountState.activeAccount,
+                                        (password) async {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                LoaderNew(
+                                              title: appBarTitle,
+                                              secondStepLoaderText:
+                                                  secondStepLoaderText,
+                                              callback: () async => _submitSell(
+                                                  accountState,
+                                                  tokensState,
+                                                  fiatState,
+                                                  password),
+                                            ),
+                                          ),
+                                        );
+                                      });
                               } else {
                                 if (double.parse(amountController.text
                                         .replaceAll(',', '.')) ==
@@ -485,6 +457,49 @@ class _SellingState extends State<Selling> {
     }
   }
 
+  _submitSell(
+    AccountState accountState,
+    TokensState tokensState,
+    FiatState fiatState,
+    String password,
+  ) async {
+    try {
+      String address;
+      double amount = double.parse(amountController.text.replaceAll(',', '.'));
+      IbanModel? foundedIban;
+      try {
+        foundedIban = fiatState.ibanList!.firstWhere((el) =>
+            el.active! &&
+            el.type == "Sell" &&
+            el.iban == fiatState.activeIban!.iban &&
+            el.fiat!.name == selectedFiat.name);
+      } catch (_) {
+        print(_);
+      }
+      String iban =
+          widget.isNewIban ? _ibanController.text : fiatState.activeIban!.iban!;
+      if (foundedIban == null || widget.isNewIban) {
+        Map sellDetails =
+            await dfxRequests.sell(iban, selectedFiat, fiatState.accessToken!);
+        address = sellDetails["deposit"]["address"];
+      } else {
+        address = foundedIban.deposit["address"];
+      }
+      await _sendTransaction(context, tokensState, assetFrom,
+          accountState.activeAccount!, address, amount, password);
+    } catch (err) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            err.toString(),
+            style: Theme.of(context).textTheme.headline5,
+          ),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+        ),
+      );
+    }
+  }
+
   hideOverlay() {
     try {
       _selectKeyTokenList.currentState!.hideOverlay();
@@ -526,17 +541,21 @@ class _SellingState extends State<Selling> {
   }
 
   _sendTransaction(context, tokensState, String token, AccountModel account,
-      String address, double amount) async {
+      String address, double amount, String password) async {
     TxErrorModel? txResponse;
     try {
+      ECPair keyPair = await HDWalletService()
+          .getKeypairFromStorage(password, account.index!);
       if (token == 'DFI') {
         txResponse = await transactionService.createAndSendTransaction(
+            keyPair: keyPair,
             account: account,
             destinationAddress: address,
             amount: balancesHelper.toSatoshi(amount.toString()),
             tokens: tokensState.tokens);
       } else {
         txResponse = await transactionService.createAndSendToken(
+            keyPair: keyPair,
             account: account,
             token: token,
             destinationAddress: address,

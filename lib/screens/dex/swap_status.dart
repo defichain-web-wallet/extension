@@ -90,12 +90,38 @@ class SwapStatusScreen extends StatelessWidget {
             ),
             Flexible(
               child: txResponse!.isError
-                  ? Text(
-                      txResponse!.error.toString() ==
-                              'txn-mempool-conflict (code 18)'
-                          ? 'Wait for approval the previous tx'
-                          : txResponse!.error.toString(),
-                      style: Theme.of(context).textTheme.button,
+                  ? Flexible(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            txResponse!.error.toString() ==
+                                'txn-mempool-conflict (code 18)'
+                                ? 'Wait for approval the previous tx'
+                                : txResponse!.error.toString(),
+                            style: Theme.of(context).textTheme.button,
+                          ),
+                          SizedBox(
+                            width: homeButtonWidth,
+                            child: PrimaryButton(
+                              label: 'Home',
+                              callback: () => Navigator.pushReplacement(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          HomeScreen(),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                        ],
+                      ),
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.end,

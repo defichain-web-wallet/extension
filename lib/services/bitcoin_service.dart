@@ -43,6 +43,6 @@ class BitcoinService {
   Future<AddressModel> getAddressModelFromKeyPair(bip32.BIP32 masterKeyPair, accountIndex, String networkString) async {
     final keyPair = getKeypairForPath(masterKeyPair, derivePath(accountIndex), networkString);
     final addressString = await getAddressFromKeyPair(keyPair, networkString);
-    return AddressModel(address: addressString, account: accountIndex, keyPair: keyPair);
+    return AddressModel(address: addressString, account: accountIndex);
   }
 }

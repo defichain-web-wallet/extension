@@ -95,8 +95,7 @@ class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
                             width: 1.0,
                             color: Theme.of(context).dividerColor))),
                 onTap: () async {
-                  await accountCubit.updateAccountDetails(
-                      isChangeActiveToken: true);
+                  await accountCubit.updateAccountDetails();
                   await transactionCubit.confirmTransactionStatus();
                 },
               )

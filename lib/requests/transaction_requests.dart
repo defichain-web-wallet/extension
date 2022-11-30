@@ -30,13 +30,12 @@ class TransactionRequests {
         final _response = await http.get(_url, headers: _headers);
         final _data =
             jsonDecode(_response.body)['data'].cast<Map<String, dynamic>>();
-
-        _data.map<UtxoModel>((utxo) {
+print(_data);
+        _data.forEach((utxo) {
           var utxoModel = UtxoModel.fromJson(utxo);
           utxoModel.address = addresses[i].address;
-          utxoModel.keyPair = addresses[i].keyPair;
           utxos.add(utxoModel);
-        }).toList();
+        });
       } catch (err) {
         if (fallbackUrl.isEmpty &&
             SettingsHelper.settings.apiName == ApiName.auto) {

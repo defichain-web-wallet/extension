@@ -70,7 +70,15 @@ class _SendFormState extends State<SendForm> {
   @override
   void initState() {
     super.initState();
+
+    _amountFocusNode.addListener(onFocusChange);
     addressController.text = widget.selectedAddress;
+  }
+
+  onFocusChange() {
+    if (_amountController.text == '0') {
+      _amountController.text = '';
+    }
   }
 
   @override
