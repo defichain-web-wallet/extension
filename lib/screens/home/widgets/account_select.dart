@@ -8,6 +8,7 @@ import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -83,21 +84,26 @@ class AccountSelectState extends State<AccountSelect> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          _isOpen ? 'Select account' : _activeAccount.name!,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.headline4!.apply(
-                                color: _isOpen
-                                    ? Theme.of(context)
-                                        .textTheme
-                                        .headline4!
-                                        .color!
-                                        .withOpacity(0.5)
-                                    : Theme.of(context)
-                                        .textTheme
-                                        .headline4!
-                                        .color!,
-                              ),
+                        Container(
+                          width: widget.width - 60,
+                          child: TickerText(
+                            child: Text(
+                              _isOpen ? 'Select account' : _activeAccount.name!,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.headline4!.apply(
+                                    color: _isOpen
+                                        ? Theme.of(context)
+                                            .textTheme
+                                            .headline4!
+                                            .color!
+                                            .withOpacity(0.5)
+                                        : Theme.of(context)
+                                            .textTheme
+                                            .headline4!
+                                            .color!,
+                                  ),
+                            ),
+                          ),
                         ),
                         Icon(
                           _isOpen
@@ -280,10 +286,15 @@ class AccountSelectState extends State<AccountSelect> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                _accountList[index].name,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.headline4!,
+                              Container(
+                                width: widget.width - 60,
+                                child: TickerText(
+                                  child: Text(
+                                    _accountList[index].name,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context).textTheme.headline4!,
+                                  ),
+                                ),
                               ),
                               _accountList[index].index == _activeAccount.index
                                   ? SvgPicture.asset(

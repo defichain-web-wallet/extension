@@ -22,8 +22,6 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
   final _textEditingController = TextEditingController();
   final _focusNode = FocusNode();
   var inputText;
-  var showConfirmButton = false;
-  var showEditButton = false;
 
   _AccountNameTextFormState(String? initValue) {
     inputText = initValue;
@@ -33,29 +31,23 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
   }
 
   void _onFocusChange() {
-    setState(() {
-      if (!_focusNode.hasFocus) {
-        showConfirmButton = false;
-        _textEditingController.text = inputText;
-      }
-    });
+    if (!_focusNode.hasFocus) {
+      _onConfirm();
+    }
   }
 
   void _onConfirm() {
-    setState(() {
-      showConfirmButton = false;
-      inputText = _textEditingController.text;
-      if (widget.onConfirm != null)
-        widget.onConfirm!(_textEditingController.text);
-    });
+    inputText = _textEditingController.text;
+    if (widget.onConfirm != null)
+      widget.onConfirm!(_textEditingController.text);
   }
 
-  void _onEdit() => setState(() {
-        _focusNode.requestFocus();
-        _textEditingController.selection = TextSelection(
-            baseOffset: 0, extentOffset: _textEditingController.text.length);
-        showConfirmButton = true;
-      });
+  // void _onEdit() => setState(() {
+  //       _focusNode.requestFocus();
+  //       _textEditingController.selection = TextSelection(
+  //           baseOffset: 0, extentOffset: _textEditingController.text.length);
+  //       showConfirmButton = true;
+  //     });
 
   @override
   void dispose() {
@@ -83,16 +75,13 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: showConfirmButton
-                    ? AppTheme.pinkColor
-                    : Colors.transparent,
+                color: Colors.transparent,
               ),
               color: Theme.of(context).cardColor,
             ),
             child: TextField(
               autofocus: false,
               textAlignVertical: TextAlignVertical.center,
-              // style: Theme.of(context).textTheme.button,
               decoration: InputDecoration(
                 filled: false,
                 fillColor: Theme.of(context).cardColor,
@@ -105,49 +94,18 @@ class _AccountNameTextFormState extends State<AccountNameTextForm> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.transparent),
+                  borderSide: BorderSide(color: AppTheme.pinkColor),
                 ),
-                suffixIcon: showConfirmButton
-                    ? IconButton(
-                        icon: Icon(Icons.done),
-                        iconSize: 20,
-                        color: AppTheme.pinkColor,
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        onPressed: _onConfirm,
-                      )
-                    : (showEditButton
-                        ? IconButton(
-                            icon: Icon(Icons.edit),
-                            iconSize: 18,
-                            color: AppTheme.pinkColor,
-                            splashColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            onPressed: _onEdit,
-                          )
-                        : null),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 10),
               ),
               focusNode: _focusNode,
               controller: _textEditingController,
-              readOnly: !showConfirmButton,
+              readOnly: false,
               onSubmitted: (value) => _onConfirm(),
             ),
           ),
         ),
       ),
-      onEnter: (details) {
-        setState(() {
-          showEditButton = true;
-        });
-      },
-      onExit: (details) {
-        setState(() {
-          showEditButton = false;
-        });
-      },
     );
   }
 }

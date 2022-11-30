@@ -108,6 +108,19 @@ class AccountCubit extends Cubit<AccountState> {
     }
   }
 
+  setAccountName() async {
+    List<AccountModel> accountList = await loadAccountDetails(state.accounts!);
+    final List<AccountModel> accounts = accountList;
+    emit(state.copyWith(
+      status: AccountStatusList.success,
+      accounts: accounts,
+      balances: state.balances,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+    ));
+
+  }
+
   updateAccountDetails() async {
     emit(state.copyWith(
       status: AccountStatusList.loading,
