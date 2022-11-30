@@ -7,6 +7,7 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/earn_screen/widgets/earn_card.dart';
+import 'package:defi_wallet/screens/liquidity/liquidity_pool_list.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
 import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -180,7 +181,8 @@ class _EarnScreenState extends State<EarnScreen> {
                                     status: 'pooled',
                                     firstBtnTitle: 'ADD',
                                     secondBtnTitle: 'REMOVE',
-                                    firstBtnCallback: liquidityCallback,
+                                    firstBtnCallback: () =>
+                                        liquidityCallback(totalPairsBalance),
                                     isCheckLockSecond: false,
                                   ),
                                 ],
@@ -252,7 +254,8 @@ class _EarnScreenState extends State<EarnScreen> {
                                       status: 'pooled',
                                       firstBtnTitle: 'ADD',
                                       secondBtnTitle: 'REMOVE',
-                                      firstBtnCallback: liquidityCallback,
+                                      firstBtnCallback: () =>
+                                          liquidityCallback(totalPairsBalance),
                                       isCheckLockSecond: false,
                                       isSmall: true,
                                     ),
@@ -311,11 +314,14 @@ class _EarnScreenState extends State<EarnScreen> {
     }
   }
 
-  liquidityCallback() {
+  liquidityCallback(double totalLiquidityBalance) {
+    Widget redirectTo =
+        (totalLiquidityBalance == 0) ? LiquidityPoolList() : LiquidityScreen();
+
     Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) => LiquidityScreen(),
+        pageBuilder: (context, animation1, animation2) => redirectTo,
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),
