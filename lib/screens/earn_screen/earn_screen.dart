@@ -2,6 +2,8 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
+import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
@@ -46,34 +48,38 @@ class _EarnScreenState extends State<EarnScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldConstrainedBox(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < ScreenSizes.medium) {
-            return Scaffold(
-              appBar: MainAppBar(
-                title: "Earn with DeFiChain",
-              ),
-              body: _buildBody(),
-            );
-          } else {
-            return Container(
-              padding: const EdgeInsets.only(top: 20),
-              child: Scaffold(
+    return BlocBuilder<TransactionCubit, TransactionState>(
+        builder: (context, txState) {
+      return ScaffoldConstrainedBox(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < ScreenSizes.medium) {
+              return Scaffold(
                 appBar: MainAppBar(
                   title: "Earn with DeFiChain",
-                  isSmall: true,
                 ),
-                body: _buildBody(isFullSize: true),
-              ),
-            );
-          }
-        },
-      ),
+                body: _buildBody(txState),
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.only(top: 20),
+                child: Scaffold(
+                  appBar: MainAppBar(
+                    title: "Earn with DeFiChain",
+                    isSmall: true,
+                  ),
+                  body: _buildBody(txState, isFullSize: true),
+                ),
+              );
+            }
+          },
+        ),
+      );
+    }
     );
   }
 
-  Widget _buildBody({isFullSize = false}) {
+  Widget _buildBody(txState, {isFullSize = false}) {
     return BlocBuilder<AccountCubit, AccountState>(
         builder: (accountContext, accountState) {
       return BlocBuilder<StakingCubit, StakingState>(
@@ -183,7 +189,7 @@ class _EarnScreenState extends State<EarnScreen> {
                                     firstBtnTitle: 'ADD',
                                     secondBtnTitle: 'REMOVE',
                                     firstBtnCallback: () =>
-                                        liquidityCallback(totalPairsBalance),
+                                        liquidityCallback(totalPairsBalance, txState),
                                     isCheckLockSecond: false,
                                   ),
                                 ],
@@ -256,7 +262,7 @@ class _EarnScreenState extends State<EarnScreen> {
                                       firstBtnTitle: 'ADD',
                                       secondBtnTitle: 'REMOVE',
                                       firstBtnCallback: () =>
-                                          liquidityCallback(totalPairsBalance),
+                                          liquidityCallback(totalPairsBalance, txState),
                                       isCheckLockSecond: false,
                                       isSmall: true,
                                     ),
@@ -324,17 +330,29 @@ class _EarnScreenState extends State<EarnScreen> {
     }
   }
 
-  liquidityCallback(double totalLiquidityBalance) {
+  liquidityCallback(double totalLiquidityBalance, txState) {
     Widget redirectTo =
         (totalLiquidityBalance == 0) ? LiquidityPoolList() : LiquidityScreen();
 
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) => redirectTo,
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ),
-    );
+    if (!(txState is TransactionLoadingState)) {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => redirectTo,
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Wait for the previous transaction to complete',
+            style: Theme.of(context).textTheme.headline5,
+          ),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+        ),
+      );
+    }
   }
 }
