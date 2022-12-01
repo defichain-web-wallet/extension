@@ -23,7 +23,7 @@ class FiatState extends Equatable {
   final List<FiatModel>? fiatList;
   final bool? isShowTutorial;
   final bool? isKycDataComplete;
-  final int? limit;
+  final LimitModel? limit;
   final CryptoRouteModel? cryptoRoute;
 
   FiatState({
@@ -98,7 +98,7 @@ class FiatState extends Equatable {
     List<FiatModel>? fiatList,
     bool? isShowTutorial,
     bool? isKycDataComplete,
-    int? limit,
+    LimitModel? limit,
     CryptoRouteModel? cryptoRoute,
   }) {
     return FiatState(
