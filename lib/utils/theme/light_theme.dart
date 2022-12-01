@@ -57,10 +57,25 @@ ThemeData createLightTheme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(16),
       ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          width: 1,
+          color: Color(0xFFF0EEF6),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          width: 1,
+          color: AppColors.pinkColor,
+        ),
+      ),
+      fillColor: Color(0xFFF6F4FC),
     ),
     textSelectionTheme:
-    TextSelectionThemeData(selectionColor: Color(0xFF7D7D7D)),
-  );
+        TextSelectionThemeData(selectionColor: Color(0xFF7D7D7D)),
+  ).copyWith(splashColor: Colors.transparent);
 }

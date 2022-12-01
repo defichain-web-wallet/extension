@@ -16,6 +16,8 @@ const button = TextStyle(fontWeight: FontWeight.w400, fontSize: 14, decorationCo
 
 const bodyText1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 19, decorationColor: Color(0xff545556));
 
+const caption = TextStyle(fontWeight: FontWeight.w400, fontSize: 11, decorationColor: Color(0xff12052F));
+
 abstract class AppColors {
   static const white = Colors.white;
   static const black = Colors.black;

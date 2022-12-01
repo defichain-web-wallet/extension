@@ -14,7 +14,8 @@ class UiKit extends StatefulWidget {
 
 class _UiKitState extends State<UiKit> {
   TextEditingController controller = TextEditingController();
-  bool isObscure = true;
+  bool isObscure1 = false;
+  bool isObscure2 = true;
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +43,24 @@ class _UiKitState extends State<UiKit> {
               hint: 'Password',
               label: 'Password',
               isShowObscureIcon: true,
-              isObscure: isObscure,
+              isObscure: isObscure1,
               onPressObscure: () {
                 setState(() {
-                  isObscure = !isObscure;
+                  isObscure1 = !isObscure1;
                 });
               }
+            ),
+            InputTextField(
+                controller: controller,
+                hint: 'Password',
+                label: 'Password',
+                isShowObscureIcon: true,
+                isObscure: isObscure2,
+                onPressObscure: () {
+                  setState(() {
+                    isObscure2 = !isObscure2;
+                  });
+                }
             ),
           ],
         ),
