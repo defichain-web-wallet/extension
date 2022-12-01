@@ -42,7 +42,7 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
               if (constraints.maxWidth < ScreenSizes.medium) {
                 return Scaffold(
                   appBar: MainAppBar(
-                      title: 'My favorite tokens',
+                      title: 'Hide tokens',
                       isShowBottom: !(state is TransactionInitialState),
                       height: !(state is TransactionInitialState)
                           ? toolbarHeightWithBottom
@@ -54,7 +54,7 @@ class _MyFavoriteTokensState extends State<MyFavoriteTokens> {
                   padding: const EdgeInsets.only(top: 20),
                   child: Scaffold(
                     appBar: MainAppBar(
-                      title: 'My favorite tokens',
+                      title: 'Hide tokens',
                       isShowBottom: !(state is TransactionInitialState),
                       height: !(state is TransactionInitialState)
                           ? toolbarHeightWithBottom

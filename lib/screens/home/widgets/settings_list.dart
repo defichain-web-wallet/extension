@@ -25,7 +25,7 @@ class _SettingsListState extends State<SettingsList> {
   final List<dynamic> menuItems = [
     {'name': 'arrow'},
     {'name': 'Rename accounts', 'value': (context, animation1, animation2) => RenameAccounts()},
-    {'name': 'My tokens', 'value': (context, animation1, animation2) => MyFavoriteTokens()},
+    {'name': 'Hide tokens', 'value': (context, animation1, animation2) => MyFavoriteTokens()},
     {'name': 'Address book', 'value': (context, animation1, animation2) => AddressBookScreen()},
     {'name': 'Settings', 'value': (context, animation1, animation2) => Settings()},
     {'name': 'Lock wallet', 'value': (context, animation1, animation2) => null}
