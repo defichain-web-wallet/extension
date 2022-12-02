@@ -59,92 +59,100 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
               _focus = focus;
             },
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(10),
-                bottomRight: Radius.circular(10),
+          child: GestureDetector(
+            onDoubleTap: () {
+              widget.focusNode!.requestFocus();
+              widget.controller!.selection = TextSelection(
+                  baseOffset: 0,
+                  extentOffset: widget.controller!.text.length);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
+                border: Border.all(
+                  color: widget.focusModel!.isFocus
+                      ? AppTheme.pinkColor
+                      : Colors.transparent,
+                ),
+                color: Theme.of(context).cardColor,
               ),
-              border: Border.all(
-                color: widget.focusModel!.isFocus
-                    ? AppTheme.pinkColor
-                    : Colors.transparent,
-              ),
-              color: Theme.of(context).cardColor,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                right: 10,
-              ),
-              child: Column(
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextField(
-                        textAlign: TextAlign.right,
-                        textAlignVertical: TextAlignVertical.center,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'(^-?\d*\.?d*\,?\d*)')),
-                        ],
-                        style: Theme.of(context).textTheme.button,
-                        decoration: InputDecoration(
-                          filled: false,
-                          fillColor: Theme.of(context).cardColor,
-                          hoverColor: Colors.transparent,
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
-                            ),
-                            borderSide: BorderSide(color: Colors.transparent),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
-                            ),
-                            borderSide: BorderSide(color: Colors.transparent),
-                          ),
-                          suffixText: widget.selectedAsset,
-                          contentPadding:
-                              const EdgeInsets.only(left: 10),
-                        ),
-                        onChanged: widget.onChanged ?? null,
-                        controller: widget.controller,
-                        focusNode: widget.focusNode,
-                        onTap: widget.hideOverlay,
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  right: 10,
+                ),
+                child: Column(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${widget.amountInUsd} $currency',
-                              style:
-                                  Theme.of(context).textTheme.headline4!.apply(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .color!
-                                            .withOpacity(0.5),
-                                      ),
-                            ),
+                        TextField(
+                          textAlign: TextAlign.right,
+                          textAlignVertical: TextAlignVertical.center,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'(^-?\d*\.?d*\,?\d*)')),
                           ],
+                          style: Theme.of(context).textTheme.button,
+                          decoration: InputDecoration(
+                            filled: false,
+                            fillColor: Theme.of(context).cardColor,
+                            hoverColor: Colors.transparent,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(10),
+                                bottomRight: Radius.circular(10),
+                              ),
+                              borderSide: BorderSide(color: Colors.transparent),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(10),
+                                bottomRight: Radius.circular(10),
+                              ),
+                              borderSide: BorderSide(color: Colors.transparent),
+                            ),
+                            suffixText: widget.selectedAsset,
+                            contentPadding:
+                                const EdgeInsets.only(left: 10),
+                          ),
+                          onChanged: widget.onChanged ?? null,
+                          controller: widget.controller,
+                          focusNode: widget.focusNode,
+                          onTap: widget.hideOverlay,
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${widget.amountInUsd} $currency',
+                                style:
+                                    Theme.of(context).textTheme.headline4!.apply(
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .color!
+                                              .withOpacity(0.5),
+                                        ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

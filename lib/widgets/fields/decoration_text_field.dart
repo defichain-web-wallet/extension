@@ -31,68 +31,76 @@ class DecorationTextField extends StatefulWidget {
 class _DecorationTextFieldState extends State<DecorationTextField> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.transparent,
+    return GestureDetector(
+      onDoubleTap: () {
+        widget.focusNode!.requestFocus();
+        widget.controller!.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: widget.controller!.text.length);
+      },
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.transparent,
+          ),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+          ),
         ),
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(10),
-          bottomRight: Radius.circular(10),
-        ),
-      ),
-      child: FocusScope(
-        child: Focus(
-          onFocusChange: (focus) =>
-              setState(() => widget.focusModel!.isFocus = focus),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
-              border: Border.all(
-                color: widget.focusModel!.isFocus
-                    ? AppTheme.pinkColor
-                    : Colors.transparent,
-              ),
-              color: Theme.of(context).cardColor,
-            ),
-            child: TextField(
-              textAlign: TextAlign.center,
-              textAlignVertical: TextAlignVertical.center,
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(
-                    RegExp(r'(^-?\d*\.?d*\,?\d*)')),
-              ],
-              style: Theme.of(context).textTheme.button,
-              decoration: InputDecoration(
-                filled: false,
-                fillColor: Theme.of(context).cardColor,
-                hoverColor: Colors.transparent,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
-                  ),
-                  borderSide: BorderSide(color: Colors.transparent),
+        child: FocusScope(
+          child: Focus(
+            onFocusChange: (focus) =>
+                setState(() => widget.focusModel!.isFocus = focus),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
-                  ),
-                  borderSide: BorderSide(color: Colors.transparent),
+                border: Border.all(
+                  color: widget.focusModel!.isFocus
+                      ? AppTheme.pinkColor
+                      : Colors.transparent,
                 ),
-                suffixIcon: widget.suffixIcon ?? null,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                color: Theme.of(context).cardColor,
               ),
-              onChanged: widget.onChanged ?? null,
-              controller: widget.controller,
-              focusNode: widget.focusNode,
-              onTap: widget.hideOverlay,
+              child: TextField(
+                textAlign: TextAlign.center,
+                textAlignVertical: TextAlignVertical.center,
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'(^-?\d*\.?d*\,?\d*)')),
+                ],
+                style: Theme.of(context).textTheme.button,
+                decoration: InputDecoration(
+                  filled: false,
+                  fillColor: Theme.of(context).cardColor,
+                  hoverColor: Colors.transparent,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(10),
+                      bottomRight: Radius.circular(10),
+                    ),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(10),
+                      bottomRight: Radius.circular(10),
+                    ),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  suffixIcon: widget.suffixIcon ?? null,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                ),
+                onChanged: widget.onChanged ?? null,
+                controller: widget.controller,
+                focusNode: widget.focusNode,
+                onTap: widget.hideOverlay,
+              ),
             ),
           ),
         ),

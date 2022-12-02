@@ -78,80 +78,88 @@ class AssetDropdown extends StatelessWidget {
         Expanded(
           flex: SettingsHelper.isBitcoin() ? 2 : 1,
           child: SettingsHelper.isBitcoin()
-              ? DecorationTextField(
-                  isBorder: isBorder,
-                  hideOverlay: hideOverlay,
-                  controller: amountController,
-                  focusNode: focusNode,
-                  focusModel: focusModel,
-                  onChanged: onChanged,
-                  suffixIcon: SettingsHelper.isBitcoin()
-                      ? Container(
-                          height: 40,
-                          padding: EdgeInsets.only(
-                              top: 10, bottom: 8, right: 12, left: 0),
-                          child: Text('BTC ≈ \$$amountInUsd'),
-                        )
-                      : Container(
-                          padding: isMaxOnly!
-                              ? EdgeInsets.only(
-                                  top: 8, bottom: 8, right: 12, left: 0)
-                              : EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 12,
-                                ),
-                          child: isMaxOnly!
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .spaceBetween, // added line
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(
-                                      width: 40,
-                                      height: 30,
-                                      child: TextButton(
-                                        child: Text(
-                                          '50%',
-                                          style: TextStyle(
-                                            fontSize: 10,
+              ? GestureDetector(
+            onDoubleTap: () {
+              focusNode!.requestFocus();
+              amountController!.selection = TextSelection(
+                  baseOffset: 0,
+                  extentOffset: amountController!.text.length);
+            },
+                child: DecorationTextField(
+                    isBorder: isBorder,
+                    hideOverlay: hideOverlay,
+                    controller: amountController,
+                    focusNode: focusNode,
+                    focusModel: focusModel,
+                    onChanged: onChanged,
+                    suffixIcon: SettingsHelper.isBitcoin()
+                        ? Container(
+                            height: 40,
+                            padding: EdgeInsets.only(
+                                top: 10, bottom: 8, right: 12, left: 0),
+                            child: Text('BTC ≈ \$$amountInUsd'),
+                          )
+                        : Container(
+                            padding: isMaxOnly!
+                                ? EdgeInsets.only(
+                                    top: 8, bottom: 8, right: 12, left: 0)
+                                : EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 12,
+                                  ),
+                            child: isMaxOnly!
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .spaceBetween, // added line
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        width: 40,
+                                        height: 30,
+                                        child: TextButton(
+                                          child: Text(
+                                            '50%',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                            ),
                                           ),
+                                          onPressed: () {
+                                            if (onAnotherSelect != null) {
+                                              onAnotherSelect!();
+                                            }
+                                            onPressedHalf!();
+                                          },
                                         ),
-                                        onPressed: () {
-                                          if (onAnotherSelect != null) {
-                                            onAnotherSelect!();
-                                          }
-                                          onPressedHalf!();
-                                        },
                                       ),
-                                    ),
-                                    SizedBox(
-                                      width: 40,
-                                      // height: 30,
-                                      child: TextButton(
-                                        child: Text(
-                                          'MAX',
-                                          style: TextStyle(
-                                            fontSize: 10,
+                                      SizedBox(
+                                        width: 40,
+                                        // height: 30,
+                                        child: TextButton(
+                                          child: Text(
+                                            'MAX',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                            ),
                                           ),
+                                          onPressed: () {
+                                            if (onAnotherSelect != null) {
+                                              onAnotherSelect!();
+                                            }
+                                            onPressedMax!();
+                                          },
                                         ),
-                                        onPressed: () {
-                                          if (onAnotherSelect != null) {
-                                            onAnotherSelect!();
-                                          }
-                                          onPressedMax!();
-                                        },
                                       ),
-                                    ),
 
-                                    //
-                                  ],
-                                )
-                              : TextButton(
-                                  child: Text('MAX'),
-                                  onPressed: onPressedMax,
-                                ),
-                        ),
-                )
+                                      //
+                                    ],
+                                  )
+                                : TextButton(
+                                    child: Text('MAX'),
+                                    onPressed: onPressedMax,
+                                  ),
+                          ),
+                  ),
+              )
               : DecorationTextFieldNew(
                   selectedAsset: assetFrom!,
                   amountInUsd: amountInUsd!,
