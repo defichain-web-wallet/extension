@@ -9,7 +9,7 @@ class LimitModel {
 
   LimitModel.fromJson(Map<String, dynamic> json) {
     try {
-      this.value = json["limit"];
+      this.value = json["limit"] + .0;
       this.period = json["period"];
     } catch (_) {
       this.value = 0.0;
