@@ -171,13 +171,6 @@ class LiquidityProgressList extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(context).appBarTheme.backgroundColor,
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.shadowColor.withOpacity(0.06),
-                        spreadRadius: 2,
-                        blurRadius: 3,
-                      ),
-                    ],
                   ),
                   child: LinearPercentIndicator(
                     padding: const EdgeInsets.all(0),

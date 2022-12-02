@@ -12,6 +12,7 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
+import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -49,11 +50,12 @@ class _SwapScreenState extends State<SwapScreen> {
   final TextEditingController amountFromController = TextEditingController();
   final TextEditingController amountToController = TextEditingController();
   final TextEditingController slippageController = TextEditingController();
-  final GlobalKey<AssetSelectState> selectKeyFrom =
-      GlobalKey<AssetSelectState>();
+  final GlobalKey<AssetSelectSwapState> selectKeyFrom =
+      GlobalKey<AssetSelectSwapState>();
   final GlobalKey<PendingButtonState> pendingButton =
       GlobalKey<PendingButtonState>();
-  final GlobalKey<AssetSelectState> selectKeyTo = GlobalKey<AssetSelectState>();
+  final GlobalKey<AssetSelectSwapState> selectKeyTo =
+      GlobalKey<AssetSelectSwapState>();
 
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
@@ -246,7 +248,7 @@ class _SwapScreenState extends State<SwapScreen> {
                             selectedAsset: assetFrom,
                             account: accountFrom,
                             assets: assets,
-                            selectKey: selectKeyFrom,
+                            selectSwapKey: selectKeyFrom,
                             amountController: amountFromController,
                             onAnotherSelect: hideOverlay,
                             amountInUsd: amountFromInUsd,
@@ -330,7 +332,7 @@ class _SwapScreenState extends State<SwapScreen> {
                             selectedAsset: assetTo,
                             account: accountTo,
                             assets: tokensForSwap,
-                            selectKey: selectKeyTo,
+                            selectSwapKey: selectKeyTo,
                             amountController: amountToController,
                             onAnotherSelect: hideOverlay,
                             amountInUsd: amountToInUsd,
@@ -470,6 +472,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                                   onPressed: () => setState(() {
                                                     slippage = 0.03;
                                                     isShowSlippageField = false;
+                                                    hideOverlay();
                                                   }),
                                                 ),
                                               ),
@@ -496,8 +499,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                                     isBorder: isCustomBgColor,
                                                     label: '0.5%',
                                                     isActive: slippage == 0.005,
-                                                    callback: () => setState(
-                                                        () => slippage = 0.005),
+                                                    callback: () =>
+                                                        setState(() {
+                                                      slippage = 0.005;
+                                                      hideOverlay();
+                                                    }),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -509,8 +515,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                                     isBorder: isCustomBgColor,
                                                     label: '1%',
                                                     isActive: slippage == 0.01,
-                                                    callback: () => setState(
-                                                        () => slippage = 0.01),
+                                                    callback: () =>
+                                                        setState(() {
+                                                      slippage = 0.01;
+                                                      hideOverlay();
+                                                    }),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -522,8 +531,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                                     isBorder: isCustomBgColor,
                                                     label: '3%',
                                                     isActive: slippage == 0.03,
-                                                    callback: () => setState(
-                                                        () => slippage = 0.03),
+                                                    callback: () =>
+                                                        setState(() {
+                                                      slippage = 0.03;
+                                                      hideOverlay();
+                                                    }),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -535,8 +547,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                                     isBorder: isCustomBgColor,
                                                     label: '5%',
                                                     isActive: slippage == 0.05,
-                                                    callback: () => setState(
-                                                        () => slippage = 0.05),
+                                                    callback: () =>
+                                                        setState(() {
+                                                      slippage = 0.05;
+                                                      hideOverlay();
+                                                    }),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -578,10 +593,12 @@ class _SwapScreenState extends State<SwapScreen> {
                                                         Icons.edit,
                                                         size: 16,
                                                       ),
-                                                      onPressed: () => setState(
-                                                          () =>
-                                                              isShowSlippageField =
-                                                                  true),
+                                                      onPressed: () =>
+                                                          setState(() {
+                                                        isShowSlippageField =
+                                                            true;
+                                                        hideOverlay();
+                                                      }),
                                                     ),
                                                   ),
                                                 )

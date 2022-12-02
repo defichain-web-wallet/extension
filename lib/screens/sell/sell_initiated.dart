@@ -5,7 +5,7 @@ import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
-import 'package:defi_wallet/widgets/toolbar/auth_app_bar.dart';
+import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,15 +19,20 @@ class SellInitiated extends StatelessWidget {
         child: LayoutBuilder(builder: (context, constraints) {
           if (constraints.maxWidth < ScreenSizes.medium) {
             return Scaffold(
-              appBar: AuthAppBar(),
+              appBar: MainAppBar(
+                title: 'Selling',
+                isShowNavButton: false,
+              ),
               body: _buildBody(context),
             );
           } else {
             return Container(
               padding: EdgeInsets.only(top: 20),
               child: Scaffold(
-                appBar: AuthAppBar(
-                  isSmall: false,
+                appBar: MainAppBar(
+                  title: 'Selling',
+                  isSmall: true,
+                  isShowNavButton: false,
                 ),
                 body: _buildBody(context, isCustomBgColor: true),
               ),

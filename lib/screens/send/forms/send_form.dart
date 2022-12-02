@@ -76,11 +76,15 @@ class _SendFormState extends State<SendForm> {
   }
 
   onFocusChange() {
+    if (_amountController.text.length > 1 && _amountController.text[0] == '0' && _amountController.text[1] != '.')
+      {
+        String s = _amountController.text.substring(1);
+        _amountController.text = s;
+      }
     if (_amountController.text == '0') {
-      _amountController.text = '';
+      _amountController.text = '0';
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

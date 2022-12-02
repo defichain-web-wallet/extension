@@ -421,12 +421,12 @@ class TokensHelper {
   double getAmountByDfi(
       List<dynamic> tokensPairs, double amount, String baseAsset) {
     try {
-      // TODO: //
       if (baseAsset == 'DFI') {
         return amount;
       } else {
         AssetPairModel assetPair =
-        tokensPairs.firstWhere((element) => element.tokenA! == baseAsset);
+        tokensPairs.firstWhere((element) =>
+            element.tokenA! == baseAsset && !element.tokenB!.contains('v1'));
         return assetPair.reserveBDivReserveA! * amount;
       }
     } catch (err) {

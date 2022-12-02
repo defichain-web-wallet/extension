@@ -85,6 +85,8 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
     return BlocBuilder<FiatCubit, FiatState>(
       builder: (context, fiatState) {
         if (fiatState.status == FiatStatusList.success) {
+          double limit = fiatState.limit!.value!;
+          String period = fiatState.limit!.period!;
           return Container(
             color: Theme.of(context).dialogBackgroundColor,
             padding:
@@ -119,7 +121,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
                           ),
                           Container(
                             child: Text(
-                              '${balancesHelper.numberStyling(fiatState.limit! / 100)}€ / Day',
+                              '${balancesHelper.numberStyling(limit)}€ / $period',
                               style: Theme.of(context).textTheme.headline1!.apply(
                                 fontFamily: 'IBM Plex Medium',
                               ),

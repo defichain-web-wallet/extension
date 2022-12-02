@@ -59,6 +59,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
                     return Scaffold(
                       appBar: MainAppBar(
                         title: 'Purchase overview',
+                        isShowNavButton: false,
                       ),
                       body: _buildBody(state, fiatState),
                     );
@@ -68,6 +69,7 @@ class _PurchaseOverviewScreenState extends State<PurchaseOverviewScreen> {
                       child: Scaffold(
                         appBar: MainAppBar(
                           title: 'Purchase overview',
+                          isShowNavButton: false,
                           isSmall: true,
                         ),
                         body: _buildBody(state, fiatState, isFullSize: true),
