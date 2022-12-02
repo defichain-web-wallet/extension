@@ -36,7 +36,8 @@ class AddressBookAddScreen extends StatefulWidget {
 class _AddressBookAddScreenState extends State<AddressBookAddScreen> {
   AddressesHelper addressHelper = AddressesHelper();
   final _formKey = GlobalKey<FormState>();
-  final _focusNode = FocusNode();
+  final _focusNodeName = FocusNode();
+  final _focusNodeAddress = FocusNode();
   TextEditingController nameController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   bool isNew = true;
@@ -92,40 +93,49 @@ class _AddressBookAddScreenState extends State<AddressBookAddScreen> {
                               style: Theme.of(context).textTheme.headline2,
                             ),
                           ),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Theme.of(context).cardColor,
-                              hoverColor: Colors.transparent,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(
-                                  color: Colors.transparent,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide:
-                                    BorderSide(color: AppTheme.pinkColor),
-                              ),
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              hintStyle: TextStyle(fontSize: 14),
-                            ),
-                            onFieldSubmitted: (value) =>
-                                _focusNode.requestFocus(),
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(20),
-                            ],
-                            controller: nameController,
-                            onChanged: (value) => checkButtonStatus(),
-                            validator: (value) {
-                              if (nameController.text.length > 3) {
-                                return null;
-                              } else {
-                                return 'Must be at least 3 characters';
-                              }
+                          GestureDetector(
+                            onDoubleTap: () {
+                              _focusNodeName.requestFocus();
+                              nameController.selection = TextSelection(
+                                  baseOffset: 0,
+                                  extentOffset: nameController.text.length);
                             },
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Theme.of(context).cardColor,
+                                hoverColor: Colors.transparent,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide:
+                                      BorderSide(color: AppTheme.pinkColor),
+                                ),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                hintStyle: TextStyle(fontSize: 14),
+                              ),
+                              onFieldSubmitted: (value) =>
+                                  _focusNodeAddress.requestFocus(),
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(20),
+                              ],
+                              focusNode: _focusNodeName,
+                              controller: nameController,
+                              onChanged: (value) => checkButtonStatus(),
+                              validator: (value) {
+                                if (nameController.text.length > 3) {
+                                  return null;
+                                } else {
+                                  return 'Must be at least 3 characters';
+                                }
+                              },
+                            ),
                           ),
                           SizedBox(
                             height: 30,
@@ -137,50 +147,58 @@ class _AddressBookAddScreenState extends State<AddressBookAddScreen> {
                               style: Theme.of(context).textTheme.headline2,
                             ),
                           ),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Theme.of(context).cardColor,
-                              hoverColor: Colors.transparent,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(
-                                  color: Colors.transparent,
+                          GestureDetector(
+                            onDoubleTap: () {
+                              _focusNodeAddress.requestFocus();
+                              addressController.selection = TextSelection(
+                                  baseOffset: 0,
+                                  extentOffset: addressController.text.length);
+                            },
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Theme.of(context).cardColor,
+                                hoverColor: Colors.transparent,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.transparent,
+                                  ),
                                 ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide:
+                                      BorderSide(color: AppTheme.pinkColor),
+                                ),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                hintStyle: TextStyle(fontSize: 14),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide:
-                                    BorderSide(color: AppTheme.pinkColor),
-                              ),
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              hintStyle: TextStyle(fontSize: 14),
-                            ),
-                            focusNode: _focusNode,
-                            onFieldSubmitted: (value) => saveButtonValidation(),
-                            controller: addressController,
-                            onChanged: (value) async {
-                              checkButtonStatus();
-                              if (SettingsHelper.isBitcoin()) {
-                                isValidAddress = await addressHelper
-                                    .validateBtcAddress(addressController.text);
-                              } else {
-                                isValidAddress = await addressHelper
-                                    .validateAddress(addressController.text);
-                              }
-                            },
-                            validator: (value) {
-                              if (widget.address != addressController.text) {
-                                if (isValidAddress) {
-                                  return null;
+                              focusNode: _focusNodeAddress,
+                              onFieldSubmitted: (value) => saveButtonValidation(),
+                              controller: addressController,
+                              onChanged: (value) async {
+                                checkButtonStatus();
+                                if (SettingsHelper.isBitcoin()) {
+                                  isValidAddress = await addressHelper
+                                      .validateBtcAddress(addressController.text);
                                 } else {
-                                  return 'Invalid address';
+                                  isValidAddress = await addressHelper
+                                      .validateAddress(addressController.text);
                                 }
-                              } else {
-                                return null;
-                              }
-                            },
+                              },
+                              validator: (value) {
+                                if (widget.address != addressController.text) {
+                                  if (isValidAddress) {
+                                    return null;
+                                  } else {
+                                    return 'Invalid address';
+                                  }
+                                } else {
+                                  return null;
+                                }
+                              },
+                            ),
                           ),
                         ],
                       ),

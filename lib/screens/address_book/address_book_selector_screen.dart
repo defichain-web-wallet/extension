@@ -21,11 +21,19 @@ class AddressBookSelectorScreen extends StatefulWidget {
 
 class _AddressBookSelectorScreenState extends State<AddressBookSelectorScreen> {
   TextEditingController searchController = TextEditingController();
+  final _focusNode = FocusNode();
   bool isPinkIcon = false;
   final List<AddressBookModel> _filterList = [];
   String searchValue = '';
   int iterator = 0;
 
+  @override
+  void initState() {
+    searchController.addListener(() { });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     return ScaffoldWrapper(
@@ -61,60 +69,69 @@ class _AddressBookSelectorScreenState extends State<AddressBookSelectorScreen> {
                             AddressBookStatusList.success)
                         ? Column(
                             children: [
-                              Container(
-                                height: 46,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Focus(
-                                  onFocusChange: (focused) {
-                                    setState(() {
-                                      isPinkIcon = focused;
-                                    });
-                                  },
-                                  child: TextField(
-                                    textAlignVertical: TextAlignVertical.center,
-                                    style: Theme.of(context).textTheme.button,
-                                    decoration: InputDecoration(
-                                      hintText: 'Search address',
-                                      filled: true,
-                                      fillColor: Theme.of(context).cardColor,
-                                      hoverColor: Colors.transparent,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(
-                                            color: Colors.transparent),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(
-                                            color: AppTheme.pinkColor),
-                                      ),
-                                      prefixIcon: Image(
-                                        image: isPinkIcon
-                                            ? AssetImage(
-                                                'assets/images/search_pink.png')
-                                            : AssetImage(
-                                                'assets/images/search_gray.png'),
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                    ),
-                                    onChanged: (value) {
+                              GestureDetector(
+                                onDoubleTap: () {
+                                  _focusNode.requestFocus();
+                                  searchController.selection = TextSelection(
+                                      baseOffset: 0,
+                                      extentOffset: searchController.text.length);
+                                },
+                                child: Container(
+                                  height: 46,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Focus(
+                                    onFocusChange: (focused) {
                                       setState(() {
-                                        if (addressBookState.addressBookList !=
-                                            null) {
-                                          searchValue = value;
-                                          _searchAddress(
-                                              value,
-                                              addressBookState
-                                                  .addressBookList!);
-                                        }
+                                        isPinkIcon = focused;
                                       });
                                     },
-                                    controller: searchController,
+                                    child: TextField(
+                                      textAlignVertical: TextAlignVertical.center,
+                                      style: Theme.of(context).textTheme.button,
+                                      decoration: InputDecoration(
+                                        hintText: 'Search address',
+                                        filled: true,
+                                        fillColor: Theme.of(context).cardColor,
+                                        hoverColor: Colors.transparent,
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                              color: Colors.transparent),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                              color: AppTheme.pinkColor),
+                                        ),
+                                        prefixIcon: Image(
+                                          image: isPinkIcon
+                                              ? AssetImage(
+                                                  'assets/images/search_pink.png')
+                                              : AssetImage(
+                                                  'assets/images/search_gray.png'),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          if (addressBookState.addressBookList !=
+                                              null) {
+                                            searchValue = value;
+                                            _searchAddress(
+                                                value,
+                                                addressBookState
+                                                    .addressBookList!);
+                                          }
+                                        });
+                                      },
+                                      focusNode: _focusNode,
+                                      controller: searchController,
+                                    ),
                                   ),
                                 ),
                               ),
