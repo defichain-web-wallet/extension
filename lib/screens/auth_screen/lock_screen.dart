@@ -36,6 +36,7 @@ class _LockScreenState extends State<LockScreen> {
   bool isFailed = false;
   Codec<String, String> stringToBase64 = utf8.fuse(base64);
   GlobalKey globalKey = GlobalKey();
+  TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -76,6 +77,7 @@ class _LockScreenState extends State<LockScreen> {
                         ),
                         SizedBox(height: 8),
                         PasswordField(
+                          passwordController: _passwordController,
                           autofocus: true,
                           obscureText: isVisiblePasswordField,
                           onEditComplete: () =>

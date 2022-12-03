@@ -20,50 +20,67 @@ class SearchField extends StatefulWidget {
 
 class _SearchFieldState extends State<SearchField> {
   bool isPinkIcon = false;
+  final _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    _focusNode.addListener(() { });
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 46,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: Colors.transparent,
-        ),
-      ),
-      child: Focus(
-        onFocusChange: (focused) {
-          setState(() {
-            isPinkIcon = focused;
-          });
-        },
-        child: TextField(
-          textAlignVertical: TextAlignVertical.center,
-          style: Theme.of(context).textTheme.button,
-          decoration: InputDecoration(
-            hintText: 'Search for a token',
-            filled: true,
-            fillColor: Theme.of(context).cardColor,
-            hoverColor: Colors.transparent,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                  color: Theme.of(context).textTheme.button!.decorationColor!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: AppTheme.pinkColor),
-            ),
-            prefixIcon: Image(
-              image: isPinkIcon
-                  ? AssetImage('assets/images/search_pink.png')
-                  : AssetImage('assets/images/search_gray.png'),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+    return GestureDetector(
+      onDoubleTap: () {
+        _focusNode.requestFocus();
+        widget.controller!.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: widget.controller!.text.length);
+      },
+      child: Container(
+        height: 46,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: Colors.transparent,
           ),
-          onChanged: widget.onChanged,
-          controller: widget.controller,
+        ),
+        child: Focus(
+          onFocusChange: (focused) {
+            setState(() {
+              isPinkIcon = focused;
+            });
+          },
+          child: TextField(
+            focusNode: _focusNode,
+            textAlignVertical: TextAlignVertical.center,
+            style: Theme.of(context).textTheme.button,
+            decoration: InputDecoration(
+              hintText: 'Search for a token',
+              filled: true,
+              fillColor: Theme.of(context).cardColor,
+              hoverColor: Colors.transparent,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                    color: Theme.of(context).textTheme.button!.decorationColor!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppTheme.pinkColor),
+              ),
+              prefixIcon: Image(
+                image: isPinkIcon
+                    ? AssetImage('assets/images/search_pink.png')
+                    : AssetImage('assets/images/search_gray.png'),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+            ),
+            onChanged: widget.onChanged,
+            controller: widget.controller,
+          ),
         ),
       ),
     );

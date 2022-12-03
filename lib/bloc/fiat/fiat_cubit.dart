@@ -11,6 +11,7 @@ import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
+import 'package:defi_wallet/models/limit_model.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:equatable/equatable.dart';
@@ -180,7 +181,7 @@ class FiatCubit extends Cubit<FiatState> {
         isShowTutorial: isShowTutorial,
         accessToken: accessToken,
         isKycDataComplete: data['kycDataComplete'],
-        limit: data['tradingLimit']['limit'],
+        limit: LimitModel.fromJson(data['tradingLimit']),
         history: history,
       ));
     } catch (err) {

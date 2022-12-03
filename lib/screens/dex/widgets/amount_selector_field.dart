@@ -18,6 +18,7 @@ class AmountSelectorField extends StatefulWidget {
   final AccountModel? account;
   final List<String>? assets;
   final GlobalKey<AssetSelectState>? selectKey;
+  final GlobalKey<AssetSelectSwapState>? selectSwapKey;
   final TextEditingController? amountController;
   final Function(String)? onSelect;
   final Function(int)? onChangeAccount;
@@ -39,6 +40,7 @@ class AmountSelectorField extends StatefulWidget {
     this.account,
     this.assets,
     this.selectKey,
+    this.selectSwapKey,
     this.amountController,
     this.onSelect,
     this.onChangeAccount,
@@ -131,7 +133,7 @@ class _AmountSelectorFieldState extends State<AmountSelectorField> {
                 child: widget.isSwap
                     ? AssetSelectSwap(
                         isBorder: widget.isBorder,
-                        key: widget.selectKey,
+                        key: widget.selectSwapKey,
                         tokensForSwap: widget.assets!,
                         selectedToken: widget.selectedAsset!,
                         onSelect: widget.onSelect!,
