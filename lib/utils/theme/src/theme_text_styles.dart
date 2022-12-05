@@ -1,4 +1,4 @@
-part of 'theme.dart';
+part of '../theme.dart';
 
 class ThemeTextStyles extends ThemeExtension<ThemeTextStyles> {
   final TextStyle appTitle;

@@ -1,4 +1,4 @@
-part of 'theme.dart';
+part of '../theme.dart';
 
 class ThemeColors extends ThemeExtension<ThemeColors> {
   final Color appContainerBackground;

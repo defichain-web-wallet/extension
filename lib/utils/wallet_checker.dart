@@ -10,7 +10,7 @@ import 'package:defi_wallet/screens/auth_screen/secure_wallet/secure_wallet_scre
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/create_password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/storage_service.dart';
-import 'package:defi_wallet/utils/theme_checker.dart';
+import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

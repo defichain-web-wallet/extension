@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-part 'constants.dart';
-part 'dark_theme.dart';
-part 'light_theme.dart';
-part 'text_theme.dart';
-part 'theme_colors.dart';
-part 'theme_text_styles.dart';
+part 'src/constants.dart';
+part 'src/dark_theme.dart';
+part 'src/light_theme.dart';
+part 'src/text_theme.dart';
+part 'src/theme_colors.dart';
+part 'src/theme_text_styles.dart';

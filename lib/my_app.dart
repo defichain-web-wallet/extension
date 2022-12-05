@@ -9,7 +9,7 @@ import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/screens/ui_kit.dart';
-import 'package:defi_wallet/utils/theme_checker.dart';
+import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/bloc/auth/auth_bloc.dart';
