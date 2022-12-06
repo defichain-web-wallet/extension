@@ -130,6 +130,14 @@ flutter:
       fonts:
         - asset: fonts/IBM_Plex_Sans/IBMPlexSans-Medium.ttf
           style: normal
+    - family: Red Hat Display
+      fonts:
+        - asset: fonts/red_hat_display/RedHatDisplay-Regular.ttf
+          style: normal
+    - family: Red Hat Display Bold
+      fonts:
+        - asset: fonts/red_hat_display/RedHatDisplay-Bold.ttf
+          style: normal
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

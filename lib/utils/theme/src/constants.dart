@@ -1,6 +1,6 @@
 part of '../theme.dart';
 
-const fontFamily = "IBM Plex Sans";
+const fontFamily = "Red Hat Display";
 
 const headline1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 30);
 const headline2 = TextStyle(fontWeight: FontWeight.w400, fontSize: 16);
