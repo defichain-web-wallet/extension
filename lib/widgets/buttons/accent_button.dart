@@ -12,15 +12,25 @@ class AccentButton extends StatelessWidget {
     LockHelper lockHelper = LockHelper();
 
     return SizedBox(
-      height: 48,
+      height: 61.0,
       width: double.infinity,
       child: ElevatedButton(
         style: ButtonStyle(
           shadowColor: MaterialStateProperty.all(Colors.transparent),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              side: BorderSide(
+                color: Color(0xFF9988BE).withOpacity(0.32),
+              ),
+            ),
+          ),
         ),
         child: Text(label!, style: TextStyle(fontSize: 14)),
-        onPressed: callback != null ? () =>
-            lockHelper.provideWithLockChecker(context, () => callback!()) : null,
+        onPressed: callback != null
+            ? () =>
+                lockHelper.provideWithLockChecker(context, () => callback!())
+            : null,
       ),
     );
   }

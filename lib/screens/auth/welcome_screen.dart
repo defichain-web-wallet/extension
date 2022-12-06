@@ -3,6 +3,7 @@ import 'package:defi_wallet/screens/ui_kit.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/auth/welcome_text_cover.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
+import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -19,15 +20,15 @@ class WelcomeScreen extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              left: -440,
-              top: 50.0,
+              left: -420,
+              top: 20.0,
               child: WelcomeTextCover(
                 '欢迎,Bem-vindo,Witamy,欢迎,Bem-vindo,Witamy',
               ),
             ),
             Positioned(
-              left: -485,
-              top: 110.0,
+              left: -425,
+              top: 70.0,
               child: WelcomeTextCover(
                 'Welcome,欢迎,Willkommen,Welcome,欢迎,Willkommen',
                 wordSelectId: 3,
@@ -35,7 +36,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             Positioned(
               left: -570,
-              top: 170.0,
+              top: 120.0,
               child: WelcomeTextCover(
                 'Bonjour,Benvenuto,어서 오십시오,Bonjour,Benvenuto,어서 오십시오',
               ),
@@ -45,7 +46,7 @@ class WelcomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(left: 20),
+                    padding: const EdgeInsets.only(left: 20, top: 54),
                     width: 390,
                     height: 370,
                     child: Image(
@@ -77,9 +78,8 @@ class WelcomeScreen extends StatelessWidget {
                   SizedBox(height: 16),
                   StretchBox(
                     maxWidth: ScreenSizes.xSmall,
-                    child: PrimaryButton(
-                      isCheckLock: false,
-                      label: 'Create a new wallet',
+                    child: NewPrimaryButton(
+                      title: 'Create a new wallet',
                       callback: () => Navigator.push(
                         context,
                         PageRouteBuilder(
