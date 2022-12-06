@@ -34,7 +34,7 @@ ThemeData createLightTheme() {
         ),
         textStyle: TextStyle(
           color: AppColors.darkTextColor,
-          fontFamily: 'IBM Plex Sans',
+          fontFamily: 'RedHatDisplay',
           fontSize: 16,
           fontWeight: FontWeight.normal,
         ),

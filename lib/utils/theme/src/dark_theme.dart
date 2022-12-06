@@ -34,7 +34,7 @@ ThemeData createDarkTheme() {
         ),
         textStyle: TextStyle(
           color: Colors.white,
-          fontFamily: "IBM Plex Sans",
+          fontFamily: "RedHatDisplay",
           fontSize: 16,
           fontWeight: FontWeight.normal,
         ),
@@ -48,7 +48,7 @@ ThemeData createDarkTheme() {
       backgroundColor: Color(0xff333436),
       shadowColor: Colors.black.withOpacity(0.35),
       titleTextStyle:
-      TextStyle(color: Colors.white, fontFamily: 'IBM Plex Sans'),
+      TextStyle(color: Colors.white, fontFamily: 'RedHatDisplay'),
       actionsIconTheme: IconThemeData(
         color: Colors.white,
       ),

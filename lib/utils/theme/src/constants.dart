@@ -1,9 +1,9 @@
 part of '../theme.dart';
 
-const fontFamily = "IBM Plex Sans";
+const fontFamily = "RedHatDisplay Bold";
 
-const headline1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 30);
-const headline2 = TextStyle(fontWeight: FontWeight.w400, fontSize: 16);
+const headline1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 40);
+const headline2 = TextStyle(fontWeight: FontWeight.w800, fontSize: 36);
 const headline3 = TextStyle(fontWeight: FontWeight.w400, fontSize: 14);
 const headline4 = TextStyle(fontWeight: FontWeight.w400, fontSize: 14);
 const headline5 = TextStyle(fontWeight: FontWeight.w400, fontSize: 14);
@@ -24,10 +24,12 @@ abstract class AppColors {
   static const grey = Colors.grey;
   static const pink = Colors.pink;
 
+  static const moonRaker = Color(0xFFDDD2F3);
+
   static const lightGreyColor = Color(0xffEDEDED);
   static const pinkColor = Color(0xffFF00A3);
   static const redErrorColor = Color(0xffD92E2E);
-  static const darkTextColor = Color(0xff132235);
+  static const darkTextColor = Color(0xff12052F);
   static const shadowColor = Color(0xff131415);
 
   static const darkerGrey = Color(0xFF6C6C6C);

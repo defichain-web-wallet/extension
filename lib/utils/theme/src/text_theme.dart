@@ -2,8 +2,8 @@ part of '../theme.dart';
 
 TextTheme createTextTheme(Color textColor) {
   return TextTheme(
-    headline1: headline1,
-    headline2: headline2,
+    headline1: applyGeneralColor(headline1, textColor),
+    headline2: headline2.apply(color: AppColors.moonRaker),
     headline3: headline3,
     headline4: headline4,
     headline5: headline5,
@@ -15,7 +15,8 @@ TextTheme createTextTheme(Color textColor) {
     caption: caption,
   ).apply(
     fontFamily: fontFamily,
-    bodyColor: textColor,
-    displayColor: textColor,
   );
 }
+
+TextStyle applyGeneralColor(TextStyle textStyle, Color color) =>
+    textStyle.apply(color: color);
