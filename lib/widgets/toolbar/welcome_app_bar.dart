@@ -16,14 +16,39 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       shadowColor: Colors.transparent,
       automaticallyImplyLeading: false,
       backgroundColor: Theme.of(context).dialogBackgroundColor,
-    toolbarHeight: toolbarHeight,
+      toolbarHeight: toolbarHeight,
       elevation: 0,
-      title: Center(
-        child: SvgPicture.asset(
-          'assets/jelly_logo_wallet.svg',
-          height: iconHeight,
-        ),
+      leading: IconButton(
+        icon: SvgPicture.asset('assets/icons/arrow_back.svg'),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      title: Text(
+        'JellyWallet',
+        style: Theme.of(context).textTheme.headline4,
       ),
     );
   }
 }
+
+// TODO: remove this
+// Container(
+// height: 4,
+// width: 200,
+// decoration: BoxDecoration(
+// gradient: LinearGradient(
+// colors: [
+// Colors.orange,
+// Colors.orangeAccent,
+// Colors.red,
+// Colors.redAccent
+// //add more colors for gradient
+// ],
+// begin: Alignment.topLeft, //begin of the gradient color
+// end: Alignment.bottomRight, //end of the gradient color
+// stops: [0, 0.2, 0.5, 0.8] //stops for individual color
+// //set the stops number equal to numbers of color
+// ),
+// ),
+// ),

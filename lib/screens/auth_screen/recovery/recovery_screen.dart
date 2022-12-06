@@ -37,7 +37,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     super.initState();
     if (widget.mnemonic == null) {
       mnemonic = List.generate(fieldsLength, (index) => '');
-      saveRestore();
+      // saveRestore();
     } else {
       mnemonic = widget.mnemonic!.split(',');
     }

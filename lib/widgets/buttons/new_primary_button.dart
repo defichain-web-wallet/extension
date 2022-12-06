@@ -37,7 +37,9 @@ class NewPrimaryButton extends StatelessWidget {
         ),
       ),
       child: ElevatedButton(
-        onPressed: callback != null ? () {} : null,
+        onPressed: callback != null ? () {
+          callback!();
+        } : null,
         style: ElevatedButton.styleFrom(
           side: BorderSide(
             style: BorderStyle.solid,

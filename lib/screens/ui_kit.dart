@@ -2,7 +2,7 @@ import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/fields/input_text_field.dart';
+import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -42,7 +42,7 @@ class _UiKitState extends State<UiKit> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         child: Column(
           children: [
-            InputTextField(
+            PasswordTextField(
                 controller: controller,
                 hint: 'Password',
                 label: 'Password',
@@ -53,7 +53,7 @@ class _UiKitState extends State<UiKit> {
                     isObscure1 = !isObscure1;
                   });
                 }),
-            InputTextField(
+            PasswordTextField(
                 controller: controller,
                 hint: 'Password',
                 label: 'Password',
