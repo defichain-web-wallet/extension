@@ -1,3 +1,4 @@
+import 'package:defi_wallet/widgets/toolbar/auth_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -17,6 +18,9 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       backgroundColor: Theme.of(context).dialogBackgroundColor,
       toolbarHeight: toolbarHeight,
+      bottom: AuthProgressBar(
+        fill: 0.3,
+      ),
       elevation: 0,
       leading: IconButton(
         icon: SvgPicture.asset(
@@ -36,24 +40,3 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
-
-// TODO: remove this
-// Container(
-// height: 4,
-// width: 200,
-// decoration: BoxDecoration(
-// gradient: LinearGradient(
-// colors: [
-// Colors.orange,
-// Colors.orangeAccent,
-// Colors.red,
-// Colors.redAccent
-// //add more colors for gradient
-// ],
-// begin: Alignment.topLeft, //begin of the gradient color
-// end: Alignment.bottomRight, //end of the gradient color
-// stops: [0, 0.2, 0.5, 0.8] //stops for individual color
-// //set the stops number equal to numbers of color
-// ),
-// ),
-// ),

@@ -20,7 +20,7 @@ class AccentButton extends StatelessWidget {
           shadowColor: MaterialStateProperty.all(Colors.transparent),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(buttonBorderRadius),
               side: BorderSide(
                 color: Color(0xFF9988BE).withOpacity(0.32),
               ),

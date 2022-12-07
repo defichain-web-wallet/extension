@@ -29,7 +29,7 @@ class CaptionText extends StatelessWidget {
                 child: Icon(
                   status == 'error' ? Icons.clear : Icons.done,
                   color: getCaptionColor(),
-                  size: 16,
+                  size: 13,
                 ),
               ),
             ),

@@ -2,7 +2,6 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/fields/password/caption_text.dart';
 import 'package:defi_wallet/widgets/fields/suffix_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 enum PasswordStatusList { initial, confirm, success, error }
 
@@ -62,16 +61,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
           height: 8,
         ),
         Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 16.0,
-                spreadRadius: 0,
-                offset: Offset(0.0, 4.0),
-                color: Color(0xFF6843FD).withOpacity(0.08),
-              ),
-            ],
-          ),
+          height: 44,
           child: TextFormField(
             autofocus: widget.autofocus,
             maxLines: maxLines,

@@ -56,8 +56,23 @@ ThemeData createDarkTheme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(inputBorderRadius),
       ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(inputBorderRadius),
+        borderSide: BorderSide(
+          width: 1,
+          color: Color(0xFFF0EEF6),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(inputBorderRadius),
+        borderSide: BorderSide(
+          width: 1,
+          color: AppColors.pinkColor,
+        ),
+      ),
+      fillColor: Color(0xFFF6F4FC),
     ),
     textSelectionTheme:
     TextSelectionThemeData(selectionColor: Color(0xFFF0F0F0)),

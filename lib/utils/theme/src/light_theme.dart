@@ -56,18 +56,20 @@ ThemeData createLightTheme() {
       foregroundColor: Color(0xFFEDEDED),
     ),
     inputDecorationTheme: InputDecorationTheme(
+      contentPadding:
+          const EdgeInsets.symmetric(vertical: 2.0, horizontal: 10.0),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(inputBorderRadius),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(inputBorderRadius),
         borderSide: BorderSide(
           width: 1,
           color: Color(0xFFF0EEF6),
         ),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(inputBorderRadius),
         borderSide: BorderSide(
           width: 1,
           color: AppColors.pinkColor,

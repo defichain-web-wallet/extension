@@ -78,12 +78,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                 _enableBtn = false;
                               });
                             } else {
-                              if (value == confirm.text && confirm.text.isNotEmpty) {
+                              if (value == confirm.text &&
+                                  confirm.text.isNotEmpty) {
                                 setState(() {
                                   passwordStatus = PasswordStatusList.success;
                                   _enableBtn = true;
                                 });
-                              } else if (value != confirm.text && confirm.text.isNotEmpty) {
+                              } else if (value != confirm.text &&
+                                  confirm.text.isNotEmpty) {
                                 setState(() {
                                   passwordStatus = PasswordStatusList.error;
                                   passwordErrorMessage = matchErrorMessage;
@@ -156,26 +158,28 @@ class _PasswordScreenState extends State<PasswordScreen> {
                           value: isConfirm,
                           textWidth: 300,
                           textWidget: RichText(
-                            text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: 'I understand that DEFI cannot recover this password for me. Learn more',
-                                    style: Theme.of(context).textTheme.bodyText2,
-                                  ),
-                                  TextSpan(text: ' '),
-                                  WidgetSpan(
-                                    child: InkWell(
-                                      child: Text(
-                                        'Learn more',
-                                        style: jellyLink,
-                                      ),
-                                      onTap: () {
-                                        print(1);
-                                      },
+                            text: TextSpan(children: [
+                              TextSpan(
+                                text:
+                                    'I understand that DEFI cannot recover this password for me.',
+                                style: Theme.of(context).textTheme.bodyText2,
+                              ),
+                              TextSpan(text: ' '),
+                              WidgetSpan(
+                                child: MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: GestureDetector(
+                                    child: Text(
+                                      'Learn more',
+                                      style: jellyLink,
                                     ),
-                                  )
-                                ]
-                            ),
+                                    onTap: () {
+                                      print(1);
+                                    },
+                                  ),
+                                ),
+                              )
+                            ]),
                           ),
                         ),
                       ),
@@ -184,15 +188,18 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       ),
                       NewPrimaryButton(
                         title: 'Create password',
-                        callback: _enableBtn && isConfirm ? () => Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                PasswordScreen(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        ) : null,
+                        callback: _enableBtn && isConfirm
+                            ? () => Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            PasswordScreen(),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ),
+                                )
+                            : null,
                       )
                     ],
                   )

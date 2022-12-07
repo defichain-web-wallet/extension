@@ -19,12 +19,7 @@ class NewPrimaryButton extends StatelessWidget {
       height: buttonHeight,
       width: width,
       decoration: BoxDecoration(
-        border: callback != null
-            ? null
-            : Border.all(
-                color: Color(0xFFd1a5dd),
-              ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(buttonBorderRadius),
         gradient: LinearGradient(
           colors: callback != null
               ? [
@@ -46,7 +41,7 @@ class NewPrimaryButton extends StatelessWidget {
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
-              Radius.circular(16),
+              Radius.circular(buttonBorderRadius),
             ),
           ),
           backgroundColor: Colors.transparent,

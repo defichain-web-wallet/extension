@@ -2,14 +2,15 @@ part of '../theme.dart';
 
 const fontFamily = "RedHatDisplay";
 
-const double fontSizeFactor = 0.8;
-const double buttonHeight = 47;
+const double buttonHeight = 48.0;
+const double buttonBorderRadius = 12.0;
+const double inputBorderRadius = 12.0;
 
 const headline1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 32);
 const headline2 = TextStyle(fontWeight: FontWeight.w900, fontSize: 28);
 const headline3 = TextStyle(fontWeight: FontWeight.w700, fontSize: 26);
-const headline4 = TextStyle(fontWeight: FontWeight.w700, fontSize: 24);
-const headline5 = TextStyle(fontWeight: FontWeight.w400, fontSize: 16);
+const headline4 = TextStyle(fontWeight: FontWeight.w700, fontSize: 18);
+const headline5 = TextStyle(fontWeight: FontWeight.w400, fontSize: 14);
 const headline6 = TextStyle(fontWeight: FontWeight.w400, fontSize: 14);
 
 const subtitle1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 12);
@@ -35,7 +36,7 @@ const bodyText2 = TextStyle(
 const caption = TextStyle(
   fontWeight: FontWeight.w400,
   height: 1.5,
-  fontSize: 11,
+  fontSize: 9,
   decorationColor: Color(0xff12052F),
 );
 
