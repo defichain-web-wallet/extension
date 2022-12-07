@@ -80,6 +80,7 @@ class WelcomeScreen extends StatelessWidget {
                   StretchBox(
                     maxWidth: ScreenSizes.xSmall,
                     child: NewPrimaryButton(
+
                       title: 'Create a new wallet',
                       callback: () => Navigator.push(
                         context,

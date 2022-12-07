@@ -35,7 +35,7 @@ class App extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: WalletChecker(),
+        home: ThemeChecker(UiKit()),
       ),
     );
   }

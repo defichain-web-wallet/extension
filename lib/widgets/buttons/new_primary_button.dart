@@ -2,7 +2,7 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class NewPrimaryButton extends StatelessWidget {
-  Function? callback;
+  void Function()? callback;
   double width;
   String title;
 
@@ -38,9 +38,7 @@ class NewPrimaryButton extends StatelessWidget {
         ),
       ),
       child: ElevatedButton(
-        onPressed: callback != null ? () {
-          callback!();
-        } : null,
+        onPressed: callback,
         style: ElevatedButton.styleFrom(
           side: BorderSide(
             style: BorderStyle.solid,
