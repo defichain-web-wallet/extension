@@ -1,12 +1,23 @@
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/fields/password/caption_text.dart';
 import 'package:defi_wallet/widgets/fields/suffix_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class InputTextField extends StatefulWidget {
+enum PasswordStatusList { initial, confirm, success, error }
+
+extension ParseToString on PasswordStatusList {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
+}
+
+class PasswordTextField extends StatefulWidget {
+  final PasswordStatusList status;
   final TextEditingController controller;
   final String hint;
   final String label;
+  final String? error;
   final Function(String text)? onChanged;
   final Function()? onPressObscure;
   final Function()? onEditComplete;
@@ -15,11 +26,13 @@ class InputTextField extends StatefulWidget {
   final bool isObscure;
   final bool isShowObscureIcon;
 
-  const InputTextField({
+  const PasswordTextField({
     Key? key,
+    this.status = PasswordStatusList.initial,
     required this.controller,
     required this.hint,
     required this.label,
+    this.error,
     this.onChanged,
     this.onPressObscure,
     this.onEditComplete,
@@ -30,21 +43,20 @@ class InputTextField extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<InputTextField> createState() => _InputTextFieldState();
+  State<PasswordTextField> createState() => _PasswordTextFieldState();
 }
 
-class _InputTextFieldState extends State<InputTextField> {
+class _PasswordTextFieldState extends State<PasswordTextField> {
   final int maxLines = 1;
 
   @override
   Widget build(BuildContext context) {
-    print('input text field');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           widget.label,
-          style: Theme.of(context).textTheme.headline4,
+          style: Theme.of(context).textTheme.headline5,
         ),
         SizedBox(
           height: 8,
@@ -78,40 +90,24 @@ class _InputTextFieldState extends State<InputTextField> {
               hintText: widget.hint,
               suffixIconConstraints:
                   BoxConstraints(minHeight: 24, minWidth: 24),
-              suffixIcon: widget.isShowObscureIcon
-                  ? Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 16.0),
-                      child: SuffixIcon(
-                        isObscure: widget.isObscure,
-                        callback: widget.onPressObscure!,
-                      ),
-                    )
-                  : null,
+              suffixIcon: Padding(
+                padding: const EdgeInsetsDirectional.only(end: 16.0),
+                child: SuffixIcon(
+                  isObscure: widget.isObscure,
+                  callback: widget.onPressObscure!,
+                ),
+              ),
             ),
             onChanged: widget.onChanged,
-            validator: (value) {
-              return value == null || value.isEmpty
-                  ? 'Please enter this field'
-                  : null;
-            },
           ),
         ),
-        if (widget.isShowObscureIcon) ...[
-          SizedBox(
-            height: 8,
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Color(0xFF12052F).withOpacity(0.08),
-            ),
-            child: Text(
-              'Must be at least 8 characters',
-              style: Theme.of(context).textTheme.caption,
-            ),
-          )
-        ]
+        SizedBox(
+          height: 8,
+        ),
+        CaptionText(
+          status: widget.status.toShortString(),
+          text: widget.error,
+        ),
       ],
     );
   }

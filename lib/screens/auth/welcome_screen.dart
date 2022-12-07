@@ -1,3 +1,4 @@
+import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/ui_kit.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -79,18 +80,18 @@ class WelcomeScreen extends StatelessWidget {
                   StretchBox(
                     maxWidth: ScreenSizes.xSmall,
                     child: NewPrimaryButton(
-                        title: 'Create a new wallet',
-                        callback: () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) =>
-                                  UiKit(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),
-                          );
-                        }),
+
+                      title: 'Create a new wallet',
+                      callback: () => Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) =>
+                              PasswordScreen(),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
+                        ),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 20),
                   Row(

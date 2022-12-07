@@ -4,7 +4,7 @@ import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/test_drug.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
-import 'package:defi_wallet/widgets/fields/input_text_field.dart';
+import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -44,8 +44,9 @@ class _UiKitState extends State<UiKit> {
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            InputTextField(
+            PasswordTextField(
                 controller: controller,
                 hint: 'Password',
                 label: 'Password',
@@ -56,7 +57,7 @@ class _UiKitState extends State<UiKit> {
                     isObscure1 = !isObscure1;
                   });
                 }),
-            InputTextField(
+            PasswordTextField(
                 controller: controller,
                 hint: 'Password',
                 label: 'Password',
@@ -94,12 +95,7 @@ class _UiKitState extends State<UiKit> {
                   NewPrimaryButton(
                     width: value ? 100 : 150,
                     title: value ? '100' : '150',
-                    callback: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TestDrug(),
-                      ),
-                    ),
+                    callback: () => redirectToTest(),
                   ),
                 ],
               ),
@@ -113,8 +109,8 @@ class _UiKitState extends State<UiKit> {
                   });
                 },
                 value: value,
-                text:
-                    'make a type specimen book. It has survived not only five centuries, but also the leap ',
+                textWidth: 250,
+                textWidget: Text('make a type specimen book. It has survived not only five centuries, but also the leap'),
               ),
             ),
           ],
@@ -122,8 +118,12 @@ class _UiKitState extends State<UiKit> {
       ),
     );
   }
-
   redirectToTest() {
-
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TestDrug(),
+      ),
+    );
   }
 }

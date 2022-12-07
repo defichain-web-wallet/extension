@@ -27,6 +27,7 @@ class _TestDrugState extends State<TestDrug> {
         (index) =>
         DraggableGridItem(
           child: Container(
+            color: Colors.amber,
             padding: EdgeInsets.only(
               left: 4.0,
               right: 4.0,

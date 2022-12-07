@@ -22,7 +22,6 @@ class SuffixIcon extends StatefulWidget {
 class _SuffixIconState extends State<SuffixIcon> {
   @override
   Widget build(BuildContext context) {
-    print('suffix icon');
     if (widget.suffixType == SuffixTypes.password) {
       String iconUrl = widget.isObscure
           ? 'assets/icons/visibility_off.svg'
