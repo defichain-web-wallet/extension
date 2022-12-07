@@ -1,4 +1,5 @@
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class AccentButton extends StatelessWidget {
@@ -12,7 +13,7 @@ class AccentButton extends StatelessWidget {
     LockHelper lockHelper = LockHelper();
 
     return SizedBox(
-      height: 61.0,
+      height: buttonHeight,
       width: double.infinity,
       child: ElevatedButton(
         style: ButtonStyle(

@@ -27,12 +27,15 @@ class _SuffixIconState extends State<SuffixIcon> {
           ? 'assets/icons/visibility_off.svg'
           : 'assets/icons/visibility.svg';
 
-      return GestureDetector(
-        onTap: widget.callback,
-        child: SvgPicture.asset(
-          iconUrl,
-          width: 24,
-          height: 24,
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: widget.callback,
+          child: SvgPicture.asset(
+            iconUrl,
+            width: 24,
+            height: 24,
+          ),
         ),
       );
     } else {

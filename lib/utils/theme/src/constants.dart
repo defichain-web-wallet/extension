@@ -2,6 +2,9 @@ part of '../theme.dart';
 
 const fontFamily = "RedHatDisplay";
 
+const double fontSizeFactor = 0.8;
+const double buttonHeight = 47;
+
 const headline1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 40);
 const headline2 = TextStyle(fontWeight: FontWeight.w900, fontSize: 36);
 const headline3 = TextStyle(fontWeight: FontWeight.w900, fontSize: 32);

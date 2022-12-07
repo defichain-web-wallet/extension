@@ -47,9 +47,9 @@ class WelcomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(left: 20, top: 54),
-                    width: 390,
-                    height: 370,
+                    padding: const EdgeInsets.only(left: 20, top: 44),
+                    width: 295,
+                    height: 312,
                     child: Image(
                       image: AssetImage(
                         'assets/welcome_logo.png',

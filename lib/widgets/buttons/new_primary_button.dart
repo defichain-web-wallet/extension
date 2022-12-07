@@ -1,3 +1,4 @@
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class NewPrimaryButton extends StatelessWidget {
@@ -15,7 +16,7 @@ class NewPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 61.0,
+      height: buttonHeight,
       width: width,
       decoration: BoxDecoration(
         border: callback != null
