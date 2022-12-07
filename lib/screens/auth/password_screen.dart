@@ -156,7 +156,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             });
                           },
                           value: isConfirm,
-                          textWidth: 300,
+                          textWidth: 270,
                           textWidget: RichText(
                             text: TextSpan(children: [
                               TextSpan(

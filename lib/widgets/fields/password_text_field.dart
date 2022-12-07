@@ -71,6 +71,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
             onEditingComplete: widget.onEditComplete,
             controller: widget.controller,
             decoration: InputDecoration(
+              hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
               filled: true,
               fillColor: Theme.of(context).inputDecorationTheme.fillColor,
               enabledBorder:

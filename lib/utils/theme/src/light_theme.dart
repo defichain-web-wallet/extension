@@ -55,6 +55,7 @@ ThemeData createLightTheme() {
       foregroundColor: Color(0xFFEDEDED),
     ),
     inputDecorationTheme: InputDecorationTheme(
+      hoverColor: Colors.transparent,
       contentPadding:
           const EdgeInsets.symmetric(vertical: 2.0, horizontal: 10.0),
       border: OutlineInputBorder(
