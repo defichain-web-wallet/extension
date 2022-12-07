@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class DefiCheckbox extends StatefulWidget {
-  String text;
-  double textWidth;
+  final String text;
+  final double textWidth;
   bool value;
-  Widget textWidget;
-  Function? callback;
+  final Widget textWidget;
+  final Function? callback;
 
   DefiCheckbox({
     Key? key,

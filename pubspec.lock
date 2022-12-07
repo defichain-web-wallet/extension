@@ -311,13 +311,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "8.1.1"
-  flutter_draggable_gridview:
-    dependency: "direct main"
-    description:
-      name: flutter_draggable_gridview
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.7"
   flutter_masked_text:
     dependency: "direct main"
     description:
@@ -699,6 +692,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.0"
+  reorderables:
+    dependency: "direct main"
+    description:
+      name: reorderables
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.1"
   sentry:
     dependency: transitive
     description:
