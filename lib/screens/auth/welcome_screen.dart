@@ -22,43 +22,46 @@ class WelcomeScreen extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              left: -420,
-              top: 20.0,
+              left: -320,
+              top: 42.0,
               child: WelcomeTextCover(
                 '欢迎,Bem-vindo,Witamy,欢迎,Bem-vindo,Witamy',
               ),
             ),
             Positioned(
-              left: -425,
-              top: 70.0,
+              left: -290,
+              top: 90.0,
               child: WelcomeTextCover(
                 'Welcome,欢迎,Willkommen,Welcome,欢迎,Willkommen',
                 wordSelectId: 3,
               ),
             ),
             Positioned(
-              left: -570,
-              top: 120.0,
+              left: -380,
+              top: 132.0,
               child: WelcomeTextCover(
                 'Bonjour,Benvenuto,어서 오십시오,Bonjour,Benvenuto,어서 오십시오',
               ),
             ),
+            Positioned(
+              top: 114,
+              left: 40,
+              child: Container(
+                width: 295,
+                height: 312,
+                child: Image(
+                  image: AssetImage(
+                    'assets/welcome_logo.png',
+                  ),
+                ),
+              ),
+            ),
             Container(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(left: 20, top: 44),
-                    width: 295,
-                    height: 312,
-                    child: Image(
-                      image: AssetImage(
-                        'assets/welcome_logo.png',
-                      ),
-                    ),
-                  ),
-                  StretchBox(
-                    maxWidth: ScreenSizes.xSmall,
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: AccentButton(
                       label: 'Import using secret Recovery Phrase',
                       callback: () async {
@@ -77,11 +80,10 @@ class WelcomeScreen extends StatelessWidget {
                       },
                     ),
                   ),
-                  SizedBox(height: 16),
-                  StretchBox(
-                    maxWidth: ScreenSizes.xSmall,
+                  SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: NewPrimaryButton(
-
                       title: 'Create a new wallet',
                       callback: () => Navigator.push(
                         context,
@@ -94,7 +96,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -113,6 +115,9 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  SizedBox(
+                    height: 24,
+                  )
                 ],
               ),
             )

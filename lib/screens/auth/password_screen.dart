@@ -60,7 +60,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                           style: Theme.of(context).textTheme.headline3,
                         ),
                         SizedBox(
-                          height: 48,
+                          height: 43,
                         ),
                         PasswordTextField(
                           controller: password,
@@ -180,7 +180,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         ),
                       ),
                       SizedBox(
-                        height: 16,
+                        height: 24,
                       ),
                       NewPrimaryButton(
                         title: 'Create password',

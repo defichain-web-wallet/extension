@@ -40,10 +40,10 @@ const caption = TextStyle(
 );
 
 const authPaddingContainer = const EdgeInsets.only(
-  top: 38,
-  bottom: 32,
-  left: 25,
-  right: 25,
+  top: 30,
+  bottom: 24,
+  left: 24,
+  right: 24,
 );
 
 const jellyLink = TextStyle(
