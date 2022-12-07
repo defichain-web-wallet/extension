@@ -1,7 +1,9 @@
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/settings_model.dart';
+import 'package:defi_wallet/test_drug.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/input_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +19,7 @@ class _UiKitState extends State<UiKit> {
   TextEditingController controller = TextEditingController();
   bool isObscure1 = false;
   bool isObscure2 = true;
+  bool value = false;
 
   @override
   Widget build(BuildContext context) {
@@ -84,21 +87,43 @@ class _UiKitState extends State<UiKit> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   NewPrimaryButton(
-                    width: 250,
-                    title: '250',
+                    width: 150,
+                    title: '150',
                     callback: () {},
                   ),
                   NewPrimaryButton(
-                    width: 150,
-                    title: '150',
-                    callback: null,
+                    width: value ? 100 : 150,
+                    title: value ? '100' : '150',
+                    callback: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TestDrug(),
+                      ),
+                    ),
                   ),
                 ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: DefiCheckbox(
+                callback: () {
+                  setState(() {
+                    value = !value;
+                  });
+                },
+                value: value,
+                text:
+                    'make a type specimen book. It has survived not only five centuries, but also the leap ',
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  redirectToTest() {
+
   }
 }

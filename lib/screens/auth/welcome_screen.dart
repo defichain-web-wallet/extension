@@ -79,17 +79,18 @@ class WelcomeScreen extends StatelessWidget {
                   StretchBox(
                     maxWidth: ScreenSizes.xSmall,
                     child: NewPrimaryButton(
-                      title: 'Create a new wallet',
-                      callback: () => Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              UiKit(),
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
-                        ),
-                      ),
-                    ),
+                        title: 'Create a new wallet',
+                        callback: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  UiKit(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          );
+                        }),
                   ),
                   SizedBox(height: 20),
                   Row(
