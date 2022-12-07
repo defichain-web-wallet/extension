@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -143,72 +144,57 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       ],
                     ),
                   ),
-                  Container(
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Checkbox(
-                                value: isConfirm,
-                                activeColor: AppColors.pinkColor,
-                                onChanged: isEnabledCheckbox
-                                    ? (newValue) {
-                                        setState(
-                                          () {
-                                            isConfirm = newValue!;
-                                            setState(() {});
-                                          },
-                                        );
-                                      }
-                                    : null),
-                            Flexible(
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: GestureDetector(
-                                  child: RichText(
-                                    text: TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text:
-                                              'I understand that this password cannot be recovered.',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .subtitle1,
-                                        ),
-                                      ],
-                                    ),
+                  Column(
+                    children: [
+                      Container(
+                        child: DefiCheckbox(
+                          callback: () {
+                            setState(() {
+                              isConfirm = !isConfirm;
+                            });
+                          },
+                          value: isConfirm,
+                          textWidth: 300,
+                          textWidget: RichText(
+                            text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'I understand that DEFI cannot recover this password for me. Learn more',
+                                    style: Theme.of(context).textTheme.bodyText2,
                                   ),
-                                  onTap: isEnabledCheckbox
-                                      ? () {
-                                          setState(
-                                            () {
-                                              isConfirm = !isConfirm;
-                                            },
-                                          );
-                                        }
-                                      : null,
-                                ),
-                              ),
+                                  TextSpan(text: ' '),
+                                  WidgetSpan(
+                                    child: InkWell(
+                                      child: Text(
+                                        'Learn more',
+                                        style: jellyLink,
+                                      ),
+                                      onTap: () {
+                                        print(1);
+                                      },
+                                    ),
+                                  )
+                                ]
                             ),
-                          ],
+                          ),
                         ),
-                        SizedBox(
-                          height: 16,
-                        ),
-                        NewPrimaryButton(
-                          title: 'Create password',
-                          callback: _enableBtn && isConfirm ? () => Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) =>
-                                  PasswordScreen(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),
-                          ) : null,
-                        )
-                      ],
-                    ),
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      NewPrimaryButton(
+                        title: 'Create password',
+                        callback: _enableBtn && isConfirm ? () => Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                PasswordScreen(),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          ),
+                        ) : null,
+                      )
+                    ],
                   )
                 ],
               ),

@@ -12,6 +12,7 @@ TextTheme createTextTheme(Color textColor) {
     subtitle2: applyGeneralColor(subtitle2, textColor),
     button: button,
     bodyText1: bodyText1,
+    bodyText2: applyGeneralColor(bodyText2, textColor),
     caption: caption,
   ).apply(
     fontFamily: fontFamily,

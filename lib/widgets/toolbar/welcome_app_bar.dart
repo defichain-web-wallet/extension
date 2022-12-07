@@ -19,10 +19,15 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: toolbarHeight,
       elevation: 0,
       leading: IconButton(
-        icon: SvgPicture.asset('assets/icons/arrow_back.svg'),
+        icon: SvgPicture.asset(
+          'assets/icons/arrow_back.svg',
+          width: 22,
+          height: 22,
+        ),
         onPressed: () {
           Navigator.pop(context);
         },
+        splashRadius: 22,
       ),
       title: Text(
         'JellyWallet',

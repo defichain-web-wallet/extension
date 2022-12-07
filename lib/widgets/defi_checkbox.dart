@@ -34,7 +34,7 @@ class _DefiCheckboxState extends State<DefiCheckbox> {
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               width: 20,

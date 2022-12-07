@@ -2,6 +2,7 @@ import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/ui_kit.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/welcome_text_cover.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -104,7 +105,7 @@ class WelcomeScreen extends StatelessWidget {
                       InkWell(
                         child: Text(
                           'Terms and Conditions',
-                          style: AppTheme.defiUnderlineText,
+                          style: jellyLink,
                         ),
                         onTap: () => ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Work in progress')),
