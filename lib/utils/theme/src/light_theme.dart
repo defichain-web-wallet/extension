@@ -6,7 +6,7 @@ ThemeData createLightTheme() {
       backgroundColor: Colors.white,
       actionTextColor: Colors.black,
     ),
-    scaffoldBackgroundColor: Color(0xffEDEDED),
+    scaffoldBackgroundColor: AppColors.whiteLilac,
     dialogBackgroundColor: Color(0xffFAFAFA),
     primaryColorLight: Color(0xFF5D5D5D),
     selectedRowColor: Color(0xFFFAFAFA),
@@ -34,8 +34,7 @@ ThemeData createLightTheme() {
         ),
         textStyle: TextStyle(
           color: AppColors.darkTextColor,
-          fontFamily: 'RedHatDisplay',
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: FontWeight.normal,
         ),
         shadowColor: Colors.black.withOpacity(0.35),

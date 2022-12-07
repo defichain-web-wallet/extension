@@ -58,7 +58,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
           style: Theme.of(context).textTheme.headline5,
         ),
         SizedBox(
-          height: 8,
+          height: 6,
         ),
         Container(
           height: 44,
@@ -92,7 +92,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
           ),
         ),
         SizedBox(
-          height: 8,
+          height: 6,
         ),
         CaptionText(
           status: widget.status.toShortString(),

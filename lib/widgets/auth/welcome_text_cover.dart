@@ -32,7 +32,7 @@ class WelcomeTextCover extends StatelessWidget {
     if (wordSelectId == wordId) {
       return Theme.of(context)
           .textTheme
-          .headline2!
+          .headline1!
           .apply(color: Theme.of(context).textTheme.headline1!.color);
     } else {
       return Theme.of(context).textTheme.headline2!;

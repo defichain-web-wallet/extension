@@ -9,6 +9,7 @@ abstract class AppColors {
   static const moonRaker = Color(0xFFDDD2F3);
   static const lavenderPurple = Color(0xFF9988BE);
   static const portage = Color(0xFF9490EA);
+  static const whiteLilac = Color(0xFFEEEBF8);
 
   static const lightGreyColor = Color(0xffEDEDED);
   static const pinkColor = Color(0xffFF00A3);

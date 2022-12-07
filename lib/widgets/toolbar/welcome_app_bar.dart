@@ -16,7 +16,7 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       shadowColor: Colors.transparent,
       automaticallyImplyLeading: false,
-      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       toolbarHeight: toolbarHeight,
       bottom: AuthProgressBar(
         fill: 0.3,
@@ -25,13 +25,13 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         icon: SvgPicture.asset(
           'assets/icons/arrow_back.svg',
-          width: 22,
-          height: 22,
+          width: 20,
+          height: 20,
         ),
         onPressed: () {
           Navigator.pop(context);
         },
-        splashRadius: 22,
+        splashRadius: 20,
       ),
       title: Text(
         'JellyWallet',

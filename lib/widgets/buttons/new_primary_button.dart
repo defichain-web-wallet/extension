@@ -49,9 +49,9 @@ class NewPrimaryButton extends StatelessWidget {
         ),
         child: Text(
           title,
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
+          style: Theme.of(context).textTheme.button!.apply(
             color: Color(0xFFFCFBFE),
+            fontWeightDelta: 1,
           ),
         ),
       ),

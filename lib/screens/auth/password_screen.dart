@@ -162,7 +162,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                               TextSpan(
                                 text:
                                     'I understand that DEFI cannot recover this password for me.',
-                                style: Theme.of(context).textTheme.bodyText2,
+                                style: Theme.of(context).textTheme.subtitle1,
                               ),
                               TextSpan(text: ' '),
                               WidgetSpan(
@@ -186,20 +186,23 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       SizedBox(
                         height: 24,
                       ),
-                      NewPrimaryButton(
-                        title: 'Create password',
-                        callback: _enableBtn && isConfirm
-                            ? () => Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            PasswordScreen(),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                )
-                            : null,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: NewPrimaryButton(
+                          title: 'Create password',
+                          callback: _enableBtn && isConfirm
+                              ? () => Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (context, animation1, animation2) =>
+                                              PasswordScreen(),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  )
+                              : null,
+                        ),
                       )
                     ],
                   )

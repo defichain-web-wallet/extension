@@ -10,7 +10,7 @@ TextTheme createTextTheme(Color textColor) {
     headline6: applyGeneralColor(headline6, textColor),
     subtitle1: applyGeneralColor(subtitle1, textColor),
     subtitle2: applyGeneralColor(subtitle2, textColor),
-    button: button,
+    button: applyGeneralColor(button, textColor),
     bodyText1: bodyText1,
     bodyText2: applyGeneralColor(bodyText2, textColor),
     caption: caption,

@@ -33,8 +33,8 @@ class _SuffixIconState extends State<SuffixIcon> {
           onTap: widget.callback,
           child: SvgPicture.asset(
             iconUrl,
-            width: 24,
-            height: 24,
+            width: 16,
+            height: 16,
           ),
         ),
       );

@@ -27,7 +27,7 @@ class AccentButton extends StatelessWidget {
             ),
           ),
         ),
-        child: Text(label!, style: TextStyle(fontSize: 14)),
+        child: Text(label!, style: Theme.of(context).textTheme.button!),
         onPressed: callback != null
             ? () =>
                 lockHelper.provideWithLockChecker(context, () => callback!())

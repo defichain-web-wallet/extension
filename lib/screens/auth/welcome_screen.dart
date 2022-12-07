@@ -18,7 +18,7 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Theme.of(context).dialogBackgroundColor,
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: Stack(
           children: [
             Positioned(
@@ -29,7 +29,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: -290,
+              left: -295,
               top: 90.0,
               child: WelcomeTextCover(
                 'Welcome,欢迎,Willkommen,Welcome,欢迎,Willkommen',
@@ -38,7 +38,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             Positioned(
               left: -380,
-              top: 132.0,
+              top: 136.0,
               child: WelcomeTextCover(
                 'Bonjour,Benvenuto,어서 오십시오,Bonjour,Benvenuto,어서 오십시오',
               ),

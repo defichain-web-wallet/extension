@@ -6,7 +6,7 @@ const double buttonHeight = 48.0;
 const double buttonBorderRadius = 12.0;
 const double inputBorderRadius = 12.0;
 
-const headline1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 32);
+const headline1 = TextStyle(fontWeight: FontWeight.w900, fontSize: 32);
 const headline2 = TextStyle(fontWeight: FontWeight.w900, fontSize: 28);
 const headline3 = TextStyle(fontWeight: FontWeight.w700, fontSize: 26);
 const headline4 = TextStyle(fontWeight: FontWeight.w700, fontSize: 18);
@@ -17,9 +17,8 @@ const subtitle1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 12);
 const subtitle2 = TextStyle(fontWeight: FontWeight.w400, fontSize: 9);
 
 const button = TextStyle(
-  fontWeight: FontWeight.w400,
+  fontWeight: FontWeight.w600,
   fontSize: 14,
-  decorationColor: Color(0xff545556),
 );
 
 const bodyText1 = TextStyle(
@@ -50,6 +49,6 @@ const authPaddingContainer = const EdgeInsets.only(
 const jellyLink = TextStyle(
   color: AppColors.pinkColor,
   decorationColor: AppColors.pinkColor,
-  fontSize: 13,
+  fontSize: 12,
   fontWeight: FontWeight.w400,
 );
