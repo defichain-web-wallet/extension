@@ -45,7 +45,8 @@ class _TestDraggableState extends State<TestDraggable> {
             width: 400,
             color: Colors.grey.withOpacity(0.5),
             child: _tiles.isNotEmpty
-                ? Center(
+                ? Align(
+              alignment: Alignment.center,
                     child: ReorderableWrap(
                       spacing: 8.0,
                       runSpacing: 4.0,
