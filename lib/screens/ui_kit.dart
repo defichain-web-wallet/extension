@@ -109,7 +109,7 @@ class _UiKitState extends State<UiKit> {
                   });
                 },
                 value: value,
-                textWidth: 250,
+                width: 250,
                 textWidget: Text('make a type specimen book. It has survived not only five centuries, but also the leap'),
               ),
             ),

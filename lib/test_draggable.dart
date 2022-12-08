@@ -46,7 +46,7 @@ class _TestDraggableState extends State<TestDraggable> {
             color: Colors.grey.withOpacity(0.5),
             child: _tiles.isNotEmpty
                 ? Center(
-                  child: ReorderableWrap(
+                    child: ReorderableWrap(
                       spacing: 8.0,
                       runSpacing: 4.0,
                       needsLongPressDraggable: false,
@@ -64,7 +64,7 @@ class _TestDraggableState extends State<TestDraggable> {
                             '${DateTime.now().toString().substring(5, 22)} reorder started: index:$index');
                       },
                     ),
-                )
+                  )
                 : Center(child: Text('Empty')),
           ),
           TextField(
@@ -76,12 +76,13 @@ class _TestDraggableState extends State<TestDraggable> {
                 _tiles.add(
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.white
-                    ),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white),
                     width: 20 + (controller.text.length.toDouble() * 7),
                     height: 37,
-                    child: Center(child: Text('${controller.text}'),),
+                    child: Center(
+                      child: Container(child: Text('${controller.text}')),
+                    ),
                   ),
                 );
                 controller.text = '';

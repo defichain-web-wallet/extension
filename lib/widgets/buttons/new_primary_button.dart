@@ -9,7 +9,7 @@ class NewPrimaryButton extends StatelessWidget {
   NewPrimaryButton(
       {Key? key,
       this.callback,
-      this.width = double.infinity,
+      this.width = 280,
       this.title = 'OK'})
       : super(key: key);
 
