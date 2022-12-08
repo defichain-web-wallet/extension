@@ -89,6 +89,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                 ),
               ),
             ),
+            style: passwordField,
             onChanged: widget.onChanged,
           ),
         ),

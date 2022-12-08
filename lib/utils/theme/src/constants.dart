@@ -10,7 +10,7 @@ const headline1 = TextStyle(fontWeight: FontWeight.w900, fontSize: 32);
 const headline2 = TextStyle(fontWeight: FontWeight.w900, fontSize: 28);
 const headline3 = TextStyle(fontWeight: FontWeight.w700, fontSize: 26);
 const headline4 = TextStyle(fontWeight: FontWeight.w700, fontSize: 18);
-const headline5 = TextStyle(fontWeight: FontWeight.w400, fontSize: 14);
+const headline5 = TextStyle(fontWeight: FontWeight.w600, fontSize: 14);
 const headline6 = TextStyle(fontWeight: FontWeight.w400, fontSize: 14);
 
 const subtitle1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 12);
@@ -23,7 +23,7 @@ const button = TextStyle(
 
 const bodyText1 = TextStyle(
   fontWeight: FontWeight.w400,
-  fontSize: 19,
+  fontSize: 14,
   decorationColor: Color(0xff545556),
 );
 
@@ -51,4 +51,9 @@ const jellyLink = TextStyle(
   decorationColor: AppColors.pinkColor,
   fontSize: 12,
   fontWeight: FontWeight.w400,
+);
+
+const passwordField = TextStyle(
+  fontSize: 12,
+  fontWeight: FontWeight.w600,
 );

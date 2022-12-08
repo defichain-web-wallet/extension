@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  static const double toolbarHeight = 50;
-  static const double iconHeight = 30;
+  final double progress;
 
-  const WelcomeAppBar({Key? key}) : super(key: key);
+  const WelcomeAppBar({
+    Key? key,
+    this.progress = 0,
+  }) : super(key: key);
+
+  static const double toolbarHeight = 50;
+  static const double iconSize = 20;
 
   @override
   Size get preferredSize => const Size.fromHeight(toolbarHeight);
@@ -18,15 +23,17 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       toolbarHeight: toolbarHeight,
-      bottom: AuthProgressBar(
-        fill: 0.3,
-      ),
+      bottom: progress != 0
+          ? AuthProgressBar(
+              fill: progress,
+            )
+          : null,
       elevation: 0,
       leading: IconButton(
         icon: SvgPicture.asset(
           'assets/icons/arrow_back.svg',
-          width: 20,
-          height: 20,
+          width: iconSize,
+          height: iconSize,
         ),
         onPressed: () {
           Navigator.pop(context);

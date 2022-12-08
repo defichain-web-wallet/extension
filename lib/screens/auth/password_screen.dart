@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/screens/auth/signup/secure_placeholder_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
@@ -43,7 +44,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
       TransactionState txState,
     ) {
       return Scaffold(
-        appBar: WelcomeAppBar(),
+        appBar: WelcomeAppBar(
+          progress: 0.3,
+        ),
         body: Container(
           padding: authPaddingContainer,
           child: Form(
@@ -196,7 +199,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                     PageRouteBuilder(
                                       pageBuilder:
                                           (context, animation1, animation2) =>
-                                              PasswordScreen(),
+                                              SecurePlaceholderScreen(),
                                       transitionDuration: Duration.zero,
                                       reverseTransitionDuration: Duration.zero,
                                     ),
