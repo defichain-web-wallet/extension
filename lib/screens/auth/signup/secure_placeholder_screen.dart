@@ -17,6 +17,13 @@ class SecurePlaceholderScreen extends StatefulWidget {
 }
 
 class _SecurePlaceholderScreenState extends State<SecurePlaceholderScreen> {
+  final double _progress = 0.7;
+  final double _coverWidth = 296.0;
+  final double _coverHeight = 258.0;
+  final double _logoWidth = 210.0;
+  final double _logoHeight = 200.0;
+  final double _logoRotateDeg = 17.5;
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
@@ -27,7 +34,7 @@ class _SecurePlaceholderScreenState extends State<SecurePlaceholderScreen> {
       ) {
         return Scaffold(
           appBar: WelcomeAppBar(
-            progress: 0.7,
+            progress: _progress,
           ),
           body: Container(
             padding: authPaddingContainer,
@@ -63,18 +70,18 @@ class _SecurePlaceholderScreenState extends State<SecurePlaceholderScreen> {
                             Positioned(
                               child: SvgPicture.asset(
                                 'assets/secure_placeholder.svg',
-                                width: 296,
-                                height: 258,
+                                width: _coverWidth,
+                                height: _coverHeight,
                               ),
                             ),
                             Positioned.fill(
                               child: Align(
                                 alignment: Alignment.center,
                                 child: Transform.rotate(
-                                  angle: -math.pi / 17.5,
+                                  angle: -math.pi / _logoRotateDeg,
                                   child: Container(
-                                    height: 210,
-                                    width: 200,
+                                    height: _logoWidth,
+                                    width: _logoHeight,
                                     child: Image(
                                       image: AssetImage(
                                         'assets/welcome_logo.png',
@@ -107,7 +114,7 @@ class _SecurePlaceholderScreenState extends State<SecurePlaceholderScreen> {
                                 ),
                               ),
                               Text(
-                                ' (not recommented)',
+                                ' (not recommended)',
                                 style: Theme.of(context)
                                     .textTheme
                                     .subtitle1!
