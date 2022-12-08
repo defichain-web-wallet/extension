@@ -3,6 +3,7 @@ import 'package:defi_wallet/screens/auth_screen/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/ui_kit.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/auth/welcome_positioned_logo.dart';
 import 'package:defi_wallet/widgets/auth/welcome_text_cover.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -17,112 +18,78 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: Stack(
-          children: [
-            Positioned(
-              left: -320,
-              top: 42.0,
-              child: WelcomeTextCover(
-                '欢迎,Bem-vindo,Witamy,欢迎,Bem-vindo,Witamy',
-              ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: WelcomePositionedLogo(),
             ),
-            Positioned(
-              left: -295,
-              top: 90.0,
-              child: WelcomeTextCover(
-                'Welcome,欢迎,Willkommen,Welcome,欢迎,Willkommen',
-                wordSelectId: 3,
-              ),
-            ),
-            Positioned(
-              left: -380,
-              top: 136.0,
-              child: WelcomeTextCover(
-                'Bonjour,Benvenuto,어서 오십시오,Bonjour,Benvenuto,어서 오십시오',
-              ),
-            ),
-            Positioned(
-              top: 114,
-              left: 40,
-              child: Container(
-                width: 295,
-                height: 312,
-                child: Image(
-                  image: AssetImage(
-                    'assets/welcome_logo.png',
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: AccentButton(
-                      label: 'Import using secret Recovery Phrase',
-                      callback: () async {
-                        var box = await Hive.openBox(HiveBoxes.client);
-                        await box.put(HiveNames.openedMnemonic, null);
-                        await box.close();
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                RecoveryScreen(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: NewPrimaryButton(
-                      title: 'Create a new wallet',
-                      callback: () => Navigator.push(
+          ),
+          Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  width: 280,
+                  child: AccentButton(
+                    label: 'Import using secret Recovery Phrase',
+                    callback: () async {
+                      var box = await Hive.openBox(HiveBoxes.client);
+                      await box.put(HiveNames.openedMnemonic, null);
+                      await box.close();
+                      Navigator.push(
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation1, animation2) =>
-                              PasswordScreen(),
+                              RecoveryScreen(),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
                         ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 12),
+                Container(
+                  child: NewPrimaryButton(
+                    title: 'Create a new wallet',
+                    callback: () => Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation1, animation2) =>
+                            PasswordScreen(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
                       ),
                     ),
                   ),
-                  SizedBox(height: 32),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'By proceeding, you agree to these ',
-                        style: Theme.of(context).textTheme.subtitle1,
+                ),
+                SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'By proceeding, you agree to these ',
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                    InkWell(
+                      child: Text(
+                        'Terms and Conditions',
+                        style: jellyLink,
                       ),
-                      InkWell(
-                        child: Text(
-                          'Terms and Conditions',
-                          style: jellyLink,
-                        ),
-                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Work in progress')),
-                        ),
+                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Work in progress')),
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 24,
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 24,
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

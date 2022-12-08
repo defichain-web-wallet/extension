@@ -39,177 +39,180 @@ class _PasswordScreenState extends State<PasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(builder: (
-      BuildContext context,
-      bool isFullScreen,
-      TransactionState txState,
-    ) {
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState txState,
+        ) {
       return Scaffold(
         appBar: WelcomeAppBar(
           progress: 0.3,
         ),
         body: Container(
           padding: authPaddingContainer,
-          child: Form(
-            key: _formKey,
-            child: StretchBox(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          'Create password',
-                          style: Theme.of(context).textTheme.headline3,
-                        ),
-                        SizedBox(
-                          height: 43,
-                        ),
-                        PasswordTextField(
-                          controller: password,
-                          hint: 'Your password',
-                          label: 'Password',
-                          status: passwordStatus,
-                          error: passwordErrorMessage,
-                          isShowObscureIcon: true,
-                          isObscure: isPasswordObscure,
-                          onChanged: (String value) {
-                            // TODO: try move to mixin
-                            if (value.length < 8) {
-                              setState(() {
-                                passwordStatus = PasswordStatusList.error;
-                                _enableBtn = false;
-                              });
-                            } else {
-                              if (value == confirm.text &&
-                                  confirm.text.isNotEmpty) {
-                                setState(() {
-                                  passwordStatus = PasswordStatusList.success;
-                                  _enableBtn = true;
-                                });
-                              } else if (value != confirm.text &&
-                                  confirm.text.isNotEmpty) {
+          child: Center(
+            child: Form(
+              key: _formKey,
+              child: StretchBox(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 312,
+                      child: Column(
+                        children: [
+                          Text(
+                            'Create password',
+                            style: Theme.of(context).textTheme.headline3,
+                          ),
+                          SizedBox(
+                            height: 43,
+                          ),
+                          PasswordTextField(
+                            controller: password,
+                            hint: 'Your password',
+                            label: 'Password',
+                            status: passwordStatus,
+                            error: passwordErrorMessage,
+                            isShowObscureIcon: true,
+                            isObscure: isPasswordObscure,
+                            onChanged: (String value) {
+                              // TODO: try move to mixin
+                              if (value.length < 8) {
                                 setState(() {
                                   passwordStatus = PasswordStatusList.error;
-                                  passwordErrorMessage = matchErrorMessage;
+                                  _enableBtn = false;
+                                });
+                              } else {
+                                if (value == confirm.text &&
+                                    confirm.text.isNotEmpty) {
+                                  setState(() {
+                                    passwordStatus = PasswordStatusList.success;
+                                    _enableBtn = true;
+                                  });
+                                } else if (value != confirm.text &&
+                                    confirm.text.isNotEmpty) {
+                                  setState(() {
+                                    passwordStatus = PasswordStatusList.error;
+                                    passwordErrorMessage = matchErrorMessage;
+                                    _enableBtn = false;
+                                  });
+                                } else {
+                                  setState(() {
+                                    passwordStatus = PasswordStatusList.success;
+                                    passwordErrorMessage = null;
+                                    _enableBtn = true;
+                                  });
+                                }
+                              }
+                            },
+                            onPressObscure: () {
+                              setState(
+                                      () => isPasswordObscure = !isPasswordObscure);
+                            },
+                          ),
+                          SizedBox(
+                            height: 24,
+                          ),
+                          PasswordTextField(
+                            controller: confirm,
+                            hint: 'Confirm password',
+                            label: 'Confirm Password',
+                            status: confirmStatus,
+                            isShowObscureIcon: true,
+                            error: confirmErrorMessage,
+                            isObscure: isConfirmObscure,
+                            onChanged: (String value) {
+                              // TODO: try move to mixin
+                              if (value.length < 8) {
+                                setState(() {
+                                  confirmStatus = PasswordStatusList.error;
+                                  confirmErrorMessage = null;
+                                  _enableBtn = false;
+                                });
+                              } else if (value != password.text) {
+                                setState(() {
+                                  confirmStatus = PasswordStatusList.error;
+                                  confirmErrorMessage = matchErrorMessage;
                                   _enableBtn = false;
                                 });
                               } else {
                                 setState(() {
-                                  passwordStatus = PasswordStatusList.success;
-                                  passwordErrorMessage = null;
+                                  confirmStatus = PasswordStatusList.success;
+                                  confirmErrorMessage = null;
                                   _enableBtn = true;
                                 });
                               }
-                            }
-                          },
-                          onPressObscure: () {
-                            setState(
-                                () => isPasswordObscure = !isPasswordObscure);
-                          },
+                            },
+                            onPressObscure: () {
+                              setState(
+                                      () => isConfirmObscure = !isConfirmObscure);
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        Container(
+                          child: DefiCheckbox(
+                            callback: () {
+                              setState(() {
+                                isConfirm = !isConfirm;
+                              });
+                            },
+                            value: isConfirm,
+                            width: 312,
+                            textWidget: RichText(
+                              text: TextSpan(children: [
+                                TextSpan(
+                                  text:
+                                  'I understand that DEFI cannot recover this password for me.',
+                                  style: Theme.of(context).textTheme.subtitle1,
+                                ),
+                                TextSpan(text: ' '),
+                                WidgetSpan(
+                                  child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      child: Text(
+                                        'Learn more',
+                                        style: jellyLink,
+                                      ),
+                                      onTap: () {
+                                        print(1);
+                                      },
+                                    ),
+                                  ),
+                                )
+                              ]),
+                            ),
+                          ),
                         ),
                         SizedBox(
                           height: 24,
                         ),
-                        PasswordTextField(
-                          controller: confirm,
-                          hint: 'Confirm password',
-                          label: 'Confirm Password',
-                          status: confirmStatus,
-                          isShowObscureIcon: true,
-                          error: confirmErrorMessage,
-                          isObscure: isConfirmObscure,
-                          onChanged: (String value) {
-                            // TODO: try move to mixin
-                            if (value.length < 8) {
-                              setState(() {
-                                confirmStatus = PasswordStatusList.error;
-                                confirmErrorMessage = null;
-                                _enableBtn = false;
-                              });
-                            } else if (value != password.text) {
-                              setState(() {
-                                confirmStatus = PasswordStatusList.error;
-                                confirmErrorMessage = matchErrorMessage;
-                                _enableBtn = false;
-                              });
-                            } else {
-                              setState(() {
-                                confirmStatus = PasswordStatusList.success;
-                                confirmErrorMessage = null;
-                                _enableBtn = true;
-                              });
-                            }
-                          },
-                          onPressObscure: () {
-                            setState(
-                                () => isConfirmObscure = !isConfirmObscure);
-                          },
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: NewPrimaryButton(
+                            title: 'Create password',
+                            callback: _enableBtn && isConfirm
+                                ? () => Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                    SecurePlaceholderScreen(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            )
+                                : null,
+                          ),
                         )
                       ],
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      Container(
-                        child: DefiCheckbox(
-                          callback: () {
-                            setState(() {
-                              isConfirm = !isConfirm;
-                            });
-                          },
-                          value: isConfirm,
-                          textWidth: 270,
-                          textWidget: RichText(
-                            text: TextSpan(children: [
-                              TextSpan(
-                                text:
-                                    'I understand that DEFI cannot recover this password for me.',
-                                style: Theme.of(context).textTheme.subtitle1,
-                              ),
-                              TextSpan(text: ' '),
-                              WidgetSpan(
-                                child: MouseRegion(
-                                  cursor: SystemMouseCursors.click,
-                                  child: GestureDetector(
-                                    child: Text(
-                                      'Learn more',
-                                      style: jellyLink,
-                                    ),
-                                    onTap: () {
-                                      print(1);
-                                    },
-                                  ),
-                                ),
-                              )
-                            ]),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 24,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: NewPrimaryButton(
-                          title: 'Create password',
-                          callback: _enableBtn && isConfirm
-                              ? () => Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                              SecurePlaceholderScreen(),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
-                                    ),
-                                  )
-                              : null,
-                        ),
-                      )
-                    ],
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/screens/auth/name_account_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -134,7 +135,7 @@ class _SecurePlaceholderScreenState extends State<SecurePlaceholderScreen> {
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation1, animation2) =>
-                                        SecurePlaceholderScreen(),
+                                        NameAccountScreen(),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ),
