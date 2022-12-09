@@ -62,11 +62,11 @@ class _DefiCheckboxState extends State<DefiCheckbox> {
                       : null,
                 ),
                 child: Checkbox(
-                  splashRadius: 1,
+                  focusNode: widget.focusNode,
+                  splashRadius: 16,
                   side: BorderSide(
                     color: Colors.transparent,
                   ),
-                  focusColor: Colors.transparent,
                   activeColor: Colors.transparent,
                   value: widget.value,
                   onChanged: (bool? val) {

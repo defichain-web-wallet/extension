@@ -4,6 +4,7 @@ import 'package:defi_wallet/screens/auth/name_account_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/fields/defi_text_form_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
@@ -31,19 +32,25 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
 
   final double _progress = 0.7;
   final int fieldsLength = 24;
+  bool isViewTextFeld = true;
   final GlobalKey globalKey = GlobalKey();
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController controller = TextEditingController();
 
   late List<String> mnemonic;
+  late List<String> mnemonicLocal;
   late List<TextEditingController> controllers;
   late List<FocusNode> focusNodes;
   late List<Widget> mnemonicPhrasesWidgets;
 
   late bool isSavedMnemonic;
 
-
   @override
   void initState() {
     super.initState();
+    _focusNode.addListener(() {
+    });
+    mnemonicLocal = [];
     isSavedMnemonic = widget.mnemonic != null;
     super.initState();
     if (widget.mnemonic == null) {
@@ -52,14 +59,16 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     } else {
       mnemonic = widget.mnemonic!.split(',');
     }
-    mnemonicPhrasesWidgets = List.generate(
-      fieldsLength,
-          (index) => MnemonicWord(
-        index: index,
-        word: mnemonic[index],
+  }
+
+  generateMnemonicWidgets() {
+    return List.generate(
+      mnemonicLocal.length,
+      (index) => MnemonicWord(
+        index: index + 1,
+        word: mnemonicLocal[index],
       ),
     );
-
   }
 
   Future<void> saveRestore() async {
@@ -70,14 +79,27 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
 
   void _onReorder(int oldIndex, int newIndex) {
     setState(() {
-      print('oldIndex $oldIndex');
-      print('newIndex $newIndex');
+      String word = mnemonicLocal.removeAt(oldIndex);
+      mnemonicLocal.insert(newIndex, word);
+      generateMnemonicWidgets();
+    });
+  }
 
-      String targetWord = mnemonic.removeAt(oldIndex);
-      mnemonic.insert(newIndex, targetWord);
-
-      Widget row = mnemonicPhrasesWidgets.removeAt(oldIndex);
-      mnemonicPhrasesWidgets.insert(newIndex, row);
+  _onFieldSubmitted(s) {
+    setState(() {
+      if(controller.text != ''){
+        mnemonicLocal.add(s);
+      }
+      controller.text = '';
+      mnemonicLocal.forEach((element) {
+        print(element);
+      });
+      if (mnemonicLocal.length < 24) {
+        FocusScope.of(context)
+            .requestFocus(_focusNode);
+      } else {
+        isViewTextFeld = false;
+      }
     });
   }
 
@@ -85,85 +107,83 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       builder: (
-          BuildContext context,
-          bool isFullScreen,
-          TransactionState txState,
-          ) {
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState txState,
+      ) {
         return Scaffold(
           appBar: WelcomeAppBar(
             progress: _progress,
           ),
-          body: Container(
-            padding: const EdgeInsets.only(
-              top: 30,
-              bottom: 24,
-              left: 12,
-              right: 12,
-            ),
-            child: StretchBox(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          'Secure your wallet',
-                          style: Theme.of(context).textTheme.headline3,
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          'Please enter your seed phrase in the correct order.',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline5!.apply(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .color!
-                                .withOpacity(0.6),
+          body: Center(
+            child: Container(
+              padding: const EdgeInsets.only(
+                top: 30,
+                bottom: 24,
+                left: 12,
+                right: 12,
+              ),
+              child: StretchBox(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Secure your wallet',
+                            style: Theme.of(context).textTheme.headline3,
                           ),
-                        ),
-                        SizedBox(
-                          height: 32,
-                        ),
-                        Container(
-                          child: ReorderableWrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 6.0,
-                            runSpacing: 6.0,
-                            enableReorder: true,
-                            needsLongPressDraggable: false,
-                            padding: const EdgeInsets.all(0),
-                            children: mnemonicPhrasesWidgets,
-                            onReorder: _onReorder,
+                          SizedBox(
+                            height: 8,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Container(
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                          hintText: 'Enter your seed phrase',
-                          hintStyle: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xff12052F).withOpacity(0.3),
+                          Text(
+                            'Please enter your seed phrase in the correct order.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headline5!.apply(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .color!
+                                      .withOpacity(0.6),
+                                ),
                           ),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Color(0xffebe9fa), width: 1.0),
+                          SizedBox(
+                            height: 32,
                           ),
-                        ),
+                          Container(
+                            width: 328,
+                            child: ReorderableWrap(
+                              alignment: WrapAlignment.center,
+                              spacing: 6.0,
+                              runSpacing: 6.0,
+                              enableReorder: true,
+                              needsLongPressDraggable: false,
+                              padding: const EdgeInsets.all(0),
+                              children: generateMnemonicWidgets(),
+                              onReorder: _onReorder,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  )
-                ],
+                    Container(
+                      child: Container(
+                        child: isViewTextFeld
+                            ? DefiTextFormField(
+                                controller: controller,
+                                onFieldSubmitted: _onFieldSubmitted,
+                                autofocus: true,
+                                focusNode: _focusNode,
+                          readOnly: !isViewTextFeld,
+                              )
+                            : NewPrimaryButton(
+                          callback: () {},
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,6 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/screens/auth/signup/secure_phrase_screen.dart';
-import 'package:defi_wallet/screens/auth/signup/secure_phrase_screen_dragg.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -38,123 +37,125 @@ class _SecurePlaceholderScreenState extends State<SecurePlaceholderScreen> {
           appBar: WelcomeAppBar(
             progress: _progress,
           ),
-          body: Container(
-            padding: authPaddingContainer,
-            child: StretchBox(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          'Secure your wallet',
-                          style: Theme.of(context).textTheme.headline3,
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          'Secure your wallet’s seed phrase.',
-                          style: Theme.of(context).textTheme.headline5!.apply(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .color!
-                                    .withOpacity(0.6),
+          body: Center(
+            child: Container(
+              padding: authPaddingContainer,
+              child: StretchBox(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Secure your wallet',
+                            style: Theme.of(context).textTheme.headline3,
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            'Secure your wallet’s seed phrase.',
+                            style: Theme.of(context).textTheme.headline5!.apply(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .color!
+                                      .withOpacity(0.6),
+                                ),
+                          ),
+                          SizedBox(
+                            height: 21,
+                          ),
+                          Stack(
+                            children: [
+                              Positioned(
+                                child: SvgPicture.asset(
+                                  'assets/secure_placeholder.svg',
+                                  width: _coverWidth,
+                                  height: _coverHeight,
+                                ),
                               ),
-                        ),
-                        SizedBox(
-                          height: 21,
-                        ),
-                        Stack(
-                          children: [
-                            Positioned(
-                              child: SvgPicture.asset(
-                                'assets/secure_placeholder.svg',
-                                width: _coverWidth,
-                                height: _coverHeight,
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Transform.rotate(
-                                  angle: -math.pi / _logoRotateDeg,
-                                  child: Container(
-                                    height: _logoWidth,
-                                    width: _logoHeight,
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/welcome_logo.png',
+                              Positioned.fill(
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Transform.rotate(
+                                    angle: -math.pi / _logoRotateDeg,
+                                    child: Container(
+                                      height: _logoWidth,
+                                      width: _logoHeight,
+                                      child: Image(
+                                        image: AssetImage(
+                                          'assets/welcome_logo.png',
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Column(
-                      children: [
-                        Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              InkWell(
-                                child: Text(
-                                  'Remind me later ',
-                                  style: jellyLink,
-                                ),
-                                onTap: () =>
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Work in progress')),
-                                ),
-                              ),
-                              Text(
-                                ' (not recommended)',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .subtitle1!
-                                    .apply(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .subtitle1!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
-                              ),
                             ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 24,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: NewPrimaryButton(
-                            title: 'Continue',
-                            callback: () => Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation1, animation2) =>
-                                        SecurePhraseScreenDragg(),
-                                        // SecurePhraseScreen(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Column(
+                        children: [
+                          Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                InkWell(
+                                  child: Text(
+                                    'Remind me later ',
+                                    style: jellyLink,
+                                  ),
+                                  onTap: () =>
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Work in progress')),
+                                  ),
+                                ),
+                                Text(
+                                  ' (not recommended)',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .apply(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .subtitle1!
+                                            .color!
+                                            .withOpacity(0.3),
+                                      ),
+                                ),
+                              ],
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                          SizedBox(
+                            height: 24,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: NewPrimaryButton(
+                              title: 'Continue',
+                              callback: () => Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          SecurePhraseScreen(),
+                                          // SecurePhraseScreen(),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),

@@ -20,6 +20,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
   GlobalKey _formKey = GlobalKey<FormState>();
   TextEditingController password = TextEditingController();
   TextEditingController confirm = TextEditingController();
+  FocusNode checkBoxFocusNode = FocusNode();
   bool isPasswordObscure = true;
   bool isConfirmObscure = true;
 
@@ -35,6 +36,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
   String? passwordErrorMessage;
 
   static const String matchErrorMessage = 'Both passwords should match';
+
+  @override
+  void initState() {
+    checkBoxFocusNode.addListener(() { });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,6 +169,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             },
                             value: isConfirm,
                             width: 312,
+                            focusNode: checkBoxFocusNode,
                             textWidget: RichText(
                               text: TextSpan(children: [
                                 TextSpan(

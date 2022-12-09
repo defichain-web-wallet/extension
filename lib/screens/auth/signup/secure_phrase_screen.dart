@@ -62,7 +62,7 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
     List<Widget> mnemonicPhrases = List.generate(
       fieldsLength,
       (index) => MnemonicWord(
-        index: index,
+        index: index + 1,
         word: mnemonic[index],
       ),
     );
@@ -76,124 +76,127 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
           appBar: WelcomeAppBar(
             progress: _progress,
           ),
-          body: Container(
-            padding: const EdgeInsets.only(
-              top: 30,
-              bottom: 24,
-              left: 12,
-              right: 12,
-            ),
-            child: StretchBox(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          'Secure your wallet',
-                          style: Theme.of(context).textTheme.headline3,
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          'Please remember your seed phrase \n in the correct order.',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline5!.apply(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .color!
-                                    .withOpacity(0.6),
-                              ),
-                        ),
-                        SizedBox(
-                          height: 32,
-                        ),
-                        Container(
-                          child: ReorderableWrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 6.0,
-                            runSpacing: 6.0,
-                            enableReorder: false,
-                            padding: const EdgeInsets.all(0),
-                            children: mnemonicPhrases,
-                            onReorder: (oldIndex, newIndex) {
-                              print(oldIndex);
-                            },
-                            onNoReorder: (int index) {
-                              debugPrint(
-                                  '${DateTime.now().toString().substring(5, 22)} reorder cancelled. index:$index');
-                            },
-                            onReorderStarted: (int index) {
-                              debugPrint(
-                                  '${DateTime.now().toString().substring(5, 22)} reorder started: index:$index');
-                            },
+          body: Center(
+            child: Container(
+              padding: const EdgeInsets.only(
+                top: 30,
+                bottom: 24,
+                left: 12,
+                right: 12,
+              ),
+              child: StretchBox(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Secure your wallet',
+                            style: Theme.of(context).textTheme.headline3,
                           ),
-                        ),
-                        SizedBox(
-                          height: 24,
-                        ),
-                        Container(
-                          child: InkWell(
-                            onTap: () async {
-                              await Clipboard.setData(
-                                ClipboardData(
-                                  text: mnemonic.join(','),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            'Please remember your seed phrase \n in the correct order.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headline5!.apply(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .color!
+                                      .withOpacity(0.6),
                                 ),
-                              );
-                            },
-                            child: RichText(
-                              text: TextSpan(
-                                children: [
-                                  WidgetSpan(
-                                    child: SvgPicture.asset(
-                                      'assets/icons/copy.svg',
-                                      width: 14,
-                                      height: 16,
-                                    ),
+                          ),
+                          SizedBox(
+                            height: 32,
+                          ),
+                          Container(
+                            width: 328,
+                            child: ReorderableWrap(
+                              alignment: WrapAlignment.center,
+                              spacing: 6.0,
+                              runSpacing: 6.0,
+                              enableReorder: false,
+                              padding: const EdgeInsets.all(0),
+                              children: mnemonicPhrases,
+                              onReorder: (oldIndex, newIndex) {
+                                print(oldIndex);
+                              },
+                              onNoReorder: (int index) {
+                                debugPrint(
+                                    '${DateTime.now().toString().substring(5, 22)} reorder cancelled. index:$index');
+                              },
+                              onReorderStarted: (int index) {
+                                debugPrint(
+                                    '${DateTime.now().toString().substring(5, 22)} reorder started: index:$index');
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            height: 24,
+                          ),
+                          Container(
+                            child: InkWell(
+                              onTap: () async {
+                                await Clipboard.setData(
+                                  ClipboardData(
+                                    text: mnemonic.join(','),
                                   ),
-                                  WidgetSpan(
-                                    child: SizedBox(
-                                      width: 12,
+                                );
+                              },
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    WidgetSpan(
+                                      child: SvgPicture.asset(
+                                        'assets/icons/copy.svg',
+                                        width: 14,
+                                        height: 16,
+                                      ),
                                     ),
-                                  ),
-                                  TextSpan(
-                                    text: 'Copy to clipboard',
-                                    style: jellyLink.apply(fontSizeDelta: 2),
-                                  )
-                                ],
+                                    WidgetSpan(
+                                      child: SizedBox(
+                                        width: 12,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'Copy to clipboard',
+                                      style: jellyLink.apply(fontSizeDelta: 2),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Container(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: NewPrimaryButton(
-                            title: 'Continue',
-                            callback: () => Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation1, animation2) =>
-                                        NameAccountScreen(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
+                    Container(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: NewPrimaryButton(
+                              title: 'Continue',
+                              callback: () => Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          NameAccountScreen(),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),

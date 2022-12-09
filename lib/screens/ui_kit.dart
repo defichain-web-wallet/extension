@@ -1,7 +1,6 @@
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/settings_model.dart';
-import 'package:defi_wallet/test_draggable.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
@@ -119,11 +118,6 @@ class _UiKitState extends State<UiKit> {
     );
   }
   redirectToTest() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const TestDraggable(),
-      ),
-    );
+
   }
 }

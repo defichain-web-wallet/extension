@@ -21,7 +21,6 @@ import 'package:defi_wallet/bloc/auth/auth_bloc.dart';
 import 'package:defi_wallet/utils/wallet_checker.dart';
 
 class App extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -40,9 +39,7 @@ class App extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: ThemeChecker(
-          RecoveryScreen()
-        ),
+        home: WalletChecker(),
       ),
     );
   }
