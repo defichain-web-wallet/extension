@@ -22,8 +22,8 @@ class _TestDraggableState extends State<TestDraggable> {
   }
 
   void _onReorder(int oldIndex, int newIndex) {
-    String word = listTest.removeAt(oldIndex);
-    listTest.insert(newIndex, word);
+    // String word = listTest.removeAt(oldIndex);
+    // listTest.insert(newIndex, word);
     setState(() {
       print('oldIndex $oldIndex');
       print('newIndex $newIndex');
@@ -73,7 +73,7 @@ class _TestDraggableState extends State<TestDraggable> {
             controller: controller,
             onSubmitted: (s) {
               setState(() {
-                listTest.add(controller.text);
+                // listTest.add(controller.text);
                 _tiles.add(
                   Container(
                     decoration: BoxDecoration(

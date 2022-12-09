@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/screens/auth/signup/secure_phrase_screen.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/auth_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
@@ -114,7 +115,7 @@ class _WalletCheckerState extends State<WalletChecker> {
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
-                  ThemeChecker(SecureScreen(mnemonic: savedMnemonic)),
+                  ThemeChecker(SecurePhraseScreen(mnemonic: savedMnemonic)),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),

@@ -1,5 +1,5 @@
 import 'package:defi_wallet/screens/auth/password_screen.dart';
-import 'package:defi_wallet/screens/auth_screen/recovery/recovery_screen.dart';
+import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/ui_kit.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';

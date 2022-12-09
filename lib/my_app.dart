@@ -8,6 +8,7 @@ import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
+import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/secure_phrase_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/secure_placeholder_screen.dart';
 import 'package:defi_wallet/screens/auth/congratulations_screen.dart';
@@ -39,7 +40,9 @@ class App extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: WalletChecker(),
+        home: ThemeChecker(
+          RecoveryScreen()
+        ),
       ),
     );
   }

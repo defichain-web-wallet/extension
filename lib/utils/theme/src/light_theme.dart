@@ -75,7 +75,7 @@ ThemeData createLightTheme() {
           color: AppColors.pinkColor,
         ),
       ),
-      fillColor: Color(0xFFF6F4FC),
+      fillColor: Colors.white.withOpacity(0.65),
     ),
     textSelectionTheme:
         TextSelectionThemeData(selectionColor: Color(0xFF7D7D7D)),
