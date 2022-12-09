@@ -46,11 +46,12 @@ const authPaddingContainer = const EdgeInsets.only(
   right: 24,
 );
 
-const jellyLink = TextStyle(
+final jellyLink = TextStyle(
   color: AppColors.pinkColor,
   decorationColor: AppColors.pinkColor,
   fontSize: 12,
   fontWeight: FontWeight.w400,
+  fontFamily: fontFamily,
 );
 
 const passwordField = TextStyle(

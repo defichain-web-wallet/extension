@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 part 'src/constants.dart';
 part 'src/app_colors.dart';

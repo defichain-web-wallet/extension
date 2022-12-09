@@ -4,6 +4,7 @@ import 'package:defi_wallet/screens/auth/name_account_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/jelly_link_text.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
@@ -28,6 +29,7 @@ class SecurePhraseScreen extends StatefulWidget {
 
 class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
   static const int mnemonicStrength = 256;
+  static const double mnemonicBoxWidth = 348;
 
   final double _progress = 0.7;
   final int fieldsLength = 24;
@@ -110,28 +112,18 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
                                 ),
                           ),
                           SizedBox(
-                            height: 32,
+                            height: 16,
                           ),
                           Container(
-                            width: 328,
+                            width: mnemonicBoxWidth,
                             child: ReorderableWrap(
                               alignment: WrapAlignment.center,
                               spacing: 6.0,
                               runSpacing: 6.0,
                               enableReorder: false,
                               padding: const EdgeInsets.all(0),
+                              onReorder: (int oldIndex, int newIndex) => null,
                               children: mnemonicPhrases,
-                              onReorder: (oldIndex, newIndex) {
-                                print(oldIndex);
-                              },
-                              onNoReorder: (int index) {
-                                debugPrint(
-                                    '${DateTime.now().toString().substring(5, 22)} reorder cancelled. index:$index');
-                              },
-                              onReorderStarted: (int index) {
-                                debugPrint(
-                                    '${DateTime.now().toString().substring(5, 22)} reorder started: index:$index');
-                              },
                             ),
                           ),
                           SizedBox(
@@ -152,8 +144,8 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
                                     WidgetSpan(
                                       child: SvgPicture.asset(
                                         'assets/icons/copy.svg',
-                                        width: 14,
-                                        height: 16,
+                                        width: 18,
+                                        height: 18,
                                       ),
                                     ),
                                     WidgetSpan(
@@ -161,9 +153,13 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
                                         width: 12,
                                       ),
                                     ),
-                                    TextSpan(
-                                      text: 'Copy to clipboard',
-                                      style: jellyLink.apply(fontSizeDelta: 2),
+                                    WidgetSpan(
+                                      child: JellyLinkText(
+                                        child: Text(
+                                          'Copy to clipboard',
+                                          style: jellyLink.apply(fontSizeDelta: 2),
+                                        ),
+                                      )
                                     )
                                   ],
                                 ),
