@@ -1,7 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/screens/auth/name_account_screen.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/fields/defi_text_form_field.dart';
@@ -10,8 +8,6 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -44,12 +40,12 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
   late List<Widget> mnemonicPhrasesWidgets;
 
   late bool isSavedMnemonic;
+  late bool isHoverMnemonicBox;
 
   @override
   void initState() {
     super.initState();
-    _focusNode.addListener(() {
-    });
+    _focusNode.addListener(() {});
     mnemonicLocal = [];
     isSavedMnemonic = widget.mnemonic != null;
     super.initState();
@@ -61,14 +57,12 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     }
   }
 
-  generateMnemonicWidgets() {
-    return List.generate(
-      mnemonicLocal.length,
-      (index) => MnemonicWord(
-        index: index + 1,
-        word: mnemonicLocal[index],
-      ),
-    );
+  void _onEnterHover(PointerEvent details) {
+    setState(() => isHoverMnemonicBox = true);
+  }
+
+  void _onExitHover(PointerEvent details) {
+    setState(() => isHoverMnemonicBox = false);
   }
 
   Future<void> saveRestore() async {
@@ -81,19 +75,16 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     setState(() {
       String word = mnemonicLocal.removeAt(oldIndex);
       mnemonicLocal.insert(newIndex, word);
-      generateMnemonicWidgets();
     });
   }
 
-  _onFieldSubmitted(s) {
+  void _onFieldSubmitted(String word) {
     setState(() {
-      if(controller.text != ''){
-        mnemonicLocal.add(s);
+      if (controller.text != '') {
+        mnemonicLocal.add(word);
       }
       controller.text = '';
-      mnemonicLocal.forEach((element) {
-        print(element);
-      });
+
       if (mnemonicLocal.length < 24) {
         FocusScope.of(context)
             .requestFocus(_focusNode);
@@ -105,6 +96,13 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> mnemonicWidgets = List.generate(
+      mnemonicLocal.length,
+          (index) => MnemonicWord(
+        index: index + 1,
+        word: mnemonicLocal[index],
+      ),
+    );
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
@@ -151,36 +149,51 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                           SizedBox(
                             height: 32,
                           ),
-                          Container(
-                            width: 328,
-                            child: ReorderableWrap(
-                              alignment: WrapAlignment.center,
-                              spacing: 6.0,
-                              runSpacing: 6.0,
-                              enableReorder: true,
-                              needsLongPressDraggable: false,
-                              padding: const EdgeInsets.all(0),
-                              children: generateMnemonicWidgets(),
-                              onReorder: _onReorder,
+                          MouseRegion(
+                            onEnter: _onEnterHover,
+                            onExit: _onExitHover,
+                            child: Container(
+                              width: 328,
+                              child: ReorderableWrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 6.0,
+                                runSpacing: 6.0,
+                                enableReorder: true,
+                                needsLongPressDraggable: false,
+                                padding: const EdgeInsets.all(0),
+                                children: mnemonicWidgets,
+                                onNoReorder: (index) {
+                                  if (!isHoverMnemonicBox) {
+                                    setState(() {
+                                      mnemonicLocal.removeAt(index);
+
+                                      if (mnemonicLocal.length < 24) {
+                                        FocusScope.of(context)
+                                            .requestFocus(_focusNode);
+                                        isViewTextFeld = true;
+                                      }
+                                    });
+                                  }
+                                },
+                                onReorder: _onReorder,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
                     Container(
-                      child: Container(
-                        child: isViewTextFeld
-                            ? DefiTextFormField(
-                                controller: controller,
-                                onFieldSubmitted: _onFieldSubmitted,
-                                autofocus: true,
-                                focusNode: _focusNode,
-                          readOnly: !isViewTextFeld,
-                              )
-                            : NewPrimaryButton(
-                          callback: () {},
-                        ),
-                      ),
+                      child: isViewTextFeld
+                          ? DefiTextFormField(
+                              controller: controller,
+                              onFieldSubmitted: _onFieldSubmitted,
+                              autofocus: true,
+                              focusNode: _focusNode,
+                              readOnly: !isViewTextFeld,
+                            )
+                          : NewPrimaryButton(
+                              callback: () {},
+                            ),
                     )
                   ],
                 ),
