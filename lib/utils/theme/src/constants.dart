@@ -40,7 +40,7 @@ const caption = TextStyle(
 );
 
 const authPaddingContainer = const EdgeInsets.only(
-  top: 30,
+  top: 32,
   bottom: 24,
   left: 24,
   right: 24,

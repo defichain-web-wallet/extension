@@ -1,22 +1,32 @@
-import 'package:defi_wallet/screens/auth/welcome_screen.dart';
-import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:defi_wallet/widgets/toolbar/auth_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double progress;
+  final Function()? onBack;
 
   const WelcomeAppBar({
     Key? key,
     this.progress = 0,
+    this.onBack,
   }) : super(key: key);
 
-  static const double toolbarHeight = 50;
+  static const String title = 'JellyWallet';
+  static const double toolbarHeight = 54;
   static const double iconSize = 20;
 
   @override
   Size get preferredSize => const Size.fromHeight(toolbarHeight);
+
+  // TODO: review it for try to remove unnecessary call [onBack]
+  _onPressedBack(BuildContext context) {
+    if (onBack == null) {
+      Navigator.pop(context);
+    } else {
+      onBack!();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +49,11 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             width: iconSize,
             height: iconSize,
           ),
-          onPressed: () {
-            // TODO: doesn't work if current page has been recovery from hive
-            Navigator.pop(context);
-          },
+          onPressed: () => _onPressedBack(context),
           splashRadius: 20,
         ),
         title: Text(
-          'JellyWallet',
+          title,
           style: Theme.of(context).textTheme.headline4,
         ),
       ),

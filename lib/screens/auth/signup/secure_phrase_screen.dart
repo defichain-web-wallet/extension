@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/mixins/storage_phrase_mixin.dart';
 import 'package:defi_wallet/screens/auth/name_account_screen.dart';
+import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -12,7 +13,6 @@ import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
 class SecurePhraseScreen extends StatefulWidget {
@@ -27,45 +27,49 @@ class SecurePhraseScreen extends StatefulWidget {
   State<SecurePhraseScreen> createState() => _SecurePhraseScreenState();
 }
 
-class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
-  static const int mnemonicStrength = 256;
-  static const double mnemonicBoxWidth = 348;
+class _SecurePhraseScreenState extends State<SecurePhraseScreen>
+    with StoragePhraseMixin {
+  static const int _mnemonicStrength = 256;
+  static const double _mnemonicBoxWidth = 348;
 
   final double _progress = 0.7;
-  final int fieldsLength = 24;
-  final GlobalKey globalKey = GlobalKey();
+  final int _fieldsLength = 24;
 
-  late List<String> mnemonic;
-  late List<TextEditingController> controllers;
-  late List<FocusNode> focusNodes;
+  late List<String> _mnemonic;
 
   @override
   void initState() {
     super.initState();
     if (widget.mnemonic == null) {
-      mnemonic = generateMnemonic(strength: mnemonicStrength).split(' ');
-      saveSecure();
+      _mnemonic = generateMnemonic(strength: _mnemonicStrength).split(' ');
+      savePhraseToStorage(_mnemonic.join(','));
     } else {
-      mnemonic = widget.mnemonic!.split(',');
+      _mnemonic = widget.mnemonic!.split(',');
     }
-    controllers = List.generate(fieldsLength, (i) {
-      return TextEditingController(text: mnemonic[i]);
-    });
   }
 
-  Future<void> saveSecure() async {
-    var box = await Hive.openBox(HiveBoxes.client);
-    await box.put(HiveNames.openedMnemonic, mnemonic.join(','));
-    await box.close();
+  void _onResetSavedPhrase() {
+    if (widget.mnemonic != null) {
+      clearPhraseInStorage();
+
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => WelcomeScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     List<Widget> mnemonicPhrases = List.generate(
-      fieldsLength,
+      _fieldsLength,
       (index) => MnemonicWord(
         index: index + 1,
-        word: mnemonic[index],
+        word: _mnemonic[index],
       ),
     );
     return ScaffoldWrapper(
@@ -77,12 +81,11 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
         return Scaffold(
           appBar: WelcomeAppBar(
             progress: _progress,
+            onBack: () => _onResetSavedPhrase(),
           ),
           body: Center(
             child: Container(
-              padding: const EdgeInsets.only(
-                top: 30,
-                bottom: 24,
+              padding: authPaddingContainer.copyWith(
                 left: 12,
                 right: 12,
               ),
@@ -115,7 +118,7 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
                             height: 16,
                           ),
                           Container(
-                            width: mnemonicBoxWidth,
+                            width: _mnemonicBoxWidth,
                             child: ReorderableWrap(
                               alignment: WrapAlignment.center,
                               spacing: 6.0,
@@ -134,7 +137,7 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
                               onTap: () async {
                                 await Clipboard.setData(
                                   ClipboardData(
-                                    text: mnemonic.join(','),
+                                    text: _mnemonic.join(','),
                                   ),
                                 );
                               },
@@ -157,9 +160,11 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen> {
                                       child: JellyLinkText(
                                         child: Text(
                                           'Copy to clipboard',
-                                          style: jellyLink.apply(fontSizeDelta: 2),
+                                          style: jellyLink.apply(
+                                            fontSizeDelta: 2,
+                                          ),
                                         ),
-                                      )
+                                      ),
                                     )
                                   ],
                                 ),

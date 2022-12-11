@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/fields/defi_text_form_field.dart';
@@ -26,7 +27,6 @@ class RecoveryScreen extends StatefulWidget {
 class _RecoveryScreenState extends State<RecoveryScreen> {
   static const int mnemonicStrength = 256;
 
-  final double _progress = 0.7;
   final int fieldsLength = 24;
   bool isViewTextFeld = true;
   final GlobalKey globalKey = GlobalKey();
@@ -110,14 +110,10 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
         TransactionState txState,
       ) {
         return Scaffold(
-          appBar: WelcomeAppBar(
-            progress: _progress,
-          ),
+          appBar: WelcomeAppBar(),
           body: Center(
             child: Container(
-              padding: const EdgeInsets.only(
-                top: 30,
-                bottom: 24,
+              padding: authPaddingContainer!.copyWith(
                 left: 12,
                 right: 12,
               ),
@@ -130,7 +126,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                         children: [
                           Text(
                             'Secure your wallet',
-                            style: Theme.of(context).textTheme.headline3,
+                            style: Theme.of(context).textTheme.headline3!,
                           ),
                           SizedBox(
                             height: 8,
