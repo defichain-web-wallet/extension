@@ -1,6 +1,6 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/storage_phrase_mixin.dart';
-import 'package:defi_wallet/screens/auth/name_account_screen.dart';
+import 'package:defi_wallet/screens/auth/signup/name_account_screen.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';

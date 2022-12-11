@@ -19,8 +19,7 @@ class CongratulationsScreen extends StatelessWidget {
             'You’ve successfully protected your wallet. Remember to keep your Secret Recovery Phrase safe, it’s your responsibility!';
 
         return Scaffold(
-          appBar: WelcomeAppBar(
-          ),
+          appBar: WelcomeAppBar(),
           body: Container(
             width: double.infinity,
             child: Column(
