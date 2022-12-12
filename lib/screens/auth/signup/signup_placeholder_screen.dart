@@ -1,5 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/screens/auth/signup/secure_phrase_screen.dart';
+import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -9,15 +9,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:math' as math;
 
-class SecurePlaceholderScreen extends StatefulWidget {
-  const SecurePlaceholderScreen({Key? key}) : super(key: key);
+class SignupPlaceholderScreen extends StatefulWidget {
+  final String password;
+
+  SignupPlaceholderScreen({
+    Key? key,
+    required this.password,
+  }) : super(key: key);
 
   @override
-  State<SecurePlaceholderScreen> createState() =>
-      _SecurePlaceholderScreenState();
+  State<SignupPlaceholderScreen> createState() =>
+      _SignupPlaceholderScreenState();
 }
 
-class _SecurePlaceholderScreenState extends State<SecurePlaceholderScreen> {
+class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen> {
   final double _progress = 0.7;
   final double _coverWidth = 296.0;
   final double _coverHeight = 258.0;
@@ -110,8 +115,8 @@ class _SecurePlaceholderScreenState extends State<SecurePlaceholderScreen> {
                                     'Remind me later ',
                                     style: jellyLink,
                                   ),
-                                  onTap: () =>
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                  onTap: () => ScaffoldMessenger.of(context)
+                                      .showSnackBar(
                                     SnackBar(content: Text('Work in progress')),
                                   ),
                                 ),
@@ -143,8 +148,9 @@ class _SecurePlaceholderScreenState extends State<SecurePlaceholderScreen> {
                                 PageRouteBuilder(
                                   pageBuilder:
                                       (context, animation1, animation2) =>
-                                          SecurePhraseScreen(),
-                                          // SecurePhraseScreen(),
+                                          SignupPhraseScreen(
+                                    password: widget.password,
+                                  ),
                                   transitionDuration: Duration.zero,
                                   reverseTransitionDuration: Duration.zero,
                                 ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
+import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
@@ -45,10 +46,13 @@ class AccountCubit extends Cubit<AccountState> {
 
   createAccount(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: AccountStatusList.loading));
+
     var box = await Hive.openBox(HiveBoxes.client);
     var encryptMnemonic =
         encryptHelper.getEncryptedData(mnemonic.join(','), password);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
+    var encryptedPassword  = Crypt.sha256(password).toString();
+    await box.put(HiveNames.password, encryptedPassword);
     await box.close();
 
     final seed = convertMnemonicToSeed(mnemonic);

@@ -1,5 +1,4 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/screens/auth/signup/secure_placeholder_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
@@ -10,7 +9,12 @@ import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class PasswordScreen extends StatefulWidget {
-  const PasswordScreen({Key? key}) : super(key: key);
+  final Function(String password) onSubmitted;
+
+  const PasswordScreen({
+    Key? key,
+    required this.onSubmitted,
+  }) : super(key: key);
 
   @override
   State<PasswordScreen> createState() => _PasswordScreenState();
@@ -39,17 +43,17 @@ class _PasswordScreenState extends State<PasswordScreen> {
 
   @override
   void initState() {
-    checkBoxFocusNode.addListener(() { });
+    checkBoxFocusNode.addListener(() {});
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(builder: (
-        BuildContext context,
-        bool isFullScreen,
-        TransactionState txState,
-        ) {
+      BuildContext context,
+      bool isFullScreen,
+      TransactionState txState,
+    ) {
       return Scaffold(
         appBar: WelcomeAppBar(
           progress: 0.3,
@@ -114,7 +118,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             },
                             onPressObscure: () {
                               setState(
-                                      () => isPasswordObscure = !isPasswordObscure);
+                                  () => isPasswordObscure = !isPasswordObscure);
                             },
                           ),
                           SizedBox(
@@ -152,7 +156,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             },
                             onPressObscure: () {
                               setState(
-                                      () => isConfirmObscure = !isConfirmObscure);
+                                  () => isConfirmObscure = !isConfirmObscure);
                             },
                           )
                         ],
@@ -174,7 +178,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                               text: TextSpan(children: [
                                 TextSpan(
                                   text:
-                                  'I understand that DEFI cannot recover this password for me.',
+                                      'I understand that DEFI cannot recover this password for me.',
                                   style: Theme.of(context).textTheme.subtitle1,
                                 ),
                                 TextSpan(text: ' '),
@@ -204,16 +208,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                           child: NewPrimaryButton(
                             title: 'Create password',
                             callback: _enableBtn && isConfirm
-                                ? () => Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation1, animation2) =>
-                                    SecurePlaceholderScreen(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),
-                            )
+                                ? () => ({widget.onSubmitted(password.text)})
                                 : null,
                           ),
                         )

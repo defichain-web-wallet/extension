@@ -4,11 +4,9 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/screens/auth/signup/secure_phrase_screen.dart';
+import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
-import 'package:defi_wallet/screens/auth_screen/auth_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
-import 'package:defi_wallet/screens/auth_screen/secure_wallet/secure_wallet_screen.dart';
 import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/create_password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/storage_service.dart';
@@ -115,7 +113,7 @@ class _WalletCheckerState extends State<WalletChecker> {
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
-                  ThemeChecker(SecurePhraseScreen(mnemonic: savedMnemonic)),
+                  ThemeChecker(SignupPhraseScreen(mnemonic: savedMnemonic)),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),

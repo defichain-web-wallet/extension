@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:async';
 
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/screens/auth/signup/congratulations_screen.dart';
+import 'package:defi_wallet/screens/auth/signup/signup_done_screen.dart';
+import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -11,18 +13,26 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 
-class NameAccountScreen extends StatefulWidget {
-  const NameAccountScreen({Key? key}) : super(key: key);
+class SignupAccountScreen extends StatefulWidget {
+  final List<String> mnemonic;
+  final String password;
+
+  const SignupAccountScreen({
+    Key? key,
+    required this.password,
+    required this.mnemonic,
+  }) : super(key: key);
 
   @override
-  State<NameAccountScreen> createState() => _NameAccountScreenState();
+  State<SignupAccountScreen> createState() => _SignupAccountScreenState();
 }
 
-class _NameAccountScreenState extends State<NameAccountScreen> {
+class _SignupAccountScreenState extends State<SignupAccountScreen> {
   TextEditingController _nameController = TextEditingController();
   File? _pickedImage;
   Uint8List _webImage = Uint8List(8);
@@ -74,6 +84,29 @@ class _NameAccountScreenState extends State<NameAccountScreen> {
       });
     }
     await box.close();
+  }
+
+  _createAccount() async {
+    AccountCubit accountCubit =
+    BlocProvider.of<AccountCubit>(context);
+    _saveImageToStorage();
+
+    await accountCubit.createAccount(
+      widget.mnemonic,
+      widget.password,
+    );
+    LoggerService.invokeInfoLogg(
+        'user created new wallet');
+
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) =>
+            SignupDoneScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
   }
 
   @override
@@ -210,24 +243,9 @@ class _NameAccountScreenState extends State<NameAccountScreen> {
                       ),
                     ),
                     NewPrimaryButton(
-                      callback: () {
-                        _saveImageToStorage();
-
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                CongratulationsScreen(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
-                      },
+                      callback: () => _createAccount(),
                       width: 280,
                       title: 'Continue',
-                    ),
-                    SizedBox(
-                      height: 24,
                     ),
                   ],
                 ),

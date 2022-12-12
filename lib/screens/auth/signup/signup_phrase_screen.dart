@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/storage_phrase_mixin.dart';
-import 'package:defi_wallet/screens/auth/signup/name_account_screen.dart';
+import 'package:defi_wallet/screens/auth/password_screen.dart';
+import 'package:defi_wallet/screens/auth/signup/signup_account_screen.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
@@ -15,19 +16,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reorderables/reorderables.dart';
 
-class SecurePhraseScreen extends StatefulWidget {
+class SignupPhraseScreen extends StatefulWidget {
   final String? mnemonic;
+  final String? password;
 
-  const SecurePhraseScreen({
+  const SignupPhraseScreen({
     Key? key,
     this.mnemonic,
+    this.password,
   }) : super(key: key);
 
   @override
-  State<SecurePhraseScreen> createState() => _SecurePhraseScreenState();
+  State<SignupPhraseScreen> createState() => _SignupPhraseScreenState();
 }
 
-class _SecurePhraseScreenState extends State<SecurePhraseScreen>
+class _SignupPhraseScreenState extends State<SignupPhraseScreen>
     with StoragePhraseMixin {
   static const int _mnemonicStrength = 256;
   static const double _mnemonicBoxWidth = 348;
@@ -63,21 +66,64 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen>
     }
   }
 
+  void _onSubmit(BuildContext context) {
+    if (widget.password == null) {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder:
+              (context, animation1, animation2) =>
+              PasswordScreen(
+                onSubmitted: (String password) =>
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder:
+                            (context, animation1, animation2) =>
+                            SignupAccountScreen(
+                              password: password,
+                              mnemonic: _mnemonic,
+                            ),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ),
+                    ),
+              ),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder:
+              (context, animation1, animation2) =>
+              SignupAccountScreen(
+                password: widget.password!,
+                mnemonic: _mnemonic,
+              ),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> mnemonicPhrases = List.generate(
       _fieldsLength,
-      (index) => MnemonicWord(
-        index: index + 1,
-        word: _mnemonic[index],
-      ),
+          (index) =>
+          MnemonicWord(
+            index: index + 1,
+            word: _mnemonic[index],
+          ),
     );
     return ScaffoldWrapper(
-      builder: (
-        BuildContext context,
-        bool isFullScreen,
-        TransactionState txState,
-      ) {
+      builder: (BuildContext context,
+          bool isFullScreen,
+          TransactionState txState,) {
         return Scaffold(
           appBar: WelcomeAppBar(
             progress: _progress,
@@ -98,7 +144,10 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen>
                         children: [
                           Text(
                             'Secure your wallet',
-                            style: Theme.of(context).textTheme.headline3,
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .headline3,
                           ),
                           SizedBox(
                             height: 8,
@@ -106,13 +155,18 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen>
                           Text(
                             'Please remember your seed phrase \n in the correct order.',
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline5!.apply(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .headline5!
-                                      .color!
-                                      .withOpacity(0.6),
-                                ),
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .headline5!
+                                .apply(
+                              color: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .color!
+                                  .withOpacity(0.6),
+                            ),
                           ),
                           SizedBox(
                             height: 16,
@@ -181,16 +235,7 @@ class _SecurePhraseScreenState extends State<SecurePhraseScreen>
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: NewPrimaryButton(
                               title: 'Continue',
-                              callback: () => Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          NameAccountScreen(),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
-                              ),
+                              callback: () => _onSubmit(context),
                             ),
                           )
                         ],
