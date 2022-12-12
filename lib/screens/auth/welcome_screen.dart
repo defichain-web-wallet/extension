@@ -55,6 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                   width: 280,
                   child: AccentButton(
                     label: 'Import using secret Recovery Phrase',
+                    isCheckLock: false,
                     callback: () async {
                       var box = await Hive.openBox(HiveBoxes.client);
                       await box.put(HiveNames.openedMnemonic, null);

@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class MnemonicWord extends StatelessWidget {
   final int index;
   final String word;
+  final bool incorrect;
 
   const MnemonicWord({
     Key? key,
     required this.index,
     required this.word,
+    this.incorrect = false,
   }) : super(key: key);
 
   @override
@@ -19,7 +21,7 @@ class MnemonicWord extends StatelessWidget {
         color: AppColors.white.withOpacity(0.65),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColors.portage.withOpacity(0.12),
+          color: incorrect ? Color(0xFFEE1771) : AppColors.portage.withOpacity(0.12),
         ),
       ),
       child: RichText(

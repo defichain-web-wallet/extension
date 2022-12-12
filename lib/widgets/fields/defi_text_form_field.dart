@@ -5,6 +5,7 @@ class DefiTextFormField extends StatefulWidget {
   double? width;
   TextEditingController? controller;
   Function(String)? onFieldSubmitted;
+  final Function(String)? onChanged;
   bool autofocus;
   bool readOnly;
   FocusNode? focusNode;
@@ -17,6 +18,7 @@ class DefiTextFormField extends StatefulWidget {
     this.autofocus = false,
     this.readOnly = false,
     this.onFieldSubmitted,
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -65,6 +67,11 @@ class _DefiTextFormFieldState extends State<DefiTextFormField> {
               ],
             ),
           ),
+          onChanged: (String value) {
+            if (widget.onChanged != null) {
+              widget.onChanged!(value);
+            }
+          },
           validator: (s) {
           },
         ),

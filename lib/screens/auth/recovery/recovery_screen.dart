@@ -1,5 +1,9 @@
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/screens/auth/password_screen.dart';
+import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -9,6 +13,7 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -25,71 +30,51 @@ class RecoveryScreen extends StatefulWidget {
 }
 
 class _RecoveryScreenState extends State<RecoveryScreen> {
-  static const int mnemonicStrength = 256;
-
-  final int fieldsLength = 24;
-  bool isViewTextFeld = true;
-  final GlobalKey globalKey = GlobalKey();
+  final int _fieldsLength = 24;
   final FocusNode _focusNode = FocusNode();
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController _wordController = TextEditingController();
 
-  late List<String> mnemonic;
-  late List<String> mnemonicLocal;
-  late List<TextEditingController> controllers;
-  late List<FocusNode> focusNodes;
-  late List<Widget> mnemonicPhrasesWidgets;
+  late List<String> _mnemonic;
+  late bool _isHoverMnemonicBox;
 
-  late bool isSavedMnemonic;
-  late bool isHoverMnemonicBox;
+  bool _isViewTextField = true;
+  bool _incorrectPhrase = false;
 
   @override
   void initState() {
     super.initState();
     _focusNode.addListener(() {});
-    mnemonicLocal = [];
-    isSavedMnemonic = widget.mnemonic != null;
+    _mnemonic = [];
     super.initState();
-    if (widget.mnemonic == null) {
-      mnemonic = generateMnemonic(strength: mnemonicStrength).split(' ');
-      // saveSecure();
-    } else {
-      mnemonic = widget.mnemonic!.split(',');
-    }
   }
 
   void _onEnterHover(PointerEvent details) {
-    setState(() => isHoverMnemonicBox = true);
+    setState(() => _isHoverMnemonicBox = true);
   }
 
   void _onExitHover(PointerEvent details) {
-    setState(() => isHoverMnemonicBox = false);
-  }
-
-  Future<void> saveRestore() async {
-    var box = await Hive.openBox(HiveBoxes.client);
-    await box.put(HiveNames.recoveryMnemonic, mnemonic.join(','));
-    await box.close();
+    setState(() => _isHoverMnemonicBox = false);
   }
 
   void _onReorder(int oldIndex, int newIndex) {
     setState(() {
-      String word = mnemonicLocal.removeAt(oldIndex);
-      mnemonicLocal.insert(newIndex, word);
+      String word = _mnemonic.removeAt(oldIndex);
+      _mnemonic.insert(newIndex, word);
     });
   }
 
   void _onFieldSubmitted(String word) {
     setState(() {
-      if (controller.text != '') {
-        mnemonicLocal.add(word);
+      if (_wordController.text != '') {
+        _mnemonic.add(word);
       }
-      controller.text = '';
+      _wordController.text = '';
 
-      if (mnemonicLocal.length < 24) {
+      if (_mnemonic.length < 24) {
         FocusScope.of(context)
             .requestFocus(_focusNode);
       } else {
-        isViewTextFeld = false;
+        _isViewTextField = false;
       }
     });
   }
@@ -97,10 +82,11 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     List<Widget> mnemonicWidgets = List.generate(
-      mnemonicLocal.length,
+      _mnemonic.length,
           (index) => MnemonicWord(
         index: index + 1,
-        word: mnemonicLocal[index],
+        word: _mnemonic[index],
+        incorrect: _incorrectPhrase,
       ),
     );
     return ScaffoldWrapper(
@@ -159,14 +145,14 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                                 padding: const EdgeInsets.all(0),
                                 children: mnemonicWidgets,
                                 onNoReorder: (index) {
-                                  if (!isHoverMnemonicBox) {
+                                  if (!_isHoverMnemonicBox) {
                                     setState(() {
-                                      mnemonicLocal.removeAt(index);
+                                      _mnemonic.removeAt(index);
 
-                                      if (mnemonicLocal.length < 24) {
+                                      if (_mnemonic.length < 24) {
                                         FocusScope.of(context)
                                             .requestFocus(_focusNode);
-                                        isViewTextFeld = true;
+                                        _isViewTextField = true;
                                       }
                                     });
                                   }
@@ -179,16 +165,80 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                       ),
                     ),
                     Container(
-                      child: isViewTextFeld
+                      child: _isViewTextField
                           ? DefiTextFormField(
-                              controller: controller,
+                              controller: _wordController,
                               onFieldSubmitted: _onFieldSubmitted,
                               autofocus: true,
                               focusNode: _focusNode,
-                              readOnly: !isViewTextFeld,
+                              readOnly: !_isViewTextField,
+                              onChanged: (String value) {
+                                try {
+                                  List<String> phraseFromClipboard =
+                                      value.split(' ');
+                                  if (phraseFromClipboard.length ==
+                                      _fieldsLength) {
+                                    setState(() {
+                                      _mnemonic = phraseFromClipboard;
+                                      _wordController.text = '';
+                                      _isViewTextField = false;
+                                    });
+                                  }
+                                } catch (err) {
+                                  print(err);
+                                }
+                              },
                             )
                           : NewPrimaryButton(
-                              callback: () {},
+                              callback: () {
+                                bool isValidPhrase = validateMnemonic(_mnemonic.join(' '));
+                                if (isValidPhrase) {
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation1, animation2) =>
+                                          PasswordScreen(
+                                            onSubmitted: (String password) async {
+                                              try {
+                                                AccountCubit accountCubit =
+                                                BlocProvider.of<AccountCubit>(context);
+                                                await accountCubit.restoreAccount(_mnemonic, password);
+                                                LoggerService.invokeInfoLogg('user was recover wallet');
+                                              } catch (err) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Something error',
+                                                      style: Theme.of(context).textTheme.headline5,
+                                                    ),
+                                                    backgroundColor:
+                                                    Theme.of(context).snackBarTheme.backgroundColor,
+                                                  ),
+                                                );
+                                              }
+
+                                              Navigator.pushReplacement(
+                                                context,
+                                                PageRouteBuilder(
+                                                  pageBuilder: (context, animation1, animation2) => HomeScreen(
+                                                    isLoadTokens: true,
+                                                  ),
+                                                  transitionDuration: Duration.zero,
+                                                  reverseTransitionDuration: Duration.zero,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  );
+                                } else {
+                                  setState(() {
+                                    _incorrectPhrase = true;
+                                  });
+                                }
+                              },
                             ),
                     )
                   ],

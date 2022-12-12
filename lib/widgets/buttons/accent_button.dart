@@ -5,8 +5,14 @@ import 'package:flutter/material.dart';
 class AccentButton extends StatelessWidget {
   final String? label;
   final Function()? callback;
+  final bool isCheckLock;
 
-  const AccentButton({Key? key, this.label, this.callback}) : super(key: key);
+  const AccentButton({
+    Key? key,
+    this.label,
+    this.callback,
+    this.isCheckLock = true,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +35,13 @@ class AccentButton extends StatelessWidget {
         ),
         child: Text(label!, style: Theme.of(context).textTheme.button!),
         onPressed: callback != null
-            ? () =>
-                lockHelper.provideWithLockChecker(context, () => callback!())
+            ? () {
+                if (isCheckLock) {
+                  lockHelper.provideWithLockChecker(context, () => callback!());
+                } else {
+                  callback!();
+                }
+              }
             : null,
       ),
     );
