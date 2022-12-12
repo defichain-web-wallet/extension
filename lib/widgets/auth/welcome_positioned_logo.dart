@@ -1,5 +1,6 @@
 import 'package:defi_wallet/widgets/auth/welcome_text_cover.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class WelcomePositionedLogo extends StatelessWidget {
   double width;

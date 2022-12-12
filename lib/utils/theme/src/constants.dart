@@ -3,8 +3,13 @@ part of '../theme.dart';
 const fontFamily = "RedHatDisplay";
 
 const double buttonHeight = 48.0;
+const double buttonSmallWidth = 280.0;
+const double buttonFullWidth = double.infinity;
+const double boxSmallWidth = 312;
+const double boxFullWidth = double.infinity;
 const double buttonBorderRadius = 12.0;
 const double inputBorderRadius = 12.0;
+
 
 const headline1 = TextStyle(fontWeight: FontWeight.w900, fontSize: 32);
 const headline2 = TextStyle(fontWeight: FontWeight.w900, fontSize: 28);
@@ -13,7 +18,7 @@ const headline4 = TextStyle(fontWeight: FontWeight.w700, fontSize: 18);
 const headline5 = TextStyle(fontWeight: FontWeight.w600, fontSize: 14);
 const headline6 = TextStyle(fontWeight: FontWeight.w600, fontSize: 16);
 
-const subtitle1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 12);
+const subtitle1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 13);
 const subtitle2 = TextStyle(fontWeight: FontWeight.w400, fontSize: 9);
 
 const button = TextStyle(
@@ -59,33 +64,42 @@ const passwordField = TextStyle(
   fontWeight: FontWeight.w600,
 );
 
-const gradientLeftToRightCenter = LinearGradient(
+const gradientButton = LinearGradient(
   begin: Alignment.centerLeft,
   end: Alignment.centerRight,
-  colors:
-    [
-    Color(0xFFBC00C0),
-    Color(0xFFFF00A3),
-  ]
-  ,
+  colors: [
+    AppColors.electricViolet,
+    AppColors.hollywoodCerise,
+  ],
 );
 
 const gradientBottomToUpCenter = LinearGradient(
   begin: Alignment.bottomCenter,
   end: Alignment.topCenter,
-  colors:
-    [
-    Color(0xFFBC00C0),
-    Color(0xFFFF00A3),
-  ]
-  ,
+  colors: [
+    AppColors.electricViolet,
+    AppColors.hollywoodCerise,
+  ],
 );
 
 const gradientGray = LinearGradient(
-  colors:
-    [
-    Color(0xFFBC00C0),
-    Color(0xFFFF00A3),
-  ]
-  ,
+  colors: [
+    AppColors.electricViolet,
+    AppColors.hollywoodCerise,
+  ],
+);
+const gradientDisableButton = LinearGradient(
+  begin: Alignment.centerLeft,
+  end: Alignment.centerRight,
+  colors: [
+    AppColors.electricVioletAlpha,
+    AppColors.hollywoodCeriseAlpha,
+  ],
+);
+
+const noSelectBorder = Border(
+  top: BorderSide(color: AppColors.noSelectLight1),
+  bottom: BorderSide(color: AppColors.noSelectLight1),
+  left: BorderSide(color: AppColors.noSelectLight1),
+  right: BorderSide(color: AppColors.noSelectLight1),
 );

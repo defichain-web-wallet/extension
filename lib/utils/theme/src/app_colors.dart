@@ -9,7 +9,12 @@ abstract class AppColors {
   static const moonRaker = Color(0xFFDDD2F3);
   static const lavenderPurple = Color(0xFF9988BE);
   static const portage = Color(0xFF9490EA);
+  static const portageBg = Color(0x129B73EE);
   static const whiteLilac = Color(0xFFEEEBF8);
+  static const hollywoodCerise = Color(0xFFFF00A3);
+  static const hollywoodCeriseAlpha = Color(0x4DFF00A3);
+  static const electricViolet = Color(0xFFBC00C0);
+  static const electricVioletAlpha = Color(0x4DBC00C0);
 
   static const lightGreyColor = Color(0xffEDEDED);
   static const pinkColor = Color(0xffFF00A3);
@@ -27,4 +32,5 @@ abstract class AppColors {
 
   static const noSelectLight1 = Color(0x3D9B73EE);
   static const noSelectLight2 = Color(0x3d12052F);
+  static const selectLight = Color(0xff9B73EE);
 }

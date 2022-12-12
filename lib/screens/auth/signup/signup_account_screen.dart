@@ -4,7 +4,8 @@ import 'dart:async';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/screens/auth/signup/chose_theme_screen.dart';
+import 'package:defi_wallet/my_app.dart';
+import 'package:defi_wallet/screens/auth/signup/signup_choose_theme_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_done_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -37,6 +38,8 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
   TextEditingController _nameController = TextEditingController();
   File? _pickedImage;
   Uint8List _webImage = Uint8List(8);
+
+  double boxHeight = 190;
 
   Future<void> _pickImage() async {
     if (!kIsWeb) {
@@ -132,21 +135,18 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                             height: 34,
                             child: Text(
                               'Name your account',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 26,
-                              ),
+                              style: headline3,
                             ),
                           ),
                           SizedBox(
                             height: 30,
                           ),
                           Container(
-                            height: 190,
+                            height: boxHeight,
                             padding: EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14.5),
-                              color: Color(0x129B73EE),
+                              color: AppColors.portageBg.withOpacity(0.07),
                             ),
                             child: Column(
                               children: [
@@ -157,7 +157,8 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                                   children: [
                                     CircleAvatar(
                                       radius: 24,
-                                      backgroundColor: Color(0x269490EA),
+                                      backgroundColor:
+                                          AppColors.portage.withOpacity(0.15),
                                       child: _pickedImage == null
                                           ? SvgPicture.asset(
                                               'assets/icon_user.svg',
@@ -185,7 +186,7 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                                           onTap: () => _pickImage(),
                                           child: CircleAvatar(
                                             radius: 12,
-                                            backgroundColor: Color(0xffffffff),
+                                            backgroundColor: AppColors.white,
                                             child: SvgPicture.asset(
                                                 'assets/icon_photo.svg'),
                                           ),
@@ -199,14 +200,9 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                                 ),
                                 Container(
                                   width: double.infinity,
-                                  height: 19,
-                                  // color: Colors.cyan,
                                   child: Text(
                                     'Account`s Name',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: headline5,
                                   ),
                                 ),
                                 SizedBox(
@@ -217,17 +213,16 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                                     controller: _nameController,
                                     decoration: InputDecoration(
                                       filled: true,
-                                      fillColor: Color(0xFFFFFFFF),
+                                      fillColor: AppColors.white,
                                       hintText: 'Enter your Account`s Name',
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color:
-                                            Color(0xff12052F).withOpacity(0.3),
+                                      hintStyle: passwordField.copyWith(
+                                        color: AppColors.darkTextColor
+                                            .withOpacity(0.3),
                                       ),
                                       border: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                          color: Color(0xffebe9fa),
+                                          color: AppColors.portage
+                                              .withOpacity(0.12),
                                           width: 1.0,
                                         ),
                                       ),
@@ -246,12 +241,12 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation1, animation2) =>
-                              ChoseThemeScreen(callback: _createAccount),
+                              SignupChooseThemeScreen(callback: _createAccount),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
                         ),
                       ),
-                      width: 280,
+                      width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
                       title: 'Continue',
                     ),
                   ],

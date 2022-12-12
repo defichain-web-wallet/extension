@@ -1,3 +1,4 @@
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class DefiCheckbox extends StatefulWidget {
@@ -15,7 +16,7 @@ class DefiCheckbox extends StatefulWidget {
     this.focusNode,
     this.isFocused = false,
     this.text = '',
-    this.width = 300,
+    this.width = double.infinity,
     this.value = false,
     this.textWidget = const Text('Add your text')
   }) : super(key: key);
@@ -41,22 +42,18 @@ class _DefiCheckboxState extends State<DefiCheckbox> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              SizedBox(height: 1,),
               Container(
                 width: 20,
                 height: 20,
                 decoration: BoxDecoration(
                   gradient: widget.value
-                      ? LinearGradient(
-                          colors: [
-                            Color(0xFFBC00C0),
-                            Color(0xFFFF00A3),
-                          ],
-                        )
+                      ? gradientButton
                       : null,
                   borderRadius: BorderRadius.circular(6),
                   border: !widget.value
                       ? Border.all(
-                          color: Color(0xFFe0dce8),
+                          color: AppColors.darkTextColor.withOpacity(0.10),
                           width: 2,
                         )
                       : null,
@@ -79,9 +76,7 @@ class _DefiCheckboxState extends State<DefiCheckbox> {
               ),
               SizedBox(width: 14,),
               Expanded(
-                child: Container(
-                  child: widget.textWidget,
-                ),
+                child: widget.textWidget,
               ),
             ],
           ),

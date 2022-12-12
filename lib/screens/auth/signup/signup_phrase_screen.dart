@@ -234,6 +234,7 @@ class _SignupPhraseScreenState extends State<SignupPhraseScreen>
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: NewPrimaryButton(
+                              width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
                               title: 'Continue',
                               callback: () => _onSubmit(context),
                             ),

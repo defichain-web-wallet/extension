@@ -1,3 +1,4 @@
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -18,7 +19,7 @@ class _NameAccountState extends State<NameAccount> {
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14.5),
-        color: Color(0x129B73EE),
+        color: AppColors.portageBg.withOpacity(0.07),
       ),
       child: Column(
         children: [
@@ -29,7 +30,7 @@ class _NameAccountState extends State<NameAccount> {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: Color(0x269490EA),
+                backgroundColor: AppColors.portage.withOpacity(0.15),
                 child: SvgPicture.asset('assets/icon_user.svg'),
               ),
               Padding(
@@ -42,7 +43,7 @@ class _NameAccountState extends State<NameAccount> {
                     },
                     child: CircleAvatar(
                       radius: 12,
-                      backgroundColor: Color(0xffffffff),
+                      backgroundColor: AppColors.white,
                       child: SvgPicture.asset(
                           'assets/icon_photo.svg'),
                     ),
@@ -60,10 +61,7 @@ class _NameAccountState extends State<NameAccount> {
             // color: Colors.cyan,
             child: Text(
               'Account`s Name',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.headline5,
             ),
           ),
           SizedBox(
@@ -73,16 +71,12 @@ class _NameAccountState extends State<NameAccount> {
             child: TextFormField(
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Color(0xFFFFFFFF),
+                fillColor: AppColors.white.withOpacity(0.6),
                 hintText: 'Enter your Account`s Name',
-                hintStyle: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xff12052F).withOpacity(0.3),
-                ),
+                hintStyle: passwordField,
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: Color(0xffebe9fa), width: 1.0),
+                      color: AppColors.portage.withOpacity(0.12), width: 1.0),
                 ),
               ),
             ),

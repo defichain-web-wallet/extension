@@ -11,19 +11,20 @@ import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ChoseThemeScreen extends StatefulWidget {
+class SignupChooseThemeScreen extends StatefulWidget {
   final Function()? callback;
 
-  const ChoseThemeScreen({
+  const SignupChooseThemeScreen({
     Key? key,
     this.callback,
   }) : super(key: key);
 
   @override
-  State<ChoseThemeScreen> createState() => _ChoseThemeScreenState();
+  State<SignupChooseThemeScreen> createState() =>
+      _SignupChooseThemeScreenState();
 }
 
-class _ChoseThemeScreenState extends State<ChoseThemeScreen> {
+class _SignupChooseThemeScreenState extends State<SignupChooseThemeScreen> {
   bool isLight = true;
   bool isDark = false;
   SettingsHelper settingsHelper = SettingsHelper();
@@ -55,7 +56,10 @@ class _ChoseThemeScreenState extends State<ChoseThemeScreen> {
             progress: 1,
           ),
           body: Container(
-            padding: authPaddingContainer,
+            padding: authPaddingContainer.copyWith(
+              left: 16,
+              right: 16,
+            ),
             child: Center(
               child: StretchBox(
                 child: Column(
@@ -67,17 +71,13 @@ class _ChoseThemeScreenState extends State<ChoseThemeScreen> {
                             height: 34,
                             child: Text(
                               'Choose theme',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 26,
-                              ),
+                              style: headline3,
                             ),
                           ),
                           SizedBox(
                             height: 8,
                           ),
                           Container(
-                            width: 328,
                             height: 42,
                             child: Text(
                               'You will always have possibility to change theme in extension',
@@ -125,7 +125,7 @@ class _ChoseThemeScreenState extends State<ChoseThemeScreen> {
                     ),
                     NewPrimaryButton(
                       callback: widget.callback,
-                      width: 280,
+                      width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
                       title: 'Continue',
                     ),
                   ],

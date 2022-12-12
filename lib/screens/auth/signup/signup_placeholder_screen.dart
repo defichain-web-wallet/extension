@@ -142,6 +142,7 @@ class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: NewPrimaryButton(
+                              width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
                               title: 'Continue',
                               callback: () => Navigator.push(
                                 context,

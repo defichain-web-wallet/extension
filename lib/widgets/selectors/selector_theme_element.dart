@@ -1,5 +1,6 @@
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:gradient_borders/gradient_borders.dart';
 
 class SelectorThemeElement extends StatefulWidget {
   final bool isSelected;
@@ -13,7 +14,7 @@ class SelectorThemeElement extends StatefulWidget {
     required this.isSelected,
     required this.callback,
     required this.text,
-    this.width = 328,
+    this.width = double.infinity,
     this.height = 61,
   }) : super(key: key);
 
@@ -31,22 +32,21 @@ class _SelectorThemeElementState extends State<SelectorThemeElement> {
           widget.callback();
         },
         child: Container(
-          padding: EdgeInsets.all(1),
           width: widget.width,
           height: widget.height,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: widget.isSelected ? null : AppColors.noSelectLight1,
-            gradient: widget.isSelected ? gradientBottomToUpCenter : null,
+            color: widget.isSelected
+                ? Theme.of(context).selectedRowColor
+                : Theme.of(context).scaffoldBackgroundColor,
+            border: widget.isSelected
+                ? GradientBoxBorder(
+                    gradient: gradientBottomToUpCenter,
+                  )
+                : noSelectBorder,
           ),
           child: Center(
             child: Container(
-              width: widget.width - 2,
-              height: widget.height - 2,
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(7),
-              ),
               child: Row(
                 children: [
                   SizedBox(

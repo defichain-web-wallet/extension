@@ -9,7 +9,7 @@ class NewPrimaryButton extends StatelessWidget {
   NewPrimaryButton(
       {Key? key,
       this.callback,
-      this.width = 280,
+      this.width = double.infinity,
       this.title = 'OK'})
       : super(key: key);
 
@@ -20,25 +20,11 @@ class NewPrimaryButton extends StatelessWidget {
       width: width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(buttonBorderRadius),
-        gradient: LinearGradient(
-          colors: callback != null
-              ? [
-                  Color(0xFFBC00C0),
-                  Color(0xFFFF00A3),
-                ]
-              : [
-                  Color(0xFFecb2ec),
-                  Color(0xFFffb2e3),
-                ],
-        ),
+        gradient: callback != null ? gradientButton : gradientDisableButton
       ),
       child: ElevatedButton(
         onPressed: callback,
         style: ElevatedButton.styleFrom(
-          side: BorderSide(
-            style: BorderStyle.solid,
-            color: Color(0xFFd1a5dd),
-          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(buttonBorderRadius),

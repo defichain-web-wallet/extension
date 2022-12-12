@@ -68,7 +68,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      width: 312,
                       child: Column(
                         children: [
                           Text(
@@ -86,6 +85,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             error: passwordErrorMessage,
                             isShowObscureIcon: true,
                             isObscure: isPasswordObscure,
+
                             onChanged: (String value) {
                               // TODO: try move to mixin
                               if (value.length < 8) {
@@ -163,16 +163,17 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       ),
                     ),
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
                           child: DefiCheckbox(
+                            width: boxSmallWidth,
                             callback: () {
                               setState(() {
                                 isConfirm = !isConfirm;
                               });
                             },
                             value: isConfirm,
-                            width: 312,
                             focusNode: checkBoxFocusNode,
                             textWidget: RichText(
                               text: TextSpan(children: [
@@ -203,14 +204,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         SizedBox(
                           height: 24,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: NewPrimaryButton(
-                            title: 'Create password',
-                            callback: _enableBtn && isConfirm
-                                ? () => ({widget.onSubmitted(password.text)})
-                                : null,
-                          ),
+                        NewPrimaryButton(
+                          width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
+                          title: 'Create password',
+                          callback: _enableBtn && isConfirm
+                              ? () => ({widget.onSubmitted(password.text)})
+                              : null,
                         )
                       ],
                     )
