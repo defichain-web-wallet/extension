@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/screens/auth/signup/chose_theme_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_done_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -87,22 +88,19 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
   }
 
   _createAccount() async {
-    AccountCubit accountCubit =
-    BlocProvider.of<AccountCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     _saveImageToStorage();
 
     await accountCubit.createAccount(
       widget.mnemonic,
       widget.password,
     );
-    LoggerService.invokeInfoLogg(
-        'user created new wallet');
+    LoggerService.invokeInfoLogg('user created new wallet');
 
     Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) =>
-            SignupDoneScreen(),
+        pageBuilder: (context, animation1, animation2) => SignupDoneScreen(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),
@@ -243,7 +241,16 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                       ),
                     ),
                     NewPrimaryButton(
-                      callback: () => _createAccount(),
+                      // callback: () => _createAccount(),
+                      callback: () => Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) =>
+                              ChoseThemeScreen(callback: _createAccount),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
+                        ),
+                      ),
                       width: 280,
                       title: 'Continue',
                     ),

@@ -83,10 +83,13 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
   Widget build(BuildContext context) {
     List<Widget> mnemonicWidgets = List.generate(
       _mnemonic.length,
-          (index) => MnemonicWord(
-        index: index + 1,
-        word: _mnemonic[index],
-        incorrect: _incorrectPhrase,
+      (index) => MouseRegion(
+        cursor: SystemMouseCursors.grab,
+        child: MnemonicWord(
+          index: index + 1,
+          word: _mnemonic[index],
+          incorrect: _incorrectPhrase,
+        ),
       ),
     );
     return ScaffoldWrapper(
