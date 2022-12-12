@@ -24,4 +24,7 @@ abstract class AppColors {
 
   static const lighterDark = Color(0xFF272727);
   static const lightDark = Color(0xFF1b1b1b);
+
+  static const noSelectLight1 = Color(0x3D9B73EE);
+  static const noSelectLight2 = Color(0x3d12052F);
 }
