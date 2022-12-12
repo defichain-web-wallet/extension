@@ -1,6 +1,6 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/buy/search_buy_token.dart';
 import 'package:defi_wallet/screens/buy/tutorials/first_step_buy_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';

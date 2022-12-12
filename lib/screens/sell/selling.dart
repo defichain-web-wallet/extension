@@ -13,7 +13,7 @@ import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/test_pool_swap_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/dex/widgets/amount_selector_field.dart';
 import 'package:defi_wallet/screens/sell/sell_initiated.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';

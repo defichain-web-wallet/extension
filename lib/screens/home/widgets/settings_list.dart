@@ -1,7 +1,7 @@
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/screens/settings/accounts/rename_accounts.dart';
 import 'package:defi_wallet/screens/settings/settings.dart';

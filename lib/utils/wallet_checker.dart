@@ -4,10 +4,11 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/screens/auth/password_screen.dart';
+import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
-import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/create_password_screen.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/storage_service.dart';
 import 'package:defi_wallet/utils/theme/theme_checker.dart';
@@ -15,7 +16,6 @@ import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
-import 'package:defi_wallet/screens/auth_screen/recovery/recovery_screen.dart';
 
 class WalletChecker extends StatefulWidget {
   @override
@@ -101,7 +101,12 @@ class _WalletCheckerState extends State<WalletChecker> {
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) => ThemeChecker(
-                  CreatePasswordScreen(showStep: false, showDoneScreen: false)),
+                PasswordScreen(
+                  onSubmitted: (String password) {
+                    // need to recovery
+                  },
+                ),
+              ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),

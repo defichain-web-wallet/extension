@@ -1,6 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/screens/auth_screen/secure_wallet/widgets/text_fields.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
@@ -78,12 +77,7 @@ class _PreviewSeedState extends State<PreviewSeed> {
                 SizedBox(
                   height: 12,
                 ),
-                TextFields(
-                  controllers: controllers,
-                  focusNodes: focusNodes,
-                  globalKey: globalKey,
-                  enabled: false,
-                ),
+                Text('...'),
               ],
             ),
           ),

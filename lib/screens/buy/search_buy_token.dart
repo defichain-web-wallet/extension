@@ -8,7 +8,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/buy/iban_screen.dart';
 import 'package:defi_wallet/screens/buy/purchase_overview_screen.dart';
 import 'package:defi_wallet/screens/tokens/add_token.dart';

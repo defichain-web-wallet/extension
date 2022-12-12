@@ -113,7 +113,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
           appBar: WelcomeAppBar(),
           body: Center(
             child: Container(
-              padding: authPaddingContainer!.copyWith(
+              padding: authPaddingContainer.copyWith(
                 left: 12,
                 right: 12,
               ),
