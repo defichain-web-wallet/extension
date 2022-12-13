@@ -63,6 +63,8 @@ class _SignupPhraseScreenState extends State<SignupPhraseScreen>
           reverseTransitionDuration: Duration.zero,
         ),
       );
+    } else {
+      Navigator.pop(context);
     }
   }
 

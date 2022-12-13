@@ -10,10 +10,12 @@ import 'package:flutter/material.dart';
 
 class PasswordScreen extends StatefulWidget {
   final Function(String password) onSubmitted;
+  final bool isShownProgressBar;
 
   const PasswordScreen({
     Key? key,
     required this.onSubmitted,
+    this.isShownProgressBar = true,
   }) : super(key: key);
 
   @override
@@ -56,7 +58,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
     ) {
       return Scaffold(
         appBar: WelcomeAppBar(
-          progress: 0.3,
+          progress: widget.isShownProgressBar ? 0.3 : 0,
         ),
         body: Container(
           padding: authPaddingContainer,

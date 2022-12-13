@@ -9,18 +9,20 @@ abstract class AppColors {
   static const moonRaker = Color(0xFFDDD2F3);
   static const lavenderPurple = Color(0xFF9988BE);
   static const portage = Color(0xFF9490EA);
-  static const portageBg = Color(0x129B73EE);
+  static const portageBg = Color(0xFF9B73EE);
   static const whiteLilac = Color(0xFFEEEBF8);
   static const hollywoodCerise = Color(0xFFFF00A3);
-  static const hollywoodCeriseAlpha = Color(0x4DFF00A3);
+  static const hollywoodCeriseAlpha = Color(0xFFFF00A3);
   static const electricViolet = Color(0xFFBC00C0);
-  static const electricVioletAlpha = Color(0x4DBC00C0);
+  static const redViolet = Color(0xFFEE1798);
+  static const electricVioletAlpha = Color(0xFFBC00C0);
+  static const razzmatazz = Color(0xFFEE1771);
 
-  static const lightGreyColor = Color(0xffEDEDED);
-  static const pinkColor = Color(0xffFF00A3);
-  static const redErrorColor = Color(0xffD92E2E);
-  static const darkTextColor = Color(0xff12052F);
-  static const shadowColor = Color(0xff131415);
+  static const lightGreyColor = Color(0xFFEDEDED);
+  static const pinkColor = Color(0xFFFF00A3);
+  static const redErrorColor = Color(0xFFD92E2E);
+  static const darkTextColor = Color(0xFF12052F);
+  static const shadowColor = Color(0xFF131415);
 
   static const darkerGrey = Color(0xFF6C6C6C);
   static const darkestGrey = Color(0xFF626262);
@@ -30,7 +32,7 @@ abstract class AppColors {
   static const lighterDark = Color(0xFF272727);
   static const lightDark = Color(0xFF1b1b1b);
 
-  static const noSelectLight1 = Color(0x3D9B73EE);
-  static const noSelectLight2 = Color(0x3d12052F);
-  static const selectLight = Color(0xff9B73EE);
+  static const noSelectLight1 = Color(0xFF9B73EE);
+  static const noSelectLight2 = Color(0xFF12052F);
+  static const selectLight = Color(0xFF9B73EE);
 }

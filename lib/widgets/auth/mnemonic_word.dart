@@ -1,5 +1,6 @@
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:gradient_borders/gradient_borders.dart';
 
 class MnemonicWord extends StatelessWidget {
   final int index;
@@ -20,8 +21,10 @@ class MnemonicWord extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white.withOpacity(0.65),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: incorrect ? Color(0xFFEE1771) : AppColors.portage.withOpacity(0.12),
+        border: incorrect ? GradientBoxBorder(
+          gradient: gradientWrongMnemonicWord,
+        ) : Border.all(
+          color: AppColors.portage.withOpacity(0.12),
         ),
       ),
       child: RichText(

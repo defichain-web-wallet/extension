@@ -82,19 +82,31 @@ const gradientBottomToUpCenter = LinearGradient(
   ],
 );
 
+const gradientWrongMnemonicWord = LinearGradient(
+  begin: Alignment.bottomCenter,
+  end: Alignment.topCenter,
+  colors: [
+    AppColors.redViolet,
+    AppColors.razzmatazz,
+  ],
+  transform: GradientRotation(4.7),
+);
+
 const gradientGray = LinearGradient(
   colors: [
     AppColors.electricViolet,
     AppColors.hollywoodCerise,
   ],
 );
-const gradientDisableButton = LinearGradient(
+
+LinearGradient gradientDisableButton = LinearGradient(
   begin: Alignment.centerLeft,
   end: Alignment.centerRight,
   colors: [
-    AppColors.electricVioletAlpha,
-    AppColors.hollywoodCeriseAlpha,
+    AppColors.pinkColor.withOpacity(0.3),
+    AppColors.electricViolet.withOpacity(0.3),
   ],
+  transform: GradientRotation(4.7),
 );
 
 const noSelectBorder = Border(
