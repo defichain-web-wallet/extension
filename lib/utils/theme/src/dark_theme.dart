@@ -22,6 +22,28 @@ ThemeData createDarkTheme() {
       color: Colors.white,
     ),
     textTheme: createTextTheme(AppColors.white),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: ButtonStyle(
+        textStyle: MaterialStatePropertyAll(button),
+        padding: MaterialStatePropertyAll(
+          EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+        ),
+        shape: MaterialStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(buttonBorderRadius),
+            ),
+            side: BorderSide(
+              color: Colors.transparent,
+            ),
+          ),
+        ),
+        backgroundColor: MaterialStatePropertyAll(
+          AppColors.purplePizzazz.withOpacity(0.1),
+        ),
+        shadowColor: MaterialStatePropertyAll(Colors.transparent),
+      ),
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         primary: Color(0xff1C1D1F),
@@ -48,7 +70,7 @@ ThemeData createDarkTheme() {
       backgroundColor: Color(0xff333436),
       shadowColor: Colors.black.withOpacity(0.35),
       titleTextStyle:
-      TextStyle(color: Colors.white, fontFamily: 'RedHatDisplay'),
+          TextStyle(color: Colors.white, fontFamily: 'RedHatDisplay'),
       actionsIconTheme: IconThemeData(
         color: Colors.white,
       ),
@@ -75,6 +97,6 @@ ThemeData createDarkTheme() {
       fillColor: Color(0xFFF6F4FC),
     ),
     textSelectionTheme:
-    TextSelectionThemeData(selectionColor: Color(0xFFF0F0F0)),
+        TextSelectionThemeData(selectionColor: Color(0xFFF0F0F0)),
   );
 }

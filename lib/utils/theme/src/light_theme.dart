@@ -22,6 +22,44 @@ ThemeData createLightTheme() {
       color: Colors.black,
     ),
     textTheme: createTextTheme(AppColors.darkTextColor),
+    // outlinedButtonTheme: OutlinedButtonThemeData(
+    //   style: OutlinedButton.styleFrom(
+    //     textStyle: button,
+    //     padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+    //     shape: RoundedRectangleBorder(
+    //         borderRadius: BorderRadius.all(
+    //           Radius.circular(buttonBorderRadius),
+    //         ),
+    //         side: BorderSide(
+    //           color: Colors.transparent,
+    //         ),
+    //     ),
+    //     backgroundColor: Colors.transparent,
+    //     shadowColor: Colors.transparent,
+    //   ),
+    // ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: ButtonStyle(
+        textStyle: MaterialStatePropertyAll(button),
+        padding: MaterialStatePropertyAll(
+          EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+        ),
+        shape: MaterialStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(buttonBorderRadius),
+            ),
+            side: BorderSide(
+              color: Colors.transparent,
+            ),
+          ),
+        ),
+        backgroundColor: MaterialStatePropertyAll(
+          AppColors.purplePizzazz.withOpacity(0.1),
+        ),
+        shadowColor: MaterialStatePropertyAll(Colors.transparent),
+      ),
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         primary: Colors.white,

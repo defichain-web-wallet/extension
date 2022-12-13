@@ -1,11 +1,13 @@
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/settings_model.dart';
+import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class UiKit extends StatefulWidget {
   const UiKit({Key? key}) : super(key: key);
@@ -40,84 +42,128 @@ class _UiKitState extends State<UiKit> {
               child: Icon(Icons.lightbulb))
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            PasswordTextField(
-                controller: controller,
-                hint: 'Password',
-                label: 'Password',
-                isShowObscureIcon: true,
-                isObscure: isObscure1,
-                onPressObscure: () {
-                  setState(() {
-                    isObscure1 = !isObscure1;
-                  });
-                }),
-            PasswordTextField(
-                controller: controller,
-                hint: 'Password',
-                label: 'Password',
-                isShowObscureIcon: true,
-                isObscure: isObscure2,
-                onPressObscure: () {
-                  setState(() {
-                    isObscure2 = !isObscure2;
-                  });
-                }),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: NewPrimaryButton(
-                title: "Create a new wallet",
-                callback: null,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              FlatButton(
+                title: 'Buy/Sell',
+                callback: () {
+                  //
+                },
+                icon: SvgPicture.asset(
+                  'assets/icons/earn_icon.svg',
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: NewPrimaryButton(
-                title: "Create a new wallet",
-                callback: () {},
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Row(
                 children: [
-                  NewPrimaryButton(
-                    width: 150,
-                    title: '150',
-                    callback: () {},
+                  FlatButton(
+                    title: 'Buy/Sell',
+                    callback: () {
+                      //
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/icons/earn_icon.svg',
+                    ),
                   ),
-                  NewPrimaryButton(
-                    width: value ? 100 : 150,
-                    title: value ? '100' : '150',
-                    callback: () => redirectToTest(),
+                  FlatButton(
+                    title: 'Buy/Sell',
+                    isPrimary: false,
+                    callback: () {
+                      //
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/icons/earn_icon.svg',
+                    ),
+                  ),
+                  FlatButton(
+                    title: 'Change',
+                    isPrimary: false,
+                    callback: () {
+                      //
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/icons/change_icon.svg',
+                    ),
                   ),
                 ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: DefiCheckbox(
-                callback: () {
-                  setState(() {
-                    value = !value;
-                  });
-                },
-                value: value,
-                width: 250,
-                textWidget: Text('make a type specimen book. It has survived not only five centuries, but also the leap'),
+              PasswordTextField(
+                  controller: controller,
+                  hint: 'Password',
+                  label: 'Password',
+                  isShowObscureIcon: true,
+                  isObscure: isObscure1,
+                  onPressObscure: () {
+                    setState(() {
+                      isObscure1 = !isObscure1;
+                    });
+                  }),
+              PasswordTextField(
+                  controller: controller,
+                  hint: 'Password',
+                  label: 'Password',
+                  isShowObscureIcon: true,
+                  isObscure: isObscure2,
+                  onPressObscure: () {
+                    setState(() {
+                      isObscure2 = !isObscure2;
+                    });
+                  }),
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: NewPrimaryButton(
+                  title: "Create a new wallet",
+                  callback: null,
+                ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: NewPrimaryButton(
+                  title: "Create a new wallet",
+                  callback: () {},
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    NewPrimaryButton(
+                      width: 150,
+                      title: '150',
+                      callback: () {},
+                    ),
+                    NewPrimaryButton(
+                      width: value ? 100 : 150,
+                      title: value ? '100' : '150',
+                      callback: () => redirectToTest(),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: DefiCheckbox(
+                  callback: () {
+                    setState(() {
+                      value = !value;
+                    });
+                  },
+                  value: value,
+                  width: 250,
+                  textWidget: Text(
+                      'make a type specimen book. It has survived not only five centuries, but also the leap'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-  redirectToTest() {
 
-  }
+  redirectToTest() {}
 }

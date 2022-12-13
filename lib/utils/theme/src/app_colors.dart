@@ -17,6 +17,7 @@ abstract class AppColors {
   static const redViolet = Color(0xFFEE1798);
   static const electricVioletAlpha = Color(0xFFBC00C0);
   static const razzmatazz = Color(0xFFEE1771);
+  static const purplePizzazz = Color(0xFFFF00E5);
 
   static const lightGreyColor = Color(0xFFEDEDED);
   static const pinkColor = Color(0xFFFF00A3);
