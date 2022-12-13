@@ -9,7 +9,7 @@ ThemeData createLightTheme() {
     scaffoldBackgroundColor: AppColors.whiteLilac,
     dialogBackgroundColor: Color(0xffFAFAFA),
     primaryColorLight: Color(0xFF5D5D5D),
-    selectedRowColor: AppColors.selectLight.withOpacity(0.07),
+    selectedRowColor: AppColors.selectLight,
     shadowColor: Colors.grey[300]!,
     cardColor: Colors.white,
     backgroundColor: Colors.white,
@@ -41,7 +41,7 @@ ThemeData createLightTheme() {
         elevation: 8,
       ),
     ),
-    dividerColor: Color(0xFFEDEDED),
+    dividerColor: AppColors.darkTextColor,
     appBarTheme: AppBarTheme(
       elevation: 5,
       backgroundColor: Colors.white,

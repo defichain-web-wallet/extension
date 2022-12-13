@@ -11,7 +11,7 @@ ThemeData createDarkTheme() {
     secondaryHeaderColor: Color(0xff333436),
     scaffoldBackgroundColor: AppColors.shadowColor,
     dialogBackgroundColor: Color(0xFF1C1D1F),
-    selectedRowColor: Color(0xFF1C1D1F),
+    selectedRowColor: Color(0xFF2A83C4),
     shadowColor: Colors.transparent,
     cardColor: Color(0xff333436),
     colorScheme: ColorScheme.dark(
@@ -42,7 +42,7 @@ ThemeData createDarkTheme() {
         elevation: 8,
       ),
     ),
-    dividerColor: Color(0xFF545556),
+    dividerColor: Color(0xFFffffff),
     appBarTheme: AppBarTheme(
       elevation: 0,
       backgroundColor: Color(0xff333436),

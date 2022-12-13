@@ -37,13 +37,15 @@ class _SelectorThemeElementState extends State<SelectorThemeElement> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             color: widget.isSelected
-                ? Theme.of(context).selectedRowColor
+                ? Theme.of(context).selectedRowColor.withOpacity(0.07)
                 : Theme.of(context).scaffoldBackgroundColor,
             border: widget.isSelected
                 ? GradientBoxBorder(
                     gradient: gradientBottomToUpCenter,
                   )
-                : noSelectBorder,
+                : Border.all(
+                    color: Theme.of(context).selectedRowColor.withOpacity(0.24),
+                  ),
           ),
           child: Center(
             child: Container(
@@ -56,8 +58,9 @@ class _SelectorThemeElementState extends State<SelectorThemeElement> {
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
-                      color:
-                          widget.isSelected ? null : AppColors.noSelectLight2,
+                      color: widget.isSelected
+                          ? null
+                          : Theme.of(context).dividerColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                       gradient:
                           widget.isSelected ? gradientBottomToUpCenter : null,
