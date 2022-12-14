@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/settings_model.dart';
+import 'package:defi_wallet/screens/home/widgets/settings_list.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
@@ -8,6 +9,8 @@ import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import '../widgets/selectors/app_selector.dart';
 
 class UiKit extends StatefulWidget {
   const UiKit({Key? key}) : super(key: key);
@@ -48,6 +51,13 @@ class _UiKitState extends State<UiKit> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Container(
+                child: AppSelector(
+                  onSelect: (String value) {
+                    //
+                  },
+                ),
+              ),
               FlatButton(
                 title: 'Buy/Sell',
                 callback: () {
