@@ -26,7 +26,7 @@ class FlatButton extends StatelessWidget {
 
   Color getSpecificBorderColor() {
     return (isPrimary)
-        ? Colors.white
+        ? Colors.transparent
         : AppColors.lavenderPurple.withOpacity(0.32);
   }
 

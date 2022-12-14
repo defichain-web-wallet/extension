@@ -69,16 +69,6 @@ class _UiKitState extends State<UiKit> {
                     ),
                   ),
                   FlatButton(
-                    title: 'Buy/Sell',
-                    isPrimary: false,
-                    callback: () {
-                      //
-                    },
-                    icon: SvgPicture.asset(
-                      'assets/icons/earn_icon.svg',
-                    ),
-                  ),
-                  FlatButton(
                     title: 'Change',
                     isPrimary: false,
                     callback: () {
