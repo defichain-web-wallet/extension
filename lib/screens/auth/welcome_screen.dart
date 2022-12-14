@@ -3,6 +3,7 @@ import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_placeholder_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/auth/welcome_positioned_logo.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -13,6 +14,7 @@ import 'package:hive/hive.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 
 class WelcomeScreen extends StatelessWidget {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   signUpFlowCallback(BuildContext context) {
     Navigator.push(
       context,
@@ -46,6 +48,11 @@ class WelcomeScreen extends StatelessWidget {
       TransactionState txState,
     ) {
       return Scaffold(
+        key: _scaffoldKey,
+        drawerScrimColor: Color(0xFF000000).withOpacity(0.24),
+        endDrawer: AccountDrawer(
+          width: buttonSmallWidth,
+        ),
         body: Container(
           padding: authPaddingContainer.copyWith(top: 0, left: 0, right: 0),
           child: Center(
@@ -104,10 +111,12 @@ class WelcomeScreen extends StatelessWidget {
                                 'Terms and Conditions',
                                 style: jellyLink,
                               ),
-                              onTap: () =>
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Work in progress')),
-                              ),
+                              onTap: () {
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //     SnackBar(
+                                //         content: Text('Work in progress')));
+                                _scaffoldKey.currentState!.openEndDrawer();
+                              },
                             ),
                           ],
                         ),
