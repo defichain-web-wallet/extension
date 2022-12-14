@@ -1,5 +1,9 @@
+import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
@@ -13,6 +17,7 @@ import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
 class RecoveryScreen extends StatefulWidget {
@@ -49,45 +54,52 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
   }
 
   void _onSubmitRecovery() async {
+    SettingsHelper.settings.apiName = ApiName.auto;
+    SettingsHelper().saveSettings();
     bool isValidPhrase = validateMnemonic(_mnemonic.join(' '));
     if (isValidPhrase) {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              PasswordScreen(
-                isShownProgressBar: false,
-                onSubmitted: (String password) async {
-                  try {
-                    AccountCubit accountCubit =
+          pageBuilder: (context, animation1, animation2) => PasswordScreen(
+            isShownProgressBar: false,
+            onSubmitted: (String password) async {
+              try {
+                AccountCubit accountCubit =
                     BlocProvider.of<AccountCubit>(context);
-                    await accountCubit.restoreAccount(_mnemonic, password);
-                    LoggerService.invokeInfoLogg('user was recover wallet');
-                  } catch (err) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Something error',
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
-                        backgroundColor:
-                        Theme.of(context).snackBarTheme.backgroundColor,
-                      ),
-                    );
-                  }
 
-                  Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) => HomeScreen(
-                        isLoadTokens: true,
-                      ),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
+                var box = await Hive.openBox(HiveBoxes.client);
+                var encryptedPassword = Crypt.sha256(password).toString();
+                await box.put(HiveNames.password, encryptedPassword);
+                await box.close();
+
+                await accountCubit.restoreAccount(_mnemonic, password);
+                LoggerService.invokeInfoLogg('user  was recover wallet');
+              } catch (err) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Something error',
+                      style: Theme.of(context).textTheme.headline5,
                     ),
-                  );
-                },
-              ),
+                    backgroundColor:
+                        Theme.of(context).snackBarTheme.backgroundColor,
+                  ),
+                );
+              }
+
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) => HomeScreen(
+                    isLoadTokens: true,
+                  ),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
+            },
+          ),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
@@ -122,8 +134,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
       _wordController.text = '';
 
       if (_mnemonic.length < 24) {
-        FocusScope.of(context)
-            .requestFocus(_focusNode);
+        FocusScope.of(context).requestFocus(_focusNode);
       } else {
         _isViewTextField = false;
       }
@@ -245,7 +256,9 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                             )
                           : NewPrimaryButton(
                               title: 'Restore Wallet',
-                              width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
+                              width: isFullScreen
+                                  ? buttonFullWidth
+                                  : buttonSmallWidth,
                               callback: _onSubmitRecovery,
                             ),
                     )
