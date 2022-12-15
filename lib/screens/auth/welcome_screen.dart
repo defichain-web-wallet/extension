@@ -6,6 +6,7 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/welcome_positioned_logo.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/create_edit_account/create_edit_account_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -104,10 +105,17 @@ class WelcomeScreen extends StatelessWidget {
                                 'Terms and Conditions',
                                 style: jellyLink,
                               ),
-                              onTap: () =>
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Work in progress')),
-                              ),
+                              onTap: ()
+                                  {
+                                    showDialog(
+                                      barrierColor: Color(0x0f180245),
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return CreateEditAccountDialog();
+                                      },
+                                    );
+                                  },
                             ),
                           ],
                         ),
