@@ -12,7 +12,7 @@ ThemeData createLightTheme() {
     selectedRowColor: AppColors.selectLight,
     shadowColor: Colors.grey[300]!,
     cardColor: Colors.white,
-    backgroundColor: Colors.white,
+    backgroundColor: LightColors.cardColor,
     secondaryHeaderColor: AppColors.lightGreyColor,
     colorScheme: ColorScheme.light(
       primary: AppColors.pinkColor,
@@ -42,7 +42,7 @@ ThemeData createLightTheme() {
       style: ButtonStyle(
         textStyle: MaterialStatePropertyAll(button),
         padding: MaterialStatePropertyAll(
-          EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+          EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
         shape: MaterialStatePropertyAll(
           RoundedRectangleBorder(

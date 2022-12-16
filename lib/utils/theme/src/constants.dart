@@ -23,7 +23,7 @@ const subtitle2 = TextStyle(fontWeight: FontWeight.w400, fontSize: 9);
 
 const button = TextStyle(
   fontWeight: FontWeight.w600,
-  fontSize: 14,
+  fontSize: 12,
 );
 
 const bodyText1 = TextStyle(
