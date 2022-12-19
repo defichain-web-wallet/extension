@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_placeholder_screen.dart';
@@ -104,10 +105,19 @@ class WelcomeScreen extends StatelessWidget {
                                 'Terms and Conditions',
                                 style: jellyLink,
                               ),
-                              onTap: () =>
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Work in progress')),
+                              onTap: () => Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          AddressBookScreenNew(),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
                               ),
+                              //     ScaffoldMessenger.of(context).showSnackBar(
+                              //   SnackBar(content: Text('Work in progress')),
+                              // ),
                             ),
                           ],
                         ),

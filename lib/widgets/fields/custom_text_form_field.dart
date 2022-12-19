@@ -1,10 +1,12 @@
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 
 class CustomTextFormField extends StatefulWidget {
   final TextEditingController? addressController;
   final Function(String)? onChanged;
+  final Widget? prefix;
   final String? hintText;
   final String? validationRule;
   final isBorder;
@@ -13,6 +15,7 @@ class CustomTextFormField extends StatefulWidget {
     Key? key,
     this.addressController,
     this.onChanged,
+    this.prefix,
     this.hintText,
     this.validationRule,
     this.isBorder = false,
@@ -48,13 +51,14 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           textAlignVertical: TextAlignVertical.center,
           style: Theme.of(context).textTheme.button,
           decoration: InputDecoration(
+              prefixIcon: widget.prefix,
               filled: true,
               fillColor: Theme.of(context).cardColor,
               hoverColor: Colors.transparent,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(
-                  color: Colors.transparent,
+                  color: widget.isBorder ? AppColors.portage.withOpacity(0.12) : Colors.transparent,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
