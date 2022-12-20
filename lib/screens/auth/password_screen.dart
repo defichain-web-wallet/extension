@@ -1,12 +1,14 @@
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PasswordScreen extends StatefulWidget {
   final Function(String password) onSubmitted;
@@ -87,7 +89,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             error: passwordErrorMessage,
                             isShowObscureIcon: true,
                             isObscure: isPasswordObscure,
-
                             onChanged: (String value) {
                               // TODO: try move to mixin
                               if (value.length < 8) {
@@ -206,13 +207,28 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         SizedBox(
                           height: 24,
                         ),
-                        NewPrimaryButton(
+                        Container(
                           width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
-                          title: 'Create password',
-                          callback: _enableBtn && isConfirm
-                              ? () => ({widget.onSubmitted(password.text)})
-                              : null,
-                        )
+                          child: BlocBuilder<AccountCubit, AccountState>(
+                            builder: (context, state) {
+                              return PendingButton(
+                                'Create password',
+                                pendingText: state.status ==
+                                        AccountStatusList.restore
+                                    ? 'Processed (${state.restored}/${state.needRestore})'
+                                    : 'Processed...',
+                                isCheckLock: false,
+                                callback: _enableBtn && isConfirm
+                                    ? (parent) async {
+                                        parent.emitPending(true);
+                                        await widget.onSubmitted(password.text);
+                                        parent.emitPending(false);
+                                      }
+                                    : null,
+                              );
+                            },
+                          ),
+                        ),
                       ],
                     )
                   ],

@@ -2,9 +2,9 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class NewPrimaryButton extends StatelessWidget {
-  void Function()? callback;
-  double width;
-  String title;
+  final void Function()? callback;
+  final double width;
+  final String title;
 
   NewPrimaryButton(
       {Key? key,

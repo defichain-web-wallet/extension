@@ -3,7 +3,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/selector_theme_element.dart';
@@ -12,11 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignupChooseThemeScreen extends StatefulWidget {
-  final Function()? callback;
+  final Function() callback;
 
   const SignupChooseThemeScreen({
     Key? key,
-    this.callback,
+    required this.callback,
   }) : super(key: key);
 
   @override
@@ -123,10 +123,16 @@ class _SignupChooseThemeScreenState extends State<SignupChooseThemeScreen> {
                         ],
                       ),
                     ),
-                    NewPrimaryButton(
-                      callback: widget.callback,
-                      width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
-                      title: 'Continue',
+                    PendingButton(
+                      'Continue',
+                      pendingText: 'Processed...',
+                      isCheckLock: false,
+                      callback: (parent) async {
+                        parent.emitPending(true);
+                        await widget.callback();
+                        // parent.emitPending(false);
+                      },
+
                     ),
                   ],
                 ),
