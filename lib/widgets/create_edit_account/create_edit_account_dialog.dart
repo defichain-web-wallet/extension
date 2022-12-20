@@ -77,7 +77,6 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
         elevation: 0.0,
-
         shape: RoundedRectangleBorder(
           side: BorderSide.none,
           borderRadius: BorderRadius.circular(20),
