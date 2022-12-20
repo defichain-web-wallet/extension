@@ -53,6 +53,7 @@ class _UiKitState extends State<UiKit> {
             children: [
               Container(
                 child: AppSelector(
+                  items: [],
                   onSelect: (String value) {
                     //
                   },

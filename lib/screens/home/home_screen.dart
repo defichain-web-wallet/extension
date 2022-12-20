@@ -15,6 +15,7 @@ import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/wallet_details.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
+import 'package:defi_wallet/widgets/home/home_card.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/network/network_selector.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -210,33 +211,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return BlocBuilder<HomeCubit, HomeState>(
         builder: (context, homeState) {
           return Container(
-            color: Theme.of(context).dialogBackgroundColor,
+            color: Theme.of(context).scaffoldBackgroundColor,
             child: Center(
               child: StretchBox(
                 maxWidth: ScreenSizes.medium,
                 child: ListView(
                   children: [
-                    Container(
-                      color: null,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: NetworkSelector(isFullSize: isFullSize,),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8, top: 8),
-                            child: WalletDetails(),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 40),
-                            child: ActionButtonsList(
-                              hideOverlay: () => hideOverlay(),
-                              swapTutorialStatus: state.swapTutorialStatus,
-                            ),
-                          ),
-                        ],
-                      ),
+                    HomeCard(),
+                    SizedBox(
+                      height: 34,
                     ),
                     Container(
                       color: Colors.transparent,

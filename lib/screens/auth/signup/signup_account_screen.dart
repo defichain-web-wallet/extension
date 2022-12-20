@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/my_app.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_choose_theme_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_done_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
@@ -236,7 +235,6 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                       ),
                     ),
                     NewPrimaryButton(
-                      // callback: () => _createAccount(),
                       callback: () => Navigator.push(
                         context,
                         PageRouteBuilder(

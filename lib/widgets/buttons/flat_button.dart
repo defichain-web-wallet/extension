@@ -59,8 +59,8 @@ class FlatButton extends StatelessWidget {
           children: [
             if (icon != null)
               Container(
-                width: 22,
-                height: 22,
+                width: isPrimary ? 22 : 20,
+                height: isPrimary ? 22 : 20,
                 padding: const EdgeInsets.only(right: 6.4),
                 child: icon!,
               ),
@@ -69,7 +69,9 @@ class FlatButton extends StatelessWidget {
               style: Theme
                   .of(context)
                   .textTheme
-                  .button!,
+                  .button!.copyWith(
+                fontSize: isPrimary ? 14 : 12,
+              ),
             )
           ],
         ),

@@ -1,15 +1,19 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+const List<String> list = <String>['USD', 'EUR', 'BTC'];
+
 class AppSelector extends StatefulWidget {
+  final List<String> items;
   final void Function(String value) onSelect;
 
-  AppSelector({Key? key, required this.onSelect}) : super(key: key);
+  AppSelector({
+    Key? key,
+    required this.items,
+    required this.onSelect,
+  }) : super(key: key);
 
   @override
   _AppSelectorState createState() => _AppSelectorState();
@@ -18,6 +22,7 @@ class AppSelector extends StatefulWidget {
 class _AppSelectorState extends State<AppSelector> {
   CustomPopupMenuController controller = CustomPopupMenuController();
   MenuHelper menuHelper = MenuHelper();
+  bool isOpenAppSelector = false;
 
   final List<dynamic> menuItems = [
     {'name': 'USD', 'icon': 'assets/currencies/usd.svg'},
@@ -25,124 +30,94 @@ class _AppSelectorState extends State<AppSelector> {
     {'name': 'BTC', 'icon': 'assets/currencies/btc.svg'},
   ];
 
-  late String activeItem;
-
-  @override
-  void initState() {
-    activeItem = menuItems[1]['name'];
-    super.initState();
-  }
+  String dropdownValue = list.first;
 
   @override
   Widget build(BuildContext context) {
-    double horizontalMargin = menuHelper.getHorizontalMargin(context);
-    return CustomPopupMenu(
-      menuOnChange: (b) => widget.onSelect(activeItem),
-      child: Container(
-        width: 116,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              activeItem,
-              style: Theme.of(context).textTheme.headline5,
-            ),
-            SizedBox(
-              width: 8,
-            ),
-            SvgPicture.asset(
-              'assets/icons/arrow_down.svg',
-              width: 6,
-              height: 6,
-            )
-          ],
-        ),
-      ),
-      menuBuilder: () => CustomPaint(
-        child: ClipPath(
-          clipper: ArrowClipper(),
-          child: Container(
-            width: 116,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).appBarTheme.backgroundColor,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: menuItems
-                  .map(
-                    (item) => Column(
+    return DropdownButtonHideUnderline(
+      child: ButtonTheme(
+        alignedDropdown: true,
+        child: DropdownButton<String>(
+          value: dropdownValue,
+          elevation: 3,
+          icon: Visibility(visible: false, child: Icon(Icons.arrow_back),),
+          style: const TextStyle(color: Colors.green),
+          onChanged: (String? value) {
+            widget.onSelect(value!);
+            setState(() {
+              dropdownValue = value;
+            });
+          },
+          borderRadius: BorderRadius.circular(20.0),
+          selectedItemBuilder: (BuildContext context) {
+            return list.map<Widget>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Container(
+                  width: 116,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        value,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline5,
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      SvgPicture.asset(
+                        'assets/icons/arrow_down.svg',
+                        width: 6,
+                        height: 6,
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }).toList();
+          },
+          items: list.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Container(
+                width: 116,
+                padding: const EdgeInsets.all(0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
                       children: [
-                        MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              controller.hideMenu();
-                              setState(() {
-                                activeItem = item['name'];
-                              });
-                            },
-                            child: Container(
-                              height: 40,
-                              child: Padding(
-                                padding:
-                                EdgeInsets.symmetric(horizontal: 20),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          child: Row(
-                                            children: [
-                                              if (activeItem != 'arrow')
-                                                SvgPicture.asset(
-                                                  item['icon'],
-                                                  width: 16,
-                                                  height: 16,
-                                                ),
-                                              SizedBox(
-                                                width: 6,
-                                              ),
-                                              Text(
-                                                item['name'],
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        if (activeItem == item['name'])
-                                          SvgPicture.asset(
-                                            'assets/icons/check_icon.svg',
-                                            width: 16,
-                                            height: 16,
-                                          )
-                                      ],
-                                    )),
-                              ),
-                            ),
-                          ),
+                        SvgPicture.asset(
+                          'assets/currencies/${value.toLowerCase()}.svg',
+                          width: 16,
+                          height: 16,
+                        ),
+                        SizedBox(
+                          width: 6,
+                        ),
+                        Text(
+                          value,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline5,
                         ),
                       ],
                     ),
-                  )
-                  .toList(),
-            ),
-          ),
+                    if (dropdownValue == value)
+                      SvgPicture.asset(
+                        'assets/icons/check_icon.svg',
+                        width: 16,
+                        height: 16,
+                      ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ),
-      showArrow: false,
-      barrierColor: Colors.transparent,
-      pressType: PressType.singleClick,
-      verticalMargin: -5,
-      horizontalMargin: horizontalMargin,
-      controller: controller,
     );
   }
 }

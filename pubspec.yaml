@@ -137,6 +137,8 @@ flutter:
           weight: 600
         - asset: fonts/RedHatDisplay/RedHatDisplay-Bold.ttf
           weight: 700
+        - asset: fonts/RedHatDisplay/RedHatDisplay-ExtraBold.ttf
+          weight: 900
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
