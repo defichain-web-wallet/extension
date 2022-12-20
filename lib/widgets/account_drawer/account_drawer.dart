@@ -1,6 +1,11 @@
+import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/settings_model.dart';
+import 'package:defi_wallet/utils/theme/theme_manager.dart';
 import 'package:defi_wallet/widgets/buttons/account_menu_button.dart';
 import 'package:defi_wallet/widgets/defi_switch.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -134,8 +139,18 @@ class _AccountDrawerState extends State<AccountDrawer> {
                                         SizedBox(
                                           width: 10,
                                         ),
-                                        SvgPicture.asset(
-                                            'assets/icons/edit_gradient.svg'),
+                                        Container(
+                                          width: 32,
+                                          height: 32,
+                                          child: IconButton(
+                                            icon: SvgPicture.asset(
+                                              'assets/icons/edit_gradient.svg',
+                                            ),
+                                            onPressed: () {
+                                              print('edit');
+                                            },
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -243,6 +258,16 @@ class _AccountDrawerState extends State<AccountDrawer> {
                       callback: () {},
                       iconPath: 'assets/icons/night_mode.svg',
                       title: 'Night Mode',
+                      isStaticBg: true,
+                      afterTitleWidget: DefiSwitch(
+                        isEnable: isDarkTheme,
+                        onToggle: (bool value) {
+                          setState(() {
+                            isDarkTheme = value;
+                          });
+                          ThemeManager.changeTheme(context);
+                        },
+                      ),
                     ),
                     SizedBox(
                       height: 5,
@@ -253,12 +278,8 @@ class _AccountDrawerState extends State<AccountDrawer> {
                           isDarkTheme = !isDarkTheme;
                         });
                       },
-                      isStaticBg: true,
                       iconPath: 'assets/icons/jelly_theme_explore.svg',
                       title: 'Explore Jelly themes',
-                      afterTitleWidget: DefiSwitch(
-                        isEnable: isDarkTheme,
-                      ),
                     ),
                   ],
                 ),
