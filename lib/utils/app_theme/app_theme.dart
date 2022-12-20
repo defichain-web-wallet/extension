@@ -7,7 +7,7 @@ class AppTheme {
   static const Color lightGreyColor = Color(0xffEDEDED);
   static const Color darkTextColor = Color(0xff132235);
   static const Color shadowColor = Color(0xff131415);
-
+  static const Color iconButtonBackground = Color.fromRGBO(148, 144, 234, 0.15);
   static const String mainFontFamily = 'IBM Plex Sans';
 
   static TextStyle get defiUnderlineText {
