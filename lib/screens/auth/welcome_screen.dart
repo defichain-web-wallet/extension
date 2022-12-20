@@ -104,10 +104,9 @@ class WelcomeScreen extends StatelessWidget {
                                 'Terms and Conditions',
                                 style: jellyLink,
                               ),
-                              onTap: () =>
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Work in progress')),
-                              ),
+                              onTap: () {
+                                // TODO: need to redirect
+                              },
                             ),
                           ],
                         ),

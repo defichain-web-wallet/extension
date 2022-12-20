@@ -18,12 +18,14 @@ abstract class AppColors {
   static const electricVioletAlpha = Color(0xFFBC00C0);
   static const razzmatazz = Color(0xFFEE1771);
   static const purplePizzazz = Color(0xFFFF00E5);
+  static const purpleHeart = Color(0xFF6326E4);
 
   static const lightGreyColor = Color(0xFFEDEDED);
   static const pinkColor = Color(0xFFFF00A3);
   static const redErrorColor = Color(0xFFD92E2E);
   static const darkTextColor = Color(0xFF12052F);
   static const shadowColor = Color(0xFF131415);
+  static const toogleBgLight = purpleHeart;
 
   static const darkerGrey = Color(0xFF6C6C6C);
   static const darkestGrey = Color(0xFF626262);
@@ -38,4 +40,5 @@ abstract class AppColors {
   static const selectLight = Color(0xFF9B73EE);
 
   static const appSelectorBorderColor = Color(0xFFEFEDF8);
+  static const whiteLilac2 = Color(0xFFEFEDF8);
 }

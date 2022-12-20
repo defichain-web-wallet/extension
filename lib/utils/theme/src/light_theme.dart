@@ -9,7 +9,7 @@ ThemeData createLightTheme() {
     scaffoldBackgroundColor: AppColors.whiteLilac,
     dialogBackgroundColor: Color(0xffFAFAFA),
     primaryColorLight: Color(0xFF5D5D5D),
-    selectedRowColor: AppColors.selectLight,
+    selectedRowColor: AppColors.portageBg,
     shadowColor: Colors.grey[300]!,
     cardColor: Colors.white,
     backgroundColor: LightColors.cardColor,

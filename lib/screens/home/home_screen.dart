@@ -14,6 +14,8 @@ import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/screens/home/widgets/wallet_details.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/home/home_card.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -36,6 +38,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   TabController? tabController;
   bool isSaveOpenTime = false;
   GlobalKey<AccountSelectState> selectKey = GlobalKey<AccountSelectState>();
@@ -160,6 +163,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               return Scaffold(
                 appBar: NewMainAppBar(
                   isShowLogo: true,
+                ),
+                endDrawer: AccountDrawer(
+                  width: buttonSmallWidth,
                 ),
                 body: _buildBody(
                   context,
