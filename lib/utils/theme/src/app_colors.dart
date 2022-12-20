@@ -37,8 +37,8 @@ abstract class AppColors {
 
   static const noSelectLight1 = Color(0xFF9B73EE);
   static const noSelectLight2 = Color(0xFF12052F);
-  static const selectLight = Color(0xFF9B73EE);
 
   static const appSelectorBorderColor = Color(0xFFEFEDF8);
   static const whiteLilac2 = Color(0xFFEFEDF8);
+  static const selectLight = portageBg;
 }
