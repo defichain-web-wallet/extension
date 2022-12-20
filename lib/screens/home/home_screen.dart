@@ -20,6 +20,8 @@ import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/network/network_selector.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
+import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
@@ -140,63 +142,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
-          return BlocBuilder<TransactionCubit, TransactionState>(
-              builder: (context, transactionState) {
-            return ScaffoldConstrainedBox(
-              child: GestureDetector(
-                child: LayoutBuilder(builder: (context, constraints) {
-                  if (state.status == AccountStatusList.loading ||
-                      tokensState.status == TokensStatusList.loading) {
-                    return Container(
-                      child: Center(
-                        child: Loader(),
-                      ),
-                    );
-                  }
+          return ScaffoldWrapper(
+            builder: (
+              BuildContext context,
+              bool isFullScreen,
+              TransactionState txState,
+            ) {
+              if (state.status == AccountStatusList.loading ||
+                  tokensState.status == TokensStatusList.loading) {
+                return Container(
+                  child: Center(
+                    child: Loader(),
+                  ),
+                );
+              }
 
-                  if (constraints.maxWidth < ScreenSizes.medium) {
-                    return Scaffold(
-                      appBar: HomeAppBar(
-                        selectKey: selectKey,
-                        updateCallback: () =>
-                            updateAccountDetails(context, state),
-                        hideOverlay: () => hideOverlay(),
-                        isShowBottom:
-                            !(transactionState is TransactionInitialState),
-                        height: !(transactionState is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight,
-                      ),
-                      body: _buildBody(
-                          context, state, transactionState, tokensState),
-                    );
-                  } else {
-                    return Container(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Scaffold(
-                        body: _buildBody(
-                            context, state, transactionState, tokensState,
-                            isFullSize: true),
-                        appBar: HomeAppBar(
-                          selectKey: selectKey,
-                          updateCallback: () =>
-                              updateAccountDetails(context, state),
-                          hideOverlay: () => hideOverlay(),
-                          isShowBottom:
-                              !(transactionState is TransactionInitialState),
-                          height: !(transactionState is TransactionInitialState)
-                              ? toolbarHeightWithBottom
-                              : toolbarHeight,
-                          isSmall: false,
-                        ),
-                      ),
-                    );
-                  }
-                }),
-                onTap: () => hideOverlay(),
-              ),
-            );
-          });
+              return Scaffold(
+                appBar: NewMainAppBar(
+                  isShowLogo: true,
+                ),
+                body: _buildBody(
+                  context,
+                  state,
+                  txState,
+                  tokensState,
+                  isFullSize: isFullScreen,
+                ),
+              );
+            },
+          );
         },
       );
     });
@@ -217,6 +191,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 maxWidth: ScreenSizes.medium,
                 child: ListView(
                   children: [
+                    SizedBox(
+                      height: 5,
+                    ),
                     HomeCard(),
                     SizedBox(
                       height: 34,
