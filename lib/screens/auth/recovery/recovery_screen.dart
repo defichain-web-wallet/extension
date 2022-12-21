@@ -129,7 +129,10 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
   void _onFieldSubmitted(String word) {
     setState(() {
       if (_wordController.text != '') {
-        _mnemonic.add(word);
+        var s = (_wordController.text.split(','));
+        s.forEach((element) {
+          _mnemonic.add(element);
+        });
       }
       _wordController.text = '';
 
