@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/screens/address_book/delete_contact_dialog.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/address_book/contact_tile.dart';
 import 'package:defi_wallet/widgets/address_book/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/address_book/last_sent_tile.dart';
@@ -11,6 +12,7 @@ import 'package:defi_wallet/widgets/create_edit_account/create_edit_account_dial
 import 'package:defi_wallet/widgets/fields/decoration_text_field_new.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
+import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
@@ -39,10 +41,12 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew> {
         TransactionState txState,
       ) {
         return Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            toolbarHeight: 54,
-            backgroundColor: Colors.transparent,
+          drawerScrimColor: Color(0x0f180245),
+          endDrawer: AccountDrawer(
+            width: buttonSmallWidth,
+          ),
+          appBar: NewMainAppBar(
+            isShowLogo: false,
           ),
           body: Container(
             margin: EdgeInsets.only(top: 5),
@@ -159,7 +163,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew> {
                               ),
                               Row(
                                 children: [
-                                  SvgPicture.asset('assets/icons/setting.svg'),
+                                  SvgPicture.asset('assets/icons/setting.svg', color: AppColors.darkTextColor,),
                                   SizedBox(
                                     width: 4,
                                   ),

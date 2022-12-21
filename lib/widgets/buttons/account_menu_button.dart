@@ -9,6 +9,7 @@ class AccountMenuButton extends StatefulWidget {
   final String iconPath;
   final String title;
   final bool isStaticBg;
+  final bool isHoverBackgroundEffect;
   final void Function()? callback;
   final Widget? afterTitleWidget;
 
@@ -19,6 +20,7 @@ class AccountMenuButton extends StatefulWidget {
     required this.callback,
     this.afterTitleWidget,
     this.isStaticBg = false,
+    this.isHoverBackgroundEffect = true,
   }) : super(key: key);
 
   @override
@@ -27,7 +29,6 @@ class AccountMenuButton extends StatefulWidget {
 
 class _AccountMenuButtonState extends State<AccountMenuButton> {
   bool isHover = false;
-
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +61,11 @@ class _AccountMenuButtonState extends State<AccountMenuButton> {
             ),
           ),
           backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-          overlayColor: MaterialStateProperty.all(
-            Theme.of(context).selectedRowColor.withOpacity(0.07),
-          ),
+          overlayColor: widget.isHoverBackgroundEffect
+              ? MaterialStateProperty.all(
+                  Theme.of(context).selectedRowColor.withOpacity(0.07),
+                )
+              : MaterialStateProperty.all<Color>(Colors.transparent),
           elevation: MaterialStateProperty.all<double>(0.0),
           shadowColor: MaterialStateProperty.all<Color>(Colors.transparent),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -81,13 +84,12 @@ class _AccountMenuButtonState extends State<AccountMenuButton> {
                     children: [
                       if (!isHover)
                         SvgPicture.asset(
-                          'assets/icons/setting.svg',
+                          '${widget.iconPath}',
                           color: AppColors.darkTextColor,
                         ),
                       if (isHover)
                         SvgPicture.asset(
                           '${widget.iconPath}',
-                          color: null,
                           cacheColorFilter: true,
                         ),
                       // if (!isHover)
@@ -123,7 +125,8 @@ class _AccountMenuButtonState extends State<AccountMenuButton> {
                                   AppColors.darkTextColor,
                                 ],
                     ),
-                    if(widget.afterTitleWidget != null) widget.afterTitleWidget!,
+                    if (widget.afterTitleWidget != null)
+                      widget.afterTitleWidget!,
                   ],
                 ),
               ),

@@ -164,6 +164,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 appBar: NewMainAppBar(
                   isShowLogo: true,
                 ),
+                drawerScrimColor: Color(0x0f180245),
                 endDrawer: AccountDrawer(
                   width: buttonSmallWidth,
                 ),

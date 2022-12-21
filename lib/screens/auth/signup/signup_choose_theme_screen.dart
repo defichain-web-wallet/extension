@@ -123,16 +123,19 @@ class _SignupChooseThemeScreenState extends State<SignupChooseThemeScreen> {
                         ],
                       ),
                     ),
-                    PendingButton(
-                      'Continue',
-                      pendingText: 'Processed...',
-                      isCheckLock: false,
-                      callback: (parent) async {
-                        parent.emitPending(true);
-                        await widget.callback();
-                        // parent.emitPending(false);
-                      },
+                    Container(
+                      width: buttonSmallWidth,
+                      child: PendingButton(
+                        'Continue',
+                        pendingText: 'Processed...',
+                        isCheckLock: false,
+                        callback: (parent) async {
+                          parent.emitPending(true);
+                          await widget.callback();
+                          // parent.emitPending(false);
+                        },
 
+                      ),
                     ),
                   ],
                 ),

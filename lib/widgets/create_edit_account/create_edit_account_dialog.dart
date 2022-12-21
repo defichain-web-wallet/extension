@@ -14,8 +14,10 @@ import 'package:simple_gradient_text/simple_gradient_text.dart';
 class CreateEditAccountDialog extends StatefulWidget {
   final bool isEdit;
 
-  const CreateEditAccountDialog({Key? key, this.isEdit = true})
-      : super(key: key);
+  const CreateEditAccountDialog({
+    Key? key,
+    this.isEdit = false,
+  }) : super(key: key);
 
   @override
   State<CreateEditAccountDialog> createState() =>
@@ -147,7 +149,8 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                       children: [
                         Text(
                           titleText,
-                          style: headline2.copyWith(fontWeight: FontWeight.w700),
+                          style:
+                              headline2.copyWith(fontWeight: FontWeight.w700),
                         )
                       ],
                     ),
@@ -211,7 +214,8 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                                     fontWeight: FontWeight.w700,
                                                     fontFamily:
                                                         'Red Hat Display'),
-                                                gradientType: GradientType.linear,
+                                                gradientType:
+                                                    GradientType.linear,
                                                 gradientDirection:
                                                     GradientDirection.btt,
                                                 colors: [
@@ -235,7 +239,8 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                       ),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(top: 28, left: 28),
+                                      padding:
+                                          EdgeInsets.only(top: 28, left: 28),
                                       child: MouseRegion(
                                         cursor: SystemMouseCursors.click,
                                         child: GestureDetector(
@@ -277,12 +282,13 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                   fillColor: AppColors.white,
                                   hintText: 'Enter your Account`s Name',
                                   hintStyle: passwordField.copyWith(
-                                    color:
-                                        AppColors.darkTextColor.withOpacity(0.3),
+                                    color: AppColors.darkTextColor
+                                        .withOpacity(0.3),
                                   ),
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: AppColors.portage.withOpacity(0.12),
+                                      color:
+                                          AppColors.portage.withOpacity(0.12),
                                       width: 1.0,
                                     ),
                                   ),
