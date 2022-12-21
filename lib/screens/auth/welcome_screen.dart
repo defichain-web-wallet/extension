@@ -2,7 +2,6 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_placeholder_screen.dart';
-import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/welcome_positioned_logo.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -26,8 +25,8 @@ class WelcomeScreen extends StatelessWidget {
               PageRouteBuilder(
                 pageBuilder: (context, animation1, animation2) =>
                     SignupPlaceholderScreen(
-                  password: password,
-                ),
+                      password: password,
+                    ),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),
@@ -43,10 +42,10 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(builder: (
-      BuildContext context,
-      bool isFullScreen,
-      TransactionState txState,
-    ) {
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState txState,
+        ) {
       return Scaffold(
         body: Container(
           padding: authPaddingContainer.copyWith(top: 0, left: 0, right: 0),
@@ -65,7 +64,7 @@ class WelcomeScreen extends StatelessWidget {
                       children: [
                         Container(
                           width:
-                              isFullScreen ? buttonFullWidth : buttonSmallWidth,
+                          isFullScreen ? buttonFullWidth : buttonSmallWidth,
                           child: AccentButton(
                             isCheckLock: false,
                             label: 'Import using secret Recovery Phrase',
@@ -78,7 +77,7 @@ class WelcomeScreen extends StatelessWidget {
                                 PageRouteBuilder(
                                   pageBuilder:
                                       (context, animation1, animation2) =>
-                                          RecoveryScreen(),
+                                      RecoveryScreen(),
                                   transitionDuration: Duration.zero,
                                   reverseTransitionDuration: Duration.zero,
                                 ),
@@ -89,7 +88,7 @@ class WelcomeScreen extends StatelessWidget {
                         SizedBox(height: 12),
                         NewPrimaryButton(
                           width:
-                              isFullScreen ? buttonFullWidth : buttonSmallWidth,
+                          isFullScreen ? buttonFullWidth : buttonSmallWidth,
                           title: 'Create a new wallet',
                           callback: () => signUpFlowCallback(context),
                         ),
@@ -106,8 +105,9 @@ class WelcomeScreen extends StatelessWidget {
                                 'Terms and Conditions',
                                 style: jellyLink,
                               ),
-                              onTap: () {
-                                // TODO: need to redirect
+                              onTap: ()
+                              {
+
                               },
                             ),
                           ],
