@@ -4,6 +4,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
 import 'package:defi_wallet/screens/dex/swap_screen.dart';
 import 'package:defi_wallet/screens/earn_screen/earn_screen.dart';
+import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
 import 'package:defi_wallet/screens/receive/receive_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/select_buy_or_sell_screen.dart';
 import 'package:defi_wallet/screens/send/send_screen.dart';
@@ -28,7 +29,7 @@ class ActionButtonsList extends StatelessWidget {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => ReceiveScreen(),
+          pageBuilder: (context, animation1, animation2) => ReceiveScreenNew(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
@@ -66,8 +67,7 @@ class ActionButtonsList extends StatelessWidget {
         Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                SwapGuideScreen(),
+            pageBuilder: (context, animation1, animation2) => SwapGuideScreen(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ),
