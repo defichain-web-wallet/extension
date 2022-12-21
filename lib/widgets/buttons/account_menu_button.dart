@@ -82,21 +82,21 @@ class _AccountMenuButtonState extends State<AccountMenuButton> {
                 child: Center(
                   child: Stack(
                     children: [
-                      if (!isHover)
+                      if (!isHover && !widget.isStaticBg)
                         SvgPicture.asset(
                           '${widget.iconPath}',
                           color: AppColors.darkTextColor,
                         ),
-                      if (isHover)
+                      if (isHover && !widget.isStaticBg)
                         SvgPicture.asset(
                           '${widget.iconPath}',
                           cacheColorFilter: true,
                         ),
-                      // if (!isHover)
-                      //   SvgPicture.asset(
-                      //     '${widget.iconPath}',
-                      //     color: AppColors.darkTextColor,
-                      //   ),
+                      if (widget.isStaticBg)
+                        SvgPicture.asset(
+                          '${widget.iconPath}',
+                          cacheColorFilter: true,
+                        ),
                     ],
                   ),
                 ),

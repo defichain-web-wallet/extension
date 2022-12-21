@@ -161,13 +161,16 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                       children: [
                         Text(
                           subtitleText,
-                          style: Theme.of(context).textTheme.headline5!.apply(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .color!
-                                    .withOpacity(0.6),
-                              ),
+                          style:
+                              Theme.of(context).textTheme.subtitle1!.copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .subtitle1!
+                                        .color!
+                                        .withOpacity(0.6),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
                         ),
                       ],
                     ),

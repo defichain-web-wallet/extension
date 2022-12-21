@@ -5,9 +5,11 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/my_app.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -49,10 +51,12 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> {
                     state.activeAccount!.getActiveAddress(isChange: false);
               }
               return Scaffold(
-                appBar: AppBar(
-                  elevation: 0,
-                  toolbarHeight: 54,
-                  backgroundColor: Colors.transparent,
+                drawerScrimColor: Color(0x0f180245),
+                endDrawer: AccountDrawer(
+                  width: buttonSmallWidth,
+                ),
+                appBar: NewMainAppBar(
+                  isShowLogo: false,
                 ),
                 body: Container(
                   margin: EdgeInsets.only(top: 5),
