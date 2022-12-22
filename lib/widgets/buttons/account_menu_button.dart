@@ -12,13 +12,15 @@ class AccountMenuButton extends StatefulWidget {
   final bool isHoverBackgroundEffect;
   final void Function()? callback;
   final Widget? afterTitleWidget;
+  final bool accountSelectMode;
 
   AccountMenuButton({
     Key? key,
     required this.iconPath,
     required this.title,
-    required this.callback,
+    this.callback,
     this.afterTitleWidget,
+    this.accountSelectMode = false,
     this.isStaticBg = false,
     this.isHoverBackgroundEffect = true,
   }) : super(key: key);
@@ -77,53 +79,83 @@ class _AccountMenuButtonState extends State<AccountMenuButton> {
         child: Container(
           child: Row(
             children: [
-              Container(
-                width: 32,
-                child: Center(
-                  child: Stack(
-                    children: [
-                      if (!isHover && !widget.isStaticBg)
-                        SvgPicture.asset(
-                          '${widget.iconPath}',
-                          color: AppColors.darkTextColor,
-                        ),
-                      if (isHover && !widget.isStaticBg)
-                        SvgPicture.asset(
-                          '${widget.iconPath}',
-                          cacheColorFilter: true,
-                        ),
-                      if (widget.isStaticBg)
-                        SvgPicture.asset(
-                          '${widget.iconPath}',
-                          cacheColorFilter: true,
-                        ),
-                    ],
+              if (!widget.accountSelectMode)
+                Container(
+                  width: 32,
+                  child: Center(
+                    child: Stack(
+                      children: [
+                        if (!isHover && !widget.isStaticBg)
+                          SvgPicture.asset(
+                            '${widget.iconPath}',
+                            color: AppColors.darkTextColor,
+                          ),
+                        if (isHover && !widget.isStaticBg)
+                          SvgPicture.asset(
+                            '${widget.iconPath}',
+                            cacheColorFilter: true,
+                          ),
+                        if (widget.isStaticBg)
+                          SvgPicture.asset(
+                            '${widget.iconPath}',
+                            cacheColorFilter: true,
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GradientText(
-                      '${widget.title}',
-                      style: Theme.of(context).textTheme.headline5,
-                      gradientType: GradientType.linear,
-                      gradientDirection: GradientDirection.btt,
-                      colors: widget.isStaticBg
-                          ? [
-                              AppColors.electricViolet.withOpacity(0.8),
-                              AppColors.hollywoodCerise.withOpacity(0.8),
-                            ]
-                          : isHover
-                              ? [
-                                  AppColors.electricViolet.withOpacity(0.8),
-                                  AppColors.hollywoodCerise.withOpacity(0.8),
-                                ]
-                              : [
-                                  AppColors.darkTextColor,
-                                  AppColors.darkTextColor,
-                                ],
+                    if (widget.accountSelectMode)
+                      SizedBox(
+                        width: 12,
+                      ),
+                    if (widget.accountSelectMode)
+                      CircleAvatar(
+                        radius: 12,
+                        backgroundColor: AppColors.portage.withOpacity(0.16),
+                        child: Text(
+                          'J',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline4!
+                              .copyWith(fontSize: 11, color: AppColors.portage),
+                        ),
+                      ),
+                    if (widget.accountSelectMode)
+                      SizedBox(
+                        width: 6.4,
+                      ),
+                    Expanded(
+                      child: GradientText(
+                        '${widget.title}',
+                        style: Theme.of(context).textTheme.headline5,
+                        gradientType: GradientType.linear,
+                        gradientDirection: GradientDirection.btt,
+                        colors: widget.callback == null
+                            ? [
+                                AppColors.darkTextColor.withOpacity(0.5),
+                                AppColors.darkTextColor.withOpacity(0.5),
+                              ]
+                            : widget.isStaticBg
+                                ? [
+                                    AppColors.electricViolet.withOpacity(0.8),
+                                    AppColors.hollywoodCerise.withOpacity(0.8),
+                                  ]
+                                : isHover
+                                    ? [
+                                        AppColors.electricViolet
+                                            .withOpacity(0.8),
+                                        AppColors.hollywoodCerise
+                                            .withOpacity(0.8),
+                                      ]
+                                    : [
+                                        AppColors.darkTextColor,
+                                        AppColors.darkTextColor,
+                                      ],
+                      ),
                     ),
                     if (widget.afterTitleWidget != null)
                       widget.afterTitleWidget!,
