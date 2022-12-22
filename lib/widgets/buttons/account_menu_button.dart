@@ -1,3 +1,4 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class AccountMenuButton extends StatefulWidget {
   State<AccountMenuButton> createState() => _AccountMenuButtonState();
 }
 
-class _AccountMenuButtonState extends State<AccountMenuButton> {
+class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
   bool isHover = false;
 
   @override
@@ -88,7 +89,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> {
                         if (!isHover && !widget.isStaticBg)
                           SvgPicture.asset(
                             '${widget.iconPath}',
-                            color: AppColors.darkTextColor,
+                            color: isDarkTheme() ? AppColors.white : null,
                           ),
                         if (isHover && !widget.isStaticBg)
                           SvgPicture.asset(
@@ -136,8 +137,16 @@ class _AccountMenuButtonState extends State<AccountMenuButton> {
                         gradientDirection: GradientDirection.btt,
                         colors: widget.callback == null
                             ? [
-                                AppColors.darkTextColor.withOpacity(0.5),
-                                AppColors.darkTextColor.withOpacity(0.5),
+                                Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .color!
+                                    .withOpacity(0.5),
+                                Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .color!
+                                    .withOpacity(0.5),
                               ]
                             : widget.isStaticBg
                                 ? [
@@ -152,8 +161,14 @@ class _AccountMenuButtonState extends State<AccountMenuButton> {
                                             .withOpacity(0.8),
                                       ]
                                     : [
-                                        AppColors.darkTextColor,
-                                        AppColors.darkTextColor,
+                                        Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!,
+                                        Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!,
                                       ],
                       ),
                     ),

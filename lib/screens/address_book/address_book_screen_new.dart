@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/address_book/delete_contact_dialog.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -26,7 +27,7 @@ class AddressBookScreenNew extends StatefulWidget {
   State<AddressBookScreenNew> createState() => _AddressBookScreenNewState();
 }
 
-class _AddressBookScreenNewState extends State<AddressBookScreenNew> {
+class _AddressBookScreenNewState extends State<AddressBookScreenNew> with ThemeMixin {
   TextEditingController controller = TextEditingController();
   bool isSelectedContacts = true;
   bool isSelectedLastSent = false;
@@ -60,7 +61,9 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew> {
             width: double.infinity,
             height: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDarkTheme()
+                  ? DarkColors.scaffoldContainerBgColor
+                  : LightColors.scaffoldContainerBgColor,
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(20),
                 topLeft: Radius.circular(20),
