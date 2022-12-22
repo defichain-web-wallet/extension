@@ -60,11 +60,11 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
         var accounts = state.accounts;
         if (accounts!.length == 1) {
           print(accounts.length);
-          accountsSelectorHeight = 204;
+          accountsSelectorHeight = 193;
         }
         if (accounts.length > 1) {
           print(accounts.length);
-          accountsSelectorHeight = 237;
+          accountsSelectorHeight = 236;
         }
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
@@ -144,6 +144,17 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                             context: context,
                                             builder: (BuildContext context) {
                                               return CreateEditAccountDialog(
+                                                callback: (s) {
+                                                  setState(() {
+                                                    accountCubit.editAccount(s,
+                                                        index: state
+                                                            .activeAccount!
+                                                            .index);
+                                                  });
+                                                },
+                                                index:
+                                                    state.activeAccount!.index,
+                                                name: state.activeAccount!.name,
                                                 isEdit: true,
                                               );
                                             },
@@ -156,9 +167,9 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                           ScrollConfiguration.of(context)
                                               .copyWith(scrollbars: false),
                                           child: ListView.builder(
-                                            itemCount: accounts!.length + 1,
+                                            itemCount: accounts.length + 1,
                                             itemBuilder: (context, index) {
-                                              if (index == accounts!.length ||
+                                              if (index == accounts.length ||
                                                   accounts.isEmpty) {
                                                 return Column(
                                                   children: [
@@ -172,20 +183,29 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                       thickness: 1,
                                                     ),
                                                     AccountMenuButton(
-                                                      callback: () async {
-
-                                                        await accountCubit.addAccount();
-                                                        // showDialog(
-                                                        //   barrierColor:
-                                                        //       Color(0x0f180245),
-                                                        //   barrierDismissible:
-                                                        //       false,
-                                                        //   context: context,
-                                                        //   builder: (BuildContext
-                                                        //       context) {
-                                                        //     return CreateEditAccountDialog();
-                                                        //   },
-                                                        // );
+                                                      callback: () {
+                                                        showDialog(
+                                                          barrierColor:
+                                                              Color(0x0f180245),
+                                                          barrierDismissible:
+                                                              false,
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return CreateEditAccountDialog(
+                                                              callback:
+                                                                  (s) async {
+                                                                await accountCubit
+                                                                    .addAccount();
+                                                                accountCubit.editAccount(
+                                                                    s,
+                                                                    index: accounts
+                                                                            .length -
+                                                                        1);
+                                                              },
+                                                            );
+                                                          },
+                                                        );
                                                       },
                                                       isHoverBackgroundEffect:
                                                       false,
@@ -217,9 +237,12 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                               .index
                                                           ? null
                                                           : () async {
-                                                        accountCubit
-                                                            .updateActiveAccount(accounts[index].index!);
-                                                      },
+                                                              accountCubit
+                                                                  .updateActiveAccount(
+                                                                      accounts[
+                                                                              index]
+                                                                          .index!);
+                                                            },
                                                       isHoverBackgroundEffect:
                                                       false,
                                                       iconPath:

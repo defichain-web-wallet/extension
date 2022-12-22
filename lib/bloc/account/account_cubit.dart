@@ -51,7 +51,7 @@ class AccountCubit extends Cubit<AccountState> {
     var encryptMnemonic =
         encryptHelper.getEncryptedData(mnemonic.join(','), password);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
-    var encryptedPassword  = Crypt.sha256(password).toString();
+    var encryptedPassword = Crypt.sha256(password).toString();
     await box.put(HiveNames.password, encryptedPassword);
     await box.close();
 
@@ -62,29 +62,36 @@ class AccountCubit extends Cubit<AccountState> {
 
     final masterKeyPairTestnet =
         hdWalletService.getMasterKeypairFormSeed(seed, testnet);
-    final masterKeyPairTestnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairTestnet.publicKey, masterKeyPairTestnet.chainCode, networkHelper.getNetworkType(testnet));
+    final masterKeyPairTestnetPublicKey = bip32.BIP32.fromPublicKey(
+        masterKeyPairTestnet.publicKey,
+        masterKeyPairTestnet.chainCode,
+        networkHelper.getNetworkType(testnet));
 
     final accountTestnet =
         await walletsHelper.createNewAccount(masterKeyPairTestnet, testnet);
 
-
     final masterKeyPairMainnet =
         hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
 
-    final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairMainnet.publicKey, masterKeyPairMainnet.chainCode, networkHelper.getNetworkType(mainnet));
+    final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(
+        masterKeyPairMainnet.publicKey,
+        masterKeyPairMainnet.chainCode,
+        networkHelper.getNetworkType(mainnet));
 
-    final masterKeyPairMainnetPrivateKey = HDWalletService().getKeypairForPathPrivateKey(masterKeyPairMainnet, HDWalletService().derivePath(0), mainnet);
+    final masterKeyPairMainnetPrivateKey = HDWalletService()
+        .getKeypairForPathPrivateKey(
+            masterKeyPairMainnet, HDWalletService().derivePath(0), mainnet);
 
-    final accountMainnet =
-        await walletsHelper.createNewAccount(masterKeyPairMainnetPublicKey, mainnet);
+    final accountMainnet = await walletsHelper.createNewAccount(
+        masterKeyPairMainnetPublicKey, mainnet);
 
     final activeToken = accountMainnet.balanceList![0].token!;
 
     accountsMainnet.add(accountMainnet);
     accountsTestnet.add(accountTestnet);
 
-
-    String accessToken = await fiatCubit.getAccessToken(accountMainnet, masterKeyPairMainnetPrivateKey);
+    String accessToken = await fiatCubit.getAccessToken(
+        accountMainnet, masterKeyPairMainnetPrivateKey);
     accountMainnet.accessToken = accessToken;
     await saveAccountsToStorage(
       accountsMainnet: accountsMainnet,
@@ -170,7 +177,7 @@ class AccountCubit extends Cubit<AccountState> {
 
         if (mnemonic != null) {
           var encryptMnemonic =
-          encryptHelper.getEncryptedData(mnemonic.join(','), password);
+              encryptHelper.getEncryptedData(mnemonic.join(','), password);
           await box.put(HiveNames.savedMnemonic, encryptMnemonic);
         }
       }
@@ -294,6 +301,30 @@ class AccountCubit extends Cubit<AccountState> {
     return accounts;
   }
 
+  editAccount(String name, {int? index}) async {
+    List<AccountModel> accounts = state.accounts!;
+    if (index == null) {
+      accounts[0].name = name;
+    } else {
+      accounts[index].name = name;
+    }
+
+    await saveAccountsToStorage(
+      accountsMainnet: accounts,
+      masterKeyPairTestnetPublicKey: state.masterKeyPairPublicKey,
+    );
+
+    emit(state.copyWith(
+      status: AccountStatusList.success,
+      accounts: accounts,
+      balances: state.balances,
+      masterKeyPairPublicKey: state.masterKeyPairPublicKey,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+    ));
+
+  }
+
   Future<AccountModel> addAccount() async {
     List<AccountModel> accounts = state.accounts!;
     int newAccountIndex = accounts.length;
@@ -349,11 +380,16 @@ class AccountCubit extends Cubit<AccountState> {
 
       var masterKeyPairMainnet =
           hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
-      final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairMainnet.publicKey, masterKeyPairMainnet.chainCode, networkHelper.getNetworkType(mainnet));
-      final masterKeyPairMainnetPrivateKey = HDWalletService().getKeypairForPathPrivateKey(masterKeyPairMainnet, HDWalletService().derivePath(0), mainnet);
+      final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(
+          masterKeyPairMainnet.publicKey,
+          masterKeyPairMainnet.chainCode,
+          networkHelper.getNetworkType(mainnet));
+      final masterKeyPairMainnetPrivateKey = HDWalletService()
+          .getKeypairForPathPrivateKey(
+              masterKeyPairMainnet, HDWalletService().derivePath(0), mainnet);
 
-      List<AccountModel> accountsMainnet = await walletsHelper
-          .restoreWallet(masterKeyPairMainnetPublicKey, mainnet, (need, restored) {
+      List<AccountModel> accountsMainnet = await walletsHelper.restoreWallet(
+          masterKeyPairMainnetPublicKey, mainnet, (need, restored) {
         emit(state.copyWith(
           status: AccountStatusList.restore,
           needRestore: need + 10,
@@ -363,10 +399,13 @@ class AccountCubit extends Cubit<AccountState> {
 
       final masterKeyPairTestnet =
           hdWalletService.getMasterKeypairFormSeed(seed, testnet);
-      final masterKeyPairTestnetPublicKey = bip32.BIP32.fromPublicKey(masterKeyPairTestnet.publicKey, masterKeyPairTestnet.chainCode, networkHelper.getNetworkType(testnet));
+      final masterKeyPairTestnetPublicKey = bip32.BIP32.fromPublicKey(
+          masterKeyPairTestnet.publicKey,
+          masterKeyPairTestnet.chainCode,
+          networkHelper.getNetworkType(testnet));
 
-      List<AccountModel> accountsTestnet = await walletsHelper
-          .restoreWallet(masterKeyPairTestnetPublicKey, testnet, (need, restored) {
+      List<AccountModel> accountsTestnet = await walletsHelper.restoreWallet(
+          masterKeyPairTestnetPublicKey, testnet, (need, restored) {
         emit(state.copyWith(
           status: AccountStatusList.restore,
           needRestore: need + 10,
@@ -375,7 +414,8 @@ class AccountCubit extends Cubit<AccountState> {
       });
       final balances = accountsMainnet[0].balanceList!;
       for (var account in accountsMainnet) {
-        String accessToken = await fiatCubit.getAccessToken(account, masterKeyPairMainnetPrivateKey);
+        String accessToken = await fiatCubit.getAccessToken(
+            account, masterKeyPairMainnetPrivateKey);
         account.accessToken = accessToken;
       }
       await saveAccountsToStorage(
@@ -424,10 +464,8 @@ class AccountCubit extends Cubit<AccountState> {
     var savedMasterKey = box.get(masterKeyName);
     var savedAccounts = box.get(accountsName);
 
-    var decryptedMasterKey =
-    stringToBase64.decode(savedMasterKey);
-    var decryptedAccounts =
-    stringToBase64.decode(savedAccounts);
+    var decryptedMasterKey = stringToBase64.decode(savedMasterKey);
+    var decryptedAccounts = stringToBase64.decode(savedAccounts);
 
     var networkType = networkHelper.getNetworkType(network);
     final masterKeyPair =
@@ -438,10 +476,11 @@ class AccountCubit extends Cubit<AccountState> {
     var needToStoreBTCAddress = false;
     for (var account in jsonFromString) {
       var accountModel = AccountModel.fromJson(account);
-      if(accountModel.bitcoinAddress == null){
+      if (accountModel.bitcoinAddress == null) {
         needToStoreBTCAddress = true;
-        accountModel.bitcoinAddress = await HDWalletService().getAddressModelFromKeyPair(
-            masterKeyPair, accountModel.index, network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
+        accountModel.bitcoinAddress = await HDWalletService()
+            .getAddressModelFromKeyPair(masterKeyPair, accountModel.index,
+                network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
         accountModel.bitcoinAddress!.blockchain = 'BTC';
       }
       if (password != '') {
@@ -482,7 +521,7 @@ class AccountCubit extends Cubit<AccountState> {
 
     final balances = accounts[0].balanceList!;
 
-    if(needToStoreBTCAddress){
+    if (needToStoreBTCAddress) {
       if (SettingsHelper.settings.network! == 'testnet') {
         await saveAccountsToStorage(accountsTestnet: accounts);
       } else {
@@ -500,14 +539,7 @@ class AccountCubit extends Cubit<AccountState> {
       swapTutorialStatus: swapTutorialStatus,
     ));
 
-    return [
-      [],
-      [],
-      accounts,
-      balances,
-      accounts[0],
-      balances[0].token
-    ];
+    return [[], [], accounts, balances, accounts[0], balances[0].token];
   }
 
   updateActiveAccount(int accountIndex) async {

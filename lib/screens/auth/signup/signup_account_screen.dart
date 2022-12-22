@@ -99,6 +99,9 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
     );
     LoggerService.invokeInfoLogg('user created new wallet');
 
+    await accountCubit.editAccount(_nameController.text == '' ? 'My Wallet' : _nameController.text);
+    LoggerService.invokeInfoLogg('user created new wallet');
+
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -117,141 +120,149 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return Scaffold(
-          appBar: WelcomeAppBar(
-            progress: 1,
-          ),
-          body: Container(
-            padding: authPaddingContainer,
-            child: Center(
-              child: StretchBox(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 34,
-                            child: Text(
-                              'Name your account',
-                              style: headline3,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 30,
-                          ),
-                          Container(
-                            height: boxHeight,
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14.5),
-                              color: AppColors.portageBg.withOpacity(0.07),
-                            ),
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: 8,
+        return BlocBuilder<AccountCubit, AccountState>(
+          builder: (BuildContext context, state) {
+            return Scaffold(
+              appBar: WelcomeAppBar(
+                progress: 1,
+              ),
+              body: Container(
+                padding: authPaddingContainer,
+                child: Center(
+                  child: StretchBox(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Container(
+                                height: 34,
+                                child: Text(
+                                  'Name your account',
+                                  style: headline3,
                                 ),
-                                Stack(
+                              ),
+                              SizedBox(
+                                height: 30,
+                              ),
+                              Container(
+                                height: boxHeight,
+                                padding: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14.5),
+                                  color: AppColors.portageBg.withOpacity(0.07),
+                                ),
+                                child: Column(
                                   children: [
-                                    CircleAvatar(
-                                      radius: 24,
-                                      backgroundColor:
-                                          AppColors.portage.withOpacity(0.15),
-                                      child: _pickedImage == null
-                                          ? SvgPicture.asset(
-                                              'assets/icon_user.svg',
-                                            )
-                                          : ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              child: kIsWeb
-                                                  ? Image.memory(
-                                                      _webImage,
-                                                      fit: BoxFit.fill,
-                                                    )
-                                                  : Image.file(
-                                                      _pickedImage!,
-                                                      fit: BoxFit.fill,
-                                                    ),
-                                            ),
+                                    SizedBox(
+                                      height: 8,
                                     ),
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 28, left: 28),
-                                      child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: GestureDetector(
-                                          onTap: () => _pickImage(),
-                                          child: CircleAvatar(
-                                            radius: 12,
-                                            backgroundColor: AppColors.white,
-                                            child: SvgPicture.asset(
-                                                'assets/icon_photo.svg'),
+                                    Stack(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 24,
+                                          backgroundColor: AppColors.portage
+                                              .withOpacity(0.15),
+                                          child: _pickedImage == null
+                                              ? SvgPicture.asset(
+                                                  'assets/icon_user.svg',
+                                                )
+                                              : ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  child: kIsWeb
+                                                      ? Image.memory(
+                                                          _webImage,
+                                                          fit: BoxFit.fill,
+                                                        )
+                                                      : Image.file(
+                                                          _pickedImage!,
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 28, left: 28),
+                                          child: MouseRegion(
+                                            cursor: SystemMouseCursors.click,
+                                            child: GestureDetector(
+                                              onTap: () => _pickImage(),
+                                              child: CircleAvatar(
+                                                radius: 12,
+                                                backgroundColor:
+                                                    AppColors.white,
+                                                child: SvgPicture.asset(
+                                                    'assets/icon_photo.svg'),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Container(
+                                      width: double.infinity,
+                                      child: Text(
+                                        'Account`s Name',
+                                        style: headline5,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 6,
+                                    ),
+                                    Container(
+                                      child: TextFormField(
+                                        controller: _nameController,
+                                        decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: AppColors.white,
+                                          hintText: 'Enter your Account`s Name',
+                                          hintStyle: passwordField.copyWith(
+                                            color: AppColors.darkTextColor
+                                                .withOpacity(0.3),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: AppColors.portage
+                                                  .withOpacity(0.12),
+                                              width: 1.0,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Container(
-                                  width: double.infinity,
-                                  child: Text(
-                                    'Account`s Name',
-                                    style: headline5,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 6,
-                                ),
-                                Container(
-                                  child: TextFormField(
-                                    controller: _nameController,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: AppColors.white,
-                                      hintText: 'Enter your Account`s Name',
-                                      hintStyle: passwordField.copyWith(
-                                        color: AppColors.darkTextColor
-                                            .withOpacity(0.3),
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.portage
-                                              .withOpacity(0.12),
-                                          width: 1.0,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        NewPrimaryButton(
+                          callback: () => Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  SignupChooseThemeScreen(callback: () async {
+                                await _createAccount();
+                              }),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    NewPrimaryButton(
-                      callback: () => Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              SignupChooseThemeScreen(callback: _createAccount),
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
+                          width:
+                              isFullScreen ? buttonFullWidth : buttonSmallWidth,
+                          title: 'Continue',
                         ),
-                      ),
-                      width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
-                      title: 'Continue',
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

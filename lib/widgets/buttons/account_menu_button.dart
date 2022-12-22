@@ -118,7 +118,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                         radius: 12,
                         backgroundColor: AppColors.portage.withOpacity(0.16),
                         child: Text(
-                          'J',
+                          '${widget.title[0]}',
                           style: Theme.of(context)
                               .textTheme
                               .headline4!
