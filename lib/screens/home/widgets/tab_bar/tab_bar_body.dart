@@ -30,35 +30,11 @@ class TabBarBody extends StatelessWidget {
           children: [
             Expanded(
               child: Container(
-                padding: const EdgeInsets.only(top: 16),
+                padding: const EdgeInsets.only(top: 12),
                 color: Theme.of(context).cardColor,
                 child: AssetList(),
               ),
             ),
-            if (!SettingsHelper.isBitcoin())
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: TextButton(
-                  child: Text(
-                    ' +  Add token ',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  onPressed: () async {
-                    await lockHelper.provideWithLockChecker(
-                        context,
-                        () => Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation1, animation2) =>
-                                        SearchToken(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),
-                            ));
-                  },
-                ),
-              ),
           ],
         ),
         Column(

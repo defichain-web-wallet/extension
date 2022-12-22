@@ -6,6 +6,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -59,23 +60,56 @@ class AssetList extends StatelessWidget {
                         bottom: 8, left: 16, right: 16, top: 2),
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.appAssetEntryBorder,
+                        ),
                         color: Theme.of(context).cardColor,
                       ),
                       child: ListTile(
                         leading: _buildTokenIcon(balances[index]),
                         title: Text(
-                          getFormatTokenBalance(tokenBalance, tokenName),
-                          style: Theme.of(context).textTheme.headline6,
+                          tokenName,
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              getFormatTokenBalance(tokenBalance),
+                              style: Theme.of(context).textTheme.headline6!.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 2,
+                            ),
+                            Text(
+                              getFormatTokenBalanceByFiat(
+                                  tokensState, coin, tokenBalance, currency),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline6!
+                                        .color!
+                                        .withOpacity(0.3),
+                                  ),
+                            ),
+                          ],
                         ),
                         subtitle: Text(
-                          getFormatTokenBalanceByFiat(
-                              tokensState, coin, tokenBalance, currency),
-                          style: Theme.of(context).textTheme.headline4!.apply(
-                              color: SettingsHelper.settings.theme == 'dark'
-                                  ? Colors.white
-                                  : Color(0xFF7D7D7D),
-                              fontSizeFactor: 0.9),
+                          tokenName,
+                          style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .color!
+                                .withOpacity(0.3),
+                          ),
                         ),
                       ),
                     ),
@@ -105,8 +139,8 @@ class AssetList extends StatelessWidget {
     }
   }
 
-  String getFormatTokenBalance(double tokenBalance, String tokenName) =>
-      '${balancesHelper.numberStyling(tokenBalance)} $tokenName';
+  String getFormatTokenBalance(double tokenBalance) =>
+      '${balancesHelper.numberStyling(tokenBalance)}';
 
   String getFormatTokenBalanceByFiat(
       state, String coin, double tokenBalance, String fiat) {
@@ -122,6 +156,6 @@ class AssetList extends StatelessWidget {
     if (fiat == 'EUR') {
       balanceInUsd *= state.eurRate;
     }
-    return '${balancesHelper.numberStyling(balanceInUsd, fixed: true)} $fiat';
+    return '\$${balancesHelper.numberStyling(balanceInUsd, fixed: true)}';
   }
 }

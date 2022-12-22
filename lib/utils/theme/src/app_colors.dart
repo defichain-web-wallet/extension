@@ -42,4 +42,5 @@ abstract class AppColors {
   static const appSelectorBorderColor = Color(0xFFEFEDF8);
   static const whiteLilac2 = Color(0xFFEFEDF8);
   static const selectLight = portageBg;
+  static const appAssetEntryBorder = whiteLilac;
 }

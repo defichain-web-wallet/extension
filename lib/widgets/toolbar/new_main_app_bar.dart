@@ -50,23 +50,61 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: () => Navigator.of(context).pop(),
                 splashRadius: 20,
               ),
-        title: Text('coming soon'),
+        title: Container(
+          height: 24,
+          width: 140,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(40),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 10,
+                height: 4,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Color(0xFF00CF21),
+                ),
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              Text('DefiChain Mainnet', style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                fontWeight: FontWeight.w500,
+              ),),
+              SizedBox(
+                width: 6,
+              ),
+              Icon(Icons.keyboard_arrow_down, color: Color(0xFFB7B2C1), size: 14,)
+            ],
+          ),
+        ),
         actions: [
-          NewActionButton(
-            iconPath: 'assets/icons/fullscreen_icon.svg',
-            onPressed: () => lockHelper.provideWithLockChecker(
-              context,
-              () => js.context.callMethod('open', [
-                window.location.toString(),
-              ]),
+          SizedBox(
+            width: 32,
+            height: 32,
+            child: NewActionButton(
+              iconPath: 'assets/icons/fullscreen_icon.svg',
+              onPressed: () => lockHelper.provideWithLockChecker(
+                context,
+                () => js.context.callMethod('open', [
+                  window.location.toString(),
+                ]),
+              ),
             ),
           ),
           SizedBox(
             width: 12,
           ),
-          NewActionButton(
-            iconPath: 'assets/icons/account_icon.svg',
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          SizedBox(
+            width: 32,
+            height: 32,
+            child: NewActionButton(
+              iconPath: 'assets/icons/account_icon.svg',
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
           SizedBox(
             width: 16,
