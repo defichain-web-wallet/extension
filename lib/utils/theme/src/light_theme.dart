@@ -6,7 +6,7 @@ ThemeData createLightTheme() {
       backgroundColor: Colors.white,
       actionTextColor: Colors.black,
     ),
-    scaffoldBackgroundColor: AppColors.whiteLilac,
+    scaffoldBackgroundColor: LightColors.scaffoldBgColor,
     dialogBackgroundColor: Color(0xffFAFAFA),
     primaryColorLight: Color(0xFF5D5D5D),
     selectedRowColor: AppColors.portageBg,
@@ -22,22 +22,13 @@ ThemeData createLightTheme() {
       color: Colors.black,
     ),
     textTheme: createTextTheme(AppColors.darkTextColor),
-    // outlinedButtonTheme: OutlinedButtonThemeData(
-    //   style: OutlinedButton.styleFrom(
-    //     textStyle: button,
-    //     padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
-    //     shape: RoundedRectangleBorder(
-    //         borderRadius: BorderRadius.all(
-    //           Radius.circular(buttonBorderRadius),
-    //         ),
-    //         side: BorderSide(
-    //           color: Colors.transparent,
-    //         ),
-    //     ),
-    //     backgroundColor: Colors.transparent,
-    //     shadowColor: Colors.transparent,
-    //   ),
-    // ),
+    listTileTheme: ListTileThemeData(
+      selectedColor: Colors.white,
+      tileColor: AppColors.appAssetEntryBorder,
+    ),
+    drawerTheme: DrawerThemeData(
+      backgroundColor: LightColors.drawerBgColor,
+    ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
         textStyle: MaterialStatePropertyAll(button),
@@ -62,6 +53,7 @@ ThemeData createLightTheme() {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
         primary: Colors.white,
         onPrimary: AppColors.darkTextColor,
         shape: RoundedRectangleBorder(

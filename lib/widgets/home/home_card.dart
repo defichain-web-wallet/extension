@@ -1,4 +1,5 @@
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
 import 'package:defi_wallet/screens/dex/swap_screen.dart';
 import 'package:defi_wallet/screens/earn_screen/earn_screen.dart';
@@ -6,6 +7,7 @@ import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
 import 'package:defi_wallet/screens/receive/receive_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/select_buy_or_sell_screen.dart';
 import 'package:defi_wallet/screens/send/send_screen.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/home/account_balance.dart';
 import 'package:defi_wallet/widgets/selectors/app_selector.dart';
@@ -19,7 +21,7 @@ class HomeCard extends StatefulWidget {
   State<HomeCard> createState() => _HomeCardState();
 }
 
-class _HomeCardState extends State<HomeCard> {
+class _HomeCardState extends State<HomeCard> with ThemeMixin {
   List<String> items = <String>['USD', 'EUR', 'BTC'];
   String activeAsset = 'USD';
   String swapTutorialStatus = 'show';
@@ -37,6 +39,8 @@ class _HomeCardState extends State<HomeCard> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20.0),
+        border: isDarkTheme() ? Border.all(
+            color: Colors.white.withOpacity(0.04)) : null,
       ),
       child: Center(
         child: Column(
@@ -64,7 +68,7 @@ class _HomeCardState extends State<HomeCard> {
                 Flexible(
                   child: FlatButton(
                     title: 'Earn',
-                    icon: SvgPicture.asset('assets/icons/earn_icon.svg'),
+                    iconPath: 'assets/icons/earn_icon.svg',
                     callback: () {
                       Navigator.push(
                         context,
@@ -84,7 +88,7 @@ class _HomeCardState extends State<HomeCard> {
                 Flexible(
                   child: FlatButton(
                     title: 'Buy/Sell',
-                    icon: SvgPicture.asset('assets/icons/wallet_icon.svg'),
+                    iconPath: 'assets/icons/wallet_icon.svg',
                     callback: () {
                       Navigator.push(
                         context,
@@ -109,7 +113,7 @@ class _HomeCardState extends State<HomeCard> {
                   child: FlatButton(
                     title: 'Send',
                     isPrimary: false,
-                    icon: SvgPicture.asset('assets/icons/send_icon.svg'),
+                    iconPath: 'assets/icons/send_icon.svg',
                     callback: () {
                       Navigator.push(
                         context,
@@ -129,7 +133,7 @@ class _HomeCardState extends State<HomeCard> {
                   child: FlatButton(
                     title: 'Receive',
                     isPrimary: false,
-                    icon: SvgPicture.asset('assets/icons/receive_icon.svg'),
+                    iconPath: 'assets/icons/receive_icon.svg',
                     callback: () {
                       Navigator.push(
                         context,
@@ -149,7 +153,7 @@ class _HomeCardState extends State<HomeCard> {
                   child: FlatButton(
                     title: 'Change',
                     isPrimary: false,
-                    icon: SvgPicture.asset('assets/icons/change_icon.svg'),
+                    iconPath: 'assets/icons/change_icon.svg',
                     callback: () {
                       if (SettingsHelper.isBitcoin() &&
                           SettingsHelper.settings.network == 'testnet') {

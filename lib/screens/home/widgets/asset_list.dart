@@ -62,9 +62,9 @@ class AssetList extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: AppColors.appAssetEntryBorder,
+                          color: Theme.of(context).listTileTheme.tileColor!,
                         ),
-                        color: Theme.of(context).cardColor,
+                        color: Theme.of(context).listTileTheme.selectedColor,
                       ),
                       child: ListTile(
                         leading: _buildTokenIcon(balances[index]),

@@ -11,7 +11,6 @@ class ThemeManager {
     SettingsModel localSettings = SettingsHelper.settings.clone();
     String themeName = localSettings.theme == 'Light' ? 'Dark' : 'Light';
 
-    print(themeName);
     localSettings.theme = themeName;
     SettingsHelper.settings = localSettings;
     settingsHelper.saveSettings();

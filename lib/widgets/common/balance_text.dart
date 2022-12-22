@@ -35,7 +35,7 @@ class _BalanceTextState extends State<BalanceText> {
       return balancesHelper.numberStyling(
             totalBalance,
             fixed: true,
-            fixedCount: 8,
+            fixedCount: 6,
           ) +
           ' ';
     }

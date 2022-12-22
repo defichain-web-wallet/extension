@@ -227,6 +227,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   onPressed: () {},
                                   icon: SvgPicture.asset(
                                     'assets/icons/filter_icon.svg',
+                                    color:
+                                        SettingsHelper.settings.theme == 'Dark'
+                                            ? Colors.white
+                                            : null,
                                   ),
                                 ),
                                 SizedBox(

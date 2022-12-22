@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/utils/theme/theme_manager.dart';
@@ -24,9 +25,9 @@ class AccountDrawer extends StatefulWidget {
   State<AccountDrawer> createState() => _AccountDrawerState();
 }
 
-class _AccountDrawerState extends State<AccountDrawer> {
+class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
   LockHelper lockHelper = LockHelper();
-  bool isDarkTheme = false;
+  bool _isDarkTheme = false;
 
   void lockWallet() async {
     await lockHelper.lockWallet();
@@ -52,11 +53,13 @@ class _AccountDrawerState extends State<AccountDrawer> {
           padding: const EdgeInsets.all(8.0),
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).drawerTheme.backgroundColor,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   width: 1,
-                  color: AppColors.whiteLilac2,
+                  color: isDarkTheme()
+                      ? DarkColors.drawerBorderColor
+                      : LightColors.drawerBorderColor,
                 )),
             child: Padding(
               padding: EdgeInsets.all(8),
@@ -306,17 +309,17 @@ class _AccountDrawerState extends State<AccountDrawer> {
                       AccountMenuButton(
                         callback: () {
                           setState(() {
-                            isDarkTheme = !isDarkTheme;
+                            _isDarkTheme = !_isDarkTheme;
                           });
                           ThemeManager.changeTheme(context);
                         },
                         iconPath: 'assets/icons/night_mode.svg',
                         title: 'Night Mode',
                         afterTitleWidget: DefiSwitch(
-                          isEnable: isDarkTheme,
+                          isEnable: _isDarkTheme,
                           onToggle: (bool value) {
                             setState(() {
-                              isDarkTheme = value;
+                              _isDarkTheme = value;
                             });
                             ThemeManager.changeTheme(context);
                           },

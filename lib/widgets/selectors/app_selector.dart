@@ -1,4 +1,6 @@
 import 'package:defi_wallet/helpers/menu_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,7 +21,7 @@ class AppSelector extends StatefulWidget {
   _AppSelectorState createState() => _AppSelectorState();
 }
 
-class _AppSelectorState extends State<AppSelector> {
+class _AppSelectorState extends State<AppSelector> with ThemeMixin {
   CustomPopupMenuController controller = CustomPopupMenuController();
   MenuHelper menuHelper = MenuHelper();
   bool isOpenAppSelector = false;
@@ -38,6 +40,9 @@ class _AppSelectorState extends State<AppSelector> {
       child: ButtonTheme(
         alignedDropdown: true,
         child: DropdownButton<String>(
+          dropdownColor: isDarkTheme()
+              ? DarkColors.dropdownBgColor
+              : LightColors.dropdownBgColor,
           value: dropdownValue,
           elevation: 3,
           icon: Visibility(visible: false, child: Icon(Icons.arrow_back),),

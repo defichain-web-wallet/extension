@@ -7,13 +7,13 @@ ThemeData createDarkTheme() {
       actionTextColor: Colors.white,
     ),
     primaryColorLight: Color(0xFF545556),
+    selectedRowColor: AppColors.portageBg,
     backgroundColor: Color(0xff333436),
     secondaryHeaderColor: Color(0xff333436),
-    scaffoldBackgroundColor: AppColors.shadowColor,
+    scaffoldBackgroundColor: DarkColors.scaffoldBgColor,
     dialogBackgroundColor: Color(0xFF1C1D1F),
-    selectedRowColor: Color(0xFF2A83C4),
     shadowColor: Colors.transparent,
-    cardColor: Color(0xff333436),
+    cardColor: Colors.white.withOpacity(0.04),
     colorScheme: ColorScheme.dark(
       primary: AppColors.pinkColor,
       primaryVariant: AppColors.pinkColor,
@@ -22,11 +22,18 @@ ThemeData createDarkTheme() {
       color: Colors.white,
     ),
     textTheme: createTextTheme(AppColors.white),
+    listTileTheme: ListTileThemeData(
+      selectedColor: Colors.white.withOpacity(0.06),
+      tileColor: Colors.white.withOpacity(0.05),
+    ),
+    drawerTheme: DrawerThemeData(
+      backgroundColor: DarkColors.drawerBgColor,
+    ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
         textStyle: MaterialStatePropertyAll(button),
         padding: MaterialStatePropertyAll(
-          EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+          EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         ),
         shape: MaterialStatePropertyAll(
           RoundedRectangleBorder(

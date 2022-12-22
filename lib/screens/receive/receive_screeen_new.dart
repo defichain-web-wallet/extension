@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/my_app.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -23,7 +24,7 @@ class ReceiveScreenNew extends StatefulWidget {
   State<ReceiveScreenNew> createState() => _ReceiveScreenNewState();
 }
 
-class _ReceiveScreenNewState extends State<ReceiveScreenNew> {
+class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
   bool isCopied = false;
   late String address;
   String hintText =
@@ -69,7 +70,12 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> {
                   width: double.infinity,
                   height: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDarkTheme()
+                        ? DarkColors.scaffoldContainerBgColor
+                        : LightColors.scaffoldContainerBgColor,
+                    border: isDarkTheme() ? Border.all(
+                      width: 1.0, color: Colors.white.withOpacity(0.05),
+                    ) : null,
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
                       topLeft: Radius.circular(20),
@@ -94,10 +100,13 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> {
                                 height: 208,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(19.2),
-                                  border: Border.all(
-                                    color: AppColors.lavenderPurple
-                                        .withOpacity(0.32),
-                                  ),
+                                  color: isDarkTheme() ? Colors.white : null,
+                                  border: isDarkTheme()
+                                      ? Border.all(
+                                          color: AppColors.lavenderPurple
+                                              .withOpacity(0.32),
+                                        )
+                                      : null,
                                 ),
                                 child: QrImage(
                                   data: address,
@@ -113,7 +122,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> {
                                   Text(
                                     'Address',
                                     style: headline5.apply(
-                                      color: AppColors.darkTextColor
+                                      color: Theme.of(context).textTheme.headline5!.color!
                                           .withOpacity(0.3),
                                     ),
                                   ),
@@ -180,9 +189,10 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> {
                                     child: Text(
                                       hintText,
                                       textAlign: TextAlign.center,
-                                      style: passwordField.apply(
-                                          color: AppColors.darkTextColor
-                                              .withOpacity(0.3)),
+                                      style: Theme.of(context).textTheme.headline6!.apply(
+                                          color: Theme.of(context).textTheme.headline6!.color!
+                                              .withOpacity(0.3),
+                                      ),
                                     ),
                                   ),
                                   if (isCopied)
@@ -192,7 +202,8 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> {
                                       decoration: BoxDecoration(
                                         borderRadius:
                                             BorderRadius.circular(6.4),
-                                        color: AppColors.malachite.withOpacity(0.08),
+                                        color: AppColors.malachite
+                                            .withOpacity(0.08),
                                       ),
                                       child: ClipRRect(
                                         borderRadius:

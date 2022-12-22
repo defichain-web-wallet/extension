@@ -64,9 +64,6 @@ class _UiKitState extends State<UiKit> {
                 callback: () {
                   //
                 },
-                icon: SvgPicture.asset(
-                  'assets/icons/earn_icon.svg',
-                ),
               ),
               Row(
                 children: [
@@ -75,9 +72,6 @@ class _UiKitState extends State<UiKit> {
                     callback: () {
                       //
                     },
-                    icon: SvgPicture.asset(
-                      'assets/icons/earn_icon.svg',
-                    ),
                   ),
                   FlatButton(
                     title: 'Change',
@@ -85,9 +79,6 @@ class _UiKitState extends State<UiKit> {
                     callback: () {
                       //
                     },
-                    icon: SvgPicture.asset(
-                      'assets/icons/change_icon.svg',
-                    ),
                   ),
                 ],
               ),

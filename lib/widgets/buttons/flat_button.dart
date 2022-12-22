@@ -1,16 +1,18 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class FlatButton extends StatelessWidget {
+class FlatButton extends StatelessWidget with ThemeMixin {
   final void Function()? callback;
   final String title;
-  final Widget? icon;
+  final String? iconPath;
   final bool isPrimary;
 
   FlatButton({
     Key? key,
     this.callback,
-    this.icon,
+    this.iconPath,
     required this.title,
     this.isPrimary = true,
   }) : super(key: key);
@@ -19,9 +21,23 @@ class FlatButton extends StatelessWidget {
   static const double largeHeight = 54.0;
 
   MaterialStatePropertyAll<Color> getSpecificBackgroundColor() {
-    return MaterialStatePropertyAll(
-      (isPrimary) ? AppColors.purplePizzazz.withOpacity(0.1) : Colors.white,
-    );
+    if (isPrimary) {
+      return MaterialStatePropertyAll(
+        AppColors.purplePizzazz.withOpacity(0.1),
+      );
+    } else {
+      return MaterialStatePropertyAll(
+        (isDarkTheme()) ? Colors.transparent : Colors.white,
+      );
+    }
+  }
+
+  Color? getSpecificIconColor() {
+    if (isPrimary) {
+      return null;
+    } else {
+      return isDarkTheme() ? Colors.white : AppColors.darkTextColor;
+    }
   }
 
   Color getSpecificBorderColor() {
@@ -36,42 +52,38 @@ class FlatButton extends StatelessWidget {
       height: isPrimary ? largeHeight : mediumHeight,
       child: ElevatedButton(
         onPressed: callback,
-        style: Theme
-            .of(context)
-            .outlinedButtonTheme
-            .style!
-            .copyWith(
-          backgroundColor: getSpecificBackgroundColor(),
-          shape: MaterialStatePropertyAll(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(buttonBorderRadius),
-              ),
-              side: BorderSide(
-                color: getSpecificBorderColor(),
+        style: Theme.of(context).outlinedButtonTheme.style!.copyWith(
+              backgroundColor: getSpecificBackgroundColor(),
+              shape: MaterialStatePropertyAll(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(buttonBorderRadius),
+                  ),
+                  side: BorderSide(
+                    color: getSpecificBorderColor(),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (icon != null)
+            if (iconPath != null)
               Container(
                 width: isPrimary ? 22 : 20,
                 height: isPrimary ? 22 : 20,
                 padding: const EdgeInsets.only(right: 6.4),
-                child: icon!,
+                child: SvgPicture.asset(
+                  iconPath!,
+                  color: getSpecificIconColor(),
+                ),
               ),
             Text(
               title,
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .button!.copyWith(
-                fontSize: isPrimary ? 14 : 12,
-              ),
+              style: Theme.of(context).textTheme.button!.copyWith(
+                    fontSize: isPrimary ? 14 : 12,
+                  ),
             )
           ],
         ),
