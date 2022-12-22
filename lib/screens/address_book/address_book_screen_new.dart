@@ -32,6 +32,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew> {
   bool isSelectedLastSent = false;
   bool isDeleted = false;
 
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
@@ -227,7 +228,9 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew> {
                                         );
                                       },
                                     ),
-                                  if (isSelectedLastSent) LastSentTile(),
+                                  if (isSelectedLastSent) LastSentTile(
+                                    address: 'df1q3lyukeychd55pt2u3xknnuxqzwuhdasgvwuuhc',
+                                  ),
                                   Divider(
                                     height: 1,
                                     color: AppColors.lavenderPurple
@@ -242,7 +245,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew> {
                     ),
                   ],
                 ),
-                if (!isDeleted)
+                if (isDeleted)
                   Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,

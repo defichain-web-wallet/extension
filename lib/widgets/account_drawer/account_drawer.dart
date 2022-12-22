@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/utils/theme/theme_manager.dart';
 import 'package:defi_wallet/widgets/buttons/account_menu_button.dart';
 import 'package:defi_wallet/widgets/create_edit_account/create_edit_account_dialog.dart';
@@ -23,7 +25,20 @@ class AccountDrawer extends StatefulWidget {
 }
 
 class _AccountDrawerState extends State<AccountDrawer> {
+  LockHelper lockHelper = LockHelper();
   bool isDarkTheme = false;
+
+  void lockWallet() async {
+    await lockHelper.lockWallet();
+
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) =>  LockScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,17 +157,15 @@ class _AccountDrawerState extends State<AccountDrawer> {
                                             children: [
                                               Text(
                                                 'Katheryna Khachaturova',
-                                                style: headline6.copyWith(
+                                                style: Theme.of(context).textTheme.headline6!.copyWith(
                                                   fontWeight: FontWeight.w700,
                                                 ),
                                               ),
-                                              // SizedBox(
-                                              //   width: ,
-                                              // ),
                                               Container(
                                                 width: 32,
                                                 height: 32,
                                                 child: IconButton(
+                                                  padding: EdgeInsets.all(0),
                                                   icon: SvgPicture.asset(
                                                     'assets/icons/edit_gradient.svg',
                                                   ),
@@ -291,10 +304,14 @@ class _AccountDrawerState extends State<AccountDrawer> {
                         height: 5,
                       ),
                       AccountMenuButton(
-                        callback: () {},
+                        callback: () {
+                          setState(() {
+                            isDarkTheme = !isDarkTheme;
+                          });
+                          ThemeManager.changeTheme(context);
+                        },
                         iconPath: 'assets/icons/night_mode.svg',
                         title: 'Night Mode',
-                        isStaticBg: true,
                         afterTitleWidget: DefiSwitch(
                           isEnable: isDarkTheme,
                           onToggle: (bool value) {
@@ -309,10 +326,9 @@ class _AccountDrawerState extends State<AccountDrawer> {
                         height: 5,
                       ),
                       AccountMenuButton(
+                        isStaticBg: true,
                         callback: () {
-                          setState(() {
-                            isDarkTheme = !isDarkTheme;
-                          });
+
                         },
                         iconPath: 'assets/icons/jelly_theme_explore.svg',
                         title: 'Explore Jelly themes',
@@ -328,7 +344,9 @@ class _AccountDrawerState extends State<AccountDrawer> {
                       ),
                       AccountMenuButton(
                         // isStaticBg: true,
-                        callback: () {},
+                        callback: () {
+                          lockWallet();
+                        },
                         iconPath: 'assets/icons/lock.svg',
                         title: 'Lock Wallet',
                       ),

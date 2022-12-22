@@ -2,13 +2,23 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class LastSentTile extends StatefulWidget {
-  const LastSentTile({Key? key}) : super(key: key);
+  final String address;
+
+  const LastSentTile({
+    Key? key,
+    required this.address,
+  }) : super(key: key);
 
   @override
   State<LastSentTile> createState() => _LastSentTileState();
 }
 
 class _LastSentTileState extends State<LastSentTile> {
+  
+  cutAddress(String s) {
+    return s.substring(0, 14) + '...' + s.substring(28, 42);
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -22,7 +32,7 @@ class _LastSentTileState extends State<LastSentTile> {
         children: [
           Expanded(
             child: Text(
-              '193767erut646ee23e3mfnh3ur3fasdasdasddd4',
+              cutAddress(widget.address),
               style: headline5.copyWith(
                 fontSize: 13,
               ),
@@ -35,7 +45,9 @@ class _LastSentTileState extends State<LastSentTile> {
                 size: 16,
                 color: AppColors.darkTextColor.withOpacity(0.5),
               ),
-              SizedBox(width: 15,),
+              SizedBox(
+                width: 15,
+              ),
               Icon(
                 Icons.close,
                 size: 16,
