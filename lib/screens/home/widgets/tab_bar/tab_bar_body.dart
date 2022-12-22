@@ -28,7 +28,13 @@ class TabBarBody extends StatelessWidget {
       children: [
         Column(
           children: [
-            Expanded(child: AssetList()),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.only(top: 16),
+                color: Theme.of(context).cardColor,
+                child: AssetList(),
+              ),
+            ),
             if (!SettingsHelper.isBitcoin())
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -57,7 +63,13 @@ class TabBarBody extends StatelessWidget {
         ),
         Column(
           children: [
-            Expanded(child: TransactionHistory()),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.only(top: 16),
+                color: Theme.of(context).cardColor,
+                child: TransactionHistory(),
+              ),
+            ),
             isEmptyList
                 ? Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),

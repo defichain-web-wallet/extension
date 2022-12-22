@@ -61,9 +61,15 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
               ]),
             ),
           ),
+          SizedBox(
+            width: 12,
+          ),
           NewActionButton(
             iconPath: 'assets/icons/account_icon.svg',
             onPressed: () => Scaffold.of(context).openEndDrawer(),
+          ),
+          SizedBox(
+            width: 16,
           )
         ],
       ),

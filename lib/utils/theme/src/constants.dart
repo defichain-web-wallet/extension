@@ -16,7 +16,7 @@ const headline2 = TextStyle(fontWeight: FontWeight.w900, fontSize: 28);
 const headline3 = TextStyle(fontWeight: FontWeight.w700, fontSize: 26);
 const headline4 = TextStyle(fontWeight: FontWeight.w700, fontSize: 18);
 const headline5 = TextStyle(fontWeight: FontWeight.w600, fontSize: 14);
-const headline6 = TextStyle(fontWeight: FontWeight.w600, fontSize: 16);
+const headline6 = TextStyle(fontWeight: FontWeight.w500, fontSize: 12);
 
 const subtitle1 = TextStyle(fontWeight: FontWeight.w400, fontSize: 13);
 const subtitle2 = TextStyle(fontWeight: FontWeight.w400, fontSize: 9);

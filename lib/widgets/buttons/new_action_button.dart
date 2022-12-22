@@ -14,22 +14,19 @@ class NewActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     LockHelper lockHelper = LockHelper();
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 16),
-      child: CircleAvatar(
-        radius: 20,
-        backgroundColor: AppTheme.iconButtonBackground,
-        child: IconButton(
-          splashRadius: 1,
-          iconSize: 18,
-          icon: SvgPicture.asset(
-            iconPath,
-            width: 18,
-            height: 18,
-          ),
-          onPressed: () =>
-              lockHelper.provideWithLockChecker(context, () => onPressed!()),
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: AppTheme.iconButtonBackground,
+      child: IconButton(
+        splashRadius: 1,
+        iconSize: 18,
+        icon: SvgPicture.asset(
+          iconPath,
+          width: 18,
+          height: 18,
         ),
+        onPressed: () =>
+            lockHelper.provideWithLockChecker(context, () => onPressed!()),
       ),
     );
   }
