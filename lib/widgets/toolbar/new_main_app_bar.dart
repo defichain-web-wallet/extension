@@ -1,6 +1,7 @@
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/logo_helper.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
+import 'package:defi_wallet/widgets/selectors/network_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
@@ -50,37 +51,7 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: () => Navigator.of(context).pop(),
                 splashRadius: 20,
               ),
-        title: Container(
-          height: 24,
-          width: 140,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(40),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 10,
-                height: 4,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Color(0xFF00CF21),
-                ),
-              ),
-              SizedBox(
-                width: 6,
-              ),
-              Text('DefiChain Mainnet', style: Theme.of(context).textTheme.subtitle2!.copyWith(
-                fontWeight: FontWeight.w500,
-              ),),
-              SizedBox(
-                width: 6,
-              ),
-              Icon(Icons.keyboard_arrow_down, color: Color(0xFFB7B2C1), size: 14,)
-            ],
-          ),
-        ),
+        title: NetworkSelector(onSelect: () {},),
         actions: [
           SizedBox(
             width: 32,

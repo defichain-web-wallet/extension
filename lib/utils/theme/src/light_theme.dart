@@ -10,7 +10,7 @@ ThemeData createLightTheme() {
     dialogBackgroundColor: Color(0xffFAFAFA),
     primaryColorLight: Color(0xFF5D5D5D),
     selectedRowColor: AppColors.portageBg,
-    shadowColor: Colors.grey[300]!,
+    shadowColor: AppColors.darkTextColor.withOpacity(0.08),
     cardColor: Colors.white,
     backgroundColor: LightColors.cardColor,
     secondaryHeaderColor: AppColors.lightGreyColor,

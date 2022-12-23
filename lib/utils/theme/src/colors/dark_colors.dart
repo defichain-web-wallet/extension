@@ -8,6 +8,9 @@ abstract class DarkColors {
 
   static Color dropdownBgColor = AppColors.mirage;
 
+  static Color networkDropdownBgColor = AppColors.mirage;
+  static Color networkMarkColor = AppColors.white.withOpacity(0.04);
+
   static const drawerBgColor = AppColors.mirage;
   static Color drawerBorderColor = AppColors.white.withOpacity(0.04);
   static Color drawerHeaderColor = AppColors.portageBg.withOpacity(0.07);

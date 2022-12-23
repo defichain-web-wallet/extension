@@ -6,11 +6,13 @@ class SelectorTabElement extends StatelessWidget {
   final String title;
   final bool isSelect;
   final Function callback;
+  final double? indicatorWidth;
 
   const SelectorTabElement({
     Key? key,
     required this.title,
     required this.callback,
+    this.indicatorWidth,
     this.isSelect = false,
   }) : super(key: key);
 
@@ -30,14 +32,18 @@ class SelectorTabElement extends StatelessWidget {
                       ? headline5.copyWith(fontSize: 12)
                       : headline5.copyWith(
                           fontSize: 12,
-                          color: AppColors.darkTextColor.withOpacity(0.3),
+                          color: Theme.of(context)
+                              .textTheme
+                              .headline5!
+                              .color!
+                              .withOpacity(0.3),
                         ),
                 ),
                 SizedBox(
                   height: 4,
                 ),
                 Container(
-                  width: 20,
+                  width: indicatorWidth ?? 20,
                   height: 2,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
