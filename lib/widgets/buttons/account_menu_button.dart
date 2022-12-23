@@ -1,5 +1,6 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/common/jelly_link_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -130,46 +131,16 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                         width: 6.4,
                       ),
                     Expanded(
-                      child: GradientText(
+                      child: Text(
                         '${widget.title}',
-                        style: Theme.of(context).textTheme.headline5,
-                        gradientType: GradientType.linear,
-                        gradientDirection: GradientDirection.btt,
-                        colors: widget.callback == null
-                            ? [
-                                Theme.of(context)
+                        style: widget.callback == null
+                            ? Theme.of(context).textTheme.headline5!.apply(
+                                color: Theme.of(context)
                                     .textTheme
                                     .headline5!
                                     .color!
-                                    .withOpacity(0.5),
-                                Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .color!
-                                    .withOpacity(0.5),
-                              ]
-                            : widget.isStaticBg
-                                ? [
-                                    AppColors.electricViolet.withOpacity(0.8),
-                                    AppColors.hollywoodCerise.withOpacity(0.8),
-                                  ]
-                                : isHover
-                                    ? [
-                                        AppColors.electricViolet
-                                            .withOpacity(0.8),
-                                        AppColors.hollywoodCerise
-                                            .withOpacity(0.8),
-                                      ]
-                                    : [
-                                        Theme.of(context)
-                                            .textTheme
-                                            .headline5!
-                                            .color!,
-                                        Theme.of(context)
-                                            .textTheme
-                                            .headline5!
-                                            .color!,
-                                      ],
+                                    .withOpacity(0.5))
+                            : Theme.of(context).textTheme.headline5,
                       ),
                     ),
                     if (widget.afterTitleWidget != null)
