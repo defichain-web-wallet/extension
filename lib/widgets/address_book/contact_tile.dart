@@ -24,6 +24,10 @@ class ContactTile extends StatefulWidget {
 class _ContactTileState extends State<ContactTile> {
   bool isHoverEdit = false;
 
+  cutAddress(String s) {
+    return s.substring(0, 14) + '...' + s.substring(28, 42);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -99,7 +103,7 @@ class _ContactTileState extends State<ContactTile> {
                 Row(
                   children: [
                     Text(
-                      widget.contactAddress,
+                      cutAddress(widget.contactAddress),
                       style: subtitle1.apply(
                         color: AppColors.darkTextColor.withOpacity(0.5),
                       ),

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/material.dart';
 class CreateEditContactDialog extends StatefulWidget {
   final bool isEdit;
   final Function()? deleteCallback;
-  final Function()? confirmCallback;
+  final Function(String name, String address) confirmCallback;
   final String contactName;
   final String address;
 
@@ -16,7 +17,7 @@ class CreateEditContactDialog extends StatefulWidget {
     Key? key,
     this.isEdit = false,
     this.deleteCallback,
-    this.confirmCallback,
+    required this.confirmCallback,
     this.contactName = '',
     this.address = '',
   }) : super(key: key);
@@ -27,6 +28,7 @@ class CreateEditContactDialog extends StatefulWidget {
 }
 
 class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
+  AddressesHelper addressHelper = AddressesHelper();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   String editTitleText = 'Edit contact';
@@ -37,8 +39,10 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
   String titleAddress = 'Address';
   String subtitleText = 'Enter name and address';
   String titleDeleteContact = 'Delete contact';
+  bool isValidAddress = false;
   late String titleText;
   late double contentHeight;
+  late bool isEnable;
 
   @override
   void initState() {
@@ -46,8 +50,20 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
     _addressController.text = widget.address;
     contentHeight = widget.isEdit ? 336 : 299;
     titleText = widget.isEdit ? editTitleText : createTitleText;
-    // TODO: implement initState
+    checkButtonStatus();
     super.initState();
+  }
+
+  checkButtonStatus() {
+    setState(() {
+      if (_nameController.text.length > 3 &&
+          _addressController.text.isNotEmpty &&
+          isValidAddress) {
+        isEnable = true;
+      } else {
+        isEnable = false;
+      }
+    });
   }
 
   @override
@@ -79,7 +95,14 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
               ),
               NewPrimaryButton(
                 width: 104,
-                callback: widget.confirmCallback,
+                callback: isEnable
+                    ? () {
+                        widget.confirmCallback!(
+                          _nameController.text,
+                          _addressController.text,
+                        );
+                      }
+                    : null,
                 title: 'Confirm',
               ),
             ],
@@ -193,6 +216,11 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                                     ),
                                   ),
                                 ),
+                                onChanged: (value) async {
+                                  isValidAddress = await addressHelper
+                                      .validateAddress(_addressController.text);
+                                  checkButtonStatus();
+                                },
                               ),
                             ),
                             SizedBox(
@@ -230,6 +258,11 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                                     ),
                                   ),
                                 ),
+                                onChanged: (value) async {
+                                  isValidAddress = await addressHelper
+                                      .validateAddress(_addressController.text);
+                                  checkButtonStatus();
+                                },
                               ),
                             ),
                           ],
