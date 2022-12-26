@@ -1,38 +1,48 @@
 import 'package:defi_wallet/widgets/auth/welcome_text_cover.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class WelcomePositionedLogo extends StatelessWidget {
-  double width;
+  final double width;
+  final double imgWidth;
+  final double titleSpace;
+  final String title;
 
   WelcomePositionedLogo({
     Key? key,
     this.width = 360,
+    this.imgWidth = 295,
+    this.titleSpace = 310,
+    this.title = 'Welcome',
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    late double screenWidth;
+
     if (width < 360) {
-      width = 360;
+      screenWidth = 360;
+    } else {
+      screenWidth = width;
     }
+
     return Container(
-      width: width,
+      width: screenWidth,
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Stack(
         alignment: AlignmentDirectional.center,
         children: [
           Positioned(
-            left: -265 + ((width - 360)/2),
+            left: -265 + ((screenWidth - 360)/2),
             top: 42.0,
             child: WelcomeTextCover(
               '欢迎,Bem-vindo,Witamy,欢迎,Bem-vindo,Witamy',
             ),
           ),
           Positioned(
-            left: -310 + ((width - 360)/2),
+            left: -titleSpace + ((screenWidth - 360)/2),
             top: 90.0,
             child: WelcomeTextCover(
-              'Welcome,欢迎,Willkommen,Welcome,欢迎,Willkommen',
+              'Welcome,欢迎,Willkommen,$title,欢迎,Willkommen',
               wordSelectId: 3,
             ),
           ),
@@ -45,14 +55,15 @@ class WelcomePositionedLogo extends StatelessWidget {
           ),
           Positioned(
             top: 120,
-            left: 0,
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 32.5 + ((width - 360)/2)),
-              width: 295,
-              height: 312,
-              child: Image(
-                image: AssetImage(
-                  'assets/welcome_logo.png',
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 32.5 + ((screenWidth - 360)/2)),
+                width: imgWidth,
+                child: Image(
+                  image: AssetImage(
+                    'assets/welcome_logo.png',
+                  ),
                 ),
               ),
             ),

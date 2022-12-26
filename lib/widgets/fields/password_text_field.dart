@@ -24,6 +24,7 @@ class PasswordTextField extends StatefulWidget {
   final bool autofocus;
   final bool isObscure;
   final bool isShowObscureIcon;
+  final bool isCaptionShown;
 
   const PasswordTextField({
     Key? key,
@@ -39,6 +40,7 @@ class PasswordTextField extends StatefulWidget {
     this.autofocus = false,
     this.isObscure = false,
     this.isShowObscureIcon = false,
+    this.isCaptionShown = true,
   }) : super(key: key);
 
   @override
@@ -89,17 +91,20 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                 ),
               ),
             ),
-            style: passwordField.apply(color: AppColors.darkTextColor, ),
+            style: passwordField.apply(
+              color: AppColors.darkTextColor,
+            ),
             onChanged: widget.onChanged,
           ),
         ),
         SizedBox(
           height: 6,
         ),
-        CaptionText(
-          status: widget.status.toShortString(),
-          text: widget.error,
-        ),
+        if (widget.isCaptionShown)
+          CaptionText(
+            status: widget.status.toShortString(),
+            text: widget.error,
+          ),
       ],
     );
   }

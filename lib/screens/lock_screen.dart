@@ -9,8 +9,11 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/auth/welcome_positioned_logo.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/fields/password_field.dart';
+import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +33,7 @@ class LockScreen extends StatefulWidget {
 
 class _LockScreenState extends State<LockScreen> {
   SettingsHelper settingsHelper = SettingsHelper();
+  bool isPasswordObscure = true;
   bool isEnable = true;
   bool isVisiblePasswordField = true;
   String password = '';
@@ -38,96 +42,84 @@ class _LockScreenState extends State<LockScreen> {
   GlobalKey globalKey = GlobalKey();
   TextEditingController _passwordController = TextEditingController();
 
+  PasswordStatusList passwordStatus = PasswordStatusList.initial;
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: WelcomeAppBar(),
         body: Container(
-          color: Theme.of(context).dialogBackgroundColor,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            child: Center(
+          padding: const EdgeInsets.only(bottom: 42),
+          child: Center(
+            child: StretchBox(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SvgPicture.asset(
-                    'assets/jelly_logo.svg',
-                    height: 180,
-                    width: 200,
-                  ),
-                  Text(
-                    widget.callback == null
-                        ? 'Welcome Back!'
-                        : 'Enter password',
-                    style: Theme.of(context).textTheme.headline1,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Your Keys. Your Crypto.',
-                    style: Theme.of(context).textTheme.headline2,
+                  Expanded(
+                    child: Center(
+                      child: WelcomePositionedLogo(
+                        imgWidth: 250,
+                        titleSpace: 345,
+                        title: 'Welcome back',
+                      ),
+                    ),
                   ),
                   SizedBox(height: 25),
-                  StretchBox(
-                    maxWidth: ScreenSizes.xSmall,
+                  Container(
+                    padding: authPaddingContainer.copyWith(
+                      top: 0,
+                      bottom: 0,
+                    ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Password',
-                          style: Theme.of(context).textTheme.headline2,
+                        PasswordTextField(
+                          controller: _passwordController,
+                          status: passwordStatus,
+                          hint: 'Your password',
+                          label: 'Password',
+                          isShowObscureIcon: true,
+                          isCaptionShown: false,
+                          isObscure: isPasswordObscure,
+                          onChanged: (String value) {
+                            password = value;
+                          },
+                          onPressObscure: () {
+                            setState(
+                                    () => isPasswordObscure = !isPasswordObscure);
+                          },
                         ),
-                        SizedBox(height: 8),
-                        PasswordField(
-                          passwordController: _passwordController,
-                          autofocus: true,
-                          obscureText: isVisiblePasswordField,
-                          onEditComplete: () =>
-                              (globalKey.currentWidget! as ElevatedButton)
-                                  .onPressed!(),
-                          hintText: 'Enter password',
-                          onChanged: (value) => password = value,
-                          onIconPressed: () => setState(() =>
-                              isVisiblePasswordField = !isVisiblePasswordField),
+                        SizedBox(height: 24),
+                        StretchBox(
+                          maxWidth: ScreenSizes.xSmall,
+                          child: PendingButton(
+                            widget.callback == null ? 'Unlock' : 'Continue',
+                            pendingText: 'Pending...',
+                            isCheckLock: false,
+                            globalKey: globalKey,
+                            callback: (parent) => _restoreWallet(parent),
+                          ),
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          isFailed ? 'Incorrect password' : '',
-                          style: Theme.of(context).textTheme.headline4!.copyWith(
-                                color: AppTheme.redErrorColor,
+                        SizedBox(height: 20),
+                        if (widget.callback == null)
+                          InkWell(
+                            child: Text(
+                              'Forgot password?',
+                              style: AppTheme.defiUnderlineText,
+                            ),
+                            onTap: isEnable
+                                ? () => Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                    RecoveryScreen(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
                               ),
-                        ),
+                            )
+                                : null,
+                          ),
                       ],
                     ),
-                  ),
-                  SizedBox(height: 4),
-                  StretchBox(
-                    maxWidth: ScreenSizes.xSmall,
-                    child: PendingButton(
-                      widget.callback == null ? 'Unlock' : 'Continue',
-                      isCheckLock: false,
-                      globalKey: globalKey,
-                      callback: (parent) => _restoreWallet(parent),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  if (widget.callback == null)
-                    InkWell(
-                      child: Text(
-                        'Forgot password?',
-                        style: AppTheme.defiUnderlineText,
-                      ),
-                      onTap: isEnable
-                          ? () => Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          RecoveryScreen(),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
-                              )
-                          : null,
-                    ),
+                  )
                 ],
               ),
             ),
@@ -174,6 +166,7 @@ class _LockScreenState extends State<LockScreen> {
       }
     } else {
       setState(() {
+        passwordStatus = PasswordStatusList.error;
         isFailed = true;
         isEnable = true;
       });
