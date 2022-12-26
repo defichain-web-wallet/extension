@@ -7,6 +7,7 @@ class SelectorTabElement extends StatelessWidget {
   final bool isSelect;
   final Function callback;
   final double? indicatorWidth;
+  final bool isPaddingLeft;
 
   const SelectorTabElement({
     Key? key,
@@ -14,6 +15,7 @@ class SelectorTabElement extends StatelessWidget {
     required this.callback,
     this.indicatorWidth,
     this.isSelect = false,
+    this.isPaddingLeft = false,
   }) : super(key: key);
 
   @override
@@ -23,6 +25,7 @@ class SelectorTabElement extends StatelessWidget {
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: Container(
+          padding: EdgeInsets.only(left: isPaddingLeft ? 8 : 0),
           child: Center(
             child: Column(
               children: [

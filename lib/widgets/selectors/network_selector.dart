@@ -1,15 +1,13 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/network/network_cubit.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-enum NetworkTabs { all, test }
 
 class NetworkSelector extends StatefulWidget {
   final void Function() onSelect;
@@ -28,16 +26,25 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
   NetworkTabs activeTab = NetworkTabs.all;
   String currentNetworkItem = 'DefiChain Mainnet';
 
-  final List<dynamic> menuItems = [
-    {'name': 'DefiChain Mainnet'},
-    {'name': 'DefiChain Testnet'},
-    {'name': 'Bitcoin Mainnet'},
-    {'name': 'Bitcoin Testnet'},
-    {'name': 'Defi-Meta-Chain Testnet'},
+  static const List<dynamic> testNetNetworksList = [
+    {'value': NetworkList.btcMainnet, 'name': 'Bitcoin Mainnet'},
+    {'value': NetworkList.btcTestnet, 'name': 'Bitcoin Testnet'},
+    {'value': NetworkList.defiMetaChainTestnet, 'name': 'Defi-Meta-Chain Testnet'},
   ];
 
-  Color getMarkColor(String item) {
-    if (currentNetworkItem == item) {
+  static const List<dynamic> allNetworksList = [
+    {'value': NetworkList.defiMainnet, 'name': 'DefiChain Mainnet'},
+    {'value': NetworkList.defiTestnet, 'name': 'DefiChain Testnet'},
+    ...testNetNetworksList
+  ];
+
+  final List<dynamic> tabs = [
+    {'value': NetworkTabs.all, 'name': 'Show/Hide'},
+    {'value': NetworkTabs.test, 'name': 'Test Networks'},
+  ];
+
+  Color getMarkColor(bool isActive) {
+    if (isActive) {
       return AppColors.networkMarkColor;
     } else {
       return isDarkTheme()
@@ -49,6 +56,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     double horizontalMargin = menuHelper.getHorizontalMargin(context);
+    NetworkCubit networkCubit = BlocProvider.of<NetworkCubit>(context);
 
     return CustomPopupMenu(
       menuOnChange: (b) => widget.onSelect(),
@@ -62,25 +70,35 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
         ),
         child: Row(
           children: [
-            Container(
-              width: 10,
-              height: 4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Color(0xFF00CF21),
+            Flexible(
+              child: Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Color(0xFF00CF21),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 6,
+                  ),
+                  Flexible(
+                    child: TickerText(
+                      child: Text(
+                        currentNetworkItem,
+                        style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 6,
+                  ),
+                ],
               ),
-            ),
-            SizedBox(
-              width: 6,
-            ),
-            Text(
-              'DefiChain Mainnet',
-              style: Theme.of(context).textTheme.subtitle2!.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            SizedBox(
-              width: 6,
             ),
             Icon(
               Icons.keyboard_arrow_down,
@@ -111,153 +129,152 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
           painter: ArrowPainter(),
           child: ClipPath(
             clipper: ArrowClipper(),
-            child: Container(
-              color: isDarkTheme()
-                ? DarkColors.networkDropdownBgColor
-                : LightColors.networkDropdownBgColor,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 260,
-              child: Container(
-                padding: const EdgeInsets.only(
-                  top: 16,
-                  bottom: 8,
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      child: Column(
-                        children: [
-                          Row(
+            child: BlocBuilder<NetworkCubit, NetworkState>(
+              builder: (context, networkState) {
+                var currentNetworksList =
+                    networkState.currentNetworkSelectorTab == NetworkTabs.all
+                        ? allNetworksList
+                        : testNetNetworksList;
+                return Container(
+                  color: isDarkTheme()
+                      ? DarkColors.networkDropdownBgColor
+                      : LightColors.networkDropdownBgColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  width: 260,
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                      top: 16,
+                      bottom: 8,
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          child: Column(
                             children: [
-                              SvgPicture.asset(
-                                'assets/icons/network_icon.svg',
-                                width: 18,
-                                height: 18,
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/network_icon.svg',
+                                    width: 18,
+                                    height: 18,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    'Network',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline4!
+                                        .apply(
+                                      fontSizeDelta: 2,
+                                    ),
+                                  )
+                                ],
                               ),
                               SizedBox(
-                                width: 10,
+                                height: 14,
                               ),
                               Text(
-                                'Network',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline4!
-                                    .apply(
-                                  fontSizeDelta: 2,
+                                'Jelly speaks more than one language. Select the network you want to use:',
+                                style:
+                                Theme.of(context).textTheme.headline6!.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .color!
+                                      .withOpacity(0.8),
                                 ),
+                              ),
+                              SizedBox(
+                                height: 14,
+                              ),
+                              Row(
+                                children: [
+                                  ...List<Widget>.generate(
+                                    tabs.length,
+                                        (index) => SelectorTabElement(
+                                      title: tabs[index]['name'],
+                                      callback: () {
+                                        print(tabs[index]['name']);
+                                        networkCubit.updateCurrentTab(
+                                          tabs[index]['value'],
+                                        );
+                                      },
+                                      isSelect:
+                                      networkState.currentNetworkSelectorTab == tabs[index]['value'],
+                                      isPaddingLeft: index % 2 == 1,
+                                      indicatorWidth: 60,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Divider(
+                                color:
+                                Theme.of(context).dividerColor.withOpacity(0.1),
                               )
                             ],
                           ),
-                          SizedBox(
-                            height: 14,
-                          ),
-                          Text(
-                            'Jelly speaks more than one language. Select the network you want to use:',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .headline6!
-                                  .color!
-                                  .withOpacity(0.8),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 14,
-                          ),
-                          Row(
-                            children: [
-                              SelectorTabElement(
-                                title: 'Show/Hide',
-                                callback: () {
-                                  setState(() {
-                                    activeTab = NetworkTabs.all;
-                                  });
-                                },
-                                isSelect: activeTab == NetworkTabs.all,
-                                indicatorWidth: 65,
-                              ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              SelectorTabElement(
-                                title: 'Test Networks',
-                                callback: () {
-                                  setState(() {
-                                    activeTab = NetworkTabs.test;
-                                  });
-                                },
-                                isSelect: activeTab == NetworkTabs.test,
-                                indicatorWidth: 60,
-                              ),
-                            ],
-                          ),
-                          Divider(
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withOpacity(0.1),
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: menuItems
-                            .map(
-                              (item) => Column(
-                            children: [
-                              MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  onTap: () {
-                                    controller.hideMenu();
-                                    setState(() {
-                                      currentNetworkItem = item['name'];
-                                    });
-                                  },
-                                  child: Container(
-                                    height: 44,
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 10,
-                                          height: 4,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                            BorderRadius.circular(
-                                                8),
-                                            color: getMarkColor(item['name']),
-                                          ),
+                        ),
+                        Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: currentNetworksList
+                                .map(
+                                  (item) => Column(
+                                children: [
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      onTap: () {
+                                        controller.hideMenu();
+                                        networkCubit.updateCurrentNetwork(item['value']);
+                                        setState(() {
+                                          currentNetworkItem = item['name'];
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 44,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 10,
+                                              height: 4,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                BorderRadius.circular(8),
+                                                color:
+                                                getMarkColor(networkState.currentNetwork == item['value']),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 8,
+                                            ),
+                                            Text(
+                                              item['name'],
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline5,
+                                            ),
+                                          ],
                                         ),
-                                        SizedBox(
-                                          width: 8,
-                                        ),
-                                        Text(
-                                          item['name'],
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5,
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            )
+                                .toList(),
                           ),
                         )
-                            .toList(),
-                      ),
-                    )
-                  ],
-                ),
-              ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),

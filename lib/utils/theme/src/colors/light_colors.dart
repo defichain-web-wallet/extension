@@ -9,7 +9,7 @@ abstract class LightColors {
   static const dropdownBgColor = AppColors.white;
 
   static Color networkDropdownBgColor = AppColors.white;
-  static Color networkMarkColor = AppColors.white.withOpacity(0.04);
+  static Color networkMarkColor = AppColors.blackRock.withOpacity(0.2);
 
   static const drawerBgColor = AppColors.white;
   static const drawerBorderColor = AppColors.whiteLilac;

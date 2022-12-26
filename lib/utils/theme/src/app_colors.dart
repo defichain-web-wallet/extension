@@ -6,6 +6,7 @@ abstract class AppColors {
   static const grey = Colors.grey;
   static const pink = Colors.pink;
 
+  static const blackRock = Color(0xFF12052F);
   static const moonRaker = Color(0xFFDDD2F3);
   static const lavenderPurple = Color(0xFF9988BE);
   static const portage = Color(0xFF9490EA);
@@ -23,10 +24,12 @@ abstract class AppColors {
   static const ebony = Color(0xFF120C23);
   static const mirage = Color(0xFF1B162C);
 
+  static const textPrimaryColor = blackRock;
+
   static const lightGreyColor = Color(0xFFEDEDED);
   static const pinkColor = Color(0xFFFF00A3);
   static const redErrorColor = Color(0xFFD92E2E);
-  static const darkTextColor = Color(0xFF12052F);
+  static const darkTextColor = textPrimaryColor;
   static const shadowColor = Color(0xFF131415);
   static const toogleBgLight = purpleHeart;
 
@@ -39,7 +42,7 @@ abstract class AppColors {
   static const lightDark = Color(0xFF1b1b1b);
 
   static const noSelectLight1 = Color(0xFF9B73EE);
-  static const noSelectLight2 = Color(0xFF12052F);
+  static const noSelectLight2 = textPrimaryColor;
 
   static const appSelectorBorderColor = Color(0xFFEFEDF8);
   static const selectLight = portageBg;

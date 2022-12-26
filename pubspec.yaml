@@ -64,7 +64,7 @@ dependencies:
 
   simple_tooltip: ^1.0.0
 
-  custom_pop_up_menu: ^1.2.2
+  custom_pop_up_menu: ^1.2.4
 
   basic_utils: ^3.6.0
 
