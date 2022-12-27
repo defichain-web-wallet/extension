@@ -1,3 +1,4 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -6,26 +7,28 @@ class DefiCheckbox extends StatefulWidget {
   final double width;
   bool value;
   bool isFocused;
+  final bool isShowLabel;
   final Widget textWidget;
   final Function? callback;
   FocusNode? focusNode;
 
-  DefiCheckbox({
-    Key? key,
-    this.callback,
-    this.focusNode,
-    this.isFocused = false,
-    this.text = '',
-    this.width = double.infinity,
-    this.value = false,
-    this.textWidget = const Text('Add your text')
-  }) : super(key: key);
+  DefiCheckbox(
+      {Key? key,
+      this.callback,
+      this.focusNode,
+      this.isFocused = false,
+      this.text = '',
+      this.width = 320,
+      this.value = false,
+      this.isShowLabel = true,
+      this.textWidget = const Text('Add your text')})
+      : super(key: key);
 
   @override
   State<DefiCheckbox> createState() => _DefiCheckboxState();
 }
 
-class _DefiCheckboxState extends State<DefiCheckbox> {
+class _DefiCheckboxState extends State<DefiCheckbox> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,14 +45,14 @@ class _DefiCheckboxState extends State<DefiCheckbox> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 1,),
+              SizedBox(
+                height: 1,
+              ),
               Container(
                 width: 20,
                 height: 20,
                 decoration: BoxDecoration(
-                  gradient: widget.value
-                      ? gradientButton
-                      : null,
+                  gradient: widget.value ? gradientButton : null,
                   borderRadius: BorderRadius.circular(6),
                   border: !widget.value
                       ? Border.all(
@@ -74,10 +77,14 @@ class _DefiCheckboxState extends State<DefiCheckbox> {
                   },
                 ),
               ),
-              SizedBox(width: 14,),
-              Expanded(
-                child: widget.textWidget,
-              ),
+              if (!widget.isShowLabel)
+                SizedBox(
+                  width: 14,
+                ),
+              if (!widget.isShowLabel)
+                Expanded(
+                  child: widget.textWidget,
+                ),
             ],
           ),
         ),
@@ -85,4 +92,3 @@ class _DefiCheckboxState extends State<DefiCheckbox> {
     );
   }
 }
-
