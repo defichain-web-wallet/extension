@@ -1,10 +1,12 @@
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/settings_model.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/home/widgets/settings_list.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
+import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +26,8 @@ class _UiKitState extends State<UiKit> {
   bool isObscure1 = false;
   bool isObscure2 = true;
   bool value = false;
+  List<String> tokensForSwap = [];
+  TokensModel? currentAsset;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +55,51 @@ class _UiKitState extends State<UiKit> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              AmountField(
+                onAssetSelect: (TokensModel asset) {
+                  print(asset.symbol);
+                  setState(() {
+                    currentAsset = asset;
+                  });
+                },
+                selectedAsset: TokensModel(
+                  name: 'Defi',
+                  symbol: 'DFI',
+                ),
+                controller: TextEditingController(
+                  text: '200.50'
+                ),
+                assets: [
+                  TokensModel(
+                    symbol: 'DFI',
+                    name: 'Defi',
+                  ),
+                  TokensModel(
+                    symbol: 'BTC',
+                    name: 'Bitcoin',
+                  ),
+                  TokensModel(
+                    symbol: 'ETH',
+                    name: 'Ethereum',
+                  ),
+                  TokensModel(
+                    symbol: 'BCH',
+                    name: 'Bitcoin Cash',
+                  ),
+                  TokensModel(
+                    symbol: 'BCH',
+                    name: 'Bitcoin Cash',
+                  ),
+                  TokensModel(
+                    symbol: 'DASHqwe',
+                    name: 'Dash',
+                  ),
+                  TokensModel(
+                    symbol: 'XRP',
+                    name: 'Ripple',
+                  ),
+                ],
+              ),
               Container(
                 child: AppSelector(
                   items: [],
