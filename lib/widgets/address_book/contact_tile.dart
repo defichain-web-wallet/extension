@@ -8,13 +8,15 @@ class ContactTile extends StatefulWidget {
   final String contactAddress;
   final String networkName;
   final Function()? editCallback;
+  final bool isDialog;
 
   const ContactTile({
     Key? key,
     required this.contactName,
     required this.contactAddress,
     required this.networkName,
-    required this.editCallback,
+    this.editCallback,
+    this.isDialog = false,
   }) : super(key: key);
 
   @override
@@ -104,9 +106,14 @@ class _ContactTileState extends State<ContactTile> {
                   children: [
                     Text(
                       cutAddress(widget.contactAddress),
-                      style: subtitle1.apply(
-                        color: AppColors.darkTextColor.withOpacity(0.5),
-                      ),
+                      style: widget.isDialog
+                          ? Theme.of(context).textTheme.subtitle1!.apply(
+                        fontSizeFactor: 0.9,
+                              color: AppColors.darkTextColor.withOpacity(0.5),
+                            )
+                          : Theme.of(context).textTheme.subtitle1!.apply(
+                              color: AppColors.darkTextColor.withOpacity(0.5),
+                            ),
                     ),
                   ],
                 ),
@@ -116,36 +123,37 @@ class _ContactTileState extends State<ContactTile> {
           SizedBox(
             width: 6,
           ),
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            onEnter: (event) {
-              setState(() {
-                isHoverEdit = true;
-              });
-            },
-            onExit: (event) {
-              setState(() {
-                isHoverEdit = false;
-              });
-            },
-            child: GestureDetector(
-              onTap: widget.editCallback,
-              child: isHoverEdit
-                  ? SvgPicture.asset(
-                      'assets/icons/edit_gradient.svg',
-                      width: 17,
-                      height: 17,
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.only(right: 1.0),
-                      child: SvgPicture.asset(
-                        'assets/icons/edit.svg',
-                        width: 16,
-                        height: 16,
+          if (widget.editCallback != null)
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              onEnter: (event) {
+                setState(() {
+                  isHoverEdit = true;
+                });
+              },
+              onExit: (event) {
+                setState(() {
+                  isHoverEdit = false;
+                });
+              },
+              child: GestureDetector(
+                onTap: widget.editCallback,
+                child: isHoverEdit
+                    ? SvgPicture.asset(
+                        'assets/icons/edit_gradient.svg',
+                        width: 17,
+                        height: 17,
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.only(right: 1.0),
+                        child: SvgPicture.asset(
+                          'assets/icons/edit.svg',
+                          width: 16,
+                          height: 16,
+                        ),
                       ),
-                    ),
+              ),
             ),
-          ),
         ],
       ),
     );

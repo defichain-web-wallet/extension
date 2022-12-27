@@ -6,6 +6,7 @@ import 'package:defi_wallet/screens/earn_screen/earn_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
 import 'package:defi_wallet/screens/receive/receive_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/select_buy_or_sell_screen.dart';
+import 'package:defi_wallet/screens/send/send_screeen_new.dart';
 import 'package:defi_wallet/screens/send/send_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
@@ -118,7 +119,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) => SendScreen(),
+                          pageBuilder: (context, animation1, animation2) => SendScreenNew(),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
                         ),

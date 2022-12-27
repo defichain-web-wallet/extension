@@ -71,6 +71,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
+        insetPadding: EdgeInsets.all(24),
         elevation: 0.0,
         shape: RoundedRectangleBorder(
           side: BorderSide.none,

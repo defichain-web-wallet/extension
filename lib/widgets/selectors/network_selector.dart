@@ -199,7 +199,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                             color: Theme.of(context)
                                 .dividerColor
                                 .withOpacity(0.1),
-                          )
+                          ),
                         ],
                       ),
                     ),
