@@ -30,7 +30,6 @@ class TransactionRequests {
         final _response = await http.get(_url, headers: _headers);
         final _data =
             jsonDecode(_response.body)['data'].cast<Map<String, dynamic>>();
-print(_data);
         _data.forEach((utxo) {
           var utxoModel = UtxoModel.fromJson(utxo);
           utxoModel.address = addresses[i].address;

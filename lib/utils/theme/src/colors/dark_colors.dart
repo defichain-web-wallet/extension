@@ -23,4 +23,6 @@ abstract class DarkColors {
   static const assetItemSelectorBorderColor = AppColors.portageBg;
 
   static const assetSelectedItemSelectorBgColor = AppColors.portageBg;
+
+  static const slippageBorderColor = AppColors.lavenderPurple;
 }

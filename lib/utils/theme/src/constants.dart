@@ -73,6 +73,15 @@ const gradientButton = LinearGradient(
   ],
 );
 
+const gradientSlippageButton = LinearGradient(
+  begin: Alignment.bottomCenter,
+  end: Alignment.topCenter,
+  colors: [
+    AppColors.electricViolet,
+    AppColors.pinkColor,
+  ],
+);
+
 const gradientBottomToUpCenter = LinearGradient(
   begin: Alignment.bottomCenter,
   end: Alignment.topCenter,

@@ -152,8 +152,6 @@ class BtcRequests {
 
       final response = await http.post(_url, headers: _headers, body: _body);
       final data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
       if (response.statusCode == 201) {
         return TxErrorModel(isError: false, txid: data['tx']['hash']);
       } else {

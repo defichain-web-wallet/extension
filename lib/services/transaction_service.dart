@@ -128,7 +128,6 @@ class TransactionService {
         witnessValue: utxo.value);
     });
 
-    print(_txb.build().toHex());
     return _txb.build().toHex();
   }
 
@@ -809,7 +808,6 @@ class TransactionService {
     int i = 0;
     do {
       selectedUtxo.add(utxos[i]);
-      print(utxos[i].mintTxId);
       sum += utxos[i].value!;
       if (selectedUtxo.length < utxos.length) {
         i++;

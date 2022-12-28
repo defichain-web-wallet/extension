@@ -55,51 +55,51 @@ class _UiKitState extends State<UiKit> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              AmountField(
-                onAssetSelect: (TokensModel asset) {
-                  print(asset.symbol);
-                  setState(() {
-                    currentAsset = asset;
-                  });
-                },
-                selectedAsset: TokensModel(
-                  name: 'Defi',
-                  symbol: 'DFI',
-                ),
-                controller: TextEditingController(
-                  text: '200.50'
-                ),
-                assets: [
-                  TokensModel(
-                    symbol: 'DFI',
-                    name: 'Defi',
-                  ),
-                  TokensModel(
-                    symbol: 'BTC',
-                    name: 'Bitcoin',
-                  ),
-                  TokensModel(
-                    symbol: 'ETH',
-                    name: 'Ethereum',
-                  ),
-                  TokensModel(
-                    symbol: 'BCH',
-                    name: 'Bitcoin Cash',
-                  ),
-                  TokensModel(
-                    symbol: 'BCH',
-                    name: 'Bitcoin Cash',
-                  ),
-                  TokensModel(
-                    symbol: 'DASHqwe',
-                    name: 'Dash',
-                  ),
-                  TokensModel(
-                    symbol: 'XRP',
-                    name: 'Ripple',
-                  ),
-                ],
-              ),
+              // AmountField(
+              //   onAssetSelect: (TokensModel asset) {
+              //     print(asset.symbol);
+              //     setState(() {
+              //       currentAsset = asset;
+              //     });
+              //   },
+              //   selectedAsset: TokensModel(
+              //     name: 'Defi',
+              //     symbol: 'DFI',
+              //   ),
+              //   controller: TextEditingController(
+              //     text: '200.50'
+              //   ),
+              //   assets: [
+              //     TokensModel(
+              //       symbol: 'DFI',
+              //       name: 'Defi',
+              //     ),
+              //     TokensModel(
+              //       symbol: 'BTC',
+              //       name: 'Bitcoin',
+              //     ),
+              //     TokensModel(
+              //       symbol: 'ETH',
+              //       name: 'Ethereum',
+              //     ),
+              //     TokensModel(
+              //       symbol: 'BCH',
+              //       name: 'Bitcoin Cash',
+              //     ),
+              //     TokensModel(
+              //       symbol: 'BCH',
+              //       name: 'Bitcoin Cash',
+              //     ),
+              //     TokensModel(
+              //       symbol: 'DASHqwe',
+              //       name: 'Dash',
+              //     ),
+              //     TokensModel(
+              //       symbol: 'XRP',
+              //       name: 'Ripple',
+              //     ),
+              //   ],
+              // ),
               Container(
                 child: AppSelector(
                   items: [],
