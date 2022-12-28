@@ -1,7 +1,7 @@
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
-import 'package:defi_wallet/screens/dex/swap_screen.dart';
+import 'package:defi_wallet/screens/swap/swap_screen.dart';
 import 'package:defi_wallet/screens/earn_screen/earn_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
 import 'package:defi_wallet/screens/receive/receive_screen.dart';
