@@ -47,7 +47,6 @@ class _AmountFieldState extends State<AmountField> {
     return GestureDetector(
       onTap: () => _focusNode.requestFocus(),
       child: Container(
-        width: 300,
         height: 80,
         padding: const EdgeInsets.only(
           top: 8,
