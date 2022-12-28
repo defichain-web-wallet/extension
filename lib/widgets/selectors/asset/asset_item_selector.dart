@@ -33,8 +33,8 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
           widget.onChange();
         },
         child: Container(
-          width: 98,
-          height: 86,
+          width: 94,
+          height: 82,
           padding: const EdgeInsets.only(left: 10, top: 10, bottom: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8)),

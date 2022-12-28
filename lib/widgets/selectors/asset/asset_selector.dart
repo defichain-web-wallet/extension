@@ -80,7 +80,6 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               width: 344,
               child: Container(
-                color: Colors.red.withOpacity(0.02),
                 padding: const EdgeInsets.only(
                   top: 16,
                   bottom: 16,
