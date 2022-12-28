@@ -128,4 +128,8 @@ class AddressBookCubit extends Cubit<AddressBookState> {
       addressBookList: addressBookList,
     ));
   }
+
+  getLastContact(){
+    return state.addressBookList!.last;
+  }
 }

@@ -4,8 +4,10 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/screens/send/send_summary_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/address_book/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -30,6 +32,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
   TextEditingController addressController = TextEditingController();
   TextEditingController assetController = TextEditingController();
   AddressBookModel contact = AddressBookModel();
+  TokensModel token = TokensModel();
   String titleText = 'Send';
   String subtitleText = 'Please enter the recipient and amount';
   bool isAddNewContact = false;
@@ -52,7 +55,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
     // TODO: implement initState
     super.initState();
     addressController.addListener(() {
-      if(addressController.text != '') {
+      if (addressController.text != '') {
         setState(() {
           isShowCheckbox = true;
         });
@@ -62,7 +65,6 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
           isAddNewContact = false;
         });
       }
-
     });
   }
 
@@ -80,6 +82,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
               builder: (context, tokensState) {
                 AddressBookCubit addressBookCubit =
                     BlocProvider.of<AddressBookCubit>(context);
+                token = getTokensList(accountState, tokensState).first;
                 return Scaffold(
                   drawerScrimColor: Color(0x0f180245),
                   endDrawer: AccountDrawer(
@@ -192,7 +195,11 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                   height: 6,
                                 ),
                                 AmountField(
-                                  onAssetSelect: (token) {},
+                                  onAssetSelect: (t) {
+                                    setState(() {
+                                      token = t;
+                                    });
+                                  },
                                   controller: assetController,
                                   selectedAsset:
                                       getTokensList(accountState, tokensState)
@@ -236,28 +243,88 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                 NewPrimaryButton(
                                   width: buttonSmallWidth,
                                   callback: () {
-                                    if (isAddNewContact) {
-                                      showDialog(
-                                        barrierColor: Color(0x0f180245),
-                                        barrierDismissible: false,
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return CreateEditContactDialog(
-                                            address: addressController.text,
-                                            isEdit: false,
-                                            confirmCallback: (name, address) {
-                                              setState(() {
-                                                addressBookCubit.addAddress(
-                                                    AddressBookModel(
-                                                        name: name,
-                                                        address: address,
-                                                        network:
-                                                            'DefiChain Mainnet'));
-                                                Navigator.pop(context);
-                                              });
-                                            },
-                                          );
-                                        },
+                                    if (addressController.text != '') {
+                                      if (isAddNewContact) {
+                                        showDialog(
+                                          barrierColor: Color(0x0f180245),
+                                          barrierDismissible: false,
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return CreateEditContactDialog(
+                                              address: addressController.text,
+                                              isEdit: false,
+                                              confirmCallback: (name, address) {
+                                                setState(
+                                                  () {
+                                                    addressBookCubit.addAddress(
+                                                      AddressBookModel(
+                                                          name: name,
+                                                          address: address,
+                                                          network:
+                                                              'DefiChain Mainnet'),
+                                                    );
+                                                    Navigator.push(
+                                                      context,
+                                                      PageRouteBuilder(
+                                                        pageBuilder: (context,
+                                                                animation1,
+                                                                animation2) =>
+                                                            SendSummaryScreen(
+                                                          contact: addressBookCubit
+                                                              .getLastContact(),
+                                                          isAfterAddContact:
+                                                              true,
+                                                          amount: double.parse(
+                                                              assetController
+                                                                  .text),
+                                                          token: token,
+                                                        ),
+                                                        transitionDuration:
+                                                            Duration.zero,
+                                                        reverseTransitionDuration:
+                                                            Duration.zero,
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            );
+                                          },
+                                        );
+                                      } else {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                SendSummaryScreen(
+                                              address: addressController.text,
+                                              amount: double.parse(
+                                                  assetController.text),
+                                              token: token,
+                                            ),
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
+                                          ),
+                                        );
+                                      }
+                                    } else if (contact.name != null) {
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1,
+                                                  animation2) =>
+                                              SendSummaryScreen(
+                                            amount: double.parse(
+                                                assetController.text),
+                                            token: token,
+                                            contact: contact,
+                                          ),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                              Duration.zero,
+                                        ),
                                       );
                                     }
                                   },

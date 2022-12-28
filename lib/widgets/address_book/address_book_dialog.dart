@@ -66,8 +66,8 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
             padding: EdgeInsets.zero,
             decoration: BoxDecoration(
               color: isDarkTheme()
-                  ? DarkColors.scaffoldContainerBgColor
-                  : LightColors.scaffoldContainerBgColor,
+                  ? DarkColors.drawerBgColor
+                  : LightColors.drawerBgColor,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Stack(

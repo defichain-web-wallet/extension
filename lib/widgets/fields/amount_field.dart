@@ -2,6 +2,7 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/selectors/asset/asset_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 
 class AmountField extends StatefulWidget {
@@ -56,11 +57,13 @@ class _AmountFieldState extends State<AmountField> {
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: _onFocused ? GradientBoxBorder(
-            gradient: gradientWrongMnemonicWord,
-          ) : Border.all(
-            color: LightColors.amountFieldBorderColor.withOpacity(0.32),
-          ),
+          border: _onFocused
+              ? GradientBoxBorder(
+                  gradient: gradientWrongMnemonicWord,
+                )
+              : Border.all(
+                  color: LightColors.amountFieldBorderColor.withOpacity(0.32),
+                ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,6 +75,31 @@ class _AmountFieldState extends State<AmountField> {
                   child: SizedBox(
                     height: 38,
                     child: TextField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(
+                          RegExp("[0-9\.-]"),
+                          replacementString: ('.'),
+                        ),
+                        FilteringTextInputFormatter.deny(
+                          RegExp(r'\.\.+'),
+                          replacementString: '.',
+                        ),
+                        FilteringTextInputFormatter.deny(
+                          RegExp(r'^\.'),
+                          replacementString: '0.',
+                        ),
+                        FilteringTextInputFormatter.deny(
+                          RegExp(r'\.\d+\.'),
+                        ),
+                        FilteringTextInputFormatter.deny(
+                          RegExp(r'\d+-'),
+                        ),
+                        FilteringTextInputFormatter.deny(
+                          RegExp(r'-\.+'),
+                        ),
+                        FilteringTextInputFormatter.deny(RegExp(r'^0\d+'),),
+                      ],
                       controller: widget.controller,
                       focusNode: _focusNode,
                       style: Theme.of(context).textTheme.headline4!.copyWith(
