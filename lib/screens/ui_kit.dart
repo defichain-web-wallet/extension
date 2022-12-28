@@ -188,7 +188,7 @@ class _UiKitState extends State<UiKit> {
               Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: DefiCheckbox(
-                  callback: () {
+                  callback: (val) {
                     setState(() {
                       value = !value;
                     });

@@ -9,7 +9,7 @@ class DefiCheckbox extends StatefulWidget {
   bool isFocused;
   final bool isShowLabel;
   final Widget textWidget;
-  final Function? callback;
+  final Function(bool? val)? callback;
   FocusNode? focusNode;
 
   DefiCheckbox(
@@ -38,8 +38,7 @@ class _DefiCheckboxState extends State<DefiCheckbox> with ThemeMixin {
         child: GestureDetector(
           onTap: () {
             setState(() {
-              widget.value = !widget.value;
-              widget.callback!();
+              widget.callback!(!widget.value);
             });
           },
           child: Row(
@@ -69,11 +68,8 @@ class _DefiCheckboxState extends State<DefiCheckbox> with ThemeMixin {
                   ),
                   activeColor: Colors.transparent,
                   value: widget.value,
-                  onChanged: (bool? val) {
-                    setState(() {
-                      widget.value = val!;
-                      widget.callback!();
-                    });
+                  onChanged: (val) {
+                    widget.callback!(val);
                   },
                 ),
               ),

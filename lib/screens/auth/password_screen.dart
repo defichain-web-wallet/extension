@@ -171,13 +171,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         Container(
                           child: DefiCheckbox(
                             width: boxSmallWidth,
-                            callback: () {
+                            callback: (val) {
                               setState(() {
-                                isConfirm = !isConfirm;
+                                isConfirm = val!;
                               });
                             },
                             value: isConfirm,
                             focusNode: checkBoxFocusNode,
+                            isShowLabel: false,
                             textWidget: RichText(
                               text: TextSpan(children: [
                                 TextSpan(

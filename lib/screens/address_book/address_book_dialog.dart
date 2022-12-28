@@ -12,10 +12,12 @@ import 'package:flutter_svg/svg.dart';
 
 class AddressBookDialog extends StatefulWidget {
   final Function(AddressBookModel contact)? getContact;
+  final Function(String address)? getAddress;
 
   const AddressBookDialog({
     Key? key,
     this.getContact,
+    this.getAddress,
   }) : super(key: key);
 
   @override
@@ -28,6 +30,14 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
   List<AddressBookModel>? viewList = [];
   bool isSelectedContacts = true;
   bool isSelectedLastSent = false;
+  List<String> addressList = [
+    'df1q46kunuj5w4rnyry28qfr0h99k0zclpgcxa5kzm',
+    'df1quamslk8wqh4439cmk7lmrs6aw2vh8s5xyxedq6',
+    'df1q46kunuj5w4rnyry28qfr0h99k0zclpgcxa5kzm',
+    'df1quamslk8wqh4439cmk7lmrs6aw2vh8s5xyxedq6',
+    'df1q46kunuj5w4rnyry28qfr0h99k0zclpgcxa5kzm',
+    'df1quamslk8wqh4439cmk7lmrs6aw2vh8s5xyxedq6',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -181,17 +191,18 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                                             const EdgeInsets.only(right: 16),
                                         child: Column(
                                           children: [
-                                            MouseRegion(
-                                              cursor: SystemMouseCursors.click,
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  if (widget.getContact !=
-                                                      null) {
-                                                    widget.getContact!(
-                                                        viewList![index]);
-                                                    Navigator.pop(context);
-                                                  }
-                                                },
+                                            GestureDetector(
+                                              onTap: () {
+                                                print('asdasd');
+                                                if (widget.getContact !=
+                                                    null) {
+                                                  widget.getContact!(
+                                                      viewList![index]);
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                              child: MouseRegion(
+                                                cursor: SystemMouseCursors.click,
                                                 child: ContactTile(
                                                   isDialog: true,
                                                   contactName:
@@ -228,7 +239,7 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                             width: double.infinity,
                             child: (true)
                                 ? ListView.builder(
-                                    itemCount: 12,
+                                    itemCount: addressList.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       return Padding(
@@ -236,9 +247,21 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                                             const EdgeInsets.only(right: 16),
                                         child: Column(
                                           children: [
-                                            LastSentTile(
-                                              address:
-                                                  'df1q3lyukeychd55pt2u3xknnuxqzwuhdasgvwuuhc',
+                                            GestureDetector(
+                                              onTap: () {
+                                                if (widget.getAddress !=
+                                                    null) {
+                                                  widget.getAddress!(
+                                                      addressList[index]);
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                              child: MouseRegion(
+                                                cursor: SystemMouseCursors.click,
+                                                child: LastSentTile(
+                                                  address: addressList[index],
+                                                ),
+                                              ),
                                             ),
                                             Divider(
                                               height: 1,

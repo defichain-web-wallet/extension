@@ -6,12 +6,20 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class AddressFieldNew extends StatefulWidget {
   final TextEditingController controller;
-  AddressBookModel contact;
+  final AddressBookModel contact;
+  final Function(String)? onChange;
+  final Function()? clearPrefix;
+  final Function(AddressBookModel contact)? getContact;
+  final Function(String address)? getAddress;
 
   AddressFieldNew({
     Key? key,
     required this.controller,
     required this.contact,
+    this.onChange,
+    this.clearPrefix,
+    this.getContact,
+    this.getAddress,
   }) : super(key: key);
 
   @override
@@ -19,6 +27,12 @@ class AddressFieldNew extends StatefulWidget {
 }
 
 class _AddressFieldNewState extends State<AddressFieldNew> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -38,88 +52,81 @@ class _AddressFieldNewState extends State<AddressFieldNew> {
           width: double.infinity,
           child: TextFormField(
             controller: widget.controller,
-            onChanged: (val) {
-              setState(() {});
-            },
+            onChanged: widget.onChange,
             decoration: InputDecoration(
-              prefixIcon: (widget.contact.name != null &&
-                      widget.controller.text == '')
-                  ? Padding(
-                      padding:
-                          const EdgeInsets.only(top: 6.0, bottom: 6, left: 16),
-                      child: Container(
-                        constraints: BoxConstraints(maxWidth: 280),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                        width: (widget.contact.name!.length * 8) + 44,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(9.6),
-                          border: Border.all(color: AppColors.portage.withOpacity(0.12)),
-                          color: AppColors.portage.withOpacity(0.07),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                widget.contact.name!,
-                                style: Theme.of(context).textTheme.headline6,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    widget.contact = AddressBookModel();
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.close,
-                                  color:
-                                      AppColors.darkTextColor.withOpacity(0.5),
-                                  size: 12,
+                prefixIcon: (widget.contact.name != null &&
+                        widget.controller.text == '')
+                    ? Padding(
+                        padding: const EdgeInsets.only(
+                            top: 6.0, bottom: 6, left: 16),
+                        child: Container(
+                          constraints: BoxConstraints(maxWidth: 280),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          width: (widget.contact.name!.length * 8) + 44,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(9.6),
+                            border: Border.all(
+                                color: AppColors.portage.withOpacity(0.12)),
+                            color: AppColors.portage.withOpacity(0.07),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.contact.name!,
+                                  style: Theme.of(context).textTheme.headline6,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                          ],
+                              SizedBox(
+                                width: 8,
+                              ),
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: GestureDetector(
+                                  onTap: widget.clearPrefix,
+                                  child: Icon(
+                                    Icons.close,
+                                    color: AppColors.darkTextColor
+                                        .withOpacity(0.5),
+                                    size: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      )
+                    : null,
+                suffixIcon: Padding(
+                  padding: EdgeInsets.only(right: 18, top: 15, bottom: 15),
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          barrierColor: Color(0x0f180245),
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AddressBookDialog(
+                              getContact: widget.getContact,
+                              getAddress: widget.getAddress,
+                            );
+                          },
+                        );
+                      },
+                      child: SvgPicture.asset(
+                        'assets/icons/address_book_icon.svg',
                       ),
-                    )
-                  : null,
-              suffixIcon: Padding(
-                padding: EdgeInsets.only(right: 18, top: 15, bottom: 15),
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        barrierColor: Color(0x0f180245),
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AddressBookDialog(
-                            getContact: (contact) {
-                              setState(() {
-                                widget.contact = contact;
-                              });
-                              // widget.controller.text = contact.address!;
-                            },
-                          );
-                        },
-                      );
-                    },
-                    child: SvgPicture.asset(
-                      'assets/icons/address_book_icon.svg',
                     ),
                   ),
                 ),
-              ),
-            ),
+                hintText: widget.contact.name != null
+                    ? null
+                    : 'Enter address or choose from Address Book'),
           ),
         ),
       ],

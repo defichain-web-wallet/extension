@@ -1,6 +1,7 @@
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
@@ -67,7 +68,7 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
                   Container(
                     child: DefiCheckbox(
                       width: 34,
-                      callback: () {
+                      callback: (val) {
                         widget.onChange();
                       },
                       isShowLabel: false,
@@ -84,16 +85,18 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
                       fontSize: 16,
                     ),
               ),
-              Text(
-                widget.assetName ?? widget.assetCode,
-                style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                      fontSize: 10,
-                      color: Theme.of(context)
-                          .textTheme
-                          .subtitle1!
-                          .color!
-                          .withOpacity(0.5),
-                    ),
+              TickerText(
+                child: Text(
+                  widget.assetName ?? widget.assetCode,
+                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                        fontSize: 10,
+                        color: Theme.of(context)
+                            .textTheme
+                            .subtitle1!
+                            .color!
+                            .withOpacity(0.5),
+                      ),
+                ),
               )
             ],
           ),
