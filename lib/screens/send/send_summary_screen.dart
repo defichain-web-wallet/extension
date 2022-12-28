@@ -8,6 +8,7 @@ import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -266,11 +267,38 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                         ),
                         Column(
                           children: [
-                            NewPrimaryButton(
-                              width: buttonSmallWidth,
-                              callback: () {},
-                              title: 'Continue',
+                          Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: 104,
+                              child: AccentButton(
+                                callback: () {
+                                  Navigator.pop(context);
+                                },
+                                label: 'Cancel',
+                              ),
                             ),
+                            NewPrimaryButton(
+                              width: 104,
+                              callback: () {
+                                // showDialog(
+                                //   barrierColor: Color(0x0f180245),
+                                //   barrierDismissible: false,
+                                //   context: context,
+                                //   builder: (BuildContext context) {
+                                //     return PassConfirmDialog(
+                                //
+                                //     );
+                                //   },
+                                // )
+
+                              },
+                              title: 'Send',
+                            ),
+                          ],
+                        ),
+
                           ],
                         ),
                       ],

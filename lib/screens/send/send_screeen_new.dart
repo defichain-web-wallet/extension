@@ -249,43 +249,38 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                           barrierColor: Color(0x0f180245),
                                           barrierDismissible: false,
                                           context: context,
-                                          builder: (BuildContext context) {
+                                          builder: (BuildContext context2) {
                                             return CreateEditContactDialog(
                                               address: addressController.text,
                                               isEdit: false,
                                               confirmCallback: (name, address) {
-                                                setState(
-                                                  () {
-                                                    addressBookCubit.addAddress(
-                                                      AddressBookModel(
-                                                          name: name,
-                                                          address: address,
-                                                          network:
-                                                              'DefiChain Mainnet'),
-                                                    );
-                                                    Navigator.push(
-                                                      context,
-                                                      PageRouteBuilder(
-                                                        pageBuilder: (context,
-                                                                animation1,
-                                                                animation2) =>
-                                                            SendSummaryScreen(
-                                                          contact: addressBookCubit
-                                                              .getLastContact(),
-                                                          isAfterAddContact:
-                                                              true,
-                                                          amount: double.parse(
-                                                              assetController
-                                                                  .text),
-                                                          token: token,
-                                                        ),
-                                                        transitionDuration:
-                                                            Duration.zero,
-                                                        reverseTransitionDuration:
-                                                            Duration.zero,
-                                                      ),
-                                                    );
-                                                  },
+                                                addressBookCubit.addAddress(
+                                                  AddressBookModel(
+                                                      name: name,
+                                                      address: address,
+                                                      network:
+                                                          'DefiChain Mainnet'),
+                                                );
+                                                Navigator.pop(context2);
+                                                Navigator.push(
+                                                  context,
+                                                  PageRouteBuilder(
+                                                    pageBuilder: (context,
+                                                            animation1,
+                                                            animation2) =>
+                                                        SendSummaryScreen(
+                                                      contact: addressBookCubit
+                                                          .getLastContact(),
+                                                      isAfterAddContact: true,
+                                                      amount: double.parse(
+                                                          assetController.text),
+                                                      token: token,
+                                                    ),
+                                                    transitionDuration:
+                                                        Duration.zero,
+                                                    reverseTransitionDuration:
+                                                        Duration.zero,
+                                                  ),
                                                 );
                                               },
                                             );
