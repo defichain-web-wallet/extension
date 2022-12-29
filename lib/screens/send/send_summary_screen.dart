@@ -486,7 +486,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
       builder: (BuildContext dialogContext) {
         return TxStatusDialog(
           txResponse: txResponse,
-          // isSuccess: !txResponse!.isError,
           callbackOk: () {
             Navigator.pushReplacement(
               context,
@@ -508,18 +507,5 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
         );
       },
     );
-    // Navigator.pushReplacement(
-    //   context,
-    //   PageRouteBuilder(
-    //     pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-    //         appBarTitle: 'Change',
-    //         txResponse: txResponse,
-    //         amount: widget.amount,
-    //         token: token,
-    //         address: address),
-    //     transitionDuration: Duration.zero,
-    //     reverseTransitionDuration: Duration.zero,
-    //   ),
-    // );
   }
 }
