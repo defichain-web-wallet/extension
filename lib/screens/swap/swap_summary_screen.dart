@@ -6,6 +6,9 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/models/tx_response_model.dart';
+import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -25,6 +28,7 @@ import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
+import 'package:defi_wallet/widgets/tx_status_dialog.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -262,6 +266,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                             width: 104,
                             child: PendingButton(
                               'Change',
+                              pendingText: 'Processed...',
                               isCheckLock: false,
                               callback: (parent) {
                                 if (widget.btcTx != '') {
@@ -289,11 +294,13 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     builder: (BuildContext context1) {
                                       return PassConfirmDialog(
                                         onSubmit: (password) async {
+                                          parent.emitPending(true);
                                           await submitSwap(
                                             state,
                                             tokensState,
                                             password,
                                           );
+                                          parent.emitPending(false);
                                         }
                                       );
                                     },
@@ -317,10 +324,11 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
 
   submitSwap(state, tokenState, String password) async {
     if (state.status == AccountStatusList.success) {
+      late TxErrorModel txResponse;
       try {
         if (widget.btcTx != '') {
           BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-          var txResponse = await bitcoinCubit.sendTransaction(widget.btcTx);
+          txResponse = await bitcoinCubit.sendTransaction(widget.btcTx);
           Navigator.pushReplacement(
               context,
               PageRouteBuilder(
@@ -338,7 +346,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
         if (widget.assetFrom != widget.assetTo) {
           ECPair keyPair = await HDWalletService()
               .getKeypairFromStorage(password, state.activeAccount.index!);
-          var txResponse = await transactionService.createAndSendSwap(
+          txResponse = await transactionService.createAndSendSwap(
               keyPair: keyPair,
               account: state.activeAccount,
               tokenFrom: widget.assetFrom,
@@ -347,26 +355,42 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
               amountTo: balancesHelper.toSatoshi(widget.amountTo.toString()),
               slippage: widget.slippage,
               tokens: tokenState.tokens);
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SwapStatusScreen(
-                      appBarTitle: appBarTitle,
-                      txResponse: txResponse,
-                      amount: widget.amountFrom,
-                      assetFrom: widget.assetFrom,
-                      assetTo: widget.assetTo),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
         }
       } catch (err) {
-        setState(() {
-          isFailed = true;
-        });
+        txResponse = TxErrorModel(isError: true);
       }
+
+      showDialog(
+        barrierColor: Color(0x0f180245),
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return TxStatusDialog(
+            txResponse: txResponse,
+            callbackOk: () {
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder:
+                      (context, animation1, animation2) =>
+                      HomeScreen(isLoadTokens: true,),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration:
+                  Duration.zero,
+                ),
+              );
+            },
+            callbackTryAgain: () async {
+              print('TryAgain');
+              await submitSwap(
+                state,
+                tokenState,
+                password,
+              );
+            },
+          );
+        },
+      );
     }
   }
 }
