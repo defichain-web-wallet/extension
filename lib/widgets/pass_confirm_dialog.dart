@@ -184,6 +184,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
 
     if (Crypt(encodedPassword).match(password)) {
       widget.onSubmit(_passwordController.text);
+      Navigator.pop(context);
     } else {
       setState(() {
         print('sad');
