@@ -32,7 +32,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
   TextEditingController addressController = TextEditingController();
   TextEditingController assetController = TextEditingController();
   AddressBookModel contact = AddressBookModel();
-  TokensModel token = TokensModel();
+  TokensModel? currentAsset;
   String titleText = 'Send';
   String subtitleText = 'Please enter the recipient and amount';
   bool isAddNewContact = false;
@@ -82,7 +82,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
               builder: (context, tokensState) {
                 AddressBookCubit addressBookCubit =
                     BlocProvider.of<AddressBookCubit>(context);
-                token = getTokensList(accountState, tokensState).first;
+                currentAsset = currentAsset ?? getTokensList(accountState, tokensState).first;
                 return Scaffold(
                   drawerScrimColor: Color(0x0f180245),
                   endDrawer: AccountDrawer(
@@ -197,13 +197,12 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                 AmountField(
                                   onAssetSelect: (t) {
                                     setState(() {
-                                      token = t;
+                                      currentAsset = t;
                                     });
                                   },
                                   controller: assetController,
                                   selectedAsset:
-                                      getTokensList(accountState, tokensState)
-                                          .first,
+                                    currentAsset!,
                                   assets:
                                       getTokensList(accountState, tokensState),
                                 ),
@@ -274,7 +273,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                                       isAfterAddContact: true,
                                                       amount: double.parse(
                                                           assetController.text),
-                                                      token: token,
+                                                      token: currentAsset!,
                                                     ),
                                                     transitionDuration:
                                                         Duration.zero,
@@ -296,7 +295,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                               address: addressController.text,
                                               amount: double.parse(
                                                   assetController.text),
-                                              token: token,
+                                              token: currentAsset!,
                                             ),
                                             transitionDuration: Duration.zero,
                                             reverseTransitionDuration:
@@ -313,7 +312,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                               SendSummaryScreen(
                                             amount: double.parse(
                                                 assetController.text),
-                                            token: token,
+                                            token: currentAsset!,
                                             contact: contact,
                                           ),
                                           transitionDuration: Duration.zero,

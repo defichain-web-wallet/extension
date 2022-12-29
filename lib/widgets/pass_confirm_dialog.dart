@@ -13,11 +13,11 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 class PassConfirmDialog extends StatefulWidget {
-  final Function(bool)? onSubmited;
+  final Function(String) onSubmit;
 
   const PassConfirmDialog({
     Key? key,
-    this.onSubmited,
+    required this.onSubmit,
   }) : super(key: key);
 
   @override
@@ -183,15 +183,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
     var encodedPassword = box.get(HiveNames.password);
 
     if (Crypt(encodedPassword).match(password)) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                HomeScreen(isLoadTokens: true),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ),
-        );
+      widget.onSubmit(_passwordController.text);
     } else {
       setState(() {
         print('sad');
