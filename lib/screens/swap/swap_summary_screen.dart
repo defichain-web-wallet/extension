@@ -12,6 +12,7 @@ import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
+import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
@@ -126,7 +127,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                     decoration: BoxDecoration(
                       border: Border.all(
                         width: 1.0,
-                        color: AppColors.lavenderPurple.withOpacity(0.65),
+                        color: AppColors.lavenderPurple.withOpacity(0.35),
                       ),
                       borderRadius: BorderRadius.all(
                         Radius.circular(12),
@@ -281,60 +282,22 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     ),
                                   );
                                 } else {
-                                  isCustomBgColor
-                                      ? PasswordBottomSheet
-                                      .provideWithPasswordFullScreen(
-                                      context, state.activeAccount!,
-                                          (password) async {
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder:
-                                                (context, animation1, animation2) =>
-                                                LoaderNew(
-                                                  title: appBarTitle,
-                                                  secondStepLoaderText:
-                                                  secondStepLoaderText,
-                                                  callback: () {
-                                                    submitSwap(
-                                                      state,
-                                                      tokensState,
-                                                      password,
-                                                    );
-                                                  },
-                                                ),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                            Duration.zero,
-                                          ),
-                                        );
-                                      })
-                                      : PasswordBottomSheet.provideWithPassword(
-                                      context, state.activeAccount!,
-                                          (password) async {
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder:
-                                                (context, animation1, animation2) =>
-                                                LoaderNew(
-                                                  title: appBarTitle,
-                                                  secondStepLoaderText:
-                                                  secondStepLoaderText,
-                                                  callback: () {
-                                                    submitSwap(
-                                                      state,
-                                                      tokensState,
-                                                      password,
-                                                    );
-                                                  },
-                                                ),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                            Duration.zero,
-                                          ),
-                                        );
-                                      });
+                                  showDialog(
+                                    barrierColor: Color(0x0f180245),
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (BuildContext context1) {
+                                      return PassConfirmDialog(
+                                        onSubmit: (password) async {
+                                          await submitSwap(
+                                            state,
+                                            tokensState,
+                                            password,
+                                          );
+                                        }
+                                      );
+                                    },
+                                  );
                                 }
                               },
                             ),

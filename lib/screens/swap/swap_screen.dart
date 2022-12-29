@@ -284,6 +284,12 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                       height: 16,
                     ),
                     AmountField(
+                      suffix: amountFromInUsd,
+                      available: getAvailableAmount(
+                        accountState,
+                        assetFrom.symbol,
+                        dexState,
+                      ),
                       onAssetSelect: (asset) {
                         onSelectFromAsset(
                           asset,
@@ -310,6 +316,12 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                       height: 8,
                     ),
                     AmountField(
+                      suffix: amountToInUsd,
+                      available: getAvailableAmount(
+                        accountState,
+                        assetTo!.symbol,
+                        dexState,
+                      ),
                       onAssetSelect: (asset) {
                         onSelectToAsset(
                           asset,
@@ -545,7 +557,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                             ),
                           ),
                           Text(
-                            '0.02350000 DFI',
+                            '${balancesHelper.fromSatohi(12000)} DFI',
                             style: Theme
                                 .of(context)
                                 .textTheme
@@ -560,7 +572,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                     Divider(
                       color: AppColors.lavenderPurple.withOpacity(0.16),
                     ),
-                    if (true)
+                    if (isShowStabilizationFee)
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Row(
@@ -599,7 +611,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                               ),
                             ),
                             Text(
-                              '26.6%',
+                              '${stabilizationFee.toString()}%',
                               style: Theme
                                   .of(context)
                                   .textTheme
