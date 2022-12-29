@@ -2,9 +2,7 @@ import 'dart:async';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
-import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
@@ -15,6 +13,7 @@ import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
+import 'package:defi_wallet/screens/swap/swap_summary_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -24,20 +23,16 @@ import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
 import 'package:defi_wallet/bloc/dex/dex_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/models/test_pool_swap_model.dart';
-import 'package:defi_wallet/screens/dex/review_swap_screen.dart';
-import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +40,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SwapScreen extends StatefulWidget {
   const SwapScreen({Key? key}) : super(key: key);
@@ -63,11 +57,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
   );
   final TextEditingController slippageController = TextEditingController();
   final GlobalKey<AssetSelectSwapState> selectKeyFrom =
-      GlobalKey<AssetSelectSwapState>();
+  GlobalKey<AssetSelectSwapState>();
   final GlobalKey<PendingButtonState> pendingButton =
-      GlobalKey<PendingButtonState>();
+  GlobalKey<PendingButtonState>();
   final GlobalKey<AssetSelectSwapState> selectKeyTo =
-      GlobalKey<AssetSelectSwapState>();
+  GlobalKey<AssetSelectSwapState>();
 
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
@@ -134,10 +128,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
       List<dynamic> tokens = tokensState.tokensForSwap[assetFrom.symbol];
       tokensForSwap = List<TokensModel>.generate(
         tokens.length,
-        (index) => TokensModel(
-          name: tokens[index],
-          symbol: tokens[index],
-        ),
+            (index) =>
+            TokensModel(
+              name: tokens[index],
+              symbol: tokens[index],
+            ),
       );
       assetFrom = assetFrom;
 
@@ -148,11 +143,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
-      builder: (
-        BuildContext context,
-        bool isFullScreen,
-        TransactionState transactionState,
-      ) {
+      builder: (BuildContext context,
+          bool isFullScreen,
+          TransactionState transactionState,) {
         return BlocBuilder<DexCubit, DexState>(
           builder: (dexContext, dexState) {
             DexCubit dexCubit = BlocProvider.of<DexCubit>(dexContext);
@@ -206,17 +199,24 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                               : LightColors.scaffoldContainerBgColor,
                           border: isDarkTheme()
                               ? Border.all(
-                                  width: 1.0,
-                                  color: Colors.white.withOpacity(0.05),
-                                )
+                            width: 1.0,
+                            color: Colors.white.withOpacity(0.05),
+                          )
                               : null,
                           borderRadius: BorderRadius.only(
                             topRight: Radius.circular(20),
                             topLeft: Radius.circular(20),
                           ),
                         ),
-                        child: _buildBody(context, dexState, dexCubit,
-                            accountState, tokensState, transactionState),
+                        child: _buildBody(
+                          context,
+                          dexState,
+                          dexCubit,
+                          accountState,
+                          tokensState,
+                          transactionState,
+                          isFullScreen,
+                        ),
                       ),
                     );
                   },
@@ -230,7 +230,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
   }
 
   Widget _buildBody(context, dexState, dexCubit, accountState, tokensState,
-      transactionState) {
+      transactionState, isFullScreen) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     bool isShowStabilizationFee =
         assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ||
@@ -275,7 +275,10 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                   children: [
                     Text(
                       'Change',
-                      style: Theme.of(context).textTheme.headline3,
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .headline3,
                     ),
                     SizedBox(
                       height: 16,
@@ -327,7 +330,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                                 fixedCount: 2, fixed: true);
                             if (SettingsHelper.isBitcoin()) {
                               amountFromInUsd =
-                                  getUdsAmount(double.parse(value), tokensState);
+                                  getUdsAmount(
+                                      double.parse(value), tokensState);
                             } else {
                               amountFromInUsd = amountToInUsd;
                             }
@@ -352,9 +356,14 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                     ),
                     Text(
                       'Slippage tolerance',
-                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .headline5!
+                          .copyWith(
                         fontSize: 12,
-                        color: Theme.of(context)
+                        color: Theme
+                            .of(context)
                             .textTheme
                             .headline5!
                             .color!
@@ -376,7 +385,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                           controller: slippageController,
                           decoration: InputDecoration(
                             filled: true,
-                            fillColor: Theme.of(context).cardColor,
+                            fillColor: Theme
+                                .of(context)
+                                .cardColor,
                             hoverColor: Colors.transparent,
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -396,11 +407,12 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                                 Icons.clear,
                                 size: 14,
                               ),
-                              onPressed: () => setState(() {
-                                slippage = 0.03;
-                                isShowSlippageField = false;
-                                hideOverlay();
-                              }),
+                              onPressed: () =>
+                                  setState(() {
+                                    slippage = 0.03;
+                                    isShowSlippageField = false;
+                                    hideOverlay();
+                                  }),
                             ),
                           ),
                           onChanged: (String value) {
@@ -418,7 +430,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ...List<Widget>.generate(slippageList.length, (index) {
+                          ...List<Widget>.generate(
+                              slippageList.length, (index) {
                             return Expanded(
                               flex: 1,
                               child: SlippageButton(
@@ -426,7 +439,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                                 isPadding: index != 0,
                                 isBorder: true,
                                 label:
-                                '${slippageList[index]} ${slippageList[index] != 'Custom' ? '%' : ''}',
+                                '${slippageList[index]} ${slippageList[index] !=
+                                    'Custom' ? '%' : ''}',
                                 isActive: slippageList[index] != 'Custom' &&
                                     slippage ==
                                         double.parse(slippageList[index]) / 100,
@@ -438,7 +452,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                                   } else {
                                     setState(() {
                                       slippage =
-                                          double.parse(slippageList[index]) / 100;
+                                          double.parse(slippageList[index]) /
+                                              100;
                                     });
                                   }
                                 },
@@ -461,9 +476,14 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                           Expanded(
                             child: Text(
                               'Rate',
-                              style: Theme.of(context).textTheme.headline5!.copyWith(
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .copyWith(
                                 fontSize: 12,
-                                color: Theme.of(context)
+                                color: Theme
+                                    .of(context)
                                     .textTheme
                                     .headline5!
                                     .color!
@@ -473,15 +493,24 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                           ),
                           Text(
                             '1 ${assetFrom.symbol} = 100.000512 DFI',
-                            style: Theme.of(context).textTheme.headline5!.copyWith(
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .headline5!
+                                .copyWith(
                               fontSize: 12,
                             ),
                           ),
                           Text(
                             ' (\$252.45)',
-                            style: Theme.of(context).textTheme.headline5!.copyWith(
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .headline5!
+                                .copyWith(
                               fontSize: 12,
-                              color: Theme.of(context)
+                              color: Theme
+                                  .of(context)
                                   .textTheme
                                   .headline5!
                                   .color!
@@ -501,9 +530,14 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                         children: [
                           Text(
                             'Platform Fee',
-                            style: Theme.of(context).textTheme.headline5!.copyWith(
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .headline5!
+                                .copyWith(
                               fontSize: 12,
-                              color: Theme.of(context)
+                              color: Theme
+                                  .of(context)
                                   .textTheme
                                   .headline5!
                                   .color!
@@ -512,7 +546,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                           ),
                           Text(
                             '0.02350000 DFI',
-                            style: Theme.of(context).textTheme.headline5!.copyWith(
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .headline5!
+                                .copyWith(
                               fontSize: 12,
                             ),
                           ),
@@ -543,12 +581,14 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                                   ),
                                   Text(
                                     'Stabilization fee',
-                                    style: Theme.of(context)
+                                    style: Theme
+                                        .of(context)
                                         .textTheme
                                         .headline5!
                                         .copyWith(
                                       fontSize: 12,
-                                      color: Theme.of(context)
+                                      color: Theme
+                                          .of(context)
                                           .textTheme
                                           .headline5!
                                           .color!
@@ -560,7 +600,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                             ),
                             Text(
                               '26.6%',
-                              style: Theme.of(context).textTheme.headline5!.copyWith(
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .copyWith(
                                 fontSize: 12,
                               ),
                             ),
@@ -570,34 +614,47 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                   ],
                 ),
               ),
-              NewPrimaryButton(
-                titleWidget: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: SvgPicture.asset(
-                        'icons/change_icon.svg',
-                        color: AppColors.white,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: NewPrimaryButton(
+                  titleWidget: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: SvgPicture.asset(
+                          'icons/change_icon.svg',
+                          color: AppColors.white,
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      'Preview Change',
-                      style: Theme.of(context).textTheme.button!.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.white,
-                        fontSize: 14,
+                      SizedBox(
+                        width: 8,
                       ),
-                    )
-                  ],
+                      Text(
+                        'Preview Change',
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .button!
+                            .copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.white,
+                          fontSize: 14,
+                        ),
+                      )
+                    ],
+                  ),
+                  callback: !isDisableSubmit()
+                      ? () =>
+                      submitReviewSwap(
+                        accountState,
+                        transactionState,
+                        context,
+                        isFullScreen,
+                      )
+                  : null,
                 ),
-                callback: () {
-                  //
-                },
               ),
             ],
           ),
@@ -606,13 +663,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
     }
   }
 
-  putAvailableBalance(
-    String asset,
-    TextEditingController controller,
-    TokensState tokensState,
-    AccountState accountState,
-    DexState dexState,
-  ) {
+  putAvailableBalance(String asset,
+      TextEditingController controller,
+      TokensState tokensState,
+      AccountState accountState,
+      DexState dexState,) {
     DexCubit dexCubit = BlocProvider.of<DexCubit>(context);
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     late double balance;
@@ -684,7 +739,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
         double.parse(amountFromController.text);
   }
 
-  submitReviewSwap(parent, state, transactionState, context, bool isFullScreen,
+  submitReviewSwap(state, transactionState, context, bool isFullScreen,
       {CryptoRouteModel? cryptoRoute}) async {
     hideOverlay();
     if (SettingsHelper.isBitcoin()) {
@@ -694,9 +749,15 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
           SnackBar(
             content: Text(
               'Min amount must be more than $minDeposit BTC',
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headline5,
             ),
-            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+            backgroundColor: Theme
+                .of(context)
+                .snackBarTheme
+                .backgroundColor,
           ),
         );
         return;
@@ -707,9 +768,15 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
         SnackBar(
           content: Text(
             'Wait for the previous transaction to complete',
-            style: Theme.of(context).textTheme.headline5,
+            style: Theme
+                .of(context)
+                .textTheme
+                .headline5,
           ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+          backgroundColor: Theme
+              .of(context)
+              .snackBarTheme
+              .backgroundColor,
         ),
       );
       return;
@@ -719,9 +786,15 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
         SnackBar(
           content: Text(
             'Insufficient funds',
-            style: Theme.of(context).textTheme.headline5,
+            style: Theme
+                .of(context)
+                .textTheme
+                .headline5,
           ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+          backgroundColor: Theme
+              .of(context)
+              .snackBarTheme
+              .backgroundColor,
         ),
       );
       return;
@@ -730,105 +803,117 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
       if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
         isFullScreen
             ? PasswordBottomSheet.provideWithPasswordFullScreen(
-                context, state.activeAccount, (password) async {
-                try {
-                  BitcoinCubit bitcoinCubit =
-                      BlocProvider.of<BitcoinCubit>(context);
-                  ECPair keyPair = await HDWalletService()
-                      .getKeypairFromStorage(
-                          password, state.activeAccount.index!);
-                  var tx = await transactionService.createBTCTransaction(
-                    keyPair: keyPair,
-                    account: state.activeAccount,
-                    destinationAddress: cryptoRoute.address!,
-                    amount: balancesHelper.toSatoshi(amountFromController.text),
-                    satPerByte: bitcoinCubit.state.networkFee!.medium!,
-                  );
-                  Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) =>
-                            ReviewSwapScreen(
-                          assetFrom.symbol!,
-                          assetTo!.symbol!.replaceAll('d', ''),
-                          double.parse(amountFromController.text),
-                          double.parse(amountToController.text),
-                          slippage,
-                          btcTx: tx,
-                        ),
-                        transitionDuration: Duration.zero,
-                        reverseTransitionDuration: Duration.zero,
-                      ));
-                } catch (err) {
-                  print(err);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Something went wrong',
-                        style: Theme.of(context).textTheme.headline5,
+            context, state.activeAccount, (password) async {
+          try {
+            BitcoinCubit bitcoinCubit =
+            BlocProvider.of<BitcoinCubit>(context);
+            ECPair keyPair = await HDWalletService()
+                .getKeypairFromStorage(
+                password, state.activeAccount.index!);
+            var tx = await transactionService.createBTCTransaction(
+              keyPair: keyPair,
+              account: state.activeAccount,
+              destinationAddress: cryptoRoute.address!,
+              amount: balancesHelper.toSatoshi(amountFromController.text),
+              satPerByte: bitcoinCubit.state.networkFee!.medium!,
+            );
+            Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      SwapSummaryScreen(
+                        assetFrom.symbol!,
+                        assetTo!.symbol!.replaceAll('d', ''),
+                        double.parse(amountFromController.text),
+                        double.parse(amountToController.text),
+                        slippage,
+                        btcTx: tx,
                       ),
-                      backgroundColor:
-                          Theme.of(context).snackBarTheme.backgroundColor,
-                    ),
-                  );
-                }
-              })
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ));
+          } catch (err) {
+            print(err);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Something went wrong',
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .headline5,
+                ),
+                backgroundColor:
+                Theme
+                    .of(context)
+                    .snackBarTheme
+                    .backgroundColor,
+              ),
+            );
+          }
+        })
             : PasswordBottomSheet.provideWithPassword(
-                context, state.activeAccount, (password) async {
-                try {
-                  BitcoinCubit bitcoinCubit =
-                      BlocProvider.of<BitcoinCubit>(context);
-                  ECPair keyPair = await HDWalletService()
-                      .getKeypairFromStorage(
-                          password, state.activeAccount.index!);
-                  var tx = await transactionService.createBTCTransaction(
-                    keyPair: keyPair,
-                    account: state.activeAccount,
-                    destinationAddress: cryptoRoute.address!,
-                    amount: balancesHelper.toSatoshi(amountFromController.text),
-                    satPerByte: bitcoinCubit.state.networkFee!.medium!,
-                  );
-                  Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) =>
-                            ReviewSwapScreen(
-                          assetFrom.symbol!,
-                          assetTo!.symbol!.replaceAll('d', ''),
-                          double.parse(amountFromController.text),
-                          double.parse(amountToController.text),
-                          slippage,
-                          btcTx: tx,
-                        ),
-                        transitionDuration: Duration.zero,
-                        reverseTransitionDuration: Duration.zero,
-                      ));
-                } catch (err) {
-                  print(err);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Something went wrong',
-                        style: Theme.of(context).textTheme.headline5,
+            context, state.activeAccount, (password) async {
+          try {
+            BitcoinCubit bitcoinCubit =
+            BlocProvider.of<BitcoinCubit>(context);
+            ECPair keyPair = await HDWalletService()
+                .getKeypairFromStorage(
+                password, state.activeAccount.index!);
+            var tx = await transactionService.createBTCTransaction(
+              keyPair: keyPair,
+              account: state.activeAccount,
+              destinationAddress: cryptoRoute.address!,
+              amount: balancesHelper.toSatoshi(amountFromController.text),
+              satPerByte: bitcoinCubit.state.networkFee!.medium!,
+            );
+            Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      SwapSummaryScreen(
+                        assetFrom.symbol!,
+                        assetTo!.symbol!.replaceAll('d', ''),
+                        double.parse(amountFromController.text),
+                        double.parse(amountToController.text),
+                        slippage,
+                        btcTx: tx,
                       ),
-                      backgroundColor:
-                          Theme.of(context).snackBarTheme.backgroundColor,
-                    ),
-                  );
-                }
-              });
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ));
+          } catch (err) {
+            print(err);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Something went wrong',
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .headline5,
+                ),
+                backgroundColor:
+                Theme
+                    .of(context)
+                    .snackBarTheme
+                    .backgroundColor,
+              ),
+            );
+          }
+        });
       } else {
         Navigator.push(
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
-                  ReviewSwapScreen(
-                assetFrom.symbol!,
-                assetTo!.symbol!,
-                double.parse(amountFromController.text),
-                double.parse(amountToController.text),
-                slippage,
-              ),
+                  SwapSummaryScreen(
+                    assetFrom.symbol!,
+                    assetTo!.symbol!,
+                    double.parse(amountFromController.text),
+                    double.parse(amountToController.text),
+                    slippage,
+                  ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ));
@@ -840,10 +925,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
     List<dynamic> tokens = tokensState.tokensForSwap[asset.symbol];
     tokensForSwap = List<TokensModel>.generate(
       tokens.length,
-      (index) => TokensModel(
-        name: tokens[index],
-        symbol: tokens[index],
-      ),
+          (index) =>
+          TokensModel(
+            name: tokens[index],
+            symbol: tokens[index],
+          ),
     );
     setState(() {
       assetFrom = asset;
@@ -910,10 +996,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
         valueFormat, dexState, dexCubit, accountState, tokensState);
   }
 
-  getFieldMsg(
-    accountState,
-    dexState,
-  ) {
+  getFieldMsg(accountState,
+      dexState,) {
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
 
     var availableAmountFrom;
@@ -936,7 +1020,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
       availableAmountTo =
           getAvailableAmount(accountState, assetTo!.symbol, dexState);
       swapFromMsg =
-          '${balancesHelper.numberStyling(availableAmountFrom)} $assetFrom';
+      '${balancesHelper.numberStyling(availableAmountFrom)} $assetFrom';
       swapToMsg = '${balancesHelper.numberStyling(availableAmountTo)} $assetTo';
     }
   }
@@ -955,7 +1039,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
         price = dexState.dexModel.priceTo!;
       }
     }
-    return '${balancesHelper.numberStyling(price, fixedCount: 8, fixed: true)} ${tokensHelper.getTokenWithPrefix(tokenTo)} per ${tokensHelper.getTokenWithPrefix(tokenFrom)}';
+    return '${balancesHelper.numberStyling(
+        price, fixedCount: 8, fixed: true)} ${tokensHelper.getTokenWithPrefix(
+        tokenTo)} per ${tokensHelper.getTokenWithPrefix(tokenFrom)}';
   }
 
   String createFeeString(dexState) {
@@ -968,8 +1054,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
     return '${balancesHelper.numberStyling(convertFromSatoshi(fee))} DFI';
   }
 
-  onFromInputChanged(
-      String query, dexState, dexCubit, accountState, tokensState) {
+  onFromInputChanged(String query, dexState, dexCubit, accountState,
+      tokensState) {
     double amount = (query == '') ? 0 : double.parse(query);
 
     if (debounce?.isActive ?? false) debounce?.cancel();
@@ -992,16 +1078,22 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
           dexCubit.updateBtcDex(assetFrom.symbol, assetTo!.symbol, amount,
               double.parse(amountToController.text));
         } else {
-          dexCubit.updateDex(assetFrom.symbol, assetTo!.symbol, amount, null,
-              address, accountState.activeAccount.addressList!, tokensState);
+          dexCubit.updateDex(
+              assetFrom.symbol,
+              assetTo!.symbol,
+              amount,
+              null,
+              address,
+              accountState.activeAccount.addressList!,
+              tokensState);
         }
       }
       //TODO: add validation
     });
   }
 
-  onToInputChanged(
-      String query, dexState, dexCubit, accountState, tokensState) {
+  onToInputChanged(String query, dexState, dexCubit, accountState,
+      tokensState) {
     double amount = (query == '') ? 0 : double.parse(query);
     if (debounce?.isActive ?? false) debounce?.cancel();
     debounce = Timer(const Duration(milliseconds: 800), () {
@@ -1023,8 +1115,14 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
           amountFromController.text = amountToController.text;
         }
       } else {
-        dexCubit.updateDex(assetFrom.symbol, assetTo!.symbol, null, amount,
-            address, accountState.activeAccount.addressList!, tokensState);
+        dexCubit.updateDex(
+            assetFrom.symbol,
+            assetTo!.symbol,
+            null,
+            amount,
+            address,
+            accountState.activeAccount.addressList!,
+            tokensState);
       }
     });
   }
@@ -1033,8 +1131,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
     var targetAmount =
-        (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
-            .toString();
+    (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+        .toString();
 
     var result = tokensHelper.getAmountByUsd(
       tokensState.tokensPairs!,
