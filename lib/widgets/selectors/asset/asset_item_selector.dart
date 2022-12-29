@@ -79,23 +79,29 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
                   )
                 ],
               ),
-              Text(
-                widget.assetCode,
-                style: Theme.of(context).textTheme.headline5!.copyWith(
-                      fontSize: 16,
-                    ),
-              ),
-              TickerText(
+              Container(
+                padding: const EdgeInsets.only(right: 10),
                 child: Text(
-                  widget.assetName ?? widget.assetCode,
-                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                        fontSize: 10,
-                        color: Theme.of(context)
-                            .textTheme
-                            .subtitle1!
-                            .color!
-                            .withOpacity(0.5),
+                  widget.assetCode,
+                  style: Theme.of(context).textTheme.headline5!.copyWith(
+                        fontSize: 16,
                       ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(right: 10),
+                child: TickerText(
+                  child: Text(
+                    widget.assetName ?? widget.assetCode,
+                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                          fontSize: 10,
+                          color: Theme.of(context)
+                              .textTheme
+                              .subtitle1!
+                              .color!
+                              .withOpacity(0.5),
+                        ),
+                  ),
                 ),
               )
             ],

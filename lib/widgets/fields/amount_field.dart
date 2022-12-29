@@ -11,7 +11,7 @@ class AmountField extends StatefulWidget {
   final TextEditingController controller;
   final TokensModel selectedAsset;
   final List<TokensModel> assets;
-  final String? available;
+  final double? available;
   final String? suffix;
 
   AmountField({
@@ -20,7 +20,7 @@ class AmountField extends StatefulWidget {
     required this.controller,
     required this.selectedAsset,
     required this.assets,
-    this.available = '35.02',
+    this.available = 35.02,
     this.suffix = '\$365.50',
     Key? key,
   }) : super(key: key);
@@ -73,69 +73,72 @@ class _AmountFieldState extends State<AmountField> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: SizedBox(
-                    height: 38,
-                    child: TextField(
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(
-                          RegExp("[0-9\.-]"),
-                          replacementString: ('.'),
-                        ),
-                        FilteringTextInputFormatter.deny(
-                          RegExp(r'\.\.+'),
-                          replacementString: '.',
-                        ),
-                        FilteringTextInputFormatter.deny(
-                          RegExp(r'^\.'),
-                          replacementString: '0.',
-                        ),
-                        FilteringTextInputFormatter.deny(
-                          RegExp(r'\.\d+\.'),
-                        ),
-                        FilteringTextInputFormatter.deny(
-                          RegExp(r'\d+-'),
-                        ),
-                        FilteringTextInputFormatter.deny(
-                          RegExp(r'-\.+'),
-                        ),
-                        FilteringTextInputFormatter.deny(RegExp(r'^0\d+'),),
-                      ],
-                      controller: widget.controller,
-                      focusNode: _focusNode,
-                      onChanged: (value) => widget.onChanged(value),
-                      style: Theme.of(context).textTheme.headline4!.copyWith(
-                            fontSize: 20,
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: SizedBox(
+                      height: 42,
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.allow(
+                            RegExp("[0-9\.-]"),
+                            replacementString: ('.'),
                           ),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.all(0.0),
+                          FilteringTextInputFormatter.deny(
+                            RegExp(r'\.\.+'),
+                            replacementString: '.',
+                          ),
+                          FilteringTextInputFormatter.deny(
+                            RegExp(r'^\.'),
+                            replacementString: '0.',
+                          ),
+                          FilteringTextInputFormatter.deny(
+                            RegExp(r'\.\d+\.'),
+                          ),
+                          FilteringTextInputFormatter.deny(
+                            RegExp(r'\d+-'),
+                          ),
+                          FilteringTextInputFormatter.deny(
+                            RegExp(r'-\.+'),
+                          ),
+                          FilteringTextInputFormatter.deny(RegExp(r'^0\d+'),),
+                        ],
+                        controller: widget.controller,
+                        focusNode: _focusNode,
+                        onChanged: (value) => widget.onChanged(value),
+                        style: Theme.of(context).textTheme.headline4!.copyWith(
+                              fontSize: 20,
+                            ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.all(0.0),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                AssetSelector(
-                  assets: widget.assets,
-                  selectedAsset: widget.selectedAsset,
-                  onSelect: (token) {
-                    widget.onAssetSelect(token);
-                  },
-                ),
-              ],
+                  AssetSelector(
+                    assets: widget.assets,
+                    selectedAsset: widget.selectedAsset,
+                    onSelect: (token) {
+                      widget.onAssetSelect(token);
+                    },
+                  ),
+                ],
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '\$365.50',
+                  widget.suffix!,
                   style: Theme.of(context).textTheme.headline6!.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context)
@@ -146,7 +149,7 @@ class _AmountFieldState extends State<AmountField> {
                       ),
                 ),
                 Text(
-                  'Available: ${widget.available}',
+                  'Available: ${widget.available.toString()}',
                   style: Theme.of(context).textTheme.headline6!.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context)
