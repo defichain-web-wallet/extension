@@ -43,7 +43,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
 
   getTokensList(accountState, tokensState) {
     List<TokensModel> resList = [];
-    accountState.balances!.reversed.forEach((element) {
+    accountState.balances!.forEach((element) {
       tokensState.tokens!.forEach((el) {
         if (element.token == el.symbol) {
           resList.add(el);
