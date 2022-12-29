@@ -135,7 +135,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> {
                     softWrap: true,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline5!.copyWith(
-                          fontSize: 16,
+                          fontSize: 14,
                           color: Theme.of(context)
                               .textTheme
                               .headline5!

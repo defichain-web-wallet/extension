@@ -4,10 +4,8 @@ import 'dart:ui';
 import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -42,7 +40,6 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
         insetPadding: EdgeInsets.all(24),
-        elevation: 0.0,
         shape: RoundedRectangleBorder(
           side: BorderSide.none,
           borderRadius: BorderRadius.circular(20),
