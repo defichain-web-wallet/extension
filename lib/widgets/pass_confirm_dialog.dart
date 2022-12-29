@@ -31,10 +31,10 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
   bool isVisiblePasswordField = true;
   String password = '';
   bool isFailed = false;
-  convert.Codec<String, String> stringToBase64 = convert.utf8.fuse(convert.base64);
+  convert.Codec<String, String> stringToBase64 =
+      convert.utf8.fuse(convert.base64);
   GlobalKey globalKey = GlobalKey();
   TextEditingController _passwordController = TextEditingController();
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,13 +64,13 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
                   label: 'Cancel',
                 ),
               ),
-                NewPrimaryButton(
-                  width: 104,
-                  title: 'Confirm',
-                  callback: () {
-                    _restoreWallet();
-                  } ,
-                ),
+              NewPrimaryButton(
+                width: 104,
+                title: 'Confirm',
+                callback: () {
+                  _restoreWallet();
+                },
+              ),
             ],
           ),
         ],
@@ -80,60 +80,65 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
           left: 16,
           right: 16,
         ),
-        content: Container(
-          width: 312,
-          height: 200,
-          child: Stack(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+        content: Stack(
+          children: [
+            Container(
+              width: 312,
+              height: 200,
+              child: Stack(
                 children: [
-                  MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.close,
-                        size: 16,
-                        color: Theme.of(context).dividerColor.withOpacity(0.5),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              Container(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.close,
+                            size: 16,
+                            color:
+                                Theme.of(context).dividerColor.withOpacity(0.5),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Container(
+                    child: Column(
                       children: [
-                        Text(
-                          'Confirmation',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline2!
-                              .copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .headline5!
-                                      .color),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'Please confirm the transaction\nby entering your password',
-                          style:
-                              Theme.of(context).textTheme.subtitle1!.copyWith(
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'Confirmation',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline2!
+                                  .copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'Please confirm the transaction\nby entering your password',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle1!
+                                  .copyWith(
                                     color: Theme.of(context)
                                         .textTheme
                                         .subtitle1!
@@ -142,38 +147,59 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
                                   ),
-                          softWrap: true,
+                              softWrap: true,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        PasswordTextField(
+                          controller: _passwordController,
+                          status: PasswordStatusList.initial,
+                          hint: 'Your password',
+                          label: 'Password',
+                          isShowObscureIcon: true,
+                          isCaptionShown: false,
+                          isObscure: isPasswordObscure,
+                          onChanged: (String value) {
+                            password = value;
+                          },
+                          onPressObscure: () {
+                            setState(
+                                () => isPasswordObscure = !isPasswordObscure);
+                          },
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    PasswordTextField(
-                      controller: _passwordController,
-                      status: PasswordStatusList.initial,
-                      hint: 'Your password',
-                      label: 'Password',
-                      isShowObscureIcon: true,
-                      isCaptionShown: false,
-                      isObscure: isPasswordObscure,
-                      onChanged: (String value) {
-                        password = value;
-                      },
-                      onPressObscure: () {
-                        setState(
-                                () => isPasswordObscure = !isPasswordObscure);
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.close,
+                      size: 16,
+                      color: Theme.of(context).dividerColor.withOpacity(0.5),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
+
   void _restoreWallet() async {
     setState(() {
       isFailed = false;
