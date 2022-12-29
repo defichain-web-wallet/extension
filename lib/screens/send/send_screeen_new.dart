@@ -5,16 +5,15 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
+import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/address_book/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/address_field_new.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
-import 'package:defi_wallet/widgets/fields/asset_text_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -30,9 +29,13 @@ class SendScreenNew extends StatefulWidget {
 
 class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
   TextEditingController addressController = TextEditingController();
-  TextEditingController assetController = TextEditingController();
+  TextEditingController assetController = TextEditingController(
+    text: '0'
+  );
   AddressBookModel contact = AddressBookModel();
   TokensModel? currentAsset;
+  String suffixText = '';
+  String? balanceInUsd;
   String titleText = 'Send';
   String subtitleText = 'Please enter the recipient and amount';
   bool isAddNewContact = false;
@@ -40,7 +43,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
 
   getTokensList(accountState, tokensState) {
     List<TokensModel> resList = [];
-    accountState.balances!.forEach((element) {
+    accountState.balances!.reversed.forEach((element) {
       tokensState.tokens!.forEach((el) {
         if (element.token == el.symbol) {
           resList.add(el);
@@ -50,10 +53,33 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
     return resList;
   }
 
+  double getAvailableBalance(accountState) {
+    int balance = accountState.activeAccount!.balanceList!
+        .firstWhere((el) => el.token! == currentAsset!.symbol! && !el.isHidden!)
+        .balance!;
+    final int fee = 3000;
+    return convertFromSatoshi(balance - fee);
+  }
+
+  String getUsdBalance(context) {
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+    try {
+      var amount = tokenHelper.getAmountByUsd(
+        tokensCubit.state.tokensPairs!,
+        double.parse(
+            assetController.text.replaceAll(',', '.')),
+        currentAsset!.symbol!,
+      );
+      return balancesHelper
+          .numberStyling(amount,
+          fixedCount: 2, fixed: true);
+    } catch (err) {
+      return '0.00';
+    }
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     addressController.addListener(() {
       if (addressController.text != '') {
         setState(() {
@@ -66,6 +92,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
         });
       }
     });
+    super.initState();
   }
 
   @override
@@ -195,6 +222,13 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                   height: 6,
                                 ),
                                 AmountField(
+                                  onChanged: (value) {
+                                    setState(() {
+                                      balanceInUsd = getUsdBalance(context);
+                                    });
+                                  },
+                                  suffix: balanceInUsd ?? getUsdBalance(context),
+                                  available: getAvailableBalance(accountState),
                                   onAssetSelect: (t) {
                                     setState(() {
                                       currentAsset = t;

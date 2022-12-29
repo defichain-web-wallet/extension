@@ -302,7 +302,7 @@ class _SellingState extends State<Selling> {
                                 Container(
                                   padding: EdgeInsets.only(right: 10),
                                   child:
-                                      SvgPicture.asset('assets/info_icon.svg'),
+                                      SvgPicture.asset('assets/important_icon.svg'),
                                 ),
                               ],
                             ),

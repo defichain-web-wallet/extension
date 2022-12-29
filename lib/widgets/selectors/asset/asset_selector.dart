@@ -10,11 +10,13 @@ import 'package:flutter/material.dart';
 class AssetSelector extends StatefulWidget {
   final void Function(TokensModel) onSelect;
   final List<TokensModel> assets;
+  final TokensModel selectedAsset;
 
   AssetSelector({
     Key? key,
     required this.onSelect,
     required this.assets,
+    required this.selectedAsset,
   }) : super(key: key);
 
   @override
@@ -48,7 +50,7 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
         width: 100,
         height: 38,
         child: AssetHeaderSelector(
-          assetCode: _currentAssetCode,
+          assetCode: widget.selectedAsset.symbol!,
           isShown: _isShowDropdown,
         ),
       ),
@@ -118,13 +120,9 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
                                 return AssetItemSelector(
                                   assetCode: widget.assets[index].symbol!,
                                   assetName: widget.assets[index].name!,
-                                  isActive: _currentAssetCode ==
+                                  isActive: widget.selectedAsset.symbol! ==
                                       widget.assets[index].symbol!,
                                   onChange: () {
-                                    setState(() {
-                                      _currentAssetCode =
-                                      widget.assets[index].symbol!;
-                                    });
                                     widget.onSelect(widget.assets[index]);
                                     controller.hideMenu();
                                   },

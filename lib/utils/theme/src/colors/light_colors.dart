@@ -23,4 +23,6 @@ abstract class LightColors {
   static const assetItemSelectorBorderColor = AppColors.portageBg;
 
   static const assetSelectedItemSelectorBgColor = AppColors.portageBg;
+
+  static const slippageBorderColor = AppColors.lavenderPurple;
 }
