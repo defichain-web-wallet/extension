@@ -7,6 +7,7 @@ import 'package:gradient_borders/gradient_borders.dart';
 
 class AmountField extends StatefulWidget {
   final void Function(TokensModel asset) onAssetSelect;
+  final void Function(String value) onChanged;
   final TextEditingController controller;
   final TokensModel selectedAsset;
   final List<TokensModel> assets;
@@ -15,6 +16,7 @@ class AmountField extends StatefulWidget {
 
   AmountField({
     required this.onAssetSelect,
+    required this.onChanged,
     required this.controller,
     required this.selectedAsset,
     required this.assets,
@@ -32,6 +34,9 @@ class _AmountFieldState extends State<AmountField> {
   bool _onFocused = false;
 
   _onFocusChange() {
+    if (widget.controller.text == '0') {
+      widget.controller.text = '';
+    }
     setState(() {
       _onFocused = _focusNode.hasFocus;
     });
@@ -102,6 +107,7 @@ class _AmountFieldState extends State<AmountField> {
                       ],
                       controller: widget.controller,
                       focusNode: _focusNode,
+                      onChanged: (value) => widget.onChanged(value),
                       style: Theme.of(context).textTheme.headline4!.copyWith(
                             fontSize: 20,
                           ),
@@ -118,6 +124,7 @@ class _AmountFieldState extends State<AmountField> {
                 ),
                 AssetSelector(
                   assets: widget.assets,
+                  selectedAsset: widget.selectedAsset,
                   onSelect: (token) {
                     widget.onAssetSelect(token);
                   },
