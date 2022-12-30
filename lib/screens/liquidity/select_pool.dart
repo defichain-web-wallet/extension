@@ -12,6 +12,8 @@ import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/buttons/flat_button.dart';
+import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
@@ -415,41 +417,59 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
                             ),
                           ),
                           Container(
-                            child: PrimaryButton(
-                              label: 'Continue',
-                              callback: isErrorBalance || isDisableSubmit()
-                                  ? () {
-                                setState(() {
-                                  isEnoughBalance = true;
-                                });
-                              }
-                                  : () => Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation1,
-                                      animation2) =>
-                                      LiquidityConfirmation(
-                                          assetPair: widget.assetPair,
-                                          baseAmount: double.parse(
-                                              _amountBaseController.text
-                                                  .replaceAll(
-                                                  ',', '.')),
-                                          quoteAmount: double.parse(
-                                              _amountQuoteController
-                                                  .text
-                                                  .replaceAll(
-                                                  ',', '.')),
-                                          shareOfPool: shareOfPool,
-                                          amountUSD: amountUSD,
-                                          balanceUSD: balanceUSD,
-                                          balanceA: balanceA,
-                                          balanceB: balanceB,
-                                          amount: amount),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration:
-                                  Duration.zero,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 104,
+                                  child: FlatButton(
+                                    title: 'Cancel',
+                                    isPrimary: false,
+                                    callback: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
                                 ),
-                              ),
+                                SizedBox(
+                                  width: 104,
+                                  child: NewPrimaryButton(
+                                    title: 'Add',
+                                    callback: isErrorBalance || isDisableSubmit()
+                                        ? () {
+                                      setState(() {
+                                        isEnoughBalance = true;
+                                      });
+                                    }
+                                        : () => Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation1,
+                                            animation2) =>
+                                            LiquidityConfirmation(
+                                                assetPair: widget.assetPair,
+                                                baseAmount: double.parse(
+                                                    _amountBaseController.text
+                                                        .replaceAll(
+                                                        ',', '.')),
+                                                quoteAmount: double.parse(
+                                                    _amountQuoteController
+                                                        .text
+                                                        .replaceAll(
+                                                        ',', '.')),
+                                                shareOfPool: shareOfPool,
+                                                amountUSD: amountUSD,
+                                                balanceUSD: balanceUSD,
+                                                balanceA: balanceA,
+                                                balanceB: balanceB,
+                                                amount: amount),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration:
+                                        Duration.zero,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
