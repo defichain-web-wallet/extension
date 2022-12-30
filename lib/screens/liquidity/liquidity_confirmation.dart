@@ -4,20 +4,31 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
+import 'package:defi_wallet/widgets/buttons/flat_button.dart';
+import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair_details.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_status.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
+import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
+import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
+import 'package:defi_wallet/widgets/tx_status_dialog.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -53,7 +64,8 @@ class LiquidityConfirmation extends StatefulWidget {
   State<LiquidityConfirmation> createState() => _LiquidityConfirmationState();
 }
 
-class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
+class _LiquidityConfirmationState extends State<LiquidityConfirmation>
+    with ThemeMixin {
   String appBarTitle = 'Confirmation';
   String submitLabel = '';
   String secondStepLoaderTextAdd =
@@ -63,303 +75,348 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
   TokensHelper tokenHelper = TokensHelper();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
+  bool isShowDetails = true;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TransactionCubit, TransactionState>(
-      builder: (context, state) => ScaffoldConstrainedBox(
-        child: LayoutBuilder(builder: (context, constraints) {
-          if (constraints.maxWidth < ScreenSizes.medium) {
-            return Scaffold(
-              appBar: MainAppBar(
-                  title: appBarTitle,
-                  isShowBottom: !(state is TransactionInitialState),
-                  height: !(state is TransactionInitialState)
-                      ? toolbarHeightWithBottom
-                      : toolbarHeight),
-              body: _buildBody(context, state, false),
-            );
-          } else {
-            return Container(
-              padding: const EdgeInsets.only(top: 20),
-              child: Scaffold(
-                appBar: MainAppBar(
-                  title: appBarTitle,
-                  action: null,
-                  isShowBottom: !(state is TransactionInitialState),
-                  height: !(state is TransactionInitialState)
-                      ? toolbarHeightWithBottom
-                      : toolbarHeight,
-                  isSmall: true,
-                ),
-                body: _buildBody(context, state, true),
+    return ScaffoldWrapper(
+      builder: (
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState transactionState,
+      ) {
+        return Scaffold(
+          appBar: NewMainAppBar(
+            isShowLogo: false,
+          ),
+          drawerScrimColor: Color(0x0f180245),
+          endDrawer: AccountDrawer(
+            width: buttonSmallWidth,
+          ),
+          body: Container(
+            padding: EdgeInsets.only(
+              top: 22,
+              bottom: 22,
+              left: 16,
+              right: 16,
+            ),
+            decoration: BoxDecoration(
+              color: isDarkTheme()
+                  ? DarkColors.scaffoldContainerBgColor
+                  : LightColors.scaffoldContainerBgColor,
+              border: isDarkTheme()
+                  ? Border.all(
+                      width: 1.0,
+                      color: Colors.white.withOpacity(0.05),
+                    )
+                  : null,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20),
+                topLeft: Radius.circular(20),
               ),
-            );
-          }
-        }),
-      ),
+            ),
+            child: _buildBody(context, transactionState),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildBody(context, transactionState, bool isFullScreen) {
+  Widget _buildBody(context, transactionState) {
+    double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
           if (state.status == AccountStatusList.success &&
               tokensState.status == TokensStatusList.success) {
             submitLabel = widget.removeLT == 0 ? 'Add' : 'Remove';
-            return Container(
-              color: Theme.of(context).dialogBackgroundColor,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: Center(
-                child: StretchBox(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        child: Column(
-                          children: [
-                            Text('You will receive',
-                                style: Theme.of(context).textTheme.headline6),
-                            widget.removeLT == 0
-                                ? Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 28),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '${widget.amount.toStringAsFixed(8)}',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .apply(fontSizeDelta: 12),
-                                        ),
-                                        Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 8)),
-                                        AssetPair(
-                                          pair: widget.assetPair.symbol!,
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                : Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 28),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          child: Row(
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 8),
-                                                child: SvgPicture.asset(
-                                                  tokenHelper
-                                                      .getImageNameByTokenName(
-                                                          widget.assetPair
-                                                              .tokenA),
-                                                  height: 25,
-                                                  width: 25,
-                                                ),
-                                              ),
-                                              Text(
-                                                  '${widget.baseAmount.toStringAsFixed(4)}',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline6
-                                                      ?.apply(fontSizeDelta: 4))
-                                            ],
-                                          ),
-                                        ),
-                                        Text(' + ',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline6
-                                                ?.apply(fontSizeDelta: 4)),
-                                        Container(
-                                          child: Row(
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 8),
-                                                child: SvgPicture.asset(
-                                                  tokenHelper
-                                                      .getImageNameByTokenName(
-                                                          widget.assetPair
-                                                              .tokenB),
-                                                  height: 25,
-                                                  width: 25,
-                                                ),
-                                              ),
-                                              Text(
-                                                  '${widget.quoteAmount.toStringAsFixed(4)}',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline6
-                                                      ?.apply(fontSizeDelta: 4))
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                            widget.removeLT != 0
-                                ? Text(
-                                    'exchanging for ${getLiquidityToken()} ${TokensHelper().getTokenFormat(widget.assetPair.symbol)} liquidity tokens',
-                                    style:
-                                        Theme.of(context).textTheme.headline5)
-                                : Column(
-                                    children: [
-                                      Text(
-                                          '${TokensHelper().getTokenFormat(widget.assetPair.symbol)} liquidity tokens',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6),
-                                      Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12)),
-                                      Text(
-                                          '${widget.shareOfPool.toStringAsFixed(8)}% share of pool',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5)
-                                    ],
-                                  ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 42.0),
-                              child: AssetPairDetails(
-                                  assetPair: widget.assetPair,
-                                  isRemove: widget.removeLT != 0,
-                                  amountA: widget.baseAmount,
-                                  amountB: widget.quoteAmount,
-                                  balanceA: widget.balanceA,
-                                  balanceB: widget.balanceB,
-                                  totalBalanceInUsd: widget.balanceUSD,
-                                  totalAmountInUsd: widget.amountUSD),
-                            ),
-                            Container(
-                                padding: const EdgeInsets.only(top: 24),
-                                child: RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                          text: 'Note: ',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6),
-                                      TextSpan(
-                                          text:
-                                              'Liquidity tokens represent a share of the liquidity pool',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5)
-                                    ],
-                                  ),
-                                ))
-                          ],
+            return StretchBox(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Summary',
+                          style: Theme.of(context).textTheme.headline3,
                         ),
-                      ),
-                      Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              child: Container(
-                                child: AccentButton(
-                                  label: 'Cancel',
-                                  callback: () => Navigator.of(context).pop(),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        Container(
+                          width: double.infinity,
+                          height: 148,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 18),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1.0,
+                              color: AppColors.lavenderPurple.withOpacity(0.35),
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'You will receive',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                            fontWeight: FontWeight.w400,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline6!
+                                                .color!
+                                                .withOpacity(0.5),
+                                          ),
+                                    ),
+                                    SizedBox(
+                                      height: 8,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: SvgPicture.asset(
+                                            TokensHelper()
+                                                .getImageNameByTokenName(
+                                                    widget.assetPair.tokenA),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 6,
+                                        ),
+                                        Text(
+                                          widget.baseAmount.toString(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline3!
+                                              .copyWith(
+                                                fontSize: 20,
+                                              ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: SvgPicture.asset(
+                                            TokensHelper()
+                                                .getImageNameByTokenName(
+                                                    widget.assetPair.tokenB),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 6,
+                                        ),
+                                        Text(
+                                          widget.quoteAmount.toString(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline3!
+                                              .copyWith(
+                                                fontSize: 20,
+                                              ),
+                                        )
+                                      ],
+                                    )
+                                  ],
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8),
-                            ),
-                            Expanded(
-                              child: Container(
-                                  child: PrimaryButton(
-                                      label: submitLabel,
-                                      isCheckLock: false,
-                                      callback: () {
-                                        isFullScreen
-                                            ? PasswordBottomSheet
-                                                .provideWithPasswordFullScreen(
-                                                    context,
-                                                    state.activeAccount!,
-                                                    (password) async {
-                                                Navigator.push(
-                                                  context,
-                                                  PageRouteBuilder(
-                                                    pageBuilder: (context,
-                                                            animation1,
-                                                            animation2) =>
-                                                        LoaderNew(
-                                                      title: appBarTitle,
-                                                      secondStepLoaderText: widget
-                                                                  .removeLT ==
-                                                              0
-                                                          ? secondStepLoaderTextAdd
-                                                          : secondStepLoaderTextRemove,
-                                                      callback: () {
-                                                        submitLiquidityAction(
-                                                            state,
-                                                            tokensState,
-                                                            transactionState,
-                                                            password);
-                                                      },
-                                                    ),
-                                                    transitionDuration:
-                                                        Duration.zero,
-                                                    reverseTransitionDuration:
-                                                        Duration.zero,
-                                                  ),
-                                                );
-                                              })
-                                            : PasswordBottomSheet
-                                                .provideWithPassword(context,
-                                                    state.activeAccount!,
-                                                    (password) async {
-                                                Navigator.push(
-                                                  context,
-                                                  PageRouteBuilder(
-                                                    pageBuilder: (context,
-                                                            animation1,
-                                                            animation2) =>
-                                                        LoaderNew(
-                                                      title: appBarTitle,
-                                                      secondStepLoaderText: widget
-                                                                  .removeLT ==
-                                                              0
-                                                          ? secondStepLoaderTextAdd
-                                                          : secondStepLoaderTextRemove,
-                                                      callback: () {
-                                                        submitLiquidityAction(
-                                                            state,
-                                                            tokensState,
-                                                            transactionState,
-                                                            password);
-                                                      },
-                                                    ),
-                                                    transitionDuration:
-                                                        Duration.zero,
-                                                    reverseTransitionDuration:
-                                                        Duration.zero,
-                                                  ),
-                                                );
-                                              });
-                                      })),
-                            )
-                          ],
+                              SizedBox(
+                                width: 16,
+                              ),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Yield',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                            fontWeight: FontWeight.w400,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline6!
+                                                .color!
+                                                .withOpacity(0.5),
+                                          ),
+                                    ),
+                                    SizedBox(
+                                      height: 8,
+                                    ),
+                                    Text(
+                                      TokensHelper()
+                                          .getAprFormat(widget.assetPair.apr!),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline3!
+                                          .copyWith(
+                                            fontSize: 20,
+                                          ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: 26,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isShowDetails = !isShowDetails;
+                            });
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Show less',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              RotationTransition(
+                                turns: AlwaysStoppedAnimation(
+                                    arrowRotateDeg / 360),
+                                child: SizedBox(
+                                  width: 8,
+                                  height: 8,
+                                  child: SvgPicture.asset(
+                                    'assets/icons/arrow_down.svg',
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        if (isShowDetails) ...[
+                          AssetPairDetails(
+                            assetPair: widget.assetPair,
+                            isRemove: widget.removeLT != 0,
+                            amountA: widget.baseAmount,
+                            amountB: widget.quoteAmount,
+                            balanceA: widget.balanceA,
+                            balanceB: widget.balanceB,
+                            totalBalanceInUsd: widget.balanceUSD,
+                            totalAmountInUsd: widget.amountUSD,
+                          ),
+                        ],
+                        Container(
+                            padding: const EdgeInsets.only(top: 24),
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Note: ',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline6!
+                                        .copyWith(
+                                          fontWeight: FontWeight.w400,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .color!
+                                              .withOpacity(0.3),
+                                        ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        'Liquidity tokens represent a share of the liquidity pool',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline6!
+                                        .copyWith(
+                                          fontWeight: FontWeight.w400,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .color!
+                                              .withOpacity(0.3),
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ))
+                      ],
+                    ),
                   ),
-                ),
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 104,
+                          child: FlatButton(
+                            title: 'Cancel',
+                            isPrimary: false,
+                            callback: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          width: 104,
+                          child: PendingButton(
+                            'Add',
+                            pendingText: 'Pending',
+                            callback: (parent) {
+                              showDialog(
+                                barrierColor: Color(0x0f180245),
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context1) {
+                                  return PassConfirmDialog(
+                                      onSubmit: (password) async {
+                                    parent.emitPending(true);
+                                    await submitLiquidityAction(
+                                      state,
+                                      tokensState,
+                                      transactionState,
+                                      password,
+                                    );
+                                    parent.emitPending(false);
+                                  });
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           } else {
@@ -394,26 +451,6 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
             account: state.activeAccount,
             token: widget.assetPair,
             amount: convertToSatoshi(widget.removeLT));
-
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => LiquidityStatus(
-              assetPair: widget.assetPair,
-              isRemove: widget.removeLT != 0,
-              amountA: widget.baseAmount,
-              amountB: widget.quoteAmount,
-              amountUSD: widget.amountUSD,
-              balanceUSD: widget.balanceUSD,
-              balanceA: widget.balanceA,
-              balanceB: widget.balanceB,
-              txError: txError,
-              isBalanceDetails: false,
-            ),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ),
-        );
       } else {
         txError = await txser.createAndSendLiqudity(
             keyPair: keyPair,
@@ -423,27 +460,39 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> {
             amountA: convertToSatoshi(widget.baseAmount),
             amountB: convertToSatoshi(widget.quoteAmount),
             tokens: tokensState.tokens);
-
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => LiquidityStatus(
-              assetPair: widget.assetPair,
-              isRemove: widget.removeLT != 0,
-              amountA: widget.baseAmount,
-              amountB: widget.quoteAmount,
-              amountUSD: widget.amountUSD,
-              balanceUSD: widget.balanceUSD,
-              balanceA: widget.balanceA,
-              balanceB: widget.balanceB,
-              txError: txError,
-              isBalanceDetails: false,
-            ),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ),
-        );
       }
+
+      showDialog(
+        barrierColor: Color(0x0f180245),
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return TxStatusDialog(
+            txResponse: txError,
+            callbackOk: () {
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder:
+                      (context, animation1, animation2) =>
+                      HomeScreen(isLoadTokens: true,),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration:
+                  Duration.zero,
+                ),
+              );
+            },
+            callbackTryAgain: () async {
+              await submitLiquidityAction(
+                state,
+                tokensState,
+                transactionState,
+                password,
+              );
+            },
+          );
+        },
+      );
     } catch (err) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

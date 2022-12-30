@@ -4,6 +4,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -90,152 +91,265 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
               }
               return Container(
                 padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 16,
-                ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10),
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10),),
+                  vertical: 12,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            child: Row(
-                              children: [
-                                AssetPair(
-                                  pair: widget.assetPair.symbol!,
-                                  size: 20,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(
-                                      TokensHelper().getTokenFormat(
-                                          widget.assetPair.symbol!),
-                                      style: Theme.of(context)
+                          Text(
+                            'Pooled ${widget.assetPair.tokenA}',
+                            style:
+                                Theme.of(context).textTheme.headline5!.copyWith(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
                                           .textTheme
-                                          .headline6
-                                          ?.apply(fontSizeDelta: 2)),
-                                ),
-                              ],
-                            ),
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
                           ),
-                          Container(
-                            child: Text(
-                                TokensHelper()
-                                    .getAprFormat(widget.assetPair.apr!),
+                          RichText(
+                            text: TextSpan(children: [
+                              TextSpan(
+                                text: '${widget.balanceA.toStringAsFixed(6)}',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .headline6
-                                    ?.apply(fontSizeDelta: 2)),
-                          )
+                                    .headline5!
+                                    .copyWith(
+                                      fontSize: 12,
+                                    ),
+                              ),
+                              TextSpan(
+                                text: getFormatAmountText(
+                                  widget.amountA.toStringAsFixed(6),
+                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
+                              ),
+                            ]),
+                          ),
                         ],
                       ),
+                    ),
+                    Divider(
+                      color: AppColors.lavenderPurple.withOpacity(0.16),
                     ),
                     Container(
-                      padding: const EdgeInsets.only(top: 22),
-                      child: Column(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Pooled ${widget.assetPair.tokenA}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline5
-                                        ?.apply(fontWeightDelta: 2)),
-                                RichText(
-                                    text: TextSpan(children: [
-                                  if (widget.isBalanceDetails)
-                                    TextSpan(
-                                      text:
-                                          '${widget.balanceA.toStringAsFixed(8)}',
-                                      style: Theme.of(context)
+                          Text(
+                            'Pooled ${widget.assetPair.tokenB}',
+                            style:
+                                Theme.of(context).textTheme.headline5!.copyWith(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
                                           .textTheme
-                                          .headline4
-                                          ?.apply(
-                                              fontWeightDelta: 2,
-                                              fontSizeDelta: 3),
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.3),
                                     ),
-                                  getFormatAmountText(
-                                      widget.amountA.toStringAsFixed(8)),
-                                ]))
-                              ],
-                            ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Pooled ${widget.assetPair.tokenB}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline5
-                                        ?.apply(fontWeightDelta: 2)),
-                                RichText(
-                                    text: TextSpan(children: [
-                                  if (widget.isBalanceDetails)
-                                    TextSpan(
-                                      text:
-                                          '${widget.balanceB.toStringAsFixed(8)}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline4
-                                          ?.apply(
-                                              fontWeightDelta: 2,
-                                              fontSizeDelta: 3),
+                          RichText(
+                            text: TextSpan(children: [
+                              TextSpan(
+                                text: '${widget.balanceB.toStringAsFixed(6)}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                      fontSize: 12,
                                     ),
-                                  getFormatAmountText(
-                                      widget.amountB.toStringAsFixed(8)),
-                                ]))
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Pooled $fiat',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline5
-                                        ?.apply(fontWeightDelta: 2)),
-                                RichText(
-                                    text: TextSpan(children: [
-                                  if (widget.isBalanceDetails)
-                                    TextSpan(
-                                      text: getPooledByFiatFormat(balanceUsd,
-                                          fiat, tokensState.eurRate),
-                                      style: Theme.of(context)
+                              ),
+                              TextSpan(
+                                text: getFormatAmountText(
+                                  widget.amountB.toStringAsFixed(6),
+                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
                                           .textTheme
-                                          .headline4
-                                          ?.apply(
-                                              fontWeightDelta: 2,
-                                              fontSizeDelta: 3),
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.3),
                                     ),
-                                  getFormatAmountText(getPooledByFiatFormat(
-                                      targetAmountUsd,
-                                      fiat,
-                                      tokensState.eurRate)),
-                                ]))
-                              ],
-                            ),
+                              ),
+                            ]),
                           ),
                         ],
                       ),
                     ),
+                    Divider(
+                      color: AppColors.lavenderPurple.withOpacity(0.16),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Pooled $fiat',
+                            style:
+                                Theme.of(context).textTheme.headline5!.copyWith(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
+                          ),
+                          RichText(
+                            text: TextSpan(children: [
+                              TextSpan(
+                                text: getPooledByFiatFormat(
+                                  balanceUsd,
+                                  fiat,
+                                  tokensState.eurRate,
+                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                      fontSize: 12,
+                                    ),
+                              ),
+                              TextSpan(
+                                text: getFormatAmountText(
+                                  getPooledByFiatFormat(targetAmountUsd, fiat,
+                                      tokensState.eurRate),
+                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
+                              ),
+                            ]),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Container(
+                    //   padding: const EdgeInsets.only(top: 22),
+                    //   child: Column(
+                    //     children: [
+                    //       Padding(
+                    //         padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    //         child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             Text('Pooled ${widget.assetPair.tokenA}',
+                    //                 style: Theme.of(context)
+                    //                     .textTheme
+                    //                     .headline5
+                    //                     ?.apply(fontWeightDelta: 2)),
+                    //             RichText(
+                    //                 text: TextSpan(children: [
+                    //               if (widget.isBalanceDetails)
+                    //                 TextSpan(
+                    //                   text:
+                    //                       '${widget.balanceA.toStringAsFixed(8)}',
+                    //                   style: Theme.of(context)
+                    //                       .textTheme
+                    //                       .headline4
+                    //                       ?.apply(
+                    //                           fontWeightDelta: 2,
+                    //                           fontSizeDelta: 3),
+                    //                 ),
+                    //               getFormatAmountText(
+                    //                   widget.amountA.toStringAsFixed(8)),
+                    //             ]))
+                    //           ],
+                    //         ),
+                    //       ),
+                    //       Padding(
+                    //         padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    //         child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             Text('Pooled ${widget.assetPair.tokenB}',
+                    //                 style: Theme.of(context)
+                    //                     .textTheme
+                    //                     .headline5
+                    //                     ?.apply(fontWeightDelta: 2)),
+                    //             RichText(
+                    //                 text: TextSpan(children: [
+                    //               if (widget.isBalanceDetails)
+                    //                 TextSpan(
+                    //                   text:
+                    //                       '${widget.balanceB.toStringAsFixed(8)}',
+                    //                   style: Theme.of(context)
+                    //                       .textTheme
+                    //                       .headline4
+                    //                       ?.apply(
+                    //                           fontWeightDelta: 2,
+                    //                           fontSizeDelta: 3),
+                    //                 ),
+                    //               getFormatAmountText(
+                    //                   widget.amountB.toStringAsFixed(8)),
+                    //             ]))
+                    //           ],
+                    //         ),
+                    //       ),
+                    //       Padding(
+                    //         padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    //         child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             Text('Pooled $fiat',
+                    //                 style: Theme.of(context)
+                    //                     .textTheme
+                    //                     .headline5
+                    //                     ?.apply(fontWeightDelta: 2)),
+                    //             RichText(
+                    //                 text: TextSpan(children: [
+                    //               if (widget.isBalanceDetails)
+                    //                 TextSpan(
+                    //                   text: getPooledByFiatFormat(balanceUsd,
+                    //                       fiat, tokensState.eurRate),
+                    //                   style: Theme.of(context)
+                    //                       .textTheme
+                    //                       .headline4
+                    //                       ?.apply(
+                    //                           fontWeightDelta: 2,
+                    //                           fontSizeDelta: 3),
+                    //                 ),
+                    //               getFormatAmountText(getPooledByFiatFormat(
+                    //                   targetAmountUsd,
+                    //                   fiat,
+                    //                   tokensState.eurRate)),
+                    //             ]))
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               );
@@ -256,23 +370,11 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
     }
   }
 
-  TextSpan getFormatAmountText(stringAmount) {
+  String getFormatAmountText(stringAmount) {
     if (widget.isBalanceDetails) {
-      return TextSpan(
-        text: ' ${widget.isRemove ? '-' : '+'}$stringAmount',
-        style: Theme.of(context)
-            .textTheme
-            .headline4
-            ?.apply(color: Colors.grey, fontWeightDelta: 2, fontSizeDelta: 3),
-      );
+      return ' ${widget.isRemove ? '-' : '+'}$stringAmount';
     } else {
-      return TextSpan(
-        text: '$stringAmount',
-        style: Theme.of(context)
-            .textTheme
-            .headline4
-            ?.apply(fontWeightDelta: 2, fontSizeDelta: 3),
-      );
+      return '$stringAmount';
     }
   }
 }
