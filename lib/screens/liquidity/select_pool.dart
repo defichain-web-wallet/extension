@@ -3,15 +3,23 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
+import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
+import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,7 +35,7 @@ class SelectPool extends StatefulWidget {
   _SelectPoolState createState() => _SelectPoolState();
 }
 
-class _SelectPoolState extends State<SelectPool> {
+class _SelectPoolState extends State<SelectPool> with ThemeMixin {
   TokensHelper tokensHelper = TokensHelper();
   final TextEditingController _amountBaseController =
       TextEditingController(text: '0');
@@ -84,38 +92,45 @@ class _SelectPoolState extends State<SelectPool> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TransactionCubit, TransactionState>(
-        builder: (context, state) => ScaffoldConstrainedBox(
-              child: LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth < ScreenSizes.medium) {
-                  return Scaffold(
-                    appBar: MainAppBar(
-                        title: 'Select Pool Pair',
-                        isShowBottom: !(state is TransactionInitialState),
-                        height: !(state is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight),
-                    body: _buildBody(context),
-                  );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Scaffold(
-                      appBar: MainAppBar(
-                        title: 'Select Pool Pair',
-                        action: null,
-                        isShowBottom: !(state is TransactionInitialState),
-                        height: !(state is TransactionInitialState)
-                            ? toolbarHeightWithBottom
-                            : toolbarHeight,
-                        isSmall: true,
-                      ),
-                      body: _buildBody(context, isFullSize: true),
-                    ),
-                  );
-                }
-              }),
-            ));
+    return ScaffoldWrapper(builder: (
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState transactionState,
+    ) {
+      return Scaffold(
+        appBar: NewMainAppBar(
+          isShowLogo: false,
+        ),
+        drawerScrimColor: Color(0x0f180245),
+        endDrawer: AccountDrawer(
+          width: buttonSmallWidth,
+        ),
+        body: Container(
+          padding: EdgeInsets.only(
+            top: 22,
+            bottom: 22,
+            left: 16,
+            right: 16,
+          ),
+          decoration: BoxDecoration(
+            color: isDarkTheme()
+                ? DarkColors.scaffoldContainerBgColor
+                : LightColors.scaffoldContainerBgColor,
+            border: isDarkTheme()
+                ? Border.all(
+              width: 1.0,
+              color: Colors.white.withOpacity(0.05),
+            )
+                : null,
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(20),
+              topLeft: Radius.circular(20),
+            ),
+          ),
+          child: _buildBody(context),
+        ),
+      );
+    });
   }
 
   Widget _buildBody(context, {isFullSize = false}) =>
@@ -154,376 +169,224 @@ class _SelectPoolState extends State<SelectPool> {
                   isErrorBalance = true;
                 }
 
-                List<Widget> _listWidgets = [
-                  Container(
-                    child: Column(
-                      children: [
-                        Row(
+                return StretchBox(
+                  child: Column(
+                    // Set the amount
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Container(
-                                height: 46,
-                                padding:
-                                const EdgeInsets.symmetric(
-                                    horizontal: 22),
-                                decoration: BoxDecoration(
-                                  color:
-                                  Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    bottomLeft:
-                                    Radius.circular(10),
-                                  ),
-                                  border: Border.all(
-                                    color: Colors.transparent,
-                                  ),
-                                ),
-                                child: Container(
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        tokenHelper
-                                            .getImageNameByTokenName(
-                                            assetFrom),
-                                        height: 24,
-                                        width: 24,
-                                      ),
-                                      Padding(
-                                        padding:
-                                        const EdgeInsets.only(
-                                            left: 12.0),
-                                        child: Text(
-                                            TokensHelper()
-                                                .getTokenFormat(
-                                                assetFrom),
-                                            style:
-                                            Theme.of(context)
-                                                .textTheme
-                                                .headline6),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: DecorationTextField(
-                                controller: _amountBaseController,
-                                focusNode: _focusBase,
-                                focusModel: _baseAmountFocusModel,
-                                suffixIcon: Container(
-                                  padding: EdgeInsets.only(
-                                    top: 8,
-                                    bottom: 8,
-                                    right: 6,
-                                  ),
-                                  child: SizedBox(
-                                    width: 40,
-                                    child: TextButton(
-                                        child: Text('MAX',
-                                            style: TextStyle(
-                                                fontSize: 10)),
-                                        onPressed: () => setMaxAmount(
-                                            _amountBaseController,
-                                            _amountQuoteController,
-                                            assetFrom,
-                                            widget.assetPair
-                                                .reserveBDivReserveA!,
-                                            accountState,
-                                            tokensState)),
-                                  ),
-                                ),
-                                onChanged: (value) => onChanged(
-                                    _amountQuoteController,
-                                    value,
-                                    widget.assetPair
-                                        .reserveBDivReserveA!,
-                                    tokensState),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Text(
-                              getAvailableAmount(
-                                  balanceFrom, assetFrom),
-                              style: Theme.of(context)
+                            Text(
+                              'Set the amount',
+                              style: Theme
+                                  .of(context)
                                   .textTheme
-                                  .headline4!
-                                  .apply(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .headline4!
-                                      .color!
-                                      .withOpacity(0.5))),
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 46,
-                                padding:
-                                const EdgeInsets.symmetric(
-                                    horizontal: 22),
-                                decoration: BoxDecoration(
-                                  color:
-                                  Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    bottomLeft:
-                                    Radius.circular(10),
-                                  ),
-                                  border: Border.all(
-                                    color: Colors.transparent,
-                                  ),
-                                ),
-                                child: Container(
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        tokenHelper
-                                            .getImageNameByTokenName(
-                                            assetTo),
-                                        height: 24,
-                                        width: 24,
-                                      ),
-                                      Padding(
-                                        padding:
-                                        const EdgeInsets.only(
-                                            left: 12.0),
-                                        child: Text(
-                                            TokensHelper()
-                                                .getTokenFormat(
-                                                assetTo),
-                                            style:
-                                            Theme.of(context)
-                                                .textTheme
-                                                .headline6),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
+                                  .headline3,
                             ),
-                            Expanded(
-                              child: DecorationTextField(
-                                isBorder: isFullSize,
-                                controller:
-                                _amountQuoteController,
-                                focusNode: _focusQuote,
-                                focusModel:
-                                _quoteAmountFocusModel,
-                                suffixIcon: Container(
-                                  padding: EdgeInsets.only(
-                                    top: 8,
-                                    bottom: 8,
-                                    right: 6,
-                                  ),
-                                  child: SizedBox(
-                                    width: 40,
-                                    child: TextButton(
-                                      child: Text('MAX',
-                                          style: TextStyle(
-                                              fontSize: 10)),
-                                      onPressed: () => setMaxAmount(
-                                          _amountQuoteController,
-                                          _amountBaseController,
-                                          assetTo,
-                                          widget.assetPair
-                                              .reserveADivReserveB!,
-                                          accountState,
-                                          tokensState),
-                                    ),
-                                  ),
-                                ),
-                                onChanged: (value) => onChanged(
-                                    _amountBaseController,
-                                    value,
-                                    widget.assetPair
-                                        .reserveADivReserveB!,
-                                    tokensState),
-                              ),
+                            SizedBox(
+                              height: 16,
                             ),
-                          ],
-                        ),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Text(
-                              getAvailableAmount(
-                                  balanceTo, assetTo),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline4!
-                                  .apply(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .headline4!
-                                      .color!
-                                      .withOpacity(0.5))),
-                        )
-                      ],
-                    ),
-                  ),
-                ];
+                            AmountField(
+                              suffix: '0.00',
+                              available: getAvailableAmount(accountState, assetFrom),
+                              onAssetSelect: (asset) {
 
+                              },
+                              onChanged: (value) {
+                                onChanged(
+                                  _amountQuoteController,
+                                  value,
+                                  widget.assetPair.reserveBDivReserveA!,
+                                  tokensState,
+                                );
+                              },
+                              controller: _amountBaseController,
+                              selectedAsset: TokensModel(
+                                name: assetFrom,
+                                symbol: assetFrom,
+                              ),
+                              assets: [],
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                            AmountField(
+                              suffix: '0.00',
+                              available: getAvailableAmount(accountState, assetTo),
+                              onAssetSelect: (asset) {
 
-
-                return Container(
-                  color: Theme.of(context).dialogBackgroundColor,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                  child: Center(
-                    child: StretchBox(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            child: Column(
+                              },
+                              onChanged: (value) {
+                                onChanged(
+                                  _amountBaseController,
+                                  value,
+                                  widget.assetPair.reserveADivReserveB!,
+                                  tokensState,
+                                );
+                              },
+                              controller: _amountQuoteController,
+                              selectedAsset: TokensModel(
+                                name: assetTo,
+                                symbol: assetTo,
+                              ),
+                              assets: [],
+                            ),
+                            SizedBox(
+                              height: 24,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                if(isFullSize) SizedBox(height: 50,),
-                                assetTo != 'DFI' ? _listWidgets[0] : _listWidgets[1],
-                                SizedBox(height: 24,),
-                                assetTo != 'DFI' ? _listWidgets[1] : _listWidgets[0],
-                                Container(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 42.0, bottom: 42),
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Your input',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6,
-                                              ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    '${_amountBaseController.text} ${TokensHelper().getTokenFormat(assetFrom)}',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline5,
-                                                  ),
-                                                  SizedBox(height: 4),
-                                                  Text(
-                                                    '${_amountQuoteController.text} ${TokensHelper().getTokenFormat(assetTo)}',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline5,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Divider(),
-                                        if (shareOfPool > minShareOfPool)
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 8),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Share of pool',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline6,
-                                                ),
-                                                Text(
-                                                  '${shareOfPool.toStringAsFixed(8)}%',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline5,
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                      ],
+                                Text(
+                                  'Show less',
+                                  style: Theme.of(context).textTheme.headline5!.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                  height: 8,
+                                  child: SvgPicture.asset(
+                                    '/assets/icons/arrow_down.svg'
+                                  ),
+                                )
+                              ],
+                            )
+
+                            // Container(
+                            //   child: Padding(
+                            //     padding: const EdgeInsets.only(
+                            //         top: 42.0, bottom: 42),
+                            //     child: Column(
+                            //       children: [
+                            //         Container(
+                            //           padding: const EdgeInsets.symmetric(
+                            //               vertical: 8),
+                            //           child: Row(
+                            //             mainAxisAlignment:
+                            //                 MainAxisAlignment.spaceBetween,
+                            //             crossAxisAlignment:
+                            //                 CrossAxisAlignment.start,
+                            //             children: [
+                            //               Text(
+                            //                 'Your input',
+                            //                 style: Theme.of(context)
+                            //                     .textTheme
+                            //                     .headline6,
+                            //               ),
+                            //               Column(
+                            //                 crossAxisAlignment:
+                            //                     CrossAxisAlignment.end,
+                            //                 children: [
+                            //                   Text(
+                            //                     '${_amountBaseController.text} ${TokensHelper().getTokenFormat(assetFrom)}',
+                            //                     style: Theme.of(context)
+                            //                         .textTheme
+                            //                         .headline5,
+                            //                   ),
+                            //                   SizedBox(height: 4),
+                            //                   Text(
+                            //                     '${_amountQuoteController.text} ${TokensHelper().getTokenFormat(assetTo)}',
+                            //                     style: Theme.of(context)
+                            //                         .textTheme
+                            //                         .headline5,
+                            //                   ),
+                            //                 ],
+                            //               ),
+                            //             ],
+                            //           ),
+                            //         ),
+                            //         Divider(),
+                            //         if (shareOfPool > minShareOfPool)
+                            //           Container(
+                            //             padding: const EdgeInsets.symmetric(
+                            //                 vertical: 8),
+                            //             child: Row(
+                            //               mainAxisAlignment:
+                            //                   MainAxisAlignment
+                            //                       .spaceBetween,
+                            //               crossAxisAlignment:
+                            //                   CrossAxisAlignment.start,
+                            //               children: [
+                            //                 Text(
+                            //                   'Share of pool',
+                            //                   style: Theme.of(context)
+                            //                       .textTheme
+                            //                       .headline6,
+                            //                 ),
+                            //                 Text(
+                            //                   '${shareOfPool.toStringAsFixed(8)}%',
+                            //                   style: Theme.of(context)
+                            //                       .textTheme
+                            //                       .headline5,
+                            //                 ),
+                            //               ],
+                            //             ),
+                            //           )
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
+                            // Center(
+                            //   child: Text(
+                            //     'Insufficient funds',
+                            //     style: Theme.of(context)
+                            //         .textTheme
+                            //         .headline4!
+                            //         .copyWith(
+                            //           color: isEnoughBalance
+                            //               ? AppTheme.redErrorColor
+                            //               : Colors.transparent,
+                            //         ),
+                            //   ),
+                            // ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: PrimaryButton(
+                          label: 'Continue',
+                          callback: isErrorBalance || isDisableSubmit()
+                              ? () {
+                                  setState(() {
+                                    isEnoughBalance = true;
+                                  });
+                                }
+                              : () => Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation1,
+                                              animation2) =>
+                                          LiquidityConfirmation(
+                                              assetPair: widget.assetPair,
+                                              baseAmount: double.parse(
+                                                  _amountBaseController.text
+                                                      .replaceAll(
+                                                          ',', '.')),
+                                              quoteAmount: double.parse(
+                                                  _amountQuoteController
+                                                      .text
+                                                      .replaceAll(
+                                                          ',', '.')),
+                                              shareOfPool: shareOfPool,
+                                              amountUSD: amountUSD,
+                                              balanceUSD: balanceUSD,
+                                              balanceA: balanceA,
+                                              balanceB: balanceB,
+                                              amount: amount),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration:
+                                          Duration.zero,
                                     ),
                                   ),
-                                ),
-                                Center(
-                                  child: Text(
-                                    'Insufficient funds',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline4!
-                                        .copyWith(
-                                          color: isEnoughBalance
-                                              ? AppTheme.redErrorColor
-                                              : Colors.transparent,
-                                        ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            child: PrimaryButton(
-                              label: 'Continue',
-                              callback: isErrorBalance || isDisableSubmit()
-                                  ? () {
-                                      setState(() {
-                                        isEnoughBalance = true;
-                                      });
-                                    }
-                                  : () => Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              LiquidityConfirmation(
-                                                  assetPair: widget.assetPair,
-                                                  baseAmount: double.parse(
-                                                      _amountBaseController.text
-                                                          .replaceAll(
-                                                              ',', '.')),
-                                                  quoteAmount: double.parse(
-                                                      _amountQuoteController
-                                                          .text
-                                                          .replaceAll(
-                                                              ',', '.')),
-                                                  shareOfPool: shareOfPool,
-                                                  amountUSD: amountUSD,
-                                                  balanceUSD: balanceUSD,
-                                                  balanceA: balanceA,
-                                                  balanceB: balanceB,
-                                                  amount: amount),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
-                                        ),
-                                      ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 );
               } else {
@@ -593,8 +456,18 @@ class _SelectPoolState extends State<SelectPool> {
     });
   }
 
-  String getAvailableAmount(balance, assetCode) {
-    return '${getAmountByFee(balance, assetCode)} $assetCode available';
+  double getAvailableAmount(accountState, assetCode) {
+    int amount = 0;
+    accountState.activeAccount.balanceList!.forEach((balance) {
+      if (balance.token == assetCode && !balance.isHidden) {
+        amount = balance.balance!;
+      }
+    });
+    if (amount < 0) {
+      amount = 0;
+    }
+
+    return convertFromSatoshi(amount);
   }
 
   bool isDisableSubmit() {

@@ -28,13 +28,6 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
   MenuHelper menuHelper = MenuHelper();
 
   bool _isShowDropdown = false;
-  late String _currentAssetCode;
-
-  @override
-  void initState() {
-    _currentAssetCode = widget.assets[0].symbol!;
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
