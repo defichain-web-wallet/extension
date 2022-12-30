@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/dex_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
@@ -100,6 +101,10 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
   String amountFromInUsd = '0.0';
   String amountToInUsd = '0.0';
 
+  double rateQuote = 0;
+  double rateQuoteUsd = 0;
+  TestPoolSwapModel? dexRate;
+
   List<String> slippageList = ['Custom', '0.5', '1', '3'];
 
   @override
@@ -110,6 +115,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
   }
 
   stateInit(accountState, dexState, tokensState) {
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     assets = [];
     if (SettingsHelper.isBitcoin()) {
       assetFrom = TokensModel(symbol: 'DFI', name: 'DFI');
@@ -137,6 +143,24 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
       assetFrom = assetFrom;
 
       assetTo = assetTo ?? tokensForSwap[0];
+
+      DexHelper dexHelper = DexHelper();
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        dexRate = await dexHelper.calculateDex(
+          assetFrom.symbol!,
+          assetTo!.symbol!,
+          1,
+          0,
+          address,
+          accountState.activeAccount!.addressList!,
+          tokensState,
+        );
+        rateQuoteUsd = tokensHelper.getAmountByUsd(
+          tokensCubit.state.tokensPairs!,
+          dexRate!.priceFrom!,
+          assetTo!.symbol!,
+        );
+      });
     }
   }
 
@@ -231,6 +255,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
 
   Widget _buildBody(context, dexState, dexCubit, accountState, tokensState,
       transactionState, isFullScreen) {
+    print(dexState);
+
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     bool isShowStabilizationFee =
         assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ||
@@ -504,7 +530,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                             ),
                           ),
                           Text(
-                            '1 ${assetFrom.symbol} = 100.000512 DFI',
+                            getRateStringFormat(dexState),
                             style: Theme
                                 .of(context)
                                 .textTheme
@@ -514,7 +540,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                             ),
                           ),
                           Text(
-                            ' (\$252.45)',
+                            ' (\$${balancesHelper.numberStyling(rateQuoteUsd, fixedCount: 2, fixed: true)})',
                             style: Theme
                                 .of(context)
                                 .textTheme
@@ -673,6 +699,12 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
         );
       }
     }
+  }
+
+  getRateStringFormat(dexState) {
+    double priceFrom =
+        (dexState is DexInitialState) ? 0.00 : dexState.initModel.priceFrom;
+    return '1 ${assetFrom.symbol} = $priceFrom ${assetTo!.symbol}';
   }
 
   putAvailableBalance(String asset,
