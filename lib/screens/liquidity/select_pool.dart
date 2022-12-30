@@ -66,6 +66,10 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
   double toolbarHeightWithBottom = 105;
   double minShareOfPool = 0.00000001;
 
+  bool isShowDetails = true;
+  String rateBalanceFromUsd = '';
+  String rateBalanceToUsd = '';
+
   @override
   void initState() {
     super.initState();
@@ -133,271 +137,335 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
     });
   }
 
-  Widget _buildBody(context, {isFullSize = false}) =>
-      BlocBuilder<TokensCubit, TokensState>(
+  Widget _buildBody(context, {isFullSize = false}) {
+      double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
+      return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
           return BlocBuilder<AccountCubit, AccountState>(
               builder: (accountContext, accountState) {
-            if (tokensState.status == TokensStatusList.success) {
-              if (accountState.status == AccountStatusList.success) {
-                assetFrom = widget.assetPair.symbol!.split('-')[0];
-                assetTo = widget.assetPair.symbol!.split('-')[1];
-                accountState.activeAccount!.balanceList!.forEach((el) {
-                  if (el.token == widget.assetPair.symbol!) {
-                    balance = el.balance!;
-                  }
-                  if (el.token == assetFrom) {
-                    balanceFrom = el.balance!;
-                  }
-                  if (el.token == assetTo) {
-                    balanceTo = el.balance!;
-                  }
-                });
+                if (tokensState.status == TokensStatusList.success) {
+                  if (accountState.status == AccountStatusList.success) {
+                    assetFrom = widget.assetPair.symbol!.split('-')[0];
+                    assetTo = widget.assetPair.symbol!.split('-')[1];
+                    accountState.activeAccount!.balanceList!.forEach((el) {
+                      if (el.token == widget.assetPair.symbol!) {
+                        balance = el.balance!;
+                      }
+                      if (el.token == assetFrom) {
+                        balanceFrom = el.balance!;
+                      }
+                      if (el.token == assetTo) {
+                        balanceTo = el.balance!;
+                      }
+                    });
 
-                try {
-                  var baseBalance = List.from(accountState
-                      .activeAccount!.balanceList!
-                      .where((element) =>
-                          element.token == widget.assetPair.tokenA))[0];
-                  var quoteBalance = List.from(accountState
-                      .activeAccount!.balanceList!
-                      .where((element) =>
-                          element.token == widget.assetPair.tokenB))[0];
-                  isErrorBalance = balanceA > baseBalance.balance ||
-                      balanceB > quoteBalance.balance;
-                } catch (err) {
-                  isErrorBalance = true;
-                }
+                    try {
+                      var baseBalance = List.from(accountState
+                          .activeAccount!.balanceList!
+                          .where((element) =>
+                      element.token == widget.assetPair.tokenA))[0];
+                      var quoteBalance = List.from(accountState
+                          .activeAccount!.balanceList!
+                          .where((element) =>
+                      element.token == widget.assetPair.tokenB))[0];
+                      isErrorBalance = balanceA > baseBalance.balance ||
+                          balanceB > quoteBalance.balance;
+                    } catch (err) {
+                      isErrorBalance = true;
+                    }
 
-                return StretchBox(
-                  child: Column(
-                    // Set the amount
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Set the amount',
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .headline3,
-                            ),
-                            SizedBox(
-                              height: 16,
-                            ),
-                            AmountField(
-                              suffix: '0.00',
-                              available: getAvailableAmount(accountState, assetFrom),
-                              onAssetSelect: (asset) {
-
-                              },
-                              onChanged: (value) {
-                                onChanged(
-                                  _amountQuoteController,
-                                  value,
-                                  widget.assetPair.reserveBDivReserveA!,
-                                  tokensState,
-                                );
-                              },
-                              controller: _amountBaseController,
-                              selectedAsset: TokensModel(
-                                name: assetFrom,
-                                symbol: assetFrom,
-                              ),
-                              assets: [],
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            AmountField(
-                              suffix: '0.00',
-                              available: getAvailableAmount(accountState, assetTo),
-                              onAssetSelect: (asset) {
-
-                              },
-                              onChanged: (value) {
-                                onChanged(
-                                  _amountBaseController,
-                                  value,
-                                  widget.assetPair.reserveADivReserveB!,
-                                  tokensState,
-                                );
-                              },
-                              controller: _amountQuoteController,
-                              selectedAsset: TokensModel(
-                                name: assetTo,
-                                symbol: assetTo,
-                              ),
-                              assets: [],
-                            ),
-                            SizedBox(
-                              height: 24,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                    return StretchBox(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Show less',
-                                  style: Theme.of(context).textTheme.headline5!.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  'Set the amount',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .headline3,
                                 ),
                                 SizedBox(
-                                  width: 8,
+                                  height: 16,
                                 ),
-                                SizedBox(
-                                  width: 8,
-                                  height: 8,
-                                  child: SvgPicture.asset(
-                                    '/assets/icons/arrow_down.svg'
-                                  ),
-                                )
-                              ],
-                            )
+                                AmountField(
+                                  suffix: '0.00',
+                                  available: getAvailableAmount(accountState, assetFrom),
+                                  onAssetSelect: (asset) {
 
-                            // Container(
-                            //   child: Padding(
-                            //     padding: const EdgeInsets.only(
-                            //         top: 42.0, bottom: 42),
-                            //     child: Column(
-                            //       children: [
-                            //         Container(
-                            //           padding: const EdgeInsets.symmetric(
-                            //               vertical: 8),
-                            //           child: Row(
-                            //             mainAxisAlignment:
-                            //                 MainAxisAlignment.spaceBetween,
-                            //             crossAxisAlignment:
-                            //                 CrossAxisAlignment.start,
-                            //             children: [
-                            //               Text(
-                            //                 'Your input',
-                            //                 style: Theme.of(context)
-                            //                     .textTheme
-                            //                     .headline6,
-                            //               ),
-                            //               Column(
-                            //                 crossAxisAlignment:
-                            //                     CrossAxisAlignment.end,
-                            //                 children: [
-                            //                   Text(
-                            //                     '${_amountBaseController.text} ${TokensHelper().getTokenFormat(assetFrom)}',
-                            //                     style: Theme.of(context)
-                            //                         .textTheme
-                            //                         .headline5,
-                            //                   ),
-                            //                   SizedBox(height: 4),
-                            //                   Text(
-                            //                     '${_amountQuoteController.text} ${TokensHelper().getTokenFormat(assetTo)}',
-                            //                     style: Theme.of(context)
-                            //                         .textTheme
-                            //                         .headline5,
-                            //                   ),
-                            //                 ],
-                            //               ),
-                            //             ],
-                            //           ),
-                            //         ),
-                            //         Divider(),
-                            //         if (shareOfPool > minShareOfPool)
-                            //           Container(
-                            //             padding: const EdgeInsets.symmetric(
-                            //                 vertical: 8),
-                            //             child: Row(
-                            //               mainAxisAlignment:
-                            //                   MainAxisAlignment
-                            //                       .spaceBetween,
-                            //               crossAxisAlignment:
-                            //                   CrossAxisAlignment.start,
-                            //               children: [
-                            //                 Text(
-                            //                   'Share of pool',
-                            //                   style: Theme.of(context)
-                            //                       .textTheme
-                            //                       .headline6,
-                            //                 ),
-                            //                 Text(
-                            //                   '${shareOfPool.toStringAsFixed(8)}%',
-                            //                   style: Theme.of(context)
-                            //                       .textTheme
-                            //                       .headline5,
-                            //                 ),
-                            //               ],
-                            //             ),
-                            //           )
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
-                            // Center(
-                            //   child: Text(
-                            //     'Insufficient funds',
-                            //     style: Theme.of(context)
-                            //         .textTheme
-                            //         .headline4!
-                            //         .copyWith(
-                            //           color: isEnoughBalance
-                            //               ? AppTheme.redErrorColor
-                            //               : Colors.transparent,
-                            //         ),
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        child: PrimaryButton(
-                          label: 'Continue',
-                          callback: isErrorBalance || isDisableSubmit()
-                              ? () {
-                                  setState(() {
-                                    isEnoughBalance = true;
-                                  });
-                                }
-                              : () => Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation1,
-                                              animation2) =>
-                                          LiquidityConfirmation(
-                                              assetPair: widget.assetPair,
-                                              baseAmount: double.parse(
-                                                  _amountBaseController.text
-                                                      .replaceAll(
-                                                          ',', '.')),
-                                              quoteAmount: double.parse(
-                                                  _amountQuoteController
-                                                      .text
-                                                      .replaceAll(
-                                                          ',', '.')),
-                                              shareOfPool: shareOfPool,
-                                              amountUSD: amountUSD,
-                                              balanceUSD: balanceUSD,
-                                              balanceA: balanceA,
-                                              balanceB: balanceB,
-                                              amount: amount),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration:
-                                          Duration.zero,
-                                    ),
+                                  },
+                                  onChanged: (value) {
+                                    onChanged(
+                                      _amountQuoteController,
+                                      value,
+                                      widget.assetPair.reserveBDivReserveA!,
+                                      tokensState,
+                                    );
+                                  },
+                                  controller: _amountBaseController,
+                                  selectedAsset: TokensModel(
+                                    name: assetFrom,
+                                    symbol: assetFrom,
                                   ),
-                        ),
+                                  assets: [],
+                                ),
+                                SizedBox(
+                                  height: 8,
+                                ),
+                                AmountField(
+                                  suffix: '0.00',
+                                  available: getAvailableAmount(accountState, assetTo),
+                                  onAssetSelect: (asset) {
+
+                                  },
+                                  onChanged: (value) {
+                                    onChanged(
+                                      _amountBaseController,
+                                      value,
+                                      widget.assetPair.reserveADivReserveB!,
+                                      tokensState,
+                                    );
+                                  },
+                                  controller: _amountQuoteController,
+                                  selectedAsset: TokensModel(
+                                    name: assetTo,
+                                    symbol: assetTo,
+                                  ),
+                                  assets: [],
+                                ),
+                                SizedBox(
+                                  height: 24,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      isShowDetails = !isShowDetails;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Show less',
+                                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      RotationTransition(
+                                        turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
+                                        child: SizedBox(
+                                          width: 8,
+                                          height: 8,
+                                          child: SvgPicture.asset(
+                                            'assets/icons/arrow_down.svg',
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                if (isShowDetails)
+                                  ...[
+                                    SizedBox(
+                                      height: 24,
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 8),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Rate',
+                                            style: Theme
+                                                .of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .copyWith(
+                                              fontSize: 12,
+                                              color: Theme
+                                                  .of(context)
+                                                  .textTheme
+                                                  .headline5!
+                                                  .color!
+                                                  .withOpacity(0.3),
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              RichText(
+                                                text: TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: '1 $assetFrom = ${widget.assetPair.reserveBDivReserveA!.toStringAsFixed(4)} $assetTo',
+                                                        style: Theme
+                                                            .of(context)
+                                                            .textTheme
+                                                            .headline5!
+                                                            .copyWith(
+                                                          fontSize: 12,
+                                                        ),
+                                                    ),
+                                                    TextSpan(
+                                                        text: ' (\$$rateBalanceFromUsd)',
+                                                        style: Theme
+                                                            .of(context)
+                                                            .textTheme
+                                                            .headline5!
+                                                            .copyWith(
+                                                          fontSize: 12,
+                                                          color: Theme
+                                                              .of(context)
+                                                              .textTheme
+                                                              .headline5!
+                                                              .color!
+                                                              .withOpacity(0.3),
+                                                        )
+                                                    ),
+                                                  ]
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 6,
+                                              ),
+                                              RichText(
+                                                text: TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text: '1 $assetTo = ${widget.assetPair.reserveADivReserveB!.toStringAsFixed(4)} $assetFrom',
+                                                        style: Theme
+                                                            .of(context)
+                                                            .textTheme
+                                                            .headline5!
+                                                            .copyWith(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                          text: ' (\$$rateBalanceToUsd)',
+                                                          style: Theme
+                                                              .of(context)
+                                                              .textTheme
+                                                              .headline5!
+                                                              .copyWith(
+                                                            fontSize: 12,
+                                                            color: Theme
+                                                                .of(context)
+                                                                .textTheme
+                                                                .headline5!
+                                                                .color!
+                                                                .withOpacity(0.3),
+                                                          )
+                                                      ),
+                                                    ]
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Divider(
+                                      color: AppColors.lavenderPurple.withOpacity(0.16),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 8),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Share of pool',
+                                            style: Theme
+                                                .of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .copyWith(
+                                              fontSize: 12,
+                                              color: Theme
+                                                  .of(context)
+                                                  .textTheme
+                                                  .headline5!
+                                                  .color!
+                                                  .withOpacity(0.3),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${shareOfPool.toStringAsFixed(8)}%',
+                                            style: Theme
+                                                .of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .copyWith(
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ]
+                              ],
+                            ),
+                          ),
+                          Container(
+                            child: PrimaryButton(
+                              label: 'Continue',
+                              callback: isErrorBalance || isDisableSubmit()
+                                  ? () {
+                                setState(() {
+                                  isEnoughBalance = true;
+                                });
+                              }
+                                  : () => Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation1,
+                                      animation2) =>
+                                      LiquidityConfirmation(
+                                          assetPair: widget.assetPair,
+                                          baseAmount: double.parse(
+                                              _amountBaseController.text
+                                                  .replaceAll(
+                                                  ',', '.')),
+                                          quoteAmount: double.parse(
+                                              _amountQuoteController
+                                                  .text
+                                                  .replaceAll(
+                                                  ',', '.')),
+                                          shareOfPool: shareOfPool,
+                                          amountUSD: amountUSD,
+                                          balanceUSD: balanceUSD,
+                                          balanceA: balanceA,
+                                          balanceB: balanceB,
+                                          amount: amount),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration:
+                                  Duration.zero,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              } else {
-                return Container();
-              }
-            } else {
-              return Container();
-            }
-          });
+                    );
+                  } else {
+                    return Container();
+                  }
+                } else {
+                  return Container();
+                }
+              });
         },
       );
+  }
+
 
   void _setBalanceAndAmountUSD(tokensState) {
     var totalBalanceInUsd = tokensHelper.getAmountByUsd(
@@ -411,6 +479,17 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
           widget.assetPair.tokenB!,
         );
 
+    var rateFrom = tokensHelper.getAmountByUsd(
+      tokensState.tokensPairs,
+      1,
+      widget.assetPair.tokenA!,
+    );
+    var rateTo = tokensHelper.getAmountByUsd(
+      tokensState.tokensPairs,
+      1,
+      widget.assetPair.tokenB!,
+    );
+
     var totalAmountInUsd = tokensHelper.getAmountByUsd(
           tokensState.tokensPairs,
           double.parse(_amountBaseController.text.replaceAll(',', '.')),
@@ -423,6 +502,8 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
         );
 
     setState(() {
+      rateBalanceFromUsd = rateFrom.toStringAsFixed(4);
+      rateBalanceToUsd = rateTo.toStringAsFixed(4);
       balanceUSD = totalBalanceInUsd;
       amountUSD = totalAmountInUsd;
     });
