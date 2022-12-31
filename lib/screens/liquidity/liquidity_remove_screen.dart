@@ -191,24 +191,13 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
                           height: 15,
                         ),
                         Container(
-                          padding: const EdgeInsets.only(
-                              top: 12, right: 16, bottom: 42, left: 16),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).backgroundColor,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10),
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Theme.of(context).shadowColor,
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset:
-                                    Offset(0, 3), // changes position of shadow
-                              ),
-                            ],
+                            borderRadius: BorderRadius.circular(12.8),
+                            border: Border.all(
+                              color: AppColors.lavenderPurple.withOpacity(0.35),
+                            ),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -220,12 +209,36 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
                                   children: [
                                     Text(
                                       'Amount',
-                                      style: TextStyle(
-                                          color: Color(0xffAFAFAF),
-                                          fontWeight: FontWeight.bold),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .copyWith(
+                                            fontSize: 12,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .color!
+                                                .withOpacity(0.3),
+                                          ),
                                     ),
-                                    AssetPair(
-                                      pair: widget.assetPair.symbol!,
+                                    Row(
+                                      children: [
+                                        AssetPair(
+                                          pair: widget.assetPair.symbol!,
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          widget.assetPair.symbol!,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline4!
+                                              .copyWith(
+                                                fontSize: 16,
+                                              ),
+                                        ),
+                                      ],
                                     )
                                   ],
                                 ),
@@ -235,8 +248,12 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     '${getCurrentSliderValue()}%',
-                                    style:
-                                        Theme.of(context).textTheme.headline1,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline3!
+                                        .copyWith(
+                                          fontSize: 24,
+                                        ),
                                   ),
                                 ),
                               ),
@@ -507,31 +524,45 @@ class SliderButton extends StatelessWidget {
   final onPressed;
   final isFullSize;
 
-  const SliderButton(
-      {Key? key,
-      required this.value,
-      required this.onPressed,
-      required this.isFullSize})
-      : super(key: key);
+  const SliderButton({
+    Key? key,
+    required this.value,
+    required this.onPressed,
+    required this.isFullSize,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
-      child: Text('${value.round().toString()}%',
-          style: Theme.of(context)
-              .textTheme
-              .headline3!
-              .apply(color: AppTheme.pinkColor, fontWeightDelta: 2)),
+      child: Text(
+        '${value.round().toString()}%',
+        style: Theme.of(context).textTheme.headline5!.copyWith(
+              fontSize: 12,
+            ),
+      ),
       style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(0),
-          shadowColor: Colors.transparent,
-          primary: isFullSize ? Colors.transparent : Color(0xfff1f1f1),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          side: BorderSide(
-            color: Colors.transparent,
-          )),
+        onPrimary: Colors.transparent,
+        primary: Colors.transparent,
+        onSurface: Colors.transparent,
+        elevation: 0,
+        fixedSize: Size(74, 28),
+        padding: const EdgeInsets.all(0),
+        shadowColor: Colors.transparent,
+        foregroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        disabledForegroundColor: Colors.transparent,
+        disabledBackgroundColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(8.0),
+          ),
+        ),
+        side: BorderSide(
+          color: AppColors.lavenderPurple.withOpacity(0.35),
+        ),
+      ),
     );
   }
 }
