@@ -124,22 +124,23 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                                       fontSize: 12,
                                     ),
                               ),
-                              TextSpan(
-                                text: getFormatAmountText(
-                                  widget.amountA.toStringAsFixed(6),
+                              if (!widget.isRemove)
+                                TextSpan(
+                                  text: getFormatAmountText(
+                                    widget.amountA.toStringAsFixed(6),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                        fontSize: 12,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!
+                                            .withOpacity(0.3),
+                                      ),
                                 ),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .copyWith(
-                                      fontSize: 12,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
-                              ),
                             ]),
                           ),
                         ],
@@ -176,22 +177,23 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                                       fontSize: 12,
                                     ),
                               ),
-                              TextSpan(
-                                text: getFormatAmountText(
-                                  widget.amountB.toStringAsFixed(6),
+                              if (!widget.isRemove)
+                                TextSpan(
+                                  text: getFormatAmountText(
+                                    widget.amountB.toStringAsFixed(6),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                        fontSize: 12,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!
+                                            .withOpacity(0.3),
+                                      ),
                                 ),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .copyWith(
-                                      fontSize: 12,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
-                              ),
                             ]),
                           ),
                         ],
@@ -232,23 +234,24 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                                       fontSize: 12,
                                     ),
                               ),
-                              TextSpan(
-                                text: getFormatAmountText(
-                                  getPooledByFiatFormat(targetAmountUsd, fiat,
-                                      tokensState.eurRate),
+                              if (!widget.isRemove)
+                                TextSpan(
+                                  text: getFormatAmountText(
+                                    getPooledByFiatFormat(targetAmountUsd, fiat,
+                                        tokensState.eurRate),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                        fontSize: 12,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!
+                                            .withOpacity(0.3),
+                                      ),
                                 ),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .copyWith(
-                                      fontSize: 12,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
-                              ),
                             ]),
                           ),
                         ],

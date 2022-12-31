@@ -7,6 +7,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/screens/liquidity/choose_pool_pair_screen.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_pool_list.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -233,7 +234,7 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                         Navigator.push(
                                           context,
                                           PageRouteBuilder(
-                                            pageBuilder: (context, animation1, animation2) => LiquidityPoolList(),
+                                            pageBuilder: (context, animation1, animation2) => ChoosePoolPairScreen(),
                                             transitionDuration: Duration.zero,
                                             reverseTransitionDuration: Duration.zero,
                                           ),

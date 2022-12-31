@@ -26,6 +26,7 @@ import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defi_wallet/widgets/tx_status_dialog.dart';
@@ -147,7 +148,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                         ),
                         Container(
                           width: double.infinity,
-                          height: 148,
+                          height: widget.removeLT == 0 ? 148 : 88,
                           padding: EdgeInsets.symmetric(
                               horizontal: 16, vertical: 18),
                           decoration: BoxDecoration(
@@ -161,124 +162,242 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                           ),
                           child: Row(
                             children: [
-                              Flexible(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'You will receive',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline6!
-                                          .copyWith(
-                                            fontWeight: FontWeight.w400,
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .headline6!
-                                                .color!
-                                                .withOpacity(0.5),
-                                          ),
-                                    ),
-                                    SizedBox(
-                                      height: 8,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: SvgPicture.asset(
-                                            TokensHelper()
-                                                .getImageNameByTokenName(
-                                                    widget.assetPair.tokenA),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        Text(
-                                          widget.baseAmount.toString(),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline3!
-                                              .copyWith(
-                                                fontSize: 20,
+                              if (widget.removeLT != 0) ...[
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'You will receive',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
+                                              fontWeight: FontWeight.w400,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6!
+                                                  .color!
+                                                  .withOpacity(0.5),
+                                            ),
+                                      ),
+                                      SizedBox(
+                                        height: 8,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                            child: Container(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                    width: 24,
+                                                    height: 24,
+                                                    child: SvgPicture.asset(
+                                                      TokensHelper()
+                                                          .getImageNameByTokenName(
+                                                              widget.assetPair
+                                                                  .tokenA),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 6,
+                                                  ),
+                                                  Text(
+                                                    balancesHelper
+                                                        .numberStyling(
+                                                            widget.baseAmount,
+                                                            fixed: true),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline3!
+                                                        .copyWith(
+                                                          fontSize: 20,
+                                                        ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 6,
+                                                  ),
+                                                ],
                                               ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: SvgPicture.asset(
-                                            TokensHelper()
-                                                .getImageNameByTokenName(
-                                                    widget.assetPair.tokenB),
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        Text(
-                                          widget.quoteAmount.toString(),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline3!
-                                              .copyWith(
-                                                fontSize: 20,
+                                          SizedBox(
+                                            height: 16,
+                                          ),
+                                          Flexible(
+                                            child: Container(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                    width: 24,
+                                                    height: 24,
+                                                    child: SvgPicture.asset(
+                                                      TokensHelper()
+                                                          .getImageNameByTokenName(
+                                                              widget.assetPair
+                                                                  .tokenB),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 6,
+                                                  ),
+                                                  Text(
+                                                    balancesHelper
+                                                        .numberStyling(
+                                                            widget.quoteAmount,
+                                                            fixed: true),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline3!
+                                                        .copyWith(
+                                                          fontSize: 20,
+                                                        ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 6,
+                                                  ),
+                                                ],
                                               ),
-                                        )
-                                      ],
-                                    )
-                                  ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 16,
-                              ),
-                              Flexible(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Yield',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline6!
-                                          .copyWith(
-                                            fontWeight: FontWeight.w400,
-                                            color: Theme.of(context)
+                              ],
+                              if (widget.removeLT == 0) ...[
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'You will receive',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
+                                              fontWeight: FontWeight.w400,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6!
+                                                  .color!
+                                                  .withOpacity(0.5),
+                                            ),
+                                      ),
+                                      SizedBox(
+                                        height: 8,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: SvgPicture.asset(
+                                              TokensHelper()
+                                                  .getImageNameByTokenName(
+                                                      widget.assetPair.tokenA),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 6,
+                                          ),
+                                          Text(
+                                            balancesHelper.numberStyling(
+                                                widget.baseAmount,
+                                                fixed: true),
+                                            style: Theme.of(context)
                                                 .textTheme
-                                                .headline6!
-                                                .color!
-                                                .withOpacity(0.5),
+                                                .headline3!
+                                                .copyWith(
+                                                  fontSize: 20,
+                                                ),
+                                          )
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: SvgPicture.asset(
+                                              TokensHelper()
+                                                  .getImageNameByTokenName(
+                                                      widget.assetPair.tokenB),
+                                            ),
                                           ),
-                                    ),
-                                    SizedBox(
-                                      height: 8,
-                                    ),
-                                    Text(
-                                      TokensHelper()
-                                          .getAprFormat(widget.assetPair.apr!),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline3!
-                                          .copyWith(
-                                            fontSize: 20,
+                                          SizedBox(
+                                            width: 6,
                                           ),
-                                    )
-                                  ],
+                                          Text(
+                                            balancesHelper.numberStyling(
+                                                widget.quoteAmount,
+                                                fixed: true),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline3!
+                                                .copyWith(
+                                                  fontSize: 20,
+                                                ),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
+                                SizedBox(
+                                  width: 16,
+                                ),
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Yield',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
+                                              fontWeight: FontWeight.w400,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6!
+                                                  .color!
+                                                  .withOpacity(0.5),
+                                            ),
+                                      ),
+                                      SizedBox(
+                                        height: 8,
+                                      ),
+                                      Text(
+                                        TokensHelper().getAprFormat(
+                                            widget.assetPair.apr!),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline3!
+                                            .copyWith(
+                                              fontSize: 20,
+                                            ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ]
                             ],
                           ),
                         ),
@@ -389,7 +508,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                         SizedBox(
                           width: 104,
                           child: PendingButton(
-                            'Add',
+                            widget.removeLT == 0 ? 'Add' : 'Remove',
                             pendingText: 'Pending',
                             callback: (parent) {
                               showDialog(
@@ -473,12 +592,11 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
-                  pageBuilder:
-                      (context, animation1, animation2) =>
-                      HomeScreen(isLoadTokens: true,),
+                  pageBuilder: (context, animation1, animation2) => HomeScreen(
+                    isLoadTokens: true,
+                  ),
                   transitionDuration: Duration.zero,
-                  reverseTransitionDuration:
-                  Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
                 ),
               );
             },

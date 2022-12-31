@@ -41,7 +41,7 @@ class PoolGridList extends StatelessWidget {
                 },
                 child: PoolAssetPair(
                   assetPair: tokensPairs![index],
-                  isFullSize: isFullSize!,
+                  isGrid: isFullSize!,
                 ),
               );
             },
