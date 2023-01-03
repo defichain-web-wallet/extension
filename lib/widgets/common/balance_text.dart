@@ -28,9 +28,9 @@ class _BalanceTextState extends State<BalanceText> {
 
   String getFormatBalance() {
     if (widget.assetName == 'USD') {
-      return '\$' + roundedPart + '.';
+      return '\$' + roundedPart.split('.')[0] + '.';
     } else if (widget.assetName == 'EUR') {
-      return '€' + roundedPart + '.';
+      return '€' + roundedPart.split('.')[0] + '.';
     } else {
       return balancesHelper.numberStyling(
             totalBalance,

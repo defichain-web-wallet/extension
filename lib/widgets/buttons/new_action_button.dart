@@ -7,9 +7,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 class NewActionButton extends StatefulWidget {
   final String iconPath;
   final Function()? onPressed;
+  final bool isStaticColor;
+  final LinearGradient? bgGradient;
 
-  const NewActionButton({Key? key, required this.iconPath, this.onPressed})
-      : super(key: key);
+  const NewActionButton({
+    Key? key,
+    required this.iconPath,
+    this.onPressed,
+    this.isStaticColor = false,
+    this.bgGradient,
+  }) : super(key: key);
 
   @override
   State<NewActionButton> createState() => _NewActionButtonState();
@@ -20,9 +27,15 @@ class _NewActionButtonState extends State<NewActionButton>  with ThemeMixin {
   Widget build(BuildContext context) {
     LockHelper lockHelper = LockHelper();
 
-    return CircleAvatar(
-      radius: 16,
-      backgroundColor: AppTheme.iconButtonBackground,
+    return Container(
+      width: 32,
+      height: 32,
+      // backgroundColor: AppTheme.iconButtonBackground,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: widget.bgGradient != null ? null : AppTheme.iconButtonBackground,
+        gradient: widget.bgGradient,
+      ),
       child: IconButton(
         splashRadius: 1,
         iconSize: 16,
@@ -30,7 +43,11 @@ class _NewActionButtonState extends State<NewActionButton>  with ThemeMixin {
           widget.iconPath,
           width: 16,
           height: 16,
-          color: isDarkTheme() ? Colors.white : null,
+          color: widget.isStaticColor
+              ? null
+              : isDarkTheme()
+                  ? Colors.white
+                  : null,
         ),
         onPressed: () =>
             lockHelper.provideWithLockChecker(context, () => widget.onPressed!()),

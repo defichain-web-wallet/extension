@@ -146,22 +146,20 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
 
       DexHelper dexHelper = DexHelper();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        setState(() async {
-          dexRate = await dexHelper.calculateDex(
-            assetFrom.symbol!,
-            assetTo!.symbol!,
-            1,
-            0,
-            address,
-            accountState.activeAccount!.addressList!,
-            tokensState,
-          );
-          rateQuoteUsd = tokensHelper.getAmountByUsd(
-            tokensCubit.state.tokensPairs!,
-            dexRate!.priceFrom!,
-            assetTo!.symbol!,
-          );
-        });
+        dexRate = await dexHelper.calculateDex(
+          assetFrom.symbol!,
+          assetTo!.symbol!,
+          1,
+          0,
+          address,
+          accountState.activeAccount!.addressList!,
+          tokensState,
+        );
+        rateQuoteUsd = tokensHelper.getAmountByUsd(
+          tokensCubit.state.tokensPairs!,
+          dexRate!.priceFrom!,
+          assetTo!.symbol!,
+        );
       });
     }
   }

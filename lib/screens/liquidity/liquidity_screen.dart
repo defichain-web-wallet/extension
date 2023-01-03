@@ -163,7 +163,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                                 var tokenPairs = List.from(foundedAssetPair)[0];
 
                                 return MainLiquidityPair(
-                                  isBorder: isFullSize,
+                                  isOpen: isFullSize,
                                   balance: tokensPairsList[index].balance,
                                   assetPair: tokenPairs,
                                 );

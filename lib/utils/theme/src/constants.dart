@@ -101,12 +101,12 @@ const gradientWrongMnemonicWord = LinearGradient(
   transform: GradientRotation(4.7),
 );
 
-// const gradientGray = LinearGradient(
-//   colors: [
-//     AppColors.electricViolet,
-//     AppColors.hollywoodCerise,
-//   ],
-// );
+LinearGradient gradientActionButtonBg = LinearGradient(
+  colors: [
+    AppColors.electricViolet.withOpacity(0.15),
+    AppColors.hollywoodCerise.withOpacity(0.15),
+  ],
+);
 
 LinearGradient gradientDisableButton = LinearGradient(
   begin: Alignment.centerLeft,

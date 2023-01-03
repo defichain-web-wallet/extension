@@ -490,6 +490,6 @@ class TokensHelper {
     } else {
       result = 'N/A';
     }
-    return '$result APR';
+    return '$result';
   }
 }

@@ -266,7 +266,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                             width: 104,
                             child: PendingButton(
                               'Change',
-                              pendingText: 'Processed...',
+                              pendingText: 'Pending',
                               isCheckLock: false,
                               callback: (parent) {
                                 if (widget.btcTx != '') {

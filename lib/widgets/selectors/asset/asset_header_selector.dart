@@ -64,7 +64,6 @@ class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
             ),
           ),
           RotationTransition(
-            // turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
             turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
             child: SizedBox(
               width: 10,
