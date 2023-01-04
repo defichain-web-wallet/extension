@@ -12,6 +12,7 @@ import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/sliders/polygon_slider_thumb.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -259,15 +260,11 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
                               ),
                               Container(
                                 child: SliderTheme(
-                                  data: SliderThemeData(
-                                      thumbShape: RoundSliderThumbShape(
-                                          enabledThumbRadius: 6),
-                                      inactiveTrackColor: AppTheme.pinkColor,
-                                      trackHeight: 1,
-                                      trackShape: RectangularSliderTrackShape(),
-                                      thumbColor: isFullScreen
-                                          ? AppTheme.pinkColor
-                                          : Colors.black),
+                                  data: SliderTheme.of(context).copyWith(
+                                    thumbShape: PolygonSliderThumb(
+                                      thumbRadius: 16.0,
+                                    ),
+                                  ),
                                   child: Slider(
                                     value: currentSliderValue,
                                     max: 100,
