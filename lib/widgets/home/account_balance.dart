@@ -36,9 +36,24 @@ class _AccountBalanceState extends State<AccountBalance> {
                       tokensState.status == TokensStatusList.success) {
                     late double totalBalance;
                     late double unconfirmedBalance;
-                    late double totalBalanceInFiat;
+                    late double totalBtcBalance;
                     if (SettingsHelper.isBitcoin()) {
-                      totalBalance = convertFromSatoshi(bitcoinState.totalBalance);
+                      if (widget.asset == 'USD') {
+                        totalBalance = tokensHelper.getAmountByUsd(
+                          tokensState.tokensPairs!,
+                          convertFromSatoshi(bitcoinState.totalBalance),
+                          'BTC',
+                        );
+                      } else if (widget.asset == 'EUR') {
+                        var a = tokensHelper.getAmountByUsd(
+                          tokensState.tokensPairs!,
+                          convertFromSatoshi(bitcoinState.totalBalance),
+                          'BTC',
+                        );
+                        totalBalance = a * tokensState.eurRate!;
+                      } else {
+                        totalBalance = convertFromSatoshi(bitcoinState.totalBalance);
+                      }
                       unconfirmedBalance = convertFromSatoshi(bitcoinState.unconfirmedBalance);
                     } else {
                       totalBalance = state.activeAccount!.balanceList!

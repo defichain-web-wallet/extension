@@ -70,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       countAssets = 1;
       tempHistoryList = bitcoinCubit.state.history ?? [];
       countTransactions = tempHistoryList.length.toDouble();
+      bitcoinCubit.loadDetails(accountState.activeAccount!.bitcoinAddress!);
     } else {
       countAssets = accountState.activeAccount!.balanceList!
           .where((el) => !el.isHidden!)
