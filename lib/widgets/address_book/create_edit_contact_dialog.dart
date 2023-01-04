@@ -98,6 +98,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                 width: 104,
                 callback: isEnable
                     ? () {
+                        Navigator.pop(context);
                         widget.confirmCallback!(
                           _nameController.text,
                           _addressController.text,

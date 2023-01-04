@@ -282,7 +282,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                           barrierColor: Color(0x0f180245),
                                           barrierDismissible: false,
                                           context: context,
-                                          builder: (BuildContext context2) {
+                                          builder: (BuildContext dialogContext) {
                                             return CreateEditContactDialog(
                                               address: addressController.text,
                                               isEdit: false,
@@ -294,7 +294,6 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                                       network:
                                                           'DefiChain Mainnet'),
                                                 );
-                                                Navigator.pop(context2);
                                                 Navigator.push(
                                                   context,
                                                   PageRouteBuilder(
