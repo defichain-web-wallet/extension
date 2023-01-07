@@ -4,6 +4,8 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
+import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
+import 'package:defi_wallet/screens/ledger/loaders/ledger_send_loader_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/utils/theme/theme_manager.dart';
 import 'package:defi_wallet/widgets/account_drawer/selected_account.dart';
@@ -133,7 +135,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                 Center(
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.center,
+                                        CrossAxisAlignment.center,
                                     children: [
                                       SelectedAccount(
                                         accountName: state.activeAccount!.name!,
@@ -164,8 +166,8 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                       Expanded(
                                         child: ScrollConfiguration(
                                           behavior:
-                                          ScrollConfiguration.of(context)
-                                              .copyWith(scrollbars: false),
+                                              ScrollConfiguration.of(context)
+                                                  .copyWith(scrollbars: false),
                                           child: ListView.builder(
                                             itemCount: accounts.length + 1,
                                             itemBuilder: (context, index) {
@@ -208,11 +210,11 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                         );
                                                       },
                                                       isHoverBackgroundEffect:
-                                                      false,
+                                                          false,
                                                       iconPath:
-                                                      'assets/icons/add.svg',
+                                                          'assets/icons/add.svg',
                                                       title:
-                                                      'Create new account',
+                                                          'Create new account',
                                                     ),
                                                   ],
                                                 );
@@ -231,10 +233,10 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                     AccountMenuButton(
                                                       accountSelectMode: true,
                                                       callback: accounts[index]
-                                                          .index ==
-                                                          state
-                                                              .activeAccount!
-                                                              .index
+                                                                  .index ==
+                                                              state
+                                                                  .activeAccount!
+                                                                  .index
                                                           ? null
                                                           : () async {
                                                               accountCubit
@@ -244,11 +246,11 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                                           .index!);
                                                             },
                                                       isHoverBackgroundEffect:
-                                                      false,
+                                                          false,
                                                       iconPath:
-                                                      'assets/icons/add.svg',
+                                                          'assets/icons/add.svg',
                                                       title:
-                                                      accounts[index].name!,
+                                                          accounts[index].name!,
                                                     ),
                                                   ],
                                                 );
@@ -274,7 +276,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                 PageRouteBuilder(
                                   pageBuilder:
                                       (context, animation1, animation2) =>
-                                      AddressBookScreenNew(),
+                                          AddressBookScreenNew(),
                                   transitionDuration: Duration.zero,
                                   reverseTransitionDuration: Duration.zero,
                                 ),
@@ -295,7 +297,32 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             height: 5,
                           ),
                           AccountMenuButton(
-                            callback: () {},
+                            callback: () {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          LedgerSendLoaderScreen(
+                                    callback: () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1,
+                                                  animation2) =>
+                                              LedgerCheckScreen(),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                              Duration.zero,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
+                              );
+                            },
                             iconPath: 'assets/icons/ledger.svg',
                             title: 'Ledger',
                           ),

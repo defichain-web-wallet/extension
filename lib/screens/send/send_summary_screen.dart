@@ -13,6 +13,7 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/my_app.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/send/send_status_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
@@ -41,6 +42,7 @@ class SendSummaryScreen extends StatefulWidget {
   final double amount;
   final bool isAfterAddContact;
   final int? fee;
+  final bool isLedger;
 
   const SendSummaryScreen({
     Key? key,
@@ -50,6 +52,7 @@ class SendSummaryScreen extends StatefulWidget {
     this.contact,
     this.address,
     this.isAfterAddContact = false,
+    this.isLedger = false,
     this.fee = 0,
   }) : super(key: key);
 
@@ -63,6 +66,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
   String secondStepLoaderText =
       'One second, Jelly is preparing your transaction!';
   String titleText = 'Summary';
+  String subtitleText =
+      'Please confirm the process on your device to complete it.';
   bool isShowAdded = false;
   late String address;
 
@@ -148,6 +153,83 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                       )
                                     ],
                                   ),
+                                  if (widget.isLedger)
+                                    SizedBox(
+                                      height: 8,
+                                    ),
+                                  if (widget.isLedger)
+                                    Text(
+                                      subtitleText,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .apply(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .color!
+                                                .withOpacity(0.6),
+                                          ),
+                                      softWrap: true,
+                                      textAlign: TextAlign.start,
+                                    ),
+                                  if (widget.isLedger)
+                                    SizedBox(
+                                      height: 16,
+                                    ),
+                                  if (widget.isLedger)
+                                    Container(
+                                      width: 296,
+                                      height: 118,
+                                      child: Stack(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 4,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/images/ledger_light.png',
+                                              width: 296,
+                                              height: 114,
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 53,
+                                              ),
+                                              Container(
+                                                width: 45,
+                                                height: 45,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                      color:
+                                                          AppColors.pinkColor),
+                                                  color: AppColors.pinkColor
+                                                      .withOpacity(0.1),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 39,
+                                              ),
+                                              Container(
+                                                width: 45,
+                                                height: 45,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                      color:
+                                                          AppColors.pinkColor),
+                                                  color: AppColors.pinkColor
+                                                      .withOpacity(0.1),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   SizedBox(
                                     height: 16,
                                   ),
@@ -188,7 +270,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                             SvgPicture.asset(
                                               TokensHelper()
                                                   .getImageNameByTokenName(
-                                                      widget.token.symbol),  height: 20,
+                                                      widget.token.symbol),
+                                              height: 20,
                                             ),
                                             SizedBox(
                                               width: 6.4,
@@ -490,12 +573,11 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder:
-                    (context, animation1, animation2) =>
-                    HomeScreen(isLoadTokens: true,),
+                pageBuilder: (context, animation1, animation2) => HomeScreen(
+                  isLoadTokens: true,
+                ),
                 transitionDuration: Duration.zero,
-                reverseTransitionDuration:
-                Duration.zero,
+                reverseTransitionDuration: Duration.zero,
               ),
             );
           },
