@@ -8,6 +8,7 @@ import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
+import 'package:defi_wallet/widgets/selectors/fees_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -55,51 +56,55 @@ class _UiKitState extends State<UiKit> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // AmountField(
-              //   onAssetSelect: (TokensModel asset) {
-              //     print(asset.symbol);
-              //     setState(() {
-              //       currentAsset = asset;
-              //     });
-              //   },
-              //   selectedAsset: TokensModel(
-              //     name: 'Defi',
-              //     symbol: 'DFI',
-              //   ),
-              //   controller: TextEditingController(
-              //     text: '200.50'
-              //   ),
-              //   assets: [
-              //     TokensModel(
-              //       symbol: 'DFI',
-              //       name: 'Defi',
-              //     ),
-              //     TokensModel(
-              //       symbol: 'BTC',
-              //       name: 'Bitcoin',
-              //     ),
-              //     TokensModel(
-              //       symbol: 'ETH',
-              //       name: 'Ethereum',
-              //     ),
-              //     TokensModel(
-              //       symbol: 'BCH',
-              //       name: 'Bitcoin Cash',
-              //     ),
-              //     TokensModel(
-              //       symbol: 'BCH',
-              //       name: 'Bitcoin Cash',
-              //     ),
-              //     TokensModel(
-              //       symbol: 'DASHqwe',
-              //       name: 'Dash',
-              //     ),
-              //     TokensModel(
-              //       symbol: 'XRP',
-              //       name: 'Ripple',
-              //     ),
-              //   ],
-              // ),
+              AmountField(
+                onChanged: (value) {
+                  //
+                },
+                onAssetSelect: (TokensModel asset) {
+                  print(asset.symbol);
+                  setState(() {
+                    currentAsset = asset;
+                  });
+                },
+                selectedAsset: TokensModel(
+                  name: 'Defi',
+                  symbol: 'DFI',
+                ),
+                controller: TextEditingController(
+                  text: '200.50'
+                ),
+                assets: [
+                  TokensModel(
+                    symbol: 'DFI',
+                    name: 'Defi',
+                  ),
+                  TokensModel(
+                    symbol: 'BTC',
+                    name: 'Bitcoin',
+                  ),
+                  TokensModel(
+                    symbol: 'ETH',
+                    name: 'Ethereum',
+                  ),
+                  TokensModel(
+                    symbol: 'BCH',
+                    name: 'Bitcoin Cash',
+                  ),
+                  TokensModel(
+                    symbol: 'DASH',
+                    name: 'Dash',
+                  ),
+                  TokensModel(
+                    symbol: 'XRP',
+                    name: 'Ripple',
+                  ),
+                ],
+              ),
+              FeesSelector(
+                onSelect: () {
+                  //
+                }
+              ),
               Container(
                 child: AppSelector(
                   items: [],

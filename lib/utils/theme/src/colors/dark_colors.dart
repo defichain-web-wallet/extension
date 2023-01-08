@@ -25,4 +25,7 @@ abstract class DarkColors {
   static const assetSelectedItemSelectorBgColor = AppColors.portageBg;
 
   static const slippageBorderColor = AppColors.lavenderPurple;
+
+  static const feesDropdownBgColor = AppColors.mirage;
+  static Color feesDropdownActiveBgColor = AppColors.portageBg.withOpacity(0.07);
 }
