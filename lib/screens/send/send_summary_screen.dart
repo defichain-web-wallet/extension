@@ -21,6 +21,7 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
@@ -315,26 +316,32 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                           label: 'Cancel',
                                         ),
                                       ),
-                                      NewPrimaryButton(
+                                      SizedBox(
                                         width: 104,
-                                        callback: () {
-                                          showDialog(
-                                            barrierColor: Color(0x0f180245),
-                                            barrierDismissible: false,
-                                            context: context,
-                                            builder: (BuildContext context1) {
-                                              return PassConfirmDialog(
-                                                  onSubmit: (password) async {
-                                                await submitSend(
-                                                  state,
-                                                  tokensState,
-                                                  password,
-                                                );
-                                              });
-                                            },
-                                          );
-                                        },
-                                        title: 'Send',
+                                        child: PendingButton(
+                                          'Send',
+                                          isCheckLock: false,
+                                          pendingText: 'Pending',
+                                          callback: (parent) {
+                                            showDialog(
+                                              barrierColor: Color(0x0f180245),
+                                              barrierDismissible: false,
+                                              context: context,
+                                              builder: (BuildContext context1) {
+                                                return PassConfirmDialog(
+                                                    onSubmit: (password) async {
+                                                  parent.emitPending(true);
+                                                  await submitSend(
+                                                    state,
+                                                    tokensState,
+                                                    password,
+                                                  );
+                                                  parent.emitPending(false);
+                                                });
+                                              },
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ],
                                   ),

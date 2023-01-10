@@ -662,7 +662,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                         width: 16,
                         height: 16,
                         child: SvgPicture.asset(
-                          'icons/change_icon.svg',
+                          'assets/icons/change_icon.svg',
                           color: AppColors.white,
                         ),
                       ),

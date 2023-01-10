@@ -101,9 +101,11 @@ class _UiKitState extends State<UiKit> {
                 ],
               ),
               FeesSelector(
-                onSelect: () {
+                onSelect: (int fee) {
                   //
-                }
+                },
+                activeFee: 2,
+                fees: [2,5,10],
               ),
               Container(
                 child: AppSelector(

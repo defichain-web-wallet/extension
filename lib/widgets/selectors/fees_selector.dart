@@ -8,9 +8,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class FeesSelector extends StatefulWidget {
-  final void Function() onSelect;
+  final void Function(int) onSelect;
+  final List<int> fees;
+  final int activeFee;
 
-  FeesSelector({Key? key, required this.onSelect}) : super(key: key);
+  FeesSelector({
+    Key? key,
+    required this.onSelect,
+    required this.fees,
+    required this.activeFee,
+  }) : super(key: key);
 
   @override
   _FeesSelectorState createState() => _FeesSelectorState();
@@ -21,12 +28,11 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
   MenuHelper menuHelper = MenuHelper();
 
   bool _isShowDropdown = false;
-  late String _currentFee;
 
   late List<dynamic> _feesList;
 
   Color getSelectedItemBgColor(String value) {
-    if (_currentFee == value) {
+    if (widget.activeFee.toString() == value) {
       return isDarkTheme()
           ? DarkColors.feesDropdownActiveBgColor
           : LightColors.feesDropdownActiveBgColor;
@@ -46,14 +52,13 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
   void initState() {
     super.initState();
     List<String> feeNames = ['Slow', 'Medium', 'Fast'];
-    _feesList = List<dynamic>.generate(feeNames.length,
-        (index) => {'value': index.toString(), 'name': feeNames[index]});
+    _feesList = List<dynamic>.generate(widget.fees.length,
+        (index) => {'value': widget.fees[index].toString(), 'name': feeNames[index]});
   }
 
   @override
   Widget build(BuildContext context) {
-    double horizontalMargin = 12;
-    _currentFee = '2';
+    double horizontalMargin = menuHelper.getHorizontalMargin(context);
 
     return CustomPopupMenu(
       menuOnChange: (b) {
@@ -157,7 +162,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
                                 controller.hideMenu();
-                                // TODO: paste here update btc state
+                                widget.onSelect(int.parse(item['value']));
                               },
                               child: Container(
                                 height: 48,
