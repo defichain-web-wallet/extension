@@ -11,6 +11,7 @@ import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
 import 'package:defi_wallet/screens/tokens/search_token.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -248,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                     PageRouteBuilder(
                                                       pageBuilder: (context, animation1,
                                                           animation2) =>
-                                                          SearchToken(),
+                                                          AddTokenScreen(),
                                                       transitionDuration: Duration.zero,
                                                       reverseTransitionDuration:
                                                       Duration.zero,
