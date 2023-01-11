@@ -57,11 +57,9 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
         var accounts = state.accounts;
         if (accounts!.length == 1) {
-          print(accounts.length);
           accountsSelectorHeight = 193;
         }
         if (accounts.length > 1) {
-          print(accounts.length);
           accountsSelectorHeight = 236;
         }
         return BackdropFilter(
@@ -234,7 +232,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                               .activeAccount!
                                                               .index
                                                           ? null
-                                                          : (index) async {
+                                                          : (accountIndex) async {
                                                               accountCubit
                                                                   .updateActiveAccount(
                                                                       accounts[
