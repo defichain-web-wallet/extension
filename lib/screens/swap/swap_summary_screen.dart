@@ -3,30 +3,21 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
-import 'package:defi_wallet/models/tx_response_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
-import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
-import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/screens/dex/swap_status.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defi_wallet/widgets/tx_status_dialog.dart';
 import 'package:defichaindart/defichaindart.dart';
@@ -269,23 +260,9 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               pendingText: 'Pending',
                               isCheckLock: false,
                               callback: (parent) {
+                                parent.emitPending(true);
                                 if (widget.btcTx != '') {
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                          LoaderNew(
-                                            title: appBarTitle,
-                                            secondStepLoaderText: secondStepLoaderText,
-                                            callback: () {
-                                              submitSwap(state, tokensState, "");
-                                            },
-                                          ),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
-                                    ),
-                                  );
+                                  submitSwap(state, tokensState, "");
                                 } else {
                                   showDialog(
                                     barrierColor: Color(0x0f180245),
@@ -306,6 +283,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     },
                                   );
                                 }
+                                parent.emitPending(false);
                               },
                             ),
                           ),
@@ -329,19 +307,6 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
         if (widget.btcTx != '') {
           BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
           txResponse = await bitcoinCubit.sendTransaction(widget.btcTx);
-          Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    SwapStatusScreen(
-                        appBarTitle: appBarTitle,
-                        txResponse: txResponse,
-                        amount: widget.amountFrom,
-                        assetFrom: widget.assetFrom,
-                        assetTo: widget.assetTo),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ));
         }
         if (widget.assetFrom != widget.assetTo) {
           ECPair keyPair = await HDWalletService()

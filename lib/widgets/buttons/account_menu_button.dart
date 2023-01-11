@@ -1,4 +1,5 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/common/jelly_link_text.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,9 +13,10 @@ class AccountMenuButton extends StatefulWidget {
   final String title;
   final bool isStaticBg;
   final bool isHoverBackgroundEffect;
-  final void Function()? callback;
+  final void Function(int index)? callback;
   final Widget? afterTitleWidget;
   final bool accountSelectMode;
+  final AccountModel? account;
 
   AccountMenuButton({
     Key? key,
@@ -25,6 +27,7 @@ class AccountMenuButton extends StatefulWidget {
     this.accountSelectMode = false,
     this.isStaticBg = false,
     this.isHoverBackgroundEffect = true,
+    this.account,
   }) : super(key: key);
 
   @override
@@ -51,7 +54,14 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                       Colors.transparent,
                     ])),
       child: ElevatedButton(
-        onPressed: widget.callback,
+        onPressed: () {
+          const int defaultAccountId = 0;
+          if (widget.account == null) {
+            widget.callback!(defaultAccountId);
+          } else {
+            widget.callback!(widget.account!.index!);
+          }
+        },
         onHover: (val) {
           setState(() {
             isHover = val;

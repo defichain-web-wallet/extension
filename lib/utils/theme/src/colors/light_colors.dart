@@ -28,4 +28,6 @@ abstract class LightColors {
 
   static const feesDropdownBgColor = AppColors.white;
   static Color feesDropdownActiveBgColor = AppColors.portageBg.withOpacity(0.07);
+
+  static Color swapNetworkMarkBgColor = AppColors.portage.withOpacity(0.15);
 }
