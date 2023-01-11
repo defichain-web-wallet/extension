@@ -179,6 +179,7 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                                     height: 8,
                                                   ),
                                                   TokenListTile(
+                                                    isSingleSelect: false,
                                                     onTap: () {
                                                       setState(() {
                                                         try {

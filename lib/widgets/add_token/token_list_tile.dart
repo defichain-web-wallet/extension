@@ -1,3 +1,4 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 class TokenListTile extends StatefulWidget {
   final Function()? onTap;
   final bool isSelect;
+  final bool isSingleSelect;
   final bool isConfirm;
   final String imgPath;
   final String tokenName;
@@ -16,6 +18,7 @@ class TokenListTile extends StatefulWidget {
     Key? key,
     this.onTap,
     required this.isSelect,
+    this.isSingleSelect = false,
     this.isConfirm = false,
     required this.imgPath,
     required this.tokenName,
@@ -27,7 +30,7 @@ class TokenListTile extends StatefulWidget {
   State<TokenListTile> createState() => _TokenListTileState();
 }
 
-class _TokenListTileState extends State<TokenListTile> {
+class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -47,13 +50,17 @@ class _TokenListTileState extends State<TokenListTile> {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(11),
-              color: Theme.of(context).cardColor,
+              color: isDarkTheme()
+                  ? DarkColors.scaffoldBgColor
+                  : LightColors.scaffoldContainerBgColor,
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: widget.isSelect
-                    ? AppColors.portageBg.withOpacity(0.07)
-                    : Colors.transparent,
+                color: isDarkTheme()
+                    ? DarkColors.scaffoldContainerBgColor
+                    : widget.isSelect
+                        ? AppColors.portageBg.withOpacity(0.07)
+                        : Colors.transparent,
                 borderRadius: BorderRadius.circular(11),
               ),
               child: Row(
@@ -131,7 +138,31 @@ class _TokenListTileState extends State<TokenListTile> {
                               style: Theme.of(context).textTheme.headline5,
                             ),
                           ),
-                        if (widget.isSelect)
+                        if(widget.isSingleSelect)
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: widget.isSelect
+                                  ? null
+                                  : Theme.of(context).dividerColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              gradient:
+                              widget.isSelect ? gradientBottomToUpCenter : null,
+                            ),
+                            child: Center(
+                              child: Container(
+                                width: widget.isSelect ? 8 : 12,
+                                height: widget.isSelect ? 8 : 12,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  borderRadius:
+                                  BorderRadius.circular(widget.isSelect ? 4 : 6),
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (!widget.isSingleSelect && widget.isSelect)
                           DefiCheckbox(
                             callback: (val) {
                               widget.onTap!();
