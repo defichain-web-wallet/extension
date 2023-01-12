@@ -1,6 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -162,13 +161,14 @@ class _SettingRecoverySeedScreenState extends State<SettingRecoverySeedScreen>
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => SettingScreen(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                SettingScreen(),
                             transitionDuration: Duration.zero,
                             reverseTransitionDuration: Duration.zero,
                           ),
                         );
                       },
-                      title: 'Continue',
+                      title: 'Confirm',
                     ),
                   ],
                 ),

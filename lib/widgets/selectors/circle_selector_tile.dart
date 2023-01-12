@@ -1,15 +1,16 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 
-class SelectorThemeElement extends StatefulWidget {
+class CircleSelectorTile extends StatefulWidget {
   final bool isSelected;
   final Function() callback;
   final String text;
   final double width;
   final double height;
 
-  const SelectorThemeElement({
+  const CircleSelectorTile({
     Key? key,
     required this.isSelected,
     required this.callback,
@@ -19,10 +20,11 @@ class SelectorThemeElement extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<SelectorThemeElement> createState() => _SelectorThemeElementState();
+  State<CircleSelectorTile> createState() => _CircleSelectorTileState();
 }
 
-class _SelectorThemeElementState extends State<SelectorThemeElement> {
+class _CircleSelectorTileState extends State<CircleSelectorTile>
+    with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -38,7 +40,7 @@ class _SelectorThemeElementState extends State<SelectorThemeElement> {
             borderRadius: BorderRadius.circular(8),
             color: widget.isSelected
                 ? Theme.of(context).selectedRowColor.withOpacity(0.07)
-                : Theme.of(context).scaffoldBackgroundColor,
+                : Colors.transparent,
             border: widget.isSelected
                 ? GradientBoxBorder(
                     gradient: gradientBottomToUpCenter,
@@ -70,7 +72,11 @@ class _SelectorThemeElementState extends State<SelectorThemeElement> {
                         width: widget.isSelected ? 8 : 12,
                         height: widget.isSelected ? 8 : 12,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
+                          color: widget.isSelected
+                              ? Theme.of(context).scaffoldBackgroundColor
+                              : isDarkTheme()
+                                  ? DarkColors.scaffoldBgColor
+                                  : LightColors.scaffoldContainerBgColor,
                           borderRadius:
                               BorderRadius.circular(widget.isSelected ? 4 : 6),
                         ),

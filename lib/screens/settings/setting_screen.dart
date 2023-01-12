@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/screens/settings/setting_language_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_recovery_seed_screen.dart';
 import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -144,19 +145,17 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin {
                                   subtitleText:
                                       'Click to choose your main language',
                                   onTap: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   PageRouteBuilder(
-                                    //     pageBuilder: (context,
-                                    //         animation1,
-                                    //         animation2) =>
-                                    //         ,
-                                    //     transitionDuration:
-                                    //     Duration.zero,
-                                    //     reverseTransitionDuration:
-                                    //     Duration.zero,
-                                    //   ),
-                                    // );
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder:
+                                            (context, animation1, animation2) =>
+                                                SettingLanguageScreen(),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration:
+                                            Duration.zero,
+                                      ),
+                                    );
                                   },
                                 ),
                               ],
