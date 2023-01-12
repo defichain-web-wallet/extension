@@ -57,7 +57,12 @@ class _SettingsListTileState extends State<SettingsListTile> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SvgPicture.asset('assets/icons/arrow_right.svg'),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      right: 2.5,
+                    ),
+                    child: SvgPicture.asset('assets/icons/arrow_right.svg'),
+                  ),
                 ],
               ),
             ],
