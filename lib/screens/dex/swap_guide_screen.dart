@@ -1,13 +1,15 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/screens/dex/swap_screen.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
-import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/screens/swap/swap_screen.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -25,9 +27,10 @@ class SwapGuideScreen extends StatefulWidget {
   State<SwapGuideScreen> createState() => _SwapGuideScreenState();
 }
 
-class _SwapGuideScreenState extends State<SwapGuideScreen> {
+class _SwapGuideScreenState extends State<SwapGuideScreen> with ThemeMixin {
+  FocusNode checkBoxFocusNode = FocusNode();
   bool isConfirm = false;
-  double headerSectionWidth = 300;
+  double headerSectionWidth = 234;
   double textSectionWidth = 350;
 
   @override
@@ -39,18 +42,35 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
         TransactionState txState,
       ) {
         return Scaffold(
-          appBar: MainAppBar(
-            title: 'How does it works?',
-            isShowBottom: !(txState is TransactionInitialState),
-            height: !(txState is TransactionInitialState)
-                ? ToolbarSizes.toolbarHeightWithBottom
-                : ToolbarSizes.toolbarHeight,
-            isSmall: isFullScreen,
+          drawerScrimColor: Color(0x0f180245),
+          endDrawer: AccountDrawer(
+            width: buttonSmallWidth,
+          ),
+          appBar: NewMainAppBar(
+            isShowLogo: false,
           ),
           body: Container(
-            color: Theme.of(context).dialogBackgroundColor,
-            padding:
-                const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
+            padding: EdgeInsets.only(
+              top: 22,
+              bottom: 24,
+              left: 16,
+              right: 16,
+            ),
+            decoration: BoxDecoration(
+              color: isDarkTheme()
+                  ? DarkColors.scaffoldContainerBgColor
+                  : LightColors.scaffoldContainerBgColor,
+              border: isDarkTheme()
+                  ? Border.all(
+                width: 1.0,
+                color: Colors.white.withOpacity(0.05),
+              )
+                  : null,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20),
+                topLeft: Radius.circular(20),
+              ),
+            ),
             child: Center(
               child: StretchBox(
                 child: Column(
@@ -59,158 +79,93 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> {
                     Expanded(
                       child: Container(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            SizedBox(
+                              height: 20,
+                            ),
                             Container(
                               width: headerSectionWidth,
-                              padding: EdgeInsets.only(
-                                top: 44,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset('assets/btc_origin.svg'),
-                                  SizedBox(
-                                    width: 15,
-                                  ),
-                                  SvgPicture.asset(
-                                      'assets/arrow_right_long.svg'),
-                                  SizedBox(
-                                    width: 15,
-                                  ),
-                                  SvgPicture.asset('assets/btc_dfx.svg'),
-                                ],
-                              ),
+                              child: SvgPicture.asset('assets/btc_guide.svg'),
+                            ),
+                            SizedBox(
+                              height: 16,
                             ),
                             Container(
                               child: SvgPicture.asset('assets/dfx_logo.svg'),
                             ),
-                            Container(
-                              width: isFullScreen ? double.infinity : textSectionWidth,
-                              padding: EdgeInsets.only(
-                                top: 44,
-                              ),
-                              child: RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                    style: isFullScreen ? Theme.of(context)
-                                        .textTheme
-                                        .headline2
-                                        ?.apply(
-                                          fontSizeFactor: 1.6,
-                                        ) : Theme.of(context)
-                                        .textTheme
-                                        .headline2
-                                        ?.apply(
-                                      fontSizeFactor: 1.4,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text:
-                                            'This service is provided by DFX Swiss. \n',
-                                      ),
-                                      TextSpan(
-                                        text:
-                                            'Swaps may take up to 4 hours to be processed. ',
-                                      ),
-                                      TextSpan(
-                                        text: 'You will not be redirected.',
-                                      ),
-                                    ]),
-                              ),
+                            SizedBox(
+                              height: 34,
                             ),
-                            Container(
-                              width: 320,
-                              padding: EdgeInsets.only(
-                                top: 44,
-                              ),
+                            Text(
+                              'This service is provided by DFX Swiss. Swaps may take up to 4 hours to be processed. You will not be redirected.',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.6)),
                             ),
                           ],
                         ),
                       ),
                     ),
                     Container(
-                      width: 217,
-                      child: Column(
-                        children: [
-                          PrimaryButton(
-                            label: 'Next',
-                            isCheckLock: false,
-                            callback: () async {
-                              AccountCubit accountCubit =
-                                  BlocProvider.of<AccountCubit>(context);
-                              String swapTutorialStatus =
-                                  isConfirm ? 'skip' : 'show';
-                              var box = await Hive.openBox(HiveBoxes.client);
-                              await box.put(HiveNames.swapTutorialStatus,
-                                  swapTutorialStatus);
-                              await box.close();
-                              accountCubit
-                                  .updateSwapTutorialStatus(swapTutorialStatus);
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          SwapScreen(),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
-                              );
-                            },
-                          ),
-                          Container(
-                            height: 48,
-                            padding: EdgeInsets.only(top: 10),
-                            child: StretchBox(
-                              child: Row(
-                                children: [
-                                  Theme(
-                                    child: Checkbox(
-                                      value: isConfirm,
-                                      activeColor: AppTheme.pinkColor,
-                                      onChanged: (newValue) {
-                                        setState(() {
-                                          isConfirm = !isConfirm;
-                                        });
-                                      },
-                                    ),
-                                    data: ThemeData(
-                                      unselectedWidgetColor: AppTheme.pinkColor,
-                                    ),
+                      child: DefiCheckbox(
+                        width: boxSmallWidth,
+                        callback: (val) {
+                          setState(() {
+                            isConfirm = val!;
+                          });
+                        },
+                        value: isConfirm,
+                        focusNode: checkBoxFocusNode,
+                        isShowLabel: false,
+                        textWidget: Text(
+                          'Don´t show this guide next time',
+                          style:
+                              Theme.of(context).textTheme.subtitle1!.copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .subtitle1!
+                                        .color!
+                                        .withOpacity(0.8),
                                   ),
-                                  Flexible(
-                                    child: MouseRegion(
-                                      cursor: SystemMouseCursors.click,
-                                      child: GestureDetector(
-                                        child: RichText(
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text:
-                                                    'Don´t show this guide next time',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .subtitle1,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          setState(
-                                            () {
-                                              isConfirm = !isConfirm;
-                                            },
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 24,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: NewPrimaryButton(
+                        title: 'Next',
+                        callback: () async {
+                          AccountCubit accountCubit =
+                          BlocProvider.of<AccountCubit>(context);
+                          String swapTutorialStatus =
+                          isConfirm ? 'skip' : 'show';
+                          var box = await Hive.openBox(HiveBoxes.client);
+                          await box.put(HiveNames.swapTutorialStatus,
+                              swapTutorialStatus);
+                          await box.close();
+                          accountCubit
+                              .updateSwapTutorialStatus(swapTutorialStatus);
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation1, animation2) =>
+                                  SwapScreen(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
                             ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
                     ),
                   ],

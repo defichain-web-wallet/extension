@@ -14,8 +14,6 @@ import 'package:defi_wallet/widgets/create_edit_account/create_edit_account_dial
 import 'package:defi_wallet/widgets/defi_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 
 class AccountDrawer extends StatefulWidget {
@@ -61,11 +59,9 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
         var accounts = state.accounts;
         if (accounts!.length == 1) {
-          print(accounts.length);
           accountsSelectorHeight = 193;
         }
         if (accounts.length > 1) {
-          print(accounts.length);
           accountsSelectorHeight = 236;
         }
         return BackdropFilter(
@@ -185,7 +181,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                       thickness: 1,
                                                     ),
                                                     AccountMenuButton(
-                                                      callback: () {
+                                                      callback: (index) {
                                                         showDialog(
                                                           barrierColor:
                                                               Color(0x0f180245),
@@ -238,7 +234,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                                   .activeAccount!
                                                                   .index
                                                           ? null
-                                                          : () async {
+                                                          : (accountIndex) async {
                                                               accountCubit
                                                                   .updateActiveAccount(
                                                                       accounts[
@@ -269,7 +265,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             height: 12,
                           ),
                           AccountMenuButton(
-                            callback: () {
+                            callback: (index) {
                               Scaffold.of(context).closeEndDrawer();
                               Navigator.push(
                                 context,
@@ -289,7 +285,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             height: 5,
                           ),
                           AccountMenuButton(
-                            callback: () {},
+                            callback: (index) {},
                             iconPath: 'assets/icons/setting.svg',
                             title: 'Settings',
                           ),
@@ -297,7 +293,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             height: 5,
                           ),
                           AccountMenuButton(
-                            callback: () {
+                            callback: (index) {
                               Navigator.push(
                                 context,
                                 PageRouteBuilder(
@@ -330,7 +326,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             height: 5,
                           ),
                           AccountMenuButton(
-                            callback: () {
+                            callback: (index) {
                               setState(() {
                                 _isDarkTheme = !_isDarkTheme;
                               });
@@ -353,7 +349,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                           ),
                           AccountMenuButton(
                             isStaticBg: true,
-                            callback: () {},
+                            callback: (index) {},
                             iconPath: 'assets/icons/jelly_theme_explore.svg',
                             title: 'Explore Jelly themes',
                           ),
@@ -369,8 +365,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             thickness: 1,
                           ),
                           AccountMenuButton(
-                            // isStaticBg: true,
-                            callback: () {
+                            callback: (index) {
                               lockWallet();
                             },
                             iconPath: 'assets/icons/lock.svg',

@@ -49,7 +49,9 @@ class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
             width: 16,
             height: 16,
             child: SvgPicture.asset(
-              TokensHelper().getImageNameByTokenName(widget.assetCode),
+              TokensHelper().getImageNameByTokenName(
+                widget.assetCode.replaceAll('d', ''),
+              ),
             ),
           ),
           Flexible(

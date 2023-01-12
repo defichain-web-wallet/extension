@@ -30,17 +30,17 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
 
   @override
   void initState() {
-    widget.addressController!.addListener(() { });
+    widget.addressController!.addListener(() {});
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onDoubleTap: () {
         _focusNode.requestFocus();
         widget.addressController!.selection = TextSelection(
-            baseOffset: 0,
-            extentOffset: widget.addressController!.text.length);
+            baseOffset: 0, extentOffset: widget.addressController!.text.length);
       },
       child: Container(
         width: double.infinity,
@@ -51,23 +51,33 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           textAlignVertical: TextAlignVertical.center,
           style: Theme.of(context).textTheme.button,
           decoration: InputDecoration(
-              prefixIcon: widget.prefix,
-              filled: true,
-              fillColor: Theme.of(context).cardColor,
-              hoverColor: Colors.transparent,
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(
-                  color: widget.isBorder ? AppColors.portage.withOpacity(0.12) : Colors.transparent,
+            prefixIcon: widget.prefix,
+            filled: true,
+            fillColor: Theme.of(context).cardColor,
+            hoverColor: Colors.transparent,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: widget.isBorder
+                    ? AppColors.portage.withOpacity(0.12)
+                    : Colors.transparent,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppTheme.pinkColor),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+            hintText: widget.hintText,
+            hintStyle: Theme.of(context).textTheme.headline6!.copyWith(
+                  color: Theme.of(context)
+                      .textTheme
+                      .headline5!
+                      .color!
+                      .withOpacity(0.3),
+                  fontWeight: FontWeight.w600,
                 ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: AppTheme.pinkColor),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-              hintText: widget.hintText,
-              hintStyle: TextStyle(fontSize: 14)),
+          ),
           onChanged: widget.onChanged,
           focusNode: _focusNode,
           controller: widget.addressController,
@@ -82,7 +92,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                     ? "Enter min. 6 characters"
                     : null;
               case 'name':
-                return value == null || value.isEmpty ? "Enter your name" : null;
+                return value == null || value.isEmpty
+                    ? "Enter your name"
+                    : null;
               case 'surname':
                 return value == null || value.isEmpty
                     ? "Enter your surname"

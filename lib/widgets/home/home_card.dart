@@ -1,20 +1,17 @@
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
 import 'package:defi_wallet/screens/liquidity/earn_screen_new.dart';
 import 'package:defi_wallet/screens/swap/swap_screen.dart';
-import 'package:defi_wallet/screens/earn_screen/earn_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
-import 'package:defi_wallet/screens/receive/receive_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/select_buy_or_sell_screen.dart';
 import 'package:defi_wallet/screens/send/send_screeen_new.dart';
-import 'package:defi_wallet/screens/send/send_screen.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/home/account_balance.dart';
 import 'package:defi_wallet/widgets/selectors/app_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeCard extends StatefulWidget {
   const HomeCard({Key? key}) : super(key: key);
@@ -152,44 +149,48 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                   width: 8.0,
                 ),
                 Flexible(
-                  child: FlatButton(
-                    title: 'Change',
-                    isPrimary: false,
-                    iconPath: 'assets/icons/change_icon.svg',
-                    callback: () {
-                      if (SettingsHelper.isBitcoin() &&
-                          SettingsHelper.settings.network == 'testnet') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Not allowed for testnet bitcoin',
-                              style: Theme.of(context).textTheme.headline5,
-                            ),
-                            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-                          ),
-                        );
-                        return;
-                      }
-                      if (swapTutorialStatus == 'show' && SettingsHelper.isBitcoin()) {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                SwapGuideScreen(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
-                      } else {
-                        Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) => SwapScreen(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),);
-                      }
-                    },
+                  child: BlocBuilder<AccountCubit, AccountState>(
+                    builder: (context, accountState) {
+                      return FlatButton(
+                        title: 'Change',
+                        isPrimary: false,
+                        iconPath: 'assets/icons/change_icon.svg',
+                        callback: () {
+                          if (SettingsHelper.isBitcoin() &&
+                              SettingsHelper.settings.network == 'testnet') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Not allowed for testnet bitcoin',
+                                  style: Theme.of(context).textTheme.headline5,
+                                ),
+                                backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+                              ),
+                            );
+                            return;
+                          }
+                          if (accountState.swapTutorialStatus == 'show' && SettingsHelper.isBitcoin()) {
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder: (context, animation1, animation2) =>
+                                    SwapGuideScreen(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder: (context, animation1, animation2) => SwapScreen(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),);
+                          }
+                        },
+                      );
+                    }
                   ),
                 ),
               ],

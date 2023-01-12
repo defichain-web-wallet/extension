@@ -1,6 +1,9 @@
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/network/network_cubit.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
@@ -21,6 +24,7 @@ class NetworkSelector extends StatefulWidget {
 class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
   CustomPopupMenuController controller = CustomPopupMenuController();
   MenuHelper menuHelper = MenuHelper();
+
 
   bool isShowAllNetworks = true;
   NetworkTabs activeTab = NetworkTabs.all;
@@ -53,6 +57,37 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
     }
   }
 
+  void onChangeLocalSettings(NetworkList networkModel) async {
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
+    bool isBitcoin = networkModel == NetworkList.btcMainnet ||
+        networkModel == NetworkList.btcTestnet;
+    late String network;
+    if (networkModel == NetworkList.btcMainnet ||
+        networkModel == NetworkList.defiMainnet) {
+      network = 'mainnet';
+    } else {
+      network = 'testnet';
+    }
+
+    SettingsHelper.settings.network = network;
+    SettingsHelper.settings.isBitcoin = isBitcoin;
+    await settingsHelper.saveSettings();
+    await accountCubit.changeNetwork(
+        SettingsHelper.settings.network!,
+    );
+  }
+
+  getNetworkName() {
+    SettingsModel settings = SettingsHelper.settings;
+    String network = settings.network!;
+    if (network == 'mainnet') {
+      return (settings.isBitcoin!) ? 'Bitcoin Mainnet' : 'DefiChain Mainnet';
+    } else {
+      return (settings.isBitcoin!) ? 'Bitcoin Testnet' : 'DefiChain Testnet';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double horizontalMargin = menuHelper.getHorizontalMargin(context);
@@ -68,44 +103,48 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(40),
         ),
-        child: Row(
-          children: [
-            Flexible(
-              child: Row(
-                children: [
-                  Container(
-                    width: 10,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Color(0xFF00CF21),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 6,
-                  ),
-                  Flexible(
-                    child: TickerText(
-                      child: Text(
-                        currentNetworkItem,
-                        style: Theme.of(context).textTheme.subtitle2!.copyWith(
-                          fontWeight: FontWeight.w500,
+        child: BlocBuilder<NetworkCubit, NetworkState>(
+          builder: (context, networkState) {
+            return Row(
+              children: [
+                Flexible(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Color(0xFF00CF21),
                         ),
                       ),
-                    ),
+                      SizedBox(
+                        width: 6,
+                      ),
+                      Flexible(
+                        child: TickerText(
+                          child: Text(
+                            getNetworkName(),
+                            style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 6,
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    width: 6,
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.keyboard_arrow_down,
-              color: Color(0xFFB7B2C1),
-              size: 14,
-            )
-          ],
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Color(0xFFB7B2C1),
+                  size: 14,
+                )
+              ],
+            );
+          },
         ),
       ),
       menuBuilder: () => Container(
@@ -197,7 +236,6 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                         (index) => SelectorTabElement(
                                       title: tabs[index]['name'],
                                       callback: () {
-                                        print(tabs[index]['name']);
                                         networkCubit.updateCurrentTab(
                                           tabs[index]['value'],
                                         );
@@ -231,10 +269,13 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                       behavior: HitTestBehavior.translucent,
                                       onTap: () {
                                         controller.hideMenu();
-                                        networkCubit.updateCurrentNetwork(item['value']);
-                                        setState(() {
-                                          currentNetworkItem = item['name'];
-                                        });
+                                        if (item['value'] != NetworkList.defiMetaChainTestnet) {
+                                          networkCubit.updateCurrentNetwork(item['value']);
+                                          setState(() {
+                                            currentNetworkItem = item['name'];
+                                          });
+                                          onChangeLocalSettings(item['value']);
+                                        }
                                       },
                                       child: Container(
                                         height: 44,
@@ -247,7 +288,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                                 borderRadius:
                                                 BorderRadius.circular(8),
                                                 color:
-                                                getMarkColor(networkState.currentNetwork == item['value']),
+                                                getMarkColor(getNetworkName() == item['name']),
                                               ),
                                             ),
                                             SizedBox(

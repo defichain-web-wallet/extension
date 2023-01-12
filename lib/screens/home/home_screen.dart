@@ -11,6 +11,7 @@ import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
 import 'package:defi_wallet/screens/tokens/search_token.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -66,19 +67,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     double countTransactions = 0;
 
     if (SettingsHelper.isBitcoin()) {
+      late List<dynamic> tempHistoryList;
       countAssets = 1;
+      tempHistoryList = bitcoinCubit.state.history ?? [];
+      countTransactions = tempHistoryList.length.toDouble();
+      bitcoinCubit.loadDetails(accountState.activeAccount!.bitcoinAddress!);
     } else {
       countAssets = accountState.activeAccount!.balanceList!
           .where((el) => !el.isHidden!)
           .length
           .toDouble();
+      countTransactions =
+          accountState.activeAccount!.historyList!.length.toDouble();
     }
     assetsTabBodyHeight =
         countAssets * heightListEntry + heightAdditionalAction;
 
-    countTransactions = (SettingsHelper.isBitcoin())
-        ? bitcoinCubit.state.history!.length.toDouble()
-        : accountState.activeAccount!.historyList!.length.toDouble();
+
     if (countTransactions < maxHistoryEntries) {
       historyTabBodyHeight =
           countTransactions * heightListEntry + heightAdditionalAction;
@@ -157,6 +162,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     child: Loader(),
                   ),
                 );
+              } else if (state.status == AccountStatusList.success &&
+                  tokensState.status == TokensStatusList.success) {
+                isFullSizeScreen = isFullScreen;
+                setTabBody(tabIndex: tabController!.index);
+
+              } else if (tokensState.status == TokensStatusList.failure) {
+                return Container(
+                  child: Center(
+                    child: ErrorPlaceholder(
+                      message: 'API error',
+                      description: 'Please change the API on settings and try again',
+                    ),
+                  ),
+                );
+              } else {
+                return Container();
               }
 
               return Scaffold(
@@ -167,12 +188,104 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 endDrawer: AccountDrawer(
                   width: buttonSmallWidth,
                 ),
-                body: _buildBody(
-                  context,
-                  state,
-                  txState,
-                  tokensState,
-                  isFullSize: isFullScreen,
+                body: BlocBuilder<HomeCubit, HomeState>(
+                  builder: (context, homeState) {
+                    return Container(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      child: Center(
+                        child: StretchBox(
+                          maxWidth: ScreenSizes.medium,
+                          child: ListView(
+                            children: [
+                              SizedBox(
+                                height: 5,
+                              ),
+                              HomeCard(),
+                              SizedBox(
+                                height: 34,
+                              ),
+                              // HomeTabs(),
+                              Container(
+                                padding: const EdgeInsets.only(top: 12, right: 24),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TabBarHeader(
+                                      tabController: tabController,
+                                    ),
+                                    Container(
+                                      child: Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {},
+                                            icon: SvgPicture.asset(
+                                              'assets/icons/filter_icon.svg',
+                                              color:
+                                              SettingsHelper.settings.theme == 'Dark'
+                                                  ? Colors.white
+                                                  : null,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 12,
+                                          ),
+                                          SizedBox(
+                                            width: 32,
+                                            height: 32,
+                                            child: NewActionButton(
+                                              iconPath: 'assets/icons/add_black.svg',
+                                              onPressed: () async {
+                                                await lockHelper.provideWithLockChecker(
+                                                  context,
+                                                      () => Navigator.push(
+                                                    context,
+                                                    PageRouteBuilder(
+                                                      pageBuilder: (context, animation1,
+                                                          animation2) =>
+                                                          AddTokenScreen(),
+                                                      transitionDuration: Duration.zero,
+                                                      reverseTransitionDuration:
+                                                      Duration.zero,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              homeState.tabIndex == 0
+                                  ? SizedBox(
+                                height: assetsTabBodyHeight,
+                                child: TabBarBody(
+                                  tabController: tabController,
+                                  isEmptyList: isExistHistory(state),
+                                ),
+                              )
+                                  : SizedBox(
+                                height: historyTabBodyHeight,
+                                child: TabBarBody(
+                                  tabController: tabController,
+                                  isEmptyList: isExistHistory(state),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               );
             },
@@ -182,130 +295,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
-  Widget _buildBody(context, state, transactionState, tokensState,
-      {isFullSize = false}) {
-    if (state.status == AccountStatusList.success &&
-        tokensState.status == TokensStatusList.success) {
-      isFullSizeScreen = isFullSize;
-      setTabBody(tabIndex: tabController!.index);
-      return BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, homeState) {
-          return Container(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: Center(
-              child: StretchBox(
-                maxWidth: ScreenSizes.medium,
-                child: ListView(
-                  children: [
-                    SizedBox(
-                      height: 5,
-                    ),
-                    HomeCard(),
-                    SizedBox(
-                      height: 34,
-                    ),
-                    // HomeTabs(),
-                    Container(
-                      padding: const EdgeInsets.only(top: 12, right: 24),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TabBarHeader(
-                            tabController: tabController,
-                          ),
-                          Container(
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: SvgPicture.asset(
-                                    'assets/icons/filter_icon.svg',
-                                    color:
-                                        SettingsHelper.settings.theme == 'Dark'
-                                            ? Colors.white
-                                            : null,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 12,
-                                ),
-                                SizedBox(
-                                  width: 32,
-                                  height: 32,
-                                  child: NewActionButton(
-                                    iconPath: 'assets/icons/add_black.svg',
-                                    onPressed: () async {
-                                      await lockHelper.provideWithLockChecker(
-                                        context,
-                                        () => Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                    animation2) =>
-                                                SearchToken(),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    homeState.tabIndex == 0
-                        ? SizedBox(
-                            height: assetsTabBodyHeight,
-                            child: TabBarBody(
-                              tabController: tabController,
-                              isEmptyList: isExistHistory(state),
-                            ),
-                          )
-                        : SizedBox(
-                            height: historyTabBodyHeight,
-                            child: TabBarBody(
-                              tabController: tabController,
-                              isEmptyList: isExistHistory(state),
-                            ),
-                          ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    } else if (tokensState.status == TokensStatusList.failure) {
-      return Container(
-        child: Center(
-          child: ErrorPlaceholder(
-            message: 'API error',
-            description: 'Please change the API on settings and try again',
-          ),
-        ),
-      );
-    } else {
-      return Container();
-    }
-  }
-
   bool isExistHistory(state) {
+    late List<dynamic> tempHistoryList;
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
 
+    tempHistoryList = bitcoinCubit.state.history ?? [];
+
     if (SettingsHelper.isBitcoin()) {
-      return bitcoinCubit.state.history!.length > 30;
+      return tempHistoryList.length > 30;
     } else if (SettingsHelper.settings.network == 'mainnet') {
       return state.activeAccount.historyList!.length > 30;
     } else {

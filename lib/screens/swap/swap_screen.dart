@@ -22,7 +22,7 @@ import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
-import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
+import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
 import 'package:defi_wallet/bloc/dex/dex_state.dart';
@@ -34,6 +34,7 @@ import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/swap/swap_account_selector_dialog.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SwapScreen extends StatefulWidget {
   const SwapScreen({Key? key}) : super(key: key);
@@ -118,8 +120,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     assets = [];
     if (SettingsHelper.isBitcoin()) {
-      assetFrom = TokensModel(symbol: 'DFI', name: 'DFI');
-      assetTo = TokensModel(symbol: 'BTC', name: 'Bitcoin');
+      assetFrom = TokensModel(symbol: 'BTC', name: 'Bitcoin');
+      assetTo = TokensModel(symbol: 'dBTC', name: 'Bitcoin');
     } else {
       accountState.activeAccount.balanceList!.forEach((el) {
         if (tokensState.tokensForSwap[el.token] != null &&
@@ -188,8 +190,10 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                           iteratorUpdate++;
                           accountFrom = accountState.accounts![0];
                           accountTo = accountState.accounts![0];
-                          bitcoinCubit.loadAvailableBalance(
-                              accountFrom.bitcoinAddress!);
+                          if (SettingsHelper.isBitcoin()) {
+                            bitcoinCubit.loadAvailableBalance(
+                                accountFrom.bitcoinAddress!);
+                          }
                           dexCubit.updateDex(
                             assetFrom.symbol!,
                             assetTo!.symbol!,
@@ -255,8 +259,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
 
   Widget _buildBody(context, dexState, dexCubit, accountState, tokensState,
       transactionState, isFullScreen) {
-    print(dexState);
-
+    double arrowRotateDegAccountFrom = false ? 180 : 0;
+    double arrowRotateDegAccountTo = false ? 180 : 0;
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     bool isShowStabilizationFee =
         assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ||
@@ -309,6 +313,96 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                     SizedBox(
                       height: 16,
                     ),
+                    if (SettingsHelper.isBitcoin())
+                      ...[
+                        Center(
+                          child: Container(
+                            height: 24,
+                            width: 78,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: isDarkTheme()
+                                  ? DarkColors.swapNetworkMarkBgColor
+                                  : LightColors.swapNetworkMarkBgColor,
+                              borderRadius: BorderRadius.circular(36)
+                            ),
+                            child: Text(
+                              'Bitcoin Mainnet',
+                              style: Theme.of(context).textTheme.headline6!.copyWith(
+                                fontSize: 8,
+                                color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3)
+                              ),
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                'Swap from',
+                                style: Theme.of(context).textTheme.headline5!.copyWith(
+                                  color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  barrierColor: Color(0x0f180245),
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return SwapAccountSelectorDialog(
+                                      confirmCallback: (name, address) {},
+                                      onSelect: (int index) {
+                                      BitcoinCubit bitcoinCubit =
+                                          BlocProvider.of<BitcoinCubit>(
+                                              context);
+                                      setState(() {
+                                        accountFrom =
+                                            accountState.accounts[index];
+                                        bitcoinCubit.loadAvailableBalance(
+                                          accountFrom.bitcoinAddress!,
+                                        );
+                                      });
+                                    },
+                                  );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      accountFrom.name!,
+                                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 8,
+                                    ),
+                                    RotationTransition(
+                                      turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
+                                      child: SizedBox(
+                                        width: 10,
+                                        height: 10,
+                                        child: SvgPicture.asset(
+                                          'assets/icons/arrow_down.svg',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 6,
+                        )
+                      ],
                     AmountField(
                       suffix: amountFromInUsd,
                       available: getAvailableAmount(
@@ -341,6 +435,93 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                     SizedBox(
                       height: 8,
                     ),
+                    if (SettingsHelper.isBitcoin())
+                      ...[
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Center(
+                          child: Container(
+                            height: 24,
+                            width: 90,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: isDarkTheme()
+                                    ? DarkColors.swapNetworkMarkBgColor
+                                    : LightColors.swapNetworkMarkBgColor,
+                                borderRadius: BorderRadius.circular(36)
+                            ),
+                            child: Text(
+                              'DeFiChain Mainnet',
+                              style: Theme.of(context).textTheme.headline6!.copyWith(
+                                  fontSize: 8,
+                                  color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3)
+                              ),
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                'Swap to',
+                                style: Theme.of(context).textTheme.headline5!.copyWith(
+                                  color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  barrierColor: Color(0x0f180245),
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return SwapAccountSelectorDialog(
+                                      confirmCallback: (name, address) {},
+                                      onSelect: (int index) {
+                                        FiatCubit fiatCubit =
+                                          BlocProvider.of<FiatCubit>(context);
+                                        setState(() {
+                                          accountTo = accountState.accounts[index];
+                                        });
+                                        fiatCubit.loadCryptoRoute(accountTo);
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    accountTo.name!,
+                                    style: Theme.of(context).textTheme.headline5!.copyWith(
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  RotationTransition(
+                                    turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
+                                    child: SizedBox(
+                                      width: 10,
+                                      height: 10,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/arrow_down.svg',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 6,
+                        )
+                      ],
                     AmountField(
                       suffix: amountToInUsd,
                       available: getAvailableAmount(
@@ -389,309 +570,392 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                       selectedAsset: assetTo!,
                       assets: tokensForSwap,
                     ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Text(
-                      'Slippage tolerance',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .headline5!
-                          .copyWith(
-                        fontSize: 12,
-                        color: Theme
-                            .of(context)
-                            .textTheme
-                            .headline5!
-                            .color!
-                            .withOpacity(0.3),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    if (isShowSlippageField)
-                      Container(
-                        height: 28,
-                        child: TextField(
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'(^-?\d*\.?d*\,?\d*)')),
-                          ],
-                          controller: slippageController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Theme
-                                .of(context)
-                                .cardColor,
-                            hoverColor: Colors.transparent,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: Colors.transparent,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: AppTheme.pinkColor),
-                            ),
-                            contentPadding: const EdgeInsets.all(8),
-                            hintText: 'Type in percent..',
-                            suffixIcon: IconButton(
-                              splashRadius: 16,
-                              icon: Icon(
-                                Icons.clear,
-                                size: 14,
-                              ),
-                              onPressed: () =>
-                                  setState(() {
-                                    slippage = 0.03;
-                                    isShowSlippageField = false;
-                                    hideOverlay();
-                                  }),
-                            ),
-                          ),
-                          onChanged: (String value) {
-                            setState(() {
-                              try {
-                                slippage = double.parse(value) / 100;
-                              } catch (err) {
-                                slippage = 0.03;
-                              }
-                            });
-                          },
+                    if (!SettingsHelper.isBitcoin())
+                      ...[
+                        SizedBox(
+                          height: 12,
                         ),
-                      )
-                    else
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ...List<Widget>.generate(
-                              slippageList.length, (index) {
-                            return Expanded(
-                              flex: 1,
-                              child: SlippageButton(
-                                isFirst: true,
-                                isPadding: index != 0,
-                                isBorder: true,
-                                label:
-                                '${slippageList[index]} ${slippageList[index] !=
-                                    'Custom' ? '%' : ''}',
-                                isActive: slippageList[index] != 'Custom' &&
-                                    slippage ==
-                                        double.parse(slippageList[index]) / 100,
-                                callback: () {
-                                  if (slippageList[index] == 'Custom') {
-                                    setState(() {
-                                      isShowSlippageField = true;
-                                    });
-                                  } else {
-                                    setState(() {
-                                      slippage =
-                                          double.parse(slippageList[index]) /
-                                              100;
-                                    });
-                                  }
-                                },
+                        Text(
+                          'Slippage tolerance',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .headline5!
+                              .copyWith(
+                            fontSize: 12,
+                            color: Theme
+                                .of(context)
+                                .textTheme
+                                .headline5!
+                                .color!
+                                .withOpacity(0.3),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 12,
+                        ),
+                        if (isShowSlippageField)
+                          Container(
+                            height: 28,
+                            child: TextField(
+                              keyboardType: TextInputType.number,
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'(^-?\d*\.?d*\,?\d*)')),
+                              ],
+                              controller: slippageController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Theme
+                                    .of(context)
+                                    .cardColor,
+                                hoverColor: Colors.transparent,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: AppTheme.pinkColor),
+                                ),
+                                contentPadding: const EdgeInsets.all(8),
+                                hintText: 'Type in percent..',
+                                suffixIcon: IconButton(
+                                  splashRadius: 16,
+                                  icon: Icon(
+                                    Icons.clear,
+                                    size: 14,
+                                  ),
+                                  onPressed: () =>
+                                      setState(() {
+                                        slippage = 0.03;
+                                        isShowSlippageField = false;
+                                        hideOverlay();
+                                      }),
+                                ),
                               ),
-                            );
-                          })
-                        ],
-                      ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Divider(
-                      color: AppColors.lavenderPurple.withOpacity(0.16),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Rate',
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                fontSize: 12,
-                                color: Theme
+                              onChanged: (String value) {
+                                setState(() {
+                                  try {
+                                    slippage = double.parse(value) / 100;
+                                  } catch (err) {
+                                    slippage = 0.03;
+                                  }
+                                });
+                              },
+                            ),
+                          )
+                        else
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ...List<Widget>.generate(
+                                  slippageList.length, (index) {
+                                return Expanded(
+                                  flex: 1,
+                                  child: SlippageButton(
+                                    isFirst: true,
+                                    isPadding: index != 0,
+                                    isBorder: true,
+                                    label:
+                                    '${slippageList[index]} ${slippageList[index] !=
+                                        'Custom' ? '%' : ''}',
+                                    isActive: slippageList[index] != 'Custom' &&
+                                        slippage ==
+                                            double.parse(slippageList[index]) / 100,
+                                    callback: () {
+                                      if (slippageList[index] == 'Custom') {
+                                        setState(() {
+                                          isShowSlippageField = true;
+                                        });
+                                      } else {
+                                        setState(() {
+                                          slippage =
+                                              double.parse(slippageList[index]) /
+                                                  100;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                );
+                              })
+                            ],
+                          ),
+                        SizedBox(
+                          height: 12,
+                        ),
+                        Divider(
+                          color: AppColors.lavenderPurple.withOpacity(0.16),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Rate',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                    fontSize: 12,
+                                    color: Theme
+                                        .of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .color!
+                                        .withOpacity(0.3),
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                getRateStringFormat(dexState),
+                                style: Theme
                                     .of(context)
                                     .textTheme
                                     .headline5!
-                                    .color!
-                                    .withOpacity(0.3),
+                                    .copyWith(
+                                  fontSize: 12,
+                                ),
                               ),
+                              Text(
+                                ' (\$${balancesHelper.numberStyling(rateQuoteUsd, fixedCount: 2, fixed: true)})',
+                                style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                  fontSize: 12,
+                                  color: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .color!
+                                      .withOpacity(0.3),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Divider(
+                          color: AppColors.lavenderPurple.withOpacity(0.16),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Platform Fee',
+                                style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                  fontSize: 12,
+                                  color: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .color!
+                                      .withOpacity(0.3),
+                                ),
+                              ),
+                              Text(
+                                '${balancesHelper.fromSatohi(12000)} DFI',
+                                style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Divider(
+                          color: AppColors.lavenderPurple.withOpacity(0.16),
+                        ),
+                        if (isShowStabilizationFee)
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: SvgPicture.asset(
+                                          '/icons/important_icon.svg',
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Text(
+                                        'Stabilization fee',
+                                        style: Theme
+                                            .of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .copyWith(
+                                          fontSize: 12,
+                                          color: Theme
+                                              .of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .color!
+                                              .withOpacity(0.3),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  '${stabilizationFee.toString()}%',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Text(
-                            getRateStringFormat(dexState),
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            ' (\$${balancesHelper.numberStyling(rateQuoteUsd, fixedCount: 2, fixed: true)})',
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(
-                              fontSize: 12,
-                              color: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .color!
-                                  .withOpacity(0.3),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Divider(
-                      color: AppColors.lavenderPurple.withOpacity(0.16),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Platform Fee',
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(
-                              fontSize: 12,
-                              color: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .color!
-                                  .withOpacity(0.3),
-                            ),
-                          ),
-                          Text(
-                            '${balancesHelper.fromSatohi(12000)} DFI',
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Divider(
-                      color: AppColors.lavenderPurple.withOpacity(0.16),
-                    ),
-                    if (isShowStabilizationFee)
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      ]
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Column(
+                  children: [
+                    BlocBuilder<FiatCubit, FiatState>(builder: (context, fiatState) {
+                      FiatCubit fiatCubit =
+                      BlocProvider.of<FiatCubit>(context);
+                      if (iterator == 0 && SettingsHelper.isBitcoin()) {
+                        fiatCubit.loadCryptoRoute(accountTo);
+                        iterator++;
+                      }
+                      if (fiatState.status == FiatStatusList.success &&
+                          SettingsHelper.isBitcoin()) {
+                        return Column(
                           children: [
-                            Expanded(
-                              child: Row(
+                            if (!fiatState.isKycDataComplete!)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 14.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    String kycHash = fiatState.kycHash!;
+                                    launch(
+                                        'https://payment.dfx.swiss/kyc?code=$kycHash');
+                                  },
+                                  child: RichText(
+                                    text: TextSpan(
+                                      text:
+                                          'Please complete the KYC process to enable this feature',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline3
+                                          ?.apply(color: AppTheme.pinkColor),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            NewPrimaryButton(
+                              titleWidget: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SizedBox(
                                     width: 16,
                                     height: 16,
                                     child: SvgPicture.asset(
-                                      '/icons/important_icon.svg',
+                                      'assets/icons/change_icon.svg',
+                                      color: AppColors.white,
                                     ),
                                   ),
                                   SizedBox(
                                     width: 8,
                                   ),
                                   Text(
-                                    'Stabilization fee',
-                                    style: Theme
-                                        .of(context)
+                                    'Preview Change',
+                                    style: Theme.of(context)
                                         .textTheme
-                                        .headline5!
+                                        .button!
                                         .copyWith(
-                                      fontSize: 12,
-                                      color: Theme
-                                          .of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.white,
+                                          fontSize: 14,
+                                        ),
                                   )
                                 ],
                               ),
-                            ),
-                            Text(
-                              '${stabilizationFee.toString()}%',
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                fontSize: 12,
-                              ),
+                              callback: !isDisableSubmit() &&
+                                      fiatState.isKycDataComplete!
+                                  ? () => submitReviewSwap(
+                                        accountState,
+                                        transactionState,
+                                        context,
+                                        isFullScreen,
+                                        cryptoRoute: fiatState.cryptoRoute,
+                                      )
+                                  : null,
                             ),
                           ],
-                        ),
-                      ),
+                        );
+                      } else {
+                        return NewPrimaryButton(
+                          titleWidget: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: SvgPicture.asset(
+                                  'assets/icons/change_icon.svg',
+                                  color: AppColors.white,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                'Preview Change',
+                                style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .button!
+                                    .copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.white,
+                                  fontSize: 14,
+                                ),
+                              )
+                            ],
+                          ),
+                          callback: !isDisableSubmit()
+                              ? () =>
+                              submitReviewSwap(
+                                accountState,
+                                transactionState,
+                                context,
+                                isFullScreen,
+                              )
+                              : null,
+                        );
+                      }
+                    }),
                   ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: NewPrimaryButton(
-                  titleWidget: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: SvgPicture.asset(
-                          'icons/change_icon.svg',
-                          color: AppColors.white,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text(
-                        'Preview Change',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .button!
-                            .copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.white,
-                          fontSize: 14,
-                        ),
-                      )
-                    ],
-                  ),
-                  callback: !isDisableSubmit()
-                      ? () =>
-                      submitReviewSwap(
-                        accountState,
-                        transactionState,
-                        context,
-                        isFullScreen,
-                      )
-                  : null,
                 ),
               ),
             ],
@@ -783,8 +1047,13 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
         double.parse(amountFromController.text);
   }
 
-  submitReviewSwap(state, transactionState, context, bool isFullScreen,
-      {CryptoRouteModel? cryptoRoute}) async {
+  submitReviewSwap(
+    state,
+    transactionState,
+    context,
+    bool isFullScreen, {
+    CryptoRouteModel? cryptoRoute,
+  }) async {
     hideOverlay();
     if (SettingsHelper.isBitcoin()) {
       double minDeposit = convertFromSatoshi(cryptoRoute!.minDeposit!);
@@ -845,107 +1114,64 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
     }
     if (isNumeric(amountFromController.text)) {
       if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
-        isFullScreen
-            ? PasswordBottomSheet.provideWithPasswordFullScreen(
-            context, state.activeAccount, (password) async {
-          try {
-            BitcoinCubit bitcoinCubit =
-            BlocProvider.of<BitcoinCubit>(context);
-            ECPair keyPair = await HDWalletService()
-                .getKeypairFromStorage(
-                password, state.activeAccount.index!);
-            var tx = await transactionService.createBTCTransaction(
-              keyPair: keyPair,
-              account: state.activeAccount,
-              destinationAddress: cryptoRoute.address!,
-              amount: balancesHelper.toSatoshi(amountFromController.text),
-              satPerByte: bitcoinCubit.state.networkFee!.medium!,
-            );
-            Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) =>
-                      SwapSummaryScreen(
-                        assetFrom.symbol!,
-                        assetTo!.symbol!.replaceAll('d', ''),
-                        double.parse(amountFromController.text),
-                        double.parse(amountToController.text),
-                        slippage,
-                        btcTx: tx,
+        showDialog(
+          barrierColor: Color(0x0f180245),
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context1) {
+            return PassConfirmDialog(
+                onSubmit: (password) async {
+                  try {
+                    BitcoinCubit bitcoinCubit =
+                    BlocProvider.of<BitcoinCubit>(context);
+                    ECPair keyPair = await HDWalletService()
+                        .getKeypairFromStorage(
+                        password, state.activeAccount.index!);
+                    var tx = await transactionService.createBTCTransaction(
+                      keyPair: keyPair,
+                      account: state.activeAccount,
+                      destinationAddress: cryptoRoute.address!,
+                      amount: balancesHelper.toSatoshi(amountFromController.text),
+                      satPerByte: bitcoinCubit.state.networkFee!.medium!,
+                    );
+                    Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) =>
+                              SwapSummaryScreen(
+                                assetFrom.symbol!,
+                                assetTo!.symbol!.replaceAll('d', ''),
+                                double.parse(amountFromController.text),
+                                double.parse(amountToController.text),
+                                slippage,
+                                btcTx: tx,
+                              ),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
+                        ));
+                  } catch (err) {
+                    print(err);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Something went wrong',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .headline5,
+                        ),
+                        backgroundColor:
+                        Theme
+                            .of(context)
+                            .snackBarTheme
+                            .backgroundColor,
                       ),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ));
-          } catch (err) {
-            print(err);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Something went wrong',
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .headline5,
-                ),
-                backgroundColor:
-                Theme
-                    .of(context)
-                    .snackBarTheme
-                    .backgroundColor,
-              ),
+                    );
+                  }
+                }
             );
-          }
-        })
-            : PasswordBottomSheet.provideWithPassword(
-            context, state.activeAccount, (password) async {
-          try {
-            BitcoinCubit bitcoinCubit =
-            BlocProvider.of<BitcoinCubit>(context);
-            ECPair keyPair = await HDWalletService()
-                .getKeypairFromStorage(
-                password, state.activeAccount.index!);
-            var tx = await transactionService.createBTCTransaction(
-              keyPair: keyPair,
-              account: state.activeAccount,
-              destinationAddress: cryptoRoute.address!,
-              amount: balancesHelper.toSatoshi(amountFromController.text),
-              satPerByte: bitcoinCubit.state.networkFee!.medium!,
-            );
-            Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) =>
-                      SwapSummaryScreen(
-                        assetFrom.symbol!,
-                        assetTo!.symbol!.replaceAll('d', ''),
-                        double.parse(amountFromController.text),
-                        double.parse(amountToController.text),
-                        slippage,
-                        btcTx: tx,
-                      ),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ));
-          } catch (err) {
-            print(err);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Something went wrong',
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .headline5,
-                ),
-                backgroundColor:
-                Theme
-                    .of(context)
-                    .snackBarTheme
-                    .backgroundColor,
-              ),
-            );
-          }
-        });
+          },
+        );
       } else {
         Navigator.push(
             context,
