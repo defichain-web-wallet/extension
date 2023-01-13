@@ -6,7 +6,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/buy/contact_screen.dart';
 import 'package:defi_wallet/screens/buy/search_buy_token.dart';
-import 'package:defi_wallet/screens/buy/tutorials/first_step_buy_screen.dart';
+import 'package:defi_wallet/screens/buy/tutorials/buy_tutorial_first_screen.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
 import 'package:defi_wallet/screens/sell/account_type_sell.dart';
 import 'package:defi_wallet/screens/sell/selling.dart';
@@ -257,7 +257,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => FirstStepBuyScreen(),
+          pageBuilder: (context, animation1, animation2) => BuyTutorialFirstScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
