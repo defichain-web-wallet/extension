@@ -1,8 +1,8 @@
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/screens/home/widgets/settings_list.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
@@ -22,7 +22,12 @@ class UiKit extends StatefulWidget {
   State<UiKit> createState() => _UiKitState();
 }
 
-class _UiKitState extends State<UiKit> {
+class _UiKitState extends State<UiKit>
+    with SnackBarMixin, SingleTickerProviderStateMixin {
+  late final AnimationController animationController = AnimationController(
+    vsync: this,
+    duration: Duration(seconds: 2),
+  )..repeat();
   TextEditingController controller = TextEditingController();
   bool isObscure1 = false;
   bool isObscure2 = true;
@@ -70,9 +75,7 @@ class _UiKitState extends State<UiKit> {
                   name: 'Defi',
                   symbol: 'DFI',
                 ),
-                controller: TextEditingController(
-                  text: '200.50'
-                ),
+                controller: TextEditingController(text: '200.50'),
                 assets: [
                   TokensModel(
                     symbol: 'DFI',
@@ -105,7 +108,7 @@ class _UiKitState extends State<UiKit> {
                   //
                 },
                 activeFee: 2,
-                fees: [2,5,10],
+                fees: [2, 5, 10],
               ),
               Container(
                 child: AppSelector(
@@ -118,7 +121,25 @@ class _UiKitState extends State<UiKit> {
               FlatButton(
                 title: 'Buy/Sell',
                 callback: () {
-                  //
+                  SnackBar snackBar = bottomShackBar(
+                    context,
+                    color: Color(0xFF9490EA),
+                    title: 'Waiting for transaction',
+                    prefix: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: Opacity(
+                        opacity: 0.4,
+                        child: RotationTransition(
+                          turns: Tween(begin: 0.0, end: 1.0).animate(animationController),
+                          child: SvgPicture.asset(
+                              'assets/icons/circular_spinner.svg'),
+                        ),
+                      ),
+                    ),
+                  );
+
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 },
               ),
               Row(
