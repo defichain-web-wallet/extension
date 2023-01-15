@@ -131,9 +131,11 @@ class _UiKitState extends State<UiKit>
                       child: Opacity(
                         opacity: 0.4,
                         child: RotationTransition(
-                          turns: Tween(begin: 0.0, end: 1.0).animate(animationController),
+                          turns: Tween(begin: 0.0, end: 1.0)
+                              .animate(animationController),
                           child: SvgPicture.asset(
-                              'assets/icons/circular_spinner.svg'),
+                            'assets/icons/circular_spinner.svg',
+                          ),
                         ),
                       ),
                     ),
