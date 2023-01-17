@@ -39,6 +39,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       if (timer != null) {
         timer.cancel();
       }
+      emit(TransactionErrorState(txId));
     }
   }
 

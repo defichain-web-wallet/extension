@@ -49,4 +49,8 @@ abstract class AppColors {
   static const appAssetEntryBorder = whiteLilac;
 
   static const networkMarkColor = Color(0xFF00CF21);
+
+  static const txStatusDone = malachite;
+  static const txStatusPending = portage;
+  static const txStatusError = razzmatazz;
 }

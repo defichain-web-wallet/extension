@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -494,6 +495,12 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
+            if (!SettingsHelper.isBitcoin()) {
+              TransactionCubit transactionCubit =
+              BlocProvider.of<TransactionCubit>(context);
+
+              transactionCubit.setOngoingTransaction(txResponse!.txid!);
+            }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(

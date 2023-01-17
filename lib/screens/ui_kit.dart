@@ -36,6 +36,14 @@ class _UiKitState extends State<UiKit>
   TokensModel? currentAsset;
 
   @override
+  void initState() {
+    Future<Null>.delayed(Duration.zero, () {
+
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

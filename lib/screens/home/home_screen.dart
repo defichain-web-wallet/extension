@@ -12,12 +12,12 @@ import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
-import 'package:defi_wallet/screens/tokens/search_token.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/home/home_card.dart';
+import 'package:defi_wallet/widgets/home/transaction_status_bar.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -195,91 +195,98 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       child: Center(
                         child: StretchBox(
                           maxWidth: ScreenSizes.medium,
-                          child: ListView(
+                          child: Stack(
                             children: [
-                              SizedBox(
-                                height: 5,
-                              ),
-                              HomeCard(),
-                              SizedBox(
-                                height: 34,
-                              ),
-                              // HomeTabs(),
-                              Container(
-                                padding: const EdgeInsets.only(top: 12, right: 24),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    topRight: Radius.circular(20),
+                              ListView(
+                                children: [
+                                  SizedBox(
+                                    height: 5,
                                   ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    TabBarHeader(
-                                      tabController: tabController,
+                                  HomeCard(),
+                                  SizedBox(
+                                    height: 34,
+                                  ),
+                                  // HomeTabs(),
+                                  Container(
+                                    padding: const EdgeInsets.only(top: 12, right: 24),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).cardColor,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        topRight: Radius.circular(20),
+                                      ),
                                     ),
-                                    Container(
-                                      child: Row(
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {},
-                                            icon: SvgPicture.asset(
-                                              'assets/icons/filter_icon.svg',
-                                              color:
-                                              SettingsHelper.settings.theme == 'Dark'
-                                                  ? Colors.white
-                                                  : null,
-                                            ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TabBarHeader(
+                                          tabController: tabController,
+                                        ),
+                                        Container(
+                                          child: Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {},
+                                                icon: SvgPicture.asset(
+                                                  'assets/icons/filter_icon.svg',
+                                                  color:
+                                                  SettingsHelper.settings.theme == 'Dark'
+                                                      ? Colors.white
+                                                      : null,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 12,
+                                              ),
+                                              SizedBox(
+                                                width: 32,
+                                                height: 32,
+                                                child: NewActionButton(
+                                                  iconPath: 'assets/icons/add_black.svg',
+                                                  onPressed: () async {
+                                                    await lockHelper.provideWithLockChecker(
+                                                      context,
+                                                          () => Navigator.push(
+                                                        context,
+                                                        PageRouteBuilder(
+                                                          pageBuilder: (context, animation1,
+                                                              animation2) =>
+                                                              AddTokenScreen(),
+                                                          transitionDuration: Duration.zero,
+                                                          reverseTransitionDuration:
+                                                          Duration.zero,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          SizedBox(
-                                            width: 12,
-                                          ),
-                                          SizedBox(
-                                            width: 32,
-                                            height: 32,
-                                            child: NewActionButton(
-                                              iconPath: 'assets/icons/add_black.svg',
-                                              onPressed: () async {
-                                                await lockHelper.provideWithLockChecker(
-                                                  context,
-                                                      () => Navigator.push(
-                                                    context,
-                                                    PageRouteBuilder(
-                                                      pageBuilder: (context, animation1,
-                                                          animation2) =>
-                                                          AddTokenScreen(),
-                                                      transitionDuration: Duration.zero,
-                                                      reverseTransitionDuration:
-                                                      Duration.zero,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  if (homeState.tabIndex == 0)
+                                    SizedBox(
+                                      height: assetsTabBodyHeight,
+                                      child: TabBarBody(
+                                        tabController: tabController,
+                                        isEmptyList: isExistHistory(state),
                                       ),
                                     )
-                                  ],
-                                ),
+                                  else
+                                    SizedBox(
+                                      height: historyTabBodyHeight,
+                                      child: TabBarBody(
+                                        tabController: tabController,
+                                        isEmptyList: isExistHistory(state),
+                                      ),
+                                    ),
+                                ],
                               ),
-                              homeState.tabIndex == 0
-                                  ? SizedBox(
-                                height: assetsTabBodyHeight,
-                                child: TabBarBody(
-                                  tabController: tabController,
-                                  isEmptyList: isExistHistory(state),
-                                ),
-                              )
-                                  : SizedBox(
-                                height: historyTabBodyHeight,
-                                child: TabBarBody(
-                                  tabController: tabController,
-                                  isEmptyList: isExistHistory(state),
-                                ),
-                              ),
+                              if (txState is! TransactionInitialState)
+                                TransactionStatusBar(),
                             ],
                           ),
                         ),
