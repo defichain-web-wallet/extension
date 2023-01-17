@@ -155,6 +155,12 @@ class _BuyTutorialFirstScreenState extends State<BuyTutorialFirstScreen>
                                     ),
                                   ),
                                 ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 123, left: 197),
+                                  child: SvgPicture.asset(
+                                      'assets/tutorial_buy_cursor.svg'),
+                                ),
                               ],
                             ),
                           ),
@@ -249,5 +255,4 @@ class _BuyTutorialFirstScreenState extends State<BuyTutorialFirstScreen>
       },
     );
   }
-
 }
