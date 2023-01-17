@@ -3,6 +3,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
 import 'package:defi_wallet/screens/liquidity/earn_screen_new.dart';
+import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
 import 'package:defi_wallet/screens/swap/swap_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/select_buy_or_sell_screen.dart';
@@ -93,7 +94,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation1, animation2) =>
-                              SelectBuyOrSellScreen(),
+                              BuySellScreen(),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
                         ),

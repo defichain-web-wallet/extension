@@ -6,6 +6,7 @@ import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/screens/buy/iban_screen.dart';
 import 'package:defi_wallet/screens/sell/selling.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -53,7 +54,7 @@ class IbanSelectorState extends State<IbanSelector> {
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Text(
                   'Your bank account',
-                  style: Theme.of(context).textTheme.headline2,
+                  style: Theme.of(context).textTheme.headline5,
                   textAlign: TextAlign.start,
                 ),
               ),
@@ -67,16 +68,9 @@ class IbanSelectorState extends State<IbanSelector> {
                 height: _tileHeight,
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(10),
-                    topLeft: Radius.circular(10),
-                    bottomRight:
-                        _isOpen ? Radius.circular(0) : Radius.circular(10),
-                    bottomLeft:
-                        _isOpen ? Radius.circular(0) : Radius.circular(10),
-                  ),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.transparent,
+                    color: AppColors.portage.withOpacity(0.12),
                   ),
                 ),
                 child: DropdownButtonHideUnderline(
@@ -92,26 +86,33 @@ class IbanSelectorState extends State<IbanSelector> {
                                   top: 12.0, bottom: 12.0, left: 22, right: 22),
                               child: Text(
                                 'IBAN',
-                                style: Theme.of(context).textTheme.headline2,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                      fontSize: 12,
+                                    ),
                               ),
                             ),
-                            // SizedBox(width: 16),
                             Text(
                               '${fiatHelper.getIbanFormat(widget.selectedIban.iban!)}',
                               overflow: TextOverflow.ellipsis,
-                              style:
-                                  Theme.of(context).textTheme.headline3!.apply(
-                                        color: _isOpen
-                                            ? Theme.of(context)
-                                                .textTheme
-                                                .headline3!
-                                                .color!
-                                                .withOpacity(0.5)
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .headline3!
-                                                .color!,
-                                      ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .copyWith(
+                                    color: _isOpen
+                                        ? Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!
+                                            .withOpacity(0.5)
+                                        : Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!,
+                                    fontSize: 12,
+                                  ),
                             ),
                           ],
                         ),
@@ -166,12 +167,9 @@ class IbanSelectorState extends State<IbanSelector> {
                   2,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Colors.transparent,
+                  color: AppColors.portage.withOpacity(0.12),
                 ),
               ),
               child: ListView.separated(
@@ -204,10 +202,11 @@ class IbanSelectorState extends State<IbanSelector> {
                         child: Center(
                           child: Text(
                             '+ Add new IBAN',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline3!
-                                .apply(color: AppTheme.pinkColor),
+                            style:
+                                Theme.of(context).textTheme.headline5!.copyWith(
+                                      color: AppTheme.pinkColor,
+                                      fontSize: 12,
+                                    ),
                           ),
                         ),
                       ),
@@ -217,12 +216,13 @@ class IbanSelectorState extends State<IbanSelector> {
                           Navigator.push(
                             context,
                             PageRouteBuilder(
-                              pageBuilder: (context, animation1, animation2) =>
-                                  IbanScreen(
-                                asset: widget.asset!,
-                                isNewIban: true,
-                                routeWidget: widget.routeWidget,
-                              ),
+                              pageBuilder: (context, animation1, animation2) {
+                                return IbanScreen(
+                                  asset: widget.asset!,
+                                  isNewIban: true,
+                                  routeWidget: widget.routeWidget,
+                                );
+                              },
                               transitionDuration: Duration.zero,
                               reverseTransitionDuration: Duration.zero,
                             ),
@@ -243,17 +243,19 @@ class IbanSelectorState extends State<IbanSelector> {
                       },
                     );
                   } else {
+                    print(index);
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(0),
-                          shadowColor: Colors.transparent,
-                          primary: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                          ),
-                          side: BorderSide(
-                            color: Colors.transparent,
-                          )),
+                        padding: const EdgeInsets.all(0),
+                        shadowColor: Colors.transparent,
+                        primary: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(0),
+                        ),
+                        side: BorderSide(
+                          color: Colors.transparent,
+                        ),
+                      ),
                       child: Container(
                         height: _tileHeight,
                         child: Padding(
@@ -270,17 +272,39 @@ class IbanSelectorState extends State<IbanSelector> {
                                         bottom: 12.0,
                                         left: 22,
                                         right: 22),
-                                    child: Text(widget.isShowAsset
-                                        ? widget.ibanList[index].fiat!.name!
-                                        : ''),
+                                    child: Text(
+                                      widget.isShowAsset
+                                          ? widget.ibanList[index].fiat!.name!
+                                          : '',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .copyWith(
+                                            fontSize: 12,
+                                          ),
+                                    ),
                                   ),
                                   Text(
                                     '${fiatHelper.getIbanFormat(widget.ibanList[index].iban!)}',
                                     overflow: TextOverflow.ellipsis,
                                     style: widget.ibanList[index].id ==
                                             widget.selectedIban.id
-                                        ? Theme.of(context).textTheme.headline2
-                                        : Theme.of(context).textTheme.headline3,
+                                        ? Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .copyWith(
+                                                fontSize: 12,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color!
+                                                    .withOpacity(0.6))
+                                        : Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .copyWith(
+                                              fontSize: 12,
+                                            ),
                                   ),
                                 ],
                               ),
@@ -301,7 +325,7 @@ class IbanSelectorState extends State<IbanSelector> {
                 separatorBuilder: (BuildContext context, int index) {
                   return Divider(
                     height: 1,
-                    color: Theme.of(context).textTheme.button!.decorationColor!,
+                    color: Theme.of(context).dividerColor.withOpacity(0.12),
                   );
                 },
               ),
