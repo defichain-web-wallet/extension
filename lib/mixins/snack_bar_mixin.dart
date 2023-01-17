@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,20 @@ mixin SnackBarMixin {
   // Hack for infinite showing snack bar
   static const int seconds = 3;
 
-  SnackBar bottomShackBar(
+  showSnackBar(context, {String title = ''}) {
+    SnackBar snackBar = bottomSnackBar(context,
+      title: title,
+      color: AppColors.txStatusDone.withOpacity(0.08),
+      prefix: Icon(
+        Icons.done,
+        color: AppColors.txStatusDone,
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  SnackBar bottomSnackBar(
     BuildContext context, {
     required Color color,
     required String title,

@@ -7,6 +7,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
@@ -30,14 +31,19 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isLoadTokens;
+  final String snackBarMessage;
 
-  const HomeScreen({Key? key, this.isLoadTokens = false}) : super(key: key);
+  const HomeScreen({
+    Key? key,
+    this.isLoadTokens = false,
+    this.snackBarMessage = '',
+  }) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProviderStateMixin {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   TabController? tabController;
   bool isSaveOpenTime = false;
@@ -190,6 +196,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 body: BlocBuilder<HomeCubit, HomeState>(
                   builder: (context, homeState) {
+                    if (widget.snackBarMessage.isNotEmpty) {
+                      Future<Null>.delayed(Duration.zero, () {
+                        showSnackBar(context, title: widget.snackBarMessage);
+                      });
+                    }
                     return Container(
                       color: Theme.of(context).scaffoldBackgroundColor,
                       child: Center(
@@ -206,7 +217,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   SizedBox(
                                     height: 34,
                                   ),
-                                  // HomeTabs(),
                                   Container(
                                     padding: const EdgeInsets.only(top: 12, right: 24),
                                     decoration: BoxDecoration(

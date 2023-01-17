@@ -202,7 +202,9 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
     await Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) => HomeScreen(),
+        pageBuilder: (context, animation1, animation2) => HomeScreen(
+          snackBarMessage: 'Tokens have been added to your Assets',
+        ),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),

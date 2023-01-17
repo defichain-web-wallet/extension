@@ -129,7 +129,7 @@ class _UiKitState extends State<UiKit>
               FlatButton(
                 title: 'Buy/Sell',
                 callback: () {
-                  SnackBar snackBar = bottomShackBar(
+                  SnackBar snackBar = bottomSnackBar(
                     context,
                     color: Color(0xFF9490EA),
                     title: 'Waiting for transaction',
