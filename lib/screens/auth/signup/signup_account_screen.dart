@@ -94,7 +94,9 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
 
   _createAccount() async {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-    _saveImageToStorage();
+    if (_pickedImage != null) {
+      _saveImageToStorage();
+    }
 
     await accountCubit.createAccount(
       widget.mnemonic,
