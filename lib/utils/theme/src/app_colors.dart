@@ -15,6 +15,7 @@ abstract class AppColors {
   static const hollywoodCerise = Color(0xFFFF00A3);
   static const hollywoodCeriseAlpha = Color(0xFFFF00A3);
   static const electricViolet = Color(0xFFBC00C0);
+  static const wineBerry = Color(0xFF51153A);
   static const redViolet = Color(0xFFEE1798);
   static const electricVioletAlpha = Color(0xFFBC00C0);
   static const razzmatazz = Color(0xFFEE1771);
@@ -25,6 +26,9 @@ abstract class AppColors {
   static const mirage = Color(0xFF1B162C);
 
   static const textPrimaryColor = blackRock;
+
+  // input
+  static const inputSuffixIconColor = white;
 
   static const lightGreyColor = Color(0xFFEDEDED);
   static const pinkColor = Color(0xFFFF00A3);

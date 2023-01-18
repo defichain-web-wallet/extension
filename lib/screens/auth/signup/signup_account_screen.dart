@@ -4,11 +4,13 @@ import 'dart:async';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_choose_theme_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_done_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/fields/input_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
@@ -33,7 +35,8 @@ class SignupAccountScreen extends StatefulWidget {
   State<SignupAccountScreen> createState() => _SignupAccountScreenState();
 }
 
-class _SignupAccountScreenState extends State<SignupAccountScreen> {
+class _SignupAccountScreenState extends State<SignupAccountScreen>
+    with ThemeMixin {
   TextEditingController _nameController = TextEditingController();
   File? _pickedImage;
   Uint8List _webImage = Uint8List(8);
@@ -91,7 +94,9 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
 
   _createAccount() async {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-    _saveImageToStorage();
+    if (_pickedImage != null) {
+      _saveImageToStorage();
+    }
 
     await accountCubit.createAccount(
       widget.mnemonic,
@@ -190,8 +195,9 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                                               onTap: () => _pickImage(),
                                               child: CircleAvatar(
                                                 radius: 12,
-                                                backgroundColor:
-                                                    AppColors.white,
+                                                backgroundColor: isDarkTheme()
+                                                    ? AppColors.mirage
+                                                    : AppColors.white,
                                                 child: SvgPicture.asset(
                                                     'assets/icon_photo.svg'),
                                               ),
@@ -214,24 +220,9 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                                       height: 6,
                                     ),
                                     Container(
-                                      child: TextFormField(
+                                      child: InputField(
                                         controller: _nameController,
-                                        decoration: InputDecoration(
-                                          filled: true,
-                                          fillColor: AppColors.white,
-                                          hintText: 'Enter your Account`s Name',
-                                          hintStyle: passwordField.copyWith(
-                                            color: AppColors.darkTextColor
-                                                .withOpacity(0.3),
-                                          ),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: AppColors.portage
-                                                  .withOpacity(0.12),
-                                              width: 1.0,
-                                            ),
-                                          ),
-                                        ),
+                                        hintText: 'Enter your Account`s Name',
                                       ),
                                     ),
                                   ],

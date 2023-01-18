@@ -62,7 +62,10 @@ class SignupDoneScreen extends StatelessWidget {
                               textAlign: TextAlign.center,
                               style:
                                   Theme.of(context).textTheme.headline5!.apply(
-                                        color: AppColors.darkTextColor
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!
                                             .withOpacity(0.6),
                                       ),
                             ),

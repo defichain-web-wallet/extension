@@ -1,12 +1,14 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-class WelcomeTextCover extends StatelessWidget {
+class WelcomeTextCover extends StatelessWidget with ThemeMixin {
   final String text;
   final int? wordSelectId;
 
   static const int defaultWordId = -1;
 
-  const WelcomeTextCover(
+  WelcomeTextCover(
     this.text, {
     Key? key,
     this.wordSelectId = defaultWordId,
@@ -35,7 +37,13 @@ class WelcomeTextCover extends StatelessWidget {
           .headline1!
           .apply(color: Theme.of(context).textTheme.headline1!.color);
     } else {
-      return Theme.of(context).textTheme.headline2!;
+      if (isDarkTheme()) {
+        return Theme.of(context).textTheme.headline2!.apply(
+          color: AppColors.moonRaker.withOpacity(0.2),
+        );
+      } else {
+        return Theme.of(context).textTheme.headline2!;
+      }
     }
   }
 }

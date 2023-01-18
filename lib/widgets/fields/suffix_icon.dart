@@ -1,3 +1,4 @@
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -35,6 +36,8 @@ class _SuffixIconState extends State<SuffixIcon> {
             iconUrl,
             width: 16,
             height: 16,
+            color:
+                Theme.of(context).textTheme.headline1!.color!.withOpacity(0.6),
           ),
         ),
       );

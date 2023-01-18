@@ -53,7 +53,6 @@ ThemeData createLightTheme() {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
         primary: Colors.white,
         onPrimary: AppColors.darkTextColor,
         shape: RoundedRectangleBorder(
@@ -105,9 +104,13 @@ ThemeData createLightTheme() {
           color: AppColors.pinkColor,
         ),
       ),
+      hintStyle: TextStyle(
+        color: AppColors.blackRock.withOpacity(0.3),
+      ),
       fillColor: Colors.white.withOpacity(0.65),
     ),
-    textSelectionTheme:
-        TextSelectionThemeData(selectionColor: Color(0xFF7D7D7D)),
+    textSelectionTheme: TextSelectionThemeData(
+      selectionColor: LightColors.inputTextSelectionColor,
+    ),
   ).copyWith(splashColor: Colors.transparent);
 }
