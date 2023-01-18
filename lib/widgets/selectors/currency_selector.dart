@@ -74,52 +74,48 @@ class _CurrencySelectorState extends State<CurrencySelector> with ThemeMixin {
             color: AppColors.portage.withOpacity(0.12),
           ),
         ),
-        child: BlocBuilder<NetworkCubit, NetworkState>(
-          builder: (context, networkState) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    SizedBox(
-                      height: 16,
-                      width: 16,
-                      child: SvgPicture.asset(
-                          'assets/currencies/${widget.selectedCurrency.name!.toLowerCase()}.svg'),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      widget.selectedCurrency.name!,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                        color: _isShowDropdown
-                            ? Theme.of(context)
-                            .textTheme
-                            .headline5!
-                            .color!
-                            .withOpacity(0.5)
-                            : Theme.of(context)
-                            .textTheme
-                            .headline5!
-                            .color!,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                SizedBox(
+                  height: 16,
+                  width: 16,
+                  child: SvgPicture.asset(
+                      'assets/currencies/${widget.selectedCurrency.name!.toLowerCase()}.svg'),
                 ),
-                RotationTransition(
-                  turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
-                  child: SizedBox(
-                    width: 10,
-                    height: 10,
-                    child: SvgPicture.asset(
-                      'assets/icons/arrow_down.svg',
-                    ),
+                SizedBox(width: 8),
+                Text(
+                  widget.selectedCurrency.name!,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.headline5!.copyWith(
+                    color: _isShowDropdown
+                        ? Theme.of(context)
+                        .textTheme
+                        .headline5!
+                        .color!
+                        .withOpacity(0.5)
+                        : Theme.of(context)
+                        .textTheme
+                        .headline5!
+                        .color!,
+                    fontSize: 12,
                   ),
                 ),
               ],
-            );
-          },
+            ),
+            RotationTransition(
+              turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
+              child: SizedBox(
+                width: 10,
+                height: 10,
+                child: SvgPicture.asset(
+                  'assets/icons/arrow_down.svg',
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       menuBuilder: () => Container(
