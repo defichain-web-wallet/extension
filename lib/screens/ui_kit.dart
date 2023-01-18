@@ -36,6 +36,14 @@ class _UiKitState extends State<UiKit>
   TokensModel? currentAsset;
 
   @override
+  void initState() {
+    Future<Null>.delayed(Duration.zero, () {
+
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -121,7 +129,7 @@ class _UiKitState extends State<UiKit>
               FlatButton(
                 title: 'Buy/Sell',
                 callback: () {
-                  SnackBar snackBar = bottomShackBar(
+                  SnackBar snackBar = bottomSnackBar(
                     context,
                     color: Color(0xFF9490EA),
                     title: 'Waiting for transaction',

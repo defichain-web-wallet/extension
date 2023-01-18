@@ -91,7 +91,7 @@ ThemeData createDarkTheme() {
         borderRadius: BorderRadius.circular(inputBorderRadius),
         borderSide: BorderSide(
           width: 1,
-          color: Color(0xFFF0EEF6),
+          color: AppColors.portage.withOpacity(0.12),
         ),
       ),
       focusedBorder: OutlineInputBorder(
@@ -101,9 +101,13 @@ ThemeData createDarkTheme() {
           color: AppColors.pinkColor,
         ),
       ),
-      fillColor: Color(0xFFF6F4FC),
+      hintStyle: TextStyle(
+        color: AppColors.white.withOpacity(0.3),
+      ),
+      fillColor: AppColors.ebony,
     ),
-    textSelectionTheme:
-        TextSelectionThemeData(selectionColor: Color(0xFFF0F0F0)),
+    textSelectionTheme: TextSelectionThemeData(
+      selectionColor: DarkColors.inputTextSelectionColor,
+    ),
   );
 }

@@ -17,29 +17,34 @@ class NewPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: buttonHeight,
-      width: width,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(buttonBorderRadius),
-          gradient: callback != null ? gradientButton : gradientDisableButton),
-      child: ElevatedButton(
-        onPressed: callback,
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(buttonBorderRadius),
-            ),
-          ),
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-        ),
-        child: titleWidget != null ? titleWidget : Text(
-          title,
-          style: Theme.of(context).textTheme.button!.apply(
-                color: Color(0xFFFCFBFE),
-                fontWeightDelta: 1,
+    return MouseRegion(
+      cursor: callback == null
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.click,
+      child: Container(
+        height: buttonHeight,
+        width: width,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(buttonBorderRadius),
+            gradient: callback != null ? gradientButton : gradientDisableButton),
+        child: ElevatedButton(
+          onPressed: callback,
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(buttonBorderRadius),
               ),
+            ),
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+          ),
+          child: titleWidget != null ? titleWidget : Text(
+            title,
+            style: Theme.of(context).textTheme.button!.apply(
+                  color: Color(0xFFFCFBFE),
+                  fontWeightDelta: 1,
+                ),
+          ),
         ),
       ),
     );

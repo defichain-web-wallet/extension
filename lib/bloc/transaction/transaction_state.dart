@@ -19,3 +19,9 @@ class TransactionLoadedState extends TransactionState {
 
   TransactionLoadedState(this.txId) : super(txId!);
 }
+
+class TransactionErrorState extends TransactionState {
+  final String? txId;
+
+  TransactionErrorState(this.txId) : super(txId!);
+}

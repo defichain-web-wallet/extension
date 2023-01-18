@@ -47,7 +47,11 @@ class _DefiTextFormFieldState extends State<DefiTextFormField> {
             hintStyle: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Color(0xff12052F).withOpacity(0.3),
+              color: Theme.of(context)
+                  .textTheme
+                  .headline1!
+                  .color!
+                  .withOpacity(0.3),
             ),
             suffixIcon: Column(
               mainAxisAlignment: MainAxisAlignment.center,

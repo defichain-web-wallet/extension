@@ -1,6 +1,13 @@
 part of '../../theme.dart';
 
 abstract class DarkColors {
+  // button
+  static const accentButtonBgColor = AppColors.mirage;
+
+  // input
+  static const inputTextSelectionColor = Colors.blue;
+  static Color inputSuffixIconColor = AppColors.white.withOpacity(0.3);
+
   static const cardColor = Colors.grey;
 
   static const scaffoldBgColor = AppColors.ebony;
