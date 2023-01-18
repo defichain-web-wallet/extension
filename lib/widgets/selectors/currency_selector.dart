@@ -1,249 +1,265 @@
-import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/bloc/network/network_cubit.dart';
+import 'package:defi_wallet/helpers/menu_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CurrencySelector extends StatefulWidget {
-  FiatModel selectedCurrency;
+  final FiatModel selectedCurrency;
+  final List<FiatModel> currencies;
   final void Function(FiatModel) onSelect;
-  List<FiatModel> currencies;
-  void Function()? onAnotherSelect;
-  final bool isBorder;
 
   CurrencySelector({
     Key? key,
-    required this.selectedCurrency,
     required this.onSelect,
+    required this.selectedCurrency,
     required this.currencies,
-    this.onAnotherSelect,
-    this.isBorder = false,
   }) : super(key: key);
 
   @override
-  CurrencySelectorState createState() => CurrencySelectorState();
+  _CurrencySelectorState createState() => _CurrencySelectorState();
 }
 
-class CurrencySelectorState extends State<CurrencySelector> {
-  GlobalKey _selectKey = GlobalKey();
-  bool _isOpen = false;
-  late OverlayState? _overlayState;
-  OverlayEntry? _overlayEntry;
-  static const _tileHeight = 44.0;
-  LockHelper lockHelper = LockHelper();
+class _CurrencySelectorState extends State<CurrencySelector> with ThemeMixin {
+  CustomPopupMenuController controller = CustomPopupMenuController();
+  MenuHelper menuHelper = MenuHelper();
+
+
+  bool isShowAllNetworks = true;
+  NetworkTabs activeTab = NetworkTabs.all;
+  String currentNetworkItem = 'DefiChain Mainnet';
+  bool _isShowDropdown = false;
   List<String> currencyLogoPathList = [
     'assets/currencies/eur.svg',
     'assets/currencies/eur.svg',
   ];
   String selectedCurrencyLogoPath = 'assets/currencies/eur.svg';
 
+  getNetworkName() {
+    SettingsModel settings = SettingsHelper.settings;
+    String network = settings.network!;
+    if (network == 'mainnet') {
+      return (settings.isBitcoin!) ? 'Bitcoin Mainnet' : 'DefiChain Mainnet';
+    } else {
+      return (settings.isBitcoin!) ? 'Bitcoin Testnet' : 'DefiChain Testnet';
+    }
+  }
+
   @override
-  Widget build(BuildContext context) => Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text(
-                'Fiat Currency',
-                style: Theme.of(context)
-                    .textTheme
-                    .headline5,
-                textAlign: TextAlign.start,
-              ),
+  Widget build(BuildContext context) {
+    double arrowRotateDeg = _isShowDropdown ? 180 : 0;
+
+    double horizontalMargin = menuHelper.getHorizontalMargin(context);
+    NetworkCubit networkCubit = BlocProvider.of<NetworkCubit>(context);
+
+    return CustomPopupMenu(
+      menuOnChange: (b) {
+        setState(() {
+          _isShowDropdown = b;
+        });
+      },
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.portage.withOpacity(0.12),
+          ),
+        ),
+        child: BlocBuilder<NetworkCubit, NetworkState>(
+          builder: (context, networkState) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: SvgPicture.asset(
+                          'assets/currencies/${widget.selectedCurrency.name!.toLowerCase()}.svg'),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      widget.selectedCurrency.name!,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                        color: _isShowDropdown
+                            ? Theme.of(context)
+                            .textTheme
+                            .headline5!
+                            .color!
+                            .withOpacity(0.5)
+                            : Theme.of(context)
+                            .textTheme
+                            .headline5!
+                            .color!,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                RotationTransition(
+                  turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
+                  child: SizedBox(
+                    width: 10,
+                    height: 10,
+                    child: SvgPicture.asset(
+                      'assets/icons/arrow_down.svg',
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+      menuBuilder: () => Container(
+        margin: const EdgeInsets.only(top: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(16),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).shadowColor,
+              spreadRadius: 4,
+              blurRadius: 12,
+              offset: Offset(0, 8),
             ),
           ],
         ),
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            child: Container(
-              key: _selectKey,
-              height: _tileHeight,
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppColors.portage.withOpacity(0.12),
-                ),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(
-                                top: 12.0, bottom: 12.0, left: 22, right: 22),
-                            child: SvgPicture.asset(selectedCurrencyLogoPath),
-                          ),
-                          // SizedBox(width: 16),
-                          Text(
-                            widget.selectedCurrency.name!,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.headline5!.copyWith(
-                                  color: _isOpen
-                                      ? Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.5)
-                                      : Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!,
-                              fontSize: 12,
-                                ),
-                          ),
-                        ],
-                      ),
-                      SvgPicture.asset(
-                        _isOpen
-                            ? 'assets/arrow_up.svg'
-                            : 'assets/arrow_down.svg',
-                        color: Theme.of(context).textTheme.button!.color,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            onTap: () async {
-              await lockHelper.provideWithLockChecker(context, () {
-                if (!_isOpen && widget.onAnotherSelect != null) {
-                  widget.onAnotherSelect!();
-                }
-                _showOverlay();
-              });
-            },
-          ),
-        ),
-      ]);
-
-  void _showOverlay() async {
-    if (_isOpen) {
-      hideOverlay();
-    } else {
-      hideOverlay();
-      setState(() {
-        _isOpen = true;
-      });
-      final keyContext = _selectKey.currentContext;
-      _overlayState = Overlay.of(keyContext!);
-      final box = keyContext.findRenderObject() as RenderBox;
-      final pos = box.localToGlobal(Offset.zero);
-
-      _overlayEntry = OverlayEntry(builder: (context) {
-        return Positioned(
-          top: pos.dy + box.size.height,
-          left: pos.dx,
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Container(
-              width: box.size.width,
-              height: ((widget.currencies.length) * (_tileHeight + 1)) + 6,
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppColors.portage.withOpacity(0.12),
-                ),
-              ),
-              child: ListView.separated(
-                itemCount: widget.currencies.length,
-                itemBuilder: (context, index) {
-                  print(widget.currencies[index].name);
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(0),
-                        shadowColor: Colors.transparent,
-                        primary: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(0),
-                        ),
-                        side: BorderSide(
-                          color: Colors.transparent,
-                        )),
+        child: CustomPaint(
+          isComplex: true,
+          willChange: true,
+          painter: ArrowPainter(),
+          child: ClipPath(
+            clipper: ArrowClipper(),
+            child: BlocBuilder<NetworkCubit, NetworkState>(
+              builder: (context, networkState) {
+                return Container(
+                  color: isDarkTheme()
+                      ? DarkColors.networkDropdownBgColor
+                      : LightColors.networkDropdownBgColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                      top: 16,
+                      bottom: 8,
+                    ),
                     child: Container(
-                      height: _tileHeight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 13),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 12.0,
-                                      bottom: 12.0,
-                                      left: 22,
-                                      right: 22),
-                                  child: SvgPicture.asset(
-                                      currencyLogoPathList[index]),
-                                ),
-                                Text(
-                                  widget.currencies[index].name!,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: widget.currencies[index].name ==
-                                          widget.selectedCurrency.name
-                                      ? Theme.of(context).textTheme.headline5!.copyWith(
-                                    color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.5),
-                                    fontSize: 12
-                                  )
-                                      : Theme.of(context).textTheme.headline5!.copyWith(
-                                      fontSize: 12
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: widget.currencies
+                            .map(
+                              (item) => Column(
+                            children: [
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  onTap: () {
+                                    controller.hideMenu();
+                                    widget.onSelect(item);
+                                  },
+                                  child: Container(
+                                    height: 44,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          height: 16,
+                                          width: 16,
+                                          child: SvgPicture.asset(
+                                              'assets/currencies/${item.name!.toLowerCase()}.svg',
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text(
+                                          item.name!,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5,
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ],
-                            ),
-                            SvgPicture.asset(
-                              widget.currencies[index].name ==
-                                      widget.selectedCurrency.name
-                                  ? 'assets/wallet_enable_pink.svg'
-                                  : 'assets/wallet_disable.svg',
-                              color: AppTheme.pinkColor,
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                        )
+                            .toList(),
                       ),
                     ),
-                    onPressed: () async {
-                      selectedCurrencyLogoPath = currencyLogoPathList[index];
-                      widget.selectedCurrency = widget.currencies[index];
-                      widget.onSelect(widget.selectedCurrency);
-                      hideOverlay();
-                    },
-                  );
-                  // }
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return Divider(
-                    height: 1,
-                    color: Theme.of(context).textTheme.button!.decorationColor!,
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
-        );
-      });
-      _overlayState!.insert(_overlayEntry!);
-    }
+        ),
+      ),
+      showArrow: false,
+      barrierColor: Colors.transparent,
+      pressType: PressType.singleClick,
+      verticalMargin: -5,
+      horizontalMargin: horizontalMargin,
+      controller: controller,
+    );
+  }
+}
+
+class ArrowClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final double width = size.width;
+    final double height = size.height;
+    final double startMargin = 0;
+
+    final double s1 = height * 0.3;
+    final double s2 = height * 0.7;
+
+    Path path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(startMargin, 0, width - startMargin, height),
+          const Radius.circular(16),
+        ),
+      )
+      ..lineTo(startMargin, s1)
+      ..lineTo(startMargin, s2)
+      ..close();
+    return path;
   }
 
-  void hideOverlay() {
-    if (_overlayEntry != null) {
-      try {
-        _overlayEntry!.remove();
-      } catch (_) {}
-    }
-    setState(() {
-      _isOpen = false;
-    });
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
+}
+
+class ArrowPainter extends CustomPainter {
+  final CustomClipper<Path> clipper = ArrowClipper();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var path = clipper.getClip(size);
+    Paint paint = new Paint()
+      ..color = AppColors.white.withOpacity(0.04)
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    canvas.drawPath(path, paint);
   }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

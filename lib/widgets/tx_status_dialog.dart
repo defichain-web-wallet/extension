@@ -8,6 +8,9 @@ import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:flutter/material.dart';
 
 class TxStatusDialog extends StatefulWidget {
+  final String title;
+  final String subtitle;
+  final String buttonLabel;
   final TxErrorModel? txResponse;
   final Function() callbackOk;
   final Function() callbackTryAgain;
@@ -15,6 +18,9 @@ class TxStatusDialog extends StatefulWidget {
 
   const TxStatusDialog({
     Key? key,
+    this.title = 'Success!',
+    this.subtitle = 'Jelly is now processing your transaction in the background. Your account balance will be updated in a few minutes.',
+    this.buttonLabel = 'OK',
     required this.txResponse,
     required this.callbackOk,
     required this.callbackTryAgain,
@@ -57,7 +63,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> {
                 Navigator.pop(context);
                 widget.callbackOk();
               },
-              title: 'OK',
+              title: widget.buttonLabel,
             ),
           ),
           if(widget.txResponse!.isError)Row(
@@ -121,7 +127,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> {
                     ],
                   ),
                   Text(
-                    !widget.txResponse!.isError ?  'Success!' : 'Oops!',
+                    !widget.txResponse!.isError ?  widget.title : 'Oops!',
                     style: Theme.of(context).textTheme.headline2!.copyWith(
                           fontWeight: FontWeight.w700,
                           color: Theme.of(context).textTheme.headline5!.color,
@@ -131,7 +137,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> {
                     height: 8,
                   ),
                   Text(
-                    !widget.txResponse!.isError ? subtitleTextSuccsess : subtitleTextOops,
+                    !widget.txResponse!.isError ? widget.subtitle : subtitleTextOops,
                     softWrap: true,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline5!.copyWith(

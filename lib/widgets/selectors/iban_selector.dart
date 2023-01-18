@@ -45,100 +45,108 @@ class IbanSelectorState extends State<IbanSelector> {
   FiatHelper fiatHelper = FiatHelper();
 
   @override
-  Widget build(BuildContext context) => Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  'Your bank account',
-                  style: Theme.of(context).textTheme.headline5,
-                  textAlign: TextAlign.start,
+  Widget build(BuildContext context) {
+    double arrowRotateDeg = _isOpen ? 180 : 0;
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                'Your bank account',
+                style: Theme.of(context).textTheme.headline5,
+                textAlign: TextAlign.start,
+              ),
+            ),
+          ],
+        ),
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            child: Container(
+              key: _selectKey,
+              height: _tileHeight,
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.portage.withOpacity(0.12),
                 ),
               ),
-            ],
-          ),
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              child: Container(
-                key: _selectKey,
-                height: _tileHeight,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.portage.withOpacity(0.12),
-                  ),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(
-                                  top: 12.0, bottom: 12.0, left: 22, right: 22),
-                              child: Text(
-                                'IBAN',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .copyWith(
-                                      fontSize: 12,
-                                    ),
-                              ),
-                            ),
-                            Text(
-                              '${fiatHelper.getIbanFormat(widget.selectedIban.iban!)}',
-                              overflow: TextOverflow.ellipsis,
+              child: DropdownButtonHideUnderline(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                                top: 12.0, bottom: 12.0, left: 22, right: 22),
+                            child: Text(
+                              'IBAN',
                               style: Theme.of(context)
                                   .textTheme
                                   .headline5!
                                   .copyWith(
-                                    color: _isOpen
-                                        ? Theme.of(context)
-                                            .textTheme
-                                            .headline5!
-                                            .color!
-                                            .withOpacity(0.5)
-                                        : Theme.of(context)
-                                            .textTheme
-                                            .headline5!
-                                            .color!,
-                                    fontSize: 12,
-                                  ),
+                                fontSize: 12,
+                              ),
                             ),
-                          ],
+                          ),
+                          Text(
+                            '${fiatHelper.getIbanFormat(widget.selectedIban.iban!)}',
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .copyWith(
+                              color: _isOpen
+                                  ? Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .color!
+                                  .withOpacity(0.5)
+                                  : Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .color!,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                      RotationTransition(
+                        turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
+                        child: SizedBox(
+                          width: 10,
+                          height: 10,
+                          child: SvgPicture.asset(
+                            'assets/icons/arrow_down.svg',
+                          ),
                         ),
-                        SvgPicture.asset(
-                          _isOpen
-                              ? 'assets/arrow_up.svg'
-                              : 'assets/arrow_down.svg',
-                          color: Theme.of(context).textTheme.button!.color,
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              onTap: () async {
-                await lockHelper.provideWithLockChecker(context, () {
-                  if (!_isOpen && widget.onAnotherSelect != null) {
-                    widget.onAnotherSelect!();
-                  }
-                  _showOverlay();
-                });
-              },
             ),
+            onTap: () async {
+              await lockHelper.provideWithLockChecker(context, () {
+                if (!_isOpen && widget.onAnotherSelect != null) {
+                  widget.onAnotherSelect!();
+                }
+                _showOverlay();
+              });
+            },
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 
   void _showOverlay() async {
     if (_isOpen) {

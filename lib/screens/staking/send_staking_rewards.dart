@@ -7,7 +7,6 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
-import 'package:defi_wallet/screens/home/widgets/home_app_bar.dart';
 import 'package:defi_wallet/screens/sell/selling_screen.dart';
 import 'package:defi_wallet/screens/staking/number_of_coins_to_stake.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -41,8 +40,8 @@ class SendStakingRewardsScreen extends StatefulWidget {
 
 class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
   GlobalKey<AssetSelectState> _selectKeyFrom = GlobalKey<AssetSelectState>();
-  final GlobalKey<CurrencySelectorState> _selectKeyCurrency =
-      GlobalKey<CurrencySelectorState>();
+  // final GlobalKey<CurrencySelectorState> _selectKeyCurrency =
+  //     GlobalKey<CurrencySelectorState>();
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<IbanSelectorState> selectKeyIban =
       GlobalKey<IbanSelectorState>();
@@ -417,9 +416,9 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
     try {
       _selectKeyFrom.currentState!.hideOverlay();
     } catch (_) {}
-    try {
-      _selectKeyCurrency.currentState!.hideOverlay();
-    } catch (_) {}
+    // try {
+    //   _selectKeyCurrency.currentState!.hideOverlay();
+    // } catch (_) {}
     try {
       selectKeyIban.currentState!.hideOverlay();
     } catch (_) {}
