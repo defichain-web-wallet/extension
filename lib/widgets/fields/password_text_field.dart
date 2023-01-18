@@ -92,7 +92,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
               ),
             ),
             style: passwordField.apply(
-              color: AppColors.darkTextColor,
+              color: Theme.of(context).textTheme.headline1!.color!,
             ),
             onChanged: widget.onChanged,
           ),

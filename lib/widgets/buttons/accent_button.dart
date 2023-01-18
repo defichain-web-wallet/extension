@@ -1,13 +1,14 @@
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-class AccentButton extends StatelessWidget {
+class AccentButton extends StatelessWidget with ThemeMixin {
   final String? label;
   final Function()? callback;
   final bool isCheckLock;
 
-  const AccentButton({
+  AccentButton({
     Key? key,
     this.label,
     this.callback,
@@ -23,10 +24,15 @@ class AccentButton extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(
+            isDarkTheme()
+                ? DarkColors.accentButtonBgColor
+                : LightColors.accentButtonBgColor,
+          ),
           shadowColor: MaterialStateProperty.all(Colors.transparent),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(buttonBorderRadius),
+              borderRadius: BorderRadius.circular(accentButtonBorderRadius),
               side: BorderSide(
                 color: Color(0xFF9988BE).withOpacity(0.32),
               ),

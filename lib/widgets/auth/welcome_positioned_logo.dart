@@ -10,7 +10,7 @@ class WelcomePositionedLogo extends StatelessWidget {
   WelcomePositionedLogo({
     Key? key,
     this.width = 360,
-    this.imgWidth = 295,
+    this.imgWidth = 268,
     this.titleSpace = 310,
     this.title = 'Welcome',
   }) : super(key: key);
@@ -58,7 +58,8 @@ class WelcomePositionedLogo extends StatelessWidget {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 32.5 + ((screenWidth - 360)/2)),
+                margin: EdgeInsets.symmetric(
+                    horizontal: 32.5 + ((screenWidth - 360) / 2)),
                 width: imgWidth,
                 child: Image(
                   image: AssetImage(

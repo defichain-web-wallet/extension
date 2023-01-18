@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -22,7 +23,7 @@ class SignupPlaceholderScreen extends StatefulWidget {
       _SignupPlaceholderScreenState();
 }
 
-class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen> {
+class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen> with ThemeMixin {
   final double _progress = 0.7;
   final double _coverWidth = 296.0;
   final double _coverHeight = 258.0;
@@ -76,7 +77,9 @@ class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen> {
                             children: [
                               Positioned(
                                 child: SvgPicture.asset(
-                                  'assets/secure_placeholder.svg',
+                                  isDarkTheme()
+                                      ? 'assets/secure_placeholder_dark.svg'
+                                      : 'assets/secure_placeholder_light.svg',
                                   width: _coverWidth,
                                   height: _coverHeight,
                                 ),

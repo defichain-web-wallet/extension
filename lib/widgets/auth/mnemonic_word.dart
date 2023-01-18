@@ -1,13 +1,14 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 
-class MnemonicWord extends StatelessWidget {
+class MnemonicWord extends StatelessWidget with ThemeMixin {
   final int index;
   final String word;
   final bool incorrect;
 
-  const MnemonicWord({
+  MnemonicWord({
     Key? key,
     required this.index,
     required this.word,
@@ -19,7 +20,7 @@ class MnemonicWord extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
-        color: AppColors.white.withOpacity(0.65),
+        color: isDarkTheme() ? AppColors.mirage : AppColors.white.withOpacity(0.65),
         borderRadius: BorderRadius.circular(8),
         border: incorrect ? GradientBoxBorder(
           gradient: gradientWrongMnemonicWord,
