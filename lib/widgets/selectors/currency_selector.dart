@@ -1,6 +1,7 @@
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -29,13 +30,13 @@ class CurrencySelectorState extends State<CurrencySelector> {
   bool _isOpen = false;
   late OverlayState? _overlayState;
   OverlayEntry? _overlayEntry;
-  static const _tileHeight = 46.0;
+  static const _tileHeight = 44.0;
   LockHelper lockHelper = LockHelper();
   List<String> currencyLogoPathList = [
-    'assets/chf_icon.svg',
-    'assets/euro_logo.svg',
+    'assets/currencies/eur.svg',
+    'assets/currencies/eur.svg',
   ];
-  String selectedCurrencyLogoPath = 'assets/chf_icon.svg';
+  String selectedCurrencyLogoPath = 'assets/currencies/eur.svg';
 
   @override
   Widget build(BuildContext context) => Column(children: [
@@ -45,8 +46,10 @@ class CurrencySelectorState extends State<CurrencySelector> {
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Text(
-                'Your bank account',
-                style: Theme.of(context).textTheme.headline2,
+                'Fiat Currency',
+                style: Theme.of(context)
+                    .textTheme
+                    .headline5,
                 textAlign: TextAlign.start,
               ),
             ),
@@ -60,16 +63,9 @@ class CurrencySelectorState extends State<CurrencySelector> {
               height: _tileHeight,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  topLeft: Radius.circular(10),
-                  bottomRight:
-                      _isOpen ? Radius.circular(0) : Radius.circular(10),
-                  bottomLeft:
-                      _isOpen ? Radius.circular(0) : Radius.circular(10),
-                ),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Colors.transparent,
+                  color: AppColors.portage.withOpacity(0.12),
                 ),
               ),
               child: DropdownButtonHideUnderline(
@@ -89,17 +85,18 @@ class CurrencySelectorState extends State<CurrencySelector> {
                           Text(
                             widget.selectedCurrency.name!,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.headline3!.apply(
+                            style: Theme.of(context).textTheme.headline5!.copyWith(
                                   color: _isOpen
                                       ? Theme.of(context)
                                           .textTheme
-                                          .headline3!
+                                          .headline5!
                                           .color!
                                           .withOpacity(0.5)
                                       : Theme.of(context)
                                           .textTheme
-                                          .headline3!
+                                          .headline5!
                                           .color!,
+                              fontSize: 12,
                                 ),
                           ),
                         ],
@@ -151,17 +148,15 @@ class CurrencySelectorState extends State<CurrencySelector> {
               height: ((widget.currencies.length) * (_tileHeight + 1)) + 6,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Colors.transparent,
+                  color: AppColors.portage.withOpacity(0.12),
                 ),
               ),
               child: ListView.separated(
                 itemCount: widget.currencies.length,
                 itemBuilder: (context, index) {
+                  print(widget.currencies[index].name);
                   return ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(0),
@@ -196,8 +191,13 @@ class CurrencySelectorState extends State<CurrencySelector> {
                                   overflow: TextOverflow.ellipsis,
                                   style: widget.currencies[index].name ==
                                           widget.selectedCurrency.name
-                                      ? Theme.of(context).textTheme.headline2
-                                      : Theme.of(context).textTheme.headline3,
+                                      ? Theme.of(context).textTheme.headline5!.copyWith(
+                                    color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.5),
+                                    fontSize: 12
+                                  )
+                                      : Theme.of(context).textTheme.headline5!.copyWith(
+                                      fontSize: 12
+                                  ),
                                 ),
                               ],
                             ),

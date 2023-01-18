@@ -6,11 +6,14 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/test_pool_swap_model.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
@@ -20,16 +23,22 @@ import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
+import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/currency_selector.dart';
 import 'package:defi_wallet/widgets/selectors/iban_selector.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,10 +55,11 @@ class Selling extends StatefulWidget {
   _SellingState createState() => _SellingState();
 }
 
-class _SellingState extends State<Selling> {
+class _SellingState extends State<Selling> with ThemeMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController amountController =
       TextEditingController(text: '0');
+  TextEditingController assetController = TextEditingController(text: '0');
   final TextEditingController _ibanController = TextEditingController();
   late FiatModel selectedFiat;
   final GlobalKey<AssetSelectState> _selectKeyTokenList =
@@ -66,10 +76,13 @@ class _SellingState extends State<Selling> {
   TestPoolSwapModel dexModel = TestPoolSwapModel();
   FocusNode focusFrom = new FocusNode();
   FocusModel focusAmountFromModel = new FocusModel();
+  TokensModel? currentAsset;
 
   TransactionService transactionService = TransactionService();
 
   List<String> assets = [];
+  String? balanceInUsd;
+  String titleText = 'Selling';
   String appBarTitle = 'Selling';
   String assetFrom = '';
   String sellFieldMsg = '';
@@ -88,53 +101,238 @@ class _SellingState extends State<Selling> {
 
   @override
   Widget build(BuildContext context) {
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-
-    return BlocBuilder<AccountCubit, AccountState>(
-        builder: (accountContext, accountState) {
-      fiatCubit.loadAllAssets();
-      return BlocBuilder<FiatCubit, FiatState>(
-        builder: (BuildContext context, fiatState) {
-          return BlocBuilder<TokensCubit, TokensState>(
+    return ScaffoldWrapper(
+      builder: (
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState txState,
+      ) {
+        return BlocBuilder<AccountCubit, AccountState>(
+          builder: (accountContext, accountState) {
+            return BlocBuilder<TokensCubit, TokensState>(
               builder: (context, tokensState) {
-            return ScaffoldConstrainedBox(
-              child: GestureDetector(
-                child: LayoutBuilder(builder: (context, constraints) {
-                  if (constraints.maxWidth < ScreenSizes.medium) {
-                    return Scaffold(
-                      key: _scaffoldKey,
-                      appBar: MainAppBar(
-                        title: appBarTitle,
-                        hideOverlay: () => hideOverlay(),
-                      ),
-                      body: _buildBody(
-                          context, accountState, fiatState, tokensState),
-                    );
-                  } else {
-                    return Container(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Scaffold(
-                        key: _scaffoldKey,
-                        body: _buildBody(
-                            context, accountState, fiatState, tokensState,
-                            isCustomBgColor: true),
-                        appBar: MainAppBar(
-                          title: appBarTitle,
-                          hideOverlay: () => hideOverlay(),
-                          isSmall: true,
+                FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+                fiatCubit.loadAllAssets();
+                return BlocBuilder<FiatCubit, FiatState>(
+                  builder: (BuildContext context, fiatState) {
+                    if (fiatState.status == FiatStatusList.loading) {
+                      return Loader();
+                    } else if (fiatState.status == FiatStatusList.failure) {
+                      Future.microtask(() => Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                LockScreen(),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          )));
+                      return Container();
+                    } else {
+                      currentAsset = currentAsset ??
+                          getTokensList(accountState, tokensState).first;
+                      IbanModel? currentIban;
+                      if (iterator == 0) {
+                        selectedFiat = fiatState.fiatList![0];
+                        accountState.activeAccount!.balanceList!.forEach((el) {
+                          try {
+                            var assetList = fiatState.assets!.where((element) =>
+                                element.name == el.token && !el.isHidden!);
+                            assets.add(List.from(assetList)[0].name);
+                          } catch (_) {}
+                        });
+                        assetFrom = assets[0];
+                        getFieldMsg(accountState);
+                        iterator++;
+                      }
+                      List<String> stringIbans = [];
+                      List<IbanModel> uniqueIbans = [];
+
+                      fiatState.ibanList!.forEach((element) {
+                        stringIbans.add(element.iban!);
+                      });
+
+                      var stringUniqueIbans =
+                          Set<String>.from(stringIbans).toList();
+
+                      stringUniqueIbans.forEach((element) {
+                        uniqueIbans.add(fiatState.ibanList!
+                            .firstWhere((el) => el.iban == element));
+                      });
+                      return Scaffold(
+                        drawerScrimColor: Color(0x0f180245),
+                        endDrawer: AccountDrawer(
+                          width: buttonSmallWidth,
                         ),
-                      ),
-                    );
-                  }
-                }),
-                onTap: () => hideOverlay(),
-              ),
+                        appBar: NewMainAppBar(
+                          isShowLogo: false,
+                        ),
+                        body: Container(
+                          padding: EdgeInsets.only(
+                            top: 22,
+                            bottom: 24,
+                            left: 16,
+                            right: 16,
+                          ),
+                          width: double.infinity,
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                            color: isDarkTheme()
+                                ? DarkColors.scaffoldContainerBgColor
+                                : LightColors.scaffoldContainerBgColor,
+                            border: isDarkTheme()
+                                ? Border.all(
+                                    width: 1.0,
+                                    color: Colors.white.withOpacity(0.05),
+                                  )
+                                : null,
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(20),
+                              topLeft: Radius.circular(20),
+                            ),
+                          ),
+                          child: Center(
+                            child: StretchBox(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                titleText,
+                                                style: headline2.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                                textAlign: TextAlign.start,
+                                                softWrap: true,
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 16,
+                                          ),
+                                          AmountField(
+                                            onChanged: (value) {
+                                              setState(() {
+                                                balanceInUsd =
+                                                    getUsdBalance(context);
+                                              });
+                                            },
+                                            suffix: balanceInUsd ??
+                                                getUsdBalance(context),
+                                            available: getAvailableBalance(
+                                                accountState),
+                                            onAssetSelect: (t) {
+                                              setState(() {
+                                                currentAsset = t;
+                                              });
+                                            },
+                                            controller: assetController,
+                                            selectedAsset: currentAsset!,
+                                            assets: getTokensList(
+                                              accountState,
+                                              tokensState,
+                                            ),
+                                          ),
+                                          SizedBox(height: 16,),
+                                          CurrencySelector(
+                                              isBorder: false,
+                                              onAnotherSelect: hideOverlay,
+                                              currencies: fiatState.fiatList!,
+                                              key: _selectKeyCurrency,
+                                              selectedCurrency: selectedFiat,
+                                              onSelect: (FiatModel selected) {
+                                                setState(() {
+                                                  selectedFiat = selected;
+                                                });
+                                              })
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      NewPrimaryButton(
+                                        width: buttonSmallWidth,
+                                        callback: () {},
+                                        title: 'Next',
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                );
+              },
             );
-          });
-        },
-      );
-    });
+          },
+        );
+      },
+    );
   }
+
+  // Widget build(BuildContext context) {
+  //   FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+  //
+  //   return BlocBuilder<AccountCubit, AccountState>(
+  //       builder: (accountContext, accountState) {
+  //     fiatCubit.loadAllAssets();
+  //     return BlocBuilder<FiatCubit, FiatState>(
+  //       builder: (BuildContext context, fiatState) {
+  //         return BlocBuilder<TokensCubit, TokensState>(
+  //             builder: (context, tokensState) {
+  //           return ScaffoldConstrainedBox(
+  //             child: GestureDetector(
+  //               child: LayoutBuilder(builder: (context, constraints) {
+  //                 if (constraints.maxWidth < ScreenSizes.medium) {
+  //                   return Scaffold(
+  //                     key: _scaffoldKey,
+  //                     appBar: MainAppBar(
+  //                       title: appBarTitle,
+  //                       hideOverlay: () => hideOverlay(),
+  //                     ),
+  //                     body: _buildBody(
+  //                         context, accountState, fiatState, tokensState),
+  //                   );
+  //                 } else {
+  //                   return Container(
+  //                     padding: const EdgeInsets.only(top: 20),
+  //                     child: Scaffold(
+  //                       key: _scaffoldKey,
+  //                       body: _buildBody(
+  //                           context, accountState, fiatState, tokensState,
+  //                           isCustomBgColor: true),
+  //                       appBar: MainAppBar(
+  //                         title: appBarTitle,
+  //                         hideOverlay: () => hideOverlay(),
+  //                         isSmall: true,
+  //                       ),
+  //                     ),
+  //                   );
+  //                 }
+  //               }),
+  //               onTap: () => hideOverlay(),
+  //             ),
+  //           );
+  //         });
+  //       },
+  //     );
+  //   });
+  // }
 
   Widget _buildBody(context, accountState, fiatState, tokensState,
       {isCustomBgColor = false}) {
@@ -457,6 +655,33 @@ class _SellingState extends State<Selling> {
     }
   }
 
+  getTokensList(accountState, tokensState) {
+    List<TokensModel> resList = [];
+    accountState.balances!.forEach((element) {
+      tokensState.tokens!.forEach((el) {
+        if (element.token == el.symbol) {
+          resList.add(el);
+        }
+      });
+    });
+
+    return resList;
+  }
+
+  String getUsdBalance(context) {
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+    try {
+      var amount = tokenHelper.getAmountByUsd(
+        tokensCubit.state.tokensPairs!,
+        double.parse(assetController.text.replaceAll(',', '.')),
+        currentAsset!.symbol!,
+      );
+      return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
+    } catch (err) {
+      return '0.00';
+    }
+  }
+
   _submitSell(
     AccountState accountState,
     TokensState tokensState,
@@ -529,6 +754,14 @@ class _SellingState extends State<Selling> {
     }
 
     return convertFromSatoshi(balance);
+  }
+
+  double getAvailableBalance(accountState) {
+    int balance = accountState.activeAccount!.balanceList!
+        .firstWhere((el) => el.token! == currentAsset!.symbol! && !el.isHidden!)
+        .balance!;
+    final int fee = 3000;
+    return convertFromSatoshi(balance - fee);
   }
 
   bool isEnoughBalance(state) {
