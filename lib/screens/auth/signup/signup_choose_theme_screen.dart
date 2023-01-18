@@ -6,7 +6,7 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/selectors/selector_theme_element.dart';
+import 'package:defi_wallet/widgets/selectors/circle_selector_tile.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -95,7 +95,7 @@ class _SignupChooseThemeScreenState extends State<SignupChooseThemeScreen> {
                           SizedBox(
                             height: 24,
                           ),
-                          SelectorThemeElement(
+                          CircleSelectorTile(
                             text: 'Light theme',
                             isSelected: isLight,
                             callback: () {
@@ -109,7 +109,7 @@ class _SignupChooseThemeScreenState extends State<SignupChooseThemeScreen> {
                           SizedBox(
                             height: 8,
                           ),
-                          SelectorThemeElement(
+                          CircleSelectorTile(
                             text: 'Dark theme',
                             isSelected: isDark,
                             callback: () {
@@ -134,7 +134,6 @@ class _SignupChooseThemeScreenState extends State<SignupChooseThemeScreen> {
                           await widget.callback();
                           // parent.emitPending(false);
                         },
-
                       ),
                     ),
                   ],
