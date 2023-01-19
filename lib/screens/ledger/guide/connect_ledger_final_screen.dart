@@ -1,25 +1,36 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
+import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class ConnectLedgerFinalScreen extends StatefulWidget {
   const ConnectLedgerFinalScreen({Key? key}) : super(key: key);
 
   @override
-  State<ConnectLedgerFinalScreen> createState() =>
-      _ConnectLedgerFinalScreenState();
+  State<ConnectLedgerFinalScreen> createState() => _ConnectLedgerFinalScreenState();
 }
 
-class _ConnectLedgerFinalScreenState extends State<ConnectLedgerFinalScreen>
-    with ThemeMixin {
-  String subtitleText =
-      'You’ve successfully connected Jellywallet to your Ledger device. Remember to keep your Secret Recovery Phrase safe!';
+class _ConnectLedgerFinalScreenState extends State<ConnectLedgerFinalScreen> with ThemeMixin {
+  String subtitleText = 'You’ve successfully connected Jellywallet to your Ledger device. Remember to keep your Secret Recovery Phrase safe!';
+
+  Future init() async {
+    var box = await Hive.openBox(HiveBoxes.client);
+    await box.put(HiveNames.ledgerWalletSetup, true);
+    await box.close();
+  }
+
+  initState() {
+    super.initState();
+    init();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,15 +83,8 @@ class _ConnectLedgerFinalScreenState extends State<ConnectLedgerFinalScreen>
                             height: 162,
                             child: Text(
                               subtitleText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline5!
-                                        .color!
-                                        .withOpacity(0.6),
+                              style: Theme.of(context).textTheme.headline5!.copyWith(
+                                    color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -91,9 +95,9 @@ class _ConnectLedgerFinalScreenState extends State<ConnectLedgerFinalScreen>
                               Navigator.push(
                                 context,
                                 PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          WelcomeScreen(),
+                                  pageBuilder: (context, animation1, animation2) => new HomeScreen(
+                                    isLoadTokens: true,
+                                  ),
                                   transitionDuration: Duration.zero,
                                   reverseTransitionDuration: Duration.zero,
                                 ),

@@ -89,6 +89,7 @@ dependencies:
   gradient_borders: ^0.2.0
   simple_gradient_text: ^1.2.4
   flutter_switch: ^0.3.2
+  js: ^0.6.4
 
 dev_dependencies:
   flutter_test:

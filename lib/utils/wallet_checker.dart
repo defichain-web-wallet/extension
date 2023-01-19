@@ -36,8 +36,7 @@ class _WalletCheckerState extends State<WalletChecker> {
         await Navigator.pushReplacement(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                ThemeChecker(LockScreen()),
+            pageBuilder: (context, animation1, animation2) => ThemeChecker(LockScreen()),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ),
@@ -58,31 +57,28 @@ class _WalletCheckerState extends State<WalletChecker> {
       bool isSavedMnemonic = await box.get(HiveNames.openedMnemonic) != null;
       String? savedMnemonic = await box.get(HiveNames.openedMnemonic);
 
-      bool isRecoveryMnemonic =
-          await box.get(HiveNames.recoveryMnemonic) != null;
+      bool ledgerSetup = await box.get(HiveNames.ledgerWalletSetup, defaultValue: false);
+      bool isRecoveryMnemonic = await box.get(HiveNames.recoveryMnemonic) != null;
       String? recoveryMnemonic = await box.get(HiveNames.recoveryMnemonic);
 
       await settingsHelper.loadSettings();
       await box.close();
 
-      if (masterKeyPair != null) {
-        if (password != null) {
+      if (masterKeyPair != null || ledgerSetup) {
+        if (password != null || ledgerSetup) {
           lockHelper.provideWithLockChecker(context, () async {
             try {
-              await accountCubit
-                  .restoreAccountFromStorage(SettingsHelper.settings.network!);
+              await accountCubit.restoreAccountFromStorage(SettingsHelper.settings.network!);
             } catch (err) {
               print(err);
             }
             if (SettingsHelper.isBitcoin()) {
-              await bitcoinCubit
-                  .loadDetails(accountCubit.state.accounts![0].bitcoinAddress!);
+              await bitcoinCubit.loadDetails(accountCubit.state.accounts![0].bitcoinAddress!);
             }
             await Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(HomeScreen(
+                pageBuilder: (context, animation1, animation2) => ThemeChecker(HomeScreen(
                   isLoadTokens: true,
                 )),
                 transitionDuration: Duration.zero,
@@ -92,8 +88,7 @@ class _WalletCheckerState extends State<WalletChecker> {
           });
         } else {
           try {
-            await accountCubit
-                .restoreAccountFromStorage(SettingsHelper.settings.network!);
+            await accountCubit.restoreAccountFromStorage(SettingsHelper.settings.network!);
           } catch (err) {
             print(err);
           }
@@ -117,8 +112,7 @@ class _WalletCheckerState extends State<WalletChecker> {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  ThemeChecker(SignupPhraseScreen(mnemonic: savedMnemonic)),
+              pageBuilder: (context, animation1, animation2) => ThemeChecker(SignupPhraseScreen(mnemonic: savedMnemonic)),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),
@@ -128,8 +122,7 @@ class _WalletCheckerState extends State<WalletChecker> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(RecoveryScreen(
+                pageBuilder: (context, animation1, animation2) => ThemeChecker(RecoveryScreen(
                   mnemonic: recoveryMnemonic,
                 )),
                 transitionDuration: Duration.zero,
@@ -140,8 +133,7 @@ class _WalletCheckerState extends State<WalletChecker> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(WelcomeScreen()),
+                pageBuilder: (context, animation1, animation2) => ThemeChecker(WelcomeScreen()),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),

@@ -1,4 +1,7 @@
+import 'dart:js_util';
+
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_final_screen.dart';
@@ -16,14 +19,11 @@ class ConnectLedgerFourthScreen extends StatefulWidget {
   const ConnectLedgerFourthScreen({Key? key}) : super(key: key);
 
   @override
-  State<ConnectLedgerFourthScreen> createState() =>
-      _ConnectLedgerFourthScreenState();
+  State<ConnectLedgerFourthScreen> createState() => _ConnectLedgerFourthScreenState();
 }
 
-class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
-    with ThemeMixin {
-  String subtitleText =
-      'Once you set up the wallet with Ledger you can only use Jellywallet with Ledger.';
+class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen> with ThemeMixin {
+  String subtitleText = 'Once you set up the wallet with Ledger you can only use Jellywallet with Ledger.';
   String titleText = '4.';
 
   @override
@@ -87,15 +87,8 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                             height: 105,
                             child: Text(
                               subtitleText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline5!
-                                        .color!
-                                        .withOpacity(0.6),
+                              style: Theme.of(context).textTheme.headline5!.copyWith(
+                                    color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -114,31 +107,35 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                               ),
                               NewPrimaryButton(
                                 width: 104,
-                                callback: () {
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                              LedgerAuthLoaderScreen(
-                                        callback: () {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation1,
-                                                      animation2) =>
-                                                  ConnectLedgerFinalScreen(),
-                                              transitionDuration: Duration.zero,
-                                              reverseTransitionDuration:
-                                                  Duration.zero,
-                                            ),
-                                          );
-                                        },
+                                callback: () async {
+                                  var result = await promiseToFuture(openLedgerDefichain("DeFiChain"));
+                                  print(result);
+                                  if (result > 0) {
+                                    // 1 = app not installed
+                                    // 2 = unknown error
+                                    // 3 = app already opened, or other app is open?
+                                    //TODO error message!
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation1, animation2) => LedgerAuthLoaderScreen(
+                                          callback: () {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context, animation1, animation2) => ConnectLedgerFinalScreen(),
+                                                transitionDuration: Duration.zero,
+                                                reverseTransitionDuration: Duration.zero,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration: Duration.zero,
                                       ),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
-                                    ),
-                                  );
+                                    );
+                                  }
                                 },
                                 title: 'Next',
                               ),

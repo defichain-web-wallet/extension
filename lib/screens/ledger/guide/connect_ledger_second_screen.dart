@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_third_screen.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -13,15 +14,18 @@ class ConnectLedgerSecondScreen extends StatefulWidget {
   const ConnectLedgerSecondScreen({Key? key}) : super(key: key);
 
   @override
-  State<ConnectLedgerSecondScreen> createState() =>
-      _ConnectLedgerSecondScreenState();
+  State<ConnectLedgerSecondScreen> createState() => _ConnectLedgerSecondScreenState();
 }
 
-class _ConnectLedgerSecondScreenState extends State<ConnectLedgerSecondScreen>
-    with ThemeMixin {
-  String subtitleText =
-      'Once you set up the wallet with Ledger you can only use Jellywallet with Ledger.';
+class _ConnectLedgerSecondScreenState extends State<ConnectLedgerSecondScreen> with ThemeMixin {
+  String subtitleText = 'Once you set up the wallet with Ledger you can only use Jellywallet with Ledger.';
   String titleText = '2.';
+
+  initState() {
+    super.initState();
+
+    jellyLedgerInit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,15 +85,8 @@ class _ConnectLedgerSecondScreenState extends State<ConnectLedgerSecondScreen>
                             height: 105,
                             child: Text(
                               subtitleText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline5!
-                                        .color!
-                                        .withOpacity(0.6),
+                              style: Theme.of(context).textTheme.headline5!.copyWith(
+                                    color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -112,9 +109,7 @@ class _ConnectLedgerSecondScreenState extends State<ConnectLedgerSecondScreen>
                                   Navigator.push(
                                     context,
                                     PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                              ConnectLedgerThirdScreen(),
+                                      pageBuilder: (context, animation1, animation2) => ConnectLedgerThirdScreen(),
                                       transitionDuration: Duration.zero,
                                       reverseTransitionDuration: Duration.zero,
                                     ),

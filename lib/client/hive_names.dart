@@ -27,4 +27,7 @@ class HiveNames {
 
   static const String accountName = 'account_name';
   static const String accountAvatar = 'account_avatar';
+
+  static const String walletType = 'wallet_type';
+  static const String ledgerWalletSetup = 'ledger_wallet_setup';
 }

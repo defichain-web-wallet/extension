@@ -1,13 +1,18 @@
 import 'dart:async';
 
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/loader/jumping_dots.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 
 class LedgerAuthLoaderScreen extends StatefulWidget {
   final bool isFullSize;
@@ -25,8 +30,7 @@ class LedgerAuthLoaderScreen extends StatefulWidget {
   State<LedgerAuthLoaderScreen> createState() => _LedgerAuthLoaderScreenState();
 }
 
-class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
-    with ThemeMixin {
+class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen> with ThemeMixin {
   String firstStepText = 'One second, Jelly is searching for your addresses...';
   String secondStepText = 'Ugh.. What a mess...';
   String thirdStepText = 'Okay, almost done...';
@@ -34,7 +38,18 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
 
   // String currentStatus = 'first-step';
   double loaderImageWidth = 54;
-  Timer? timer;
+
+  void initState() {
+    super.initState();
+  }
+
+  Future init() async {
+    var box = await Hive.openBox(HiveBoxes.client);
+    await box.put(HiveNames.walletType, "ledger");
+    await box.close();
+
+    jellyLedgerInit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +57,13 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
       currentText = firstStepText;
     }
     if (widget.currentStatus == 'first-step') {
-      timer = Timer.periodic(Duration(seconds: 3), (_timer) {
-        getStatusText(widget.currentStatus, _timer);
-        print('Timer TICK');
-        // if (widget.currentStatus == 'third-step') {
-        //   _timer.cancel();
-        // }
+      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+      Future.delayed(const Duration(milliseconds: 10), () async {
+        await init();
+        await accountCubit.restoreLedgerAccount(SettingsHelper.settings.network, (need, restored) {
+          getStatusText(widget.currentStatus, need, restored);
+        });
+        widget.callback!();
       });
     }
     return ScaffoldWrapper(
@@ -93,9 +109,7 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
                     Column(
                       children: [
                         Image.asset(
-                          isDarkTheme()
-                              ? 'assets/images/loader_dark_bg.gif'
-                              : 'assets/images/loader_white_bg.gif',
+                          isDarkTheme() ? 'assets/images/loader_dark_bg.gif' : 'assets/images/loader_white_bg.gif',
                           width: loaderImageWidth,
                         ),
                         SizedBox(
@@ -107,14 +121,9 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
                             currentText,
                             textAlign: TextAlign.center,
                             softWrap: true,
-                            style:
-                                Theme.of(context).textTheme.headline5!.copyWith(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.6),
-                                    ),
+                            style: Theme.of(context).textTheme.headline5!.copyWith(
+                                  color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
+                                ),
                           ),
                         ),
                       ],
@@ -129,21 +138,23 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
     );
   }
 
-  getStatusText(currentStatus, timer) async {
-    if (currentStatus == 'first-step') {
+  getStatusText(String currentStatus, int need, int restored) async {
+    print(need);
+    print(restored);
+    print(currentStatus);
+    if (currentStatus == 'first-step' && restored >= 3) {
       setState(() {
         widget.currentStatus = 'second-step';
         currentText = secondStepText;
       });
     }
-    if (currentStatus == 'second-step') {
+    if (currentStatus == 'second-step' && restored >= 6) {
       setState(() {
         widget.currentStatus = 'third-step';
         currentText = thirdStepText;
       });
     }
-    if (currentStatus == 'third-step') {
-      timer.cancel();
+    if (currentStatus == 'third-step' && need == restored) {
       widget.callback!();
     }
   }
