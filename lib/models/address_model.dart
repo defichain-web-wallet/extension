@@ -14,6 +14,10 @@ class AddressModel {
 
   AddressModel({this.address, this.account, this.isChange, this.index, this.blockchain, this.pubKey});
 
+  String getPath() {
+    return HDWalletService.derivePath(this.index!);
+  }
+
   AddressModel.fromJson(Map<String, dynamic> json) {
     this.address = json["address"];
     this.account = json["account"];

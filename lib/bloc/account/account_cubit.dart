@@ -428,11 +428,7 @@ class AccountCubit extends Cubit<AccountState> {
     var accountsName;
     List<AccountModel> accounts = [];
 
-    if (network == testnet) {
-      accountsName = HiveNames.accountsTestnet;
-    } else {
-      accountsName = HiveNames.accountsMainnet;
-    }
+    accountsName = HiveNames.accountsMainnet;
 
     var savedAccounts = box.get(accountsName);
 

@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
@@ -42,6 +43,8 @@ class _WalletCheckerState extends State<WalletChecker> {
           ),
         );
       }
+
+      jellyLedgerInit();
 
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
       BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);

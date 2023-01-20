@@ -2,16 +2,16 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/common/jelly_link_text.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class LedgerCheckScreen extends StatefulWidget {
-  const LedgerCheckScreen({Key? key}) : super(key: key);
+  final Function() onStartSign;
+
+  const LedgerCheckScreen({Key? key, required this.onStartSign}) : super(key: key);
 
   @override
   State<LedgerCheckScreen> createState() => _LedgerCheckScreenState();
@@ -19,6 +19,10 @@ class LedgerCheckScreen extends StatefulWidget {
 
 class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
   String titleText = 'Ledger';
+
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +49,7 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
-            color: isDarkTheme()
-                ? DarkColors.scaffoldContainerBgColor
-                : LightColors.scaffoldContainerBgColor,
+            color: isDarkTheme() ? DarkColors.scaffoldContainerBgColor : LightColors.scaffoldContainerBgColor,
             border: isDarkTheme()
                 ? Border.all(
                     width: 1.0,
@@ -71,8 +73,7 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                         children: [
                           Text(
                             titleText,
-                            style:
-                                headline2.copyWith(fontWeight: FontWeight.w700),
+                            style: headline2.copyWith(fontWeight: FontWeight.w700),
                           )
                         ],
                       ),
@@ -90,11 +91,7 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                       Text(
                         'Now connect your Ledger device and open the DeFiChain Application',
                         style: Theme.of(context).textTheme.headline5!.copyWith(
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .color!
-                                  .withOpacity(0.6),
+                              color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
                             ),
                         textAlign: TextAlign.center,
                       ),
@@ -108,6 +105,11 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                             ),
                         textAlign: TextAlign.center,
                       ),
+                      PendingButton('Start', pendingText: 'Sign on your ledger', isCheckLock: false, callback: (parent) async {
+                        parent.emitPending(true);
+                        await this.widget.onStartSign();
+                        parent.emitPending(false);
+                      })
                     ],
                   ),
                 ],

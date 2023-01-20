@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:defi_wallet/models/account_model.dart';
@@ -12,27 +14,24 @@ class LocalSigningService implements SigningWalletService {
 
   @override
   Future<Uint8List> getPublicKey(AccountModel accountModel, String address, String network) async {
-    // var pubKey = await _hdWalletService.getPrivateKey(accountModel, address, network);
-    // return pubKey!.publicKey!;
-    return new Uint8List.fromList([]);
+    var pubKey = await _hdWalletService.getPrivateKey(accountModel, address, network);
+    return pubKey.publicKey!;
   }
 
   @override
   Future<String> signTransaction(TransactionBuilder txBuilder, AccountModel accountModel, List<UtxoModel> utxoModel, String network, String changePath) async {
-    // for (var utxo in utxoModel) {
-    //   var privateKey = await _hdWalletService.getPrivateKey(accountModel, utxo.address!, network);
-    //   txBuilder.sign(vin: utxo.mintIndex!, keyPair: privateKey, witnessValue: utxo.value);
-    // }
+    for (var utxo in utxoModel) {
+      var privateKey = await _hdWalletService.getPrivateKey(accountModel, utxo.address!, network);
+      txBuilder.sign(vin: utxo.mintIndex!, keyPair: privateKey, witnessValue: utxo.value);
+    }
 
-    // var tx = txBuilder.build();
-    // return tx.toHex();
-    return "";
+    var tx = txBuilder.build();
+    return tx.toHex();
   }
 
   @override
   Future<String> signMessage(AccountModel accountModel, String address, String message, String network) async {
-    // var privateKey = await _hdWalletService.getPrivateKey(accountModel, address, network);
-    // return privateKey.signMessage(message, NetworkHelper().getNetwork(network));
-    return "";
+    var privateKey = await _hdWalletService.getPrivateKey(accountModel, address, network);
+    return privateKey.signMessage(message, NetworkHelper().getNetwork(network));
   }
 }

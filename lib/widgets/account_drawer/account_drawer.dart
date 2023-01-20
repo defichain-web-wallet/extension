@@ -78,9 +78,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     width: 1,
-                    color: isDarkTheme()
-                        ? DarkColors.drawerBorderColor
-                        : LightColors.drawerBorderColor,
+                    color: isDarkTheme() ? DarkColors.drawerBorderColor : LightColors.drawerBorderColor,
                   ),
                 ),
                 child: Padding(
@@ -93,9 +91,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                           Container(
                             height: accountsSelectorHeight,
                             decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .selectedRowColor
-                                  .withOpacity(0.07),
+                              color: Theme.of(context).selectedRowColor.withOpacity(0.07),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Stack(
@@ -114,14 +110,11 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                         child: IconButton(
                                           splashRadius: 12,
                                           padding: const EdgeInsets.all(0),
-                                          onPressed: () => Scaffold.of(context)
-                                              .closeEndDrawer(),
+                                          onPressed: () => Scaffold.of(context).closeEndDrawer(),
                                           icon: Icon(
                                             Icons.close,
                                             size: 16,
-                                            color: Theme.of(context)
-                                                .dividerColor
-                                                .withOpacity(0.5),
+                                            color: Theme.of(context).dividerColor.withOpacity(0.5),
                                           ),
                                         ),
                                       )
@@ -130,8 +123,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                 ),
                                 Center(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       SelectedAccount(
                                         accountName: state.activeAccount!.name!,
@@ -144,14 +136,10 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                               return CreateEditAccountDialog(
                                                 callback: (s) {
                                                   setState(() {
-                                                    accountCubit.editAccount(s,
-                                                        index: state
-                                                            .activeAccount!
-                                                            .index);
+                                                    accountCubit.editAccount(s, index: state.activeAccount!.index);
                                                   });
                                                 },
-                                                index:
-                                                    state.activeAccount!.index,
+                                                index: state.activeAccount!.index,
                                                 name: state.activeAccount!.name,
                                                 isEdit: true,
                                               );
@@ -161,56 +149,39 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                       ),
                                       Expanded(
                                         child: ScrollConfiguration(
-                                          behavior:
-                                              ScrollConfiguration.of(context)
-                                                  .copyWith(scrollbars: false),
+                                          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
                                           child: ListView.builder(
                                             itemCount: accounts.length + 1,
                                             itemBuilder: (context, index) {
-                                              if (index == accounts.length ||
-                                                  accounts.isEmpty) {
+                                              if (index == accounts.length || accounts.isEmpty) {
                                                 return Column(
                                                   children: [
                                                     Divider(
                                                       height: 1,
                                                       endIndent: 12,
                                                       indent: 12,
-                                                      color: Theme.of(context)
-                                                          .dividerColor
-                                                          .withOpacity(0.05),
+                                                      color: Theme.of(context).dividerColor.withOpacity(0.05),
                                                       thickness: 1,
                                                     ),
                                                     AccountMenuButton(
                                                       callback: (index) {
                                                         showDialog(
-                                                          barrierColor:
-                                                              Color(0x0f180245),
-                                                          barrierDismissible:
-                                                              false,
+                                                          barrierColor: Color(0x0f180245),
+                                                          barrierDismissible: false,
                                                           context: context,
-                                                          builder: (BuildContext
-                                                              context) {
+                                                          builder: (BuildContext context) {
                                                             return CreateEditAccountDialog(
-                                                              callback:
-                                                                  (s) async {
-                                                                await accountCubit
-                                                                    .addAccount();
-                                                                accountCubit.editAccount(
-                                                                    s,
-                                                                    index: accounts
-                                                                            .length -
-                                                                        1);
+                                                              callback: (s) async {
+                                                                await accountCubit.addAccount();
+                                                                accountCubit.editAccount(s, index: accounts.length - 1);
                                                               },
                                                             );
                                                           },
                                                         );
                                                       },
-                                                      isHoverBackgroundEffect:
-                                                          false,
-                                                      iconPath:
-                                                          'assets/icons/add.svg',
-                                                      title:
-                                                          'Create new account',
+                                                      isHoverBackgroundEffect: false,
+                                                      iconPath: 'assets/icons/add.svg',
+                                                      title: 'Create new account',
                                                     ),
                                                   ],
                                                 );
@@ -221,32 +192,19 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                       height: 1,
                                                       endIndent: 12,
                                                       indent: 12,
-                                                      color: Theme.of(context)
-                                                          .dividerColor
-                                                          .withOpacity(0.05),
+                                                      color: Theme.of(context).dividerColor.withOpacity(0.05),
                                                       thickness: 1,
                                                     ),
                                                     AccountMenuButton(
                                                       accountSelectMode: true,
-                                                      callback: accounts[index]
-                                                                  .index ==
-                                                              state
-                                                                  .activeAccount!
-                                                                  .index
+                                                      callback: accounts[index].index == state.activeAccount!.index
                                                           ? null
                                                           : (accountIndex) async {
-                                                              accountCubit
-                                                                  .updateActiveAccount(
-                                                                      accounts[
-                                                                              index]
-                                                                          .index!);
+                                                              accountCubit.updateActiveAccount(accounts[index].index!);
                                                             },
-                                                      isHoverBackgroundEffect:
-                                                          false,
-                                                      iconPath:
-                                                          'assets/icons/add.svg',
-                                                      title:
-                                                          accounts[index].name!,
+                                                      isHoverBackgroundEffect: false,
+                                                      iconPath: 'assets/icons/add.svg',
+                                                      title: accounts[index].name!,
                                                     ),
                                                   ],
                                                 );
@@ -270,9 +228,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                               Navigator.push(
                                 context,
                                 PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          AddressBookScreenNew(),
+                                  pageBuilder: (context, animation1, animation2) => AddressBookScreenNew(),
                                   transitionDuration: Duration.zero,
                                   reverseTransitionDuration: Duration.zero,
                                 ),
@@ -297,19 +253,16 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                               Navigator.push(
                                 context,
                                 PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          LedgerSendLoaderScreen(
+                                  pageBuilder: (context, animation1, animation2) => LedgerSendLoaderScreen(
                                     callback: () {
                                       Navigator.pushReplacement(
                                         context,
                                         PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              LedgerCheckScreen(),
+                                          pageBuilder: (context, animation1, animation2) => LedgerCheckScreen(
+                                            onStartSign: () => {},
+                                          ),
                                           transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
+                                          reverseTransitionDuration: Duration.zero,
                                         ),
                                       );
                                     },
@@ -359,9 +312,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                         children: [
                           Divider(
                             height: 8,
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withOpacity(0.05),
+                            color: Theme.of(context).dividerColor.withOpacity(0.05),
                             thickness: 1,
                           ),
                           AccountMenuButton(
