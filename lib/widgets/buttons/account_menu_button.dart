@@ -1,12 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:defi_wallet/widgets/common/jelly_link_text.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutter_switch/flutter_switch.dart';
-import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class AccountMenuButton extends StatefulWidget {
   final String iconPath;
@@ -17,6 +15,9 @@ class AccountMenuButton extends StatefulWidget {
   final Widget? afterTitleWidget;
   final bool accountSelectMode;
   final AccountModel? account;
+  final bool isLockType;
+  final Color? hoverBgColor;
+  final Color? hoverTextColor;
 
   AccountMenuButton({
     Key? key,
@@ -28,6 +29,9 @@ class AccountMenuButton extends StatefulWidget {
     this.isStaticBg = false,
     this.isHoverBackgroundEffect = true,
     this.account,
+    this.isLockType = false,
+    this.hoverBgColor,
+    this.hoverTextColor,
   }) : super(key: key);
 
   @override
@@ -36,6 +40,17 @@ class AccountMenuButton extends StatefulWidget {
 
 class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
   bool isHover = false;
+  late Color _circleAccountBgColor;
+
+  Color getRandomColor() {
+    return Color((math.Random().nextDouble() * 0xFFFFFF).toInt());
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _circleAccountBgColor = getRandomColor();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +92,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
           backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
           overlayColor: widget.isHoverBackgroundEffect
               ? MaterialStateProperty.all(
-                  Theme.of(context).selectedRowColor.withOpacity(0.07),
+                  widget.hoverBgColor ?? Theme.of(context).selectedRowColor.withOpacity(0.07),
                 )
               : MaterialStateProperty.all<Color>(Colors.transparent),
           elevation: MaterialStateProperty.all<double>(0.0),
@@ -100,11 +115,15 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                         if (!isHover && !widget.isStaticBg)
                           SvgPicture.asset(
                             '${widget.iconPath}',
-                            color: isDarkTheme() ? AppColors.white : null,
+                            color: isDarkTheme()
+                                ? AppColors.white
+                                : AppColors.blackRock,
                           ),
                         if (isHover && !widget.isStaticBg)
                           SvgPicture.asset(
                             '${widget.iconPath}',
+                            color: widget.hoverTextColor ??
+                                AppColors.hollywoodCerise,
                             cacheColorFilter: true,
                           ),
                         if (widget.isStaticBg)
@@ -127,7 +146,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                     if (widget.accountSelectMode)
                       CircleAvatar(
                         radius: 12,
-                        backgroundColor: AppColors.portage.withOpacity(0.16),
+                        backgroundColor: _circleAccountBgColor.withOpacity(0.16),
                         child: Text(
                           '${widget.title[0]}',
                           style: Theme.of(context)
@@ -144,13 +163,23 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                       child: Text(
                         '${widget.title}',
                         style: widget.callback == null
-                            ? Theme.of(context).textTheme.headline5!.apply(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .color!
-                                    .withOpacity(0.5))
-                            : Theme.of(context).textTheme.headline5,
+                            ? Theme.of(context).textTheme.headline5!.copyWith(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .color!
+                                      .withOpacity(0.5),
+                                  fontSize: widget.isLockType ? 13 : 14,
+                                )
+                            : Theme.of(context).textTheme.headline5!.copyWith(
+                                  color: isHover || widget.isStaticBg
+                                      ? widget.hoverTextColor ?? AppColors.hollywoodCerise
+                                      : Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!,
+                                  fontSize: widget.isLockType ? 13 : 14,
+                                ),
                       ),
                     ),
                     if (widget.afterTitleWidget != null)

@@ -6,7 +6,6 @@ import 'package:defi_wallet/screens/liquidity/earn_screen_new.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
 import 'package:defi_wallet/screens/swap/swap_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
-import 'package:defi_wallet/screens/select_buy_or_sell/select_buy_or_sell_screen.dart';
 import 'package:defi_wallet/screens/send/send_screeen_new.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/home/account_balance.dart';
@@ -22,6 +21,8 @@ class HomeCard extends StatefulWidget {
 }
 
 class _HomeCardState extends State<HomeCard> with ThemeMixin {
+  static const double homeCardWidth = 328;
+  static const double homeCardHeight = 266;
   List<String> items = <String>['USD', 'EUR', 'BTC'];
   String activeAsset = 'USD';
   String swapTutorialStatus = 'show';
@@ -34,34 +35,43 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: homeCardWidth,
+      height: homeCardHeight,
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
-      padding: const EdgeInsets.only(left: 12, top: 12, right: 12, bottom: 12),
+      padding: const EdgeInsets.only(left: 12, top: 22, right: 12, bottom: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20.0),
         border: isDarkTheme() ? Border.all(
+            width: 1,
             color: Colors.white.withOpacity(0.04)) : null,
       ),
       child: Center(
         child: Column(
           children: [
-            AppSelector(
-              items: items,
-              onSelect: (String name) {
-                print(name);
-                setState(() {
-                  activeAsset = name;
-                });
-              },
+            SizedBox(
+              height: 21,
+              child: AppSelector(
+                items: items,
+                onSelect: (String name) {
+                  print(name);
+                  setState(() {
+                    activeAsset = name;
+                  });
+                },
+              ),
             ),
             SizedBox(
               height: 12,
             ),
-            AccountBalance(
-              asset: activeAsset,
+            SizedBox(
+              height: 56,
+              child: AccountBalance(
+                asset: activeAsset,
+              ),
             ),
             SizedBox(
-              height: 28,
+              height: 31,
             ),
             Row(
               children: [

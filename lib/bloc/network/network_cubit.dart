@@ -17,4 +17,10 @@ class NetworkCubit extends Cubit<NetworkState> {
       currentNetworkSelectorTab: value,
     ));
   }
+
+  updateTestnetNetworksList(bool status) {
+    emit(state.copyWith(
+      isShownTestnet: status
+    ));
+  }
 }

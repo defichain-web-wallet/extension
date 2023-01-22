@@ -71,8 +71,8 @@ class FlatButton extends StatelessWidget with ThemeMixin {
           children: [
             if (iconPath != null)
               Container(
-                width: isPrimary ? 22 : 20,
-                height: isPrimary ? 22 : 20,
+                width: isPrimary ? 20 : 18,
+                height: isPrimary ? 20 : 18,
                 padding: const EdgeInsets.only(right: 6.4),
                 child: SvgPicture.asset(
                   iconPath!,
@@ -82,7 +82,7 @@ class FlatButton extends StatelessWidget with ThemeMixin {
             Text(
               title,
               style: Theme.of(context).textTheme.button!.copyWith(
-                    fontSize: isPrimary ? 14 : 12,
+                    fontSize: 13,
                   ),
             )
           ],

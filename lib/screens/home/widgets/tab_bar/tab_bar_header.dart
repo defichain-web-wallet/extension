@@ -33,6 +33,7 @@ class _TabBarHeaderState extends State<TabBarHeader> {
               ),
               insets: EdgeInsets.symmetric(
                 horizontal: widget.width * 0.3,
+                vertical: 4,
               ),
             ),
             tabs: [

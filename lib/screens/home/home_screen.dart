@@ -208,92 +208,95 @@ class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProvi
                           maxWidth: ScreenSizes.medium,
                           child: Stack(
                             children: [
-                              ListView(
-                                children: [
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  HomeCard(),
-                                  SizedBox(
-                                    height: 34,
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.only(top: 12, right: 24),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
+                              ScrollConfiguration(
+                                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                                child: ListView(
+                                  children: [
+                                    SizedBox(
+                                      height: 5,
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        TabBarHeader(
-                                          tabController: tabController,
+                                    HomeCard(),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.only(top: 12, right: 24),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
                                         ),
-                                        Container(
-                                          child: Row(
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {},
-                                                icon: SvgPicture.asset(
-                                                  'assets/icons/filter_icon.svg',
-                                                  color:
-                                                  SettingsHelper.settings.theme == 'Dark'
-                                                      ? Colors.white
-                                                      : null,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 12,
-                                              ),
-                                              SizedBox(
-                                                width: 32,
-                                                height: 32,
-                                                child: NewActionButton(
-                                                  iconPath: 'assets/icons/add_black.svg',
-                                                  onPressed: () async {
-                                                    await lockHelper.provideWithLockChecker(
-                                                      context,
-                                                          () => Navigator.push(
-                                                        context,
-                                                        PageRouteBuilder(
-                                                          pageBuilder: (context, animation1,
-                                                              animation2) =>
-                                                              AddTokenScreen(),
-                                                          transitionDuration: Duration.zero,
-                                                          reverseTransitionDuration:
-                                                          Duration.zero,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            ],
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TabBarHeader(
+                                            tabController: tabController,
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  if (homeState.tabIndex == 0)
-                                    SizedBox(
-                                      height: assetsTabBodyHeight,
-                                      child: TabBarBody(
-                                        tabController: tabController,
-                                        isEmptyList: isExistHistory(state),
+                                          Container(
+                                            child: Row(
+                                              children: [
+                                                IconButton(
+                                                  onPressed: () {},
+                                                  icon: SvgPicture.asset(
+                                                    'assets/icons/filter_icon.svg',
+                                                    color:
+                                                    SettingsHelper.settings.theme == 'Dark'
+                                                        ? Colors.white
+                                                        : null,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 12,
+                                                ),
+                                                SizedBox(
+                                                  width: 32,
+                                                  height: 32,
+                                                  child: NewActionButton(
+                                                    iconPath: 'assets/icons/add_black.svg',
+                                                    onPressed: () async {
+                                                      await lockHelper.provideWithLockChecker(
+                                                        context,
+                                                            () => Navigator.push(
+                                                          context,
+                                                          PageRouteBuilder(
+                                                            pageBuilder: (context, animation1,
+                                                                animation2) =>
+                                                                AddTokenScreen(),
+                                                            transitionDuration: Duration.zero,
+                                                            reverseTransitionDuration:
+                                                            Duration.zero,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                    )
-                                  else
-                                    SizedBox(
-                                      height: historyTabBodyHeight,
-                                      child: TabBarBody(
-                                        tabController: tabController,
-                                        isEmptyList: isExistHistory(state),
-                                      ),
                                     ),
-                                ],
+                                    if (homeState.tabIndex == 0)
+                                      SizedBox(
+                                        height: assetsTabBodyHeight,
+                                        child: TabBarBody(
+                                          tabController: tabController,
+                                          isEmptyList: isExistHistory(state),
+                                        ),
+                                      )
+                                    else
+                                      SizedBox(
+                                        height: historyTabBodyHeight,
+                                        child: TabBarBody(
+                                          tabController: tabController,
+                                          isEmptyList: isExistHistory(state),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
                               if (txState is! TransactionInitialState)
                                 TransactionStatusBar(),

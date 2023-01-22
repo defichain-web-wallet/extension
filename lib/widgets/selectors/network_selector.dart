@@ -30,16 +30,32 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
   NetworkTabs activeTab = NetworkTabs.all;
   String currentNetworkItem = 'DefiChain Mainnet';
 
-  static const List<dynamic> testNetNetworksList = [
-    {'value': NetworkList.btcMainnet, 'name': 'Bitcoin Mainnet'},
-    {'value': NetworkList.btcTestnet, 'name': 'Bitcoin Testnet'},
-    {'value': NetworkList.defiMetaChainTestnet, 'name': 'Defi-Meta-Chain Testnet'},
-  ];
-
   static const List<dynamic> allNetworksList = [
-    {'value': NetworkList.defiMainnet, 'name': 'DefiChain Mainnet'},
-    {'value': NetworkList.defiTestnet, 'name': 'DefiChain Testnet'},
-    ...testNetNetworksList
+    {
+      'isTestnet': false,
+      'value': NetworkList.defiMainnet,
+      'name': 'DefiChain Mainnet',
+    },
+    {
+      'isTestnet': true,
+      'value': NetworkList.defiTestnet,
+      'name': 'DefiChain Testnet',
+    },
+    {
+      'isTestnet': false,
+      'value': NetworkList.btcMainnet,
+      'name': 'Bitcoin Mainnet',
+    },
+    {
+      'isTestnet': true,
+      'value': NetworkList.btcTestnet,
+      'name': 'Bitcoin Testnet',
+    },
+    {
+      'isTestnet': true,
+      'value': NetworkList.defiMetaChainTestnet,
+      'name': 'Defi-Meta-Chain Testnet',
+    },
   ];
 
   final List<dynamic> tabs = [
@@ -97,11 +113,11 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
       menuOnChange: (b) => widget.onSelect(),
       child: Container(
         height: 24,
-        width: 140,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        width: 119,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(36),
         ),
         child: BlocBuilder<NetworkCubit, NetworkState>(
           builder: (context, networkState) {
@@ -127,6 +143,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                             getNetworkName(),
                             style: Theme.of(context).textTheme.subtitle2!.copyWith(
                               fontWeight: FontWeight.w500,
+                              fontSize: 8,
                             ),
                           ),
                         ),
@@ -137,10 +154,12 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Color(0xFFB7B2C1),
-                  size: 14,
+                SizedBox(
+                  width: 8,
+                  height: 8,
+                  child: SvgPicture.asset(
+                    'assets/icons/network_arrow_down.svg',
+                  ),
                 )
               ],
             );
@@ -171,15 +190,15 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
             child: BlocBuilder<NetworkCubit, NetworkState>(
               builder: (context, networkState) {
                 var currentNetworksList =
-                networkState.currentNetworkSelectorTab == NetworkTabs.all
+                networkState.isShownTestnet
                     ? allNetworksList
-                    : testNetNetworksList;
+                    : allNetworksList.where((element) => element['isTestnet']);
                 return Container(
                   color: isDarkTheme()
                       ? DarkColors.networkDropdownBgColor
                       : LightColors.networkDropdownBgColor,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  width: 260,
+                  width: 240,
                   child: Container(
                     padding: const EdgeInsets.only(
                       top: 16,
@@ -201,7 +220,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                     width: 10,
                                   ),
                                   Text(
-                                    'Network',
+                                    'Networks',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline4!
@@ -236,12 +255,15 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                         (index) => SelectorTabElement(
                                       title: tabs[index]['name'],
                                       callback: () {
-                                        networkCubit.updateCurrentTab(
-                                          tabs[index]['value'],
-                                        );
+                                        if (tabs[index]['value'] == NetworkTabs.test) {
+                                          networkCubit.updateTestnetNetworksList(
+                                              !networkState.isShownTestnet
+                                          );
+                                        }
                                       },
                                       isSelect:
                                       networkState.currentNetworkSelectorTab == tabs[index]['value'],
+                                      isShownTestnet: networkState.isShownTestnet,
                                       isPaddingLeft: index % 2 == 1,
                                       indicatorWidth: 60,
                                     ),

@@ -17,7 +17,7 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   static const double toolbarHeight = 54.0;
   static const double iconSize = 20.0;
-  static const double logoWidth = 42.0;
+  static const double logoWidth = 26.0;
   static const double logoLeftPadding = 16.0;
   static const double leadingWidth = logoWidth + logoLeftPadding;
 

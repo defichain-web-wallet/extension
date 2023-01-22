@@ -7,6 +7,7 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/home/asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -55,63 +56,20 @@ class AssetList extends StatelessWidget {
                   double tokenBalance =
                       convertFromSatoshi(balances[index].balance!);
 
-                  return Padding(
-                    padding: const EdgeInsets.only(
-                        bottom: 8, left: 16, right: 16, top: 2),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Theme.of(context).listTileTheme.tileColor!,
-                        ),
-                        color: Theme.of(context).listTileTheme.selectedColor,
-                      ),
-                      child: ListTile(
-                        leading: _buildTokenIcon(balances[index]),
-                        title: Text(
-                          tokenName,
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              getFormatTokenBalance(tokenBalance),
-                              style: Theme.of(context).textTheme.headline6!.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 2,
-                            ),
-                            Text(
-                              getFormatTokenBalanceByFiat(
-                                  tokensState, coin, tokenBalance, currency),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline6!
-                                        .color!
-                                        .withOpacity(0.3),
-                                  ),
-                            ),
-                          ],
-                        ),
-                        subtitle: Text(
-                          tokenName,
-                          style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .color!
-                                .withOpacity(0.3),
-                          ),
-                        ),
-                      ),
+                  return Container(
+                    margin: const EdgeInsets.only(
+                      bottom: 4,
+                      left: 16,
+                      right: 16,
+                      top: 2,
+                    ),
+                    child: AssetCard(
+                      index: index,
+                      tokenBalance: tokenBalance,
+                      tokenName: tokenName,
+                      tokenCode: tokenName,
+                      tokensState: tokensState,
+                      balances: balances,
                     ),
                   );
                 },
@@ -133,8 +91,8 @@ class AssetList extends StatelessWidget {
     } else {
       return SvgPicture.asset(
         tokenHelper.getImageNameByTokenName(token.token!),
-        height: 40,
-        width: 40,
+        height: 42,
+        width: 42,
       );
     }
   }
