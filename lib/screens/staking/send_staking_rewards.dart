@@ -3,34 +3,39 @@ import 'dart:convert';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
+import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/screens/sell/selling_screen.dart';
 import 'package:defi_wallet/screens/staking/number_of_coins_to_stake.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
+import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
+import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/fields/invested_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
+import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/currency_selector.dart';
 import 'package:defi_wallet/widgets/selectors/iban_selector.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hive/hive.dart';
 
 class SendStakingRewardsScreen extends StatefulWidget {
-  final bool isNewIban;
-  final bool isPayment;
-
   const SendStakingRewardsScreen({
     Key? key,
-    this.isPayment = false,
-    this.isNewIban = false,
   }) : super(key: key);
 
   @override
@@ -38,389 +43,398 @@ class SendStakingRewardsScreen extends StatefulWidget {
       _SendStakingRewardsScreenState();
 }
 
-class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen> {
-  GlobalKey<AssetSelectState> _selectKeyFrom = GlobalKey<AssetSelectState>();
-  // final GlobalKey<CurrencySelectorState> _selectKeyCurrency =
-  //     GlobalKey<CurrencySelectorState>();
-  final _formKey = GlobalKey<FormState>();
-  final GlobalKey<IbanSelectorState> selectKeyIban =
-      GlobalKey<IbanSelectorState>();
-
-  String assetFrom = '';
-
-  StakingType type = StakingType.Reinvest;
+class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen>
+    with ThemeMixin {
+  final String titleText = 'Staking';
+  bool isEdit = false;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AccountCubit, AccountState>(
-      builder: (context, state) {
-        FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-        StakingCubit stakingCubit = BlocProvider.of<StakingCubit>(context);
-        fiatCubit.loadAllAssets(isSell: true);
-        return BlocBuilder<FiatCubit, FiatState>(builder: (context, fiatState) {
-          return BlocBuilder<StakingCubit, StakingState>(
-            builder: (context, stakingState) {
-              if (state.status == AccountStatusList.success &&
-                  fiatState.status == FiatStatusList.success) {
-                List<IbanModel> uniqueIbans =
-                    fiatState.ibanList!.where((el) => el.fiat != null).toList();
-
-                assetFrom =
-                    (assetFrom.isEmpty) ? state.activeToken! : assetFrom;
-                List<String> assets = [];
-                fiatState.assets!.forEach((el) {
-                  assets.add(el.dexName!);
-                });
-
-                return ScaffoldConstrainedBox(
-                  child: GestureDetector(
-                    onTap: () => hideOverlay(),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        if (constraints.maxWidth < ScreenSizes.medium) {
-                          return Scaffold(
-                            appBar: MainAppBar(
-                              hideOverlay: hideOverlay,
-                              title: 'Staking',
-                            ),
-                            body: _buildBody(state, fiatState, stakingState,
-                                stakingCubit, uniqueIbans, assets),
-                          );
-                        } else {
-                          return Container(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: Scaffold(
-                              appBar: MainAppBar(
-                                hideOverlay: hideOverlay,
-                                title: 'Staking',
-                                isSmall: true,
-                              ),
-                              body: _buildBody(
-                                state,
-                                fiatState,
-                                stakingState,
-                                stakingCubit,
-                                uniqueIbans,
-                                assets,
-                                isFullSize: true,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                );
-              } else {
-                return Loader();
-              }
-            },
-          );
-        });
-      },
-    );
-  }
-
-  Widget _buildBody(
-          state, fiatState, stakingState, stakingCubit, uniqueIbans, assets,
-          {isFullSize = false}) =>
-      Container(
-        color: Theme.of(context).dialogBackgroundColor,
-        padding:
-            const EdgeInsets.only(left: 18, right: 12, top: 24, bottom: 24),
-        child: Center(
-          child: StretchBox(
-            child: GestureDetector(
-              onTap: () {
-                hideOverlay();
-              },
+    return ScaffoldWrapper(
+      builder: (
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState txState,
+      ) {
+        return Scaffold(
+          drawerScrimColor: Color(0x0f180245),
+          endDrawer: AccountDrawer(
+            width: buttonSmallWidth,
+          ),
+          appBar: NewMainAppBar(
+            isShowLogo: false,
+          ),
+          body: Container(
+            decoration:
+                BoxDecoration(color: AppColors.viridian.withOpacity(0.16)),
+            child: SingleChildScrollView(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.only(),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                  Container(
+                    padding: EdgeInsets.only(
+                      top: 8,
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
+                    ),
+                    child: Stack(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: EdgeInsets.only(top: 15),
-                              child:
-                                  SvgPicture.asset('assets/staking_logo.svg'),
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(top: 30),
-                              child: Text(
-                                widget.isPayment
-                                    ? 'Where should we send your staking rewards?'
-                                    : 'Where do you want to receive your staking rewards?',
-                                style: Theme.of(context).textTheme.headline6,
+                              margin: EdgeInsets.only(
+                                top: 20,
                               ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(top: 30),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                              padding: EdgeInsets.only(top: 38),
+                              width: 328,
+                              height: 123,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                    color: AppColors.appSelectorBorderColor),
+                                color: isDarkTheme()
+                                    ? DarkColors.scaffoldContainerBgColor
+                                    : LightColors.scaffoldContainerBgColor,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      child: Container(
-                                        width: 100,
-                                        height: 46,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).cardColor,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: type == StakingType.Reinvest
-                                                ? AppTheme.pinkColor
-                                                : Colors.transparent,
-                                            width: 1,
-                                            style: BorderStyle.solid,
-                                          ),
+                                  Text(
+                                    'DFI Staking by LOCK',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .copyWith(
+                                          fontSize: 16,
                                         ),
-                                        child: Center(child: Text('Reinvest')),
-                                      ),
-                                      onTap: () {
-                                        hideOverlay();
-                                        type = StakingType.Reinvest;
-                                        if (widget.isPayment) {
-                                          stakingCubit.setPaymentType(type);
-                                        } else {
-                                          stakingCubit.setRewardType(type);
-                                        }
-                                      },
-                                    ),
                                   ),
-                                  MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      child: Container(
-                                        width: 100,
-                                        height: 46,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).cardColor,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: type == StakingType.Wallet
-                                                ? AppTheme.pinkColor
-                                                : Colors.transparent,
-                                            width: 1,
-                                            style: BorderStyle.solid,
-                                          ),
-                                        ),
-                                        child: Center(child: Text('Wallet')),
-                                      ),
-                                      onTap: () {
-                                        hideOverlay();
-                                        type = StakingType.Wallet;
-                                        if (widget.isPayment) {
-                                          stakingCubit.setPaymentType(type);
-                                        } else {
-                                          stakingCubit.setRewardType(type);
-                                        }
-                                      },
-                                    ),
+                                  SizedBox(
+                                    height: 4,
                                   ),
-                                  MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      child: Container(
-                                        width: 100,
-                                        height: 46,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).cardColor,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color:
-                                                type == StakingType.BankAccount
-                                                    ? AppTheme.pinkColor
-                                                    : Colors.transparent,
-                                            width: 1,
-                                            style: BorderStyle.solid,
-                                          ),
+                                  Text(
+                                    '37% APY / 30% APR',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .copyWith(
+                                          fontSize: 12,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .color!
+                                              .withOpacity(0.6),
                                         ),
-                                        child: Center(child: Text('Auto sell')),
-                                      ),
-                                      onTap: () {
-                                        hideOverlay();
-                                        type = StakingType.BankAccount;
-                                        if (widget.isPayment) {
-                                          stakingCubit.setPaymentType(type);
-                                        } else {
-                                          stakingCubit.setRewardType(type);
-                                        }
-                                      },
-                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  ),
+                                  Text(
+                                    '0% Fee in 2022',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .copyWith(
+                                          fontSize: 12,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .color!
+                                              .withOpacity(0.3),
+                                        ),
                                   ),
                                 ],
                               ),
                             ),
-                            type == StakingType.Wallet
-                                ? Container(
-                                    padding: EdgeInsets.only(top: 30),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'In which currencie do you want to receive your staking rewards?',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline2,
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.only(top: 20),
-                                          child: Container(
-                                            width: 250,
-                                            child: AssetSelect(
-                                              onAnotherSelect: hideOverlay,
-                                              isTopPosition: true,
-                                              key: _selectKeyFrom,
-                                              isBorderRadiusAll: true,
-                                              tokensForSwap: assets,
-                                              selectedToken: assetFrom,
-                                              onSelect: (String asset) {
-                                                setState(
-                                                    () => {assetFrom = asset});
-                                              },
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                : type == StakingType.BankAccount
-                                    ? Container(
-                                        padding: EdgeInsets.only(top: 30),
-                                        child: Column(
-                                          children: [
-                                            Form(
-                                              key: _formKey,
-                                              child: Container(
-                                                padding:
-                                                    EdgeInsets.only(top: 10),
-                                                child: IbanSelector(
-                                                  key: selectKeyIban,
-                                                  onAnotherSelect: hideOverlay,
-                                                  routeWidget: Selling(
-                                                    isNewIban: widget.isNewIban,
-                                                  ),
-                                                  ibanList: uniqueIbans,
-                                                  selectedIban:
-                                                      fiatState.activeIban!,
-                                                  isShowAsset: true,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : Container(),
                           ],
                         ),
-                      ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(
+                                top: 7.17,
+                                bottom: 11.77,
+                                left: 3,
+                                right: 12.77,
+                              ),
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color(0xFF167156),
+                              ),
+                              child: SvgPicture.asset(
+                                'assets/icons/staking_lock.svg',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AccentButton(
-                            label: 'Cancel',
-                            callback: () {
-                              hideOverlay();
-                              Navigator.of(context).pop();
-                            }),
+                  Container(
+                    padding: EdgeInsets.only(
+                      top: 22,
+                      bottom: 24,
+                      left: 16,
+                      right: 16,
+                    ),
+                    width: double.infinity,
+                    constraints: BoxConstraints(minHeight: 541),
+                    // height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: isDarkTheme()
+                          ? DarkColors.scaffoldContainerBgColor
+                          : LightColors.scaffoldContainerBgColor,
+                      border: isDarkTheme()
+                          ? Border.all(
+                              width: 1.0,
+                              color: Colors.white.withOpacity(0.05),
+                            )
+                          : null,
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        topLeft: Radius.circular(20),
                       ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: PrimaryButton(
-                          label: 'Next',
-                          isCheckLock: false,
-                          callback: () async {
-                            hideOverlay();
-                            AssetByFiatModel foundAsset = fiatState.assets!
-                                .firstWhere(
-                                    (element) => element.dexName == assetFrom);
-
-                            try {
-                              if (widget.isPayment) {
-                                stakingCubit.updatePaymentInfo(
-                                    type, foundAsset, fiatState.activeIban!);
-                                String rewardType = stakingState.rewardType
-                                    .toString()
-                                    .split('.')[1];
-                                String paybackType = stakingState.paymentType
-                                    .toString()
-                                    .split('.')[1];
-                                try {
-                                  var foundedRoute = stakingState.routes!
-                                      .firstWhere((element) =>
-                                          element.active! &&
-                                          element.rewardType == rewardType &&
-                                          element.paybackType == paybackType);
-                                  await stakingCubit.createStaking(
-                                      fiatState.accessToken!,
-                                      isActive: true,
-                                      id: foundedRoute.id!);
-                                } catch (err) {
-                                  await stakingCubit
-                                      .createStaking(fiatState.accessToken!);
-                                }
-                              } else {
-                                stakingCubit.updateRewardInfo(
-                                    type, foundAsset, fiatState.activeIban!);
-                              }
-                              Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            widget.isPayment
-                                                ? NumberOfCoinsToStakeScreen()
-                                                : SendStakingRewardsScreen(
-                                                    isPayment: true),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ));
-                            } catch (err) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    err.toString().replaceAll("\"", ''),
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
-                                  ),
-                                  backgroundColor: Theme.of(context)
-                                      .snackBarTheme
-                                      .backgroundColor,
+                    ),
+                    child: StretchBox(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                titleText,
+                                style: headline2.copyWith(
+                                    fontWeight: FontWeight.w700),
+                              )
+                            ],
+                          ),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: AppColors.portageBg.withOpacity(0.24),
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'DFI Staking',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline4!
+                                          .copyWith(
+                                            fontSize: 16,
+                                          ),
+                                    ),
+                                    Text(
+                                      '2,000 DFI',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline4!
+                                          .copyWith(
+                                            fontSize: 16,
+                                          ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            }
-                          },
-                        ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Pending Withdrawals ',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .subtitle1!
+                                          .copyWith(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .color!
+                                                .withOpacity(0.5),
+                                          ),
+                                    ),
+                                    Text(
+                                      '-1,000 DFI',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .copyWith(
+                                            fontSize: 16,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .color!
+                                                .withOpacity(0.8),
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.all(16),
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        AppColors.portageBg.withOpacity(0.07),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Reward strategy ',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .copyWith(
+                                                  fontSize: 16,
+                                                ),
+                                          ),
+                                          Container(
+                                            width: 32,
+                                            height: 32,
+                                            child: Center(
+                                              child: isEdit
+                                                  ? NewActionButton(
+                                                      isStaticColor: true,
+                                                      bgGradient:
+                                                          gradientActionButtonBg,
+                                                      iconPath:
+                                                          'assets/icons/add.svg',
+                                                      onPressed: () {},
+                                                    )
+                                                  : GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          isEdit = true;
+                                                        });
+                                                      },
+                                                      child: MouseRegion(
+                                                        cursor:
+                                                            SystemMouseCursors
+                                                                .click,
+                                                        child: SvgPicture.asset(
+                                                          'assets/icons/edit_gradient.svg',
+                                                        ),
+                                                      ),
+                                                    ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 12,
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          InvestedField(
+                                            isDeleteBtn: false,
+                                            isDisable: !isEdit,
+                                          ),
+                                          SizedBox(
+                                            height: 8,
+                                          ),
+                                          InvestedField(
+                                            subtitle: 'Saving Account',
+                                            isDeleteBtn: isEdit,
+                                            isDisable: !isEdit,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                if (!isEdit)
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        width: 140,
+                                        child: AccentButton(
+                                          label: 'Unstake',
+                                          callback: () {},
+                                        ),
+                                      ),
+                                      NewPrimaryButton(
+                                        width: 140,
+                                        title: 'Stake',
+                                        callback: () {},
+                                      )
+                                    ],
+                                  ),
+                                if (isEdit)
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        width: 140,
+                                        child: AccentButton(
+                                          label: 'Cancel',
+                                          callback: () {
+                                            setState(() {
+                                              isEdit = false;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      NewPrimaryButton(
+                                        width: 140,
+                                        title: 'Save',
+                                        callback: () {
+                                          setState(() {
+                                            isEdit = false;
+                                          });
+                                        },
+                                      )
+                                    ],
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-        ),
-      );
-
-  hideOverlay() {
-    try {
-      _selectKeyFrom.currentState!.hideOverlay();
-    } catch (_) {}
-    // try {
-    //   _selectKeyCurrency.currentState!.hideOverlay();
-    // } catch (_) {}
-    try {
-      selectKeyIban.currentState!.hideOverlay();
-    } catch (_) {}
+        );
+      },
+    );
   }
 }

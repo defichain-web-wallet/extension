@@ -581,28 +581,37 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
   stakingCallback(context) {
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
-    if (fiatCubit.state.isKycDataComplete! &&
-        fiatCubit.state.history.length > 0) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              SendStakingRewardsScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'To use this feature, you must first successfully complete a bank transaction (buy or sell)!',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-        ),
-      );
-    }
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) =>
+            SendStakingRewardsScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
+    // if (fiatCubit.state.isKycDataComplete! &&
+    //     fiatCubit.state.history.length > 0) {
+    //   Navigator.push(
+    //     context,
+    //     PageRouteBuilder(
+    //       pageBuilder: (context, animation1, animation2) =>
+    //           SendStakingRewardsScreen(),
+    //       transitionDuration: Duration.zero,
+    //       reverseTransitionDuration: Duration.zero,
+    //     ),
+    //   );
+    // } else {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text(
+    //         'To use this feature, you must first successfully complete a bank transaction (buy or sell)!',
+    //         style: Theme.of(context).textTheme.headline5,
+    //       ),
+    //       backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+    //     ),
+    //   );
+    // }
   }
 
   liquidityCallback(double totalLiquidityBalance, txState) {
