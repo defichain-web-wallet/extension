@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
@@ -32,7 +33,8 @@ class SendScreenNew extends StatefulWidget {
   State<SendScreenNew> createState() => _SendScreenNewState();
 }
 
-class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
+class _SendScreenNewState extends State<SendScreenNew>
+    with ThemeMixin, NetworkMixin {
   TextEditingController addressController = TextEditingController();
   TextEditingController assetController = TextEditingController(text: '0');
   AddressBookModel contact = AddressBookModel();
@@ -363,7 +365,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                                           name: name,
                                                           address: address,
                                                           network:
-                                                              'DefiChain Mainnet'),
+                                                              currentNetworkName()),
                                                     );
                                                     Navigator.push(
                                                       context,

@@ -440,8 +440,8 @@ class TokensHelper {
     String symbol,
     String resultAsset,
   ) {
-    AssetPairModel assetPair =
-      tokensPairs.firstWhere((element) => element.symbol! == symbol);
+    AssetPairModel assetPair = tokensPairs
+        .firstWhere((element) => element.symbol! == symbol.replaceAll('d', ''));
     double baseBalance = getBaseBalance(amount, assetPair);
     double quoteBalance = getQuoteBalance(amount, assetPair);
     double baseBalanceByAsset;
