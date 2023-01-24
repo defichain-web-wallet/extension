@@ -42,7 +42,9 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
                 ),
             decoration: InputDecoration(
               filled: !widget.isDisable,
-              fillColor: Colors.white,
+              fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+              enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+              focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
               counterText: '',
               counterStyle: TextStyle(fontSize: 0),
               contentPadding: EdgeInsets.only(right: 0),

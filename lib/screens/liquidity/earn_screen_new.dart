@@ -10,7 +10,7 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_pool_list.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
-import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
+import 'package:defi_wallet/screens/staking/staking_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
@@ -585,7 +585,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) =>
-            SendStakingRewardsScreen(),
+            StakingScreen(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),

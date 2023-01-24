@@ -9,7 +9,7 @@ import 'package:defi_wallet/screens/settings/setting_screen.dart';
 import 'package:defi_wallet/utils/theme/theme_manager.dart';
 import 'package:defi_wallet/widgets/account_drawer/selected_account.dart';
 import 'package:defi_wallet/widgets/buttons/account_menu_button.dart';
-import 'package:defi_wallet/widgets/create_edit_account/create_edit_account_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/create_edit_account_dialog.dart';
 import 'package:defi_wallet/widgets/defi_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

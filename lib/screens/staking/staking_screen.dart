@@ -11,6 +11,7 @@ import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/screens/sell/selling_screen.dart';
 import 'package:defi_wallet/screens/staking/number_of_coins_to_stake.dart';
+import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -18,6 +19,7 @@ import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
 import 'package:defi_wallet/widgets/fields/invested_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -33,18 +35,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive/hive.dart';
 
-class SendStakingRewardsScreen extends StatefulWidget {
-  const SendStakingRewardsScreen({
+class StakingScreen extends StatefulWidget {
+  const StakingScreen({
     Key? key,
   }) : super(key: key);
 
   @override
-  _SendStakingRewardsScreenState createState() =>
-      _SendStakingRewardsScreenState();
+  _StakingScreenState createState() => _StakingScreenState();
 }
 
-class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen>
-    with ThemeMixin {
+class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
   final String titleText = 'Staking';
   bool isEdit = false;
 
@@ -212,6 +212,9 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen>
                               )
                             ],
                           ),
+                          SizedBox(
+                            height: 8,
+                          ),
                           Container(
                             width: double.infinity,
                             padding: EdgeInsets.all(16),
@@ -326,7 +329,19 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen>
                                                           gradientActionButtonBg,
                                                       iconPath:
                                                           'assets/icons/add.svg',
-                                                      onPressed: () {},
+                                                      onPressed: () {
+                                                        showDialog(
+                                                          barrierColor:
+                                                              Color(0x0f180245),
+                                                          barrierDismissible:
+                                                              false,
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return StakingAddAssetDialog();
+                                                          },
+                                                        );
+                                                      },
                                                     )
                                                   : GestureDetector(
                                                       onTap: () {
@@ -385,13 +400,37 @@ class _SendStakingRewardsScreenState extends State<SendStakingRewardsScreen>
                                         width: 140,
                                         child: AccentButton(
                                           label: 'Unstake',
-                                          callback: () {},
+                                          callback: () {
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context, animation1, animation2) =>
+                                                    StakeUnstakeScreen(
+                                                      isUnstake: true,
+                                                    ),
+                                                transitionDuration: Duration.zero,
+                                                reverseTransitionDuration: Duration.zero,
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ),
                                       NewPrimaryButton(
                                         width: 140,
                                         title: 'Stake',
-                                        callback: () {},
+                                        callback: () {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation1, animation2) =>
+                                                  StakeUnstakeScreen(
+                                                    isUnstake: false,
+                                                  ),
+                                              transitionDuration: Duration.zero,
+                                              reverseTransitionDuration: Duration.zero,
+                                            ),
+                                          );
+                                        },
                                       )
                                     ],
                                   ),
