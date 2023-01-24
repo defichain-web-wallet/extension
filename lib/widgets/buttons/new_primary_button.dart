@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class NewPrimaryButton extends StatelessWidget {
   void Function()? callback;
+  final GlobalKey? globalKey;
   double width;
   String title;
   Widget? titleWidget;
@@ -10,6 +11,7 @@ class NewPrimaryButton extends StatelessWidget {
   NewPrimaryButton({
     Key? key,
     this.callback,
+    this.globalKey,
     this.width = double.infinity,
     this.title = 'OK',
     this.titleWidget,
@@ -29,6 +31,7 @@ class NewPrimaryButton extends StatelessWidget {
             gradient: callback != null ? gradientButton : gradientDisableButton),
         child: ElevatedButton(
           onPressed: callback,
+          key: globalKey,
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(

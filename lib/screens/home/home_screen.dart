@@ -59,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProvi
   double maxHistoryEntries = 30;
   double heightListEntry = 74;
   double heightAdditionalAction = 60;
+  bool isShownSnackBar = false;
 
   tabListener() {
     HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
@@ -196,10 +197,11 @@ class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProvi
                 ),
                 body: BlocBuilder<HomeCubit, HomeState>(
                   builder: (context, homeState) {
-                    if (widget.snackBarMessage.isNotEmpty) {
+                    if (widget.snackBarMessage.isNotEmpty && !isShownSnackBar) {
                       Future<Null>.delayed(Duration.zero, () {
                         showSnackBar(context, title: widget.snackBarMessage);
                       });
+                      isShownSnackBar = true;
                     }
                     return Container(
                       color: Theme.of(context).scaffoldBackgroundColor,

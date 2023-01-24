@@ -77,6 +77,9 @@ class _LockScreenState extends State<LockScreen> {
                           label: 'Password',
                           isShowObscureIcon: true,
                           isCaptionShown: false,
+                          onEditComplete: () =>
+                              (globalKey.currentWidget! as ElevatedButton)
+                                  .onPressed!(),
                           isObscure: isPasswordObscure,
                           onChanged: (String value) {
                             password = value;

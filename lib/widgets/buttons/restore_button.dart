@@ -27,6 +27,7 @@ class PendingButtonState extends State<PendingButton> {
   Widget build(BuildContext context) {
     return NewPrimaryButton(
       title: pending ? widget.pendingText : widget.text,
+      globalKey: widget.globalKey,
       callback: (!pending && widget.callback != null)
           ? () async => widget.callback(this)
           : null,

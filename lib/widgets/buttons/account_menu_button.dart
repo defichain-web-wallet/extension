@@ -71,10 +71,12 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
       child: ElevatedButton(
         onPressed: () {
           const int defaultAccountId = 0;
-          if (widget.account == null) {
-            widget.callback!(defaultAccountId);
-          } else {
-            widget.callback!(widget.account!.index!);
+          if (widget.callback != null) {
+            if (widget.account == null) {
+              widget.callback!(defaultAccountId);
+            } else {
+              widget.callback!(widget.account!.index!);
+            }
           }
         },
         onHover: (val) {

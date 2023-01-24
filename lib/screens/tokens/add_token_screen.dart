@@ -69,10 +69,12 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                         accountState.activeAccount!.balanceList!
                             .firstWhere((token) => token.token == el.symbol);
                       } catch (err) {
-                        if (SettingsHelper.settings.network == "mainnet") {
-                          availableTokens.add(el);
-                        } else if (el.symbol != "TSLA") {
-                          availableTokens.add(el);
+                        if (!el.symbol.contains('v1')) {
+                          if (SettingsHelper.settings.network == "mainnet") {
+                            availableTokens.add(el);
+                          } else if (el.symbol != "TSLA") {
+                            availableTokens.add(el);
+                          }
                         }
                       }
                     }

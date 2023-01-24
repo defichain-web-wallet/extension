@@ -345,7 +345,7 @@ class TokensHelper {
   }
 
   String getTokenWithPrefix(token) {
-    return (token != 'DFI' && token != 'DUSD') ? 'd' + token : token;
+    return (token != 'DFI' && token != 'DUSD' && token != 'csETH') ? 'd' + token : token;
   }
 
   bool isPair(symbol) {

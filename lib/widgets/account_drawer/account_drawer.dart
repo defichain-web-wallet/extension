@@ -29,14 +29,7 @@ class AccountDrawer extends StatefulWidget {
 
 class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
   LockHelper lockHelper = LockHelper();
-  bool _isDarkTheme = false;
   late double accountsSelectorHeight;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   void lockWallet() async {
     await lockHelper.lockWallet();
@@ -236,9 +229,10 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                           : (accountIndex) async {
                                                               accountCubit
                                                                   .updateActiveAccount(
-                                                                      accounts[
-                                                                              index]
-                                                                          .index!);
+                                                                  accounts[
+                                                                  index]
+                                                                      .index!);
+                                                              Scaffold.of(context).closeEndDrawer();
                                                             },
                                                       isHoverBackgroundEffect:
                                                           false,
@@ -313,9 +307,6 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                           ),
                           AccountMenuButton(
                             callback: (index) {
-                              setState(() {
-                                _isDarkTheme = !_isDarkTheme;
-                              });
                               ThemeManager.changeTheme(context);
                             },
                             iconPath: isDarkTheme()
@@ -329,11 +320,8 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                 : AppColors.white,
                             title: 'Night Mode',
                             afterTitleWidget: DefiSwitch(
-                              isEnable: _isDarkTheme,
+                              isEnable: isDarkTheme(),
                               onToggle: (bool value) {
-                                setState(() {
-                                  _isDarkTheme = value;
-                                });
                                 ThemeManager.changeTheme(context);
                               },
                             ),
