@@ -391,6 +391,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                                             Duration.zero,
                                                       ),
                                                     );
+                                                    Navigator.pop(dialogContext);
                                                   },
                                                 );
                                               },
