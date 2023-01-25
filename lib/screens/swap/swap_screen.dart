@@ -409,6 +409,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                         accountState,
                         assetFrom.symbol,
                         dexState,
+                        isBitcoin: SettingsHelper.isBitcoin()
                       ),
                       onAssetSelect: (asset) {
                         onSelectFromAsset(
@@ -1431,9 +1432,20 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
     return (amount > 0) ? convertFromSatoshi(balance - fee) : 0.0;
   }
 
-  double getAvailableAmount(accountState, assetFrom, dexState) {
+  double getAvailableAmount(
+    accountState,
+    assetFrom,
+    dexState, {
+    bool isBitcoin = false,
+  }) {
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     int amount = 0;
     int fee = 0;
+
+    if (isBitcoin) {
+      return convertFromSatoshi(bitcoinCubit.state.availableBalance);
+    }
+
     if (accountState.status == AccountStatusList.success &&
         dexState is DexLoadedState) {
       if (dexState.dexModel.fee != null) {
