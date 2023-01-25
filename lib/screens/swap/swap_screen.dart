@@ -236,14 +236,18 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                             topLeft: Radius.circular(20),
                           ),
                         ),
-                        child: _buildBody(
-                          context,
-                          dexState,
-                          dexCubit,
-                          accountState,
-                          tokensState,
-                          transactionState,
-                          isFullScreen,
+                        child: BlocBuilder<BitcoinCubit, BitcoinState>(
+                          builder: (context, bitcoinState) {
+                            return _buildBody(
+                              context,
+                              dexState,
+                              dexCubit,
+                              accountState,
+                              tokensState,
+                              transactionState,
+                              isFullScreen,
+                            );
+                          }
                         ),
                       ),
                     );
