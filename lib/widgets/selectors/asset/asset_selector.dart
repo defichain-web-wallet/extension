@@ -11,12 +11,14 @@ class AssetSelector extends StatefulWidget {
   final void Function(TokensModel) onSelect;
   final List<TokensModel> assets;
   final TokensModel selectedAsset;
+  final bool isDisabled;
 
   AssetSelector({
     Key? key,
     required this.onSelect,
     required this.assets,
     required this.selectedAsset,
+    this.isDisabled = false,
   }) : super(key: key);
 
   @override
@@ -44,10 +46,10 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
         height: 38,
         child: AssetHeaderSelector(
           assetCode: widget.selectedAsset.symbol!,
-          isShown: _isShowDropdown,
+          isShown: _isShowDropdown && !widget.isDisabled,
         ),
       ),
-      menuBuilder: () => Container(
+      menuBuilder: () => widget.isDisabled ? Container() : Container(
         margin: const EdgeInsets.only(top: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(

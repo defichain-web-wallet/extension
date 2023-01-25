@@ -409,6 +409,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                       ],
                     AmountField(
                       suffix: amountFromInUsd,
+                      isDisabledSelector: SettingsHelper.isBitcoin(),
                       available: getAvailableAmount(
                         accountState,
                         assetFrom.symbol,
@@ -529,6 +530,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                       ],
                     AmountField(
                       suffix: amountToInUsd,
+                      isDisabledSelector: SettingsHelper.isBitcoin(),
                       available: getAvailableAmount(
                         accountState,
                         assetTo!.symbol,

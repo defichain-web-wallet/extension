@@ -260,6 +260,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                           balanceInUsd = getUsdBalance(context);
                                         });
                                       },
+                                      isDisabledSelector: SettingsHelper.isBitcoin(),
                                       suffix: balanceInUsd ??
                                           getUsdBalance(context),
                                       available: getAvailableBalance(
