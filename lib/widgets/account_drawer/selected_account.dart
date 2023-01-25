@@ -106,8 +106,8 @@ class _SelectedAccountState extends State<SelectedAccount> {
             children: [
               Text(
                 '${widget.accountName}',
-                style: Theme.of(context).textTheme.headline6!.copyWith(
-                      fontWeight: FontWeight.w700,
+                style: Theme.of(context).textTheme.headline4!.copyWith(
+                      fontSize: 16,
                     ),
               ),
               SizedBox(

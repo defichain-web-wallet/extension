@@ -159,15 +159,15 @@ class TokensHelper {
     switch (tokenName) {
       case 'DFI':
         {
-          return Color(0xffFF00A3);
+          return Color(0xFFFF00AF);
         }
       case 'ETH':
         {
-          return Color(0xff627EEA);
+          return Color(0xFF627EEA);
         }
       case 'BTC':
         {
-          return Color(0xffF7931A);
+          return Color(0xFFF7931A);
         }
       case 'LTC':
         {
@@ -345,7 +345,7 @@ class TokensHelper {
   }
 
   String getTokenWithPrefix(token) {
-    return (token != 'DFI' && token != 'DUSD') ? 'd' + token : token;
+    return (token != 'DFI' && token != 'DUSD' && token != 'csETH') ? 'd' + token : token;
   }
 
   bool isPair(symbol) {

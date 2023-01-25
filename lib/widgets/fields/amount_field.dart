@@ -138,7 +138,7 @@ class _AmountFieldState extends State<AmountField> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.suffix!,
+                  '\$${widget.suffix!}',
                   style: Theme.of(context).textTheme.headline6!.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context)

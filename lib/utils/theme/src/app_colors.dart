@@ -11,7 +11,7 @@ abstract class AppColors {
   static const lavenderPurple = Color(0xFF9988BE);
   static const portage = Color(0xFF9490EA);
   static const portageBg = Color(0xFF9B73EE);
-  static const whiteLilac = Color(0xFFEFEDF8);
+  static const whiteLilac = Color(0xFFEBEDF8);
   static const hollywoodCerise = Color(0xFFFF00A3);
   static const hollywoodCeriseAlpha = Color(0xFFFF00A3);
   static const electricViolet = Color(0xFFBC00C0);

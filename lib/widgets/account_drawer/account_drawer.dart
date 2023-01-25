@@ -20,7 +20,7 @@ class AccountDrawer extends StatefulWidget {
 
   const AccountDrawer({
     Key? key,
-    this.width = 304,
+    this.width = 280,
   }) : super(key: key);
 
   @override
@@ -29,14 +29,7 @@ class AccountDrawer extends StatefulWidget {
 
 class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
   LockHelper lockHelper = LockHelper();
-  bool _isDarkTheme = false;
   late double accountsSelectorHeight;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   void lockWallet() async {
     await lockHelper.lockWallet();
@@ -66,15 +59,15 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
           child: Drawer(
-            width: widget.width! + 16,
+            width: widget.width!,
             backgroundColor: Colors.transparent,
-            elevation: 0,
+            elevation: 3,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).drawerTheme.backgroundColor,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     width: 1,
                     color: isDarkTheme()
@@ -236,9 +229,10 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                           : (accountIndex) async {
                                                               accountCubit
                                                                   .updateActiveAccount(
-                                                                      accounts[
-                                                                              index]
-                                                                          .index!);
+                                                                  accounts[
+                                                                  index]
+                                                                      .index!);
+                                                              Scaffold.of(context).closeEndDrawer();
                                                             },
                                                       isHoverBackgroundEffect:
                                                           false,
@@ -313,19 +307,21 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                           ),
                           AccountMenuButton(
                             callback: (index) {
-                              setState(() {
-                                _isDarkTheme = !_isDarkTheme;
-                              });
                               ThemeManager.changeTheme(context);
                             },
-                            iconPath: 'assets/icons/night_mode.svg',
+                            iconPath: isDarkTheme()
+                                ? 'assets/icons/light_mode.svg'
+                                : 'assets/icons/night_mode.svg',
+                            hoverBgColor: isDarkTheme()
+                                ? AppColors.white
+                                : AppColors.blackRock,
+                            hoverTextColor: isDarkTheme()
+                                ? AppColors.blackRock
+                                : AppColors.white,
                             title: 'Night Mode',
                             afterTitleWidget: DefiSwitch(
-                              isEnable: _isDarkTheme,
+                              isEnable: isDarkTheme(),
                               onToggle: (bool value) {
-                                setState(() {
-                                  _isDarkTheme = value;
-                                });
                                 ThemeManager.changeTheme(context);
                               },
                             ),
@@ -351,6 +347,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             thickness: 1,
                           ),
                           AccountMenuButton(
+                            isLockType: true,
                             callback: (index) {
                               lockWallet();
                             },

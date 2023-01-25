@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -92,6 +93,13 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
     Navigator.pop(context);
   }
 
+  Future<void> _saveImageToStorage() async {
+    var box = await Hive.openBox(HiveBoxes.client);
+    await box.put(HiveNames.accountAvatar, _webImage);
+    await box.put(HiveNames.accountName, _nameController.text);
+    await box.close();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AccountCubit, AccountState>(
@@ -124,13 +132,13 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                   ),
                   NewPrimaryButton(
                     width: 104,
-                    callback: () {
+                    callback: () async {
                       if (_nameController.text.length > 3) {
+                        if (_pickedImage != null) {
+                          await _saveImageToStorage();
+                        }
                         widget.callback!(_nameController.text);
                         Navigator.pop(context);
-                         // AccountCubit accountCubit =
-                         // BlocProvider.of<AccountCubit>(context);
-                         // accountCubit.updateAccountDetails();
                       }
                     },
                     title: 'Confirm',

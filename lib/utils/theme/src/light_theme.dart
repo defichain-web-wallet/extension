@@ -33,7 +33,7 @@ ThemeData createLightTheme() {
       style: ButtonStyle(
         textStyle: MaterialStatePropertyAll(button),
         padding: MaterialStatePropertyAll(
-          EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         ),
         shape: MaterialStatePropertyAll(
           RoundedRectangleBorder(
