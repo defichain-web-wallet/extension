@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_remove_screen.dart';
+import 'package:defi_wallet/screens/swap/swap_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -70,6 +71,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
             width: buttonSmallWidth,
           ),
           appBar: NewMainAppBar(
+            bgColor: AppColors.viridian.withOpacity(0.16),
             isShowLogo: false,
           ),
           body: Container(
@@ -371,41 +373,58 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                           SizedBox(
                             height: 16,
                           ),
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.viridian.withOpacity(0.07),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Column(
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          SwapScreen(),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
+                              );
+                            },
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.viridian.withOpacity(0.07),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      padding: EdgeInsets.only(right: 10),
-                                      child: SvgPicture.asset(
-                                          'assets/icons/compare_arrow.svg'),
+                                    Column(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.only(right: 10),
+                                          child: SvgPicture.asset(
+                                              'assets/icons/compare_arrow.svg'),
+                                        ),
+                                      ],
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            changeDfiText,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .copyWith(
+                                                  fontSize: 12,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
-                                Expanded(
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        changeDfiText,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline5!
-                                            .copyWith(
-                                              fontSize: 12,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                           SizedBox(
@@ -456,7 +475,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                     Container(
                                       padding: EdgeInsets.only(right: 10),
                                       child: SvgPicture.asset(
-                                          'assets/icons/copy.svg'),
+                                          'assets/icons/copy.svg',),
                                     ),
                                   ],
                                 ),
@@ -513,6 +532,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                               ),
                             ],
                           ),
+                          SizedBox(height: 88,),
                         ],
                       ),
                     ),

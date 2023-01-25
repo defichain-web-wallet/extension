@@ -1,39 +1,18 @@
-import 'dart:convert';
-
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
-import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/available_asset_model.dart';
-import 'package:defi_wallet/models/iban_model.dart';
-import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
-import 'package:defi_wallet/screens/sell/selling_screen.dart';
-import 'package:defi_wallet/screens/staking/number_of_coins_to_stake.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
 import 'package:defi_wallet/widgets/fields/invested_field.dart';
-import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box_new.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/selectors/currency_selector.dart';
-import 'package:defi_wallet/widgets/selectors/iban_selector.dart';
-import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hive/hive.dart';
 
 class StakingScreen extends StatefulWidget {
   const StakingScreen({
@@ -62,6 +41,7 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
             width: buttonSmallWidth,
           ),
           appBar: NewMainAppBar(
+            bgColor: AppColors.viridian.withOpacity(0.16),
             isShowLogo: false,
           ),
           body: Container(
@@ -404,12 +384,16 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                             Navigator.push(
                                               context,
                                               PageRouteBuilder(
-                                                pageBuilder: (context, animation1, animation2) =>
+                                                pageBuilder: (context,
+                                                        animation1,
+                                                        animation2) =>
                                                     StakeUnstakeScreen(
-                                                      isUnstake: true,
-                                                    ),
-                                                transitionDuration: Duration.zero,
-                                                reverseTransitionDuration: Duration.zero,
+                                                  isUnstake: true,
+                                                ),
+                                                transitionDuration:
+                                                    Duration.zero,
+                                                reverseTransitionDuration:
+                                                    Duration.zero,
                                               ),
                                             );
                                           },
@@ -422,12 +406,14 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                           Navigator.push(
                                             context,
                                             PageRouteBuilder(
-                                              pageBuilder: (context, animation1, animation2) =>
+                                              pageBuilder: (context, animation1,
+                                                      animation2) =>
                                                   StakeUnstakeScreen(
-                                                    isUnstake: false,
-                                                  ),
+                                                isUnstake: false,
+                                              ),
                                               transitionDuration: Duration.zero,
-                                              reverseTransitionDuration: Duration.zero,
+                                              reverseTransitionDuration:
+                                                  Duration.zero,
                                             ),
                                           );
                                         },
