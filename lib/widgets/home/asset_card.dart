@@ -37,17 +37,12 @@ class _AssetCardState extends State<AssetCard> {
 
   Widget _buildTokenIcon(BalanceModel token) {
     if (token.isPair!) {
-      return AssetPair(pair: token.token!);
+      return AssetPair(pair: token.token!, size: 20,);
     } else {
       return AssetIcon(
         url: tokensHelper.getImageNameByTokenName(token.token!),
         color: tokensHelper.getColorByTokenName(token.token!),
       );
-      // return SvgPicture.asset(
-      //   tokensHelper.getImageNameByTokenName(token.token!),
-      //   height: 42,
-      //   width: 42,
-      // );
     }
   }
 
