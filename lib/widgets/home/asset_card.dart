@@ -62,8 +62,8 @@ class _AssetCardState extends State<AssetCard> {
       balanceInUsd = tokensHelper.getPairsAmountByAsset(
           state.tokensPairs, balanceInSatoshi, coin, 'USD');
     } else {
-      balanceInUsd =
-          tokensHelper.getAmountByUsd(state.tokensPairs, tokenBalance, coin);
+      balanceInUsd = tokensHelper.getAmountByUsd(
+          state.tokensPairs, tokenBalance, coin.replaceAll('d', ''));
     }
     if (fiat == 'EUR') {
       balanceInUsd *= state.eurRate;
@@ -145,7 +145,7 @@ class _AssetCardState extends State<AssetCard> {
                   Text(
                     getFormatTokenBalanceByFiat(
                       widget.tokensState,
-                      tokensHelper.getTokenWithPrefix(widget.tokenCode),
+                      widget.tokenCode,
                       widget.tokenBalance,
                       currency,
                     ),
