@@ -263,10 +263,14 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext context1) {
-                                      return LedgerCheckScreen(onStartSign: () async {
+                                      return LedgerCheckScreen(onStartSign: (p, c) async {
                                         parent.emitPending(true);
-                                        await submitSwap(state, tokensState, null);
+                                        p.emitPending(true);
+                                        await submitSwap(state, tokensState, null, callbackOk: () {
+                                          Navigator.pop(c);
+                                        });
                                         parent.emitPending(false);
+                                        p.emitPending(false);
                                       });
                                     },
                                   );
@@ -288,7 +292,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
         ),
       );
 
-  submitSwap(state, tokenState, String? password) async {
+  submitSwap(state, tokenState, String? password, {final Function()? callbackOk}) async {
     if (state.status == AccountStatusList.success) {
       late TxErrorModel txResponse;
       try {
@@ -319,6 +323,9 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
           return TxStatusDialog(
             txResponse: txResponse,
             callbackOk: () {
+              if (callbackOk != null) {
+                callbackOk();
+              }
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(

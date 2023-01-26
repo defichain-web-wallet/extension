@@ -5,10 +5,12 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -422,24 +424,44 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                           child: PendingButton(
                             widget.removeLT == 0 ? 'Add' : 'Remove',
                             pendingText: 'Pending',
-                            callback: (parent) {
-                              showDialog(
-                                barrierColor: Color(0x0f180245),
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (BuildContext context1) {
-                                  return PassConfirmDialog(onSubmit: (password) async {
-                                    parent.emitPending(true);
-                                    await submitLiquidityAction(
-                                      state,
-                                      tokensState,
-                                      transactionState,
-                                      password,
-                                    );
-                                    parent.emitPending(false);
-                                  });
-                                },
-                              );
+                            callback: (parent) async {
+                              final isLedger = await SettingsHelper.isLedger();
+                              if (isLedger) {
+                                showDialog(
+                                  barrierColor: Color(0x0f180245),
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (BuildContext context1) {
+                                    return LedgerCheckScreen(onStartSign: (p, c) async {
+                                      parent.emitPending(true);
+                                      p.emitPending(true);
+                                      await submitLiquidityAction(state, tokensState, transactionState, null, callbackOk: (() {
+                                        Navigator.pop(c);
+                                      }));
+                                      parent.emitPending(false);
+                                      p.emitPending(false);
+                                    });
+                                  },
+                                );
+                              } else {
+                                showDialog(
+                                  barrierColor: Color(0x0f180245),
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (BuildContext context1) {
+                                    return PassConfirmDialog(onSubmit: (password) async {
+                                      parent.emitPending(true);
+                                      await submitLiquidityAction(
+                                        state,
+                                        tokensState,
+                                        transactionState,
+                                        password,
+                                      );
+                                      parent.emitPending(false);
+                                    });
+                                  },
+                                );
+                              }
                             },
                           ),
                         ),
@@ -457,7 +479,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
     });
   }
 
-  submitLiquidityAction(state, tokensState, transactionState, password) async {
+  submitLiquidityAction(state, tokensState, transactionState, password, {final Function()? callbackOk}) async {
     if (transactionState is TransactionLoadingState) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -473,7 +495,11 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
     try {
       var txser = TransactionService();
       var txError;
-      ECPair keyPair = await HDWalletService().getKeypairFromStorage(password, state.activeAccount.index!);
+      ECPair? keyPair;
+      final isLedger = await SettingsHelper.isLedger();
+      if (!isLedger) {
+        keyPair = await HDWalletService().getKeypairFromStorage(password, state.activeAccount.index!);
+      }
       if (widget.removeLT != 0) {
         txError = await txser.removeLiqudity(keyPair: keyPair, account: state.activeAccount, token: widget.assetPair, amount: convertToSatoshi(widget.removeLT));
       } else {
@@ -495,6 +521,9 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
           return TxStatusDialog(
             txResponse: txError,
             callbackOk: () {
+              if (callbackOk != null) {
+                callbackOk();
+              }
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(

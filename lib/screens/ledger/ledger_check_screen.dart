@@ -9,7 +9,7 @@ import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class LedgerCheckScreen extends StatefulWidget {
-  final Function() onStartSign;
+  final Function(dynamic parent, BuildContext context) onStartSign;
 
   const LedgerCheckScreen({Key? key, required this.onStartSign}) : super(key: key);
 
@@ -107,7 +107,7 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                       ),
                       PendingButton('Start', pendingText: 'Sign on your ledger', isCheckLock: false, callback: (parent) async {
                         parent.emitPending(true);
-                        await this.widget.onStartSign();
+                        await this.widget.onStartSign(parent, context);
                         parent.emitPending(false);
                       })
                     ],

@@ -228,8 +228,7 @@ class FiatCubit extends Cubit<FiatState> {
       accessToken: state.accessToken,
     ));
     try {
-      List<AssetByFiatModel> assets =
-      await dfxRequests.getAvailableAssets(state.accessToken!);
+      List<AssetByFiatModel> assets = await dfxRequests.getAvailableAssets(state.accessToken!);
       emit(state.copyWith(
         status: FiatStatusList.success,
         phone: state.phone,
@@ -277,8 +276,7 @@ class FiatCubit extends Cubit<FiatState> {
     }
   }
 
-  saveBuyDetails(
-      String iban, AssetByFiatModel asset, String accessToken) async {
+  saveBuyDetails(String iban, AssetByFiatModel asset, String accessToken) async {
     await dfxRequests.saveBuyDetails(iban, asset, accessToken);
     emit(state.copyWith(
       status: FiatStatusList.success,
@@ -322,15 +320,12 @@ class FiatCubit extends Cubit<FiatState> {
       accessToken: state.accessToken,
     ));
     List<IbanModel> ibanList = await dfxRequests.getIbanList(state.accessToken!);
-    List<IbanModel> activeIbanList =
-        ibanList.where((el) => el.active!).toList();
+    List<IbanModel> activeIbanList = ibanList.where((el) => el.active!).toList();
     IbanModel? iban;
 
     try {
       if (state.currentIban != null && asset != null && state.currentIban != '') {
-        iban = activeIbanList.firstWhere((element) =>
-            element.asset!.name == asset.name &&
-            element.iban == state.currentIban!.replaceAll(' ', ''));
+        iban = activeIbanList.firstWhere((element) => element.asset!.name == asset.name && element.iban == state.currentIban!.replaceAll(' ', ''));
       } else {
         iban = activeIbanList[0];
       }
@@ -385,8 +380,7 @@ class FiatCubit extends Cubit<FiatState> {
       assets.forEach((element) {
         if (element.name.contains(value.toUpperCase())) {
           search.add(element);
-        } else if (element.name
-            .contains(value.replaceAll('d', '').toUpperCase())) {
+        } else if (element.name.contains(value.replaceAll('d', '').toUpperCase())) {
           search.add(element);
         }
       });
@@ -539,8 +533,7 @@ class FiatCubit extends Cubit<FiatState> {
     ));
   }
 
-  setAddress(
-      String street, String city, String zipCode, String accessToken) async {
+  setAddress(String street, String city, String zipCode, String accessToken) async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
       phone: state.phone,
@@ -611,8 +604,7 @@ class FiatCubit extends Cubit<FiatState> {
       accessToken: state.accessToken,
     ));
     List<FiatModel> fiatList = await dfxRequests.getFiatList(accessToken);
-    List<FiatModel> activeFiatList =
-        fiatList.where((el) => el.enable!).toList();
+    List<FiatModel> activeFiatList = fiatList.where((el) => el.enable!).toList();
     emit(state.copyWith(
       status: FiatStatusList.success,
       phone: state.phone,
@@ -658,21 +650,17 @@ class FiatCubit extends Cubit<FiatState> {
     ));
     try {
       List<FiatModel> fiatList = await dfxRequests.getFiatList(state.accessToken!);
-      List<FiatModel> activeFiatList =
-      fiatList.where((el) => el.enable!).toList();
+      List<FiatModel> activeFiatList = fiatList.where((el) => el.enable!).toList();
 
-      List<AssetByFiatModel> assets =
-      await dfxRequests.getAvailableAssets(state.accessToken!);
+      List<AssetByFiatModel> assets = await dfxRequests.getAvailableAssets(state.accessToken!);
 
       List<IbanModel> ibanList = await dfxRequests.getIbanList(state.accessToken!);
-      List<IbanModel> activeIbanList =
-      ibanList.where((el) => el.active!).toList();
+      List<IbanModel> activeIbanList = ibanList.where((el) => el.active!).toList();
       IbanModel? iban;
 
       try {
         if (state.currentIban != null && state.currentIban != '') {
-          iban = activeIbanList
-              .firstWhere((element) => (element.iban == state.currentIban!.replaceAll(' ', '')));
+          iban = activeIbanList.firstWhere((element) => (element.iban == state.currentIban!.replaceAll(' ', '')));
         } else {
           if (isSell) {
             iban = activeIbanList.firstWhere((element) => element.type == 'Sell');
@@ -796,8 +784,7 @@ class FiatCubit extends Cubit<FiatState> {
       if (needRefresh) {
         accessToken = await dfxRequests.signIn(account, keyPair);
       } else {
-        accessToken =
-            state.accessToken ?? await dfxRequests.signIn(account, keyPair);
+        accessToken = state.accessToken ?? await dfxRequests.signIn(account, keyPair);
       }
       return accessToken;
     } catch (err) {

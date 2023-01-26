@@ -308,7 +308,14 @@ class AccountCubit extends Cubit<AccountState> {
     List<AccountModel> accounts = state.accounts!;
     int newAccountIndex = accounts.length;
 
-    final account = await walletsHelper.createNewAccount(state.masterKeyPairPublicKey!, SettingsHelper.settings.network!, accountIndex: newAccountIndex);
+    final isLedger = await SettingsHelper.isLedger();
+    AccountModel account;
+
+    if (isLedger) {
+      account = await ledgerWalletsHelper.createNewAccount(SettingsHelper.settings.network!, newAccountIndex);
+    } else {
+      account = await walletsHelper.createNewAccount(state.masterKeyPairPublicKey!, SettingsHelper.settings.network!, accountIndex: newAccountIndex);
+    }
 
     final balances = account.balanceList!;
     final activeToken = balances[0].token;

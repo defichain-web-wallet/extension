@@ -27,7 +27,7 @@ class FiatState extends Equatable {
   final CryptoRouteModel? cryptoRoute;
 
   FiatState({
-    this.status = FiatStatusList.initial,
+    this.status = FiatStatusList.success,
     this.phone,
     this.countryCode,
     this.phoneWithoutPrefix,
@@ -53,29 +53,29 @@ class FiatState extends Equatable {
 
   @override
   List<Object?> get props => [
-    status,
-    phone,
-    countryCode,
-    phoneWithoutPrefix,
-    numberPrefix,
-    email,
-    currentIban,
-    kycHash,
-    accessToken,
-    ibansList,
-    assets,
-    foundAssets,
-    history,
-    activeIban,
-    ibanList,
-    personalInfo,
-    countryList,
-    fiatList,
-    isShowTutorial,
-    isKycDataComplete,
-    limit,
-    cryptoRoute,
-  ];
+        status,
+        phone,
+        countryCode,
+        phoneWithoutPrefix,
+        numberPrefix,
+        email,
+        currentIban,
+        kycHash,
+        accessToken,
+        ibansList,
+        assets,
+        foundAssets,
+        history,
+        activeIban,
+        ibanList,
+        personalInfo,
+        countryList,
+        fiatList,
+        isShowTutorial,
+        isKycDataComplete,
+        limit,
+        cryptoRoute,
+      ];
 
   FiatState copyWith({
     FiatStatusList? status,

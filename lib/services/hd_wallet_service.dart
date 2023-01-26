@@ -31,7 +31,7 @@ class HDWalletService {
     return ECPair.fromWIF(wif, network: networkHelper.getNetwork(networkString));
   }
 
-  Future<ECPair> getKeypairFromStorage(String password, int accountIndex) async {
+  Future<ECPair> getKeypairFromStorage(String? password, int accountIndex) async {
     var networkString = NetworkHelper().getNetworkString();
     String network;
     String boxKey;

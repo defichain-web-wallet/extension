@@ -15,7 +15,9 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/my_app.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/screens/send/send_status_screen.dart';
+import 'package:defi_wallet/screens/settings/settings.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -64,18 +66,15 @@ class SendSummaryScreen extends StatefulWidget {
 class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
-  String secondStepLoaderText =
-      'One second, Jelly is preparing your transaction!';
+  String secondStepLoaderText = 'One second, Jelly is preparing your transaction!';
   String titleText = 'Summary';
-  String subtitleText =
-      'Please confirm the process on your device to complete it.';
+  String subtitleText = 'Please confirm the process on your device to complete it.';
   bool isShowAdded = false;
   late String address;
 
   @override
   void initState() {
-    address =
-        widget.address != null ? widget.address! : widget.contact!.address!;
+    address = widget.address != null ? widget.address! : widget.contact!.address!;
     // TODO: implement initState
     super.initState();
     if (widget.isAfterAddContact) {
@@ -108,8 +107,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
           appBar: NewMainAppBar(
             isShowLogo: false,
           ),
-          body: BlocBuilder<AccountCubit, AccountState>(
-              builder: (context, state) {
+          body: BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
             return BlocBuilder<TokensCubit, TokensState>(
               builder: (context, tokensState) {
                 return Stack(
@@ -124,9 +122,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                       width: double.infinity,
                       height: double.infinity,
                       decoration: BoxDecoration(
-                        color: isDarkTheme()
-                            ? DarkColors.scaffoldContainerBgColor
-                            : LightColors.scaffoldContainerBgColor,
+                        color: isDarkTheme() ? DarkColors.scaffoldContainerBgColor : LightColors.scaffoldContainerBgColor,
                         border: isDarkTheme()
                             ? Border.all(
                                 width: 1.0,
@@ -149,8 +145,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                     children: [
                                       Text(
                                         titleText,
-                                        style: headline2.copyWith(
-                                            fontWeight: FontWeight.w700),
+                                        style: headline2.copyWith(fontWeight: FontWeight.w700),
                                       )
                                     ],
                                   ),
@@ -161,15 +156,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                   if (widget.isLedger)
                                     Text(
                                       subtitleText,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .apply(
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .color!
-                                                .withOpacity(0.6),
+                                      style: Theme.of(context).textTheme.headline5!.apply(
+                                            color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
                                           ),
                                       softWrap: true,
                                       textAlign: TextAlign.start,
@@ -204,11 +192,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                                 height: 45,
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                      color:
-                                                          AppColors.pinkColor),
-                                                  color: AppColors.pinkColor
-                                                      .withOpacity(0.1),
+                                                  border: Border.all(color: AppColors.pinkColor),
+                                                  color: AppColors.pinkColor.withOpacity(0.1),
                                                 ),
                                               ),
                                               SizedBox(
@@ -219,11 +204,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                                 height: 45,
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                      color:
-                                                          AppColors.pinkColor),
-                                                  color: AppColors.pinkColor
-                                                      .withOpacity(0.1),
+                                                  border: Border.all(color: AppColors.pinkColor),
+                                                  color: AppColors.pinkColor.withOpacity(0.1),
                                                 ),
                                               ),
                                             ],
@@ -236,42 +218,26 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                   ),
                                   Container(
                                     width: double.infinity,
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 16, horizontal: 21),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                            color: AppColors.lavenderPurple
-                                                .withOpacity(0.32))),
+                                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 21),
+                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.lavenderPurple.withOpacity(0.32))),
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           'Do you really want to send',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .copyWith(
+                                          style: Theme.of(context).textTheme.headline6!.copyWith(
                                                 fontWeight: FontWeight.w400,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6!
-                                                    .color!
-                                                    .withOpacity(0.5),
+                                                color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.5),
                                               ),
                                         ),
                                         SizedBox(
                                           height: 8,
                                         ),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             SvgPicture.asset(
-                                              TokensHelper()
-                                                  .getImageNameByTokenName(
-                                                      widget.token.symbol),
+                                              TokensHelper().getImageNameByTokenName(widget.token.symbol),
                                               height: 20,
                                             ),
                                             SizedBox(
@@ -279,10 +245,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                             ),
                                             Text(
                                               widget.amount.toString(),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline4!
-                                                  .copyWith(
+                                              style: Theme.of(context).textTheme.headline4!.copyWith(
                                                     fontSize: 20,
                                                   ),
                                             ),
@@ -293,16 +256,9 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                         ),
                                         Text(
                                           'to',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .copyWith(
+                                          style: Theme.of(context).textTheme.headline6!.copyWith(
                                                 fontWeight: FontWeight.w400,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6!
-                                                    .color!
-                                                    .withOpacity(0.5),
+                                                color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.5),
                                               ),
                                         ),
                                         SizedBox(
@@ -311,10 +267,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                         if (widget.contact != null)
                                           Text(
                                             widget.contact!.name!,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline4!
-                                                .copyWith(
+                                            style: Theme.of(context).textTheme.headline4!.copyWith(
                                                   fontSize: 20,
                                                 ),
                                           ),
@@ -325,16 +278,9 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                         if (widget.contact != null)
                                           Text(
                                             widget.contact!.address!,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline6!
-                                                .copyWith(
+                                            style: Theme.of(context).textTheme.headline6!.copyWith(
                                                   fontWeight: FontWeight.w400,
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .headline6!
-                                                      .color!
-                                                      .withOpacity(0.5),
+                                                  color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.5),
                                                 ),
                                           ),
                                         if (widget.address != null)
@@ -344,36 +290,22 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                               horizontal: 12,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: isDarkTheme()
-                                                  ? DarkColors.drawerBgColor
-                                                  : LightColors.drawerBgColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
+                                              color: isDarkTheme() ? DarkColors.drawerBgColor : LightColors.drawerBgColor,
+                                              borderRadius: BorderRadius.circular(12),
                                               border: Border.all(
                                                 color: AppColors.whiteLilac,
                                               ),
                                             ),
-                                            textStyle: Theme.of(context)
-                                                .textTheme
-                                                .subtitle2!
-                                                .copyWith(
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .subtitle2!
-                                                      .color!
-                                                      .withOpacity(0.5),
+                                            textStyle: Theme.of(context).textTheme.subtitle2!.copyWith(
+                                                  color: Theme.of(context).textTheme.subtitle2!.color!.withOpacity(0.5),
                                                   fontSize: 10,
                                                 ),
                                             message: '${widget.address!}',
                                             child: Padding(
-                                              padding:
-                                                  EdgeInsets.only(bottom: 20),
+                                              padding: EdgeInsets.only(bottom: 20),
                                               child: Text(
                                                 cutAddress(widget.address!),
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline4!
-                                                    .copyWith(
+                                                style: Theme.of(context).textTheme.headline4!.copyWith(
                                                       fontSize: 20,
                                                     ),
                                               ),
@@ -387,8 +319,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                               Column(
                                 children: [
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Container(
                                         width: 104,
@@ -405,24 +336,44 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                           'Send',
                                           isCheckLock: false,
                                           pendingText: 'Pending',
-                                          callback: (parent) {
-                                            showDialog(
-                                              barrierColor: Color(0x0f180245),
-                                              barrierDismissible: false,
-                                              context: context,
-                                              builder: (BuildContext context1) {
-                                                return PassConfirmDialog(
-                                                    onSubmit: (password) async {
+                                          callback: (parent) async {
+                                            final isLedger = await SettingsHelper.isLedger();
+                                            if (isLedger) {
+                                              showDialog(
+                                                barrierColor: Color(0x0f180245),
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder: (BuildContext context1) {
+                                                  return LedgerCheckScreen(onStartSign: (p, c) async {
+                                                    parent.emitPending(true);
+                                                    p.emitPending(true);
+                                                    await submitSend(state, tokensState, null, callbackOk: (() {
+                                                      Navigator.pop(c);
+                                                    }));
+                                                    parent.emitPending(false);
+                                                    p.emitPending(false);
+                                                  });
+                                                },
+                                              );
+                                            } else {
+                                              showDialog(
+                                                barrierColor: Color(0x0f180245),
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder: (BuildContext context1) {
                                                   parent.emitPending(true);
-                                                  await submitSend(
-                                                    state,
-                                                    tokensState,
-                                                    password,
-                                                  );
-                                                  parent.emitPending(false);
-                                                });
-                                              },
-                                            );
+                                                  return PassConfirmDialog(onSubmit: (password) async {
+                                                    await submitSend(
+                                                      state,
+                                                      tokensState,
+                                                      password,
+                                                    );
+
+                                                    parent.emitPending(false);
+                                                  });
+                                                },
+                                              );
+                                            }
                                           },
                                         ),
                                       ),
@@ -453,11 +404,9 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(6.4),
                                   child: BackdropFilter(
-                                    filter: ImageFilter.blur(
-                                        sigmaX: 5.0, sigmaY: 5.0),
+                                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.done,
@@ -490,12 +439,11 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
     );
   }
 
-  submitSend(state, tokensState, password) async {
+  Future submitSend(state, tokensState, password, {final Function()? callbackOk}) async {
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
-        _callback(
-            state.activeAccount, password, bitcoinCubit, tokensState.tokens);
+        await _callback(state.activeAccount, password, bitcoinCubit, tokensState.tokens, callbackOk: callbackOk);
       }
     } catch (_err) {
       print(_err);
@@ -517,11 +465,9 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
     }
   }
 
-  Future _callback(AccountModel account, String password,
-      BitcoinCubit bitcoinCubit, List<TokensModel> tokens) async {
-    ECPair keyPair =
-        await HDWalletService().getKeypairFromStorage(password, account.index!);
+  Future _callback(AccountModel account, String? password, BitcoinCubit bitcoinCubit, List<TokensModel> tokens, {final Function()? callbackOk}) async {
     if (SettingsHelper.isBitcoin()) {
+      ECPair keyPair = await HDWalletService().getKeypairFromStorage(password, account.index!);
       var tx = await transactionService.createBTCTransaction(
         keyPair: keyPair,
         account: account,
@@ -533,40 +479,32 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-              appBarTitle: 'Change',
-              txResponse: txResponse,
-              amount: widget.amount,
-              token: 'BTC',
-              address: address),
+          pageBuilder: (context, animation1, animation2) => SendStatusScreen(appBarTitle: 'Change', txResponse: txResponse, amount: widget.amount, token: 'BTC', address: address),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
       );
     } else {
-      await _sendTransaction(
-          context, tokens, widget.token.symbol!, account, keyPair);
+      await _sendTransaction(context, tokens, widget.token.symbol!, account, password, callbackOk: callbackOk);
     }
   }
 
-  Future _sendTransaction(context, List<TokensModel> tokens, String token,
-      AccountModel account, ECPair keyPair) async {
+  Future _sendTransaction(context, List<TokensModel> tokens, String token, AccountModel account, String? password, {final Function()? callbackOk}) async {
     TxErrorModel? txResponse;
+
+    final isLedger = await SettingsHelper.isLedger();
+
+    ECPair? keyPair;
+    if (!isLedger) {
+      keyPair = await HDWalletService().getKeypairFromStorage(password, account.index!);
+    }
+
     if (token == 'DFI') {
       txResponse = await transactionService.createAndSendTransaction(
-          keyPair: keyPair,
-          account: account,
-          destinationAddress: address,
-          amount: balancesHelper.toSatoshi(widget.amount.toString()),
-          tokens: tokens);
+          keyPair: keyPair, account: account, destinationAddress: address, amount: balancesHelper.toSatoshi(widget.amount.toString()), tokens: tokens);
     } else {
       txResponse = await transactionService.createAndSendToken(
-          keyPair: keyPair,
-          account: account,
-          token: token,
-          destinationAddress: address,
-          amount: balancesHelper.toSatoshi(widget.amount.toString()),
-          tokens: tokens);
+          keyPair: keyPair, account: account, token: token, destinationAddress: address, amount: balancesHelper.toSatoshi(widget.amount.toString()), tokens: tokens);
     }
 
     showDialog(
@@ -577,6 +515,9 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
+            if (callbackOk != null) {
+              callbackOk();
+            }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
@@ -590,8 +531,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
           },
           callbackTryAgain: () async {
             print('TryAgain');
-            await _sendTransaction(
-                context, tokens, widget.token.symbol!, account, keyPair);
+            await _sendTransaction(context, tokens, widget.token.symbol!, account, password);
           },
         );
       },

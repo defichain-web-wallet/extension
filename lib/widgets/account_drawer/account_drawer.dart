@@ -259,7 +259,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                         context,
                                         PageRouteBuilder(
                                           pageBuilder: (context, animation1, animation2) => LedgerCheckScreen(
-                                            onStartSign: () => {},
+                                            onStartSign: (p, c) async => {},
                                           ),
                                           transitionDuration: Duration.zero,
                                           reverseTransitionDuration: Duration.zero,

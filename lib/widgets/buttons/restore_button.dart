@@ -8,12 +8,9 @@ class PendingButton extends StatefulWidget {
   final globalKey;
   final isCheckLock;
 
-  const PendingButton(this.text,
-      {Key? key,
-      required this.callback,
-      this.pendingText = 'Pending...',
-      GlobalKey? this.globalKey,
-      this.isCheckLock = true})
+  final double? width;
+
+  const PendingButton(this.text, {Key? key, required this.callback, this.pendingText = 'Pending...', GlobalKey? this.globalKey, this.isCheckLock = true, this.width})
       : super(key: key);
 
   @override
@@ -26,10 +23,9 @@ class PendingButtonState extends State<PendingButton> {
   @override
   Widget build(BuildContext context) {
     return NewPrimaryButton(
+      width: widget.width ?? double.infinity,
       title: pending ? widget.pendingText : widget.text,
-      callback: (!pending && widget.callback != null)
-          ? () async => widget.callback(this)
-          : null,
+      callback: (!pending && widget.callback != null) ? () async => await widget.callback(this) : null,
     );
   }
 

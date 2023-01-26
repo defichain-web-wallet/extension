@@ -33,7 +33,7 @@ class TransactionService {
 
   List<UtxoModel> accountUtxoList = [];
 
-  Future<TxErrorModel> removeLiqudity({required AccountModel account, required ECPair keyPair, required AssetPairModel token, required int amount}) async {
+  Future<TxErrorModel> removeLiqudity({required AccountModel account, required ECPair? keyPair, required AssetPairModel token, required int amount}) async {
     await _getUtxoList(account);
 
     var sumAmount = 0;
@@ -121,7 +121,7 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendLiqudity(
       {required AccountModel account,
-      required ECPair keyPair,
+      required ECPair? keyPair,
       required String tokenA,
       required String tokenB,
       required int amountA,
@@ -258,7 +258,7 @@ class TransactionService {
   }
 
   Future<TxErrorModel> createAndSendTransaction(
-      {required AccountModel account, required ECPair keyPair, required String destinationAddress, required int amount, required List<TokensModel> tokens}) async {
+      {required AccountModel account, required ECPair? keyPair, required String destinationAddress, required int amount, required List<TokensModel> tokens}) async {
     var tokenId = await tokensRequests.getTokenID('DFI', tokens);
     List<TxAuthModel> txAuthList = [];
     TxResponseModel? responseModel;
@@ -324,7 +324,7 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendToken(
       {required AccountModel account,
-      required ECPair keyPair,
+      required ECPair? keyPair,
       required String token,
       required String destinationAddress,
       required int amount,
@@ -738,14 +738,15 @@ class TransactionService {
   Future<TxErrorModel> _waitPreviousTx(TxResponseModel responseModel) async {
     var wait = true;
     TxErrorModel? txid;
-
+    int count = 0;
     for (; wait;) {
       txid = await transactionRequests.sendTxHex(responseModel.hex);
-      if (!txid.isError || txid.error != 'Missing inputs') {
+      if (!txid.isError || txid.error != 'Missing inputs' || count >= 10) {
         wait = false;
       } else {
         await new Future.delayed(new Duration(seconds: 2));
       }
+      count++;
     }
 
     if (!txid!.isError) {

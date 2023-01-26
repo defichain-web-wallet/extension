@@ -16,24 +16,24 @@ import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:hex/hex.dart';
 
 class LedgerWalletsHelper {
-  HDWalletService _hdWalletService = HDWalletService();
   HistoryRequests _historyRequests = HistoryRequests();
   BalanceRequests _balanceRequests = BalanceRequests();
   final SettingsHelper settingsHelper = SettingsHelper();
 
   static const int MaxIndexCheck = 2;
 
-  Future<AccountModel> createNewAccount(bip32.BIP32 masterKeyPair, String network, {int accountIndex = 0}) async {
+  Future<AccountModel> createNewAccount(String network, int accountIndex) async {
     AccountModel account = AccountModel(index: accountIndex);
-
     List<AddressModel> addressList = [];
-    addressList.add(await _hdWalletService.getAddressModelFromKeyPair(masterKeyPair, accountIndex, network));
+    addressList.add(await getAccountModelFromLedger(network, accountIndex));
+
     account.addressList = addressList;
     account.balanceList = [BalanceModel(token: 'DFI', balance: 0)];
     account.historyList = [];
     account.testnetHistoryList = [];
     account.index = accountIndex;
     account.activeToken = 'DFI';
+    account.bitcoinAddress = addressList[0];
     return account;
   }
 
