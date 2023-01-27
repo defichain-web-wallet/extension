@@ -6,10 +6,8 @@ import 'package:flutter/material.dart';
 
 class LedgerErrorDialog extends StatefulWidget {
   final Exception? error;
-  final Function() callbackOk;
-  final Function() callbackTryAgain;
 
-  const LedgerErrorDialog({Key? key, required this.error, required this.callbackOk, required this.callbackTryAgain}) : super(key: key);
+  const LedgerErrorDialog({Key? key, required this.error}) : super(key: key);
 
   @override
   State<LedgerErrorDialog> createState() => _LedgerErrorDialogState();
@@ -20,6 +18,24 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
   final double _logoHeight = 200.0;
   final double _logoRotateDeg = 17.5;
   String subtitleTextOops = 'Something went wrong, Jelly couldn\'t communicate with your ledger. Make sure you have connected your ledger and opened the DeFiChain application!';
+  String deviceLocked = 'Something went wrong, Jelly detected that your ledger is still locked. Please unlock your ledger and retry!';
+  String transactionAborted = 'Something went wrong, Jelly detected that you have aborted the transaction.';
+
+  late String errorMessage;
+
+  @override
+  initState() {
+    super.initState();
+    errorMessage = subtitleTextOops;
+
+    if (widget.error.toString().contains("0x6982")) {
+      //device locked!
+      errorMessage = deviceLocked;
+    } else if (widget.error.toString().contains("0x6985")) {
+      //device locked!
+      errorMessage = transactionAborted;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +54,7 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
         ),
         actions: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 width: 104,
@@ -46,17 +62,9 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
                   callback: () {
                     Navigator.pop(context);
                   },
-                  label: 'Cancel',
+                  label: 'Ok',
                 ),
-              ),
-              NewPrimaryButton(
-                width: 104,
-                callback: () {
-                  Navigator.pop(context);
-                  widget.callbackTryAgain();
-                },
-                title: 'Try again',
-              ),
+              )
             ],
           ),
         ],
@@ -108,7 +116,7 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
                     height: 8,
                   ),
                   Text(
-                    subtitleTextOops,
+                    errorMessage,
                     softWrap: true,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline5!.copyWith(

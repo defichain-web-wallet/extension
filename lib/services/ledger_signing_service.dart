@@ -57,8 +57,12 @@ class LedgerSigningService implements SigningWalletService {
     final tx = txBuilder.buildIncomplete();
     final txhex = tx.toHex();
 
-    var txHex = await promiseToFuture(signTransactionLedgerRaw(prevOuts, paths, txhex, network, changePath));
-    return txHex;
+    try {
+      var txHex = await promiseToFuture(signTransactionLedgerRaw(prevOuts, paths, txhex, network, changePath));
+      return txHex;
+    } catch (err) {
+      throw new Exception(err);
+    }
   }
 
   @override

@@ -8,6 +8,7 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -268,6 +269,9 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                         p.emitPending(true);
                                         await submitSwap(state, tokensState, null, callbackOk: () {
                                           Navigator.pop(c);
+                                        }, callbackFail: () {
+                                          parent.emitPending(true);
+                                          p.emitPending(true);
                                         });
                                         parent.emitPending(false);
                                         p.emitPending(false);
@@ -292,9 +296,10 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
         ),
       );
 
-  submitSwap(state, tokenState, String? password, {final Function()? callbackOk}) async {
+  submitSwap(state, tokenState, String? password, {final Function()? callbackOk, final Function()? callbackFail}) async {
     if (state.status == AccountStatusList.success) {
       late TxErrorModel txResponse;
+
       try {
         if (widget.btcTx != '') {
           BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
@@ -311,8 +316,11 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
               slippage: widget.slippage,
               tokens: tokenState.tokens);
         }
+      } on Exception catch (err) {
+        throw err;
       } catch (err) {
         txResponse = TxErrorModel(isError: true);
+        if (callbackFail != null) callbackFail();
       }
 
       showDialog(

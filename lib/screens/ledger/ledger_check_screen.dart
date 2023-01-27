@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
@@ -107,8 +108,20 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                       ),
                       PendingButton('Start', pendingText: 'Sign on your ledger', isCheckLock: false, callback: (parent) async {
                         parent.emitPending(true);
-                        await this.widget.onStartSign(parent, context);
-                        parent.emitPending(false);
+                        try {
+                          await this.widget.onStartSign(parent, context);
+                        } on Exception catch (error) {
+                          showDialog(
+                            barrierColor: Color(0x0f180245),
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (BuildContext dialogContext) {
+                              return LedgerErrorDialog(error: error);
+                            },
+                          );
+                        } finally {
+                          parent.emitPending(false);
+                        }
                       })
                     ],
                   ),

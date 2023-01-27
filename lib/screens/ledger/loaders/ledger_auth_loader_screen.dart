@@ -6,7 +6,7 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/ledger/leder_error_dialog.dart';
+import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
 import 'package:defi_wallet/widgets/loader/jumping_dots.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -149,13 +149,7 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen> with Th
         barrierDismissible: false,
         context: context,
         builder: (BuildContext dialogContext) {
-          return LedgerErrorDialog(
-            error: error,
-            callbackOk: () {},
-            callbackTryAgain: () async {
-              await restoreWallet();
-            },
-          );
+          return LedgerErrorDialog(error: error);
         },
       );
     }
