@@ -102,7 +102,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(19.2),
                                   color: isDarkTheme() ? Colors.white : null,
-                                  border: isDarkTheme()
+                                  border: !isDarkTheme()
                                       ? Border.all(
                                           color: AppColors.lavenderPurple
                                               .withOpacity(0.32),

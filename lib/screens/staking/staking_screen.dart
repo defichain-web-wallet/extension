@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -163,7 +164,6 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                     ),
                     width: double.infinity,
                     constraints: BoxConstraints(minHeight: 541),
-                    // height: double.infinity,
                     decoration: BoxDecoration(
                       color: isDarkTheme()
                           ? DarkColors.scaffoldContainerBgColor
@@ -187,8 +187,7 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                             children: [
                               Text(
                                 titleText,
-                                style: headline2.copyWith(
-                                    fontWeight: FontWeight.w700),
+                                style: Theme.of(context).textTheme.headline3,
                               )
                             ],
                           ),
@@ -408,9 +407,10 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                             PageRouteBuilder(
                                               pageBuilder: (context, animation1,
                                                       animation2) =>
-                                                  StakeUnstakeScreen(
-                                                isUnstake: false,
-                                              ),
+                                              StakingKycStartScreen(),
+                                              //     StakeUnstakeScreen(
+                                              //   isUnstake: false,
+                                              // ),
                                               transitionDuration: Duration.zero,
                                               reverseTransitionDuration:
                                                   Duration.zero,
