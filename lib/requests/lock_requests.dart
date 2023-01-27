@@ -9,6 +9,7 @@ import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
+import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
 import 'package:defi_wallet/models/staking_model.dart';
 import 'package:defi_wallet/services/dfx_service.dart';
@@ -100,6 +101,24 @@ class LockRequests {
       final response = await http.get(url, headers: headers);
       dynamic data = jsonDecode(response.body);
       return LockUserModel.fromJson(data);
+    } catch (_) {
+      print(_);
+      return null;
+    }
+  }
+
+  Future<LockStakingModel?> getStaking(String accessToken) async {
+    try {
+      final Uri url = Uri.parse('https://api.lock.space/v1/staking?asset=DFI&blockchain=DeFiChain&strategy=Masternode');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final response = await http.get(url, headers: headers);
+      dynamic data = jsonDecode(response.body);
+      return LockStakingModel.fromJson(data);
     } catch (_) {
       print(_);
       return null;
