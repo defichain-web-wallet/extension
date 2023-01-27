@@ -32,7 +32,7 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
       //device locked!
       errorMessage = deviceLocked;
     } else if (widget.error.toString().contains("0x6985")) {
-      //device locked!
+      //transaction rejected by user
       errorMessage = transactionAborted;
     }
   }
