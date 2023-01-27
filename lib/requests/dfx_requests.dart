@@ -146,6 +146,31 @@ class DfxRequests {
     }
   }
 
+  Future<bool> transferKYC(String accessToken) async {
+    try {
+      final Uri url = Uri.parse('https://api.dfx.swiss/v1/kyc/transfer');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final body = jsonEncode({
+        "walletName": "LOCK.space"
+      });
+
+      final response = await http.put(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
   Future<Map<String, dynamic>> getUserDetails(String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/user');
