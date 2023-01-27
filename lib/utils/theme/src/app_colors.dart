@@ -58,6 +58,8 @@ abstract class AppColors {
   static const txStatusPending = portage;
   static const txStatusError = razzmatazz;
 
+  static const receivedIconColor = malachite;
+
   // Circle avatars of accounts. Must be min 10 items
   static const accountColors = [
     Color(0xFFD300AC),

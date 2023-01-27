@@ -7,6 +7,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/screens/history/widgets/icon_history_type.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -48,7 +49,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           if (state.status == AccountStatusList.success &&
               tokensState.status == TokensStatusList.success) {
             var historyList;
-            DateFormat formatter = DateFormat('dd-MM-yyyy');
+            DateFormat formatter = DateFormat('MMM d, yyyy h:mm a');
             var balancesHelper = BalancesHelper();
             TokensHelper tokenHelper = TokensHelper();
             HistoryHelper historyHelper = HistoryHelper();
@@ -145,31 +146,78 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                         color: Theme.of(context).cardColor,
                       ),
                       child: ListTile(
-                        leading: IconHistoryType(
-                          type: type,
+                        contentPadding: const EdgeInsets.all(0),
+                        minLeadingWidth: 32,
+                        leading: Container(
+                          width: 32,
+                          height: 32,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: historyTypeIconGradient,
+                          ),
+                          child: IconHistoryType(
+                            type: type,
+                          ),
                         ),
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              historyHelper.getTransactionType(type),
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                            Text(
-                              '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 8)} $tokenName',
-                              style: Theme.of(context).textTheme.headline4,
-                            ),
-                          ],
+                        title: Container(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                historyHelper.getTransactionType(type),
+                                style: Theme.of(context).textTheme.headline5,
+                              ),
+                              Text(
+                                '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 4)} $tokenName',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
+                                      fontSize: 15,
+                                      color: (txValuePrefix == '+')
+                                          ? AppColors.receivedIconColor
+                                          : Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .color,
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
                         subtitle: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               date.toString(),
-                              style: Theme.of(context).textTheme.headline5,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline6!
+                                        .color!
+                                        .withOpacity(0.3),
+                                  ),
                             ),
                             Text(
-                                "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
+                              "\$${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName).abs(), fixed: true, fixedCount: 2)}",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline6!
+                                        .color!
+                                        .withOpacity(0.3),
+                                  ),
+                            )
                           ],
                         ),
                       ),
