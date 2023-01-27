@@ -220,6 +220,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                     ),
                                                     AccountMenuButton(
                                                       accountSelectMode: true,
+                                                      account: accounts[index],
                                                       callback: accounts[index]
                                                                   .index ==
                                                               state

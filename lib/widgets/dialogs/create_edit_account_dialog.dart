@@ -41,6 +41,7 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
   String editSubtitleText = 'You can change your avatar and name';
   String createTitleText = 'Create account';
   String createSubtitleText = 'How do you want to name this new Account';
+  GlobalKey globalKey = GlobalKey();
   late double contentHeight;
   late String titleText;
   late String subtitleText;
@@ -132,6 +133,7 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                   ),
                   NewPrimaryButton(
                     width: 104,
+                    globalKey: globalKey,
                     callback: () async {
                       if (_nameController.text.length > 3) {
                         if (_pickedImage != null) {
@@ -322,6 +324,9 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                   height: 44,
                                   child: TextFormField(
                                     controller: _nameController,
+                                    onEditingComplete: () =>
+                                        (globalKey.currentWidget! as ElevatedButton)
+                                            .onPressed!(),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: AppColors.white,

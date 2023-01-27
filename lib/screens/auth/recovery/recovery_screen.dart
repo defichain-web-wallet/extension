@@ -44,6 +44,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
 
   bool _isViewTextField = true;
   bool _incorrectPhrase = false;
+  bool _onStartedReorder = false;
 
   @override
   void initState() {
@@ -205,6 +206,11 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                             child: Container(
                               width: _mnemonicBoxWidth,
                               child: ReorderableWrap(
+                                onReorderStarted: (index) {
+                                  setState(() {
+                                    _onStartedReorder = true;
+                                  });
+                                },
                                 alignment: WrapAlignment.center,
                                 spacing: 6.0,
                                 runSpacing: 6.0,
@@ -216,12 +222,17 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                                   if (!_isHoverMnemonicBox) {
                                     setState(() {
                                       _mnemonic.removeAt(index);
+                                      _onStartedReorder = false;
 
                                       if (_mnemonic.length < 24) {
                                         FocusScope.of(context)
                                             .requestFocus(_focusNode);
                                         _isViewTextField = true;
                                       }
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _onStartedReorder = false;
                                     });
                                   }
                                 },
@@ -232,39 +243,67 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                         ],
                       ),
                     ),
-                    Container(
-                      child: _isViewTextField
-                          ? DefiTextFormField(
-                              controller: _wordController,
-                              onFieldSubmitted: _onFieldSubmitted,
-                              autofocus: true,
-                              focusNode: _focusNode,
-                              readOnly: !_isViewTextField,
-                              onChanged: (String value) {
-                                try {
-                                  List<String> phraseFromClipboard =
-                                      value.split(' ');
-                                  if (phraseFromClipboard.length ==
-                                      _fieldsLength) {
-                                    setState(() {
-                                      _mnemonic = phraseFromClipboard;
-                                      _wordController.text = '';
-                                      _isViewTextField = false;
-                                    });
+                    if (_onStartedReorder)
+                      Container(
+                        height: 46,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              width: 1,
+                              color: Theme.of(context)
+                                  .dividerColor
+                                  .withOpacity(0.2),
+                            )),
+                        child: Center(
+                          child: Text(
+                            'Drag word here for remove',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline6!
+                                        .color!
+                                        .withOpacity(0.3)),
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        child: _isViewTextField
+                            ? DefiTextFormField(
+                                controller: _wordController,
+                                onFieldSubmitted: _onFieldSubmitted,
+                                autofocus: true,
+                                focusNode: _focusNode,
+                                readOnly: !_isViewTextField,
+                                onChanged: (String value) {
+                                  try {
+                                    List<String> phraseFromClipboard =
+                                        value.split(' ');
+                                    if (phraseFromClipboard.length ==
+                                        _fieldsLength) {
+                                      setState(() {
+                                        _mnemonic = phraseFromClipboard;
+                                        _wordController.text = '';
+                                        _isViewTextField = false;
+                                      });
+                                    }
+                                  } catch (err) {
+                                    print(err);
                                   }
-                                } catch (err) {
-                                  print(err);
-                                }
-                              },
-                            )
-                          : NewPrimaryButton(
-                              title: 'Restore Wallet',
-                              width: isFullScreen
-                                  ? buttonFullWidth
-                                  : buttonSmallWidth,
-                              callback: _onSubmitRecovery,
-                            ),
-                    )
+                                },
+                              )
+                            : NewPrimaryButton(
+                                title: 'Restore Wallet',
+                                width: isFullScreen
+                                    ? buttonFullWidth
+                                    : buttonSmallWidth,
+                                callback: _onSubmitRecovery,
+                              ),
+                      )
                   ],
                 ),
               ),

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/delete_contact_dialog.dart';
@@ -32,10 +33,11 @@ class AddressBookScreenNew extends StatefulWidget {
 }
 
 class _AddressBookScreenNewState extends State<AddressBookScreenNew>
-    with ThemeMixin {
+    with ThemeMixin, NetworkMixin {
   int iterator = 0;
   TextEditingController controller = TextEditingController();
   List<AddressBookModel>? viewList = [];
+  List<AddressBookModel>? lastSent = [];
   bool isSelectedContacts = true;
   bool isSelectedLastSent = false;
   bool isDeleted = false;
@@ -43,7 +45,6 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
   showDeletedTooltip() {
     setState(() {
       isDeleted = true;
-
     });
     Timer(Duration(milliseconds: 1500), () {
       setState(() {
@@ -69,10 +70,9 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
         }
         return BlocBuilder<AddressBookCubit, AddressBookState>(
           builder: (context, addressBookState) {
-            if (iterator == 1 &&
-                addressBookState.status == AddressBookStatusList.success) {
+            if (addressBookState.status == AddressBookStatusList.success) {
               viewList = addressBookState.addressBookList;
-              iterator++;
+              lastSent = addressBookState.lastSentList;
             }
             return Scaffold(
               drawerScrimColor: Color(0x0f180245),
@@ -134,11 +134,13 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                               confirmCallback: (name, address) {
                                                 setState(() {
                                                   addressBookCubit.addAddress(
-                                                      AddressBookModel(
-                                                          name: name,
-                                                          address: address,
-                                                          network:
-                                                              'DefiChain Mainnet'));
+                                                    AddressBookModel(
+                                                      name: name,
+                                                      address: address,
+                                                      network:
+                                                          currentNetworkName(),
+                                                    ),
+                                                  );
                                                   controller.text = '';
                                                   viewList = addressBookState
                                                       .addressBookList;
@@ -360,9 +362,9 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                           Expanded(
                             child: Container(
                               width: double.infinity,
-                              child: (true)
+                              child: (lastSent != null && lastSent!.isNotEmpty)
                                   ? ListView.builder(
-                                      itemCount: 12,
+                                      itemCount: lastSent!.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return Padding(
@@ -371,8 +373,8 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                           child: Column(
                                             children: [
                                               LastSentTile(
-                                                address:
-                                                    'df1q3lyukeychd55pt2u3xknnuxqzwuhdasgvwuuhc',
+                                                address: lastSent![index].address!,
+                                                index: index,
                                               ),
                                               Divider(
                                                 height: 1,
@@ -386,7 +388,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                     )
                                   : Center(
                                       child: Text(
-                                        'Oops!',
+                                        'Oops! You don\'t have addresses yet',
                                       ),
                                     ),
                             ),

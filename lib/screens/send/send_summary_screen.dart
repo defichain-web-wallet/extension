@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
@@ -21,11 +23,8 @@ import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
-import 'package:defi_wallet/widgets/loader/loader_new.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
-import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
@@ -59,7 +58,8 @@ class SendSummaryScreen extends StatefulWidget {
   State<SendSummaryScreen> createState() => _SendSummaryScreenState();
 }
 
-class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
+class _SendSummaryScreenState extends State<SendSummaryScreen>
+    with ThemeMixin, NetworkMixin {
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
   String secondStepLoaderText =
@@ -72,7 +72,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
   void initState() {
     address =
         widget.address != null ? widget.address! : widget.contact!.address!;
-    // TODO: implement initState
     super.initState();
     if (widget.isAfterAddContact) {
       isShowAdded = true;
@@ -409,7 +408,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
   }
 
   submitSend(state, tokensState, password) async {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);;
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
         _callback(
@@ -469,6 +468,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
 
   Future _sendTransaction(context, List<TokensModel> tokens, String token,
       AccountModel account, ECPair keyPair) async {
+    AddressBookCubit addressBookCubit =
+    BlocProvider.of<AddressBookCubit>(context);
     TxErrorModel? txResponse;
     if (token == 'DFI') {
       txResponse = await transactionService.createAndSendTransaction(
@@ -486,6 +487,14 @@ class _SendSummaryScreenState extends State<SendSummaryScreen> with ThemeMixin {
           amount: balancesHelper.toSatoshi(widget.amount.toString()),
           tokens: tokens);
     }
+
+    addressBookCubit.addAddressToLastSent(
+      AddressBookModel(
+        address: address,
+        isLastSent: true,
+        network: currentNetworkName(),
+      ),
+    );
 
     showDialog(
       barrierColor: Color(0x0f180245),

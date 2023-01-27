@@ -40,16 +40,16 @@ class AccountMenuButton extends StatefulWidget {
 
 class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
   bool isHover = false;
-  late Color _circleAccountBgColor;
 
-  Color getRandomColor() {
-    return Color((math.Random().nextDouble() * 0xFFFFFF).toInt());
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _circleAccountBgColor = getRandomColor();
+  Color getCircleAvatarColor(int index) {
+    String accountIndex = index.toString();
+    if (accountIndex.length == 1) {
+      return AppColors
+          .accountColors[widget.account!.index!];
+    } else {
+      return AppColors
+          .accountColors[int.parse(accountIndex[1])];
+    }
   }
 
   @override
@@ -148,13 +148,16 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                     if (widget.accountSelectMode)
                       CircleAvatar(
                         radius: 12,
-                        backgroundColor: _circleAccountBgColor.withOpacity(0.16),
+                        backgroundColor: getCircleAvatarColor(widget.account!.index!)
+                            .withOpacity(0.16),
                         child: Text(
                           '${widget.title[0]}',
                           style: Theme.of(context)
                               .textTheme
                               .headline4!
-                              .copyWith(fontSize: 11, color: AppColors.portage),
+                              .copyWith(
+                                  fontSize: 11,
+                                  color: getCircleAvatarColor(widget.account!.index!)),
                         ),
                       ),
                     if (widget.accountSelectMode)

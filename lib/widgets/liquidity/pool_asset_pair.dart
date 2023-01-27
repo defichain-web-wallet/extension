@@ -46,7 +46,6 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
             children: [
               AssetPair(
                 pair: widget.assetPair.symbol!,
-                size: 34,
                 isTransform: false,
               ),
               SizedBox(
@@ -156,12 +155,10 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
           children: [
             Container(
               width: 70,
-              child: Center(
-                child: AssetPair(
-                  pair: widget.assetPair.symbol!,
-                  size: 30,
-                  isTransform: false,
-                ),
+              alignment: Alignment.centerLeft,
+              child: AssetPair(
+                pair: widget.assetPair.symbol!,
+                isTransform: false,
               ),
             ),
             Container(

@@ -13,6 +13,7 @@ class AmountField extends StatefulWidget {
   final List<TokensModel> assets;
   final double? available;
   final String? suffix;
+  final bool isDisabledSelector;
 
   AmountField({
     required this.onAssetSelect,
@@ -22,6 +23,7 @@ class AmountField extends StatefulWidget {
     required this.assets,
     this.available = 35.02,
     this.suffix = '\$365.50',
+    this.isDisabledSelector = false,
     Key? key,
   }) : super(key: key);
 
@@ -130,6 +132,7 @@ class _AmountFieldState extends State<AmountField> {
                     onSelect: (token) {
                       widget.onAssetSelect(token);
                     },
+                    isDisabled: widget.isDisabledSelector,
                   ),
                 ],
               ),

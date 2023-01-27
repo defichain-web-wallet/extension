@@ -28,16 +28,9 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
   int iterator = 0;
   TextEditingController controller = TextEditingController();
   List<AddressBookModel>? viewList = [];
+  List<AddressBookModel>? lastSent = [];
   bool isSelectedContacts = true;
   bool isSelectedLastSent = false;
-  List<String> addressList = [
-    'df1q46kunuj5w4rnyry28qfr0h99k0zclpgcxa5kzm',
-    'df1quamslk8wqh4439cmk7lmrs6aw2vh8s5xyxedq6',
-    'df1q46kunuj5w4rnyry28qfr0h99k0zclpgcxa5kzm',
-    'df1quamslk8wqh4439cmk7lmrs6aw2vh8s5xyxedq6',
-    'df1q46kunuj5w4rnyry28qfr0h99k0zclpgcxa5kzm',
-    'df1quamslk8wqh4439cmk7lmrs6aw2vh8s5xyxedq6',
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +46,7 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
         if (iterator == 1 &&
             addressBookState.status == AddressBookStatusList.success) {
           viewList = addressBookState.addressBookList;
+          lastSent = addressBookState.lastSentList;
           iterator++;
         }
 
@@ -193,7 +187,6 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                                           children: [
                                             GestureDetector(
                                               onTap: () {
-                                                print('asdasd');
                                                 if (widget.getContact !=
                                                     null) {
                                                   widget.getContact!(
@@ -237,9 +230,9 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                         Expanded(
                           child: Container(
                             width: double.infinity,
-                            child: (true)
+                            child: (lastSent != null && lastSent!.isNotEmpty)
                                 ? ListView.builder(
-                                    itemCount: addressList.length,
+                                    itemCount: lastSent!.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       return Padding(
@@ -252,14 +245,15 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                                                 if (widget.getAddress !=
                                                     null) {
                                                   widget.getAddress!(
-                                                      addressList[index]);
+                                                      lastSent![index].address!);
                                                   Navigator.pop(context);
                                                 }
                                               },
                                               child: MouseRegion(
                                                 cursor: SystemMouseCursors.click,
                                                 child: LastSentTile(
-                                                  address: addressList[index],
+                                                  address: lastSent![index].address!,
+                                                  index: index,
                                                 ),
                                               ),
                                             ),
