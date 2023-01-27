@@ -12,12 +12,14 @@ import { LedgerTransactionRaw } from "./ledger_tx";
 export class JellyWalletLedger {
 
   async getTransport(): Promise<Transport> {
-    return await SpeculosTransport.open({ baseURL: "172.21.226.17:5000" });
-    // return await TransportWebUSB.create();
+    // return await SpeculosTransport.open({ baseURL: "172.21.226.17:5000" });
+    return await TransportWebUSB.create();
   }
 
   async appLedgerDefichain(): Promise<AppDfi> {
     const transport = await this.getTransport();
+    transport.exchangeTimeout = 1000;
+    transport.unresponsiveTimeout = 1000;
     listen((log) => console.log(log));
 
 
@@ -56,15 +58,23 @@ export class JellyWalletLedger {
     try {
 
       const appDfi = await this.appLedgerDefichain();
-      const address = await appDfi.getWalletPublicKey(path, {
+      const timeoutError = new Error('TIME_OUT')
+      const addressPromise = appDfi.getWalletPublicKey(path, {
         verify: verify,
         format: "bech32",
       });
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(timeoutError);
+        }, 2000);
+      });
+      
+     const address = await Promise.race([addressPromise, timeoutPromise]);
+
       console.log(address);
       return address;
     } catch (e) {
-      console.log(e);
-      return null;
+      throw e;
     }
   };
 

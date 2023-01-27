@@ -40,13 +40,17 @@ class LedgerWalletsHelper {
   Future<AddressModel> getAccountModelFromLedger(String network, int index) async {
     var path = HDWalletService.derivePath(index);
 
-    var ledgerAddress = await promiseToFuture(getAddress(path, false));
-    var pubKey = ledgerAddress.publicKey;
-    var address = ledgerAddress.bitcoinAddress;
+    try {
+      var ledgerAddress = await promiseToFuture(getAddress(path, false));
+      var pubKey = ledgerAddress.publicKey;
+      var address = ledgerAddress.bitcoinAddress;
 
-    final pubKeyUint = Uint8List.fromList(HEX.decoder.convert(pubKey));
+      final pubKeyUint = Uint8List.fromList(HEX.decoder.convert(pubKey));
 
-    return AddressModel(account: index, address: address, index: 0, isChange: false, pubKey: pubKeyUint);
+      return AddressModel(account: index, address: address, index: 0, isChange: false, pubKey: pubKeyUint);
+    } catch (error) {
+      throw new Exception(error);
+    }
   }
 
   Future<List<AccountModel>> restoreWallet(String network, Function(int, int) statusBar) async {

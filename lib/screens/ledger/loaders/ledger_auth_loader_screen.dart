@@ -6,6 +6,7 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/screens/ledger/leder_error_dialog.dart';
 import 'package:defi_wallet/widgets/loader/jumping_dots.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -57,13 +58,8 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen> with Th
       currentText = firstStepText;
     }
     if (widget.currentStatus == 'first-step') {
-      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
       Future.delayed(const Duration(milliseconds: 10), () async {
-        await init();
-        await accountCubit.restoreLedgerAccount(SettingsHelper.settings.network, (need, restored) {
-          getStatusText(widget.currentStatus, need, restored);
-        });
-        widget.callback!();
+        await restoreWallet();
       });
     }
     return ScaffoldWrapper(
@@ -136,6 +132,33 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen> with Th
         );
       },
     );
+  }
+
+  Future restoreWallet() async {
+    await init();
+    try {
+      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+      await accountCubit.restoreLedgerAccount(SettingsHelper.settings.network, (need, restored) {
+        getStatusText(widget.currentStatus, need, restored);
+      });
+
+      widget.callback!();
+    } on Exception catch (error) {
+      showDialog(
+        barrierColor: Color(0x0f180245),
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return LedgerErrorDialog(
+            error: error,
+            callbackOk: () {},
+            callbackTryAgain: () async {
+              await restoreWallet();
+            },
+          );
+        },
+      );
+    }
   }
 
   getStatusText(String currentStatus, int need, int restored) async {
