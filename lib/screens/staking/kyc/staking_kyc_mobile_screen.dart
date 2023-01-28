@@ -10,7 +10,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class StakingKycMobileScreen extends StatefulWidget {
-  const StakingKycMobileScreen({Key? key}) : super(key: key);
+  final String kycLink;
+
+  const StakingKycMobileScreen({
+    Key? key,
+    required this.kycLink,
+  }) : super(key: key);
 
   @override
   State<StakingKycMobileScreen> createState() => _StakingKycMobileScreenState();
@@ -118,13 +123,13 @@ class _StakingKycMobileScreenState extends State<StakingKycMobileScreen>
                                 color: isDarkTheme() ? Colors.white : null,
                                 border: !isDarkTheme()
                                     ? Border.all(
-                                  color: AppColors.lavenderPurple
-                                      .withOpacity(0.32),
-                                )
+                                        color: AppColors.lavenderPurple
+                                            .withOpacity(0.32),
+                                      )
                                     : null,
                               ),
                               child: QrImage(
-                                data: 'cryptowallet',
+                                data: widget.kycLink,
                                 padding: EdgeInsets.all(17.7),
                               ),
                             ),

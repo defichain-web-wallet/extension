@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
@@ -43,6 +44,7 @@ class AccountCubit extends Cubit<AccountState> {
   BalanceRequests balanceRequests = BalanceRequests();
   HistoryRequests historyRequests = HistoryRequests();
   FiatCubit fiatCubit = FiatCubit();
+  LockCubit lockCubit = LockCubit();
 
   createAccount(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: AccountStatusList.loading));
@@ -92,7 +94,11 @@ class AccountCubit extends Cubit<AccountState> {
 
     String accessToken = await fiatCubit.getAccessToken(
         accountMainnet, masterKeyPairMainnetPrivateKey);
+    String lockAccessToken = await lockCubit.getAccessToken(
+        accountMainnet, masterKeyPairMainnetPrivateKey);
+
     accountMainnet.accessToken = accessToken;
+    accountMainnet.lockAccessToken = lockAccessToken;
     await saveAccountsToStorage(
       accountsMainnet: accountsMainnet,
       masterKeyPairMainnetPublicKey: masterKeyPairMainnetPublicKey,
@@ -416,7 +422,10 @@ class AccountCubit extends Cubit<AccountState> {
       for (var account in accountsMainnet) {
         String accessToken = await fiatCubit.getAccessToken(
             account, masterKeyPairMainnetPrivateKey);
+        String lockAccessToken = await lockCubit.getAccessToken(
+            account, masterKeyPairMainnetPrivateKey);
         account.accessToken = accessToken;
+        account.lockAccessToken = lockAccessToken;
       }
       await saveAccountsToStorage(
         accountsMainnet: accountsMainnet,
@@ -494,6 +503,12 @@ class AccountCubit extends Cubit<AccountState> {
             keyPair,
             needRefresh: true,
           );
+          String lockAccessToken = await lockCubit.getAccessToken(
+            accountModel,
+            keyPair,
+            needRefresh: true,
+          );
+          accountModel.lockAccessToken = lockAccessToken;
           accountModel.accessToken = accessToken;
         } catch (err) {
           print(err);

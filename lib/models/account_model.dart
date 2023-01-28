@@ -18,6 +18,7 @@ class AccountModel {
   String? activeToken;
   String? name;
   String? accessToken;
+  String? lockAccessToken;
 
   AccountModel({
     this.index,
@@ -30,6 +31,7 @@ class AccountModel {
     this.historyNext,
     this.activeToken,
     this.accessToken,
+    this.lockAccessToken,
   }){
     this.name = 'Account ${this.index! + 1}';
   }
@@ -39,6 +41,7 @@ class AccountModel {
     this.name = jsonModel["name"];
     this.activeToken = jsonModel["activeToken"];
     this.accessToken = jsonModel["accessToken"];
+    this.lockAccessToken = jsonModel["lockAccessToken"];
     if (jsonModel["bitcoinAddress"] == null) {
       this.bitcoinAddress = null;
     } else {
@@ -87,6 +90,7 @@ class AccountModel {
     data["activeToken"] = this.activeToken;
     data["name"] = this.name;
     data["accessToken"] = this.accessToken;
+    data["lockAccessToken"] = this.lockAccessToken;
     data["bitcoinAddress"] = this.bitcoinAddress!.toJson();
     data['addressList'] = this.addressList?.map((e) => e.toJson()).toList();
     data['balanceList'] = this.balanceList?.map((e) => e.toJson()).toList();

@@ -186,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProvi
               } else {
                 return Container();
               }
-
+print('lockAccessToken: ${state.activeAccount!.lockAccessToken}');
               return Scaffold(
                 appBar: NewMainAppBar(
                   isShowLogo: true,

@@ -1,15 +1,14 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
-import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
+import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/screens/liquidity/liquidity_pool_list.dart';
-import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
+import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -21,7 +20,6 @@ import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:hive/hive.dart';
 
 class EarnScreenNew extends StatefulWidget {
   const EarnScreenNew({Key? key}) : super(key: key);
@@ -36,14 +34,13 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
   @override
   void initState() {
     super.initState();
-    StakingCubit stakingCubit = BlocProvider.of<StakingCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       await fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
-      await stakingCubit.loadStakingRouteBalance(fiatCubit.state.accessToken!,
-          accountCubit.state.activeAccount!.addressList![0].address!);
+      await lockCubit.loadUserDetails(accountCubit.state.activeAccount!);
     });
   }
 
@@ -57,9 +54,9 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
       ) {
         return BlocBuilder<AccountCubit, AccountState>(
             builder: (accountContext, accountState) {
-          return BlocBuilder<StakingCubit, StakingState>(
-              builder: (context, stakingState) {
-            if (stakingState.status == StakingStatusList.success) {
+          return BlocBuilder<LockCubit, LockState>(
+              builder: (lockContext, lockState) {
+            if (lockState.status == LockStatusList.success) {
               return BlocBuilder<TokensCubit, TokensState>(
                   builder: (tokensContext, tokensState) {
                 double totalPairsBalance = 0;
@@ -141,7 +138,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                               height: 19,
                             ),
                             GestureDetector(
-                              onTap:() => stakingCallback(context),
+                              onTap: () => stakingCallback(lockState),
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Stack(
@@ -152,8 +149,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                       padding: EdgeInsets.all(16),
                                       decoration: BoxDecoration(
                                         border: Border.all(
-                                          color:
-                                              AppColors.portageBg.withOpacity(0.24),
+                                          color: AppColors.portageBg
+                                              .withOpacity(0.24),
                                         ),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -189,7 +186,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                         .headline5!
                                                         .copyWith(
                                                           fontSize: 12,
-                                                          color: Theme.of(context)
+                                                          color: Theme.of(
+                                                                  context)
                                                               .textTheme
                                                               .headline5!
                                                               .color!
@@ -213,27 +211,32 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                   children: [
                                                     Row(
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment.end,
+                                                          CrossAxisAlignment
+                                                              .end,
                                                       children: [
                                                         Text(
                                                           '0.00',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .headline4!
-                                                              .copyWith(
-                                                                fontSize: 20,
-                                                              ),
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline4!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        20,
+                                                                  ),
                                                         ),
                                                         SizedBox(
                                                           width: 5,
                                                         ),
                                                         Padding(
                                                           padding:
-                                                              const EdgeInsets.only(
+                                                              const EdgeInsets
+                                                                      .only(
                                                                   bottom: 2.0),
                                                           child: Text(
                                                             'DFI',
-                                                            style: Theme.of(context)
+                                                            style: Theme.of(
+                                                                    context)
                                                                 .textTheme
                                                                 .headline4!
                                                                 .copyWith(
@@ -250,11 +253,13 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                           .headline5!
                                                           .copyWith(
                                                             fontSize: 12,
-                                                            color: Theme.of(context)
+                                                            color: Theme.of(
+                                                                    context)
                                                                 .textTheme
                                                                 .headline5!
                                                                 .color!
-                                                                .withOpacity(0.3),
+                                                                .withOpacity(
+                                                                    0.3),
                                                           ),
                                                     ),
                                                   ],
@@ -268,29 +273,34 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                   children: [
                                                     Row(
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment.end,
+                                                          CrossAxisAlignment
+                                                              .end,
                                                       children: [
                                                         Text(
                                                           '0.00',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .headline4!
-                                                              .copyWith(
-                                                                fontSize: 20,
-                                                                color: AppColors
-                                                                    .malachite,
-                                                              ),
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline4!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: AppColors
+                                                                        .malachite,
+                                                                  ),
                                                         ),
                                                         SizedBox(
                                                           width: 5,
                                                         ),
                                                         Padding(
                                                           padding:
-                                                              const EdgeInsets.only(
+                                                              const EdgeInsets
+                                                                      .only(
                                                                   bottom: 2.0),
                                                           child: Text(
                                                             'DFI',
-                                                            style: Theme.of(context)
+                                                            style: Theme.of(
+                                                                    context)
                                                                 .textTheme
                                                                 .headline4!
                                                                 .copyWith(
@@ -309,11 +319,13 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                           .headline5!
                                                           .copyWith(
                                                             fontSize: 12,
-                                                            color: Theme.of(context)
+                                                            color: Theme.of(
+                                                                    context)
                                                                 .textTheme
                                                                 .headline5!
                                                                 .color!
-                                                                .withOpacity(0.3),
+                                                                .withOpacity(
+                                                                    0.3),
                                                           ),
                                                     ),
                                                   ],
@@ -325,10 +337,11 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                       ),
                                     ),
                                     Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 1, top: 1),
+                                      padding: const EdgeInsets.only(
+                                          right: 1, top: 1),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
                                         children: [
                                           Container(
                                             padding: EdgeInsets.only(
@@ -360,7 +373,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                               height: 18,
                             ),
                             GestureDetector(
-                              onTap: () => liquidityCallback(totalPairsBalance, txState),
+                              onTap: () =>
+                                  liquidityCallback(totalPairsBalance, txState),
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Container(
@@ -369,7 +383,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                   padding: EdgeInsets.all(16),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: AppColors.portageBg.withOpacity(0.24),
+                                      color:
+                                          AppColors.portageBg.withOpacity(0.24),
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -493,8 +508,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                           .headline4!
                                                           .copyWith(
                                                             fontSize: 20,
-                                                            color:
-                                                                AppColors.malachite,
+                                                            color: AppColors
+                                                                .malachite,
                                                           ),
                                                     ),
                                                     SizedBox(
@@ -549,7 +564,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                   ),
                 );
               });
-            } else if (stakingState.status == StakingStatusList.failure) {
+            } else if (lockState.status == LockStatusList.failure) {
               return Container(
                 child: Center(
                   child: ErrorPlaceholder(
@@ -578,40 +593,27 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
     return maxValue;
   }
 
-  stakingCallback(context) {
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) =>
-            StakingScreen(),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ),
-    );
-    // if (fiatCubit.state.isKycDataComplete! &&
-    //     fiatCubit.state.history.length > 0) {
-    //   Navigator.push(
-    //     context,
-    //     PageRouteBuilder(
-    //       pageBuilder: (context, animation1, animation2) =>
-    //           SendStakingRewardsScreen(),
-    //       transitionDuration: Duration.zero,
-    //       reverseTransitionDuration: Duration.zero,
-    //     ),
-    //   );
-    // } else {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: Text(
-    //         'To use this feature, you must first successfully complete a bank transaction (buy or sell)!',
-    //         style: Theme.of(context).textTheme.headline5,
-    //       ),
-    //       backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-    //     ),
-    //   );
-    // }
+  stakingCallback(lockState) {
+    if (lockState.lockUserDetails.kycStatus == 'Full') {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => StakingScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) =>
+              StakingKycStartScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    }
   }
 
   liquidityCallback(double totalLiquidityBalance, txState) {
