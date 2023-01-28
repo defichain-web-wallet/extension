@@ -11,6 +11,7 @@ import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
+import 'package:defi_wallet/models/lock_withdraw_model.dart';
 import 'package:defi_wallet/models/staking_model.dart';
 import 'package:defi_wallet/services/dfx_service.dart';
 import 'package:defichaindart/defichaindart.dart';
@@ -119,6 +120,85 @@ class LockRequests {
       final response = await http.get(url, headers: headers);
       dynamic data = jsonDecode(response.body);
       return LockStakingModel.fromJson(data);
+    } catch (_) {
+      print(_);
+      return null;
+    }
+  }
+
+  Future<bool> setDeposit(String accessToken, int stakingId, double amount, String txId) async {
+    try {
+      final Uri url = Uri.parse(
+          'https://api.lock.space/v1/staking/$stakingId/deposit');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+      final body = jsonEncode({
+        'amount': amount,
+        'txId': txId
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+      dynamic data = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (_) {
+      print(_);
+      return false;
+    }
+  }
+
+  Future<LockWithdrawModel?> requestWithdraw(String accessToken, int stakingId, double amount) async {
+    try {
+      final Uri url = Uri.parse(
+          'https://api.lock.space/v1/staking/$stakingId/withdrawal');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+      final body = jsonEncode({
+        'amount': amount,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+      dynamic data = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return LockWithdrawModel.fromJson(data);
+      } else {
+        return null;
+      }
+    } catch (_) {
+      print(_);
+      return null;
+    }
+  }
+
+  Future<LockStakingModel?> signedWithdraw(String accessToken,int stakingId, LockWithdrawModel withdrawModel) async {
+    try {
+      final Uri url = Uri.parse(
+          'https://api.lock.space/v1/staking/$stakingId/withdrawal/${withdrawModel.id}/sign');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+      final body = jsonEncode({
+        'signature': withdrawModel.signature,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+      dynamic data = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return LockStakingModel.fromJson(data);
+      } else {
+        return null;
+      }
     } catch (_) {
       print(_);
       return null;
