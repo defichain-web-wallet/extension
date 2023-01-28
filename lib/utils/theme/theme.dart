@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 part 'src/constants.dart';
 part 'src/app_colors.dart';
+part 'src/app_gradients.dart';
 part 'src/dark_theme.dart';
 part 'src/light_theme.dart';
 part 'src/text_theme.dart';

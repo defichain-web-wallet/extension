@@ -12,28 +12,28 @@ class IconHistoryType extends StatelessWidget {
       case 'SEND':
       case 'vin':
         return SvgPicture.asset(
-          'assets/send_icon.svg',
+          'assets/history/send.svg',
         );
       case 'RECEIVE':
       case 'vout':
         return SvgPicture.asset(
-          'assets/receive_icon.svg',
+          'assets/history/received.svg',
         );
       case 'PoolSwap':
         return SvgPicture.asset(
-          'assets/swap_icon.svg',
+          'assets/history/changed.svg',
         );
       case 'AddPoolLiquidity':
         return SvgPicture.asset(
-          'assets/add_liquidity_icon.svg',
+          'assets/history/liquidity.svg',
         );
       case 'RemovePoolLiquidity':
         return SvgPicture.asset(
-          'assets/remove_liquidity_icon.svg',
+          'assets/history/liquidity.svg',
         );
       default:
         return SvgPicture.asset(
-          'assets/swap_icon.svg',
+          'assets/history/changed.svg',
         );
     }
   }
