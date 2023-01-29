@@ -43,6 +43,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       await fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
       await lockCubit.loadUserDetails(accountCubit.state.activeAccount!);
+      await lockCubit.loadStakingDetails(accountCubit.state.activeAccount!);
     });
   }
 
