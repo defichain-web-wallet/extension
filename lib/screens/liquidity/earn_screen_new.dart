@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
@@ -29,6 +30,7 @@ class EarnScreenNew extends StatefulWidget {
 }
 
 class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
+  BalancesHelper balancesHelper = BalancesHelper();
   String titleText = 'Earn';
 
   @override
@@ -215,7 +217,14 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                               .end,
                                                       children: [
                                                         Text(
-                                                          '0.00',
+                                                          balancesHelper
+                                                              .numberStyling(
+                                                            lockState
+                                                                .lockStakingDetails!
+                                                                .balance!,
+                                                            fixed: true,
+                                                            fixedCount: 2,
+                                                          ),
                                                           style:
                                                               Theme.of(context)
                                                                   .textTheme
@@ -234,7 +243,9 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                                       .only(
                                                                   bottom: 2.0),
                                                           child: Text(
-                                                            'DFI',
+                                                            lockState
+                                                                .lockStakingDetails!
+                                                                .asset!,
                                                             style: Theme.of(
                                                                     context)
                                                                 .textTheme

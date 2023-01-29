@@ -1,24 +1,23 @@
-import 'dart:typed_data';
-
-import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
-import 'package:defichaindart/defichaindart.dart';
-
 class LockRewardRoutesModel {
   int? id;
   String? label;
-  int? rewardPercent;
+  double? rewardPercent;
   String? kycLink;
   String? targetAsset;
   String? targetAddress;
   String? targetBlockchain;
 
+  LockRewardRoutesModel({
+    this.id,
+    this.label,
+    this.rewardPercent,
+    this.kycLink,
+    this.targetAsset,
+    this.targetAddress,
+    this.targetBlockchain,
+  });
 
-  LockRewardRoutesModel(
-      {this.id,
-      this.label, this.rewardPercent, this.kycLink, this.targetAsset, this.targetAddress, this.targetBlockchain});
-
-  LockRewardRoutesModel.fromJson(Map<String, dynamic> json)  {
+  LockRewardRoutesModel.fromJson(Map<String, dynamic> json) {
     this.id = json["id"];
     this.label = json["label"];
     this.rewardPercent = json["rewardPercent"];

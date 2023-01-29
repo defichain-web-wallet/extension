@@ -408,7 +408,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   }
 
   submitSend(state, tokensState, password) async {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);;
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
         _callback(

@@ -1,3 +1,4 @@
+import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +8,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 class InvestedField extends StatefulWidget {
   final TextEditingController? controller;
   final String? subtitle;
+  final String tokenName;
+  final String label;
   final bool isDeleteBtn;
   final bool isDisable;
 
   const InvestedField({
     Key? key,
+    required this.tokenName,
+    required this.label,
     this.controller,
     this.subtitle,
     this.isDeleteBtn = true,
@@ -23,7 +28,8 @@ class InvestedField extends StatefulWidget {
 }
 
 class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
-  TextEditingController controller = TextEditingController();
+  TokensHelper tokenHelper = TokensHelper();
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -32,7 +38,7 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
         Container(
           width: 218,
           child: TextFormField(
-            controller: controller,
+            controller: widget.controller,
             readOnly: widget.isDisable,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             maxLength: 3,
@@ -43,8 +49,10 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
             decoration: InputDecoration(
               filled: !widget.isDisable,
               fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-              enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-              focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+              enabledBorder:
+                  Theme.of(context).inputDecorationTheme.enabledBorder,
+              focusedBorder:
+                  Theme.of(context).inputDecorationTheme.focusedBorder,
               counterText: '',
               counterStyle: TextStyle(fontSize: 0),
               contentPadding: EdgeInsets.only(right: 0),
@@ -82,7 +90,8 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SvgPicture.asset(
-                              'assets/tokens/defi.svg',
+                              tokenHelper
+                                  .getImageNameByTokenName(widget.tokenName),
                               width: 24,
                               height: 24,
                             ),
@@ -93,7 +102,7 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  'DFI ',
+                                  '${widget.tokenName} ',
                                   style: Theme.of(context)
                                       .textTheme
                                       .headline5!
@@ -104,7 +113,7 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 1.0),
                                   child: Text(
-                                    'Reinvest',
+                                    widget.label,
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline5!
@@ -146,7 +155,6 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
                 ),
               ),
             ),
-            // controller: widget.controller,
           ),
         ),
         if (widget.isDeleteBtn)
