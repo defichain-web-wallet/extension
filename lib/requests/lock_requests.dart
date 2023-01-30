@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
+import 'package:defi_wallet/models/lock_analytics_model.dart';
 import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
 import 'package:defi_wallet/models/lock_withdraw_model.dart';
@@ -199,6 +200,24 @@ class LockRequests {
       } else {
         return null;
       }
+    } catch (_) {
+      print(_);
+      return null;
+    }
+  }
+
+  Future<LockAnalyticsModel?> getAnalytics(String accessToken) async {
+    try {
+      final Uri url = Uri.parse('https://api.lock.space/v1/analytics/staking?asset=DFI&blockchain=DeFiChain&strategy=Masternode');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final response = await http.get(url, headers: headers);
+      dynamic data = jsonDecode(response.body);
+      return LockAnalyticsModel.fromJson(data);
     } catch (_) {
       print(_);
       return null;
