@@ -6,11 +6,13 @@ class LockState extends Equatable {
   final LockStatusList status;
   final LockUserModel? lockUserDetails;
   final LockStakingModel? lockStakingDetails;
+  final LockAnalyticsModel? lockAnalyticsDetails;
 
   LockState({
     this.status = LockStatusList.initial,
     this.lockUserDetails,
     this.lockStakingDetails,
+    this.lockAnalyticsDetails,
   });
 
   @override
@@ -18,17 +20,20 @@ class LockState extends Equatable {
         status,
         lockUserDetails,
         lockStakingDetails,
+        lockAnalyticsDetails,
       ];
 
   LockState copyWith({
     LockStatusList? status,
     LockUserModel? lockUserDetails,
     LockStakingModel? lockStakingDetails,
+    LockAnalyticsModel? lockAnalyticsDetails,
   }) {
     return LockState(
       status: status ?? this.status,
       lockUserDetails: lockUserDetails ?? this.lockUserDetails,
       lockStakingDetails: lockStakingDetails ?? this.lockStakingDetails,
+      lockAnalyticsDetails: lockAnalyticsDetails ?? this.lockAnalyticsDetails,
     );
   }
 }

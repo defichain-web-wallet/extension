@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/models/account_model.dart';
+import 'package:defi_wallet/models/lock_analytics_model.dart';
 import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
 import 'package:defi_wallet/requests/lock_requests.dart';
@@ -36,6 +37,7 @@ class LockCubit extends Cubit<LockState> {
       status: LockStatusList.loading,
       lockUserDetails: state.lockUserDetails,
       lockStakingDetails: state.lockStakingDetails,
+      lockAnalyticsDetails: state.lockAnalyticsDetails,
     ));
 
     try {
@@ -46,12 +48,14 @@ class LockCubit extends Cubit<LockState> {
         status: LockStatusList.success,
         lockUserDetails: data,
         lockStakingDetails: state.lockStakingDetails,
+        lockAnalyticsDetails: state.lockAnalyticsDetails,
       ));
     } catch (_) {
       emit(state.copyWith(
         status: LockStatusList.failure,
         lockUserDetails: state.lockUserDetails,
         lockStakingDetails: state.lockStakingDetails,
+        lockAnalyticsDetails: state.lockAnalyticsDetails,
       ));
     }
   }
@@ -61,6 +65,7 @@ class LockCubit extends Cubit<LockState> {
       status: LockStatusList.loading,
       lockStakingDetails: state.lockStakingDetails,
       lockUserDetails: state.lockUserDetails,
+      lockAnalyticsDetails: state.lockAnalyticsDetails,
     ));
 
     try {
@@ -70,6 +75,34 @@ class LockCubit extends Cubit<LockState> {
         status: LockStatusList.success,
         lockStakingDetails: data,
         lockUserDetails: state.lockUserDetails,
+        lockAnalyticsDetails: state.lockAnalyticsDetails,
+      ));
+    } catch (_) {
+      emit(state.copyWith(
+        status: LockStatusList.failure,
+        lockStakingDetails: state.lockStakingDetails,
+        lockUserDetails: state.lockUserDetails,
+        lockAnalyticsDetails: state.lockAnalyticsDetails,
+      ));
+    }
+  }
+
+  loadAnalyticsDetails(AccountModel account) async {
+    emit(state.copyWith(
+      status: LockStatusList.loading,
+      lockStakingDetails: state.lockStakingDetails,
+      lockUserDetails: state.lockUserDetails,
+      lockAnalyticsDetails: state.lockAnalyticsDetails,
+    ));
+
+    try {
+      LockAnalyticsModel? data =
+          await lockRequests.getAnalytics(account.lockAccessToken!);
+      emit(state.copyWith(
+        status: LockStatusList.success,
+        lockStakingDetails: state.lockStakingDetails,
+        lockUserDetails: state.lockUserDetails,
+        lockAnalyticsDetails: data,
       ));
     } catch (_) {
       emit(state.copyWith(

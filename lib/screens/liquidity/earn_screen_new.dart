@@ -44,6 +44,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
       await fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
       await lockCubit.loadUserDetails(accountCubit.state.activeAccount!);
       await lockCubit.loadStakingDetails(accountCubit.state.activeAccount!);
+      await lockCubit.loadAnalyticsDetails(accountCubit.state.activeAccount!);
     });
   }
 
@@ -183,7 +184,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                         ),
                                                   ),
                                                   Text(
-                                                    'up to 43% APY',
+                                                    'up to ${(lockState.lockAnalyticsDetails!.apy! * 100)}% APY',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .headline5!
@@ -198,7 +199,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                         ),
                                                   ),
                                                 ],
-                                              )
+                                              ),
                                             ],
                                           ),
                                           SizedBox(
@@ -218,14 +219,18 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                               .end,
                                                       children: [
                                                         Text(
-                                                          balancesHelper
-                                                              .numberStyling(
-                                                            lockState
-                                                                .lockStakingDetails!
-                                                                .balance!,
-                                                            fixed: true,
-                                                            fixedCount: 2,
-                                                          ),
+                                                          lockState.lockUserDetails!
+                                                                      .kycStatus! ==
+                                                                  'Full'
+                                                              ? balancesHelper
+                                                                  .numberStyling(
+                                                                  lockState
+                                                                      .lockStakingDetails!
+                                                                      .balance!,
+                                                                  fixed: true,
+                                                                  fixedCount: 2,
+                                                                )
+                                                              : '0.00',
                                                           style:
                                                               Theme.of(context)
                                                                   .textTheme
@@ -244,9 +249,13 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                                       .only(
                                                                   bottom: 2.0),
                                                           child: Text(
-                                                            lockState
-                                                                .lockStakingDetails!
-                                                                .asset!,
+                                                            lockState.lockUserDetails!
+                                                                        .kycStatus! ==
+                                                                    'Full'
+                                                                ? lockState
+                                                                    .lockStakingDetails!
+                                                                    .asset!
+                                                                : 'DFI',
                                                             style: Theme.of(
                                                                     context)
                                                                 .textTheme

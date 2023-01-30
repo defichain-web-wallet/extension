@@ -5,10 +5,10 @@ import 'package:defi_wallet/models/lock_analytics_model.dart';
 import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
 import 'package:defi_wallet/models/lock_withdraw_model.dart';
+import 'package:defi_wallet/services/lock_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:http/http.dart' as http;
 
-import '../services/lock_service.dart';
 
 class LockRequests {
   LockService lockService = LockService();

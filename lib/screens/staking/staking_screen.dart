@@ -116,7 +116,7 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                           height: 4,
                                         ),
                                         Text(
-                                          '37% APY / 30% APR',
+                                          '${lockState.lockAnalyticsDetails!.apy! * 100}% APY / ${lockState.lockAnalyticsDetails!.apr! * 100}% APR',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
