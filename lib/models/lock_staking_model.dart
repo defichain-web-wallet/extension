@@ -33,7 +33,7 @@ class LockStakingModel {
     this.depositAddress = json["depositAddress"];
     this.strategy = json["strategy"];
     this.minimalStake = json["minimalStake"];
-    this.minimalDeposit = json["minimalDeposit"];
+    this.minimalDeposit = json["minimalDeposits"]["DFI"];
     this.fee = json["fee"];
     this.balance = json["balance"];
     this.pendingDeposits = json["pendingDeposits"];

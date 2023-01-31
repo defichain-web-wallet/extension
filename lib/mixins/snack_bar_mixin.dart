@@ -8,11 +8,11 @@ mixin SnackBarMixin {
   // Hack for infinite showing snack bar
   static const int seconds = 3;
 
-  showSnackBar(context, {String title = ''}) {
+  showSnackBar(context, {String title = '', Color? color, Widget? prefix,}) {
     SnackBar snackBar = bottomSnackBar(context,
       title: title,
-      color: AppColors.txStatusDone.withOpacity(0.08),
-      prefix: Icon(
+      color: color ?? AppColors.txStatusDone.withOpacity(0.08),
+      prefix: prefix ??  Icon(
         Icons.done,
         color: AppColors.txStatusDone,
       ),
