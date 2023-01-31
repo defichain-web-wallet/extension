@@ -234,7 +234,10 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               );
             }
           } else {
-            return Container();
+            return SliverFillRemaining(
+              hasScrollBody: false,
+              child: Container(),
+            );
           }
         });
       });
