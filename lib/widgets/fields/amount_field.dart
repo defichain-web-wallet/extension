@@ -14,6 +14,7 @@ class AmountField extends StatefulWidget {
   final double? available;
   final String? suffix;
   final bool isDisabledSelector;
+  final FocusNode? focusNode;
 
   AmountField({
     required this.onAssetSelect,
@@ -21,6 +22,7 @@ class AmountField extends StatefulWidget {
     required this.controller,
     required this.selectedAsset,
     required this.assets,
+    this.focusNode,
     this.available = 35.02,
     this.suffix = '\$365.50',
     this.isDisabledSelector = false,
@@ -32,7 +34,7 @@ class AmountField extends StatefulWidget {
 }
 
 class _AmountFieldState extends State<AmountField> {
-  final FocusNode _focusNode = FocusNode();
+  late FocusNode _focusNode;
   bool _onFocused = false;
 
   _onFocusChange() {
@@ -46,6 +48,12 @@ class _AmountFieldState extends State<AmountField> {
 
   @override
   void initState() {
+    if(widget.focusNode == null) {
+      _focusNode = FocusNode();
+    } {
+      _focusNode = widget.focusNode!;
+    }
+
     _focusNode.addListener(_onFocusChange);
     super.initState();
   }
@@ -107,7 +115,9 @@ class _AmountFieldState extends State<AmountField> {
                           FilteringTextInputFormatter.deny(
                             RegExp(r'-\.+'),
                           ),
-                          FilteringTextInputFormatter.deny(RegExp(r'^0\d+'),),
+                          FilteringTextInputFormatter.deny(
+                            RegExp(r'^0\d+'),
+                          ),
                         ],
                         controller: widget.controller,
                         focusNode: _focusNode,

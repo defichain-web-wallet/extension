@@ -32,6 +32,8 @@ class IbanScreen extends StatefulWidget {
 class _IbanScreenState extends State<IbanScreen> with ThemeMixin {
   final _formKey = GlobalKey<FormState>();
   final _ibanController = TextEditingController();
+  final FocusNode confirmFocusNode = FocusNode();
+  final FocusNode ibanFocusNode = FocusNode();
   final GlobalKey<IbanSelectorState> selectKeyIban =
       GlobalKey<IbanSelectorState>();
   String titleText = 'Select IBAN';
@@ -151,11 +153,15 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin {
                                     widget.isNewIban ||
                                             fiatState.activeIban == null
                                         ? IbanField(
+                                      focusNode: ibanFocusNode,
                                             ibanController: _ibanController,
                                             hintText:
                                                 'DE89 37XX XXXX XXXX XXXX XX',
                                             maskFormat:
                                                 'AA## #### #### #### #### ##',
+                                      onSubmit: (val) {
+                                              confirmFocusNode.requestFocus();
+                                      },
                                           )
                                         : IbanSelector(
                                             asset: widget.asset,
@@ -181,6 +187,7 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin {
                                 ),
                               ),
                               NewPrimaryButton(
+                                focusNode: confirmFocusNode,
                                 width: 104,
                                 callback: () {
                                   hideOverlay();
@@ -220,6 +227,8 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin {
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ));
+    } else {
+      ibanFocusNode.requestFocus();
     }
   }
 

@@ -41,6 +41,7 @@ class _LockScreenState extends State<LockScreen> {
   Codec<String, String> stringToBase64 = utf8.fuse(base64);
   GlobalKey globalKey = GlobalKey();
   TextEditingController _passwordController = TextEditingController();
+  FocusNode unlockFocusNode = FocusNode();
 
   PasswordStatusList passwordStatus = PasswordStatusList.initial;
 
@@ -88,6 +89,9 @@ class _LockScreenState extends State<LockScreen> {
                             setState(
                                     () => isPasswordObscure = !isPasswordObscure);
                           },
+                          onSubmitted: (val) {
+                            unlockFocusNode.requestFocus();
+                          },
                         ),
                         SizedBox(height: 24),
                         StretchBox(
@@ -97,6 +101,7 @@ class _LockScreenState extends State<LockScreen> {
                             pendingText: 'Pending...',
                             isCheckLock: false,
                             globalKey: globalKey,
+                            focusNode: unlockFocusNode,
                             callback: (parent) => _restoreWallet(parent),
                           ),
                         ),

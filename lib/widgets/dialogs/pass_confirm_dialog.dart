@@ -35,6 +35,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
       convert.utf8.fuse(convert.base64);
   GlobalKey globalKey = GlobalKey();
   TextEditingController _passwordController = TextEditingController();
+  FocusNode confirmFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +68,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
                 ),
               ),
               NewPrimaryButton(
+                focusNode: confirmFocusNode,
                 width: 104,
                 title: 'Confirm',
                 callback: () {
@@ -173,6 +175,9 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
                           onPressObscure: () {
                             setState(
                                 () => isPasswordObscure = !isPasswordObscure);
+                          },
+                          onSubmitted: (val) {
+                            confirmFocusNode.requestFocus();
                           },
                         ),
                       ],

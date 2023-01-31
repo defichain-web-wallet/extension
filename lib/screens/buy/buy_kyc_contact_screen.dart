@@ -29,6 +29,10 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode phoneFocusNode = FocusNode();
+  final FocusNode confirmFocusNode = FocusNode();
+
   final DfxRequests dfxRequests = DfxRequests();
   String countryCode = 'US';
   String numberPrefix = '+1';
@@ -166,6 +170,10 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
                                         height: 6,
                                       ),
                                       TextFormField(
+                                        onFieldSubmitted: (val) {
+                                          phoneFocusNode.requestFocus();
+                                        },
+                                        focusNode: emailFocusNode,
                                         controller: _emailController,
                                         decoration: InputDecoration(
                                             contentPadding:
@@ -196,6 +204,10 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
                                         height: 6,
                                       ),
                                       TextFormField(
+                                        onFieldSubmitted: (val){
+                                          confirmFocusNode.requestFocus();
+                                        },
+                                        focusNode: phoneFocusNode,
                                         controller: _phoneController,
                                         decoration: InputDecoration(
                                             contentPadding:
@@ -220,6 +232,7 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
                                     ),
                                   ),
                                   NewPrimaryButton(
+                                    focusNode: confirmFocusNode,
                                     width: 104,
                                     callback: isEnable
                                         ? () async {
@@ -263,6 +276,8 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
           reverseTransitionDuration: Duration.zero,
         ),
       );
+    } else {
+      confirmFocusNode.unfocus();
     }
   }
 }

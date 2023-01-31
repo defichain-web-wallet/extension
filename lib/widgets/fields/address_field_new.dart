@@ -11,6 +11,7 @@ class AddressFieldNew extends StatefulWidget {
   final Function()? clearPrefix;
   final Function(AddressBookModel contact)? getContact;
   final Function(String address)? getAddress;
+  final Function(String address)? onSubmit;
 
   AddressFieldNew({
     Key? key,
@@ -20,6 +21,7 @@ class AddressFieldNew extends StatefulWidget {
     this.clearPrefix,
     this.getContact,
     this.getAddress,
+    this.onSubmit,
   }) : super(key: key);
 
   @override
@@ -51,6 +53,7 @@ class _AddressFieldNewState extends State<AddressFieldNew> {
         Container(
           width: double.infinity,
           child: TextFormField(
+            onFieldSubmitted: widget.onSubmit,
             controller: widget.controller,
             onChanged: widget.onChange,
             decoration: InputDecoration(

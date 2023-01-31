@@ -38,6 +38,7 @@ class _SendScreenNewState extends State<SendScreenNew>
   TextEditingController addressController = TextEditingController();
   TextEditingController assetController = TextEditingController(text: '0');
   AddressBookModel contact = AddressBookModel();
+  FocusNode amountFocusNode = FocusNode();
   TokensModel? currentAsset;
   String suffixText = '';
   String? balanceInUsd;
@@ -214,6 +215,9 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       height: 24,
                                     ),
                                     AddressFieldNew(
+                                      onSubmit: (val) {
+                                        amountFocusNode.requestFocus();
+                                      },
                                       clearPrefix: () {
                                         setState(() {
                                           contact = AddressBookModel();
@@ -234,6 +238,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                         setState(() {
                                           addressController.text = '';
                                           contact = val;
+                                          amountFocusNode.requestFocus();
                                         });
                                       },
                                       contact: contact,
@@ -255,6 +260,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       height: 6,
                                     ),
                                     AmountField(
+                                      focusNode: amountFocusNode,
                                       onChanged: (value) {
                                         setState(() {
                                           balanceInUsd = getUsdBalance(context);

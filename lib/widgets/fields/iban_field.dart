@@ -8,7 +8,9 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class IbanField extends StatefulWidget {
   final TextEditingController? ibanController;
+  final FocusNode? focusNode;
   final Function(String)? onChanged;
+  final Function(String)? onSubmit;
   final Function()? onFocus;
   final String? hintText;
   final String maskFormat;
@@ -17,7 +19,9 @@ class IbanField extends StatefulWidget {
   IbanField({
     Key? key,
     this.ibanController,
+    this.focusNode,
     this.onChanged,
+    this.onSubmit,
     this.onFocus,
     this.hintText,
     this.maskFormat = '',
@@ -89,7 +93,7 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
                   }
                 },
                 child: TextFormField(
-                  focusNode: _focusNode,
+                  focusNode: widget.focusNode,
                   textAlignVertical: TextAlignVertical.center,
                   style: Theme.of(context).textTheme.headline5!.copyWith(
                         fontSize: 12,
@@ -168,6 +172,7 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
                             : null;
                     }
                   },
+                  onFieldSubmitted: widget.onSubmit,
                 ),
               )),
         ),
