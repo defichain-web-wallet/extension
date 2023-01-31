@@ -70,8 +70,12 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
 
   @override
   void initState() {
-    address =
+    if (widget.contact != null) {
+      address =
         widget.address != null ? widget.address! : widget.contact!.address!;
+    } else {
+      address = widget.address!;
+    }
     super.initState();
     if (widget.isAfterAddContact) {
       isShowAdded = true;
