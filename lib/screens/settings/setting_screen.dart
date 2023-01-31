@@ -7,7 +7,7 @@ import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
-import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/settings/settings_list_tile.dart';

@@ -11,6 +11,7 @@ class FiatState extends Equatable {
   final String? email;
   final String? currentIban;
   final String? kycHash;
+  final String? kycStatus;
   final String? accessToken;
   final List<String>? ibansList;
   final List<AssetByFiatModel>? assets;
@@ -35,6 +36,7 @@ class FiatState extends Equatable {
     this.email,
     this.currentIban,
     this.kycHash,
+    this.kycStatus,
     this.accessToken,
     this.ibansList,
     this.assets,
@@ -61,6 +63,7 @@ class FiatState extends Equatable {
     email,
     currentIban,
     kycHash,
+    kycStatus,
     accessToken,
     ibansList,
     assets,
@@ -86,6 +89,7 @@ class FiatState extends Equatable {
     String? email,
     String? currentIban,
     String? kycHash,
+    String? kycStatus,
     String? accessToken,
     List<String>? ibansList,
     List<AssetByFiatModel>? assets,
@@ -110,6 +114,7 @@ class FiatState extends Equatable {
       email: email ?? this.email,
       currentIban: currentIban ?? this.currentIban,
       kycHash: kycHash ?? this.kycHash,
+      kycStatus: kycStatus ?? this.kycStatus,
       accessToken: accessToken ?? this.accessToken,
       ibansList: ibansList ?? this.ibansList,
       assets: assets ?? this.assets,

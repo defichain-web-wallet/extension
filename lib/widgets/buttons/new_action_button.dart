@@ -9,6 +9,8 @@ class NewActionButton extends StatefulWidget {
   final Function()? onPressed;
   final bool isStaticColor;
   final LinearGradient? bgGradient;
+  final double width;
+  final double height;
 
   const NewActionButton({
     Key? key,
@@ -16,6 +18,8 @@ class NewActionButton extends StatefulWidget {
     this.onPressed,
     this.isStaticColor = false,
     this.bgGradient,
+    this.width = 32,
+    this.height = 32,
   }) : super(key: key);
 
   @override
@@ -28,8 +32,8 @@ class _NewActionButtonState extends State<NewActionButton>  with ThemeMixin {
     LockHelper lockHelper = LockHelper();
 
     return Container(
-      width: 32,
-      height: 32,
+      width: widget.width,
+      height: widget.height,
       // backgroundColor: AppTheme.iconButtonBackground,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
@@ -41,8 +45,8 @@ class _NewActionButtonState extends State<NewActionButton>  with ThemeMixin {
         iconSize: 16,
         icon: SvgPicture.asset(
           widget.iconPath,
-          width: 16,
-          height: 16,
+          width: widget.width / 2,
+          height: widget.height / 2,
           color: widget.isStaticColor
               ? null
               : isDarkTheme()

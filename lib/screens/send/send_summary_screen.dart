@@ -24,10 +24,10 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
-import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/tx_status_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
@@ -415,7 +415,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   }
 
   submitSend(state, tokensState, password) async {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);;
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
         _callback(

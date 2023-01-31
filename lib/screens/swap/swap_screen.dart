@@ -22,7 +22,7 @@ import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
-import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
 import 'package:defi_wallet/bloc/dex/dex_state.dart';

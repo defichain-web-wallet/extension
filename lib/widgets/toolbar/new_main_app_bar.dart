@@ -9,10 +9,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isShowLogo;
+  final Color? bgColor;
 
   const NewMainAppBar({
     Key? key,
     this.isShowLogo = true,
+    this.bgColor,
   }) : super(key: key);
 
   static const double toolbarHeight = 54.0;
@@ -33,7 +35,7 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         shadowColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: bgColor != null ? bgColor : Theme.of(context).scaffoldBackgroundColor,
         toolbarHeight: toolbarHeight,
         elevation: 0,
         leadingWidth: leadingWidth,

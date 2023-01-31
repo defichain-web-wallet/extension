@@ -22,6 +22,7 @@ abstract class AppColors {
   static const purplePizzazz = Color(0xFFFF00E5);
   static const purpleHeart = Color(0xFF6326E4);
   static const malachite = Color(0xff00CF21);
+  static const viridian = Color(0xff498F69);
   static const ebony = Color(0xFF120C23);
   static const mirage = Color(0xFF1B162C);
 

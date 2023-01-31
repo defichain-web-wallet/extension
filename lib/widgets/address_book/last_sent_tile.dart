@@ -2,7 +2,7 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:defi_wallet/widgets/address_book/create_edit_contact_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

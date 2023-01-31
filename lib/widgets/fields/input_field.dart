@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class InputField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
+  final Widget? suffix;
 
   InputField({
     Key? key,
     required this.controller,
     required this.hintText,
+    this.suffix,
   }) : super(key: key);
 
   @override
@@ -24,6 +26,7 @@ class InputField extends StatelessWidget {
           focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
           hintText: hintText,
           suffixIconConstraints: BoxConstraints(minHeight: 24, minWidth: 24),
+          suffixIcon: suffix,
         ),
         style: passwordField.apply(
           color: Theme.of(context).textTheme.headline1!.color!,
