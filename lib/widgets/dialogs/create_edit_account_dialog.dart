@@ -35,6 +35,8 @@ class CreateEditAccountDialog extends StatefulWidget {
 
 class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
   TextEditingController _nameController = TextEditingController();
+  FocusNode nameFocusNode = FocusNode();
+  FocusNode confirmFocusNode = FocusNode();
   File? _pickedImage;
   Uint8List _webImage = Uint8List(8);
   String editTitleText = 'Edit account';
@@ -48,9 +50,16 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
 
   @override
   void initState() {
+    nameFocusNode.requestFocus();
     if (widget.name != null) {
       _nameController.text = widget.name!;
     }
+    nameFocusNode.addListener(() {
+      if (nameFocusNode.hasFocus) {
+        _nameController.selection = TextSelection(
+            baseOffset: 0, extentOffset: _nameController.text.length);
+      }
+    });
     contentHeight = widget.isEdit ? 293 : 220;
     titleText = widget.isEdit ? editTitleText : createTitleText;
     subtitleText = widget.isEdit ? editSubtitleText : createSubtitleText;
@@ -132,6 +141,7 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                     ),
                   ),
                   NewPrimaryButton(
+                    focusNode: confirmFocusNode,
                     width: 104,
                     globalKey: globalKey,
                     callback: () async {
@@ -141,6 +151,8 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                         }
                         widget.callback!(_nameController.text);
                         Navigator.pop(context);
+                      } else {
+                        nameFocusNode.requestFocus();
                       }
                     },
                     title: 'Confirm',
@@ -323,10 +335,11 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                 Container(
                                   height: 44,
                                   child: TextFormField(
+                                    focusNode: nameFocusNode,
                                     controller: _nameController,
-                                    onEditingComplete: () =>
-                                        (globalKey.currentWidget! as ElevatedButton)
-                                            .onPressed!(),
+                                    onEditingComplete: () => (globalKey
+                                            .currentWidget! as ElevatedButton)
+                                        .onPressed!(),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: AppColors.white,
@@ -343,6 +356,9 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                         ),
                                       ),
                                     ),
+                                    onFieldSubmitted: (val) {
+                                      confirmFocusNode.requestFocus();
+                                    },
                                   ),
                                 ),
                               ],
