@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class PendingButton extends StatefulWidget {
   final String text;
   final String pendingText;
+  final FocusNode? focusNode;
   final callback;
   final globalKey;
   final isCheckLock;
@@ -12,6 +13,7 @@ class PendingButton extends StatefulWidget {
       {Key? key,
       required this.callback,
       this.pendingText = 'Pending...',
+      this.focusNode,
       GlobalKey? this.globalKey,
       this.isCheckLock = true})
       : super(key: key);
@@ -26,6 +28,7 @@ class PendingButtonState extends State<PendingButton> {
   @override
   Widget build(BuildContext context) {
     return NewPrimaryButton(
+      focusNode: widget.focusNode,
       title: pending ? widget.pendingText : widget.text,
       globalKey: widget.globalKey,
       callback: (!pending && widget.callback != null)

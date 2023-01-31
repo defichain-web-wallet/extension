@@ -28,7 +28,10 @@ class _PasswordScreenState extends State<PasswordScreen> {
   GlobalKey _formKey = GlobalKey<FormState>();
   TextEditingController password = TextEditingController();
   TextEditingController confirm = TextEditingController();
+  FocusNode passwordFocusNode = FocusNode();
+  FocusNode confirmFocusNode = FocusNode();
   FocusNode checkBoxFocusNode = FocusNode();
+  FocusNode btnFocusNode = FocusNode();
   bool isPasswordObscure = true;
   bool isConfirmObscure = true;
 
@@ -47,7 +50,10 @@ class _PasswordScreenState extends State<PasswordScreen> {
 
   @override
   void initState() {
+    passwordFocusNode.addListener(() {});
+    confirmFocusNode.addListener(() {});
     checkBoxFocusNode.addListener(() {});
+    btnFocusNode.addListener(() {});
     super.initState();
   }
 
@@ -82,6 +88,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             height: 43,
                           ),
                           PasswordTextField(
+                            focusNode: passwordFocusNode,
                             controller: password,
                             hint: 'Your password',
                             label: 'Password',
@@ -123,11 +130,15 @@ class _PasswordScreenState extends State<PasswordScreen> {
                               setState(
                                   () => isPasswordObscure = !isPasswordObscure);
                             },
+                            onSubmitted: (val) {
+                              confirmFocusNode.requestFocus();
+                            },
                           ),
                           SizedBox(
                             height: 24,
                           ),
                           PasswordTextField(
+                            focusNode: confirmFocusNode,
                             controller: confirm,
                             hint: 'Confirm password',
                             label: 'Confirm Password',
@@ -161,7 +172,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
                               setState(
                                   () => isConfirmObscure = !isConfirmObscure);
                             },
-                          )
+                            onSubmitted: (val) {
+                              if (isConfirm) {
+                                btnFocusNode.requestFocus();
+                              } else {
+                                checkBoxFocusNode.requestFocus();
+                              }
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -209,11 +227,13 @@ class _PasswordScreenState extends State<PasswordScreen> {
                           height: 24,
                         ),
                         Container(
-                          width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
+                          width:
+                              isFullScreen ? buttonFullWidth : buttonSmallWidth,
                           child: BlocBuilder<AccountCubit, AccountState>(
                             builder: (context, state) {
                               return PendingButton(
                                 'Create password',
+                                focusNode: btnFocusNode,
                                 pendingText: state.status ==
                                         AccountStatusList.restore
                                     ? 'Processed (${state.restored}/${state.needRestore})'
@@ -221,6 +241,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                 isCheckLock: false,
                                 callback: _enableBtn && isConfirm
                                     ? (parent) async {
+                                        btnFocusNode.unfocus();
                                         parent.emitPending(true);
                                         await widget.onSubmitted(password.text);
                                         parent.emitPending(false);

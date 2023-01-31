@@ -16,6 +16,7 @@ class PasswordTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hint;
   final String label;
+  final FocusNode? focusNode;
   final String? error;
   final Function(String text)? onChanged;
   final Function()? onPressObscure;
@@ -32,6 +33,7 @@ class PasswordTextField extends StatefulWidget {
     required this.controller,
     required this.hint,
     required this.label,
+    this.focusNode,
     this.error,
     this.onChanged,
     this.onPressObscure,
@@ -65,6 +67,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
         Container(
           height: 44,
           child: TextFormField(
+            focusNode: widget.focusNode,
             autofocus: widget.autofocus,
             maxLines: maxLines,
             onFieldSubmitted: widget.onSubmitted,
