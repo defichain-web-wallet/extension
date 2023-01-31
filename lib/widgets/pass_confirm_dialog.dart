@@ -12,10 +12,12 @@ import 'package:hive/hive.dart';
 
 class PassConfirmDialog extends StatefulWidget {
   final Function(String) onSubmit;
+  final Function()? onCancel;
 
   const PassConfirmDialog({
     Key? key,
     required this.onSubmit,
+    this.onCancel,
   }) : super(key: key);
 
   @override
@@ -56,6 +58,9 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
                 width: 104,
                 child: AccentButton(
                   callback: () {
+                    if (widget.onCancel != null) {
+                      widget.onCancel!();
+                    }
                     Navigator.pop(context);
                   },
                   label: 'Cancel',
@@ -91,6 +96,9 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
                           onTap: () {
+                            if (widget.onCancel != null) {
+                              widget.onCancel!();
+                            }
                             Navigator.pop(context);
                           },
                           child: Icon(
@@ -180,6 +188,9 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
                   cursor: SystemMouseCursors.click,
                   child: GestureDetector(
                     onTap: () {
+                      if (widget.onCancel != null) {
+                        widget.onCancel!();
+                      }
                       Navigator.pop(context);
                     },
                     child: Icon(

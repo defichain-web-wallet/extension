@@ -375,8 +375,8 @@ class _SendScreenNewState extends State<SendScreenNew>
                                                                 animation1,
                                                                 animation2) =>
                                                             SendSummaryScreen(
-                                                          contact: addressBookCubit
-                                                              .getLastContact(),
+                                                          address:
+                                                            addressController.text,
                                                           isAfterAddContact:
                                                               true,
                                                           amount: double.parse(
