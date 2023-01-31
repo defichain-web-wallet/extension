@@ -75,11 +75,22 @@ class AssetList extends StatelessWidget {
                 ),
               );
             } else {
-              return Container();
+              return SliverFillRemaining(
+                hasScrollBody: false,
+                child: Container(
+                  color: Theme.of(context).cardColor,
+                  child: Center(
+                    child: Text('Not yet any tokens'),
+                  ),
+                ),
+              );
             }
           });
         } else {
-          return Container();
+          return SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(),
+          );
         }
       });
     });
