@@ -223,8 +223,14 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 ),
               );
             } else {
-              return Center(
-                child: Text('Not yet any transaction'),
+              return SliverFillRemaining(
+                hasScrollBody: false,
+                child: Container(
+                  color: Theme.of(context).cardColor,
+                  child: Center(
+                    child: Text('Not yet any transaction'),
+                  ),
+                ),
               );
             }
           } else {

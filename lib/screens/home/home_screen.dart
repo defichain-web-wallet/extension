@@ -407,7 +407,15 @@ class _HomeScreenState extends State<HomeScreen>
                                         ),
                                       ),
                                       if (tabController!.index == 0)
-                                        AssetList()
+                                        ...[
+                                          AssetList(),
+                                          SliverFillRemaining(
+                                            hasScrollBody: false,
+                                            child: Container(
+                                              color: Theme.of(context).cardColor,
+                                            ),
+                                          )
+                                        ]
                                       else
                                         TransactionHistory(),
                                     ],
