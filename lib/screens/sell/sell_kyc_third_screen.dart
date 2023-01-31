@@ -29,6 +29,9 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode phoneFocusNode = FocusNode();
+  final FocusNode confirmFocusNode = FocusNode();
   String countryCode = 'US';
   String numberPrefix = '+1';
   String titleText = '3/3. How can we contact with you';
@@ -158,6 +161,7 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                                     height: 6,
                                   ),
                                   TextFormField(
+                                    focusNode: emailFocusNode,
                                     controller: _emailController,
                                     decoration: InputDecoration(
                                         contentPadding:
@@ -168,6 +172,9 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                                               !EmailValidator.validate(val)
                                           ? 'Enter a valid email'
                                           : null;
+                                    },
+                                    onFieldSubmitted: (val) {
+                                      phoneFocusNode.requestFocus();
                                     },
                                   ),
                                   SizedBox(
@@ -188,11 +195,15 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                                     height: 6,
                                   ),
                                   TextFormField(
+                                    focusNode: phoneFocusNode,
                                     controller: _phoneController,
                                     decoration: InputDecoration(
                                         contentPadding:
                                             EdgeInsets.only(left: 12),
                                         hintText: 'Enter phone number'),
+                                    onFieldSubmitted: (val) {
+                                      confirmFocusNode.requestFocus();
+                                    },
                                   ),
                                 ],
                               ),
@@ -211,6 +222,7 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                                 ),
                               ),
                               NewPrimaryButton(
+                                focusNode: confirmFocusNode,
                                 width: 104,
                                 callback: () {
                                   _authenticateWithEmail(context, fiatState);
@@ -252,6 +264,8 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
           reverseTransitionDuration: Duration.zero,
         ),
       );
+    } else {
+      confirmFocusNode.unfocus();
     }
   }
 }

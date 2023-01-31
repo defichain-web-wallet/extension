@@ -29,6 +29,10 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
   final _streetAddressController = TextEditingController();
   final _cityController = TextEditingController();
   final _zipCodeController = TextEditingController();
+  final FocusNode streetFocusNode = FocusNode();
+  final FocusNode cityFocusNode = FocusNode();
+  final FocusNode zipCodeFocusNode = FocusNode();
+  final FocusNode confirmFocusNode = FocusNode();
   final String titleText = '2/3. Let us know where do you live';
   final String subtitleText = 'We should know your Address for ...';
   late Map selectedCountry;
@@ -266,6 +270,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                   height: 6,
                                                 ),
                                                 TextFormField(
+                                                  focusNode: streetFocusNode,
                                                   controller:
                                                   _streetAddressController,
                                                   decoration: InputDecoration(
@@ -279,6 +284,9 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                         value.isEmpty
                                                         ? 'Please enter this field'
                                                         : null;
+                                                  },
+                                                  onFieldSubmitted: (val) {
+                                                    cityFocusNode.requestFocus();
                                                   },
                                                 ),
                                                 SizedBox(
@@ -300,6 +308,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                   height: 6,
                                                 ),
                                                 TextFormField(
+                                                  focusNode: cityFocusNode,
                                                   controller: _cityController,
                                                   decoration: InputDecoration(
                                                     contentPadding:
@@ -311,6 +320,9 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                         value.isEmpty
                                                         ? 'Please enter this field'
                                                         : null;
+                                                  },
+                                                  onFieldSubmitted: (val) {
+                                                    zipCodeFocusNode.requestFocus();
                                                   },
                                                 ),
                                                 SizedBox(
@@ -332,6 +344,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                   height: 6,
                                                 ),
                                                 TextFormField(
+                                                  focusNode: zipCodeFocusNode,
                                                   controller: _zipCodeController,
                                                   decoration: InputDecoration(
                                                     contentPadding:
@@ -343,6 +356,9 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                         value.isEmpty
                                                         ? 'Please enter this field'
                                                         : null;
+                                                  },
+                                                  onFieldSubmitted: (val) {
+                                                    confirmFocusNode.requestFocus();
                                                   },
                                                 ),
                                                 SizedBox(
@@ -359,49 +375,55 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                               ),
                             ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                width: 104,
-                                child: AccentButton(
-                                  callback: () {
-                                    Navigator.pop(context);
-                                  },
-                                  label: 'Back',
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: NewPrimaryButton(
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
                                   width: 104,
-                                  callback: () async {
-                                    FiatCubit fiatCubit =
-                                    BlocProvider.of<FiatCubit>(context);
-                                    fiatCubit.setCountry(selectedCountry);
-                                    if (_formKey.currentState!.validate()) {
-                                      await fiatCubit.setAddress(
-                                        _streetAddressController.text,
-                                        _cityController.text,
-                                        _zipCodeController.text,
-                                        fiatState.accessToken!,
-                                      );
-                                      Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                animation2) =>
-                                                SellKycThirdScreen(),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                            Duration.zero,
-                                          ));
-                                    }
-                                  },
-                                  title: 'Next',
+                                  child: AccentButton(
+                                    callback: () {
+                                      Navigator.pop(context);
+                                    },
+                                    label: 'Back',
+                                  ),
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: NewPrimaryButton(
+                                    focusNode: confirmFocusNode,
+                                    width: 104,
+                                    callback: () async {
+                                      FiatCubit fiatCubit =
+                                      BlocProvider.of<FiatCubit>(context);
+                                      fiatCubit.setCountry(selectedCountry);
+                                      if (_formKey.currentState!.validate()) {
+                                        await fiatCubit.setAddress(
+                                          _streetAddressController.text,
+                                          _cityController.text,
+                                          _zipCodeController.text,
+                                          fiatState.accessToken!,
+                                        );
+                                        Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation1,
+                                                  animation2) =>
+                                                  SellKycThirdScreen(),
+                                              transitionDuration: Duration.zero,
+                                              reverseTransitionDuration:
+                                              Duration.zero,
+                                            ));
+                                      } else {
+                                        confirmFocusNode.unfocus();
+                                      }
+                                    },
+                                    title: 'Next',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
