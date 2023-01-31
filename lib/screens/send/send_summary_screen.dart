@@ -323,21 +323,24 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                           isCheckLock: false,
                                           pendingText: 'Pending',
                                           callback: (parent) {
+                                            parent.emitPending(true);
                                             showDialog(
                                               barrierColor: Color(0x0f180245),
                                               barrierDismissible: false,
                                               context: context,
                                               builder: (BuildContext context1) {
                                                 return PassConfirmDialog(
-                                                    onSubmit: (password) async {
-                                                  parent.emitPending(true);
-                                                  await submitSend(
-                                                    state,
-                                                    tokensState,
-                                                    password,
-                                                  );
-                                                  parent.emitPending(false);
-                                                });
+                                                  onCancel: () {
+                                                    parent.emitPending(false);
+                                                  },
+                                                  onSubmit: (password) async {
+                                                    await submitSend(
+                                                      state,
+                                                      tokensState,
+                                                      password,
+                                                    );
+                                                  },
+                                                );
                                               },
                                             );
                                           },
