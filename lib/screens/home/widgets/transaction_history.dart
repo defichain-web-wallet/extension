@@ -83,71 +83,71 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             }
 
             if (historyList != null && historyList.length != 0) {
-              return ListView.builder(
-                itemCount: historyList.length,
-                itemBuilder: (context, index) {
-                  var tokenName;
-                  var txValue;
-                  var isSend;
-                  var type;
-                  var date;
-                  var txValuePrefix;
-                  if (SettingsHelper.isBitcoin()) {
-                    tokenName = 'BTC';
-                    txValue = convertFromSatoshi(historyList[index].value);
-                    isSend = historyList[index].isSend;
-                    type = isSend ? 'SEND' : 'RECEIVE';
-                    DateTime dateTime =
-                        DateTime.parse(historyList[index].blockTime);
-                    date = formatter.format(DateTime.fromMillisecondsSinceEpoch(
-                            dateTime.millisecondsSinceEpoch)
-                        .toLocal());
-                    txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
-                        ? isSend
-                            ? ''
-                            : '+'
-                        : '';
-                  } else if (SettingsHelper.settings.network == 'mainnet') {
-                    tokenName = historyList[index].tokens![0].code;
-                    txValue = historyList[index].value;
-                    isSend = historyList[index].category == 'SEND';
-                    type = historyList[index].category;
-                    DateTime dateTime = DateTime.parse(historyList[index].date);
-                    date = formatter.format(DateTime.fromMillisecondsSinceEpoch(
-                            dateTime.millisecondsSinceEpoch)
-                        .toLocal());
-                    txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
-                        ? isSend
-                            ? '-'
-                            : '+'
-                        : '';
-                  } else {
-                    tokenName = historyList[index].token;
-                    txValue = convertFromSatoshi(historyList[index].value);
-                    isSend = historyList[index].isSend;
-                    type = historyList[index].type;
-                    date = (historyList[index].blockTime != null)
-                        ? formatter.format(DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(historyList[index].blockTime) * 1000)
-                            .toLocal())
-                        : 'date';
-                    txValuePrefix = (type == 'vout' || type == 'vin')
-                        ? isSend
-                            ? '-'
-                            : '+'
-                        : '';
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.only(
-                        bottom: 8, left: 16, right: 16, top: 2),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).cardColor,
-                      ),
+              return SliverFixedExtentList(
+                itemExtent: 64.0 + 10,
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    var tokenName;
+                    var txValue;
+                    var isSend;
+                    var type;
+                    var date;
+                    var txValuePrefix;
+                    if (SettingsHelper.isBitcoin()) {
+                      tokenName = 'BTC';
+                      txValue = convertFromSatoshi(historyList[index].value);
+                      isSend = historyList[index].isSend;
+                      type = isSend ? 'SEND' : 'RECEIVE';
+                      DateTime dateTime =
+                          DateTime.parse(historyList[index].blockTime);
+                      date = formatter.format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                                  dateTime.millisecondsSinceEpoch)
+                              .toLocal());
+                      txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
+                          ? isSend
+                              ? ''
+                              : '+'
+                          : '';
+                    } else if (SettingsHelper.settings.network == 'mainnet') {
+                      tokenName = historyList[index].tokens![0].code;
+                      txValue = historyList[index].value;
+                      isSend = historyList[index].category == 'SEND';
+                      type = historyList[index].category;
+                      DateTime dateTime =
+                          DateTime.parse(historyList[index].date);
+                      date = formatter.format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                                  dateTime.millisecondsSinceEpoch)
+                              .toLocal());
+                      txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
+                          ? isSend
+                              ? '-'
+                              : '+'
+                          : '';
+                    } else {
+                      tokenName = historyList[index].token;
+                      txValue = convertFromSatoshi(historyList[index].value);
+                      isSend = historyList[index].isSend;
+                      type = historyList[index].type;
+                      date = (historyList[index].blockTime != null)
+                          ? formatter.format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                      int.parse(historyList[index].blockTime) *
+                                          1000)
+                                  .toLocal())
+                          : 'date';
+                      txValuePrefix = (type == 'vout' || type == 'vin')
+                          ? isSend
+                              ? '-'
+                              : '+'
+                          : '';
+                    }
+                    return Container(
+                      color: Theme.of(context).cardColor,
+                      padding: const EdgeInsets.only(
+                          bottom: 8, left: 16, right: 16, top: 2),
                       child: ListTile(
-                        contentPadding: const EdgeInsets.all(0),
-                        minLeadingWidth: 32,
                         leading: Container(
                           width: 32,
                           height: 32,
@@ -160,32 +160,29 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             type: type,
                           ),
                         ),
-                        title: Container(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                historyHelper.getTransactionType(type),
-                                style: Theme.of(context).textTheme.headline5,
-                              ),
-                              Text(
-                                '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 4)} $tokenName',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .copyWith(
-                                      fontSize: 15,
-                                      color: (txValuePrefix == '+')
-                                          ? AppColors.receivedIconColor
-                                          : Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .color,
-                                    ),
-                              ),
-                            ],
-                          ),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              historyHelper.getTransactionType(type),
+                              style: Theme.of(context).textTheme.headline5,
+                            ),
+                            Text(
+                              '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 4)} $tokenName',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .copyWith(
+                                    fontSize: 15,
+                                    color: (txValuePrefix == '+')
+                                        ? AppColors.receivedIconColor
+                                        : Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color,
+                                  ),
+                            ),
+                          ],
                         ),
                         subtitle: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -205,25 +202,25 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                   ),
                             ),
                             Text(
-                              "\$${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName).abs(), fixed: true, fixedCount: 2)}",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6!
-                                  .copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline6!
-                                        .color!
-                                        .withOpacity(0.3),
-                                  ),
-                            )
+                                "\$${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName).abs(), fixed: true, fixedCount: 2)}",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    )),
                           ],
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                  childCount: historyList.length,
+                ),
               );
             } else {
               return Center(

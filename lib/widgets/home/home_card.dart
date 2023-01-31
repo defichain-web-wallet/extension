@@ -37,7 +37,6 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
     return Container(
       width: homeCardWidth,
       height: homeCardHeight,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
       padding: const EdgeInsets.only(left: 12, top: 22, right: 12, bottom: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,

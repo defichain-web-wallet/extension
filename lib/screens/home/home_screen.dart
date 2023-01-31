@@ -8,15 +8,21 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
+import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/screens/home/widgets/transaction_history.dart';
+import 'package:defi_wallet/screens/liquidity/earn_screen_new.dart';
+import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
 import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
+import 'package:defi_wallet/widgets/home/account_balance.dart';
 import 'package:defi_wallet/widgets/home/home_card.dart';
 import 'package:defi_wallet/widgets/home/transaction_status_bar.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -43,11 +49,11 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SnackBarMixin, TickerProviderStateMixin {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   TabController? tabController;
   bool isSaveOpenTime = false;
-  GlobalKey<AccountSelectState> selectKey = GlobalKey<AccountSelectState>();
   LockHelper lockHelper = LockHelper();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
@@ -60,11 +66,12 @@ class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProvi
   double heightListEntry = 74;
   double heightAdditionalAction = 60;
   bool isShownSnackBar = false;
+  double sliverTopHeight = 0.0;
+  double targetSliverTopHeight = 76.0;
 
   tabListener() {
     HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
     homeCubit.updateTabIndex(index: tabController!.index);
-    setTabBody(tabIndex: tabController!.index);
   }
 
   setTabBody({int tabIndex = 0}) {
@@ -89,7 +96,6 @@ class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProvi
     }
     assetsTabBodyHeight =
         countAssets * heightListEntry + heightAdditionalAction;
-
 
     if (countTransactions < maxHistoryEntries) {
       historyTabBodyHeight =
@@ -138,14 +144,6 @@ class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProvi
     super.dispose();
   }
 
-  void hideOverlay() {
-    try {
-      selectKey.currentState!.hideOverlay();
-    } catch (err) {
-      log('error when try to hide overlay: $err');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
@@ -169,147 +167,263 @@ class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProvi
                     child: Loader(),
                   ),
                 );
-              } else if (state.status == AccountStatusList.success &&
-                  tokensState.status == TokensStatusList.success) {
-                isFullSizeScreen = isFullScreen;
-                setTabBody(tabIndex: tabController!.index);
-
               } else if (tokensState.status == TokensStatusList.failure) {
                 return Container(
                   child: Center(
                     child: ErrorPlaceholder(
                       message: 'API error',
-                      description: 'Please change the API on settings and try again',
+                      description:
+                          'Please change the API on settings and try again',
                     ),
                   ),
                 );
               } else {
-                return Container();
-              }
-
-              return Scaffold(
-                appBar: NewMainAppBar(
-                  isShowLogo: true,
-                ),
-                drawerScrimColor: Color(0x0f180245),
-                endDrawer: AccountDrawer(
-                  width: buttonSmallWidth,
-                ),
-                body: BlocBuilder<HomeCubit, HomeState>(
-                  builder: (context, homeState) {
-                    if (widget.snackBarMessage.isNotEmpty && !isShownSnackBar) {
-                      Future<Null>.delayed(Duration.zero, () {
-                        showSnackBar(context, title: widget.snackBarMessage);
-                      });
-                      isShownSnackBar = true;
-                    }
-                    return Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      child: Center(
-                        child: StretchBox(
-                          maxWidth: ScreenSizes.medium,
-                          child: Stack(
-                            children: [
-                              ScrollConfiguration(
-                                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                                child: ListView(
-                                  children: [
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    HomeCard(),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.only(top: 12, right: 24),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).cardColor,
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(20),
-                                          topRight: Radius.circular(20),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          TabBarHeader(
-                                            tabController: tabController,
-                                          ),
-                                          Container(
-                                            child: Row(
-                                              children: [
-                                                IconButton(
-                                                  onPressed: () {},
-                                                  icon: SvgPicture.asset(
-                                                    'assets/icons/filter_icon.svg',
-                                                    color:
-                                                    SettingsHelper.settings.theme == 'Dark'
-                                                        ? Colors.white
-                                                        : null,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: 12,
-                                                ),
-                                                SizedBox(
-                                                  width: 32,
-                                                  height: 32,
-                                                  child: NewActionButton(
-                                                    iconPath: 'assets/icons/add_black.svg',
-                                                    onPressed: () async {
-                                                      await lockHelper.provideWithLockChecker(
-                                                        context,
-                                                            () => Navigator.push(
-                                                          context,
-                                                          PageRouteBuilder(
-                                                            pageBuilder: (context, animation1,
-                                                                animation2) =>
-                                                                AddTokenScreen(),
-                                                            transitionDuration: Duration.zero,
-                                                            reverseTransitionDuration:
-                                                            Duration.zero,
+                return Scaffold(
+                  appBar: NewMainAppBar(
+                    isShowLogo: true,
+                  ),
+                  drawerScrimColor: Color(0x0f180245),
+                  endDrawer: AccountDrawer(
+                    width: buttonSmallWidth,
+                  ),
+                  body: BlocBuilder<HomeCubit, HomeState>(
+                    builder: (context, homeState) {
+                      if (widget.snackBarMessage.isNotEmpty &&
+                          !isShownSnackBar) {
+                        Future<Null>.delayed(Duration.zero, () {
+                          showSnackBar(context, title: widget.snackBarMessage);
+                        });
+                        isShownSnackBar = true;
+                      }
+                      return Container(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        child: Center(
+                          child: StretchBox(
+                            maxWidth: ScreenSizes.medium,
+                            child: Stack(
+                              children: [
+                                ScrollConfiguration(
+                                  behavior: ScrollConfiguration.of(context)
+                                      .copyWith(scrollbars: false),
+                                  child: CustomScrollView(
+                                    slivers: [
+                                      SliverAppBar(
+                                        pinned: true,
+                                        floating: false,
+                                        backgroundColor: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        elevation: 0,
+                                        actions: [Container()],
+                                        automaticallyImplyLeading: false,
+                                        toolbarHeight: 56 + 20,
+                                        expandedHeight: 266 + 30,
+                                        flexibleSpace: LayoutBuilder(
+                                          builder: (BuildContext context,
+                                              BoxConstraints constraints) {
+                                            sliverTopHeight =
+                                                constraints.biggest.height;
+                                            return SafeArea(
+                                              child: FlexibleSpaceBar(
+                                                centerTitle: true,
+                                                titlePadding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16,
+                                                        vertical: 10),
+                                                title: AnimatedOpacity(
+                                                  opacity: sliverTopHeight ==
+                                                          targetSliverTopHeight
+                                                      ? 1.0
+                                                      : 0.0,
+                                                  duration: const Duration(
+                                                      milliseconds: 200),
+                                                  child: Container(
+                                                    height: 56,
+                                                    child: Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: AccountBalance(
+                                                            asset: 'USD',
+                                                            isSmall: true,
                                                           ),
                                                         ),
-                                                      );
-                                                    },
+                                                        SizedBox(
+                                                          width: 72,
+                                                          child: FlatButton(
+                                                            title: '',
+                                                            iconPath:
+                                                                'assets/icons/earn_icon.svg',
+                                                            isSmall: true,
+                                                            callback: () {
+                                                              Navigator.push(
+                                                                context,
+                                                                PageRouteBuilder(
+                                                                  pageBuilder: (context,
+                                                                          animation1,
+                                                                          animation2) =>
+                                                                      EarnScreenNew(),
+                                                                  transitionDuration:
+                                                                      Duration
+                                                                          .zero,
+                                                                  reverseTransitionDuration:
+                                                                      Duration
+                                                                          .zero,
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        SizedBox(
+                                                          width: 72,
+                                                          child: FlatButton(
+                                                            title: '',
+                                                            iconPath:
+                                                                'assets/icons/wallet_icon.svg',
+                                                            isSmall: true,
+                                                            callback: () {
+                                                              Navigator.push(
+                                                                context,
+                                                                PageRouteBuilder(
+                                                                  pageBuilder: (context,
+                                                                          animation1,
+                                                                          animation2) =>
+                                                                      BuySellScreen(),
+                                                                  transitionDuration:
+                                                                      Duration
+                                                                          .zero,
+                                                                  reverseTransitionDuration:
+                                                                      Duration
+                                                                          .zero,
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ],
+                                                background: Container(
+                                                  height: 266,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 16,
+                                                    horizontal: 16,
+                                                  ),
+                                                  child: HomeCard(),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      SliverAppBar(
+                                        backgroundColor: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        pinned: true,
+                                        actions: [Container()],
+                                        automaticallyImplyLeading: false,
+                                        expandedHeight: 58.0,
+                                        toolbarHeight: 58,
+                                        flexibleSpace: FlexibleSpaceBar(
+                                          background: Container(
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                            child: Container(
+                                              padding: const EdgeInsets.only(
+                                                top: 12,
+                                                right: 16,
+                                                bottom: 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    Theme.of(context).cardColor,
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(20),
+                                                  topRight: Radius.circular(20),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: TabBarHeader(
+                                                      tabController:
+                                                          tabController,
+                                                      currentTabIndex:
+                                                          homeState.tabIndex,
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {},
+                                                    icon: SvgPicture.asset(
+                                                      'assets/icons/filter_icon.svg',
+                                                      color: SettingsHelper
+                                                                  .settings
+                                                                  .theme ==
+                                                              'Dark'
+                                                          ? Colors.white
+                                                          : null,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 12,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 32,
+                                                    height: 32,
+                                                    child: NewActionButton(
+                                                      iconPath:
+                                                          'assets/icons/add_black.svg',
+                                                      onPressed: () async {
+                                                        await lockHelper
+                                                            .provideWithLockChecker(
+                                                          context,
+                                                          () => Navigator.push(
+                                                            context,
+                                                            PageRouteBuilder(
+                                                              pageBuilder: (context,
+                                                                      animation1,
+                                                                      animation2) =>
+                                                                  AddTokenScreen(),
+                                                              transitionDuration:
+                                                                  Duration.zero,
+                                                              reverseTransitionDuration:
+                                                                  Duration.zero,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    if (homeState.tabIndex == 0)
-                                      SizedBox(
-                                        height: assetsTabBodyHeight,
-                                        child: TabBarBody(
-                                          tabController: tabController,
-                                          isEmptyList: isExistHistory(state),
-                                        ),
-                                      )
-                                    else
-                                      SizedBox(
-                                        height: historyTabBodyHeight,
-                                        child: TabBarBody(
-                                          tabController: tabController,
-                                          isEmptyList: isExistHistory(state),
+                                          ),
                                         ),
                                       ),
-                                  ],
+                                      if (tabController!.index == 0)
+                                        AssetList()
+                                      else
+                                        TransactionHistory(),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              if (txState is! TransactionInitialState)
-                                TransactionStatusBar(),
-                            ],
+                                if (txState is! TransactionInitialState)
+                                  TransactionStatusBar(),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              );
+                      );
+                    },
+                  ),
+                );
+              }
             },
           );
         },
@@ -334,7 +448,6 @@ class _HomeScreenState extends State<HomeScreen> with SnackBarMixin, TickerProvi
 
   updateAccountDetails(context, state) async {
     lockHelper.provideWithLockChecker(context, () async {
-      hideOverlay();
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
       if (state.status == AccountStatusList.success) {
         await accountCubit.updateAccountDetails();

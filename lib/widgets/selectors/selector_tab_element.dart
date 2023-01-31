@@ -1,7 +1,6 @@
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/common/jelly_link_text.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 
 class SelectorTabElement extends StatelessWidget {
   final String title;
@@ -31,6 +30,7 @@ class SelectorTabElement extends StatelessWidget {
           padding: EdgeInsets.only(left: isPaddingLeft ? 8 : 0),
           child: Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 JellyLinkText(
                   child: Text(

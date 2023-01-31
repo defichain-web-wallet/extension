@@ -16,8 +16,6 @@ class JellyLinkText extends StatelessWidget {
         map['begin'] = Alignment.topRight;
         map['end'] = Alignment.bottomLeft;
 
-        // linear-gradient(199.84deg, #FF00A3 0.53%, #BC00C0 100.59%);
-
         return LinearGradient(
           stops: [0.5, 100.5],
           colors: colors,

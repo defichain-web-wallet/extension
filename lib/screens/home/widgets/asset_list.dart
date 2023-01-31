@@ -6,12 +6,9 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/home/asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 
 // ignore: must_be_immutable
 class AssetList extends StatelessWidget {
@@ -46,33 +43,36 @@ class AssetList extends StatelessWidget {
           return BlocBuilder<TokensCubit, TokensState>(
               builder: (context, tokensState) {
             if (tokensState.status == TokensStatusList.success) {
-              return ListView.builder(
-                itemCount: balances.length,
-                itemBuilder: (context, index) {
-                  String coin = balances[index].token!;
-                  String tokenName = SettingsHelper.isBitcoin()
-                      ? coin
-                      : tokenHelper.getTokenWithPrefix(coin);
-                  double tokenBalance =
-                      convertFromSatoshi(balances[index].balance!);
-
-                  return Container(
-                    margin: const EdgeInsets.only(
-                      bottom: 4,
-                      left: 16,
-                      right: 16,
-                      top: 2,
-                    ),
-                    child: AssetCard(
-                      index: index,
-                      tokenBalance: tokenBalance,
-                      tokenName: tokenName,
-                      tokenCode: tokenName,
-                      tokensState: tokensState,
-                      balances: balances,
-                    ),
-                  );
-                },
+              return SliverFixedExtentList(
+                itemExtent: 64.0 + 6,
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    String coin = balances[index].token!;
+                    String tokenName = SettingsHelper.isBitcoin()
+                        ? coin
+                        : tokenHelper.getTokenWithPrefix(coin);
+                    double tokenBalance =
+                        convertFromSatoshi(balances[index].balance!);
+                    return Container(
+                      padding: const EdgeInsets.only(
+                        bottom: 4,
+                        left: 16,
+                        right: 16,
+                        top: 2,
+                      ),
+                      color: Theme.of(context).cardColor,
+                      child: AssetCard(
+                        index: index,
+                        tokenBalance: tokenBalance,
+                        tokenName: tokenName,
+                        tokenCode: tokenName,
+                        tokensState: tokensState,
+                        balances: balances,
+                      ),
+                    );
+                  },
+                  childCount: balances.length,
+                ),
               );
             } else {
               return Container();
@@ -83,18 +83,6 @@ class AssetList extends StatelessWidget {
         }
       });
     });
-  }
-
-  Widget _buildTokenIcon(BalanceModel token) {
-    if (token.isPair!) {
-      return AssetPair(pair: token.token!);
-    } else {
-      return SvgPicture.asset(
-        tokenHelper.getImageNameByTokenName(token.token!),
-        height: 42,
-        width: 42,
-      );
-    }
   }
 
   String getFormatTokenBalance(double tokenBalance) =>
