@@ -89,7 +89,7 @@ class _LockScreenState extends State<LockScreen> {
                             setState(
                                     () => isPasswordObscure = !isPasswordObscure);
                           },
-                          onSubmitted: (val) {
+                          onSaved: (val) {
                             unlockFocusNode.requestFocus();
                           },
                         ),

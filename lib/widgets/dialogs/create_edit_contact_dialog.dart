@@ -31,6 +31,8 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
   AddressesHelper addressHelper = AddressesHelper();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
+  FocusNode nameFocusNode = FocusNode();
+  FocusNode addressFocusNode = FocusNode();
   String editTitleText = 'Edit contact';
   String createTitleText = 'New contact';
   String titleContactName = 'Contact`s Name';
@@ -43,6 +45,15 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
   late String titleText;
   late double contentHeight;
   late bool isEnable;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _addressController.dispose();
+    nameFocusNode.dispose();
+    addressFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -200,6 +211,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                             Container(
                               height: 44,
                               child: TextFormField(
+                                focusNode: nameFocusNode,
                                 controller: _nameController,
                                 decoration: InputDecoration(
                                   filled: true,
@@ -222,6 +234,9 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                                       .validateAddress(_addressController.text);
                                   checkButtonStatus();
                                 },
+                                onFieldSubmitted: (val){
+                                  addressFocusNode.requestFocus();
+                                },
                               ),
                             ),
                             SizedBox(
@@ -242,6 +257,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                             Container(
                               height: 44,
                               child: TextFormField(
+                                focusNode: addressFocusNode,
                                 controller: _addressController,
                                 decoration: InputDecoration(
                                   filled: true,
@@ -263,6 +279,14 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                                   isValidAddress = await addressHelper
                                       .validateAddress(_addressController.text);
                                   checkButtonStatus();
+                                },
+                                onFieldSubmitted: (val) {
+                                  if(isEnable) {
+                                    widget.confirmCallback(
+                                      _nameController.text,
+                                      _addressController.text,
+                                    );
+                                  }
                                 },
                               ),
                             ),

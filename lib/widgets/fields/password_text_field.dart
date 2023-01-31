@@ -21,7 +21,8 @@ class PasswordTextField extends StatefulWidget {
   final Function(String text)? onChanged;
   final Function()? onPressObscure;
   final Function()? onEditComplete;
-  final Function(String value)? onSubmitted;
+  final Function(String)? onSubmitted;
+  final Function(String?)? onSaved;
   final bool autofocus;
   final bool isObscure;
   final bool isShowObscureIcon;
@@ -39,6 +40,7 @@ class PasswordTextField extends StatefulWidget {
     this.onPressObscure,
     this.onEditComplete,
     this.onSubmitted,
+    this.onSaved,
     this.autofocus = false,
     this.isObscure = false,
     this.isShowObscureIcon = false,
@@ -74,6 +76,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
             textAlignVertical: TextAlignVertical.center,
             obscureText: widget.isObscure,
             onEditingComplete: widget.onEditComplete,
+            onSaved: widget.onSaved,
             controller: widget.controller,
             decoration: InputDecoration(
               hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,

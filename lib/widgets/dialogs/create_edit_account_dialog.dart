@@ -36,7 +36,6 @@ class CreateEditAccountDialog extends StatefulWidget {
 class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
   TextEditingController _nameController = TextEditingController();
   FocusNode nameFocusNode = FocusNode();
-  FocusNode confirmFocusNode = FocusNode();
   File? _pickedImage;
   Uint8List _webImage = Uint8List(8);
   String editTitleText = 'Edit account';
@@ -47,6 +46,12 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
   late double contentHeight;
   late String titleText;
   late String subtitleText;
+
+  @override
+  void dispose() {
+    nameFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -141,7 +146,6 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                     ),
                   ),
                   NewPrimaryButton(
-                    focusNode: confirmFocusNode,
                     width: 104,
                     globalKey: globalKey,
                     callback: () async {
@@ -150,6 +154,7 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                           await _saveImageToStorage();
                         }
                         widget.callback!(_nameController.text);
+                        print('test');
                         Navigator.pop(context);
                       } else {
                         nameFocusNode.requestFocus();
@@ -356,8 +361,14 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                         ),
                                       ),
                                     ),
-                                    onFieldSubmitted: (val) {
-                                      confirmFocusNode.requestFocus();
+                                    onSaved: (val) async {
+                                      if (_nameController.text.length > 3) {
+                                        if (_pickedImage != null) {
+                                          await _saveImageToStorage();
+                                        }
+                                        widget.callback!(_nameController.text);
+                                        Navigator.pop(context);
+                                      }
                                     },
                                   ),
                                 ),

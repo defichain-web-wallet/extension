@@ -45,6 +45,9 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
   void dispose() {
     _emailController.dispose();
     _phoneController.dispose();
+    emailFocusNode.dispose();
+    phoneFocusNode.dispose();
+    confirmFocusNode.dispose();
     super.dispose();
   }
 
