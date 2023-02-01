@@ -38,6 +38,12 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> {
   FocusNode confirmFocusNode = FocusNode();
 
   @override
+  void dispose() {
+    confirmFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),

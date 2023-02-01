@@ -394,7 +394,6 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       width: buttonSmallWidth,
                                       callback: isEnableBtn()
                                           ? () async {
-                                              print('TEST');
                                               if (addressController.text !=
                                                   '') {
                                                 if (isAddNewContact) {

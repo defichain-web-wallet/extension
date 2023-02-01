@@ -154,7 +154,6 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                           await _saveImageToStorage();
                         }
                         widget.callback!(_nameController.text);
-                        print('test');
                         Navigator.pop(context);
                       } else {
                         nameFocusNode.requestFocus();

@@ -40,6 +40,8 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
   TextEditingController _nameController = TextEditingController();
   File? _pickedImage;
   Uint8List _webImage = Uint8List(8);
+  FocusNode nameFocusNode = FocusNode();
+  FocusNode confirmFocusNode = FocusNode();
 
   double boxHeight = 190;
 
@@ -115,6 +117,13 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
         reverseTransitionDuration: Duration.zero,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    nameFocusNode.dispose();
+    confirmFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -221,8 +230,17 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
                                     ),
                                     Container(
                                       child: InputField(
+                                        focusNode: nameFocusNode,
                                         controller: _nameController,
                                         hintText: 'Enter your Account`s Name',
+                                        onChanged: (val) {
+                                          setState(() {
+
+                                          });
+                                        },
+                                        onSubmited: (val) {
+                                          confirmFocusNode.requestFocus();
+                                        },
                                       ),
                                     ),
                                   ],
@@ -232,7 +250,8 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
                           ),
                         ),
                         NewPrimaryButton(
-                          callback: () => Navigator.push(
+                          focusNode: confirmFocusNode,
+                          callback: _nameController.text.length > 3 ? () => Navigator.push(
                             context,
                             PageRouteBuilder(
                               pageBuilder: (context, animation1, animation2) =>
@@ -242,7 +261,7 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
                               transitionDuration: Duration.zero,
                               reverseTransitionDuration: Duration.zero,
                             ),
-                          ),
+                          ) : null,
                           width:
                               isFullScreen ? buttonFullWidth : buttonSmallWidth,
                           title: 'Continue',

@@ -5,11 +5,17 @@ class InputField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final Widget? suffix;
+  final FocusNode? focusNode;
+  final Function(String)? onSubmited;
+  final Function(String)? onChanged;
 
   InputField({
     Key? key,
     required this.controller,
     required this.hintText,
+    this.onSubmited,
+    this.onChanged,
+    this.focusNode,
     this.suffix,
   }) : super(key: key);
 
@@ -17,6 +23,8 @@ class InputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: TextFormField(
+        onChanged: onChanged,
+        focusNode: focusNode,
         controller: controller,
         decoration: InputDecoration(
           hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
@@ -31,6 +39,7 @@ class InputField extends StatelessWidget {
         style: passwordField.apply(
           color: Theme.of(context).textTheme.headline1!.color!,
         ),
+        onFieldSubmitted: onSubmited,
       ),
     );
   }
