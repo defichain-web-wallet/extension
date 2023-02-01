@@ -8,6 +8,7 @@ import 'package:gradient_borders/gradient_borders.dart';
 class AmountField extends StatefulWidget {
   final void Function(TokensModel asset) onAssetSelect;
   final void Function(String value) onChanged;
+  final void Function(String?)? onSubmited;
   final TextEditingController controller;
   final TokensModel selectedAsset;
   final List<TokensModel> assets;
@@ -22,6 +23,7 @@ class AmountField extends StatefulWidget {
     required this.controller,
     required this.selectedAsset,
     required this.assets,
+    this.onSubmited,
     this.focusNode,
     this.available = 35.02,
     this.suffix = '\$365.50',
@@ -91,7 +93,8 @@ class _AmountFieldState extends State<AmountField> {
                   Flexible(
                     child: SizedBox(
                       height: 42,
-                      child: TextField(
+                      child: TextFormField(
+                        onFieldSubmitted: widget.onSubmited,
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(

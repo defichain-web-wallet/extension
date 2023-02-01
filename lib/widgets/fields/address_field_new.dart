@@ -12,11 +12,13 @@ class AddressFieldNew extends StatefulWidget {
   final Function(AddressBookModel contact)? getContact;
   final Function(String address)? getAddress;
   final Function(String address)? onSubmit;
+  final FocusNode? focusNode;
 
   AddressFieldNew({
     Key? key,
     required this.controller,
     required this.contact,
+    this.focusNode,
     this.onChange,
     this.clearPrefix,
     this.getContact,
@@ -53,6 +55,7 @@ class _AddressFieldNewState extends State<AddressFieldNew> {
         Container(
           width: double.infinity,
           child: TextFormField(
+            focusNode: widget.focusNode,
             onFieldSubmitted: widget.onSubmit,
             controller: widget.controller,
             onChanged: widget.onChange,

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/helpers/addresses_helper.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -33,6 +34,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
   TextEditingController _addressController = TextEditingController();
   FocusNode nameFocusNode = FocusNode();
   FocusNode addressFocusNode = FocusNode();
+  FocusNode confirmFocusNode = FocusNode();
   String editTitleText = 'Edit contact';
   String createTitleText = 'New contact';
   String titleContactName = 'Contact`s Name';
@@ -42,6 +44,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
   String subtitleText = 'Enter name and address';
   String titleDeleteContact = 'Delete contact';
   bool isValidAddress = false;
+  bool isOnlyName = false;
   late String titleText;
   late double contentHeight;
   late bool isEnable;
@@ -50,6 +53,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
   void dispose() {
     _nameController.dispose();
     _addressController.dispose();
+    confirmFocusNode.dispose();
     nameFocusNode.dispose();
     addressFocusNode.dispose();
     super.dispose();
@@ -59,6 +63,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
   void initState() {
     _nameController.text = widget.contactName;
     _addressController.text = widget.address;
+    isOnlyName = widget.address.isNotEmpty;
     contentHeight = widget.isEdit ? 336 : 299;
     titleText = widget.isEdit ? editTitleText : createTitleText;
     checkButtonStatus();
@@ -106,6 +111,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                 ),
               ),
               NewPrimaryButton(
+                focusNode: confirmFocusNode,
                 width: 104,
                 callback: isEnable
                     ? () {
@@ -234,8 +240,12 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                                       .validateAddress(_addressController.text);
                                   checkButtonStatus();
                                 },
-                                onFieldSubmitted: (val){
-                                  addressFocusNode.requestFocus();
+                                onFieldSubmitted: (val) {
+                                  if (isOnlyName) {
+                                    confirmFocusNode.requestFocus();
+                                  } else {
+                                    addressFocusNode.requestFocus();
+                                  }
                                 },
                               ),
                             ),
@@ -257,6 +267,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                             Container(
                               height: 44,
                               child: TextFormField(
+                                readOnly: isOnlyName,
                                 focusNode: addressFocusNode,
                                 controller: _addressController,
                                 decoration: InputDecoration(
@@ -281,12 +292,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                                   checkButtonStatus();
                                 },
                                 onFieldSubmitted: (val) {
-                                  if(isEnable) {
-                                    widget.confirmCallback(
-                                      _nameController.text,
-                                      _addressController.text,
-                                    );
-                                  }
+                                  confirmFocusNode.requestFocus();
                                 },
                               ),
                             ),

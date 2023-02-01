@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
@@ -39,6 +40,9 @@ class _SendScreenNewState extends State<SendScreenNew>
   TextEditingController assetController = TextEditingController(text: '0');
   AddressBookModel contact = AddressBookModel();
   FocusNode amountFocusNode = FocusNode();
+  FocusNode addressFocusNode = FocusNode();
+  FocusNode confirmFocusNode = FocusNode();
+  AddressesHelper addressesHelper = AddressesHelper();
   TokensModel? currentAsset;
   String suffixText = '';
   String? balanceInUsd;
@@ -46,6 +50,7 @@ class _SendScreenNewState extends State<SendScreenNew>
   String subtitleText = 'Please enter the recipient and amount';
   bool isAddNewContact = false;
   bool isShowCheckbox = false;
+  bool isValidAddress = false;
   int iterator = 0;
 
   getTokensList(accountState, tokensState) {
@@ -87,6 +92,30 @@ class _SendScreenNewState extends State<SendScreenNew>
     } catch (err) {
       return '0.00';
     }
+  }
+
+  addressValidation() async {
+    if (SettingsHelper.isBitcoin()) {
+      isValidAddress =
+          await addressesHelper.validateBtcAddress(addressController.text);
+    } else {
+      isValidAddress =
+          await addressesHelper.validateAddress(addressController.text);
+    }
+  }
+
+  bool isEnableBtn() {
+    return (isValidAddress || contact.name != null) &&
+        double.tryParse(assetController.text) != 0 &&
+        assetController.text != '';
+  }
+
+  @override
+  void dispose() {
+    amountFocusNode.dispose();
+    addressFocusNode.dispose();
+    confirmFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -215,6 +244,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       height: 24,
                                     ),
                                     AddressFieldNew(
+                                      focusNode: addressFocusNode,
                                       onSubmit: (val) {
                                         amountFocusNode.requestFocus();
                                       },
@@ -227,6 +257,11 @@ class _SendScreenNewState extends State<SendScreenNew>
                                         if (val == '') {
                                           setState(() {
                                             isAddNewContact = false;
+                                            addressValidation();
+                                          });
+                                        } else {
+                                          setState(() {
+                                            addressValidation();
                                           });
                                         }
                                       },
@@ -266,7 +301,8 @@ class _SendScreenNewState extends State<SendScreenNew>
                                           balanceInUsd = getUsdBalance(context);
                                         });
                                       },
-                                      isDisabledSelector: SettingsHelper.isBitcoin(),
+                                      isDisabledSelector:
+                                          SettingsHelper.isBitcoin(),
                                       suffix: balanceInUsd ??
                                           getUsdBalance(context),
                                       available: getAvailableBalance(
@@ -275,6 +311,9 @@ class _SendScreenNewState extends State<SendScreenNew>
                                         setState(() {
                                           currentAsset = t;
                                         });
+                                      },
+                                      onSubmited: (val) {
+                                        confirmFocusNode.requestFocus();
                                       },
                                       controller: assetController,
                                       selectedAsset: currentAsset!,
@@ -351,99 +390,118 @@ class _SendScreenNewState extends State<SendScreenNew>
                                         height: 18.5,
                                       ),
                                     NewPrimaryButton(
+                                      focusNode: confirmFocusNode,
                                       width: buttonSmallWidth,
-                                      callback: () {
-                                        if (addressController.text != '') {
-                                          if (isAddNewContact) {
-                                            showDialog(
-                                              barrierColor: Color(0x0f180245),
-                                              barrierDismissible: false,
-                                              context: context,
-                                              builder:
-                                                  (BuildContext dialogContext) {
-                                                return CreateEditContactDialog(
-                                                  address:
-                                                      addressController.text,
-                                                  isEdit: false,
-                                                  confirmCallback:
-                                                      (name, address) {
-                                                    addressBookCubit.addAddress(
-                                                      AddressBookModel(
-                                                          name: name,
-                                                          address: address,
-                                                          network:
-                                                              currentNetworkName()),
-                                                    );
-                                                    Navigator.push(
-                                                      context,
-                                                      PageRouteBuilder(
-                                                        pageBuilder: (context,
-                                                                animation1,
-                                                                animation2) =>
-                                                            SendSummaryScreen(
-                                                          address:
-                                                            addressController.text,
-                                                          isAfterAddContact:
-                                                              true,
-                                                          amount: double.parse(
-                                                              assetController
-                                                                  .text),
-                                                          token: currentAsset!,
-                                                          fee: bitcoinState.activeFee,
-                                                        ),
-                                                        transitionDuration:
-                                                            Duration.zero,
-                                                        reverseTransitionDuration:
-                                                            Duration.zero,
+                                      callback: isEnableBtn()
+                                          ? () async {
+                                              print('TEST');
+                                              if (addressController.text !=
+                                                  '') {
+                                                if (isAddNewContact) {
+                                                  showDialog(
+                                                    barrierColor:
+                                                        Color(0x0f180245),
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder: (BuildContext
+                                                        dialogContext) {
+                                                      return CreateEditContactDialog(
+                                                        address:
+                                                            addressController
+                                                                .text,
+                                                        isEdit: false,
+                                                        confirmCallback:
+                                                            (name, address) {
+                                                          addressBookCubit
+                                                              .addAddress(
+                                                            AddressBookModel(
+                                                                name: name,
+                                                                address:
+                                                                    address,
+                                                                network:
+                                                                    currentNetworkName()),
+                                                          );
+                                                          Navigator.push(
+                                                            context,
+                                                            PageRouteBuilder(
+                                                              pageBuilder: (context,
+                                                                      animation1,
+                                                                      animation2) =>
+                                                                  SendSummaryScreen(
+                                                                address:
+                                                                    addressController
+                                                                        .text,
+                                                                isAfterAddContact:
+                                                                    true,
+                                                                amount: double.parse(
+                                                                    assetController
+                                                                        .text),
+                                                                token:
+                                                                    currentAsset!,
+                                                                fee: bitcoinState
+                                                                    .activeFee,
+                                                              ),
+                                                              transitionDuration:
+                                                                  Duration.zero,
+                                                              reverseTransitionDuration:
+                                                                  Duration.zero,
+                                                            ),
+                                                          );
+                                                          Navigator.pop(
+                                                              dialogContext);
+                                                        },
+                                                      );
+                                                    },
+                                                  );
+                                                } else {
+                                                  Navigator.push(
+                                                    context,
+                                                    PageRouteBuilder(
+                                                      pageBuilder: (context,
+                                                              animation1,
+                                                              animation2) =>
+                                                          SendSummaryScreen(
+                                                        address:
+                                                            addressController
+                                                                .text,
+                                                        amount: double.parse(
+                                                            assetController
+                                                                .text),
+                                                        token: currentAsset!,
+                                                        fee: bitcoinState
+                                                            .activeFee,
                                                       ),
-                                                    );
-                                                    Navigator.pop(dialogContext);
-                                                  },
+                                                      transitionDuration:
+                                                          Duration.zero,
+                                                      reverseTransitionDuration:
+                                                          Duration.zero,
+                                                    ),
+                                                  );
+                                                }
+                                              } else if (contact.name != null) {
+                                                Navigator.push(
+                                                  context,
+                                                  PageRouteBuilder(
+                                                    pageBuilder: (context,
+                                                            animation1,
+                                                            animation2) =>
+                                                        SendSummaryScreen(
+                                                      amount: double.parse(
+                                                          assetController.text),
+                                                      token: currentAsset!,
+                                                      contact: contact,
+                                                      fee: bitcoinState
+                                                          .activeFee,
+                                                    ),
+                                                    transitionDuration:
+                                                        Duration.zero,
+                                                    reverseTransitionDuration:
+                                                        Duration.zero,
+                                                  ),
                                                 );
-                                              },
-                                            );
-                                          } else {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    SendSummaryScreen(
-                                                  address:
-                                                      addressController.text,
-                                                  amount: double.parse(
-                                                      assetController.text),
-                                                  token: currentAsset!,
-                                                  fee: bitcoinState.activeFee,
-                                                ),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
-                                          }
-                                        } else if (contact.name != null) {
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation1,
-                                                      animation2) =>
-                                                  SendSummaryScreen(
-                                                amount: double.parse(
-                                                    assetController.text),
-                                                token: currentAsset!,
-                                                contact: contact,
-                                                fee: bitcoinState.activeFee,
-                                              ),
-                                              transitionDuration: Duration.zero,
-                                              reverseTransitionDuration:
-                                                  Duration.zero,
-                                            ),
-                                          );
-                                        }
-                                      },
+                                              }
+                                            }
+                                          : null,
                                       title: 'Continue',
                                     ),
                                   ],

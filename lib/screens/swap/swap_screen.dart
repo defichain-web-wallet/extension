@@ -73,6 +73,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
   TestPoolSwapModel dexModel = TestPoolSwapModel();
   FocusNode focusFrom = new FocusNode();
   FocusNode focusTo = new FocusNode();
+  FocusNode confirmFocusNode = new FocusNode();
   FocusModel focusAmountFromModel = new FocusModel();
   FocusModel focusAmountToModel = new FocusModel();
   Timer? debounce;
@@ -108,6 +109,14 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
   TestPoolSwapModel? dexRate;
 
   List<String> slippageList = ['Custom', '0.5', '1', '3'];
+
+  @override
+  void dispose() {
+    focusFrom.dispose();
+    focusTo.dispose();
+    confirmFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -435,6 +444,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                           tokensState,
                         );
                       },
+                      onSubmited: (val){
+                        confirmFocusNode.requestFocus();
+                      },
                       controller: amountFromController,
                       selectedAsset: assetFrom,
                       assets: assets,
@@ -574,6 +586,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                           dexCubit,
                           tokensState,
                         );
+                      },
+                      onSubmited: (val){
+                        confirmFocusNode.requestFocus();
                       },
                       controller: amountToController,
                       selectedAsset: assetTo!,
@@ -924,6 +939,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                         );
                       } else {
                         return NewPrimaryButton(
+                          focusNode: confirmFocusNode,
                           titleWidget: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
