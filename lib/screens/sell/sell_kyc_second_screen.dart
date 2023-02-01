@@ -394,7 +394,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                           ),
                                         );
                                       } catch (err) {
-                                        bottomSnackBar(
+                                        showSnackBar(
                                           context,
                                           title: err.toString().replaceAll('"', ''),
                                           color: AppColors.txStatusError.withOpacity(0.1),
