@@ -24,6 +24,7 @@ import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/home/account_balance.dart';
 import 'package:defi_wallet/widgets/home/home_card.dart';
+import 'package:defi_wallet/widgets/home/home_title.dart';
 import 'package:defi_wallet/widgets/home/transaction_status_bar.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -229,88 +230,10 @@ class _HomeScreenState extends State<HomeScreen>
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 16,
                                                         vertical: 10),
-                                                title: sliverTopHeight ==
-                                                        targetSliverTopHeight
-                                                    ? AnimatedOpacity(
-                                                        opacity: sliverTopHeight ==
-                                                                targetSliverTopHeight
-                                                            ? 1.0
-                                                            : 0.0,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    200),
-                                                        child: Container(
-                                                          height: 56,
-                                                          child: Row(
-                                                            children: [
-                                                              Expanded(
-                                                                child:
-                                                                    AccountBalance(
-                                                                  asset: 'USD',
-                                                                  isSmall: true,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 72,
-                                                                child:
-                                                                    FlatButton(
-                                                                  title: '',
-                                                                  iconPath:
-                                                                      'assets/icons/earn_icon.svg',
-                                                                  isSmall: true,
-                                                                  callback: () {
-                                                                    Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      PageRouteBuilder(
-                                                                        pageBuilder: (context,
-                                                                                animation1,
-                                                                                animation2) =>
-                                                                            EarnScreenNew(),
-                                                                        transitionDuration:
-                                                                            Duration.zero,
-                                                                        reverseTransitionDuration:
-                                                                            Duration.zero,
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 8,
-                                                              ),
-                                                              SizedBox(
-                                                                width: 72,
-                                                                child:
-                                                                    FlatButton(
-                                                                  title: '',
-                                                                  iconPath:
-                                                                      'assets/icons/wallet_icon.svg',
-                                                                  isSmall: true,
-                                                                  callback: () {
-                                                                    Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      PageRouteBuilder(
-                                                                        pageBuilder: (context,
-                                                                                animation1,
-                                                                                animation2) =>
-                                                                            BuySellScreen(),
-                                                                        transitionDuration:
-                                                                            Duration.zero,
-                                                                        reverseTransitionDuration:
-                                                                            Duration.zero,
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : null,
+                                                title: HomeTitle(
+                                                  sliverTopHeight: sliverTopHeight,
+                                                  targetSliverTopHeight: targetSliverTopHeight,
+                                                ),
                                                 background: Container(
                                                   height: 266,
                                                   padding: const EdgeInsets
