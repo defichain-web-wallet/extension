@@ -23,6 +23,7 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -341,102 +342,109 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      NewPrimaryButton(
+                                      SizedBox(
                                         width: buttonSmallWidth,
-                                        callback: () async {
-                                          TransactionCubit transactionCubit =
-                                              BlocProvider.of<TransactionCubit>(
-                                                  context);
-                                          lockHelper.provideWithLockChecker(
-                                              context, () async {
-                                            if (transactionCubit.state
-                                                is TransactionLoadingState) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    'Wait for the previous transaction to complete',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline5,
-                                                  ),
-                                                  backgroundColor:
-                                                      Theme.of(context)
-                                                          .snackBarTheme
-                                                          .backgroundColor,
-                                                ),
-                                              );
-                                              return;
-                                            }
-                                            bool isEnough =
-                                                isEnoughBalance(accountState);
-                                            hideOverlay();
-                                            if (_formKey.currentState!
-                                                .validate()) {
-                                              if (isEnough) {
-                                                showDialog(
-                                                  barrierColor:
-                                                      Color(0x0f180245),
-                                                  barrierDismissible: false,
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context1) {
-                                                    return PassConfirmDialog(
-                                                        onSubmit:
-                                                            (password) async {
-
-                                                      await _submitSell(
-                                                        accountState,
-                                                        tokensState,
-                                                        fiatState,
-                                                        password,
-                                                      );
-                                                    });
-                                                  },
-                                                );
-                                              } else {
-                                                if (double.parse(
-                                                        amountController.text
-                                                            .replaceAll(
-                                                                ',', '.')) ==
-                                                    0) {
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        'Amount is empty',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline5,
-                                                      ),
-                                                      backgroundColor:
-                                                          Theme.of(context)
-                                                              .snackBarTheme
-                                                              .backgroundColor,
+                                        child: PendingButton(
+                                          'Sell',
+                                          callback: (parent) async {
+                                            parent.emitPending(true);
+                                            TransactionCubit transactionCubit =
+                                                BlocProvider.of<TransactionCubit>(
+                                                    context);
+                                            lockHelper.provideWithLockChecker(
+                                                context, () async {
+                                              if (transactionCubit.state
+                                                  is TransactionLoadingState) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Wait for the previous transaction to complete',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline5,
                                                     ),
+                                                    backgroundColor:
+                                                        Theme.of(context)
+                                                            .snackBarTheme
+                                                            .backgroundColor,
+                                                  ),
+                                                );
+                                                return;
+                                              }
+                                              bool isEnough =
+                                                  isEnoughBalance(accountState);
+                                              hideOverlay();
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                if (isEnough) {
+                                                  showDialog(
+                                                    barrierColor:
+                                                        Color(0x0f180245),
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context1) {
+                                                      return PassConfirmDialog(
+                                                        onCancel: () {
+                                                          parent.emitPending(false);
+                                                        },
+                                                          onSubmit:
+                                                              (password) async {
+
+                                                        await _submitSell(
+                                                          accountState,
+                                                          tokensState,
+                                                          fiatState,
+                                                          password,
+                                                        );
+                                                        parent.emitPending(false);
+                                                      });
+                                                    },
                                                   );
                                                 } else {
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        'Insufficient funds',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline5,
+                                                  if (double.parse(
+                                                          amountController.text
+                                                              .replaceAll(
+                                                                  ',', '.')) ==
+                                                      0) {
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          'Amount is empty',
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .headline5,
+                                                        ),
+                                                        backgroundColor:
+                                                            Theme.of(context)
+                                                                .snackBarTheme
+                                                                .backgroundColor,
                                                       ),
-                                                      backgroundColor:
-                                                          Theme.of(context)
-                                                              .snackBarTheme
-                                                              .backgroundColor,
-                                                    ),
-                                                  );
+                                                    );
+                                                  } else {
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          'Insufficient funds',
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .headline5,
+                                                        ),
+                                                        backgroundColor:
+                                                            Theme.of(context)
+                                                                .snackBarTheme
+                                                                .backgroundColor,
+                                                      ),
+                                                    );
+                                                  }
                                                 }
                                               }
-                                            }
-                                          });
-                                        },
-                                        title: 'Sell',
+                                            });
+                                          },
+                                        ),
                                       ),
                                     ],
                                   ),
