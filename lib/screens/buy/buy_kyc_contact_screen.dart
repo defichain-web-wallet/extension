@@ -66,7 +66,7 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
                 }
                 if (fiatState.status == FiatStatusList.loading) {
                   return Loader();
-                } else if (fiatState.status == FiatStatusList.failure) {
+                } else if (fiatState.status == FiatStatusList.expired) {
                   Future.microtask(() => Navigator.pushReplacement(
                       context,
                       PageRouteBuilder(

@@ -49,8 +49,8 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-        fiatCubit.loadCountryList();
+        // FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+        // fiatCubit.loadCountryList();
         return BlocBuilder<FiatCubit, FiatState>(
           builder: (BuildContext context, fiatState) {
             if (fiatState.email != null) {
@@ -61,7 +61,7 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
             }
             if (fiatState.status == FiatStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.failure) {
+            } else if (fiatState.status == FiatStatusList.expired) {
               Future.microtask(() => Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(

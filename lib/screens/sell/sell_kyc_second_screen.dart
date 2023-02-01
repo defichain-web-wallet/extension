@@ -1,6 +1,7 @@
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_third_screen.dart';
@@ -24,7 +25,7 @@ class SellKycSecondScreen extends StatefulWidget {
 }
 
 class _SellKycSecondScreenState extends State<SellKycSecondScreen>
-    with ThemeMixin {
+    with ThemeMixin, SnackBarMixin {
   final _formKey = GlobalKey<FormState>();
   final _streetAddressController = TextEditingController();
   final _cityController = TextEditingController();
@@ -59,7 +60,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
             }
             if (fiatState.status == FiatStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.failure) {
+            } else if (fiatState.status == FiatStatusList.expired) {
               Future.microtask(() =>
                   Navigator.pushReplacement(
                       context,
@@ -202,7 +203,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                         .spaceBetween,
                                                     children: [
                                                       Text(
-                                                        'Select country',
+                                                        selectedCountry['name'],
                                                         style: Theme
                                                             .of(context)
                                                             .textTheme
@@ -210,12 +211,6 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                             .copyWith(
                                                           fontWeight: FontWeight
                                                               .w600,
-                                                          color: Theme
-                                                              .of(context)
-                                                              .textTheme
-                                                              .headline6!
-                                                              .color!
-                                                              .withOpacity(0.3),
                                                         ),
                                                       ),
                                                       RotationTransition(
@@ -380,13 +375,14 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                     BlocProvider.of<FiatCubit>(context);
                                     fiatCubit.setCountry(selectedCountry);
                                     if (_formKey.currentState!.validate()) {
-                                      await fiatCubit.setAddress(
-                                        _streetAddressController.text,
-                                        _cityController.text,
-                                        _zipCodeController.text,
-                                        fiatState.accessToken!,
-                                      );
-                                      Navigator.push(
+                                      try {
+                                        await fiatCubit.setAddress(
+                                          _streetAddressController.text,
+                                          _cityController.text,
+                                          _zipCodeController.text,
+                                          fiatState.accessToken!,
+                                        );
+                                        Navigator.push(
                                           context,
                                           PageRouteBuilder(
                                             pageBuilder: (context, animation1,
@@ -395,7 +391,19 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                             transitionDuration: Duration.zero,
                                             reverseTransitionDuration:
                                             Duration.zero,
-                                          ));
+                                          ),
+                                        );
+                                      } catch (err) {
+                                        bottomSnackBar(
+                                          context,
+                                          title: err.toString().replaceAll('"', ''),
+                                          color: AppColors.txStatusError.withOpacity(0.1),
+                                          prefix: Icon(
+                                            Icons.close,
+                                            color: AppColors.txStatusError,
+                                          ),
+                                        );
+                                      }
                                     }
                                   },
                                   title: 'Next',

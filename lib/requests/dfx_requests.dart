@@ -259,7 +259,14 @@ class DfxRequests {
 
       final response = await http.post(url, headers: headers, body: body);
 
-    } catch (_) {
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        var errorMessage = jsonDecode(response.body);
+        throw Error.safeToString(errorMessage['message'] is List
+            ? errorMessage['message'][0]
+            : errorMessage['message']);
+      }
+    } catch (err) {
+      throw err;
     }
   }
 
@@ -327,8 +334,11 @@ class DfxRequests {
       final body = jsonEncode(kyc.toJson());
 
       final response = await http.post(url, headers: headers, body: body);
-    } catch (_) {
-      print(_);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Error.safeToString(jsonDecode(response.body)['message']);
+      }
+    } catch (err) {
+      throw err;
     }
   }
 
@@ -377,11 +387,10 @@ class DfxRequests {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
-        if (response.statusCode == 409) {
-          throw Error.safeToString('Iban already exist');
-        } else {
-          throw Error.safeToString('Other error');
-        }
+        var errorMessage = jsonDecode(response.body);
+        throw Error.safeToString(errorMessage['message'] is List
+            ? errorMessage['message'][0]
+            : errorMessage['message']);
       }
     } catch (err) {
       throw err;

@@ -6,6 +6,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
@@ -46,7 +47,7 @@ class Selling extends StatefulWidget {
   _SellingState createState() => _SellingState();
 }
 
-class _SellingState extends State<Selling> with ThemeMixin {
+class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
   final TextEditingController amountController =
       TextEditingController(text: '0');
   final TextEditingController _ibanController = TextEditingController();
@@ -96,7 +97,7 @@ class _SellingState extends State<Selling> with ThemeMixin {
                   builder: (BuildContext context, fiatState) {
                     if (fiatState.status == FiatStatusList.loading) {
                       return Loader();
-                    } else if (fiatState.status == FiatStatusList.failure) {
+                    } else if (fiatState.status == FiatStatusList.expired) {
                       Future.microtask(() => Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
@@ -111,7 +112,7 @@ class _SellingState extends State<Selling> with ThemeMixin {
                           getTokensList(accountState, tokensState).first;
                       IbanModel? currentIban;
                       if (iterator == 0) {
-                        selectedFiat = fiatState.fiatList![0];
+                        selectedFiat = fiatState.sellableFiatList![0];
                         accountState.activeAccount!.balanceList!.forEach((el) {
                           try {
                             var assetList = fiatState.assets!.where((element) =>
@@ -232,7 +233,7 @@ class _SellingState extends State<Selling> with ThemeMixin {
                                             height: 6,
                                           ),
                                           CurrencySelector(
-                                            currencies: fiatState.fiatList!,
+                                            currencies: fiatState.sellableFiatList!,
                                             selectedCurrency: selectedFiat,
                                             onSelect: (selected) {
                                               setState(() {
@@ -514,13 +515,13 @@ class _SellingState extends State<Selling> with ThemeMixin {
       await _sendTransaction(context, tokensState, assetFrom,
           accountState.activeAccount!, address, amount, password);
     } catch (err) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            err.toString(),
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+      showSnackBar(
+        context,
+        title: err.toString().replaceAll('"', ''),
+        color: AppColors.txStatusError.withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
         ),
       );
     }

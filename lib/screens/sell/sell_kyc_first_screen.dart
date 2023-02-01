@@ -63,7 +63,7 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
             }
             if (fiatState.status == FiatStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.failure) {
+            } else if (fiatState.status == FiatStatusList.expired) {
               Future.microtask(() => Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(

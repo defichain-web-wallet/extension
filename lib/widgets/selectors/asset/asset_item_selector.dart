@@ -81,11 +81,13 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
               ),
               Container(
                 padding: const EdgeInsets.only(right: 10),
-                child: Text(
-                  widget.assetCode,
-                  style: Theme.of(context).textTheme.headline5!.copyWith(
-                        fontSize: 16,
-                      ),
+                child: TickerText(
+                  child: Text(
+                    widget.assetCode,
+                    style: Theme.of(context).textTheme.headline5!.copyWith(
+                          fontSize: 16,
+                        ),
+                  ),
                 ),
               ),
               Container(
