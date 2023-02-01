@@ -511,8 +511,9 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
       } catch (_) {
         print(_);
       }
-      String iban =
-          widget.isNewIban ? _ibanController.text : fiatState.activeIban!.iban!;
+      String iban = _ibanController.text.isNotEmpty
+          ? _ibanController.text
+          : fiatState.activeIban!.iban!;
       if (foundedIban == null || widget.isNewIban) {
         Map sellDetails =
             await dfxRequests.sell(iban, selectedFiat, fiatState.accessToken!);
