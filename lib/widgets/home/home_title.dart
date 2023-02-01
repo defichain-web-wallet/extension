@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 class HomeTitle extends StatelessWidget {
   final double sliverTopHeight;
   final double targetSliverTopHeight;
+  final String activeAsset;
 
   const HomeTitle({
     Key? key,
     required this.sliverTopHeight,
     required this.targetSliverTopHeight,
+    required this.activeAsset,
   }) : super(key: key);
 
 
@@ -36,7 +38,7 @@ class HomeTitle extends StatelessWidget {
             Expanded(
               child:
               AccountBalance(
-                asset: 'USD',
+                asset: activeAsset,
                 isSmall: true,
               ),
             ),

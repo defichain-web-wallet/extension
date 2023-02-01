@@ -75,6 +75,11 @@ class _HomeScreenState extends State<HomeScreen>
     homeCubit.updateTabIndex(index: tabController!.index);
   }
 
+  assetListener(String asset) {
+    HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
+    homeCubit.updateActiveAsset(asset: asset);
+  }
+
   setTabBody({int tabIndex = 0}) {
     AccountState accountState = BlocProvider.of<AccountCubit>(context).state;
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
@@ -233,6 +238,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                 title: HomeTitle(
                                                   sliverTopHeight: sliverTopHeight,
                                                   targetSliverTopHeight: targetSliverTopHeight,
+                                                  activeAsset: homeState.activeAsset,
                                                 ),
                                                 background: Container(
                                                   height: 266,
@@ -241,7 +247,10 @@ class _HomeScreenState extends State<HomeScreen>
                                                     vertical: 16,
                                                     horizontal: 16,
                                                   ),
-                                                  child: HomeCard(),
+                                                  child: HomeCard(
+                                                    activeAsset: homeState.activeAsset,
+                                                    onAssetSelect: assetListener
+                                                  ),
                                                 ),
                                               ),
                                             );

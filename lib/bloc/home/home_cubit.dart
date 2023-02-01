@@ -23,4 +23,10 @@ class HomeCubit extends Cubit<HomeState> {
       tabIndex: index,
     ));
   }
+
+  updateActiveAsset({String asset = 'USD'}) {
+    emit(state.copyWith(
+      activeAsset: asset
+    ));
+  }
 }

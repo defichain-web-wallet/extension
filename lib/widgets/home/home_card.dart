@@ -14,7 +14,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeCard extends StatefulWidget {
-  const HomeCard({Key? key}) : super(key: key);
+  final String activeAsset;
+  final Function(String) onAssetSelect;
+
+  const HomeCard({
+    Key? key,
+    required this.activeAsset,
+    required this.onAssetSelect,
+  }) : super(key: key);
 
   @override
   State<HomeCard> createState() => _HomeCardState();
@@ -24,7 +31,6 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
   static const double homeCardWidth = 328;
   static const double homeCardHeight = 266;
   List<String> items = <String>['USD', 'EUR', 'BTC'];
-  String activeAsset = 'USD';
   String swapTutorialStatus = 'show';
 
   @override
@@ -52,12 +58,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
               height: 21,
               child: AppSelector(
                 items: items,
-                onSelect: (String name) {
-                  print(name);
-                  setState(() {
-                    activeAsset = name;
-                  });
-                },
+                onSelect: widget.onAssetSelect,
               ),
             ),
             SizedBox(
@@ -66,7 +67,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
             SizedBox(
               height: 56,
               child: AccountBalance(
-                asset: activeAsset,
+                asset: widget.activeAsset,
               ),
             ),
             SizedBox(
