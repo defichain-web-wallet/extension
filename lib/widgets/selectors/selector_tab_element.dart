@@ -1,9 +1,9 @@
 import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:defi_wallet/widgets/common/jelly_link_text.dart';
 import 'package:flutter/material.dart';
 
 class SelectorTabElement extends StatelessWidget {
   final String title;
+  final bool isColoredTitle;
   final bool isSelect;
   final bool isShownTestnet;
   final Function callback;
@@ -15,6 +15,7 @@ class SelectorTabElement extends StatelessWidget {
     required this.title,
     required this.callback,
     this.indicatorWidth,
+    this.isColoredTitle = false,
     this.isSelect = false,
     this.isShownTestnet = true,
     this.isPaddingLeft = false,
@@ -32,23 +33,27 @@ class SelectorTabElement extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                JellyLinkText(
-                  child: Text(
-                    title,
-                    style: isSelect
-                        ? headline5.copyWith(
-                            fontSize: 12,
-                            color: AppColors.pinkColor,
-                          )
-                        : headline5.copyWith(
-                            fontSize: 12,
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .color!
-                                .withOpacity(0.3),
-                          ),
-                  ),
+                Text(
+                  title,
+                  style: isSelect
+                      ? isColoredTitle
+                          ? headline5.copyWith(
+                              fontSize: 12,
+                              color: AppColors.pinkColor,
+                            )
+                          : headline5.copyWith(
+                              fontSize: 12,
+                              color:
+                                  Theme.of(context).textTheme.headline5!.color,
+                            )
+                      : headline5.copyWith(
+                          fontSize: 12,
+                          color: Theme.of(context)
+                              .textTheme
+                              .headline5!
+                              .color!
+                              .withOpacity(0.3),
+                        ),
                 ),
                 Container(
                   width: indicatorWidth ?? 20,
