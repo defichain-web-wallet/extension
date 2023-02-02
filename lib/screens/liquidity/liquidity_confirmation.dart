@@ -581,6 +581,13 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
             tokens: tokensState.tokens);
       }
 
+      if (!txError.isError) {
+        TransactionCubit transactionCubit =
+          BlocProvider.of<TransactionCubit>(context);
+
+        transactionCubit.setOngoingTransaction(txError.txid!);
+      }
+
       showDialog(
         barrierColor: Color(0x0f180245),
         barrierDismissible: false,
