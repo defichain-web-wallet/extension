@@ -1,32 +1,25 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:defi_wallet/models/focus_model.dart';
-import 'package:defi_wallet/widgets/fields/decoration_text_field.dart';
 
 class SelectPool extends StatefulWidget {
   final AssetPairModel assetPair;
@@ -45,8 +38,6 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
       TextEditingController(text: '0');
   FocusNode _focusBase = new FocusNode();
   FocusNode _focusQuote = new FocusNode();
-  FocusModel _baseAmountFocusModel = new FocusModel();
-  FocusModel _quoteAmountFocusModel = new FocusModel();
   TokensHelper tokenHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
   List<String> tokensForSwap = [];
@@ -65,6 +56,8 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
   double amountUSD = 0;
   bool isErrorBalance = false;
   bool isEnoughBalance = false;
+  bool isNotEmptyAmountQuote = false;
+  bool isNotEmptyAmountBase = false;
   int balanceFrom = 0;
   int balanceTo = 0;
   double toolbarHeight = 55;
@@ -76,8 +69,33 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
   String rateBalanceToUsd = '';
 
   @override
+  void dispose() {
+    _amountBaseController.dispose();
+    _amountQuoteController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
+    _amountBaseController.addListener(() {
+      if (_amountBaseController.text == '') {
+        setState(() {
+          isNotEmptyAmountBase = false;
+        });
+      } else {
+        isNotEmptyAmountBase = true;
+      }
+    });
+    _amountQuoteController.addListener(() {
+      if (_amountQuoteController.text == '') {
+        setState(() {
+          isNotEmptyAmountQuote = false;
+        });
+      } else {
+        isNotEmptyAmountQuote = true;
+      }
+    });
     TokensState tokensState = BlocProvider.of<TokensCubit>(context).state;
     _focusBase.addListener(onFocusBaseField);
     _focusQuote.addListener(onFocusQuoteField);
@@ -209,16 +227,16 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
                                 setState(() {
                                   amountFromUSD = amountFrom;
                                   amountToUSD = amountFromUSD;
+                                  onChanged(
+                                    _amountQuoteController,
+                                    value,
+                                    widget.assetPair.reserveBDivReserveA!,
+                                    tokensState,
+                                  );
                                 });
                               } catch (err) {
                                 print(err);
                               }
-                              onChanged(
-                                _amountQuoteController,
-                                value,
-                                widget.assetPair.reserveBDivReserveA!,
-                                tokensState,
-                              );
                             },
                             controller: _amountBaseController,
                             selectedAsset: TokensModel(
@@ -246,16 +264,16 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
                                 setState(() {
                                   amountToUSD = amountTo;
                                   amountFromUSD = amountToUSD;
+                                  onChanged(
+                                    _amountBaseController,
+                                    value,
+                                    widget.assetPair.reserveADivReserveB!,
+                                    tokensState,
+                                  );
                                 });
                               } catch (err) {
                                 print(err);
                               }
-                              onChanged(
-                                _amountBaseController,
-                                value,
-                                widget.assetPair.reserveADivReserveB!,
-                                tokensState,
-                              );
                             },
                             controller: _amountQuoteController,
                             selectedAsset: TokensModel(
@@ -449,39 +467,43 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
                             width: 104,
                             child: NewPrimaryButton(
                               title: 'Add',
-                              callback: isErrorBalance || isDisableSubmit()
-                                  ? () {
-                                      setState(() {
-                                        isEnoughBalance = true;
-                                      });
-                                    }
-                                  : () => Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              LiquidityConfirmation(
-                                                  assetPair: widget.assetPair,
-                                                  baseAmount: double.parse(
-                                                      _amountBaseController.text
-                                                          .replaceAll(
-                                                              ',', '.')),
-                                                  quoteAmount: double.parse(
-                                                      _amountQuoteController
-                                                          .text
-                                                          .replaceAll(
-                                                              ',', '.')),
-                                                  shareOfPool: shareOfPool,
-                                                  amountUSD: amountUSD,
-                                                  balanceUSD: balanceUSD,
-                                                  balanceA: balanceA,
-                                                  balanceB: balanceB,
-                                                  amount: amount),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
-                                        ),
-                                      ),
+                              callback: isValidAmount()
+                                  ? isErrorBalance || isDisableSubmit()
+                                      ? () {
+                                          setState(() {
+                                            isEnoughBalance = true;
+                                          });
+                                        }
+                                      : () => Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation1,
+                                                      animation2) =>
+                                                  LiquidityConfirmation(
+                                                      assetPair:
+                                                          widget.assetPair,
+                                                      baseAmount: double.parse(
+                                                          _amountBaseController
+                                                              .text
+                                                              .replaceAll(
+                                                                  ',', '.')),
+                                                      quoteAmount: double.parse(
+                                                          _amountQuoteController
+                                                              .text
+                                                              .replaceAll(
+                                                                  ',', '.')),
+                                                      shareOfPool: shareOfPool,
+                                                      amountUSD: amountUSD,
+                                                      balanceUSD: balanceUSD,
+                                                      balanceA: balanceA,
+                                                      balanceB: balanceB,
+                                                      amount: amount),
+                                              transitionDuration: Duration.zero,
+                                              reverseTransitionDuration:
+                                                  Duration.zero,
+                                            ),
+                                          )
+                                  : null,
                             ),
                           ),
                         ],
@@ -625,6 +647,7 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
 
   onChanged(TextEditingController controller, String value, double reserve,
       tokensState) {
+    print(controller.text);
     try {
       double baseAmount = double.parse(value.replaceAll(',', '.'));
       if (!(baseAmount * reserve).isNaN) {
@@ -635,5 +658,16 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
     } catch (_) {
       controller.text = '0';
     }
+  }
+
+  bool isValidAmount() {
+    return double.tryParse(_amountBaseController.text) != null &&
+        double.tryParse(_amountBaseController.text) != 0.0 &&
+        double.tryParse(_amountQuoteController.text) != null &&
+        double.tryParse(_amountQuoteController.text) != 0.0 &&
+        _amountBaseController.text.isNotEmpty &&
+        _amountQuoteController.text.isNotEmpty &&
+        isNotEmptyAmountBase &&
+        isNotEmptyAmountQuote;
   }
 }
