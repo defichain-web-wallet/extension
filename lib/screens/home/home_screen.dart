@@ -418,6 +418,7 @@ class _HomeScreenState extends State<HomeScreen>
                                           SliverFillRemaining(
                                             hasScrollBody: false,
                                             child: Container(
+                                              height: 90,
                                               color: Theme.of(context).cardColor,
                                             ),
                                           )
@@ -428,6 +429,7 @@ class _HomeScreenState extends State<HomeScreen>
                                           SliverFillRemaining(
                                             hasScrollBody: false,
                                             child: Container(
+                                              height: 90,
                                               color: Theme.of(context).cardColor,
                                             ),
                                           ),
