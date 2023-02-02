@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     setTabBody();
-    tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 2, vsync: this, initialIndex: 1);
     tabController!.addListener(tabListener);
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);

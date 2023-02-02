@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
@@ -5,6 +7,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/history/widgets/icon_history_type.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -17,17 +20,38 @@ class TransactionHistory extends StatefulWidget {
   State<TransactionHistory> createState() => _TransactionHistoryState();
 }
 
-class _TransactionHistoryState extends State<TransactionHistory> {
+class _TransactionHistoryState extends State<TransactionHistory>
+    with ThemeMixin {
+  static const int defaultShowItemsCount = 30;
   late ScrollController _controller;
   SettingsHelper settingsHelper = SettingsHelper();
+  DateFormat formatter = DateFormat('MMM d, yyyy h:mm a');
+  DateFormat labelDateFormatter = DateFormat('d MMMM');
+  BalancesHelper balancesHelper = BalancesHelper();
+  TokensHelper tokenHelper = TokensHelper();
+  HistoryHelper historyHelper = HistoryHelper();
+  String currency = SettingsHelper.settings.currency!;
+  int initialTransactionIndex = 0;
+  List<dynamic> historyList = [];
+  bool isFullLoadedHistory = false;
+
+  bool isScrollPositionOnBottom = false;
 
   _scrollListener() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
-        !_controller.position.outOfRange) {
-      print('reach the bottom');
+        !_controller.position.outOfRange && !isFullLoadedHistory) {
+      setState(() {
+        isScrollPositionOnBottom = true;
+        initialTransactionIndex += defaultShowItemsCount;
+        print('reach the bottom');
+      });
     }
     if (_controller.offset <= _controller.position.minScrollExtent &&
         !_controller.position.outOfRange) {
+      // setState(() {
+      //
+      // })
+      isScrollPositionOnBottom = false;
       print('reach the top');
     }
   }
@@ -48,178 +72,304 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             builder: (context, bitcoinState) {
           if (state.status == AccountStatusList.success &&
               tokensState.status == TokensStatusList.success) {
-            var historyList;
-            DateFormat formatter = DateFormat('MMM d, yyyy h:mm a');
-            var balancesHelper = BalancesHelper();
-            TokensHelper tokenHelper = TokensHelper();
-            HistoryHelper historyHelper = HistoryHelper();
-            var currency = SettingsHelper.settings.currency!;
-            const int defaultShowItemsCount = 30;
+            var tempHistoryList;
             late int showItemsCount;
+            late int targetHistoryLength;
             if (SettingsHelper.isBitcoin()) {
-              showItemsCount =
-                  bitcoinState.history!.length < defaultShowItemsCount
-                      ? bitcoinState.history!.length
-                      : defaultShowItemsCount;
               historyList = bitcoinState.history ?? [];
             } else {
               if (SettingsHelper.settings.network == 'mainnet') {
-                showItemsCount = state.activeAccount!.historyList!.length <
-                        defaultShowItemsCount
+                targetHistoryLength = ((initialTransactionIndex + 30) >
+                        state.activeAccount!.historyList!.length)
                     ? state.activeAccount!.historyList!.length
-                    : defaultShowItemsCount;
-                historyList = new List.from(state.activeAccount!.historyList!
-                    .sublist(0, showItemsCount));
+                    : initialTransactionIndex + 30;
+                historyList.addAll(
+                    new List.from(state.activeAccount!.historyList!
+                        .sublist(initialTransactionIndex, targetHistoryLength)),
+                );
+                if (targetHistoryLength == state.activeAccount!.historyList!.length) {
+                  isFullLoadedHistory = true;
+                }
               } else {
-                showItemsCount =
-                    state.activeAccount!.testnetHistoryList!.length <
-                            defaultShowItemsCount
-                        ? state.activeAccount!.testnetHistoryList!.length
-                        : defaultShowItemsCount;
+                targetHistoryLength = (initialTransactionIndex + 30 >
+                    state.activeAccount!.testnetHistoryList!.length)
+                    ? state.activeAccount!.testnetHistoryList!.length
+                    : initialTransactionIndex + 30;
                 historyList = new List.from(state
                     .activeAccount!.testnetHistoryList!
-                    .sublist(0, showItemsCount));
+                    .sublist(initialTransactionIndex, initialTransactionIndex + 30));
               }
             }
+            print(historyList.length);
 
             if (historyList != null && historyList.length != 0) {
-              return SliverFixedExtentList(
-                itemExtent: 64.0 + 10,
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    var tokenName;
-                    var txValue;
-                    var isSend;
-                    var type;
-                    var date;
-                    var txValuePrefix;
-                    if (SettingsHelper.isBitcoin()) {
-                      tokenName = 'BTC';
-                      txValue = convertFromSatoshi(historyList[index].value);
-                      isSend = historyList[index].isSend;
-                      type = isSend ? 'SEND' : 'RECEIVE';
-                      DateTime dateTime =
-                          DateTime.parse(historyList[index].blockTime);
-                      date = formatter.format(
-                          DateTime.fromMillisecondsSinceEpoch(
-                                  dateTime.millisecondsSinceEpoch)
-                              .toLocal());
-                      txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
-                          ? isSend
-                              ? ''
-                              : '+'
-                          : '';
-                    } else if (SettingsHelper.settings.network == 'mainnet') {
-                      tokenName = historyList[index].tokens![0].code;
-                      txValue = historyList[index].value;
-                      isSend = historyList[index].category == 'SEND';
-                      type = historyList[index].category;
-                      DateTime dateTime =
-                          DateTime.parse(historyList[index].date);
-                      date = formatter.format(
-                          DateTime.fromMillisecondsSinceEpoch(
-                                  dateTime.millisecondsSinceEpoch)
-                              .toLocal());
-                      txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
-                          ? isSend
-                              ? '-'
-                              : '+'
-                          : '';
-                    } else {
-                      tokenName = historyList[index].token;
-                      txValue = convertFromSatoshi(historyList[index].value);
-                      isSend = historyList[index].isSend;
-                      type = historyList[index].type;
-                      date = (historyList[index].blockTime != null)
-                          ? formatter.format(
+              return SliverFillRemaining(
+                hasScrollBody: true,
+                fillOverscroll: true,
+                child: Stack(
+                  children: [
+                    ListView.builder(
+                      controller: _controller,
+                      itemCount: historyList.length,
+                      itemBuilder: (context, index) {
+                        var tokenName;
+                        var txValue;
+                        var isSend;
+                        var type;
+                        var date;
+                        var txValuePrefix;
+                        DateTime currentDate;
+                        DateTime nextDate;
+                        if (SettingsHelper.isBitcoin()) {
+                          tokenName = 'BTC';
+                          txValue =
+                              convertFromSatoshi(historyList[index].value);
+                          isSend = historyList[index].isSend;
+                          type = isSend ? 'SEND' : 'RECEIVE';
+                          DateTime dateTime =
+                              DateTime.parse(historyList[index].blockTime);
+                          date = formatter.format(
                               DateTime.fromMillisecondsSinceEpoch(
-                                      int.parse(historyList[index].blockTime) *
+                                      dateTime.millisecondsSinceEpoch)
+                                  .toLocal());
+                          txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
+                              ? isSend
+                                  ? ''
+                                  : '+'
+                              : '';
+                          currentDate =
+                              DateTime.parse(historyList[index].blockTime);
+                          if (index + 1 == historyList.length) {
+                            nextDate =
+                                DateTime.parse(historyList[index].blockTime);
+                          } else {
+                            nextDate = DateTime.parse(
+                                historyList[index + 1].blockTime);
+                          }
+                        } else if (SettingsHelper.settings.network ==
+                            'mainnet') {
+                          tokenName = historyList[index].tokens![0].code;
+                          txValue = historyList[index].value;
+                          isSend = historyList[index].category == 'SEND';
+                          type = historyList[index].category;
+                          DateTime dateTime =
+                              DateTime.parse(historyList[index].date);
+                          date = formatter.format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                      dateTime.millisecondsSinceEpoch)
+                                  .toLocal());
+                          txValuePrefix = (type == 'SEND' || type == 'RECEIVE')
+                              ? isSend
+                                  ? '-'
+                                  : '+'
+                              : '';
+                          currentDate = DateTime.parse(historyList[index].date);
+                          if (index + 1 == historyList.length) {
+                            nextDate = DateTime.parse(historyList[index].date);
+                          } else {
+                            nextDate =
+                                DateTime.parse(historyList[index + 1].date);
+                          }
+                        } else {
+                          tokenName = historyList[index].token;
+                          txValue =
+                              convertFromSatoshi(historyList[index].value);
+                          isSend = historyList[index].isSend;
+                          type = historyList[index].type;
+                          date = (historyList[index].blockTime != null)
+                              ? formatter.format(
+                                  DateTime.fromMillisecondsSinceEpoch(int.parse(
+                                              historyList[index].blockTime) *
                                           1000)
-                                  .toLocal())
-                          : 'date';
-                      txValuePrefix = (type == 'vout' || type == 'vin')
-                          ? isSend
-                              ? '-'
-                              : '+'
-                          : '';
-                    }
-                    return Container(
-                      color: Theme.of(context).cardColor,
-                      padding: const EdgeInsets.only(
-                          bottom: 8, left: 16, right: 16, top: 2),
-                      child: ListTile(
-                        leading: Container(
-                          width: 32,
-                          height: 32,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: historyTypeIconGradient,
-                          ),
-                          child: IconHistoryType(
-                            type: type,
-                          ),
-                        ),
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      .toLocal())
+                              : 'date';
+                          txValuePrefix = (type == 'vout' || type == 'vin')
+                              ? isSend
+                                  ? '-'
+                                  : '+'
+                              : '';
+                          currentDate = DateTime.fromMillisecondsSinceEpoch(
+                                  int.parse(historyList[index].blockTime) *
+                                      1000)
+                              .toLocal();
+                          if (index + 1 == historyList.length) {
+                            nextDate = DateTime.fromMillisecondsSinceEpoch(
+                                    int.parse(historyList[index].blockTime) *
+                                        1000)
+                                .toLocal();
+                          } else {
+                            nextDate = DateTime.fromMillisecondsSinceEpoch(
+                                    int.parse(historyList[index].blockTime) *
+                                        1000)
+                                .toLocal();
+                          }
+                        }
+                        return Column(
                           children: [
-                            Text(
-                              historyHelper.getTransactionType(type),
-                              style: Theme.of(context).textTheme.headline5,
-                            ),
-                            Text(
-                              '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 4)} $tokenName',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                    fontSize: 15,
-                                    color: (txValuePrefix == '+')
-                                        ? AppColors.receivedIconColor
-                                        : Theme.of(context)
+                            if (currentDate.day < nextDate.day || index == 0)
+                              Container(
+                                color: Theme.of(context).cardColor,
+                                width: double.infinity,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6),
+                                child: Text(
+                                  labelDateFormatter
+                                      .format(nextDate)
+                                      .toString(),
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                        color: Theme.of(context)
                                             .textTheme
-                                            .headline5!
-                                            .color,
+                                            .headline6!
+                                            .color!
+                                            .withOpacity(0.3),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                              ),
+                            Container(
+                              color: Theme.of(context).cardColor,
+                              padding: const EdgeInsets.only(
+                                bottom: 2,
+                                left: 14,
+                                right: 14,
+                                top: 2,
+                              ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(0),
+                                leading: Container(
+                                  width: 32,
+                                  height: 32,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    gradient: historyTypeIconGradient,
                                   ),
+                                  child: IconHistoryType(
+                                    type: type,
+                                  ),
+                                ),
+                                title: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      historyHelper.getTransactionType(type),
+                                      style:
+                                          Theme.of(context).textTheme.headline5,
+                                    ),
+                                    Text(
+                                      '$txValuePrefix${balancesHelper.numberStyling(txValue, fixed: true, fixedCount: 4)} $tokenName',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .copyWith(
+                                            fontSize: 15,
+                                            color: (txValuePrefix == '+')
+                                                ? AppColors.receivedIconColor
+                                                : Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                subtitle: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      date.toString(),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline6!
+                                                .color!
+                                                .withOpacity(0.3),
+                                          ),
+                                    ),
+                                    Text(
+                                        "\$${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName).abs(), fixed: true, fixedCount: 2)}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
+                                              fontWeight: FontWeight.w600,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6!
+                                                  .color!
+                                                  .withOpacity(0.3),
+                                            )),
+                                  ],
+                                ),
+                              ),
                             ),
+                            if (isFullLoadedHistory && index == historyList.length - 1)
+                              Container(
+                                width: double.infinity,
+                                color: Theme.of(context).cardColor,
+                                child: Text('No more transactions'),
+                              )
+                            else if (isScrollPositionOnBottom && index == historyList.length - 1)
+                              Container(
+                                color: Colors.red,
+                                child: Text('Loading...'),
+                              )
                           ],
-                        ),
-                        subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              date.toString(),
+                        );
+                      },
+                    ),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(36),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: 4.0,
+                            sigmaY: 4.0,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(36),
+                              color: isDarkTheme()
+                                  ? DarkColors.historyDataLabel
+                                  : LightColors.historyDataLabel,
+                            ),
+                            child: Text(
+                              labelDateFormatter
+                                  .format(DateTime.now())
+                                  .toString(),
+                              textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme
                                   .headline6!
                                   .copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline6!
-                                        .color!
-                                        .withOpacity(0.3),
-                                  ),
-                            ),
-                            Text(
-                                "\$${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName).abs(), fixed: true, fixedCount: 2)}",
-                                style: Theme.of(context)
+                                color: Theme.of(context)
                                     .textTheme
                                     .headline6!
-                                    .copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline6!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    )),
-                          ],
+                                    .color!
+                                    .withOpacity(0.3),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    );
-                  },
-                  childCount: historyList.length,
+                    ),
+                  ],
                 ),
               );
             } else {
