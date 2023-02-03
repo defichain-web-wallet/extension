@@ -45,7 +45,6 @@ class LockCubit extends Cubit<LockState> {
     try {
       LockUserModel? data =
           await lockRequests.getUser(account.lockAccessToken!);
-      print('GETUSER address: ${data!.kycStatus}');
       emit(state.copyWith(
         status: LockStatusList.success,
         lockUserDetails: data,
@@ -72,7 +71,6 @@ class LockCubit extends Cubit<LockState> {
     try {
       LockUserModel? data =
           await lockRequests.getKYC(account.lockAccessToken!);
-      print('GETKYS address: ${data!.kycStatus}');
       emit(state.copyWith(
         status: LockStatusList.success,
         lockUserDetails: data,

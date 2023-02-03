@@ -477,196 +477,206 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                       SizedBox(
                                         height: 16,
                                       ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation1,
-                                                      animation2) =>
-                                                  SwapScreen(),
-                                              transitionDuration: Duration.zero,
-                                              reverseTransitionDuration:
-                                                  Duration.zero,
-                                            ),
-                                          );
-                                        },
-                                        child: MouseRegion(
-                                          cursor: SystemMouseCursors.click,
-                                          child: Container(
-                                            width: double.infinity,
-                                            padding: EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.viridian
-                                                  .withOpacity(0.07),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Column(
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.only(
-                                                          right: 10),
-                                                      child: SvgPicture.asset(
-                                                          'assets/icons/compare_arrow.svg'),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    children: [
-                                                      Text(
-                                                        changeDfiText,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline5!
-                                                            .copyWith(
-                                                              fontSize: 12,
-                                                            ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 24,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'DFI Deposit address ',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline4!
-                                                .copyWith(
-                                                  fontSize: 16,
-                                                ),
-                                          ),
-                                          Text(
-                                            '(optional)',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .subtitle1!
-                                                .copyWith(
-                                                  fontSize: 16,
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .headline4!
-                                                      .color!
-                                                      .withOpacity(0.6),
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          await Clipboard.setData(
-                                            ClipboardData(
-                                                text: lockState
-                                                    .lockStakingDetails!
-                                                    .depositAddress!),
-                                          );
-                                        },
-                                        child: MouseRegion(
-                                          cursor: SystemMouseCursors.click,
-                                          child: Container(
-                                            width: double.infinity,
-                                            padding: EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.viridian
-                                                  .withOpacity(0.07),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Column(
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.only(
-                                                          right: 10),
-                                                      child: SvgPicture.asset(
-                                                        'assets/icons/copy.svg',
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Text(
-                                                        cutAddress(
-                                                          lockState
-                                                              .lockStakingDetails!
-                                                              .depositAddress!,
-                                                        ),
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline5!
-                                                            .copyWith(
-                                                              fontSize: 12,
-                                                            ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 16,
-                                      ),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    EdgeInsets.only(right: 10),
-                                                child: SvgPicture.asset(
-                                                    'assets/icons/important_icon.svg'),
+                                      if (!widget.isUnstake) ...[
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context,
+                                                        animation1,
+                                                        animation2) =>
+                                                    SwapScreen(),
+                                                transitionDuration:
+                                                    Duration.zero,
+                                                reverseTransitionDuration:
+                                                    Duration.zero,
                                               ),
-                                            ],
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  warningText,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline5!
-                                                      .copyWith(
-                                                        fontSize: 12,
+                                            );
+                                          },
+                                          child: MouseRegion(
+                                            cursor: SystemMouseCursors.click,
+                                            child: Container(
+                                              width: double.infinity,
+                                              padding: EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.viridian
+                                                    .withOpacity(0.07),
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 10),
+                                                        child: SvgPicture.asset(
+                                                            'assets/icons/compare_arrow.svg'),
                                                       ),
+                                                    ],
+                                                  ),
+                                                  Expanded(
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          changeDfiText,
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline5!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        12,
+                                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 24,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'DFI Deposit address ',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline4!
+                                                  .copyWith(
+                                                    fontSize: 16,
+                                                  ),
+                                            ),
+                                            Text(
+                                              '(optional)',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .subtitle1!
+                                                  .copyWith(
+                                                    fontSize: 16,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline4!
+                                                        .color!
+                                                        .withOpacity(0.6),
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            await Clipboard.setData(
+                                              ClipboardData(
+                                                  text: lockState
+                                                      .lockStakingDetails!
+                                                      .depositAddress!),
+                                            );
+                                          },
+                                          child: MouseRegion(
+                                            cursor: SystemMouseCursors.click,
+                                            child: Container(
+                                              width: double.infinity,
+                                              padding: EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.viridian
+                                                    .withOpacity(0.07),
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 10),
+                                                        child: SvgPicture.asset(
+                                                          'assets/icons/copy.svg',
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          cutAddress(
+                                                            lockState
+                                                                .lockStakingDetails!
+                                                                .depositAddress!,
+                                                          ),
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline5!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        12,
+                                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 16,
+                                        ),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Column(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      right: 10),
+                                                  child: SvgPicture.asset(
+                                                      'assets/icons/important_icon.svg'),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    warningText,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .copyWith(
+                                                          fontSize: 12,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                       SizedBox(
                                         height: 88,
                                       ),
