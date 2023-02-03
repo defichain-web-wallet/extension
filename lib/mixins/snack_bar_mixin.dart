@@ -63,7 +63,8 @@ mixin SnackBarMixin {
     Widget? suffix,
     Function? onTapCallback,
   }) {
-    return ClipRect(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8.0),
       child: BackdropFilter(
         filter: ImageFilter.blur(
           sigmaX: 8.0,
