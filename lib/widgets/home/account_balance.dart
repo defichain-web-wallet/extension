@@ -8,6 +8,7 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/common/balance_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 
 class AccountBalance extends StatefulWidget {
   final String asset;
@@ -110,7 +111,24 @@ class _AccountBalanceState extends State<AccountBalance> {
                       ),
                     );
                   } else {
-                    return Container();
+                    return Column(
+                      children: [
+                        SizedBox(height: 42.0,),
+                        SizedBox(
+                          width: 128.0,
+                          height: 10.0,
+                          child: Shimmer.fromColors(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              baseColor: Color(0xFFD0CDD4),
+                              highlightColor: Color(0xFFE0DDE4)),
+                        ),
+                      ],
+                    );
                   }
                 });
           },

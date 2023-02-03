@@ -166,24 +166,6 @@ class _HomeScreenState extends State<HomeScreen>
               bool isFullScreen,
               TransactionState txState,
             ) {
-              if (state.status == AccountStatusList.loading ||
-                  tokensState.status == TokensStatusList.loading) {
-                return Container(
-                  child: Center(
-                    child: Loader(),
-                  ),
-                );
-              } else if (tokensState.status == TokensStatusList.failure) {
-                return Container(
-                  child: Center(
-                    child: ErrorPlaceholder(
-                      message: 'API error',
-                      description:
-                          'Please change the API on settings and try again',
-                    ),
-                  ),
-                );
-              } else {
                 return Scaffold(
                   appBar: NewMainAppBar(
                     isShowLogo: true,
@@ -377,7 +359,6 @@ class _HomeScreenState extends State<HomeScreen>
                     },
                   ),
                 );
-              }
             },
           );
         },

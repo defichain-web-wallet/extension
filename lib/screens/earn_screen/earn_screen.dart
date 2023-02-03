@@ -38,7 +38,7 @@ class _EarnScreenState extends State<EarnScreen> {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       await fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
       await stakingCubit.loadStakingRouteBalance(
           fiatCubit.state.accessToken!,

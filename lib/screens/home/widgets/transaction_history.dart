@@ -8,6 +8,7 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/screens/history/widgets/icon_history_type.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/home/skeleton_transaction_history_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -53,7 +54,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             var balancesHelper = BalancesHelper();
             TokensHelper tokenHelper = TokensHelper();
             HistoryHelper historyHelper = HistoryHelper();
-            var currency = SettingsHelper.settings.currency!;
             const int defaultShowItemsCount = 30;
             late int showItemsCount;
             if (SettingsHelper.isBitcoin()) {
@@ -228,13 +228,13 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 child: Container(
                   color: Theme.of(context).cardColor,
                   child: Center(
-                    child: Text('Not yet any transaction'),
+                    child: Text('No transaction yet'),
                   ),
                 ),
               );
             }
           } else {
-            return Container();
+            return SkeletonTransactionHistoryCard();
           }
         });
       });

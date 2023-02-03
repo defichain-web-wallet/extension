@@ -9,6 +9,7 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/home/asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 
 // ignore: must_be_immutable
 class AssetList extends StatelessWidget {
@@ -24,64 +25,76 @@ class AssetList extends StatelessWidget {
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
       return BlocBuilder<BitcoinCubit, BitcoinState>(
           builder: (context, bitcoinState) {
-        if (state.status == AccountStatusList.success) {
-          late List<BalanceModel> balances;
-          if (SettingsHelper.isBitcoin()) {
-            balances = List.generate(
-                1,
-                (index) => BalanceModel(
-                      token: 'BTC',
-                      balance: bitcoinState.totalBalance,
-                    ));
-          } else {
-            balances = state.activeAccount!.balanceList!
-                .where((el) => !el.isHidden!)
-                .toList();
-          }
-          String currency = SettingsHelper.settings.currency!;
-
-          return BlocBuilder<TokensCubit, TokensState>(
-              builder: (context, tokensState) {
-            if (tokensState.status == TokensStatusList.success) {
-              return SliverFixedExtentList(
-                itemExtent: 64.0 + 6,
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    String coin = balances[index].token!;
-                    String tokenName = SettingsHelper.isBitcoin()
-                        ? coin
-                        : tokenHelper.getTokenWithPrefix(coin);
-                    double tokenBalance =
-                        convertFromSatoshi(balances[index].balance!);
-                    return Container(
-                      padding: const EdgeInsets.only(
-                        bottom: 4,
-                        left: 16,
-                        right: 16,
-                        top: 2,
-                      ),
-                      color: Theme.of(context).cardColor,
-                      child: AssetCard(
-                        index: index,
-                        tokenBalance: tokenBalance,
-                        tokenName: tokenName,
-                        tokenCode: tokenName,
-                        tokensState: tokensState,
-                        balances: balances,
+            return BlocBuilder<TokensCubit, TokensState>(
+                builder: (context, tokensState) {
+                  if (tokensState.status == TokensStatusList.success &&
+                      state.status == AccountStatusList.success) {
+                    late List<BalanceModel> balances;
+                    if (SettingsHelper.isBitcoin()) {
+                      balances = List.generate(
+                          1,
+                              (index) => BalanceModel(
+                            token: 'BTC',
+                            balance: bitcoinState.totalBalance,
+                          ));
+                    } else {
+                      balances = state.activeAccount!.balanceList!
+                          .where((el) => !el.isHidden!)
+                          .toList();
+                    }
+                    return SliverFixedExtentList(
+                      itemExtent: 64.0 + 6,
+                      delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                          String coin = balances[index].token!;
+                          String tokenName = SettingsHelper.isBitcoin()
+                              ? coin
+                              : tokenHelper.getTokenWithPrefix(coin);
+                          double tokenBalance =
+                          convertFromSatoshi(balances[index].balance!);
+                          return Container(
+                            padding: const EdgeInsets.only(
+                              bottom: 4,
+                              left: 16,
+                              right: 16,
+                              top: 2,
+                            ),
+                            color: Theme.of(context).cardColor,
+                            child: AssetCard(
+                              index: index,
+                              tokenBalance: tokenBalance,
+                              tokenName: tokenName,
+                              tokenCode: tokenName,
+                              tokensState: tokensState,
+                              balances: balances,
+                            ),
+                          );
+                        },
+                        childCount: balances.length,
                       ),
                     );
-                  },
-                  childCount: balances.length,
-                ),
-              );
-            } else {
-              return Container();
-            }
+                  } else {
+                    return SliverFixedExtentList(
+                      itemExtent: 64.0 + 6,
+                      delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                          return Container(
+                            padding: const EdgeInsets.only(
+                              bottom: 4,
+                              left: 16,
+                              right: 16,
+                              top: 2,
+                            ),
+                            color: Theme.of(context).cardColor,
+                            child: AssetCard(),
+                          );
+                        },
+                        childCount: 1
+                      ),
+                    );
+                  }
+                });
           });
-        } else {
-          return Container();
-        }
-      });
     });
   }
 

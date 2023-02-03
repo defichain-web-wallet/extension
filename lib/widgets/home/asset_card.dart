@@ -5,26 +5,26 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/assets/asset_icon.dart';
+import 'package:defi_wallet/widgets/home/skeleton_asset_card_content.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AssetCard extends StatefulWidget {
-  final int index;
-  final String tokenCode;
-  final String tokenName;
-  final double tokenBalance;
-  final TokensState tokensState;
+  final int? index;
+  final String? tokenCode;
+  final String? tokenName;
+  final double? tokenBalance;
+  final TokensState? tokensState;
   final List<BalanceModel> balances;
 
   const AssetCard({
     Key? key,
-    required this.index,
-    required this.tokenCode,
-    required this.tokenName,
-    required this.tokenBalance,
-    required this.tokensState,
-    required this.balances,
+    this.index,
+    this.tokenCode,
+    this.tokenName,
+    this.tokenBalance,
+    this.tokensState,
+    this.balances = const [],
   }) : super(key: key);
 
   @override
@@ -35,8 +35,13 @@ class _AssetCardState extends State<AssetCard> {
   TokensHelper tokensHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 
-  Widget _buildTokenIcon(BalanceModel token) {
-    if (token.isPair!) {
+  Widget _buildTokenIcon(BalanceModel? token) {
+    if (token == null) {
+      return AssetIcon(
+        url: tokensHelper.getImageNameByTokenName("DFI"),
+        color: tokensHelper.getColorByTokenName("DFI"),
+      );
+    } else if (token.isPair!) {
       return AssetPair(pair: token.token!, size: 20,);
     } else {
       return AssetIcon(
@@ -66,9 +71,100 @@ class _AssetCardState extends State<AssetCard> {
     return '\$${balancesHelper.numberStyling(balanceInUsd, fixed: true)}';
   }
 
+  List<Widget> _buildRow(AssetCard widget, String currency) {
+    List<Widget> rowChildren = [
+      SizedBox(
+        height: 42,
+        width: 42,
+        child: widget.index == null ?
+        _buildTokenIcon(null)  :
+        _buildTokenIcon(widget.balances[widget.index!]),
+      ),
+      SizedBox(
+        width: 10,
+      ),
+    ];
+
+    if (widget.index == null
+        || widget.tokenCode == null
+        || widget.tokenName == null
+        || widget.tokenBalance == null
+        || widget.tokensState == null
+    ) {
+      rowChildren.add(SkeletonAssetCardContent());
+    } else {
+      rowChildren.add(
+        Expanded(
+          child: Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.tokenName!,
+                  style: Theme.of(context).textTheme.headline5,
+                ),
+                Text(
+                  widget.tokenName!,
+                  style: Theme.of(context).textTheme.headline6!.copyWith(
+                    color: Theme.of(context)
+                        .textTheme
+                        .headline6!
+                        .color!
+                        .withOpacity(0.3),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+      rowChildren.add(
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  getFormatTokenBalance(widget.tokenBalance!),
+                  style: Theme.of(context).textTheme.headline6!.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(
+                  height: 2,
+                ),
+                Text(
+                  getFormatTokenBalanceByFiat(
+                    widget.tokensState,
+                    widget.tokenCode!,
+                    widget.tokenBalance!,
+                    currency,
+                  ),
+                  style: Theme.of(context).textTheme.headline6!.copyWith(
+                    color: Theme.of(context)
+                        .textTheme
+                        .headline6!
+                        .color!
+                        .withOpacity(0.3),
+                  ),
+                ),
+              ],
+            ),
+          )
+      );
+    }
+
+    return rowChildren;
+  }
+
   @override
   Widget build(BuildContext context) {
     String currency = SettingsHelper.settings.currency!;
+
 
     return Container(
       height: 64,
@@ -87,75 +183,7 @@ class _AssetCardState extends State<AssetCard> {
       ),
       child: Container(
         child: Row(
-          children: [
-            SizedBox(
-              height: 42,
-              width: 42,
-              child: _buildTokenIcon(widget.balances[widget.index]),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Container(
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.tokenName,
-                      style: Theme.of(context).textTheme.headline5,
-                    ),
-                    Text(
-                      widget.tokenName,
-                      style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .color!
-                                .withOpacity(0.3),
-                          ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    getFormatTokenBalance(widget.tokenBalance),
-                    style: Theme.of(context).textTheme.headline6!.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    getFormatTokenBalanceByFiat(
-                      widget.tokensState,
-                      widget.tokenCode,
-                      widget.tokenBalance,
-                      currency,
-                    ),
-                    style: Theme.of(context).textTheme.headline6!.copyWith(
-                          color: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .color!
-                              .withOpacity(0.3),
-                        ),
-                  ),
-                ],
-              ),
-            )
-          ],
+          children: _buildRow(widget, currency),
         ),
       ),
     );
