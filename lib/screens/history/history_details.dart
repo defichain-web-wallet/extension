@@ -45,12 +45,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 class HistoryDetails extends StatefulWidget {
   final HistoryNew? dfxHistoryModel;
-  final HistoryModel? generalHistoryModel;
 
   const HistoryDetails({
     Key? key,
     this.dfxHistoryModel,
-    this.generalHistoryModel,
   }) : super(key: key);
 
   @override
@@ -527,22 +525,7 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                     style: AppTheme.defiUnderlineText,
                                   ),
                                   onTap: () {
-                                    if (SettingsHelper.isBitcoin()) {
-                                      if (SettingsHelper.settings.network! ==
-                                          'mainnet') {
-                                        launch(
-                                          'https://live.blockcypher.com/btc/tx/$txId',
-                                        );
-                                      } else {
-                                        launch(
-                                          'https://live.blockcypher.com/btc-testnet/tx/$txId',
-                                        );
-                                      }
-                                    } else {
-                                      launch(
-                                        'https://defiscan.live/transactions/$txId?network=${SettingsHelper.settings.network}',
-                                      );
-                                    }
+                                    historyHelper.openExplorerLink(txId);
                                   },
                                 ),
                               ],

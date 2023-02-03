@@ -237,17 +237,21 @@ class _TransactionHistoryState extends State<TransactionHistory>
                               ),
                               child: ListTile(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation1, animation2) =>
-                                          HistoryDetails(
-                                            dfxHistoryModel: historyList[index],
-                                          ),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
-                                    ),
-                                  );
+                                  if (!SettingsHelper.isBitcoin() && SettingsHelper.settings.network == 'mainnet') {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation1, animation2) =>
+                                            HistoryDetails(
+                                              dfxHistoryModel: historyList[index],
+                                            ),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration: Duration.zero,
+                                      ),
+                                    );
+                                  } else {
+                                    historyHelper.openExplorerLink(historyList[index].txid);
+                                  }
                                 },
                                 contentPadding: const EdgeInsets.all(0),
                                 leading: Container(
