@@ -221,7 +221,7 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                                   )
                                 : Center(
                                     child: Text(
-                                      'Oops!',
+                                      'No contacts',
                                     ),
                                   ),
                           ),
@@ -269,7 +269,7 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                                   )
                                 : Center(
                                     child: Text(
-                                      'Oops!',
+                                      'Oops! You don\'t have addresses yet',
                                     ),
                                   ),
                           ),

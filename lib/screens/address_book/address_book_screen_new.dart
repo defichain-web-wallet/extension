@@ -353,7 +353,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                     )
                                   : Center(
                                       child: Text(
-                                        'Oops!',
+                                        'No contacts',
                                       ),
                                     ),
                             ),
