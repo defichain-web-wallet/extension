@@ -343,47 +343,49 @@ class _TransactionHistoryState extends State<TransactionHistory>
                         );
                       },
                     ),
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(36),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: 4.0,
-                            sigmaY: 4.0,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 4,
-                              horizontal: 12,
+                    // TODO: need to update date when scrolling
+                    if (false)
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(36),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(
+                              sigmaX: 4.0,
+                              sigmaY: 4.0,
                             ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(36),
-                              color: isDarkTheme()
-                                  ? DarkColors.historyDataLabel
-                                  : LightColors.historyDataLabel,
-                            ),
-                            child: Text(
-                              labelDateFormatter
-                                  .format(DateTime.now())
-                                  .toString(),
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6!
-                                  .copyWith(
-                                color: Theme.of(context)
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(36),
+                                color: isDarkTheme()
+                                    ? DarkColors.historyDataLabel
+                                    : LightColors.historyDataLabel,
+                              ),
+                              child: Text(
+                                labelDateFormatter
+                                    .format(DateTime.now())
+                                    .toString(),
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
                                     .textTheme
                                     .headline6!
-                                    .color!
-                                    .withOpacity(0.3),
-                                fontWeight: FontWeight.w600,
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.3),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               );
