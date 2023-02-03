@@ -12,6 +12,7 @@ import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/liquidity_asset_pair.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
@@ -82,16 +83,21 @@ class _MainLiquidityPairState extends State<MainLiquidityPair> with ThemeMixin {
                             SizedBox(
                               width: 11,
                             ),
-                            Text(
-                              TokensHelper()
-                                  .getTokenFormat(widget.assetPair!.symbol),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                    fontSize: 16,
-                                  ),
+                            Expanded(
+                              child: TickerText(
+                                child: Text(
+                                  TokensHelper()
+                                      .getTokenFormat(widget.assetPair!.symbol),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                        fontSize: 16,
+                                      ),
+                                ),
+                              ),
                             ),
+                            SizedBox(width: 5,),
                           ],
                         ),
                       ],
