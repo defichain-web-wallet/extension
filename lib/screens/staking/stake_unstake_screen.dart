@@ -681,68 +681,85 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                       width: buttonSmallWidth,
                                       title: 'Continue',
                                       callback: () {
-                                        if (double.parse(controller.text) >=
-                                            lockState.lockStakingDetails!
-                                                .minimalDeposit!) {
-                                          if (widget.isUnstake) {
-                                            showDialog(
-                                              barrierColor: Color(0x0f180245),
-                                              barrierDismissible: false,
-                                              context: context,
-                                              builder:
-                                                  (BuildContext dialogContext) {
-                                                return PassConfirmDialog(
-                                                  onSubmit: (password) {
-                                                    unstakeCallback(
-                                                      password,
-                                                      accountState
-                                                          .activeAccount!,
-                                                      accountState
-                                                          .activeAccount!
-                                                          .lockAccessToken!,
-                                                      lockState
-                                                          .lockStakingDetails!
-                                                          .id!,
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            );
+                                        if (!(txState
+                                            is! TransactionInitialState)) {
+                                          if (double.parse(controller.text) >=
+                                              lockState.lockStakingDetails!
+                                                  .minimalDeposit!) {
+                                            if (widget.isUnstake) {
+                                              showDialog(
+                                                barrierColor: Color(0x0f180245),
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder: (BuildContext
+                                                    dialogContext) {
+                                                  return PassConfirmDialog(
+                                                    onSubmit: (password) {
+                                                      unstakeCallback(
+                                                        password,
+                                                        accountState
+                                                            .activeAccount!,
+                                                        accountState
+                                                            .activeAccount!
+                                                            .lockAccessToken!,
+                                                        lockState
+                                                            .lockStakingDetails!
+                                                            .id!,
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              showDialog(
+                                                barrierColor: Color(0x0f180245),
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder: (BuildContext
+                                                    dialogContext) {
+                                                  return PassConfirmDialog(
+                                                    onSubmit: (password) {
+                                                      stakeCallback(
+                                                        password,
+                                                        accountState
+                                                            .activeAccount!,
+                                                        lockState
+                                                            .lockStakingDetails!
+                                                            .depositAddress!,
+                                                        tokensState.tokens!,
+                                                        accountState
+                                                            .activeAccount!
+                                                            .lockAccessToken!,
+                                                        lockState
+                                                            .lockStakingDetails!
+                                                            .id!,
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            }
                                           } else {
-                                            showDialog(
-                                              barrierColor: Color(0x0f180245),
-                                              barrierDismissible: false,
-                                              context: context,
-                                              builder:
-                                                  (BuildContext dialogContext) {
-                                                return PassConfirmDialog(
-                                                  onSubmit: (password) {
-                                                    stakeCallback(
-                                                      password,
-                                                      accountState
-                                                          .activeAccount!,
-                                                      lockState
-                                                          .lockStakingDetails!
-                                                          .depositAddress!,
-                                                      tokensState.tokens!,
-                                                      accountState
-                                                          .activeAccount!
-                                                          .lockAccessToken!,
-                                                      lockState
-                                                          .lockStakingDetails!
-                                                          .id!,
-                                                    );
-                                                  },
-                                                );
-                                              },
+                                            showSnackBar(
+                                              context,
+                                              title: 'Minimal amount: '
+                                                  '${lockState.lockStakingDetails!.minimalDeposit}',
+                                              color: AppColors.txStatusError
+                                                  .withOpacity(0.1),
+                                              prefix: Icon(
+                                                Icons.close,
+                                                color: AppColors.txStatusError,
+                                              ),
                                             );
                                           }
                                         } else {
                                           showSnackBar(
                                             context,
-                                            title: 'Minimal amount: '
-                                                '${lockState.lockStakingDetails!.minimalDeposit}',
-                                            color: AppColors.txStatusError.withOpacity(0.1),
+                                            title:
+                                                'Please wait for the previous '
+                                                'transaction',
+                                            color: AppColors.txStatusError
+                                                .withOpacity(0.1),
                                             prefix: Icon(
                                               Icons.close,
                                               color: AppColors.txStatusError,

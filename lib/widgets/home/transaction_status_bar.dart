@@ -25,6 +25,12 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
   )..repeat();
 
   @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Positioned(
       bottom: 16.0,
