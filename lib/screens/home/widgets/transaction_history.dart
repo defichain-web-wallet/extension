@@ -8,6 +8,7 @@ import 'package:defi_wallet/helpers/history_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/screens/history/history_details.dart';
 import 'package:defi_wallet/screens/history/widgets/icon_history_type.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -48,9 +49,6 @@ class _TransactionHistoryState extends State<TransactionHistory>
     }
     if (_controller.offset <= _controller.position.minScrollExtent &&
         !_controller.position.outOfRange) {
-      // setState(() {
-      //
-      // })
       isScrollPositionOnBottom = false;
       print('reach the top');
     }
@@ -100,7 +98,6 @@ class _TransactionHistoryState extends State<TransactionHistory>
                     .sublist(initialTransactionIndex, initialTransactionIndex + 30));
               }
             }
-            print(historyList.length);
 
             if (historyList != null && historyList.length != 0) {
               return SliverFillRemaining(
@@ -239,6 +236,19 @@ class _TransactionHistoryState extends State<TransactionHistory>
                                 top: 2,
                               ),
                               child: ListTile(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation1, animation2) =>
+                                          HistoryDetails(
+                                            dfxHistoryModel: historyList[index],
+                                          ),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  );
+                                },
                                 contentPadding: const EdgeInsets.all(0),
                                 leading: Container(
                                   width: 32,
@@ -317,12 +327,13 @@ class _TransactionHistoryState extends State<TransactionHistory>
                               Container(
                                 width: double.infinity,
                                 color: Theme.of(context).cardColor,
-                                child: Text('No more transactions'),
+                                child: Text('No more transactions', textAlign: TextAlign.center),
                               )
                             else if (isScrollPositionOnBottom && index == historyList.length - 1)
                               Container(
-                                color: Colors.red,
-                                child: Text('Loading...'),
+                                width: double.infinity,
+                                color: Theme.of(context).cardColor,
+                                child: Text('Loading...', textAlign: TextAlign.center,),
                               )
                           ],
                         );

@@ -61,6 +61,8 @@ abstract class AppColors {
 
   static const receivedIconColor = malachite;
 
+  static const historyTypeMark = portageBg;
+
   // Circle avatars of accounts. Must be min 10 items
   static const accountColors = [
     Color(0xFFD300AC),
