@@ -325,7 +325,6 @@ class AccountCubit extends Cubit<AccountState> {
       activeAccount: state.activeAccount,
       activeToken: state.activeToken,
     ));
-
   }
 
   Future<AccountModel> addAccount() async {
@@ -489,7 +488,9 @@ class AccountCubit extends Cubit<AccountState> {
                 network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
         accountModel.bitcoinAddress!.blockchain = 'BTC';
       }
-      if (password != '') {
+      if (password != '' &&
+          accountModel.lockAccessToken == null &&
+          accountModel.accessToken == null) {
         try {
           var keyPair = await HDWalletService().getKeypairFromStorage(
             password,
@@ -702,7 +703,8 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   loadAccounts() async {
-    var accountList = await loadAccountDetails([state.activeAccount!], isUpdateWithHistory: false);
+    var accountList = await loadAccountDetails([state.activeAccount!],
+        isUpdateWithHistory: false);
     emit(state.copyWith(
       status: AccountStatusList.success,
       accounts: accountList,
