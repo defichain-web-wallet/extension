@@ -8,6 +8,9 @@ abstract class DarkColors {
   static const inputTextSelectionColor = Colors.blue;
   static Color inputSuffixIconColor = AppColors.white.withOpacity(0.3);
 
+  // icons
+  static Color iconDragBoxColor = AppColors.white.withOpacity(0.24);
+
   static const cardColor = Colors.grey;
 
   static const scaffoldBgColor = AppColors.ebony;

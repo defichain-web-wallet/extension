@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
@@ -17,6 +18,7 @@ import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -32,8 +34,10 @@ class RecoveryScreen extends StatefulWidget {
   State<RecoveryScreen> createState() => _RecoveryScreenState();
 }
 
-class _RecoveryScreenState extends State<RecoveryScreen> {
+class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
   static const double _mnemonicBoxWidth = 328;
+  static final RegExp _regExpPhraseSeparators = RegExp('[ .,;:|/-]');
+  static final String _replaceComaSeparator = ',';
 
   final int _fieldsLength = 24;
   final FocusNode _focusNode = FocusNode();
@@ -108,6 +112,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     } else {
       setState(() {
         _incorrectPhrase = true;
+        _onStartedReorder = true;
       });
     }
   }
@@ -130,7 +135,11 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
   void _onFieldSubmitted(String word) {
     setState(() {
       if (_wordController.text != '') {
-        var s = (_wordController.text.split(','));
+        final phraseBySeparator = _wordController.text.replaceAll(
+          _regExpPhraseSeparators,
+          _replaceComaSeparator,
+        );
+        var s = (phraseBySeparator.split(_replaceComaSeparator));
         s.forEach((element) {
           _mnemonic.add(element);
         });
@@ -245,29 +254,45 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                     ),
                     if (_onStartedReorder)
                       Container(
-                        height: 46,
+                        height: 44,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              width: 1,
-                              color: Theme.of(context)
-                                  .dividerColor
-                                  .withOpacity(0.2),
-                            )),
-                        child: Center(
-                          child: Text(
-                            'Drag word here for remove',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline6!
-                                        .color!
-                                        .withOpacity(0.3)),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            width: 1,
+                            color:
+                                Theme.of(context).dividerColor.withOpacity(0.2),
                           ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 14,
+                              height: 15,
+                              child: SvgPicture.asset(
+                                'assets/icons/trash.svg',
+                                color: isDarkTheme()
+                                    ? DarkColors.iconDragBoxColor
+                                    : LightColors.iconDragBoxColor,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 16,
+                            ),
+                            Text(
+                              'Drag word here to remove',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .color!
+                                      .withOpacity(0.24)),
+                            ),
+                          ],
                         ),
                       )
                     else
@@ -281,8 +306,12 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                                 readOnly: !_isViewTextField,
                                 onChanged: (String value) {
                                   try {
+                                    final phraseBySeparator = value.replaceAll(
+                                      _regExpPhraseSeparators,
+                                      _replaceComaSeparator,
+                                    );
                                     List<String> phraseFromClipboard =
-                                        value.split(' ');
+                                      phraseBySeparator.split(_replaceComaSeparator);
                                     if (phraseFromClipboard.length ==
                                         _fieldsLength) {
                                       setState(() {
