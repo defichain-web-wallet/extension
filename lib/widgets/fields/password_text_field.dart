@@ -78,7 +78,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
             controller: widget.controller,
             decoration: InputDecoration(
               errorStyle: TextStyle(
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.transparent,
                 color: Colors.pink,
                 fontSize: 10
               ),
