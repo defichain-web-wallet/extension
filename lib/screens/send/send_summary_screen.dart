@@ -344,6 +344,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                       password,
                                                     );
                                                   },
+                                                  context: context,
                                                 );
                                               },
                                             );
