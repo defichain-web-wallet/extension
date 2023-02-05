@@ -33,6 +33,7 @@ class EarnScreenNew extends StatefulWidget {
 class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBarMixin {
   BalancesHelper balancesHelper = BalancesHelper();
   String titleText = 'Earn';
+  int iterator = 0;
 
   @override
   void initState() {
@@ -615,7 +616,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
     return maxValue;
   }
 
-  stakingCallback(lockState) {
+  stakingCallback(lockState) async{
     if (lockState.lockUserDetails.kycStatus == 'Full') {
       Navigator.push(
         context,
@@ -626,6 +627,12 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
         ),
       );
     } else {
+      if (lockState.lockUserDetails.kycLink == 'https://kyc.lock.space?code=null'){
+        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+        await lockCubit.loadKycDetails(accountCubit.state.activeAccount!);
+        await lockCubit.loadUserDetails(accountCubit.state.activeAccount!);
+      }
       Navigator.push(
         context,
         PageRouteBuilder(
