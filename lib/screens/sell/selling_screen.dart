@@ -348,26 +348,22 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                           'Sell',
                                           callback: (parent) async {
                                             parent.emitPending(true);
-                                            TransactionCubit transactionCubit =
-                                                BlocProvider.of<TransactionCubit>(
-                                                    context);
                                             lockHelper.provideWithLockChecker(
                                                 context, () async {
-                                              if (transactionCubit.state
+                                                  print(txState);
+                                              if (txState
                                                   is TransactionLoadingState) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      'Wait for the previous transaction to complete',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .headline5,
-                                                    ),
-                                                    backgroundColor:
-                                                        Theme.of(context)
-                                                            .snackBarTheme
-                                                            .backgroundColor,
+                                                parent.emitPending(false);
+                                                showSnackBar(
+                                                  context,
+                                                  title:
+                                                  'Please wait for the previous '
+                                                      'transaction',
+                                                  color: AppColors.txStatusError
+                                                      .withOpacity(0.1),
+                                                  prefix: Icon(
+                                                    Icons.close,
+                                                    color: AppColors.txStatusError,
                                                   ),
                                                 );
                                                 return;

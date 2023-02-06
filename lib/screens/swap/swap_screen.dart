@@ -953,7 +953,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                           ),
                           callback: !isDisableSubmit()
                               ? () {
-                            if (!(transactionState is! TransactionInitialState)){
+                            if (transactionState is! TransactionLoadingState) {
                                     submitReviewSwap(
                                       accountState,
                                       transactionState,
@@ -961,7 +961,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                       isFullScreen,
                                     );
                                   } else {
-                              print('11111');
                               showSnackBar(
                                 context,
                                 title:

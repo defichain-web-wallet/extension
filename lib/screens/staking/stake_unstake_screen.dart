@@ -691,8 +691,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                       width: buttonSmallWidth,
                                       title: 'Continue',
                                       callback: () {
-                                        if (!(txState
-                                            is! TransactionInitialState)) {
+                                        if (txState is! TransactionLoadingState) {
                                           if (double.parse(controller.text) >=
                                               lockState.lockStakingDetails!
                                                   .minimalDeposit!) {
