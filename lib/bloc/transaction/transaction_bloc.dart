@@ -55,7 +55,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   setOngoingTransaction(String txId) async {
-    emit(TransactionInitialState(''));
+    emit(TransactionLoadingState(txId));
     var box = await Hive.openBox(HiveBoxes.client);
     await box.put(HiveNames.ongoingTransaction, txId);
     await box.close();

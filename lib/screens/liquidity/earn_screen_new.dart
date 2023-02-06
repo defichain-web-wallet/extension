@@ -5,6 +5,7 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -29,9 +30,10 @@ class EarnScreenNew extends StatefulWidget {
   State<EarnScreenNew> createState() => _EarnScreenNewState();
 }
 
-class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
+class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBarMixin {
   BalancesHelper balancesHelper = BalancesHelper();
   String titleText = 'Earn';
+  int iterator = 0;
 
   @override
   void initState() {
@@ -614,7 +616,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
     return maxValue;
   }
 
-  stakingCallback(lockState) {
+  stakingCallback(lockState) async{
     if (lockState.lockUserDetails.kycStatus == 'Full') {
       Navigator.push(
         context,
@@ -625,6 +627,12 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
         ),
       );
     } else {
+      if (lockState.lockUserDetails.kycLink == 'https://kyc.lock.space?code=null'){
+        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+        await lockCubit.loadKycDetails(accountCubit.state.activeAccount!);
+        await lockCubit.loadUserDetails(accountCubit.state.activeAccount!);
+      }
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -640,7 +648,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
   liquidityCallback(double totalLiquidityBalance, txState) {
     Widget redirectTo = LiquidityScreenNew();
 
-    if (!(txState is TransactionLoadingState)) {
+    if (txState is! TransactionLoadingState) {
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -650,13 +658,16 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Wait for the previous transaction to complete',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+      showSnackBar(
+        context,
+        title:
+        'Please wait for the previous '
+            'transaction',
+        color: AppColors.txStatusError
+            .withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
         ),
       );
     }

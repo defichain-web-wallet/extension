@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
@@ -18,6 +19,7 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -477,196 +479,206 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                       SizedBox(
                                         height: 16,
                                       ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation1,
-                                                      animation2) =>
-                                                  SwapScreen(),
-                                              transitionDuration: Duration.zero,
-                                              reverseTransitionDuration:
-                                                  Duration.zero,
-                                            ),
-                                          );
-                                        },
-                                        child: MouseRegion(
-                                          cursor: SystemMouseCursors.click,
-                                          child: Container(
-                                            width: double.infinity,
-                                            padding: EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.viridian
-                                                  .withOpacity(0.07),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Column(
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.only(
-                                                          right: 10),
-                                                      child: SvgPicture.asset(
-                                                          'assets/icons/compare_arrow.svg'),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    children: [
-                                                      Text(
-                                                        changeDfiText,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline5!
-                                                            .copyWith(
-                                                              fontSize: 12,
-                                                            ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 24,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'DFI Deposit address ',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline4!
-                                                .copyWith(
-                                                  fontSize: 16,
-                                                ),
-                                          ),
-                                          Text(
-                                            '(optional)',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .subtitle1!
-                                                .copyWith(
-                                                  fontSize: 16,
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .headline4!
-                                                      .color!
-                                                      .withOpacity(0.6),
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          await Clipboard.setData(
-                                            ClipboardData(
-                                                text: lockState
-                                                    .lockStakingDetails!
-                                                    .depositAddress!),
-                                          );
-                                        },
-                                        child: MouseRegion(
-                                          cursor: SystemMouseCursors.click,
-                                          child: Container(
-                                            width: double.infinity,
-                                            padding: EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.viridian
-                                                  .withOpacity(0.07),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Column(
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.only(
-                                                          right: 10),
-                                                      child: SvgPicture.asset(
-                                                        'assets/icons/copy.svg',
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Text(
-                                                        cutAddress(
-                                                          lockState
-                                                              .lockStakingDetails!
-                                                              .depositAddress!,
-                                                        ),
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline5!
-                                                            .copyWith(
-                                                              fontSize: 12,
-                                                            ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 16,
-                                      ),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    EdgeInsets.only(right: 10),
-                                                child: SvgPicture.asset(
-                                                    'assets/icons/important_icon.svg'),
+                                      if (!widget.isUnstake) ...[
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context,
+                                                        animation1,
+                                                        animation2) =>
+                                                    SwapScreen(),
+                                                transitionDuration:
+                                                    Duration.zero,
+                                                reverseTransitionDuration:
+                                                    Duration.zero,
                                               ),
-                                            ],
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  warningText,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline5!
-                                                      .copyWith(
-                                                        fontSize: 12,
+                                            );
+                                          },
+                                          child: MouseRegion(
+                                            cursor: SystemMouseCursors.click,
+                                            child: Container(
+                                              width: double.infinity,
+                                              padding: EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.viridian
+                                                    .withOpacity(0.07),
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 10),
+                                                        child: SvgPicture.asset(
+                                                            'assets/icons/compare_arrow.svg'),
                                                       ),
+                                                    ],
+                                                  ),
+                                                  Expanded(
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          changeDfiText,
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline5!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        12,
+                                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 24,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'DFI Deposit address ',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline4!
+                                                  .copyWith(
+                                                    fontSize: 16,
+                                                  ),
+                                            ),
+                                            Text(
+                                              '(optional)',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .subtitle1!
+                                                  .copyWith(
+                                                    fontSize: 16,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline4!
+                                                        .color!
+                                                        .withOpacity(0.6),
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            await Clipboard.setData(
+                                              ClipboardData(
+                                                  text: lockState
+                                                      .lockStakingDetails!
+                                                      .depositAddress!),
+                                            );
+                                          },
+                                          child: MouseRegion(
+                                            cursor: SystemMouseCursors.click,
+                                            child: Container(
+                                              width: double.infinity,
+                                              padding: EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.viridian
+                                                    .withOpacity(0.07),
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 10),
+                                                        child: SvgPicture.asset(
+                                                          'assets/icons/copy.svg',
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          cutAddress(
+                                                            lockState
+                                                                .lockStakingDetails!
+                                                                .depositAddress!,
+                                                          ),
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline5!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        12,
+                                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 16,
+                                        ),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Column(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      right: 10),
+                                                  child: SvgPicture.asset(
+                                                      'assets/icons/important_icon.svg'),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    warningText,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .copyWith(
+                                                          fontSize: 12,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                       SizedBox(
                                         height: 88,
                                       ),
@@ -677,60 +689,105 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    NewPrimaryButton(
+                                    SizedBox(
                                       width: buttonSmallWidth,
-                                      title: 'Continue',
-                                      callback: () {
-                                        if (widget.isUnstake) {
-                                          showDialog(
-                                            barrierColor: Color(0x0f180245),
-                                            barrierDismissible: false,
-                                            context: context,
-                                            builder:
-                                                (BuildContext dialogContext) {
-                                              return PassConfirmDialog(
-                                                onSubmit: (password) {
-                                                  unstakeCallback(
-                                                    password,
-                                                    accountState.activeAccount!,
-                                                    accountState.activeAccount!
-                                                        .lockAccessToken!,
-                                                    lockState
-                                                        .lockStakingDetails!
-                                                        .id!,
-                                                  );
-                                                },
+                                      child: PendingButton(
+                                        'Continue',
+                                        pendingText: 'Pending...',
+                                        callback: (parent) {
+                                          if (txState is! TransactionLoadingState) {
+                                            if (double.parse(controller.text) >=
+                                                lockState.lockStakingDetails!
+                                                    .minimalDeposit!) {
+                                              parent.emitPending(true);
+                                              if (widget.isUnstake) {
+                                                showDialog(
+                                                  barrierColor: Color(0x0f180245),
+                                                  barrierDismissible: false,
+                                                  context: context,
+                                                  builder: (BuildContext
+                                                      dialogContext) {
+                                                    return PassConfirmDialog(
+                                                      onCancel: () {
+                                                        parent.emitPending(false);
+                                                      },
+                                                      onSubmit: (password) {
+                                                        unstakeCallback(
+                                                          password,
+                                                          accountState
+                                                              .activeAccount!,
+                                                          accountState
+                                                              .activeAccount!
+                                                              .lockAccessToken!,
+                                                          lockState
+                                                              .lockStakingDetails!
+                                                              .id!,
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                showDialog(
+                                                  barrierColor: Color(0x0f180245),
+                                                  barrierDismissible: false,
+                                                  context: context,
+                                                  builder: (BuildContext
+                                                      dialogContext) {
+                                                    return PassConfirmDialog(
+                                                      onCancel: () {
+                                                        parent.emitPending(false);
+                                                      },
+                                                      onSubmit: (password) {
+                                                        stakeCallback(
+                                                          password,
+                                                          accountState
+                                                              .activeAccount!,
+                                                          lockState
+                                                              .lockStakingDetails!
+                                                              .depositAddress!,
+                                                          tokensState.tokens!,
+                                                          accountState
+                                                              .activeAccount!
+                                                              .lockAccessToken!,
+                                                          lockState
+                                                              .lockStakingDetails!
+                                                              .id!,
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                );
+                                              }
+                                            } else {
+                                              showSnackBar(
+                                                context,
+                                                title: 'Minimal amount: '
+                                                    '${lockState.lockStakingDetails!.minimalDeposit}',
+                                                color: AppColors.txStatusError
+                                                    .withOpacity(0.1),
+                                                prefix: Icon(
+                                                  Icons.close,
+                                                  color: AppColors.txStatusError,
+                                                ),
                                               );
-                                            },
-                                          );
-                                        } else {
-                                          showDialog(
-                                            barrierColor: Color(0x0f180245),
-                                            barrierDismissible: false,
-                                            context: context,
-                                            builder:
-                                                (BuildContext dialogContext) {
-                                              return PassConfirmDialog(
-                                                onSubmit: (password) {
-                                                  stakeCallback(
-                                                    password,
-                                                    accountState.activeAccount!,
-                                                    lockState
-                                                        .lockStakingDetails!
-                                                        .depositAddress!,
-                                                    tokensState.tokens!,
-                                                    accountState.activeAccount!
-                                                        .lockAccessToken!,
-                                                    lockState
-                                                        .lockStakingDetails!
-                                                        .id!,
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          );
-                                        }
-                                      },
+                                            }
+                                          } else {
+                                            showSnackBar(
+                                              context,
+                                              title:
+                                                  'Please wait for the previous '
+                                                  'transaction',
+                                              color: AppColors.txStatusError
+                                                  .withOpacity(0.1),
+                                              prefix: Icon(
+                                                Icons.close,
+                                                color: AppColors.txStatusError,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -781,8 +838,6 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
         double.parse(controller.text),
         txResponse.txid!,
       );
-    } else {
-      showSnackBar(context, title: 'Something wrong');
     }
     showDialog(
       barrierColor: Color(0x0f180245),
@@ -792,6 +847,12 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
+            if (!txResponse!.isError) {
+              TransactionCubit transactionCubit =
+              BlocProvider.of<TransactionCubit>(context);
+
+              transactionCubit.setOngoingTransaction(txResponse.txid!);
+            }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
@@ -852,6 +913,12 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
+            if (!txResponse.isError) {
+              TransactionCubit transactionCubit =
+              BlocProvider.of<TransactionCubit>(context);
+
+              transactionCubit.setOngoingTransaction(txResponse.txid!);
+            }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(

@@ -286,7 +286,7 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
   sellCallback(context, state) async {
     var box = await Hive.openBox(HiveBoxes.client);
     var kycStatus = await box.get(HiveNames.kycStatus);
-    bool isSkipKyc = kycStatus == 'skip';
+    bool isSkipKyc = kycStatus == 'skip' || state.kycStatus == 'Completed';
     await box.close();
     Navigator.push(
       context,

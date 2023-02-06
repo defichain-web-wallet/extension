@@ -14,6 +14,7 @@ extension ParseToString on PasswordStatusList {
 class PasswordTextField extends StatefulWidget {
   final PasswordStatusList status;
   final TextEditingController controller;
+  final double height;
   final String hint;
   final String label;
   final String? error;
@@ -21,6 +22,7 @@ class PasswordTextField extends StatefulWidget {
   final Function()? onPressObscure;
   final Function()? onEditComplete;
   final Function(String value)? onSubmitted;
+  final String? Function(String?)? validator;
   final bool autofocus;
   final bool isObscure;
   final bool isShowObscureIcon;
@@ -32,11 +34,13 @@ class PasswordTextField extends StatefulWidget {
     required this.controller,
     required this.hint,
     required this.label,
+    this.height = 44,
     this.error,
     this.onChanged,
     this.onPressObscure,
     this.onEditComplete,
     this.onSubmitted,
+    this.validator,
     this.autofocus = false,
     this.isObscure = false,
     this.isShowObscureIcon = false,
@@ -63,7 +67,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
           height: 6,
         ),
         Container(
-          height: 44,
+          height: widget.height,
           child: TextFormField(
             autofocus: widget.autofocus,
             maxLines: maxLines,
@@ -73,6 +77,11 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
             onEditingComplete: widget.onEditComplete,
             controller: widget.controller,
             decoration: InputDecoration(
+              errorStyle: TextStyle(
+                backgroundColor: Colors.transparent,
+                color: Colors.pink,
+                fontSize: 10
+              ),
               hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
               filled: true,
               fillColor: Theme.of(context).inputDecorationTheme.fillColor,
@@ -95,6 +104,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
               color: Theme.of(context).textTheme.headline1!.color!,
             ),
             onChanged: widget.onChanged,
+            validator: widget.validator,
           ),
         ),
         SizedBox(

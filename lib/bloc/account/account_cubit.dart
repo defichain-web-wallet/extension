@@ -224,9 +224,9 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<List<AccountModel>> loadAccountDetails(
-      List<AccountModel> accounts) async {
-    bool needUpdate = true;
-
+    List<AccountModel> accounts, {
+    bool isUpdateWithHistory = true,
+  }) async {
     for (var i = 0; i < accounts.length; i++) {
       var balanceList = await balanceRequests.getBalanceListByAddressList(
           accounts[i].addressList!, SettingsHelper.settings.network!);
@@ -237,13 +237,11 @@ class AccountCubit extends Cubit<AccountState> {
           if (newBalance.token == oldBalance.token) {
             findBalance = true;
             if (newBalance.balance != oldBalance.balance) {
-              needUpdate = true;
               oldBalance.balance = newBalance.balance;
             }
           }
         });
         if (!findBalance) {
-          needUpdate = true;
           accounts[i].balanceList!.add(newBalance);
         }
       });
@@ -256,12 +254,11 @@ class AccountCubit extends Cubit<AccountState> {
           }
         });
         if (!balanceExist) {
-          needUpdate = true;
           //TODO: need testing with tx
           oldBalance.balance = 0;
         }
       });
-      if (needUpdate) {
+      if (isUpdateWithHistory) {
         List<HistoryNew> txListModel;
         TxListModel testnetTxListModel;
         try {
@@ -328,7 +325,6 @@ class AccountCubit extends Cubit<AccountState> {
       activeAccount: state.activeAccount,
       activeToken: state.activeToken,
     ));
-
   }
 
   Future<AccountModel> addAccount() async {
@@ -492,7 +488,9 @@ class AccountCubit extends Cubit<AccountState> {
                 network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
         accountModel.bitcoinAddress!.blockchain = 'BTC';
       }
-      if (password != '') {
+      if (password != '' &&
+          accountModel.lockAccessToken == null &&
+          accountModel.accessToken == null) {
         try {
           var keyPair = await HDWalletService().getKeypairFromStorage(
             password,
@@ -701,6 +699,21 @@ class AccountCubit extends Cubit<AccountState> {
       activeToken: state.activeToken,
       historyFilterBy: state.historyFilterBy,
       swapTutorialStatus: status,
+    ));
+  }
+
+  loadAccounts() async {
+    var accountList = await loadAccountDetails([state.activeAccount!],
+        isUpdateWithHistory: false);
+    emit(state.copyWith(
+      status: AccountStatusList.success,
+      accounts: accountList,
+      balances: state.balances,
+      masterKeyPairPublicKey: state.masterKeyPairPublicKey,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+      historyFilterBy: state.historyFilterBy,
+      swapTutorialStatus: state.swapTutorialStatus,
     ));
   }
 }

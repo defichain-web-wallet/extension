@@ -1,6 +1,6 @@
 part of 'fiat_cubit.dart';
 
-enum FiatStatusList { initial, loading, success, restore, failure }
+enum FiatStatusList { initial, loading, success, expired, failure }
 
 class FiatState extends Equatable {
   final FiatStatusList status;
@@ -21,7 +21,8 @@ class FiatState extends Equatable {
   final List<IbanModel>? ibanList;
   final KycModel? personalInfo;
   final List<dynamic>? countryList;
-  final List<FiatModel>? fiatList;
+  final List<FiatModel>? buyableFiatList;
+  final List<FiatModel>? sellableFiatList;
   final bool? isShowTutorial;
   final bool? isKycDataComplete;
   final LimitModel? limit;
@@ -46,7 +47,8 @@ class FiatState extends Equatable {
     this.ibanList,
     this.personalInfo,
     this.countryList,
-    this.fiatList,
+    this.buyableFiatList,
+    this.sellableFiatList,
     this.isShowTutorial = true,
     this.isKycDataComplete,
     this.limit,
@@ -73,7 +75,8 @@ class FiatState extends Equatable {
     ibanList,
     personalInfo,
     countryList,
-    fiatList,
+    buyableFiatList,
+    sellableFiatList,
     isShowTutorial,
     isKycDataComplete,
     limit,
@@ -99,7 +102,8 @@ class FiatState extends Equatable {
     List<IbanModel>? ibanList,
     KycModel? personalInfo,
     List<dynamic>? countryList,
-    List<FiatModel>? fiatList,
+    List<FiatModel>? buyableFiatList,
+    List<FiatModel>? sellableFiatList,
     bool? isShowTutorial,
     bool? isKycDataComplete,
     LimitModel? limit,
@@ -124,7 +128,8 @@ class FiatState extends Equatable {
       ibanList: ibanList ?? this.ibanList,
       personalInfo: personalInfo ?? this.personalInfo,
       countryList: countryList ?? this.countryList,
-      fiatList: fiatList ?? this.fiatList,
+      buyableFiatList: buyableFiatList ?? this.buyableFiatList,
+      sellableFiatList: sellableFiatList ?? this.sellableFiatList,
       isShowTutorial: isShowTutorial ?? this.isShowTutorial,
       isKycDataComplete: isKycDataComplete ?? this.isKycDataComplete,
       limit: limit ?? this.limit,

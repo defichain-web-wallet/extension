@@ -60,6 +60,9 @@ class _DefiTextFormFieldState extends State<DefiTextFormField> {
                 MouseRegion(
                   cursor: SystemMouseCursors.click,
                   child: GestureDetector(
+                    onTap: () {
+                      widget.onFieldSubmitted!(widget.controller!.text);
+                    },
                     child: Container(
                       child: SvgPicture.asset(
                         'assets/icons/arrow_phrase.svg',

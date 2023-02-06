@@ -7,6 +7,7 @@ import 'package:defi_wallet/helpers/dex_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
@@ -51,7 +52,7 @@ class SwapScreen extends StatefulWidget {
   _SwapScreenState createState() => _SwapScreenState();
 }
 
-class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
+class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin {
   final TextEditingController amountFromController = TextEditingController(
     text: '0.00',
   );
@@ -951,13 +952,29 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
                             ],
                           ),
                           callback: !isDisableSubmit()
-                              ? () =>
-                              submitReviewSwap(
-                                accountState,
-                                transactionState,
+                              ? () {
+                            if (transactionState is! TransactionLoadingState) {
+                                    submitReviewSwap(
+                                      accountState,
+                                      transactionState,
+                                      context,
+                                      isFullScreen,
+                                    );
+                                  } else {
+                              showSnackBar(
                                 context,
-                                isFullScreen,
-                              )
+                                title:
+                                'Please wait for the previous '
+                                    'transaction',
+                                color: AppColors.txStatusError
+                                    .withOpacity(0.1),
+                                prefix: Icon(
+                                  Icons.close,
+                                  color: AppColors.txStatusError,
+                                ),
+                              );
+                            }
+                                }
                               : null,
                         );
                       }
@@ -1082,24 +1099,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin {
         );
         return;
       }
-    }
-    if (transactionState is TransactionLoadingState) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Wait for the previous transaction to complete',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headline5,
-          ),
-          backgroundColor: Theme
-              .of(context)
-              .snackBarTheme
-              .backgroundColor,
-        ),
-      );
-      return;
     }
     if (isEnoughBalance(state)) {
       ScaffoldMessenger.of(context).showSnackBar(

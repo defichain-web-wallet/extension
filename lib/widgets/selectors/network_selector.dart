@@ -252,22 +252,26 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                 children: [
                                   ...List<Widget>.generate(
                                     tabs.length,
-                                        (index) => SelectorTabElement(
+                                    (index) => SelectorTabElement(
+                                      isColoredTitle: true,
                                       title: tabs[index]['name'],
                                       callback: () {
-                                        if (tabs[index]['value'] == NetworkTabs.test) {
-                                          networkCubit.updateTestnetNetworksList(
-                                              !networkState.isShownTestnet
-                                          );
+                                        if (tabs[index]['value'] ==
+                                            NetworkTabs.test) {
+                                          networkCubit
+                                              .updateTestnetNetworksList(
+                                                  !networkState.isShownTestnet);
                                         }
                                       },
-                                      isSelect:
-                                      networkState.currentNetworkSelectorTab == tabs[index]['value'],
-                                      isShownTestnet: networkState.isShownTestnet,
+                                      isSelect: networkState
+                                              .currentNetworkSelectorTab ==
+                                          tabs[index]['value'],
+                                      isShownTestnet:
+                                          networkState.isShownTestnet,
                                       isPaddingLeft: index % 2 == 1,
                                       indicatorWidth: 60,
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                               Divider(

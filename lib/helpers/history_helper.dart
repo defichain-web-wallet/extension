@@ -1,4 +1,6 @@
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/history_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HistoryHelper {
   sortHistoryList(List<HistoryModel> list) {
@@ -37,5 +39,24 @@ class HistoryHelper {
   bool isAvailableTypes(String type) {
     return !'AddPoolLiquidity|RemovePoolLiquidity|PoolSwap|vin|vout'
         .contains(type);
+  }
+
+  void openExplorerLink(String txId) {
+    if (SettingsHelper.isBitcoin()) {
+      if (SettingsHelper.settings.network! ==
+          'mainnet') {
+        launch(
+          'https://live.blockcypher.com/btc/tx/$txId',
+        );
+      } else {
+        launch(
+          'https://live.blockcypher.com/btc-testnet/tx/$txId',
+        );
+      }
+    } else {
+      launch(
+        'https://defiscan.live/transactions/$txId?network=${SettingsHelper.settings.network}',
+      );
+    }
   }
 }

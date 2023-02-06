@@ -1,5 +1,6 @@
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
+import 'package:defi_wallet/models/lock_withdraw_model.dart';
 import 'package:defi_wallet/requests/lock_requests.dart';
 import 'package:defichaindart/defichaindart.dart';
 
@@ -19,7 +20,15 @@ class LockService {
   }
 
   Future<bool> makeWithdraw(ECPair keyPair, String accessToken, int stakingId, double amount) async {
-    var withdrawModel = await LockRequests().requestWithdraw(accessToken, stakingId, amount);
+    LockWithdrawModel? withdrawModel;
+
+    var existWithdraws = await LockRequests().getWithdraws(accessToken, stakingId);
+    if(existWithdraws!.isEmpty){
+      withdrawModel = await LockRequests().requestWithdraw(accessToken, stakingId, amount);
+    } else {
+      withdrawModel = await LockRequests().changeAmountWithdraw(accessToken, stakingId, existWithdraws[0].id!, amount);
+    }
+
     if(withdrawModel == null){
       return false;
     }

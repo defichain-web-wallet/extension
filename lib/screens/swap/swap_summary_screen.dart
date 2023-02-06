@@ -270,6 +270,9 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     context: context,
                                     builder: (BuildContext context1) {
                                       return PassConfirmDialog(
+                                        onCancel: () {
+                                          parent.emitPending(false);
+                                        },
                                         onSubmit: (password) async {
                                           parent.emitPending(true);
                                           await submitSwap(
@@ -277,13 +280,11 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                             tokensState,
                                             password,
                                           );
-                                          parent.emitPending(false);
                                         }
                                       );
                                     },
                                   );
                                 }
-                                parent.emitPending(false);
                               },
                             ),
                           ),
@@ -333,6 +334,12 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
           return TxStatusDialog(
             txResponse: txResponse,
             callbackOk: () {
+              if (!txResponse.isError) {
+                TransactionCubit transactionCubit =
+                  BlocProvider.of<TransactionCubit>(context);
+
+                transactionCubit.setOngoingTransaction(txResponse.txid!);
+              }
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(

@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
@@ -29,7 +30,7 @@ class IbanScreen extends StatefulWidget {
   _IbanScreenState createState() => _IbanScreenState();
 }
 
-class _IbanScreenState extends State<IbanScreen> with ThemeMixin {
+class _IbanScreenState extends State<IbanScreen> with ThemeMixin, SnackBarMixin {
   final _formKey = GlobalKey<FormState>();
   final _ibanController = TextEditingController();
   final GlobalKey<IbanSelectorState> selectKeyIban =
@@ -209,17 +210,33 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin {
       String iban = (widget.isNewIban || fiatState.activeIban == null)
           ? _ibanController.text
           : fiatState.activeIban.iban;
-      print(_ibanController.text);
-      await fiatCubit.saveBuyDetails(
-          iban, widget.asset, fiatState.accessToken!);
-      Navigator.push(
+      try {
+        if (widget.isNewIban) {
+          await fiatCubit.saveBuyDetails(
+            iban,
+            widget.asset,
+            fiatState.accessToken!,
+          );
+        }
+        Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+              widget.routeWidget!,
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ));
+      } catch (err) {
+        showSnackBar(
           context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                widget.routeWidget!,
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ));
+          title: err.toString().replaceAll('"', ''),
+          color: AppColors.txStatusError.withOpacity(0.1),
+          prefix: Icon(
+            Icons.close,
+            color: AppColors.txStatusError,
+          ),
+        );
+      }
     }
   }
 

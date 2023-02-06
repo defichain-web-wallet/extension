@@ -54,7 +54,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
           builder: (context, fiatState) {
             if (fiatState.status == FiatStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.failure) {
+            } else if (fiatState.status == FiatStatusList.expired) {
               Future.microtask(() => Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(

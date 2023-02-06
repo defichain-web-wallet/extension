@@ -52,6 +52,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SnackBarMixin, TickerProviderStateMixin {
+  static const int tickerTimerUpdate = 15;
+  Timer? timer;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   TabController? tabController;
   bool isSaveOpenTime = false;
@@ -134,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     setTabBody();
-    tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 2, vsync: this,);
     tabController!.addListener(tabListener);
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
@@ -147,12 +149,16 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     tabController!.dispose();
+    if (timer != null) {
+      timer!.cancel();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     if (widget.isLoadTokens) {
       tokensCubit.loadTokensFromStorage();
     }
@@ -161,6 +167,7 @@ class _HomeScreenState extends State<HomeScreen>
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
           return ScaffoldWrapper(
+            isUpdate: true,
             builder: (
               BuildContext context,
               bool isFullScreen,
@@ -176,6 +183,12 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {
+                      if (timer == null) {
+                        timer = Timer.periodic(
+                            Duration(seconds: tickerTimerUpdate), (timer) async {
+                          await accountCubit.loadAccounts();
+                        });
+                      }
                       if (widget.snackBarMessage.isNotEmpty &&
                           !isShownSnackBar) {
                         Future<Null>.delayed(Duration.zero, () {
@@ -332,6 +345,7 @@ class _HomeScreenState extends State<HomeScreen>
                                           SliverFillRemaining(
                                             hasScrollBody: false,
                                             child: Container(
+                                              height: txState is! TransactionInitialState ? 90 : 0,
                                               color: Theme.of(context).cardColor,
                                             ),
                                           )
@@ -342,6 +356,7 @@ class _HomeScreenState extends State<HomeScreen>
                                           SliverFillRemaining(
                                             hasScrollBody: false,
                                             child: Container(
+                                              height: txState is! TransactionInitialState ? 90 : 0,
                                               color: Theme.of(context).cardColor,
                                             ),
                                           ),

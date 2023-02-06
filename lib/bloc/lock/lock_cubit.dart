@@ -18,6 +18,8 @@ class LockCubit extends Cubit<LockState> {
   TransactionService transactionService = TransactionService();
   AccountState accountState = AccountState();
 
+
+
   Future<String> getAccessToken(
     AccountModel account,
     ECPair keyPair, {
@@ -43,7 +45,32 @@ class LockCubit extends Cubit<LockState> {
     try {
       LockUserModel? data =
           await lockRequests.getUser(account.lockAccessToken!);
-      print('address: ${data!.kycStatus}');
+      emit(state.copyWith(
+        status: LockStatusList.success,
+        lockUserDetails: data,
+        lockStakingDetails: state.lockStakingDetails,
+        lockAnalyticsDetails: state.lockAnalyticsDetails,
+      ));
+    } catch (_) {
+      emit(state.copyWith(
+        status: LockStatusList.failure,
+        lockUserDetails: state.lockUserDetails,
+        lockStakingDetails: state.lockStakingDetails,
+        lockAnalyticsDetails: state.lockAnalyticsDetails,
+      ));
+    }
+  }
+  loadKycDetails(AccountModel account) async {
+    emit(state.copyWith(
+      status: LockStatusList.loading,
+      lockUserDetails: state.lockUserDetails,
+      lockStakingDetails: state.lockStakingDetails,
+      lockAnalyticsDetails: state.lockAnalyticsDetails,
+    ));
+
+    try {
+      LockUserModel? data =
+          await lockRequests.getKYC(account.lockAccessToken!);
       emit(state.copyWith(
         status: LockStatusList.success,
         lockUserDetails: data,
