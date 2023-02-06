@@ -12,6 +12,7 @@ import 'package:defi_wallet/screens/history/history_details.dart';
 import 'package:defi_wallet/screens/history/widgets/icon_history_type.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -336,8 +337,37 @@ class _TransactionHistoryState extends State<TransactionHistory>
                             else if (isScrollPositionOnBottom && index == historyList.length - 1)
                               Container(
                                 width: double.infinity,
+                                height: 80,
                                 color: Theme.of(context).cardColor,
-                                child: Text('Loading...', textAlign: TextAlign.center,),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 30,
+                                      height: 30,
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.portage.withOpacity(0.24),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 14,
+                                    ),
+                                    Text(
+                                      'Loading',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .copyWith(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!
+                                            .withOpacity(0.6),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               )
                           ],
                         );
