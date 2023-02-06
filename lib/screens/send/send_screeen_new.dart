@@ -349,8 +349,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                     NewPrimaryButton(
                                       width: buttonSmallWidth,
                                       callback: () {
-                                        if (!(txState
-                                            is! TransactionInitialState)) {
+                                        if (txState is! TransactionLoadingState) {
                                           if (addressController.text != '') {
                                             if (isAddNewContact) {
                                               showDialog(

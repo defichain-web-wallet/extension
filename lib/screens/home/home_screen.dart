@@ -155,6 +155,7 @@ class _HomeScreenState extends State<HomeScreen>
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
           return ScaffoldWrapper(
+            isUpdate: true,
             builder: (
               BuildContext context,
               bool isFullScreen,

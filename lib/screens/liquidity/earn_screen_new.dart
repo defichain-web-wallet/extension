@@ -641,7 +641,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
   liquidityCallback(double totalLiquidityBalance, txState) {
     Widget redirectTo = LiquidityScreenNew();
 
-    if (!(txState is! TransactionInitialState)) {
+    if (txState is! TransactionLoadingState) {
       Navigator.push(
         context,
         PageRouteBuilder(
