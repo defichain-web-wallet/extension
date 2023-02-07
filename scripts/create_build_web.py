@@ -9,6 +9,7 @@ import pathlib
 
 
 DIR = pathlib.Path(__file__).parent.resolve()
+EXT = "tar"
 
 
 def get_version():
@@ -67,7 +68,7 @@ def create_tag(name):
 
 
 def push():
-    command = f"git push"
+    command = f"git push origin --tags"
     subprocess.run(command, universal_newlines=True, shell=True)
 
 
@@ -80,7 +81,7 @@ def build():
 
 
 def pack_archive(name):
-    shutil.make_archive(name, 'tar', f"{DIR}/../build/web")
+    shutil.make_archive(name, f"{EXT}", f"{DIR}/../build/web")
 
 
 def upload_archive(name):
@@ -99,12 +100,12 @@ def upload_archive(name):
         'includeTeamDriveItems': True,
         'supportsTeamDrives': True
     })
-    gfile.SetContentFile(f"{name}.tar")
+    gfile.SetContentFile(f"{name}.{EXT}")
     gfile.Upload(param={'supportsTeamDrives': True})
 
 
 def delete_archive(name):
-    os.remove(name)
+    os.remove(f"{name}.{EXT}")
 
 
 def run(version):
