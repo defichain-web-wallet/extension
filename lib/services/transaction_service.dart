@@ -4,7 +4,6 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/models/tx_auth_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_response_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
