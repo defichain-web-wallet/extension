@@ -67,7 +67,7 @@ def create_tag(name):
 
 
 def push():
-    command = f"git push"
+    command = f"git push origin --tags"
     subprocess.run(command, universal_newlines=True, shell=True)
 
 
