@@ -4,7 +4,6 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/models/tx_auth_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/models/tx_response_model.dart';
@@ -32,7 +31,7 @@ class TransactionService {
 
   Future<TxErrorModel> removeLiqudity(
       {required AccountModel account,
-        required ECPair keyPair,
+      required ECPair keyPair,
       required AssetPairModel token,
       required int amount}) async {
     await _getUtxoList(account);
@@ -52,41 +51,49 @@ class TransactionService {
     return await prepareTx(responseModel, TxType.removeLiq);
   }
 
-  Future<String> createBTCTransaction({
-    required ECPair keyPair,
-    required AccountModel account,
-    required String destinationAddress,
-    required int amount,
-    required int satPerByte}) async {
+  Future<String> createBTCTransaction(
+      {required ECPair keyPair,
+      required AccountModel account,
+      required String destinationAddress,
+      required int amount,
+      required int satPerByte}) async {
     //romance portion fit sea price casual forward piano afraid erosion want replace excite figure place butter fortune empower rotate safe surface person distance simple
     //https://api.blockcypher.com/v1/btc/test3/addrs/tb1qhwqqsktldqypttltr59px506p890ce0sgj0fe7?unspentOnly=true
 
     var utxos = await BtcRequests().getUTXOs(address: account.bitcoinAddress!);
-    var fee = calculateBTCFee(2,2,satPerByte);
+    var fee = calculateBTCFee(2, 2, satPerByte);
     var selectedUtxo = _utxoSelector(utxos, fee, amount);
-    if (selectedUtxo.length > 2){
-      selectedUtxo = _utxoSelector(utxos, calculateBTCFee(2,selectedUtxo.length,satPerByte), amount);
+    if (selectedUtxo.length > 2) {
+      selectedUtxo = _utxoSelector(
+          utxos, calculateBTCFee(2, selectedUtxo.length, satPerByte), amount);
     }
-    String network = SettingsHelper.settings.network! == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet';
+    String network = SettingsHelper.settings.network! == 'mainnet'
+        ? 'bitcoin'
+        : 'bitcoin_testnet';
     NetworkType networkType = NetworkHelper().getNetwork(network);
-    final _txb = TransactionBuilder(
-        network: networkType);
+    final _txb = TransactionBuilder(network: networkType);
     _txb.setVersion(2);
     var amountUtxo = 0;
     selectedUtxo.forEach((utxo) {
       amountUtxo += utxo.value!;
-      _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: keyPair.publicKey), network: networkType).data!.output);
+      _txb.addInput(
+          utxo.mintTxId,
+          utxo.mintIndex,
+          null,
+          P2WPKH(
+                  data: PaymentData(pubkey: keyPair.publicKey),
+                  network: networkType)
+              .data!
+              .output);
     });
 
     _txb.addOutput(destinationAddress, amount);
-    if(amountUtxo > amount+fee+DUST){
-      _txb.addOutput(account.bitcoinAddress!.address, amountUtxo - (amount+fee));
+    if (amountUtxo > amount + fee + DUST) {
+      _txb.addOutput(
+          account.bitcoinAddress!.address, amountUtxo - (amount + fee));
     }
     selectedUtxo.asMap().forEach((index, utxo) {
-    _txb.sign(
-        vin: index,
-        keyPair: keyPair,
-        witnessValue: utxo.value);
+      _txb.sign(vin: index, keyPair: keyPair, witnessValue: utxo.value);
     });
 
     return _txb.build().toHex();
@@ -94,13 +101,12 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendLiqudity(
       {required AccountModel account,
-        required ECPair keyPair,
+      required ECPair keyPair,
       required String tokenA,
       required String tokenB,
       required int amountA,
       required int amountB,
       required List<TokensModel> tokens}) async {
-
     await _getUtxoList(account);
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
@@ -115,35 +121,27 @@ class TransactionService {
     var addressBalanceList = await balanceRequests
         .getAddressBalanceListByAddressList(account.addressList!);
 
-    if(amountDFI != null){
+    if (amountDFI != null) {
       var tokenDFIbalanceAll =
-      balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
+          balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
 
       var coinDFIbalanceAll =
-      balancesHelper.getBalanceByTokenName(addressBalanceList, '\$DFI');
+          balancesHelper.getBalanceByTokenName(addressBalanceList, '\$DFI');
 
       if (tokenDFIbalanceAll + coinDFIbalanceAll < amountDFI) {
-        return TxErrorModel(isError: true, error: 'Not enough balance. Wait for approval the previous tx');
+        return TxErrorModel(
+            isError: true,
+            error: 'Not enough balance. Wait for approval the previous tx');
       }
 
       var tokenDFIId = await tokensRequests.getTokenID('DFI', tokens);
 
       if (tokenDFIbalanceAll < amountDFI) {
-        var responseModel = await createTransaction(
-          keyPair: keyPair,
-            utxoList: accountUtxoList,
+        var responseModel = await utxoToAccountTransaction(
+            keyPair: keyPair,
             account: account,
-            destinationAddress: account.addressList![0].address!,
-            changeAddress: account.getActiveAddress(isChange: true),
-            amount: 0,
-            reservedBalance: amountDFI - tokenDFIbalanceAll,
-            additional: (txb, nw, newUtxo) {
-              txb.addUtxosToAccountOutput(
-                  tokenDFIId,
-                  account.addressList![0].address!,
-                  amountDFI! - tokenDFIbalanceAll,
-                  nw);
-            });
+            amount: amountDFI - tokenDFIbalanceAll,
+            tokenId: tokenDFIId!);
 
         txErrorModel = await prepareTx(responseModel, TxType.convertUtxo);
         if (txErrorModel.isError) {
@@ -156,7 +154,7 @@ class TransactionService {
     var tokenBId = await tokensRequests.getTokenID(tokenB, tokens);
 
     var responseModel = await createTransaction(
-      keyPair: keyPair,
+        keyPair: keyPair,
         utxoList: accountUtxoList,
         destinationAddress: account.addressList![0].address!,
         account: account,
@@ -173,20 +171,22 @@ class TransactionService {
         },
         useAllUtxo: true);
 
-    if(txErrorModel.txLoaderList!.length > 0){
-      txErrorModel.txLoaderList!.add(TxLoaderModel(txHex: responseModel.hex, type: TxType.addLiq));
+    if (txErrorModel.txLoaderList!.length > 0) {
+      txErrorModel.txLoaderList!
+          .add(TxLoaderModel(txHex: responseModel.hex, type: TxType.addLiq));
     } else {
-      txErrorModel = await prepareTx(responseModel,TxType.addLiq);
+      txErrorModel = await prepareTx(responseModel, TxType.addLiq);
     }
-    
+
     return txErrorModel;
   }
 
   Future<TxErrorModel> createAndSendTransaction(
       {required AccountModel account,
-        required ECPair keyPair,
+      required ECPair keyPair,
       required String destinationAddress,
-      required int amount, required List<TokensModel> tokens}) async {
+      required int amount,
+      required List<TokensModel> tokens}) async {
     var tokenId = await tokensRequests.getTokenID('DFI', tokens);
     TxResponseModel? responseModel;
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
@@ -196,7 +196,7 @@ class TransactionService {
     var addressBalanceList = await balanceRequests
         .getAddressBalanceListByAddressList(account.addressList!);
     var tokenDFIbalance =
-    balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
+        balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
 
     //Swap DFI tokens to UTXO if needed
     if (tokenDFIbalance >= DUST) {
@@ -214,14 +214,17 @@ class TransactionService {
                 value: tokenDFIbalance,
                 mintIndex: newUtxo.length + 1));
             txb.addOutput(account.addressList![0].address!, tokenDFIbalance);
-            txb.addAccountToUtxoOutput(tokenId, account.addressList![0].address!,
-                tokenDFIbalance, mintingStartsAt);
+            txb.addAccountToUtxoOutput(
+                tokenId,
+                account.addressList![0].address!,
+                tokenDFIbalance,
+                mintingStartsAt);
           });
       if (responseModel.isError) {
         return TxErrorModel(isError: true, error: responseModel.error);
       }
 
-       txErrorModel = await prepareTx(responseModel,TxType.convertUtxo);
+      txErrorModel = await prepareTx(responseModel, TxType.convertUtxo);
 
       if (txErrorModel.isError) {
         return txErrorModel;
@@ -229,7 +232,7 @@ class TransactionService {
     }
 
     var responseTxModel = await createTransaction(
-      keyPair: keyPair,
+        keyPair: keyPair,
         utxoList: accountUtxoList,
         destinationAddress: destinationAddress,
         account: account,
@@ -239,10 +242,11 @@ class TransactionService {
       return TxErrorModel(isError: true, error: responseTxModel.error);
     }
 
-    if(txErrorModel.txLoaderList!.length > 0){
-      txErrorModel.txLoaderList!.add(TxLoaderModel(txHex: responseTxModel.hex, type: TxType.send));
+    if (txErrorModel.txLoaderList!.length > 0) {
+      txErrorModel.txLoaderList!
+          .add(TxLoaderModel(txHex: responseTxModel.hex, type: TxType.send));
     } else {
-      txErrorModel = await prepareTx(responseTxModel,TxType.send);
+      txErrorModel = await prepareTx(responseTxModel, TxType.send);
     }
 
     return txErrorModel;
@@ -250,26 +254,25 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendToken(
       {required AccountModel account,
-        required ECPair keyPair,
+      required ECPair keyPair,
       required String token,
       required String destinationAddress,
-      required int amount, required List<TokensModel> tokens}) async {
-
-
+      required int amount,
+      required List<TokensModel> tokens}) async {
     await _getUtxoList(account);
 
     var tokenId = await tokensRequests.getTokenID(token, tokens);
 
     var responseModel = await createTransaction(
-      keyPair:keyPair,
+        keyPair: keyPair,
         utxoList: accountUtxoList,
         destinationAddress: destinationAddress,
         account: account,
         changeAddress: account.getActiveAddress(isChange: true),
         amount: 0,
         additional: (txb, nw, newUtxo) {
-            txb.addAccountToAccountOutputAt(tokenId, destinationAddress,
-                destinationAddress, amount, 0);
+          txb.addAccountToAccountOutputAt(
+              tokenId, destinationAddress, destinationAddress, amount, 0);
         },
         useAllUtxo: true);
     if (responseModel.isError) {
@@ -279,216 +282,98 @@ class TransactionService {
     return await prepareTx(responseModel, TxType.send);
   }
 
-//TODO: Need refactoring this function  #fastest_programing
   Future<TxErrorModel> createAndSendSwap(
       {required AccountModel account,
-        required ECPair keyPair,
+      required ECPair keyPair,
       required String tokenFrom,
       required String tokenTo,
-      required int amount, required int amountTo, required List<TokensModel> tokens, double slippage = 0.03}) async
-  {
-    return TxErrorModel(isError: false);
+      required int amount,
+      required int amountTo,
+      required List<TokensModel> tokens,
+      double slippage = 0.03}) async {
+    TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
+    var tokenFromId = await tokensRequests.getTokenID(tokenFrom, tokens);
+    var tokenToId = await tokensRequests.getTokenID(tokenTo, tokens);
+
+    var maxPrice = amount / (amountTo) * (1 + slippage);
+    var oneHundredMillions = 100000000;
+    var n = maxPrice * oneHundredMillions;
+    var fraction = (n % oneHundredMillions).round();
+    var integer = ((n - fraction) / oneHundredMillions).round();
+
+    await _getUtxoList(account);
+
+    if (tokenFrom == 'DFI') {
+      var addressBalanceList = await balanceRequests
+          .getAddressBalanceListByAddressList(account.addressList!);
+      var tokenBalance =
+          balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
+
+      if (tokenBalance < amount) {
+        var responseModel = await utxoToAccountTransaction(
+            keyPair: keyPair,
+            account: account,
+            amount: amount - tokenBalance,
+            tokenId: tokenFromId!);
+
+        if (responseModel.isError) {
+          return TxErrorModel(isError: true, error: responseModel.error);
+        }
+
+        var utxoToAccTxid = await prepareTx(responseModel, TxType.convertUtxo);
+        if (utxoToAccTxid.isError) {
+          return utxoToAccTxid;
+        }
+      }
+    }
+
+    var responseModel = await createTransaction(
+        keyPair: keyPair,
+        utxoList: accountUtxoList,
+        destinationAddress: account.getActiveAddress(isChange: false),
+        changeAddress: account.getActiveAddress(isChange: true),
+        amount: 0,
+        account: account,
+        additional: (txb, nw, newUtxo) {
+          txb.addSwapOutput(
+              tokenFromId,
+              account.addressList![0].address!,
+              amount,
+              tokenToId,
+              account.getActiveAddress(isChange: false),
+              integer,
+              fraction);
+        },
+        useAllUtxo: true);
+
+    if (txErrorModel.txLoaderList!.length > 0) {
+      txErrorModel.txLoaderList!
+          .add(TxLoaderModel(txHex: responseModel.hex, type: TxType.swap));
+    } else {
+      txErrorModel = await prepareTx(responseModel, TxType.swap);
+    }
+
+    return txErrorModel;
   }
-  // {
-  //   var tokenFromId = await tokensRequests.getTokenID(tokenFrom, tokens);
-  //   var tokenToId = await tokensRequests.getTokenID(tokenTo, tokens);
-  //
-  //   var maxPrice = amount / (amountTo) * (1 + slippage);
-  //   var oneHundredMillions = 100000000;
-  //   var n = maxPrice * oneHundredMillions;
-  //   var fraction = (n % oneHundredMillions).round();
-  //   var integer = ((n - fraction) / oneHundredMillions).round();
-  //
-  //   await _getUtxoList(account);
-  //
-  //   List<TxAuthModel> txAuthList = [];
-  //   List<UtxoModel> selectedUtxoList = [];
-  //   if (tokenFrom == 'DFI') {
-  //     var addressBalanceList = await balanceRequests
-  //         .getAddressBalanceListByAddressList(account.addressList!);
-  //     var tokenBalance =
-  //         balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
-  //
-  //     if (tokenBalance >= amount) {
-  //       var sumAmount = 0;
-  //       for (var element in addressBalanceList) {
-  //         if (sumAmount < amount) {
-  //           for (var balance in element.balanceList!) {
-  //             if (balance.token == 'DFI') {
-  //               var utxoList =
-  //                   _utxoSelectorForSendToken(accountUtxoList, txAuthList);
-  //
-  //               var authTxidModel = await _createAuthTx(
-  //                   keyPair: keyPair,
-  //                   utxoList: utxoList,
-  //                   destinationAddress: element.addressModel!,
-  //                   account: account);
-  //               if (authTxidModel.isError) {
-  //                 return authTxidModel;
-  //               }
-  //
-  //               var sendedAmount = 0;
-  //               if (balance.balance! >= amount - sumAmount) {
-  //                 sendedAmount = amount - sumAmount;
-  //                 sumAmount += amount - sumAmount;
-  //               } else {
-  //                 sendedAmount = balance.balance!;
-  //                 sumAmount += balance.balance!;
-  //               }
-  //
-  //               selectedUtxoList.add(authTxidModel.utxo!);
-  //               txAuthList.add(TxAuthModel(
-  //                   address: element.addressModel!,
-  //                   txid: authTxidModel.txid,
-  //                   mintIndex: 1,
-  //                   value: sendedAmount));
-  //             }
-  //           }
-  //         }
-  //       }
-  //     } else {
-  //       var needAmount = amount - tokenBalance;
-  //       var selectedUtxo = _utxoSelector(accountUtxoList, FEE, needAmount);
-  //       var activeAddress = account.getActiveAddress(isChange: false);
-  //       var responseModel = await createTransaction(
-  //         keyPair: keyPair,
-  //           utxoList: selectedUtxo,
-  //           account: account,
-  //           destinationAddress: account.getActiveAddress(isChange: false),
-  //           changeAddress: account.getActiveAddress(isChange: true),
-  //           amount: 0,
-  //           reservedBalance: needAmount,
-  //           additional: (txb, nw, newUtxo) {
-  //             txb.addUtxosToAccountOutput(tokenFromId,
-  //                 activeAddress, needAmount, nw);
-  //           },
-  //           useAllUtxo: true);
-  //       if (responseModel.isError) {
-  //         return TxErrorModel(isError: true, error: responseModel.error);
-  //       }
-  //
-  //       var utxoToAccTxId = await _waitPreviousTx(responseModel);
-  //
-  //       if (utxoToAccTxId.isError) {
-  //         return utxoToAccTxId;
-  //       }
-  //
-  //       await _waitConfirmTx(utxoToAccTxId.txid!);
-  //       await _getUtxoList(account);
-  //
-  //       addressBalanceList = balancesHelper.updateBalance(addressBalanceList, activeAddress, 'DFI', needAmount);
-  //
-  //       var sumAmount = 0;
-  //       for (var element in addressBalanceList) {
-  //         if (sumAmount < amount) {
-  //           for (var balance in element.balanceList!) {
-  //             if (balance.token == 'DFI') {
-  //               var utxoList =
-  //                   _utxoSelectorForSendToken(accountUtxoList, txAuthList);
-  //
-  //               var authTxidModel = await _createAuthTx(
-  //                   keyPair: keyPair,
-  //                   utxoList: utxoList,
-  //                   destinationAddress: element.addressModel!,
-  //                   account: account);
-  //
-  //               if (authTxidModel.isError) {
-  //                 return authTxidModel;
-  //               }
-  //
-  //               var sendedAmount = 0;
-  //               if (balance.balance! >= amount - sumAmount) {
-  //                 sendedAmount = amount - sumAmount;
-  //                 sumAmount += amount - sumAmount;
-  //               } else {
-  //                 sendedAmount = balance.balance!;
-  //                 sumAmount += balance.balance!;
-  //               }
-  //
-  //               selectedUtxoList.add(authTxidModel.utxo!);
-  //               txAuthList.add(TxAuthModel(
-  //                   address: element.addressModel!,
-  //                   txid: authTxidModel.txid,
-  //                   mintIndex: 1,
-  //                   value: sendedAmount));
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   } else {
-  //     var sumAmount = 0;
-  //     for (var element in account.addressList!) {
-  //       if (sumAmount < amount) {
-  //         var balances = await balanceRequests.getBalanceListByAddress(
-  //             element.address!, true, SettingsHelper.settings.network!);
-  //         for (var balance in balances) {
-  //           if (balance.token == tokenFrom) {
-  //             var utxoList =
-  //                 _utxoSelectorForSendToken(accountUtxoList, txAuthList);
-  //
-  //             var authTxidModel = await _createAuthTx(
-  //               keyPair: keyPair,
-  //                 utxoList: utxoList,
-  //                 destinationAddress: element,
-  //                 account: account);
-  //
-  //             if (authTxidModel.isError) {
-  //               return authTxidModel;
-  //             }
-  //
-  //             var sendedAmount = 0;
-  //             if (balance.balance! >= amount - sumAmount) {
-  //               sendedAmount = amount - sumAmount;
-  //               sumAmount += amount - sumAmount;
-  //             } else {
-  //               sendedAmount = balance.balance!;
-  //               sumAmount += balance.balance!;
-  //             }
-  //
-  //             selectedUtxoList.add(authTxidModel.utxo!);
-  //             txAuthList.add(TxAuthModel(
-  //                 address: element,
-  //                 txid: authTxidModel.txid,
-  //                 mintIndex: 1,
-  //                 value: sendedAmount));
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //
-  //    late TxResponseModel responseModel;
-  //    late TxErrorModel response;
-  //
-  //   for(var i = 0; i<txAuthList.length; i++) {
-  //      responseModel = await createTransaction(
-  //        keyPair: keyPair,
-  //         utxoList: [selectedUtxoList[i]],
-  //         destinationAddress: account.getActiveAddress(isChange: false),
-  //         changeAddress: account.getActiveAddress(isChange: true),
-  //         amount: 0,
-  //         account: account,
-  //         additional: (txb, nw, newUtxo) {
-  //           txb.addSwapOutput(
-  //               tokenFromId,
-  //               txAuthList[i].address!.address!,
-  //               txAuthList[i].value!,
-  //               tokenToId,
-  //               account.getActiveAddress(isChange: false),
-  //               integer,
-  //               fraction);
-  //         },
-  //         useAllUtxo: true);
-  //      if (responseModel.isError) {
-  //        return TxErrorModel(isError: true, error: responseModel.error);
-  //      }
-  //      response = await _waitPreviousTx(responseModel);
-  //   }
-  //
-  //
-  //   return response;
-  // }
+
+  Future<TxResponseModel> utxoToAccountTransaction(
+      {required AccountModel account,
+      required ECPair keyPair,
+      required int amount,
+      required int tokenId}) {
+    return createTransaction(
+        keyPair: keyPair,
+        utxoList: accountUtxoList,
+        account: account,
+        destinationAddress: account.addressList![0].address!,
+        changeAddress: account.getActiveAddress(isChange: true),
+        amount: 0,
+        reservedBalance: amount,
+        additional: (txb, nw, newUtxo) {
+          txb.addUtxosToAccountOutput(
+              tokenId, account.addressList![0].address!, amount, nw);
+        });
+  }
 
   Future<TxResponseModel> createTransaction(
       {required ECPair keyPair,
@@ -506,7 +391,7 @@ class TransactionService {
     List<UtxoModel> selectedUTXO = [];
     List<UtxoModel> newUTXO = [];
 
-    if(utxoList.length == 0){
+    if (utxoList.length == 0) {
       return TxResponseModel(
           isError: true,
           error: 'Not enough balance. Wait for approval the previous tx',
@@ -521,23 +406,31 @@ class TransactionService {
       selectedUTXO = _utxoSelector(utxoList, FEE, amount);
     }
 
-
     final _txb = TransactionBuilder(
         network: networkHelper.getNetwork(SettingsHelper.settings.network!));
     _txb.setVersion(2);
 
     selectedUTXO.forEach((utxo) {
-      _txb.addInput(utxo.mintTxId, utxo.mintIndex, null, P2WPKH(data: PaymentData(pubkey: keyPair.publicKey), network: networkHelper.getNetwork(SettingsHelper.settings.network!)).data!.output);
+      _txb.addInput(
+          utxo.mintTxId,
+          utxo.mintIndex,
+          null,
+          P2WPKH(
+                  data: PaymentData(pubkey: keyPair.publicKey),
+                  network: networkHelper
+                      .getNetwork(SettingsHelper.settings.network!))
+              .data!
+              .output);
       sum += utxo.value!;
     });
 
     if (sum < amount + FEE) {
-        return TxResponseModel(
-            isError: true,
-            error: 'Not enough balance. Wait for approval the previous tx',
-            usingUTXO: [],
-            newUTXO: [],
-            hex: '');
+      return TxResponseModel(
+          isError: true,
+          error: 'Not enough balance. Wait for approval the previous tx',
+          usingUTXO: [],
+          newUTXO: [],
+          hex: '');
     }
     if (amount > 0) {
       _txb.addOutput(destinationAddress, amount);
@@ -563,12 +456,8 @@ class TransactionService {
     }
 
     selectedUTXO.asMap().forEach((index, utxo) {
-      _txb.sign(
-          vin: index,
-          keyPair: keyPair,
-          witnessValue: utxo.value);
+      _txb.sign(vin: index, keyPair: keyPair, witnessValue: utxo.value);
     });
-
 
     TxResponseModel responseModel = TxResponseModel(
         hex: _txb.build().toHex(),
@@ -596,7 +485,6 @@ class TransactionService {
     return selectedUtxo;
   }
 
-
   List<UtxoModel> _shuffle(List<UtxoModel> items) {
     var random = new Random();
 
@@ -616,25 +504,25 @@ class TransactionService {
   Future<List<UtxoModel>> _getUtxoList(AccountModel account) async {
     if (accountUtxoList.isEmpty) {
       accountUtxoList =
-      await transactionRequests.getUTXOs(addresses: account.addressList!);
+          await transactionRequests.getUTXOs(addresses: account.addressList!);
     }
 
     return accountUtxoList;
   }
 
   void _updateUtxoList(TxResponseModel responseModel, String txid) {
-      List<UtxoModel> usingUtxo = [];
-      responseModel.usingUTXO.forEach((data) {
-        Map<dynamic, dynamic> dataJson = data.toJson();
-        usingUtxo.add(UtxoModel.fromJson(dataJson));
-      });
+    List<UtxoModel> usingUtxo = [];
+    responseModel.usingUTXO.forEach((data) {
+      Map<dynamic, dynamic> dataJson = data.toJson();
+      usingUtxo.add(UtxoModel.fromJson(dataJson));
+    });
 
-      for(var i = 0; i < usingUtxo.length;i++){
-        accountUtxoList.removeWhere((item) {
-           return item.mintTxId == usingUtxo[i].mintTxId &&
-              item.mintIndex == usingUtxo[i].mintIndex;
-        });
-      }
+    for (var i = 0; i < usingUtxo.length; i++) {
+      accountUtxoList.removeWhere((item) {
+        return item.mintTxId == usingUtxo[i].mintTxId &&
+            item.mintIndex == usingUtxo[i].mintIndex;
+      });
+    }
 
     responseModel.newUTXO.forEach((element) {
       accountUtxoList.add(UtxoModel(
@@ -645,22 +533,25 @@ class TransactionService {
     });
   }
 
-
-  Future<TxErrorModel> prepareTx(TxResponseModel responseModel, TxType type) async {
+  Future<TxErrorModel> prepareTx(
+      TxResponseModel responseModel, TxType type) async {
     TxErrorModel? txid = await transactionRequests.sendTxHex(responseModel.hex);
     if (!txid.isError) {
       _updateUtxoList(responseModel, txid.txLoaderList![0].txId!);
       txid.txLoaderList![0].type = type;
-  }
+    }
 
     return txid;
   }
 
-  int calculateBTCFee(int inputCount, int outputCount, int satPerByte){
+  int calculateBTCFee(int inputCount, int outputCount, int satPerByte) {
     int txBodySize = 10;
     int txInputSize = 148;
     int txOutputSize = 34;
 
-    return (txBodySize+inputCount*txInputSize+txOutputSize*outputCount)*satPerByte;
+    return (txBodySize +
+            inputCount * txInputSize +
+            txOutputSize * outputCount) *
+        satPerByte;
   }
 }
