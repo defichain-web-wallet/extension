@@ -75,7 +75,7 @@ class SwapStatusScreen extends StatelessWidget {
         TransactionCubit transactionCubit =
           BlocProvider.of<TransactionCubit>(context);
 
-        transactionCubit.setOngoingTransaction(txResponse!.txid!);
+        transactionCubit.setOngoingTransaction(txResponse!);
       }
     }
     return Container(
@@ -163,14 +163,14 @@ class SwapStatusScreen extends StatelessWidget {
                                   if (SettingsHelper.settings.network! ==
                                       'mainnet') {
                                     launch(
-                                        'https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
+                                        'https://live.blockcypher.com/btc/tx/txResponse!.txid}');
                                   } else {
                                     launch(
-                                        'https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
+                                        'https://live.blockcypher.com/btc-testnet/tx/txResponse!.txid}');
                                   }
                                 } else {
                                   launch(
-                                      'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
+                                      'https://defiscan.live/transactions/txResponse!.txid}?network=${SettingsHelper.settings.network!}');
                                 }
                               },
                             ),

@@ -6,6 +6,7 @@ import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_auth_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/models/tx_response_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
 import 'package:defi_wallet/requests/btc_requests.dart';
@@ -47,7 +48,8 @@ class TransactionService {
           txb.addRemoveLiquidityOutput(
               token.id!, amount, account.addressList![0].address!);
         });
-    return await _waitPreviousTx(responseModel);
+
+    return await prepareTx(responseModel, TxType.removeLiq);
   }
 
   Future<String> createBTCTransaction({
@@ -100,6 +102,7 @@ class TransactionService {
       required List<TokensModel> tokens}) async {
 
     await _getUtxoList(account);
+    TxErrorModel txErrorModel = TxErrorModel(isError: false);
 
     int? amountDFI;
 
@@ -142,9 +145,9 @@ class TransactionService {
                   nw);
             });
 
-        var utxoToAccTxid = await _waitPreviousTx(responseModel);
-        if (utxoToAccTxid.isError) {
-          return utxoToAccTxid;
+        txErrorModel = await prepareTx(responseModel, TxType.convertUtxo);
+        if (txErrorModel.isError) {
+          return txErrorModel;
         }
       }
     }
@@ -170,7 +173,8 @@ class TransactionService {
         },
         useAllUtxo: true);
 
-    return await _waitPreviousTx(responseModel);
+    txErrorModel.txLoaderList!.add(TxLoaderModel(txHex: responseModel.hex, type: TxType.addLiq));
+    return txErrorModel;
   }
 
   Future<TxErrorModel> createAndSendTransaction(
@@ -180,6 +184,7 @@ class TransactionService {
       required int amount, required List<TokensModel> tokens}) async {
     var tokenId = await tokensRequests.getTokenID('DFI', tokens);
     TxResponseModel? responseModel;
+    TxErrorModel txErrorModel = TxErrorModel(isError: false);
 
     await _getUtxoList(account);
 
@@ -211,10 +216,10 @@ class TransactionService {
         return TxErrorModel(isError: true, error: responseModel.error);
       }
 
-      var accToUtxoTxId = await _waitPreviousTx(responseModel);
+       txErrorModel = await prepareTx(responseModel,TxType.convertUtxo);
 
-      if (accToUtxoTxId.isError) {
-        return accToUtxoTxId;
+      if (txErrorModel.isError) {
+        return txErrorModel;
       }
     }
 
@@ -228,8 +233,9 @@ class TransactionService {
     if (responseTxModel.isError) {
       return TxErrorModel(isError: true, error: responseTxModel.error);
     }
+    txErrorModel.txLoaderList!.add(TxLoaderModel(txHex: responseTxModel.hex, type: TxType.send));
 
-    return await _waitPreviousTx(responseTxModel);
+    return txErrorModel;
   }
 
   Future<TxErrorModel> createAndSendToken(
@@ -238,6 +244,7 @@ class TransactionService {
       required String token,
       required String destinationAddress,
       required int amount, required List<TokensModel> tokens}) async {
+
 
     await _getUtxoList(account);
 
@@ -259,7 +266,7 @@ class TransactionService {
       return TxErrorModel(isError: true, error: responseModel.error);
     }
 
-    return await _waitPreviousTx(responseModel);
+    return await prepareTx(responseModel, TxType.send);
   }
 
 //TODO: Need refactoring this function  #fastest_programing
@@ -629,45 +636,14 @@ class TransactionService {
   }
 
 
-  Future<TxErrorModel> _waitPreviousTx(TxResponseModel responseModel) async {
-    var wait = true;
-    TxErrorModel? txid;
-
-    for (; wait;) {
-      txid = await transactionRequests.sendTxHex(responseModel.hex);
-      if (!txid.isError || txid.error != 'Missing inputs') {
-        wait = false;
-      } else {
-        await new Future.delayed(new Duration(seconds: 2));
-      }
-    }
-
-    if (!txid!.isError) {
-      _updateUtxoList(responseModel, txid.txid!);
+  Future<TxErrorModel> prepareTx(TxResponseModel responseModel, TxType type) async {
+    TxErrorModel? txid = await transactionRequests.sendTxHex(responseModel.hex);
+    if (!txid.isError) {
+      _updateUtxoList(responseModel, txid.txLoaderList![0].txId!);
+      txid.txLoaderList![0].type = type;
   }
 
     return txid;
-  }
-
-  Future<bool> _waitConfirmTx(String txid) async {
-    var wait = true;
-    bool txPresent = false;
-
-    for (; wait;) {
-      try {
-        txPresent = await historyRequests.getTxPresent(
-            txid, SettingsHelper.settings.network!);
-      } catch (err) {
-        txPresent = false;
-      }
-      if (txPresent) {
-        wait = false;
-      } else {
-        await new Future.delayed(new Duration(seconds: 2));
-      }
-    }
-
-    return txPresent;
   }
 
   int calculateBTCFee(int inputCount, int outputCount, int satPerByte){

@@ -2,12 +2,13 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'transaction_state.dart';
 
 class TransactionCubit extends Cubit<TransactionState> {
-  TransactionCubit() : super(TransactionInitialState(''));
+  TransactionCubit() : super(TransactionInitialState(null));
   HistoryRequests historyRequests = HistoryRequests();
   Timer? timer;
 
@@ -23,23 +24,23 @@ class TransactionCubit extends Cubit<TransactionState> {
     }
   }
 
-  onChangeTransactionState(String txId, {dynamic timer}) async {
+  onChangeTransactionState(TxErrorModel txErrorModel, {dynamic timer}) async {
     try {
       bool isOngoing = await historyRequests.getTxPresent(
-          txId, SettingsHelper.settings.network!);
+          txErrorModel, SettingsHelper.settings.network!);
       if (isOngoing) {
         if (timer != null) {
           timer.cancel();
         }
-        emit(TransactionLoadedState(txId));
+        emit(TransactionLoadedState(txErrorModel));
       } else {
-        emit(TransactionLoadingState(txId));
+        emit(TransactionLoadingState(txErrorModel));
       }
     } catch (err) {
       if (timer != null) {
         timer.cancel();
       }
-      emit(TransactionErrorState(txId));
+      emit(TransactionErrorState(txErrorModel));
     }
   }
 
@@ -51,10 +52,10 @@ class TransactionCubit extends Cubit<TransactionState> {
 
   confirmTransactionStatus() async {
     clearOngoingTransaction();
-    emit(TransactionInitialState(''));
+    emit(TransactionInitialState(null));
   }
 
-  setOngoingTransaction(String txId) async {
+  setOngoingTransaction(TxErrorModel txId) async {
     emit(TransactionLoadingState(txId));
     var box = await Hive.openBox(HiveBoxes.client);
     await box.put(HiveNames.ongoingTransaction, txId);

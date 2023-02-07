@@ -1,7 +1,9 @@
+import 'package:defi_wallet/models/tx_loader_model.dart';
+
 class TxErrorModel {
   bool isError;
   String? error;
-  String? txid;
+  List<TxLoaderModel>? txLoaderList;
 
-  TxErrorModel({required this.isError, this.error, this.txid});
+  TxErrorModel({required this.isError, this.error, this.txLoaderList});
 }

@@ -90,7 +90,7 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
       TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
 
-      transactionCubit.setOngoingTransaction(widget.txError.txid!);
+      transactionCubit.setOngoingTransaction(widget.txError);
     }
     return Container(
       color: Theme

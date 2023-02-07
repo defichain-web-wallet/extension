@@ -338,7 +338,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                 TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
-                transactionCubit.setOngoingTransaction(txResponse.txid!);
+                transactionCubit.setOngoingTransaction(txResponse);
               }
               Navigator.pushReplacement(
                 context,

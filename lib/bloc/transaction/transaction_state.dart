@@ -1,27 +1,29 @@
-abstract class TransactionState {
-  final String? txId;
+import 'package:defi_wallet/models/tx_error_model.dart';
 
-  TransactionState(this.txId);
+abstract class TransactionState {
+  final TxErrorModel? txErrorModel;
+
+  TransactionState(this.txErrorModel);
 }
 
 class TransactionInitialState extends TransactionState {
-  TransactionInitialState(String? txId) : super(txId);
+  TransactionInitialState(TxErrorModel? txErrorModel) : super(txErrorModel);
 }
 
 class TransactionLoadingState extends TransactionState {
-  final String? txId;
+  final TxErrorModel? txErrorModel;
 
-  TransactionLoadingState(this.txId) : super(txId);
+  TransactionLoadingState(this.txErrorModel) : super(txErrorModel);
 }
 
 class TransactionLoadedState extends TransactionState {
-  final String? txId;
+  final TxErrorModel? txErrorModel;
 
-  TransactionLoadedState(this.txId) : super(txId!);
+  TransactionLoadedState(this.txErrorModel) : super(txErrorModel!);
 }
 
 class TransactionErrorState extends TransactionState {
-  final String? txId;
+  final TxErrorModel? txErrorModel;
 
-  TransactionErrorState(this.txId) : super(txId!);
+  TransactionErrorState(this.txErrorModel) : super(txErrorModel!);
 }
