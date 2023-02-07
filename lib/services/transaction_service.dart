@@ -102,7 +102,7 @@ class TransactionService {
       required List<TokensModel> tokens}) async {
 
     await _getUtxoList(account);
-    TxErrorModel txErrorModel = TxErrorModel(isError: false);
+    TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
     int? amountDFI;
 
@@ -173,7 +173,12 @@ class TransactionService {
         },
         useAllUtxo: true);
 
-    txErrorModel.txLoaderList!.add(TxLoaderModel(txHex: responseModel.hex, type: TxType.addLiq));
+    if(txErrorModel.txLoaderList!.length > 0){
+      txErrorModel.txLoaderList!.add(TxLoaderModel(txHex: responseModel.hex, type: TxType.addLiq));
+    } else {
+      txErrorModel = await prepareTx(responseModel,TxType.addLiq);
+    }
+    
     return txErrorModel;
   }
 
@@ -184,7 +189,7 @@ class TransactionService {
       required int amount, required List<TokensModel> tokens}) async {
     var tokenId = await tokensRequests.getTokenID('DFI', tokens);
     TxResponseModel? responseModel;
-    TxErrorModel txErrorModel = TxErrorModel(isError: false);
+    TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
     await _getUtxoList(account);
 
@@ -233,7 +238,12 @@ class TransactionService {
     if (responseTxModel.isError) {
       return TxErrorModel(isError: true, error: responseTxModel.error);
     }
-    txErrorModel.txLoaderList!.add(TxLoaderModel(txHex: responseTxModel.hex, type: TxType.send));
+
+    if(txErrorModel.txLoaderList!.length > 0){
+      txErrorModel.txLoaderList!.add(TxLoaderModel(txHex: responseTxModel.hex, type: TxType.send));
+    } else {
+      txErrorModel = await prepareTx(responseTxModel,TxType.send);
+    }
 
     return txErrorModel;
   }
