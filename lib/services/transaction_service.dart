@@ -262,7 +262,6 @@ class TransactionService {
     return await _waitPreviousTx(responseModel);
   }
 
-//TODO: Need refactoring this function  #fastest_programing
   Future<TxErrorModel> createAndSendSwap(
       {required AccountModel account,
         required ECPair keyPair,
@@ -270,208 +269,71 @@ class TransactionService {
       required String tokenTo,
       required int amount, required int amountTo, required List<TokensModel> tokens, double slippage = 0.03}) async
   {
-    return TxErrorModel(isError: false);
+    var tokenFromId = await tokensRequests.getTokenID(tokenFrom, tokens);
+    var tokenToId = await tokensRequests.getTokenID(tokenTo, tokens);
+
+    var maxPrice = amount / (amountTo) * (1 + slippage);
+    var oneHundredMillions = 100000000;
+    var n = maxPrice * oneHundredMillions;
+    var fraction = (n % oneHundredMillions).round();
+    var integer = ((n - fraction) / oneHundredMillions).round();
+
+    await _getUtxoList(account);
+
+    if (tokenFrom == 'DFI') {
+      var addressBalanceList = await balanceRequests
+          .getAddressBalanceListByAddressList(account.addressList!);
+      var tokenBalance =
+          balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
+
+      if (tokenBalance < amount) {
+        var responseModel = await createTransaction(
+            keyPair: keyPair,
+            utxoList: accountUtxoList,
+            account: account,
+            destinationAddress: account.addressList![0].address!,
+            changeAddress: account.getActiveAddress(isChange: true),
+            amount: 0,
+            reservedBalance: amount - tokenBalance,
+            additional: (txb, nw, newUtxo) {
+              txb.addUtxosToAccountOutput(
+                  tokenFromId,
+                  account.addressList![0].address!,
+                  amount - tokenBalance,
+                  nw);
+            });
+
+        var utxoToAccTxid = await _waitPreviousTx(responseModel);
+        if (utxoToAccTxid.isError) {
+          return utxoToAccTxid;
+        }
+      }
+    }
+
+    var responseModel = await createTransaction(
+        keyPair: keyPair,
+        utxoList: accountUtxoList,
+        destinationAddress: account.getActiveAddress(isChange: false),
+        changeAddress: account.getActiveAddress(isChange: true),
+        amount: 0,
+        account: account,
+        additional: (txb, nw, newUtxo) {
+          txb.addSwapOutput(
+              tokenFromId,
+              account.addressList![0].address!,
+              amount,
+              tokenToId,
+              account.getActiveAddress(isChange: false),
+              integer,
+              fraction);
+        },
+        useAllUtxo: true);
+    if (responseModel.isError) {
+      return TxErrorModel(isError: true, error: responseModel.error);
+    }
+
+    return await _waitPreviousTx(responseModel);
   }
-  // {
-  //   var tokenFromId = await tokensRequests.getTokenID(tokenFrom, tokens);
-  //   var tokenToId = await tokensRequests.getTokenID(tokenTo, tokens);
-  //
-  //   var maxPrice = amount / (amountTo) * (1 + slippage);
-  //   var oneHundredMillions = 100000000;
-  //   var n = maxPrice * oneHundredMillions;
-  //   var fraction = (n % oneHundredMillions).round();
-  //   var integer = ((n - fraction) / oneHundredMillions).round();
-  //
-  //   await _getUtxoList(account);
-  //
-  //   List<TxAuthModel> txAuthList = [];
-  //   List<UtxoModel> selectedUtxoList = [];
-  //   if (tokenFrom == 'DFI') {
-  //     var addressBalanceList = await balanceRequests
-  //         .getAddressBalanceListByAddressList(account.addressList!);
-  //     var tokenBalance =
-  //         balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
-  //
-  //     if (tokenBalance >= amount) {
-  //       var sumAmount = 0;
-  //       for (var element in addressBalanceList) {
-  //         if (sumAmount < amount) {
-  //           for (var balance in element.balanceList!) {
-  //             if (balance.token == 'DFI') {
-  //               var utxoList =
-  //                   _utxoSelectorForSendToken(accountUtxoList, txAuthList);
-  //
-  //               var authTxidModel = await _createAuthTx(
-  //                   keyPair: keyPair,
-  //                   utxoList: utxoList,
-  //                   destinationAddress: element.addressModel!,
-  //                   account: account);
-  //               if (authTxidModel.isError) {
-  //                 return authTxidModel;
-  //               }
-  //
-  //               var sendedAmount = 0;
-  //               if (balance.balance! >= amount - sumAmount) {
-  //                 sendedAmount = amount - sumAmount;
-  //                 sumAmount += amount - sumAmount;
-  //               } else {
-  //                 sendedAmount = balance.balance!;
-  //                 sumAmount += balance.balance!;
-  //               }
-  //
-  //               selectedUtxoList.add(authTxidModel.utxo!);
-  //               txAuthList.add(TxAuthModel(
-  //                   address: element.addressModel!,
-  //                   txid: authTxidModel.txid,
-  //                   mintIndex: 1,
-  //                   value: sendedAmount));
-  //             }
-  //           }
-  //         }
-  //       }
-  //     } else {
-  //       var needAmount = amount - tokenBalance;
-  //       var selectedUtxo = _utxoSelector(accountUtxoList, FEE, needAmount);
-  //       var activeAddress = account.getActiveAddress(isChange: false);
-  //       var responseModel = await createTransaction(
-  //         keyPair: keyPair,
-  //           utxoList: selectedUtxo,
-  //           account: account,
-  //           destinationAddress: account.getActiveAddress(isChange: false),
-  //           changeAddress: account.getActiveAddress(isChange: true),
-  //           amount: 0,
-  //           reservedBalance: needAmount,
-  //           additional: (txb, nw, newUtxo) {
-  //             txb.addUtxosToAccountOutput(tokenFromId,
-  //                 activeAddress, needAmount, nw);
-  //           },
-  //           useAllUtxo: true);
-  //       if (responseModel.isError) {
-  //         return TxErrorModel(isError: true, error: responseModel.error);
-  //       }
-  //
-  //       var utxoToAccTxId = await _waitPreviousTx(responseModel);
-  //
-  //       if (utxoToAccTxId.isError) {
-  //         return utxoToAccTxId;
-  //       }
-  //
-  //       await _waitConfirmTx(utxoToAccTxId.txid!);
-  //       await _getUtxoList(account);
-  //
-  //       addressBalanceList = balancesHelper.updateBalance(addressBalanceList, activeAddress, 'DFI', needAmount);
-  //
-  //       var sumAmount = 0;
-  //       for (var element in addressBalanceList) {
-  //         if (sumAmount < amount) {
-  //           for (var balance in element.balanceList!) {
-  //             if (balance.token == 'DFI') {
-  //               var utxoList =
-  //                   _utxoSelectorForSendToken(accountUtxoList, txAuthList);
-  //
-  //               var authTxidModel = await _createAuthTx(
-  //                   keyPair: keyPair,
-  //                   utxoList: utxoList,
-  //                   destinationAddress: element.addressModel!,
-  //                   account: account);
-  //
-  //               if (authTxidModel.isError) {
-  //                 return authTxidModel;
-  //               }
-  //
-  //               var sendedAmount = 0;
-  //               if (balance.balance! >= amount - sumAmount) {
-  //                 sendedAmount = amount - sumAmount;
-  //                 sumAmount += amount - sumAmount;
-  //               } else {
-  //                 sendedAmount = balance.balance!;
-  //                 sumAmount += balance.balance!;
-  //               }
-  //
-  //               selectedUtxoList.add(authTxidModel.utxo!);
-  //               txAuthList.add(TxAuthModel(
-  //                   address: element.addressModel!,
-  //                   txid: authTxidModel.txid,
-  //                   mintIndex: 1,
-  //                   value: sendedAmount));
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   } else {
-  //     var sumAmount = 0;
-  //     for (var element in account.addressList!) {
-  //       if (sumAmount < amount) {
-  //         var balances = await balanceRequests.getBalanceListByAddress(
-  //             element.address!, true, SettingsHelper.settings.network!);
-  //         for (var balance in balances) {
-  //           if (balance.token == tokenFrom) {
-  //             var utxoList =
-  //                 _utxoSelectorForSendToken(accountUtxoList, txAuthList);
-  //
-  //             var authTxidModel = await _createAuthTx(
-  //               keyPair: keyPair,
-  //                 utxoList: utxoList,
-  //                 destinationAddress: element,
-  //                 account: account);
-  //
-  //             if (authTxidModel.isError) {
-  //               return authTxidModel;
-  //             }
-  //
-  //             var sendedAmount = 0;
-  //             if (balance.balance! >= amount - sumAmount) {
-  //               sendedAmount = amount - sumAmount;
-  //               sumAmount += amount - sumAmount;
-  //             } else {
-  //               sendedAmount = balance.balance!;
-  //               sumAmount += balance.balance!;
-  //             }
-  //
-  //             selectedUtxoList.add(authTxidModel.utxo!);
-  //             txAuthList.add(TxAuthModel(
-  //                 address: element,
-  //                 txid: authTxidModel.txid,
-  //                 mintIndex: 1,
-  //                 value: sendedAmount));
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //
-  //    late TxResponseModel responseModel;
-  //    late TxErrorModel response;
-  //
-  //   for(var i = 0; i<txAuthList.length; i++) {
-  //      responseModel = await createTransaction(
-  //        keyPair: keyPair,
-  //         utxoList: [selectedUtxoList[i]],
-  //         destinationAddress: account.getActiveAddress(isChange: false),
-  //         changeAddress: account.getActiveAddress(isChange: true),
-  //         amount: 0,
-  //         account: account,
-  //         additional: (txb, nw, newUtxo) {
-  //           txb.addSwapOutput(
-  //               tokenFromId,
-  //               txAuthList[i].address!.address!,
-  //               txAuthList[i].value!,
-  //               tokenToId,
-  //               account.getActiveAddress(isChange: false),
-  //               integer,
-  //               fraction);
-  //         },
-  //         useAllUtxo: true);
-  //      if (responseModel.isError) {
-  //        return TxErrorModel(isError: true, error: responseModel.error);
-  //      }
-  //      response = await _waitPreviousTx(responseModel);
-  //   }
-  //
-  //
-  //   return response;
-  // }
 
   Future<TxResponseModel> createTransaction(
       {required ECPair keyPair,
@@ -503,7 +365,6 @@ class TransactionService {
     } else {
       selectedUTXO = _utxoSelector(utxoList, FEE, amount);
     }
-
 
     final _txb = TransactionBuilder(
         network: networkHelper.getNetwork(SettingsHelper.settings.network!));
@@ -579,7 +440,6 @@ class TransactionService {
     return selectedUtxo;
   }
 
-
   List<UtxoModel> _shuffle(List<UtxoModel> items) {
     var random = new Random();
 
@@ -628,7 +488,6 @@ class TransactionService {
     });
   }
 
-
   Future<TxErrorModel> _waitPreviousTx(TxResponseModel responseModel) async {
     var wait = true;
     TxErrorModel? txid;
@@ -647,27 +506,6 @@ class TransactionService {
   }
 
     return txid;
-  }
-
-  Future<bool> _waitConfirmTx(String txid) async {
-    var wait = true;
-    bool txPresent = false;
-
-    for (; wait;) {
-      try {
-        txPresent = await historyRequests.getTxPresent(
-            txid, SettingsHelper.settings.network!);
-      } catch (err) {
-        txPresent = false;
-      }
-      if (txPresent) {
-        wait = false;
-      } else {
-        await new Future.delayed(new Duration(seconds: 2));
-      }
-    }
-
-    return txPresent;
   }
 
   int calculateBTCFee(int inputCount, int outputCount, int satPerByte){
