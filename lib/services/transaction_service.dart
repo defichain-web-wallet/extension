@@ -320,9 +320,9 @@ class TransactionService {
           return TxErrorModel(isError: true, error: responseModel.error);
         }
 
-        var utxoToAccTxid = await prepareTx(responseModel, TxType.convertUtxo);
-        if (utxoToAccTxid.isError!) {
-          return utxoToAccTxid;
+         txErrorModel = await prepareTx(responseModel, TxType.convertUtxo);
+        if (txErrorModel.isError!) {
+          return txErrorModel;
         }
       }
     }
