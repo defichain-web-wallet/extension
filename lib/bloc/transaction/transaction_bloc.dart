@@ -33,17 +33,17 @@ class TransactionCubit extends Cubit<TransactionState> {
         SettingsHelper.settings.network!,
       );
       if (isOngoing) {
-        if (txErrorModel.txLoaderList!.length == 1 || state.txIndex! == 1) {
+        if (txErrorModel.txLoaderList!.length > 1 && state.txIndex == 0) {
+          TxErrorModel tempTxErrorModel = await TransactionRequests().sendTxHex(
+              state.txErrorModel!.txLoaderList![1].txHex!);
+          state.txErrorModel!.txLoaderList![1] =  tempTxErrorModel.txLoaderList![0];
+          emit(TransactionLoadingState(state.txErrorModel, txIndex: 1));
+        } else {
           if (timer != null) {
             timer.cancel();
           }
           await clearOngoingTransaction();
           emit(TransactionLoadedState(txErrorModel, txIndex: state.txIndex!));
-        } else {
-          TxErrorModel tempTxErrorModel = await TransactionRequests().sendTxHex(
-              state.txErrorModel!.txLoaderList![1].txHex!);
-          state.txErrorModel!.txLoaderList![1] =  tempTxErrorModel.txLoaderList![0];
-          emit(TransactionLoadingState(state.txErrorModel, txIndex: 1));
         }
       } else {
         emit(TransactionLoadingState(txErrorModel, txIndex: state.txIndex!));

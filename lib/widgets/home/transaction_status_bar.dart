@@ -30,6 +30,21 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
     super.dispose();
   }
 
+  String getFormatTxType(String type) {
+    switch (type) {
+      case 'TxType.swap':
+        return 'Swapping';
+      case 'TxType.send':
+        return 'Sending';
+      case 'TxType.addLiq':
+        return 'Add Liquidity';
+      case 'TxType.removeLiq':
+        return 'Remove Liquidity';
+      default:
+        return 'Converting UTXO';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Positioned(
@@ -46,8 +61,13 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
         late Color snackBarBgColor;
 
         if (txState is TransactionLoadingState) {
+          String status = getFormatTxType(
+            txState.txErrorModel!.txLoaderList![txState.txIndex].type!
+                .toString(),
+          );
           title = 'Transactions (${txState.txIndex + 1}'
-              '/${txState.txErrorModel!.txLoaderList!.length})';
+              '/${txState.txErrorModel!.txLoaderList!.length}):'
+              ' $status';
           prefixWidget = Opacity(
             opacity: 0.4,
             child: RotationTransition(

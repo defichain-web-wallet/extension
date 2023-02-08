@@ -20,9 +20,12 @@ class TxLoaderModel {
         .firstWhere((e) => e.toString() == json["status"]);
     this.txId = json["txId"];
     this.txHex = json["txHex"];
-    this.type = TxType.addLiq;
-    this.type = TxType.values
-        .firstWhere((e) => e.toString() == json["type"]);
+    if (json["type"] == null) {
+      this.type = TxType.convertUtxo;
+    } else {
+      this.type = TxType.values
+          .firstWhere((e) => e.toString() == json["type"]);
+    }
   }
 
   Map<dynamic, dynamic> toJson() {
