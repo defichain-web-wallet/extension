@@ -35,11 +35,13 @@ class _LockScreenState extends State<LockScreen> {
   SettingsHelper settingsHelper = SettingsHelper();
   bool isPasswordObscure = true;
   bool isEnable = true;
+  bool isValid = true;
   bool isVisiblePasswordField = true;
   String password = '';
   bool isFailed = false;
   Codec<String, String> stringToBase64 = utf8.fuse(base64);
   GlobalKey globalKey = GlobalKey();
+  final _formKey = GlobalKey<FormState>();
   TextEditingController _passwordController = TextEditingController();
 
   PasswordStatusList passwordStatus = PasswordStatusList.initial;
@@ -68,59 +70,66 @@ class _LockScreenState extends State<LockScreen> {
                       top: 0,
                       bottom: 0,
                     ),
-                    child: Column(
-                      children: [
-                        PasswordTextField(
-                          controller: _passwordController,
-                          status: passwordStatus,
-                          hint: 'Your password',
-                          label: 'Password',
-                          isShowObscureIcon: true,
-                          isCaptionShown: false,
-                          onEditComplete: () =>
-                              (globalKey.currentWidget! as ElevatedButton)
-                                  .onPressed!(),
-                          isObscure: isPasswordObscure,
-                          onChanged: (String value) {
-                            password = value;
-                          },
-                          onPressObscure: () {
-                            setState(
-                                    () => isPasswordObscure = !isPasswordObscure);
-                          },
-                        ),
-                        SizedBox(height: 24),
-                        StretchBox(
-                          maxWidth: ScreenSizes.xSmall,
-                          child: PendingButton(
-                            widget.callback == null ? 'Unlock' : 'Continue',
-                            pendingText: 'Pending...',
-                            isCheckLock: false,
-                            globalKey: globalKey,
-                            callback: (parent) => _restoreWallet(parent),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          PasswordTextField(
+                            height: 71,
+                            controller: _passwordController,
+                            status: passwordStatus,
+                            hint: 'Your password',
+                            label: 'Password',
+                            isShowObscureIcon: true,
+                            isCaptionShown: false,
+                            onEditComplete: () =>
+                                (globalKey.currentWidget! as ElevatedButton)
+                                    .onPressed!(),
+                            isObscure: isPasswordObscure,
+                            onChanged: (String value) {
+                              password = value;
+                            },
+                            onPressObscure: () {
+                              setState(
+                                      () => isPasswordObscure = !isPasswordObscure);
+                            },
+                            validator: (val){
+                              return isValid ? null : "Incorrect password";
+                            },
                           ),
-                        ),
-                        SizedBox(height: 20),
-                        if (widget.callback == null)
-                          InkWell(
-                            child: Text(
-                              'Forgot password?',
-                              style: AppTheme.defiUnderlineText,
+                          // SizedBox(height: 24),
+                          StretchBox(
+                            maxWidth: ScreenSizes.xSmall,
+                            child: PendingButton(
+                              widget.callback == null ? 'Unlock' : 'Continue',
+                              pendingText: 'Pending...',
+                              isCheckLock: false,
+                              globalKey: globalKey,
+                              callback: (parent) => _restoreWallet(parent),
                             ),
-                            onTap: isEnable
-                                ? () => Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation1, animation2) =>
-                                    RecoveryScreen(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),
-                            )
-                                : null,
                           ),
-                      ],
+                          SizedBox(height: 20),
+                          if (widget.callback == null)
+                            InkWell(
+                              child: Text(
+                                'Forgot password?',
+                                style: AppTheme.defiUnderlineText,
+                              ),
+                              onTap: isEnable
+                                  ? () => Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                      RecoveryScreen(),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
+                              )
+                                  : null,
+                            ),
+                        ],
+                      ),
                     ),
                   )
                 ],
@@ -132,6 +141,8 @@ class _LockScreenState extends State<LockScreen> {
 
   void _restoreWallet(parent) async {
     setState(() {
+      isValid = true;
+      _formKey.currentState!.validate();
       isFailed = false;
       isEnable = false;
     });
@@ -139,6 +150,10 @@ class _LockScreenState extends State<LockScreen> {
     var encodedPassword = box.get(HiveNames.password);
 
     if (Crypt(encodedPassword).match(password)) {
+      setState(() {
+        isValid = true;
+        _formKey.currentState!.validate();
+      });
       parent.emitPending(true);
       if (widget.callback == null) {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
@@ -169,6 +184,8 @@ class _LockScreenState extends State<LockScreen> {
       }
     } else {
       setState(() {
+        isValid = false;
+        _formKey.currentState!.validate();
         passwordStatus = PasswordStatusList.error;
         isFailed = true;
         isEnable = true;
