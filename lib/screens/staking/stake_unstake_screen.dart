@@ -95,7 +95,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                 return BlocBuilder<TokensCubit, TokensState>(
                   builder: (tokensContext, tokensState) {
                     String availableAmount =
-                        '${widget.isUnstake ? lockState.lockStakingDetails!.balance! : getAvailableBalance(
+                        '${widget.isUnstake ? (lockState.lockStakingDetails!.balance! - lockState.lockStakingDetails!.pendingWithdrawals!) : getAvailableBalance(
                             accountState,
                             lockState.lockStakingDetails!.asset!,
                           )}';
@@ -403,7 +403,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                               currentSliderValue =
                                                                   value;
                                                               _setBalance(
-                                                                  lockState);
+                                                                  lockState, availableAmount);
                                                             });
                                                           },
                                                         ),
@@ -424,7 +424,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                                 currentSliderValue =
                                                                     25;
                                                                 _setBalance(
-                                                                    lockState);
+                                                                    lockState, availableAmount);
                                                               });
                                                             },
                                                           ),
@@ -437,7 +437,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                                 currentSliderValue =
                                                                     50;
                                                                 _setBalance(
-                                                                    lockState);
+                                                                    lockState, availableAmount);
                                                               });
                                                             },
                                                           ),
@@ -450,7 +450,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                                 currentSliderValue =
                                                                     75;
                                                                 _setBalance(
-                                                                    lockState);
+                                                                    lockState, availableAmount);
                                                               });
                                                             },
                                                           ),
@@ -463,13 +463,13 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                                 currentSliderValue =
                                                                     100;
                                                                 _setBalance(
-                                                                    lockState);
+                                                                    lockState, availableAmount);
                                                               });
                                                             },
                                                           ),
                                                         ],
                                                       ),
-                                                    )
+                                                    ),
                                                   ],
                                                 ),
                                             ],
@@ -880,9 +880,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
     );
   }
 
-  void _setBalance(LockState lockState) {
+  void _setBalance(LockState lockState, availableAmount) {
     controller.text = balancesHelper.numberStyling(
-      (lockState.lockStakingDetails!.balance! * currentSliderValue) / 100,
+      (double.parse(availableAmount) * currentSliderValue) / 100,
       fixedCount: 4,
       fixed: true,
     );
@@ -905,43 +905,43 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       double.parse(controller.text),
     );
     TxErrorModel txResponse = TxErrorModel(isError: !isUnstakeSuccess);
-    showDialog(
-      barrierColor: Color(0x0f180245),
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return TxStatusDialog(
-          txResponse: txResponse,
-          callbackOk: () {
-            if (!txResponse.isError) {
-              TransactionCubit transactionCubit =
-              BlocProvider.of<TransactionCubit>(context);
+      showDialog(
+        barrierColor: Color(0x0f180245),
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return TxStatusDialog(
+            txResponse: txResponse,
+            callbackOk: () {
+              if (!txResponse.isError && !widget.isUnstake) {
+                TransactionCubit transactionCubit =
+                    BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse.txid!);
-            }
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) => HomeScreen(
-                  isLoadTokens: true,
+                transactionCubit.setOngoingTransaction(txResponse.txid!);
+              }
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) => HomeScreen(
+                    isLoadTokens: true,
+                  ),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
                 ),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
-          },
-          callbackTryAgain: () async {
-            print('TryAgain');
-            await unstakeCallback(
-              password,
-              account,
-              lockAccessToken,
-              stakingId,
-            );
-          },
-        );
-      },
-    );
+              );
+            },
+            callbackTryAgain: () async {
+              print('TryAgain');
+              await unstakeCallback(
+                password,
+                account,
+                lockAccessToken,
+                stakingId,
+              );
+            },
+          );
+        },
+      );
   }
 
   String getUsdBalance(
