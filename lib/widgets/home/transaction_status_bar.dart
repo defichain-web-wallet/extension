@@ -46,7 +46,8 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
         late Color snackBarBgColor;
 
         if (txState is TransactionLoadingState) {
-          title = 'Waiting for transaction';
+          title = 'Transactions (${txState.txIndex}'
+              '/${txState.txErrorModel!.txLoaderList!.length})';
           prefixWidget = Opacity(
             opacity: 0.4,
             child: RotationTransition(
@@ -77,11 +78,11 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
           context,
           color: snackBarBgColor,
           title: title,
-          subtitle: txState.txId!,
+          subtitle: txState.txErrorModel!.txLoaderList![txState.txIndex!].txId,
           prefix: prefixWidget,
           suffix: InkWell(
             onTap: () => launch(
-              '${Hosts.defiScanLiveTx}/${txState.txId!}' +
+              '${Hosts.defiScanLiveTx}/${txState.txErrorModel!.txLoaderList![txState.txIndex!].txId}' +
                   '?network=${SettingsHelper.settings.network!}',
             ),
             child: SizedBox(

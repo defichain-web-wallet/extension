@@ -831,13 +831,13 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       amount: balancesHelper.toSatoshi(controller.text),
       tokens: tokens,
     );
-    if (!txResponse.isError) {
-      lockCubit.stake(
-        lockAccessToken,
-        stakingId,
-        double.parse(controller.text),
-        txResponse.txid!,
-      );
+    if (!txResponse.isError!) {
+      // lockCubit.stake(
+      //   lockAccessToken,
+      //   stakingId,
+      //   double.parse(controller.text),
+      //   txResponse.txid!,
+      // );
     }
     showDialog(
       barrierColor: Color(0x0f180245),
@@ -847,11 +847,11 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
-            if (!txResponse!.isError) {
+            if (!txResponse!.isError!) {
               TransactionCubit transactionCubit =
               BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse.txid!);
+              // transactionCubit.setOngoingTransaction(txResponse.txid!);
             }
             Navigator.pushReplacement(
               context,
@@ -913,11 +913,11 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
-            if (!txResponse.isError) {
+            if (!txResponse.isError!) {
               TransactionCubit transactionCubit =
               BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse.txid!);
+              // transactionCubit.setOngoingTransaction(txResponse.txid!);
             }
             Navigator.pushReplacement(
               context,

@@ -56,7 +56,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> {
           horizontal: 14,
         ),
         actions: [
-          if(!widget.txResponse!.isError)Center(
+          if(!widget.txResponse!.isError!)Center(
             child: NewPrimaryButton(
               width: buttonSmallWidth,
               callback: () {
@@ -66,7 +66,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> {
               title: widget.buttonLabel,
             ),
           ),
-          if(widget.txResponse!.isError)Row(
+          if(widget.txResponse!.isError!)Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
@@ -100,7 +100,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> {
             Container(
               constraints: BoxConstraints(maxWidth: 312),
               width: 312,
-              height: !widget.txResponse!.isError ? 339 : 319,
+              height: !widget.txResponse!.isError! ? 339 : 319,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -127,7 +127,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> {
                     ],
                   ),
                   Text(
-                    !widget.txResponse!.isError ?  widget.title : 'Oops!',
+                    !widget.txResponse!.isError! ?  widget.title : 'Oops!',
                     style: Theme.of(context).textTheme.headline2!.copyWith(
                           fontWeight: FontWeight.w700,
                           color: Theme.of(context).textTheme.headline5!.color,
@@ -137,7 +137,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> {
                     height: 8,
                   ),
                   Text(
-                    !widget.txResponse!.isError ? widget.subtitle : subtitleTextOops,
+                    !widget.txResponse!.isError! ? widget.subtitle : subtitleTextOops,
                     softWrap: true,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline5!.copyWith(

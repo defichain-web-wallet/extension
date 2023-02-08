@@ -144,7 +144,7 @@ class TransactionService {
             tokenId: tokenDFIId!);
 
         txErrorModel = await prepareTx(responseModel, TxType.convertUtxo);
-        if (txErrorModel.isError) {
+        if (txErrorModel.isError!) {
           return txErrorModel;
         }
       }
@@ -226,7 +226,7 @@ class TransactionService {
 
       txErrorModel = await prepareTx(responseModel, TxType.convertUtxo);
 
-      if (txErrorModel.isError) {
+      if (txErrorModel.isError!) {
         return txErrorModel;
       }
     }
@@ -321,7 +321,7 @@ class TransactionService {
         }
 
         var utxoToAccTxid = await prepareTx(responseModel, TxType.convertUtxo);
-        if (utxoToAccTxid.isError) {
+        if (utxoToAccTxid.isError!) {
           return utxoToAccTxid;
         }
       }
@@ -536,7 +536,7 @@ class TransactionService {
   Future<TxErrorModel> prepareTx(
       TxResponseModel responseModel, TxType type) async {
     TxErrorModel? txid = await transactionRequests.sendTxHex(responseModel.hex);
-    if (!txid.isError) {
+    if (!txid.isError!) {
       _updateUtxoList(responseModel, txid.txLoaderList![0].txId!);
       txid.txLoaderList![0].type = type;
     }

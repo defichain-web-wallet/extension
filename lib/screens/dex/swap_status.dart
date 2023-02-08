@@ -65,7 +65,7 @@ class SwapStatusScreen extends StatelessWidget {
       );
 
   Widget _buildBody(context, {isCustomBgColor = false}) {
-    if (txResponse!.isError) {
+    if (txResponse!.isError!) {
       LoggerService.invokeInfoLogg(
           'user was swap token failed ${txResponse!.error}');
     } else {
@@ -89,7 +89,7 @@ class SwapStatusScreen extends StatelessWidget {
               txResponse: txResponse,
             ),
             Flexible(
-              child: txResponse!.isError
+              child: txResponse!.isError!
                   ? Flexible(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
