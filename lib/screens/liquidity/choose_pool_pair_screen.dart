@@ -3,7 +3,7 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
-import 'package:defi_wallet/screens/liquidity/select_pool.dart';
+import 'package:defi_wallet/screens/liquidity/liquidity_select_pool.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/liquidity/pool_asset_pair.dart';
@@ -245,7 +245,7 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                                     pageBuilder: (context,
                                                             animation1,
                                                             animation2) =>
-                                                        SelectPool(
+                                                        LiquiditySelectPool(
                                                       assetPair:
                                                           availableTokens[
                                                               index],
@@ -287,7 +287,7 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                                         pageBuilder: (context,
                                                                 animation1,
                                                                 animation2) =>
-                                                            SelectPool(
+                                                            LiquiditySelectPool(
                                                           assetPair:
                                                               availableTokens[
                                                                   index],

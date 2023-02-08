@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -21,16 +22,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 
-class SelectPool extends StatefulWidget {
+class LiquiditySelectPool extends StatefulWidget {
   final AssetPairModel assetPair;
 
-  const SelectPool({Key? key, required this.assetPair}) : super(key: key);
+  const LiquiditySelectPool({Key? key, required this.assetPair}) : super(key: key);
 
   @override
-  _SelectPoolState createState() => _SelectPoolState();
+  _LiquiditySelectPoolState createState() => _LiquiditySelectPoolState();
 }
 
-class _SelectPoolState extends State<SelectPool> with ThemeMixin {
+class _LiquiditySelectPoolState extends State<LiquiditySelectPool> with ThemeMixin, SnackBarMixin {
   TokensHelper tokensHelper = TokensHelper();
   final TextEditingController _amountBaseController =
       TextEditingController(text: '0');
@@ -468,11 +469,20 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
                             child: NewPrimaryButton(
                               title: 'Add',
                               callback: isValidAmount()
-                                  ? isErrorBalance || isDisableSubmit()
+                                  ? isErrorBalance || isDisableSubmit(context)
                                       ? () {
                                           setState(() {
                                             isEnoughBalance = true;
                                           });
+                                          showSnackBar(
+                                            context,
+                                            title: 'Insufficient funds!',
+                                            color: AppColors.txStatusError.withOpacity(0.1),
+                                            prefix: Icon(
+                                              Icons.close,
+                                              color: AppColors.txStatusError,
+                                            ),
+                                          );
                                         }
                                       : () => Navigator.push(
                                             context,
@@ -607,11 +617,18 @@ class _SelectPoolState extends State<SelectPool> with ThemeMixin {
     return convertFromSatoshi(amount);
   }
 
-  bool isDisableSubmit() {
+  bool isDisableSubmit(context) {
     int amountFrom = convertToSatoshi(
         double.parse(_amountBaseController.text.replaceAll(',', '.')));
     int amountTo = convertToSatoshi(
         double.parse(_amountQuoteController.text.replaceAll(',', '.')));
+
+    bool returnValue = balanceFrom == 0 ||
+        balanceTo == 0 ||
+        amountFrom > balanceFrom ||
+        amountTo > balanceTo;
+
+
 
     return balanceFrom == 0 ||
         balanceTo == 0 ||
