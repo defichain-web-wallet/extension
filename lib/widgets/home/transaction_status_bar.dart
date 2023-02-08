@@ -46,7 +46,7 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
         late Color snackBarBgColor;
 
         if (txState is TransactionLoadingState) {
-          title = 'Transactions (${txState.txIndex}'
+          title = 'Transactions (${txState.txIndex + 1}'
               '/${txState.txErrorModel!.txLoaderList!.length})';
           prefixWidget = Opacity(
             opacity: 0.4,
