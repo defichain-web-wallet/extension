@@ -128,22 +128,33 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
           subtitle: txId,
           prefix: prefixWidget,
           suffix: InkWell(
-            onTap: () => launch(
-              '${Hosts.defiScanLiveTx}/$txId' +
-                  '?network=${SettingsHelper.settings.network!}',
-            ),
+            onTap: () async {
+              if (txState is TransactionLoadedState) {
+                await accountCubit.updateAccountDetails();
+                await transactionCubit.confirmTransactionStatus();
+              } else {
+                launch(
+                  '${Hosts.defiScanLiveTx}/$txId' +
+                      '?network=${SettingsHelper.settings.network!}',
+                );
+              }
+            },
             child: SizedBox(
-              width: 18,
-              height: 18,
+              width: 16,
+              height: 16,
               child: SvgPicture.asset(
-                'assets/icons/open_in_new.svg',
-                color: Theme.of(context).textTheme.headline1!.color!,
+                txState is TransactionLoadedState
+                      ? 'assets/icons/cancel_icon.svg'
+                      : 'assets/icons/open_in_new.svg',
+                  color: Theme.of(context).textTheme.headline1!.color!,
               ),
             ),
           ),
           onTapCallback: () async {
-            await accountCubit.updateAccountDetails();
-            await transactionCubit.confirmTransactionStatus();
+            launch(
+              '${Hosts.defiScanLiveTx}/$txId' +
+                  '?network=${SettingsHelper.settings.network!}',
+            );
           }
         );
       }),
