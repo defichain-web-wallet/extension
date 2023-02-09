@@ -377,18 +377,6 @@ class _HomeScreenState extends State<HomeScreen>
                                                           homeState.tabIndex,
                                                     ),
                                                   ),
-                                                  IconButton(
-                                                    onPressed: () {},
-                                                    icon: SvgPicture.asset(
-                                                      'assets/icons/filter_icon.svg',
-                                                      color: SettingsHelper
-                                                                  .settings
-                                                                  .theme ==
-                                                              'Dark'
-                                                          ? Colors.white
-                                                          : null,
-                                                    ),
-                                                  ),
                                                   SizedBox(
                                                     width: 12,
                                                   ),

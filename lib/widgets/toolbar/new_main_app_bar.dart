@@ -59,24 +59,6 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
             width: 32,
             height: 32,
             child: NewActionButton(
-              iconPath: 'assets/icons/fullscreen_icon.svg',
-              onPressed: () => lockHelper.provideWithLockChecker(
-                context,
-                () {
-                  // js.context.callMethod('open', [
-                  //   window.location.toString(),
-                  // ]);
-                },
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 12,
-          ),
-          SizedBox(
-            width: 32,
-            height: 32,
-            child: NewActionButton(
               iconPath: 'assets/icons/account_icon.svg',
               onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
