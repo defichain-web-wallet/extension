@@ -52,9 +52,10 @@ class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: () => _onPressedBack(context),
           splashRadius: 20,
         ),
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.headline4,
+        title: SvgPicture.asset(
+          'assets/welcome_logo.svg',
+          color: Theme.of(context).textTheme.headline4!.color,
+          width: 94,
         ),
       ),
     );

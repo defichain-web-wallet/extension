@@ -707,10 +707,10 @@ class AccountCubit extends Cubit<AccountState> {
         isUpdateWithHistory: false);
     emit(state.copyWith(
       status: AccountStatusList.success,
-      accounts: accountList,
+      accounts: state.accounts,
       balances: state.balances,
       masterKeyPairPublicKey: state.masterKeyPairPublicKey,
-      activeAccount: state.activeAccount,
+      activeAccount: accountList[0],
       activeToken: state.activeToken,
       historyFilterBy: state.historyFilterBy,
       swapTutorialStatus: state.swapTutorialStatus,

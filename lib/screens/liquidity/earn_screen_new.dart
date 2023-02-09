@@ -43,10 +43,10 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
-      await fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
-      await lockCubit.loadUserDetails(accountCubit.state.activeAccount!);
-      await lockCubit.loadStakingDetails(accountCubit.state.activeAccount!);
-      await lockCubit.loadAnalyticsDetails(accountCubit.state.activeAccount!);
+      await fiatCubit.loadUserDetails(accountCubit.state.accounts!.first);
+      await lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
+      await lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
+      await lockCubit.loadAnalyticsDetails(accountCubit.state.accounts!.first);
     });
   }
 
