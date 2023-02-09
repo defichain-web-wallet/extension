@@ -45,7 +45,7 @@ class SellInitiated extends StatelessWidget {
     TransactionCubit transactionCubit =
       BlocProvider.of<TransactionCubit>(context);
 
-    transactionCubit.setOngoingTransaction(txResponse!.txid!);
+    // transactionCubit.setOngoingTransaction(txResponse!.txid!);
     return Container(
       color: Theme.of(context).dialogBackgroundColor,
       child: Padding(
@@ -60,7 +60,7 @@ class SellInitiated extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Image.asset(
-                        txResponse!.isError
+                        txResponse!.isError!
                             ? 'assets/error_gif.gif'
                             : 'assets/status_reload_icon.png',
                         height: 106,
@@ -69,13 +69,13 @@ class SellInitiated extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.only(top: 60),
                         child: Text(
-                          txResponse!.isError
+                          txResponse!.isError!
                               ? 'Something went wrong'
                               : 'Transaction initiated',
                           style: Theme.of(context).textTheme.headline1,
                         ),
                       ),
-                      if (!txResponse!.isError)
+                      if (!txResponse!.isError!)
                         Container(
                           padding: EdgeInsets.only(top: 10),
                           width: 300,

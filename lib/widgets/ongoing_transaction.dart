@@ -61,16 +61,16 @@ class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
                       style: Theme.of(context).textTheme.headline4!.apply(fontWeightDelta: 2),
                     ),
                     Padding(padding: const EdgeInsets.symmetric(vertical: 2)),
-                    SingleChildScrollView(
-                      child: InkWell(
-                        child: Text(state.txId!,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.defiUnderlineText
-                                .apply(decoration: TextDecoration.none)),
-                        onTap: () => launch(
-                            'https://defiscan.live/transactions/${state.txId}?network=${SettingsHelper.settings.network!}'),
-                      ),
-                    ),
+                    // SingleChildScrollView(
+                    //   child: InkWell(
+                    //     child: Text(state.txId!,
+                    //         overflow: TextOverflow.ellipsis,
+                    //         style: AppTheme.defiUnderlineText
+                    //             .apply(decoration: TextDecoration.none)),
+                    //     onTap: () => launch(
+                    //         'https://defiscan.live/transactions/${state.txId}?network=${SettingsHelper.settings.network!}'),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -80,8 +80,7 @@ class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
                 child: Icon(Icons.open_in_new,
                     color: AppTheme.pinkColor, size: 25),
                 hoverColor: Colors.transparent,
-                onTap: () => launch(
-                    'https://defiscan.live/transactions/${state.txId}?network=${SettingsHelper.settings.network!}'),
+                onTap: () => null,
               ),
             if (state is TransactionLoadedState)
               InkWell(

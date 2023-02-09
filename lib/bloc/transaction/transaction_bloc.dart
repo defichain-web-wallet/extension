@@ -2,12 +2,16 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
+import 'package:defi_wallet/requests/transaction_requests.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'transaction_state.dart';
 
 class TransactionCubit extends Cubit<TransactionState> {
-  TransactionCubit() : super(TransactionInitialState(''));
+  TransactionCubit() : super(TransactionInitialState(null));
+  static const int lastTxIndex = 1;
   HistoryRequests historyRequests = HistoryRequests();
   Timer? timer;
 
@@ -16,30 +20,46 @@ class TransactionCubit extends Cubit<TransactionState> {
     var txId = await box.get(HiveNames.ongoingTransaction);
     await box.close();
     if (txId != null) {
-      await onChangeTransactionState(txId);
+      TxErrorModel txErrorModel = TxErrorModel.fromJson(txId);
+      await onChangeTransactionState(txErrorModel);
       timer = Timer.periodic(Duration(seconds: 2), (timer) async {
-        await onChangeTransactionState(txId, timer: timer);
+        await onChangeTransactionState(txErrorModel, timer: timer);
       });
     }
   }
 
-  onChangeTransactionState(String txId, {dynamic timer}) async {
+  onChangeTransactionState(TxErrorModel txErrorModel, {dynamic timer}) async {
+    bool isOngoing;
+    TxLoaderModel loadingTx;
     try {
-      bool isOngoing = await historyRequests.getTxPresent(
-          txId, SettingsHelper.settings.network!);
+      loadingTx = txErrorModel.txLoaderList!.firstWhere(
+        (element) => element.status == TxStatus.waiting,
+      );
+      isOngoing = await historyRequests.getTxPresent(
+        loadingTx.txId!,
+        SettingsHelper.settings.network!,
+      );
       if (isOngoing) {
-        if (timer != null) {
-          timer.cancel();
+        if (txErrorModel.txLoaderList!.length > 1 &&
+            txErrorModel.txLoaderList!.indexOf(loadingTx) == 0 &&
+            txErrorModel.txLoaderList![lastTxIndex].txHex != null) {
+          TxErrorModel tempTxErrorModel = await TransactionRequests().sendTxHex(
+            txErrorModel.txLoaderList![lastTxIndex].txHex!,
+          );
+          txErrorModel.txLoaderList![lastTxIndex].txId =
+              tempTxErrorModel.txLoaderList![0].txId;
         }
-        emit(TransactionLoadedState(txId));
+        loadingTx.status = TxStatus.success;
+        await setOngoingTransaction(txErrorModel);
       } else {
-        emit(TransactionLoadingState(txId));
+        emit(TransactionLoadingState(txErrorModel));
       }
     } catch (err) {
+      print('transaction_bloc: $err');
       if (timer != null) {
         timer.cancel();
       }
-      emit(TransactionErrorState(txId));
+      emit(TransactionLoadedState(txErrorModel));
     }
   }
 
@@ -51,13 +71,19 @@ class TransactionCubit extends Cubit<TransactionState> {
 
   confirmTransactionStatus() async {
     clearOngoingTransaction();
-    emit(TransactionInitialState(''));
+    emit(TransactionInitialState(null));
   }
 
-  setOngoingTransaction(String txId) async {
-    emit(TransactionLoadingState(txId));
+  setOngoingTransaction(TxErrorModel txErrorModel) async {
     var box = await Hive.openBox(HiveBoxes.client);
-    await box.put(HiveNames.ongoingTransaction, txId);
-    await box.close();
+    try {
+      await box.put(
+        HiveNames.ongoingTransaction,
+        txErrorModel.toJson(),
+      );
+    } finally {
+      emit(TransactionLoadingState(txErrorModel));
+      await box.close();
+    }
   }
 }

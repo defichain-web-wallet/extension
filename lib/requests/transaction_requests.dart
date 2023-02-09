@@ -3,6 +3,7 @@ import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -74,7 +75,7 @@ class TransactionRequests {
       final response = await http.post(_url, headers: _headers, body: _body);
       final data = jsonDecode(response.body);
       if (response.statusCode == 201) {
-        return TxErrorModel(isError: false, txid: data['data']);
+        return TxErrorModel(isError: false, txLoaderList: [TxLoaderModel(txId: data['data'], txHex: txHex)]);
       } else {
         return TxErrorModel(isError: true, error: data['error']['message']);
       }
