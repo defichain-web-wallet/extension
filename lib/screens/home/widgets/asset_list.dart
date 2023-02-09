@@ -9,7 +9,6 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/home/asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shimmer/shimmer.dart';
 
 // ignore: must_be_immutable
 class AssetList extends StatelessWidget {

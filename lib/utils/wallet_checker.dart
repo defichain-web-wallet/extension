@@ -153,9 +153,6 @@ class _WalletCheckerState extends State<WalletChecker> {
 
     checkWallets();
 
-    return Container(
-      color: Theme.of(context).dialogBackgroundColor,
-      child: Center(child: Loader()),
-    );
+    return Container();
   }
 }

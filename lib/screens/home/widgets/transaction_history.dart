@@ -72,14 +72,11 @@ class _TransactionHistoryState extends State<TransactionHistory>
             builder: (context, bitcoinState) {
           if (state.status == AccountStatusList.success &&
               tokensState.status == TokensStatusList.success) {
-            var historyList;
+            List<dynamic> historyList = [];
             DateFormat formatter = DateFormat('MMM d, yyyy h:mm a');
             var balancesHelper = BalancesHelper();
             TokensHelper tokenHelper = TokensHelper();
             HistoryHelper historyHelper = HistoryHelper();
-            const int defaultShowItemsCount = 30;
-            var tempHistoryList;
-            late int showItemsCount;
             late int targetHistoryLength;
             if (SettingsHelper.isBitcoin()) {
               historyList = bitcoinState.history ?? [];
@@ -89,8 +86,7 @@ class _TransactionHistoryState extends State<TransactionHistory>
                         state.activeAccount!.historyList!.length)
                     ? state.activeAccount!.historyList!.length
                     : initialTransactionIndex + 30;
-                historyList.addAll(
-                    new List.from(state.activeAccount!.historyList!
+                historyList.addAll(List.from(state.activeAccount!.historyList!
                         .sublist(initialTransactionIndex, targetHistoryLength)),
                 );
                 if (targetHistoryLength == state.activeAccount!.historyList!.length) {
@@ -107,7 +103,7 @@ class _TransactionHistoryState extends State<TransactionHistory>
               }
             }
 
-            if (historyList != null && historyList.length != 0) {
+            if (historyList.length != 0) {
               return SliverFillRemaining(
                 hasScrollBody: true,
                 fillOverscroll: true,
