@@ -764,12 +764,12 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       tokens: tokens,
     );
     if (!txResponse.isError!) {
-      // lockCubit.stake(
-      //   lockAccessToken,
-      //   stakingId,
-      //   double.parse(controller.text),
-      //   txResponse.txid!,
-      // );
+      lockCubit.stake(
+        lockAccessToken,
+        stakingId,
+        double.parse(controller.text),
+        txResponse.txLoaderList![0].txId!,
+      );
     }
     showDialog(
       barrierColor: Color(0x0f180245),
@@ -783,7 +783,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
               TransactionCubit transactionCubit =
               BlocProvider.of<TransactionCubit>(context);
 
-              // transactionCubit.setOngoingTransaction(txResponse.txid!);
+              transactionCubit.setOngoingTransaction(txResponse);
             }
             Navigator.pushReplacement(
               context,
