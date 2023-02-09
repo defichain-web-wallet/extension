@@ -133,7 +133,7 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                           height: 4,
                                         ),
                                         Text(
-                                          '0% Fee in 2022',
+                                          '5.55% Fee',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
