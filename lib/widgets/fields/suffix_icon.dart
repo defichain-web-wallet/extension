@@ -8,12 +8,14 @@ class SuffixIcon extends StatefulWidget {
   final SuffixTypes suffixType;
   final Function() callback;
   final bool isObscure;
+  final bool isOpasity;
 
   const SuffixIcon({
     Key? key,
     required this.callback,
     this.suffixType = SuffixTypes.password,
     this.isObscure = false,
+    this.isOpasity = false,
   }) : super(key: key);
 
   @override
@@ -37,7 +39,7 @@ class _SuffixIconState extends State<SuffixIcon> {
             width: 16,
             height: 16,
             color:
-                Theme.of(context).textTheme.headline1!.color!.withOpacity(0.6),
+                widget.isOpasity ? Theme.of(context).textTheme.headline1!.color! : Theme.of(context).textTheme.headline1!.color!.withOpacity(0.6),
           ),
         ),
       );
