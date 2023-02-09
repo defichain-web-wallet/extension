@@ -168,6 +168,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
                             height: 16,
                           ),
                           PasswordTextField(
+                            autofocus: true,
                             height: 71,
                             controller: _passwordController,
                             status: PasswordStatusList.initial,
@@ -178,7 +179,6 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
                             isObscure: isPasswordObscure,
                             onChanged: (String value) {
                               setState(() {
-                                print(value);
                                 password = value;
                               });
                             },
@@ -246,7 +246,6 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
       Navigator.pop(context);
     } else {
       setState(() {
-        print('sad');
         isValid = false;
         _formKey.currentState!.validate();
         isFailed = true;
