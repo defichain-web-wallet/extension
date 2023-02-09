@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
 import 'package:defi_wallet/requests/transaction_requests.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,6 +11,7 @@ import 'transaction_state.dart';
 
 class TransactionCubit extends Cubit<TransactionState> {
   TransactionCubit() : super(TransactionInitialState(null));
+  static const int lastTxIndex = 1;
   HistoryRequests historyRequests = HistoryRequests();
   Timer? timer;
 
@@ -27,34 +29,37 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   onChangeTransactionState(TxErrorModel txErrorModel, {dynamic timer}) async {
+    bool isOngoing;
+    TxLoaderModel loadingTx;
     try {
-      bool isOngoing = await historyRequests.getTxPresent(
-        txErrorModel.txLoaderList![state.txIndex!].txId!,
+      loadingTx = txErrorModel.txLoaderList!.firstWhere(
+        (element) => element.status == TxStatus.waiting,
+      );
+      isOngoing = await historyRequests.getTxPresent(
+        loadingTx.txId!,
         SettingsHelper.settings.network!,
       );
       if (isOngoing) {
-        if (txErrorModel.txLoaderList!.length == 1 || state.txIndex! == 1) {
-          if (timer != null) {
-            timer.cancel();
-          }
-          await clearOngoingTransaction();
-          emit(TransactionLoadedState(txErrorModel, txIndex: state.txIndex!));
-        } else {
+        if (txErrorModel.txLoaderList!.length > 1 &&
+            txErrorModel.txLoaderList!.indexOf(loadingTx) == 0 &&
+            txErrorModel.txLoaderList![lastTxIndex].txHex != null) {
           TxErrorModel tempTxErrorModel = await TransactionRequests().sendTxHex(
-            state.txErrorModel!.txLoaderList![1].txHex!,
+            txErrorModel.txLoaderList![lastTxIndex].txHex!,
           );
-          state.txErrorModel!.txLoaderList![1].txId =
+          txErrorModel.txLoaderList![lastTxIndex].txId =
               tempTxErrorModel.txLoaderList![0].txId;
-          emit(TransactionLoadingState(state.txErrorModel, txIndex: 1));
         }
+        loadingTx.status = TxStatus.success;
+        await setOngoingTransaction(txErrorModel);
       } else {
-        emit(TransactionLoadingState(txErrorModel, txIndex: state.txIndex!));
+        emit(TransactionLoadingState(txErrorModel));
       }
     } catch (err) {
+      print('transaction_bloc: $err');
       if (timer != null) {
         timer.cancel();
       }
-      emit(TransactionErrorState(txErrorModel));
+      emit(TransactionLoadedState(txErrorModel));
     }
   }
 

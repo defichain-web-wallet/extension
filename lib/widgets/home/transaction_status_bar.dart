@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,15 +58,36 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
         TransactionCubit transactionCubit =
             BlocProvider.of<TransactionCubit>(context);
         late String title;
+        String txId = '';
         late Widget prefixWidget;
         late Color snackBarBgColor;
 
         if (txState is TransactionLoadingState) {
-          String status = getFormatTxType(
-            txState.txErrorModel!.txLoaderList![txState.txIndex].type!
-                .toString(),
-          );
-          title = 'Transactions (${txState.txIndex + 1}'
+          String status = '';
+          int txIndex = 0;
+          TxLoaderModel loadingTx;
+
+          try {
+            loadingTx = txState.txErrorModel!.txLoaderList!.firstWhere(
+              (element) => element.status == TxStatus.waiting,
+            );
+            status = getFormatTxType(
+              loadingTx.type!.toString(),
+            );
+            txId = loadingTx.txId!;
+            txIndex = txState.txErrorModel!.txLoaderList!.indexOf(loadingTx);
+          } catch (err) {
+            print('transaction_status_bar: $err');
+            loadingTx = txState.txErrorModel!.txLoaderList!.lastWhere(
+              (element) => element.status == TxStatus.success,
+            );
+            txIndex = txState.txErrorModel!.txLoaderList!.indexOf(loadingTx);
+            txId = loadingTx.txId!;
+            status = getFormatTxType(
+              loadingTx.type!.toString(),
+            );
+          }
+          title = 'Transactions (${txIndex + 1}'
               '/${txState.txErrorModel!.txLoaderList!.length}):'
               ' $status';
           prefixWidget = Opacity(
@@ -79,6 +101,11 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
           );
           snackBarBgColor = AppColors.txStatusPending.withOpacity(0.15);
         } else if (txState is TransactionLoadedState) {
+          TxLoaderModel txLoaderModelSuccess =
+              txState.txErrorModel!.txLoaderList!.lastWhere(
+            (element) => element.status == TxStatus.success,
+          );
+          txId = txLoaderModelSuccess.txId!;
           title = 'Transaction successful!';
           prefixWidget = Icon(
             Icons.done,
@@ -98,11 +125,11 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
           context,
           color: snackBarBgColor,
           title: title,
-          subtitle: txState.txErrorModel!.txLoaderList![txState.txIndex!].txId,
+          subtitle: txId,
           prefix: prefixWidget,
           suffix: InkWell(
             onTap: () => launch(
-              '${Hosts.defiScanLiveTx}/${txState.txErrorModel!.txLoaderList![txState.txIndex!].txId}' +
+              '${Hosts.defiScanLiveTx}/$txId' +
                   '?network=${SettingsHelper.settings.network!}',
             ),
             child: SizedBox(
