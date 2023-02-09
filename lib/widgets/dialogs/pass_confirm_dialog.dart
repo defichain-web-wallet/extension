@@ -168,6 +168,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
                             height: 16,
                           ),
                           PasswordTextField(
+                            autofocus: true,
                             height: 71,
                             controller: _passwordController,
                             status: PasswordStatusList.initial,
