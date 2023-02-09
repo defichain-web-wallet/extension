@@ -335,6 +335,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             callback: (index) {},
                             iconPath: 'assets/icons/jelly_theme_explore.svg',
                             title: 'Explore Jelly themes',
+                            isFuture: true,
                           ),
                         ],
                       ),

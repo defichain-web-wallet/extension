@@ -16,6 +16,7 @@ class AccountMenuButton extends StatefulWidget {
   final bool accountSelectMode;
   final AccountModel? account;
   final bool isLockType;
+  final bool isFuture;
   final Color? hoverBgColor;
   final Color? hoverTextColor;
 
@@ -30,6 +31,7 @@ class AccountMenuButton extends StatefulWidget {
     this.isHoverBackgroundEffect = true,
     this.account,
     this.isLockType = false,
+    this.isFuture = false,
     this.hoverBgColor,
     this.hoverTextColor,
   }) : super(key: key);
@@ -189,6 +191,17 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                     ),
                     if (widget.afterTitleWidget != null)
                       widget.afterTitleWidget!,
+                    if (widget.isFuture)
+                      Text(
+                        '(coming soon)',
+                        style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .subtitle2!
+                                  .color!
+                                  .withOpacity(0.3),
+                            ),
+                      )
                   ],
                 ),
               ),
