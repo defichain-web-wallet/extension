@@ -264,6 +264,46 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                             CrossAxisAlignment.center,
                                         children: [
                                           Text(
+                                            'Pending Deposits ',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .subtitle1!
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5!
+                                                      .color!
+                                                      .withOpacity(0.5),
+                                                ),
+                                          ),
+                                          Text(
+                                            '${lockState.lockStakingDetails!.pendingDeposits == 0 ? '' : '+'}'
+                                            '${lockState.lockStakingDetails!.pendingDeposits}'
+                                            ' ${lockState.lockStakingDetails!.asset}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .copyWith(
+                                                  fontSize: 16,
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5!
+                                                      .color!
+                                                      .withOpacity(0.8),
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 16,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
                                             'Pending Withdrawals ',
                                             style: Theme.of(context)
                                                 .textTheme
