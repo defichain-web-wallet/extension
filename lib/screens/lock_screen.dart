@@ -1,4 +1,5 @@
-import 'dart:convert';
+import 'dart:convert' as Convert;
+import 'dart:ui';
 import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
@@ -12,6 +13,7 @@ import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/welcome_positioned_logo.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/extension_welcome_bg.dart';
 import 'package:defi_wallet/widgets/fields/password_field.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -39,7 +41,7 @@ class _LockScreenState extends State<LockScreen> {
   bool isVisiblePasswordField = true;
   String password = '';
   bool isFailed = false;
-  Codec<String, String> stringToBase64 = utf8.fuse(base64);
+  Convert.Codec<String, String> stringToBase64 = Convert.utf8.fuse(Convert.base64);
   GlobalKey globalKey = GlobalKey();
   final _formKey = GlobalKey<FormState>();
   TextEditingController _passwordController = TextEditingController();
@@ -48,94 +50,90 @@ class _LockScreenState extends State<LockScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: Container(
-          padding: const EdgeInsets.only(bottom: 42),
-          child: Center(
-            child: StretchBox(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: WelcomePositionedLogo(
-                        imgWidth: 250,
-                        titleSpace: 345,
-                        title: 'Welcome back',
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 25),
-                  Container(
-                    padding: authPaddingContainer.copyWith(
-                      top: 0,
-                      bottom: 0,
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
+        body: Stack(
+          children: [
+            ExtensionWelcomeBg(),
+            Container(
+              padding: const EdgeInsets.only(bottom: 42),
+              child: Center(
+                child: StretchBox(
+                     child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          PasswordTextField(
-                            height: 71,
-                            controller: _passwordController,
-                            status: passwordStatus,
-                            hint: 'Your password',
-                            label: 'Password',
-                            isShowObscureIcon: true,
-                            isCaptionShown: false,
-                            onEditComplete: () =>
-                                (globalKey.currentWidget! as ElevatedButton)
-                                    .onPressed!(),
-                            isObscure: isPasswordObscure,
-                            onChanged: (String value) {
-                              password = value;
-                            },
-                            onPressObscure: () {
-                              setState(
-                                      () => isPasswordObscure = !isPasswordObscure);
-                            },
-                            validator: (val){
-                              return isValid ? null : "Incorrect password";
-                            },
-                          ),
-                          // SizedBox(height: 24),
-                          StretchBox(
-                            maxWidth: ScreenSizes.xSmall,
-                            child: PendingButton(
-                              widget.callback == null ? 'Unlock' : 'Continue',
-                              pendingText: 'Pending...',
-                              isCheckLock: false,
-                              globalKey: globalKey,
-                              callback: (parent) => _restoreWallet(parent),
+                          Container(
+                            padding: authPaddingContainer.copyWith(
+                              top: 0,
+                              bottom: 0,
                             ),
-                          ),
-                          SizedBox(height: 20),
-                          if (widget.callback == null)
-                            InkWell(
-                              child: Text(
-                                'Forgot password?',
-                                style: AppTheme.defiUnderlineText,
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  PasswordTextField(
+                                    isOpasity: true,
+                                    height: 71,
+                                    controller: _passwordController,
+                                    status: passwordStatus,
+                                    hint: 'Your password',
+                                    label: 'Password',
+                                    isShowObscureIcon: true,
+                                    isCaptionShown: false,
+                                    onEditComplete: () =>
+                                        (globalKey.currentWidget! as ElevatedButton)
+                                            .onPressed!(),
+                                    isObscure: isPasswordObscure,
+                                    onChanged: (String value) {
+                                      password = value;
+                                    },
+                                    onPressObscure: () {
+                                      setState(
+                                              () => isPasswordObscure = !isPasswordObscure);
+                                    },
+                                    validator: (val){
+                                      return isValid ? null : "Incorrect password";
+                                    },
+                                  ),
+                                  // SizedBox(height: 24),
+                                  StretchBox(
+                                    maxWidth: ScreenSizes.xSmall,
+                                    child: PendingButton(
+                                      widget.callback == null ? 'Unlock' : 'Continue',
+                                      pendingText: 'Pending...',
+                                      isCheckLock: false,
+                                      globalKey: globalKey,
+                                      callback: (parent) => _restoreWallet(parent),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  if (widget.callback == null)
+                                    InkWell(
+                                      child: Text(
+                                        'Forgot password?',
+                                        style: AppTheme.defiUnderlineText,
+                                      ),
+                                      onTap: isEnable
+                                          ? () => Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder:
+                                              (context, animation1, animation2) =>
+                                              RecoveryScreen(),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration: Duration.zero,
+                                        ),
+                                      )
+                                          : null,
+                                    ),
+                                ],
                               ),
-                              onTap: isEnable
-                                  ? () => Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                      RecoveryScreen(),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
-                              )
-                                  : null,
                             ),
+                          )
                         ],
                       ),
-                    ),
-                  )
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
       );
 
