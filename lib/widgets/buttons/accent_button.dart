@@ -26,45 +26,59 @@ class AccentButton extends StatelessWidget with ThemeMixin {
     return SizedBox(
       height: buttonHeight,
       width: double.infinity,
-      child: ClipRRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 1.5,
-            sigmaY: 1.5,
-          ),
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(
-                isOpasity
-                    ? Color(0xff030A53).withOpacity(0.33)
-                    : isDarkTheme()
-                        ? DarkColors.accentButtonBgColor
-                        : LightColors.accentButtonBgColor,
-              ),
-              shadowColor: MaterialStateProperty.all(Colors.transparent),
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(accentButtonBorderRadius),
-                  side: BorderSide(
-                    color: Color(0xFF9988BE).withOpacity(0.32),
-                  ),
+      child: Stack(
+        children: [
+          if (isOpasity)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(accentButtonBorderRadius),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 1.5,
+                  sigmaY: 1.5,
+                ),
+                child: Container(
+                  width: double.infinity,
+                  height: buttonHeight,
                 ),
               ),
             ),
-            child: Text(label!, style: Theme.of(context).textTheme.button!.copyWith(
-              color: isOpasity ? Colors.white : Theme.of(context).textTheme.button!.color
-            )),
-            onPressed: callback != null
-                ? () {
-                    if (isCheckLock) {
-                      lockHelper.provideWithLockChecker(context, () => callback!());
-                    } else {
-                      callback!();
+          Container(
+            width: double.infinity,
+            height: buttonHeight,
+            child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  isOpasity
+                      ? Color(0xff030A53).withOpacity(0.33)
+                      : isDarkTheme()
+                          ? DarkColors.accentButtonBgColor
+                          : LightColors.accentButtonBgColor,
+                ),
+                shadowColor: MaterialStateProperty.all(Colors.transparent),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(accentButtonBorderRadius),
+                    side: BorderSide(
+                      color: Color(0xFF9988BE).withOpacity(0.32),
+                    ),
+                  ),
+                ),
+              ),
+              child: Text(label!, style: Theme.of(context).textTheme.button!.copyWith(
+                color: isOpasity ? Colors.white : Theme.of(context).textTheme.button!.color
+              )),
+              onPressed: callback != null
+                  ? () {
+                      if (isCheckLock) {
+                        lockHelper.provideWithLockChecker(context, () => callback!());
+                      } else {
+                        callback!();
+                      }
                     }
-                  }
-                : null,
+                  : null,
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
