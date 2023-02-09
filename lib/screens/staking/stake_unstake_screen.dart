@@ -479,73 +479,6 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                         height: 16,
                                       ),
                                       if (!widget.isUnstake) ...[
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    SwapScreen(),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
-                                          },
-                                          child: MouseRegion(
-                                            cursor: SystemMouseCursors.click,
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding: EdgeInsets.all(16),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.viridian
-                                                    .withOpacity(0.07),
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                              ),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Column(
-                                                    children: [
-                                                      Container(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                right: 10),
-                                                        child: SvgPicture.asset(
-                                                            'assets/icons/compare_arrow.svg'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      children: [
-                                                        Text(
-                                                          changeDfiText,
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .headline5!
-                                                                  .copyWith(
-                                                                    fontSize:
-                                                                        12,
-                                                                  ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 24,
-                                        ),
                                         Row(
                                           children: [
                                             Text(
@@ -831,12 +764,12 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       tokens: tokens,
     );
     if (!txResponse.isError!) {
-      // lockCubit.stake(
-      //   lockAccessToken,
-      //   stakingId,
-      //   double.parse(controller.text),
-      //   txResponse.txid!,
-      // );
+      lockCubit.stake(
+        lockAccessToken,
+        stakingId,
+        double.parse(controller.text),
+        txResponse.txLoaderList![0].txId!,
+      );
     }
     showDialog(
       barrierColor: Color(0x0f180245),
@@ -850,7 +783,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
               TransactionCubit transactionCubit =
               BlocProvider.of<TransactionCubit>(context);
 
-              // transactionCubit.setOngoingTransaction(txResponse.txid!);
+              transactionCubit.setOngoingTransaction(txResponse);
             }
             Navigator.pushReplacement(
               context,

@@ -133,7 +133,7 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                           height: 4,
                                         ),
                                         Text(
-                                          '0% Fee in 2022',
+                                          '5.55% Fee',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -250,6 +250,46 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                                 .headline4!
                                                 .copyWith(
                                                   fontSize: 16,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 16,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Pending Deposits ',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .subtitle1!
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5!
+                                                      .color!
+                                                      .withOpacity(0.5),
+                                                ),
+                                          ),
+                                          Text(
+                                            '${lockState.lockStakingDetails!.pendingDeposits == 0 ? '' : '+'}'
+                                            '${lockState.lockStakingDetails!.pendingDeposits}'
+                                            ' ${lockState.lockStakingDetails!.asset}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .copyWith(
+                                                  fontSize: 16,
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5!
+                                                      .color!
+                                                      .withOpacity(0.8),
                                                 ),
                                           ),
                                         ],
