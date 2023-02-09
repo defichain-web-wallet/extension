@@ -18,7 +18,7 @@ class StatusTransaction extends StatelessWidget {
         children: [
           Image.asset(
             !isBTCError
-                ? txResponse!.isError
+                ? txResponse!.isError!
                     ? 'assets/error_gif.gif'
                     : 'assets/status_reload_icon.png'
                 : 'assets/error_gif.gif',
@@ -32,7 +32,7 @@ class StatusTransaction extends StatelessWidget {
               children: [
                 Text(
                   !isBTCError
-                      ? txResponse!.isError
+                      ? txResponse!.isError!
                           ? 'Transaction failed'
                           : 'Transaction successful!'
                       : 'Transaction failed',
@@ -43,7 +43,7 @@ class StatusTransaction extends StatelessWidget {
                 SizedBox(height: 24),
                 Text(
                   !isBTCError
-                      ? txResponse!.isError
+                      ? txResponse!.isError!
                           ? 'Were not transaction successfully'
                           : 'Your transaction will now be processed in the background. Your account balance will be updated in a few minutes.'
                       : 'Were not transaction successfully',

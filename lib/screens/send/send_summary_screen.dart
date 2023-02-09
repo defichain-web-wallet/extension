@@ -511,12 +511,12 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       builder: (BuildContext dialogContext) {
         return TxStatusDialog(
           txResponse: txResponse,
-          callbackOk: () {
+          callbackOk: () async {
             if (!SettingsHelper.isBitcoin()) {
               TransactionCubit transactionCubit =
               BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse!.txid!);
+              await transactionCubit.setOngoingTransaction(txResponse!);
             }
             Navigator.pushReplacement(
               context,
