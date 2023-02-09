@@ -127,7 +127,7 @@ class _SignupChooseThemeScreenState extends State<SignupChooseThemeScreen> {
                       width: buttonSmallWidth,
                       child: PendingButton(
                         'Continue',
-                        pendingText: 'Processed...',
+                        pendingText: 'Processing...',
                         isCheckLock: false,
                         callback: (parent) async {
                           parent.emitPending(true);

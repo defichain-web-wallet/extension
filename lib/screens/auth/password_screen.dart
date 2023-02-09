@@ -216,8 +216,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                 'Create password',
                                 pendingText: state.status ==
                                         AccountStatusList.restore
-                                    ? 'Processed (${state.restored}/${state.needRestore})'
-                                    : 'Processed...',
+                                    ? 'Processing (${state.restored}/${state.needRestore})'
+                                    : 'Processing...',
                                 isCheckLock: false,
                                 callback: _enableBtn && isConfirm
                                     ? (parent) async {
