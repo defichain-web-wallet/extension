@@ -334,11 +334,11 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
           return TxStatusDialog(
             txResponse: txResponse,
             callbackOk: () {
-              if (!txResponse.isError) {
+              if (!txResponse.isError!) {
                 TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
-                transactionCubit.setOngoingTransaction(txResponse.txid!);
+                transactionCubit.setOngoingTransaction(txResponse);
               }
               Navigator.pushReplacement(
                 context,

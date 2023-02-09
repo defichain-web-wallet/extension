@@ -585,7 +585,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
         TransactionCubit transactionCubit =
           BlocProvider.of<TransactionCubit>(context);
 
-        transactionCubit.setOngoingTransaction(txError.txid!);
+        transactionCubit.setOngoingTransaction(txError);
       }
 
       showDialog(

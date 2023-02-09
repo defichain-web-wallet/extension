@@ -608,7 +608,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
               TransactionCubit transactionCubit =
               BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse!.txid!);
+              // transactionCubit.setOngoingTransaction(txResponse!.txid!);
             }
             Navigator.pushReplacement(
               context,

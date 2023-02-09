@@ -47,7 +47,7 @@ class SendStatusScreen extends StatelessWidget {
         TransactionState txState,
       ) {
         if (errorBTC!.isEmpty) {
-          if (txResponse!.isError) {
+          if (txResponse!.isError!) {
             LoggerService.invokeInfoLogg(
                 'user was send token failed: ${txResponse!.error}');
           } else {
@@ -56,7 +56,7 @@ class SendStatusScreen extends StatelessWidget {
               TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse!.txid!);
+              // transactionCubit.setOngoingTransaction(txResponse!.txid!);
             }
           }
         }
@@ -84,7 +84,7 @@ class SendStatusScreen extends StatelessWidget {
                     ),
                     errorBTC!.isEmpty
                         ? Flexible(
-                            child: txResponse!.isError
+                            child: txResponse!.isError!
                                 ? Flexible(
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.end,
@@ -163,20 +163,20 @@ class SendStatusScreen extends StatelessWidget {
                                               style: AppTheme.defiUnderlineText,
                                             ),
                                             onTap: () {
-                                              if (SettingsHelper.isBitcoin()) {
-                                                if (SettingsHelper
-                                                        .settings.network! ==
-                                                    'mainnet') {
-                                                  launch(
-                                                      'https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
-                                                } else {
-                                                  launch(
-                                                      'https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
-                                                }
-                                              } else {
-                                                launch(
-                                                    'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
-                                              }
+                                              // if (SettingsHelper.isBitcoin()) {
+                                              //   if (SettingsHelper
+                                              //           .settings.network! ==
+                                              //       'mainnet') {
+                                              //     launch(
+                                              //         'https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
+                                              //   } else {
+                                              //     launch(
+                                              //         'https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
+                                              //   }
+                                              // } else {
+                                              //   launch(
+                                              //       'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
+                                              // }
                                             },
                                           ),
                                         ],

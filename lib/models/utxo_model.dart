@@ -13,19 +13,20 @@ class UtxoModel {
         this.address,
         this.value});
 
-  UtxoModel.fromJson(Map<String, dynamic> json) {
+  UtxoModel.fromJson(Map<dynamic, dynamic> json) {
     this.mintTxId = json["vout"]['txid'];
     this.mintIndex = json["vout"]['n'];
     this.address = json["address"];
-    this.value = convertToSatoshi(double.parse(json["vout"]["value"]));
+    this.value = convertToSatoshi(double.parse(json["vout"]["value"].toString()));
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data["mintIndex"] = this.mintIndex;
-    data["mintTxId"] = this.mintTxId;
+  Map<dynamic, dynamic> toJson() {
+    var data = {};
+    data["vout"] = {};
+    data["vout"]['txid'] = this.mintTxId;
+    data["vout"]['n'] = this.mintIndex;
     data["address"] = this.address;
-    data["value"] = convertFromSatoshi(this.value!);
+    data["vout"]["value"] = convertFromSatoshi(this.value!);
     return data;
   }
 }
