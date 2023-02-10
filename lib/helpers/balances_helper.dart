@@ -1,9 +1,50 @@
 import 'package:basic_utils/basic_utils.dart';
+import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_balance_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/requests/balance_requests.dart';
 
 class BalancesHelper {
   static const int COIN = 100000000;
+  static const int DUST = 3000; //TODO: move to constants file
+  static const int FEE = 3000; //TODO: move to constants file
+
+  Future<int> availableBalance(String currency, TxType type, AccountModel account) async {
+    var addressBalanceList = await BalanceRequests()
+        .getAddressBalanceListByAddressList(account.addressList!);
+    if(currency == 'DFI'){
+        var tokenDFIbalance =
+        getBalanceByTokenName(addressBalanceList, 'DFI');
+
+        var coinDFIbalance =
+        getBalanceByTokenName(addressBalanceList, '\$DFI');
+        switch (type) {
+          case TxType.send:
+            if(tokenDFIbalance > FEE){
+              return coinDFIbalance + tokenDFIbalance - (FEE*2);
+            } else {
+              return coinDFIbalance - (FEE);
+            }
+          case TxType.swap:
+            if(coinDFIbalance > (FEE*2)+DUST){
+              return coinDFIbalance + tokenDFIbalance - (FEE*2);
+            } else {
+              return tokenDFIbalance;
+            }
+          case TxType.addLiq:
+            if(coinDFIbalance > (FEE*2)+DUST){
+              return coinDFIbalance + tokenDFIbalance - (FEE*2);
+            } else {
+              return tokenDFIbalance;
+            }
+          default:
+            return 0;
+        }
+    } else {
+      return getBalanceByTokenName(addressBalanceList, currency);
+    }
+  }
 
   List<BalanceModel> findAndSumDuplicates(List<BalanceModel> balanceList) {
     List<BalanceModel> newBalanceList = [];
