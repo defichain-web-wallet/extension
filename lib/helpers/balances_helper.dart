@@ -10,7 +10,7 @@ class BalancesHelper {
   static const int DUST = 3000; //TODO: move to constants file
   static const int FEE = 3000; //TODO: move to constants file
 
-  Future<int> availableBalance(String currency, TxType type, AccountModel account) async {
+  Future<int> getAvailableBalance(String currency, TxType type, AccountModel account) async {
     var addressBalanceList = await BalanceRequests()
         .getAddressBalanceListByAddressList(account.addressList!);
     if(currency == 'DFI'){
