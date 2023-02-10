@@ -42,6 +42,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
   final int _fieldsLength = 24;
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _wordController = TextEditingController();
+  FocusNode confirmFocusNode = FocusNode();
 
   late List<String> _mnemonic;
   late bool _isHoverMnemonicBox;
@@ -51,9 +52,19 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
   bool _onStartedReorder = false;
 
   @override
+  void dispose() {
+    _focusNode.dispose();
+    _wordController.dispose();
+    confirmFocusNode.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _focusNode.addListener(() {});
+    confirmFocusNode.addListener(() { });
     _mnemonic = [];
     super.initState();
   }
@@ -147,9 +158,10 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
       _wordController.text = '';
 
       if (_mnemonic.length < 24) {
-        FocusScope.of(context).requestFocus(_focusNode);
+        _focusNode.requestFocus();
       } else {
         _isViewTextField = false;
+        confirmFocusNode.requestFocus();
       }
     });
   }
@@ -234,9 +246,9 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                                       _onStartedReorder = false;
 
                                       if (_mnemonic.length < 24) {
-                                        FocusScope.of(context)
-                                            .requestFocus(_focusNode);
+
                                         _isViewTextField = true;
+                                        _focusNode.requestFocus();
                                       }
                                     });
                                   } else {
@@ -318,6 +330,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                                         _mnemonic = phraseFromClipboard;
                                         _wordController.text = '';
                                         _isViewTextField = false;
+                                        confirmFocusNode.requestFocus();
                                       });
                                     }
                                   } catch (err) {
@@ -326,6 +339,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                                 },
                               )
                             : NewPrimaryButton(
+                                focusNode: confirmFocusNode,
                                 title: 'Restore Wallet',
                                 width: isFullScreen
                                     ? buttonFullWidth

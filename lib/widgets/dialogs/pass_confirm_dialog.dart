@@ -41,6 +41,15 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
       convert.utf8.fuse(convert.base64);
   GlobalKey globalKey = GlobalKey();
   TextEditingController _passwordController = TextEditingController();
+  FocusNode confirmFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    confirmFocusNode.dispose();
+    _passwordController.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +84,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
                   ),
                 ),
                 NewPrimaryButton(
+                  focusNode: confirmFocusNode,
                   width: 104,
                   title: 'Confirm',
                   callback: () {
@@ -188,6 +198,9 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
                             },
                             validator: (val) {
                               return isValid ? null : "Incorrect password";
+                            },
+                            onSubmitted: (val) {
+                              confirmFocusNode.requestFocus();
                             },
                           ),
                         ],

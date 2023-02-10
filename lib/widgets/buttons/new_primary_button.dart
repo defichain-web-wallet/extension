@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class NewPrimaryButton extends StatelessWidget {
   void Function()? callback;
   final GlobalKey? globalKey;
+  final FocusNode? focusNode;
   double width;
   String title;
   Widget? titleWidget;
@@ -12,6 +13,7 @@ class NewPrimaryButton extends StatelessWidget {
     Key? key,
     this.callback,
     this.globalKey,
+    this.focusNode,
     this.width = double.infinity,
     this.title = 'OK',
     this.titleWidget,
@@ -30,6 +32,7 @@ class NewPrimaryButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(buttonBorderRadius),
             gradient: callback != null ? gradientButton : gradientDisableButton),
         child: ElevatedButton(
+          focusNode: focusNode,
           onPressed: callback,
           key: globalKey,
           style: ElevatedButton.styleFrom(
