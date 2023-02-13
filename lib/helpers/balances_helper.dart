@@ -10,7 +10,7 @@ class BalancesHelper {
   static const int DUST = 3000; //TODO: move to constants file
   static const int FEE = 3000; //TODO: move to constants file
 
-  Future<int> getAvailableBalance(String currency, TxType type, AccountModel account) async {
+  Future<double> getAvailableBalance(String currency, TxType type, AccountModel account) async {
     var addressBalanceList = await BalanceRequests()
         .getAddressBalanceListByAddressList(account.addressList!);
     if(currency == 'DFI'){
@@ -22,27 +22,27 @@ class BalancesHelper {
         switch (type) {
           case TxType.send:
             if(tokenDFIbalance > FEE){
-              return coinDFIbalance + tokenDFIbalance - (FEE*2);
+              return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE*2));
             } else {
-              return coinDFIbalance - (FEE);
+              return fromSatohi(coinDFIbalance - (FEE));
             }
           case TxType.swap:
             if(coinDFIbalance > (FEE*2)+DUST){
-              return coinDFIbalance + tokenDFIbalance - (FEE*2);
+              return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE*2));
             } else {
-              return tokenDFIbalance;
+              return fromSatohi(tokenDFIbalance);
             }
           case TxType.addLiq:
             if(coinDFIbalance > (FEE*2)+DUST){
-              return coinDFIbalance + tokenDFIbalance - (FEE*2);
+              return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE*2));
             } else {
-              return tokenDFIbalance;
+              return fromSatohi(tokenDFIbalance);
             }
           default:
             return 0;
         }
     } else {
-      return getBalanceByTokenName(addressBalanceList, currency);
+      return fromSatohi(getBalanceByTokenName(addressBalanceList, currency));
     }
   }
 

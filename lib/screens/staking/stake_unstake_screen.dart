@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/available_amount/available_amount_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_remove_screen.dart';
 import 'package:defi_wallet/screens/swap/swap_screen.dart';
@@ -51,6 +53,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
   final String warningText = 'You can also deposit DFI directly from an other '
       'DeFiChain address. Simply send the DFI to this staking deposit address.';
   final FocusNode _focusNode = FocusNode();
+  String savedAvailable = '';
   TextEditingController controller = TextEditingController();
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
@@ -58,6 +61,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
   LockService lockService = LockService();
   bool _onFocused = false;
   double currentSliderValue = 0;
+  int i = 0;
 
   late String titleText;
 
@@ -74,9 +78,14 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
     if (controller.text == '') {
       controller.text = '0';
     }
-    setState(() {
       _onFocused = _focusNode.hasFocus;
-    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -91,9 +100,17 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
           builder: (accountContext, accountState) {
             return BlocBuilder<LockCubit, LockState>(
               builder: (lockContext, lockState) {
+                AvailableAmountCubit availableAmountCubit =
+                BlocProvider.of<AvailableAmountCubit>(context);
+                availableAmountCubit.getAvailable(
+                  lockState.lockStakingDetails!.asset!,
+                  TxType.send,
+                  accountState.activeAccount!,
+                );
                 return BlocBuilder<TokensCubit, TokensState>(
                   builder: (tokensContext, tokensState) {
-                    String availableAmount =
+
+                    String availableAmount = //TODO
                         '${widget.isUnstake ? (lockState.lockStakingDetails!.balance! - lockState.lockStakingDetails!.pendingWithdrawals!) : getAvailableBalance(
                             accountState,
                             lockState.lockStakingDetails!.asset!,
@@ -356,22 +373,104 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                               .withOpacity(0.3),
                                                         ),
                                                   ),
-                                                  Text(
-                                                    'Available: $availableAmount',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline6!
-                                                        .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .headline6!
-                                                              .color!
-                                                              .withOpacity(0.3),
-                                                        ),
-                                                  ),
+                                                  if (widget.isUnstake)
+                                                    Text(
+                                                      'Available: '
+                                                      '${(lockState.lockStakingDetails!.balance! - lockState.lockStakingDetails!.pendingWithdrawals!)}',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline6!
+                                                          .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headline6!
+                                                                .color!
+                                                                .withOpacity(
+                                                                    0.3),
+                                                          ),
+                                                    ),
+                                                  if (!widget.isUnstake)
+                                                    BlocBuilder<
+                                                        AvailableAmountCubit,
+                                                        AvailableAmountState>(
+                                                      builder:
+                                                          (availableAmountContext,
+                                                              availableAmountState) {
+                                                        if (availableAmountState
+                                                                .status !=
+                                                            AvailableAmountStatusList
+                                                                .success) {
+                                                          if(savedAvailable == ''){
+                                                            return Container();
+                                                          } else {
+                                                            return Text(
+                                                              'Available: '
+                                                                  '$savedAvailable',
+                                                              style: Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline6!
+                                                                  .copyWith(
+                                                                fontWeight:
+                                                                FontWeight.w600,
+                                                                color: Theme.of(
+                                                                    context)
+                                                                    .textTheme
+                                                                    .headline6!
+                                                                    .color!
+                                                                    .withOpacity(
+                                                                    0.3),
+                                                              ),
+                                                            );
+                                                          }
+                                                        } else {
+                                                          savedAvailable = availableAmountState
+                                                              .available
+                                                              .toString();
+                                                          return GestureDetector(
+                                                            onTap: () {
+                                                              print('wwww');
+                                                              setState(() {
+                                                                // print('wwww');
+                                                                controller
+                                                                        .text =
+                                                                    availableAmountState
+                                                                        .available
+                                                                        .toString();
+                                                                print(controller
+                                                                    .text);
+                                                              });
+                                                            },
+                                                            child: MouseRegion(
+                                                              cursor:
+                                                                  SystemMouseCursors
+                                                                      .click,
+                                                              child: Text(
+                                                                'Available: ${availableAmountState.available}',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headline6!
+                                                                    .copyWith(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      color: Theme.of(
+                                                                              context)
+                                                                          .textTheme
+                                                                          .headline6!
+                                                                          .color!
+                                                                          .withOpacity(
+                                                                              0.3),
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        }
+                                                      },
+                                                    ),
                                                 ],
                                               ),
                                               if (widget.isUnstake)
@@ -402,7 +501,8 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                               currentSliderValue =
                                                                   value;
                                                               _setBalance(
-                                                                  lockState, availableAmount);
+                                                                  lockState,
+                                                                  availableAmount);
                                                             });
                                                           },
                                                         ),
@@ -423,7 +523,8 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                                 currentSliderValue =
                                                                     25;
                                                                 _setBalance(
-                                                                    lockState, availableAmount);
+                                                                    lockState,
+                                                                    availableAmount);
                                                               });
                                                             },
                                                           ),
@@ -436,7 +537,8 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                                 currentSliderValue =
                                                                     50;
                                                                 _setBalance(
-                                                                    lockState, availableAmount);
+                                                                    lockState,
+                                                                    availableAmount);
                                                               });
                                                             },
                                                           ),
@@ -449,7 +551,8 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                                 currentSliderValue =
                                                                     75;
                                                                 _setBalance(
-                                                                    lockState, availableAmount);
+                                                                    lockState,
+                                                                    availableAmount);
                                                               });
                                                             },
                                                           ),
@@ -462,7 +565,8 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                                 currentSliderValue =
                                                                     100;
                                                                 _setBalance(
-                                                                    lockState, availableAmount);
+                                                                    lockState,
+                                                                    availableAmount);
                                                               });
                                                             },
                                                           ),
@@ -627,21 +731,24 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                         'Continue',
                                         pendingText: 'Pending...',
                                         callback: (parent) {
-                                          if (txState is! TransactionLoadingState) {
+                                          if (txState
+                                              is! TransactionLoadingState) {
                                             if (double.parse(controller.text) >=
                                                 lockState.lockStakingDetails!
                                                     .minimalDeposit!) {
                                               parent.emitPending(true);
                                               if (widget.isUnstake) {
                                                 showDialog(
-                                                  barrierColor: Color(0x0f180245),
+                                                  barrierColor:
+                                                      Color(0x0f180245),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
                                                       dialogContext) {
                                                     return PassConfirmDialog(
                                                       onCancel: () {
-                                                        parent.emitPending(false);
+                                                        parent
+                                                            .emitPending(false);
                                                       },
                                                       onSubmit: (password) {
                                                         unstakeCallback(
@@ -661,14 +768,16 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                 );
                                               } else {
                                                 showDialog(
-                                                  barrierColor: Color(0x0f180245),
+                                                  barrierColor:
+                                                      Color(0x0f180245),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
                                                       dialogContext) {
                                                     return PassConfirmDialog(
                                                       onCancel: () {
-                                                        parent.emitPending(false);
+                                                        parent
+                                                            .emitPending(false);
                                                       },
                                                       onSubmit: (password) {
                                                         stakeCallback(
@@ -700,7 +809,8 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                     .withOpacity(0.1),
                                                 prefix: Icon(
                                                   Icons.close,
-                                                  color: AppColors.txStatusError,
+                                                  color:
+                                                      AppColors.txStatusError,
                                                 ),
                                               );
                                             }
@@ -781,7 +891,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
           callbackOk: () {
             if (!txResponse!.isError!) {
               TransactionCubit transactionCubit =
-              BlocProvider.of<TransactionCubit>(context);
+                  BlocProvider.of<TransactionCubit>(context);
 
               transactionCubit.setOngoingTransaction(txResponse);
             }
@@ -837,43 +947,43 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       double.parse(controller.text),
     );
     TxErrorModel txResponse = TxErrorModel(isError: !isUnstakeSuccess);
-      showDialog(
-        barrierColor: Color(0x0f180245),
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext dialogContext) {
-          return TxStatusDialog(
-            txResponse: txResponse,
-            callbackOk: () {
-              if (!txResponse.isError! && !widget.isUnstake) {
-                TransactionCubit transactionCubit =
-                    BlocProvider.of<TransactionCubit>(context);
+    showDialog(
+      barrierColor: Color(0x0f180245),
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return TxStatusDialog(
+          txResponse: txResponse,
+          callbackOk: () {
+            if (!txResponse.isError! && !widget.isUnstake) {
+              TransactionCubit transactionCubit =
+                  BlocProvider.of<TransactionCubit>(context);
 
-                transactionCubit.setOngoingTransaction(txResponse);
-              }
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) => HomeScreen(
-                    isLoadTokens: true,
-                  ),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
+              transactionCubit.setOngoingTransaction(txResponse);
+            }
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) => HomeScreen(
+                  isLoadTokens: true,
                 ),
-              );
-            },
-            callbackTryAgain: () async {
-              print('TryAgain');
-              await unstakeCallback(
-                password,
-                account,
-                lockAccessToken,
-                stakingId,
-              );
-            },
-          );
-        },
-      );
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+          },
+          callbackTryAgain: () async {
+            print('TryAgain');
+            await unstakeCallback(
+              password,
+              account,
+              lockAccessToken,
+              stakingId,
+            );
+          },
+        );
+      },
+    );
   }
 
   String getUsdBalance(
