@@ -4,6 +4,7 @@ import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/selectors/network_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 // import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
 // import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 
@@ -35,7 +36,9 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         shadowColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        backgroundColor: bgColor != null ? bgColor : Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: bgColor != null
+            ? bgColor
+            : Theme.of(context).scaffoldBackgroundColor,
         toolbarHeight: toolbarHeight,
         elevation: 0,
         leadingWidth: leadingWidth,
@@ -45,15 +48,21 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: LogoHelper().getLogo(),
               )
             : IconButton(
+                padding: const EdgeInsets.only(left: logoLeftPadding - 2),
                 icon: SvgPicture.asset(
                   'assets/icons/arrow_back.svg',
                   width: iconSize,
                   height: iconSize,
                 ),
                 onPressed: () => Navigator.of(context).pop(),
-                splashRadius: 20,
+                hoverColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                focusColor: Colors.transparent,
               ),
-        title: NetworkSelector(onSelect: () {},),
+        title: NetworkSelector(
+          onSelect: () {},
+        ),
         actions: [
           SizedBox(
             width: 32,
