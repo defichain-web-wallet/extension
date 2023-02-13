@@ -23,7 +23,7 @@ class _BuyTutorialFirstScreenState extends State<BuyTutorialFirstScreen>
     with ThemeMixin {
   FocusNode checkBoxFocusNode = FocusNode();
   bool isConfirm = false;
-  String titleText = 'Fiat to crypto: how it works?';
+  String titleText = 'Fiat to crypto: How it works!';
 
   @override
   Widget build(BuildContext context) {

@@ -25,7 +25,7 @@ class BuyTutorialSecondScreen extends StatefulWidget {
 }
 
 class _BuyTutorialSecondScreenState extends State<BuyTutorialSecondScreen> with ThemeMixin{
-  String titleText = 'Fiat to crypto: how it works?';
+  String titleText = 'Fiat to crypto: How it works!';
   FocusNode checkBoxFocusNode = FocusNode();
 
   @override
