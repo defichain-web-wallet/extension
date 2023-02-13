@@ -8,6 +8,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
@@ -21,9 +22,11 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
+import 'package:defi_wallet/widgets/common/app_tooltip.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/home/account_balance.dart';
 import 'package:defi_wallet/widgets/home/home_card.dart';
+import 'package:defi_wallet/widgets/home/home_sliver_app_bar.dart';
 import 'package:defi_wallet/widgets/home/transaction_status_bar.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -50,7 +53,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen>
-    with SnackBarMixin, TickerProviderStateMixin {
+    with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
   static const int tickerTimerUpdate = 15;
   Timer? timer;
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -130,7 +133,10 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     setTabBody();
-    tabController = TabController(length: 2, vsync: this,);
+    tabController = TabController(
+      length: 2,
+      vsync: this,
+    );
     tabController!.addListener(tabListener);
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
@@ -196,8 +202,9 @@ class _HomeScreenState extends State<HomeScreen>
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {
                       if (timer == null) {
-                        timer = Timer.periodic(
-                            Duration(seconds: tickerTimerUpdate), (timer) async {
+                        timer =
+                            Timer.periodic(Duration(seconds: tickerTimerUpdate),
+                                (timer) async {
                           await accountCubit.loadAccounts();
                         });
                       }
@@ -220,124 +227,7 @@ class _HomeScreenState extends State<HomeScreen>
                                       .copyWith(scrollbars: false),
                                   child: CustomScrollView(
                                     slivers: [
-                                      SliverAppBar(
-                                        pinned: true,
-                                        floating: false,
-                                        backgroundColor: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        elevation: 0,
-                                        actions: [Container()],
-                                        automaticallyImplyLeading: false,
-                                        toolbarHeight: 56 + 20,
-                                        expandedHeight: 266 + 30,
-                                        flexibleSpace: LayoutBuilder(
-                                          builder: (BuildContext context,
-                                              BoxConstraints constraints) {
-                                            sliverTopHeight =
-                                                constraints.biggest.height;
-                                            return SafeArea(
-                                              child: FlexibleSpaceBar(
-                                                centerTitle: true,
-                                                titlePadding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 16,
-                                                        vertical: 10),
-                                                title: sliverTopHeight ==
-                                                        targetSliverTopHeight
-                                                    ? AnimatedOpacity(
-                                                        opacity: sliverTopHeight ==
-                                                                targetSliverTopHeight
-                                                            ? 1.0
-                                                            : 0.0,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    200),
-                                                        child: Container(
-                                                          height: 56,
-                                                          child: Row(
-                                                            children: [
-                                                              Expanded(
-                                                                child:
-                                                                    AccountBalance(
-                                                                  asset: 'USD',
-                                                                  isSmall: true,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 72,
-                                                                child:
-                                                                    FlatButton(
-                                                                  title: '',
-                                                                  iconPath:
-                                                                      'assets/icons/earn_icon.svg',
-                                                                  isSmall: true,
-                                                                  callback: () {
-                                                                    Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      PageRouteBuilder(
-                                                                        pageBuilder: (context,
-                                                                                animation1,
-                                                                                animation2) =>
-                                                                            EarnScreenNew(),
-                                                                        transitionDuration:
-                                                                            Duration.zero,
-                                                                        reverseTransitionDuration:
-                                                                            Duration.zero,
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 8,
-                                                              ),
-                                                              SizedBox(
-                                                                width: 72,
-                                                                child:
-                                                                    FlatButton(
-                                                                  title: '',
-                                                                  iconPath:
-                                                                      'assets/icons/wallet_icon.svg',
-                                                                  isSmall: true,
-                                                                  callback: () {
-                                                                    Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      PageRouteBuilder(
-                                                                        pageBuilder: (context,
-                                                                                animation1,
-                                                                                animation2) =>
-                                                                            BuySellScreen(),
-                                                                        transitionDuration:
-                                                                            Duration.zero,
-                                                                        reverseTransitionDuration:
-                                                                            Duration.zero,
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : null,
-                                                background: Container(
-                                                  height: 266,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    vertical: 16,
-                                                    horizontal: 16,
-                                                  ),
-                                                  child: HomeCard(),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
+                                      HomeSliverAppBar(),
                                       SliverAppBar(
                                         backgroundColor: Theme.of(context)
                                             .scaffoldBackgroundColor,
@@ -413,28 +303,31 @@ class _HomeScreenState extends State<HomeScreen>
                                           ),
                                         ),
                                       ),
-                                      if (tabController!.index == 0)
-                                        ...[
-                                          AssetList(),
-                                          SliverFillRemaining(
-                                            hasScrollBody: false,
-                                            child: Container(
-                                              height: txState is! TransactionInitialState ? 90 : 0,
-                                              color: Theme.of(context).cardColor,
-                                            ),
-                                          )
-                                        ]
-                                      else
-                                        ...[
-                                          TransactionHistory(),
-                                          SliverFillRemaining(
-                                            hasScrollBody: false,
-                                            child: Container(
-                                              height: txState is! TransactionInitialState ? 90 : 0,
-                                              color: Theme.of(context).cardColor,
-                                            ),
+                                      if (tabController!.index == 0) ...[
+                                        AssetList(),
+                                        SliverFillRemaining(
+                                          hasScrollBody: false,
+                                          child: Container(
+                                            height: txState
+                                                    is! TransactionInitialState
+                                                ? 90
+                                                : 0,
+                                            color: Theme.of(context).cardColor,
                                           ),
-                                        ]
+                                        )
+                                      ] else ...[
+                                        TransactionHistory(),
+                                        SliverFillRemaining(
+                                          hasScrollBody: false,
+                                          child: Container(
+                                            height: txState
+                                                    is! TransactionInitialState
+                                                ? 90
+                                                : 0,
+                                            color: Theme.of(context).cardColor,
+                                          ),
+                                        ),
+                                      ]
                                     ],
                                   ),
                                 ),
