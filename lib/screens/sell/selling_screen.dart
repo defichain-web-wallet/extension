@@ -50,11 +50,11 @@ class Selling extends StatefulWidget {
 
 class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
   final TextEditingController amountController =
-      TextEditingController(text: '0');
+  TextEditingController(text: '0');
   final TextEditingController _ibanController = TextEditingController();
   late FiatModel selectedFiat;
   final GlobalKey<IbanSelectorState> selectKeyIban =
-      GlobalKey<IbanSelectorState>();
+  GlobalKey<IbanSelectorState>();
   final _formKey = GlobalKey<FormState>();
 
   DfxRequests dfxRequests = DfxRequests();
@@ -67,7 +67,6 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
   List<String> assets = [];
   String? balanceInUsd;
   String titleText = 'Selling';
-  String assetFrom = '';
   int iterator = 0;
   int iteratorFiat = 0;
 
@@ -81,10 +80,10 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       builder: (
-        BuildContext context,
-        bool isFullScreen,
-        TransactionState txState,
-      ) {
+          BuildContext context,
+          bool isFullScreen,
+          TransactionState txState,
+          ) {
         return BlocBuilder<AccountCubit, AccountState>(
           builder: (accountContext, accountState) {
             if (iteratorFiat == 0) {
@@ -109,19 +108,22 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                           )));
                       return Container();
                     } else {
-                      currentAsset = currentAsset ??
-                          getTokensList(accountState, tokensState).first;
                       IbanModel? currentIban;
                       if (iterator == 0) {
                         selectedFiat = fiatState.sellableFiatList![0];
                         accountState.activeAccount!.balanceList!.forEach((el) {
                           try {
                             var assetList = fiatState.assets!.where((element) =>
-                                element.name == el.token && !el.isHidden!);
-                            assets.add(List.from(assetList)[0].name);
-                          } catch (_) {}
+                            element.dexName == el.token && !el.isHidden!);
+                            print(List.from(assetList));
+                            assets.add(List.from(assetList)[0].dexName);
+                          } catch (_) {
+                            print('123');
+                          }
                         });
-                        assetFrom = assets[0];
+                        currentAsset = currentAsset ??
+                            getTokensList(accountState, tokensState, assets)
+                                .first;
                         iterator++;
                       }
                       List<String> stringIbans = [];
@@ -132,7 +134,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                       });
 
                       var stringUniqueIbans =
-                          Set<String>.from(stringIbans).toList();
+                      Set<String>.from(stringIbans).toList();
 
                       stringUniqueIbans.forEach((element) {
                         uniqueIbans.add(fiatState.ibanList!
@@ -161,9 +163,9 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                 : LightColors.scaffoldContainerBgColor,
                             border: isDarkTheme()
                                 ? Border.all(
-                                    width: 1.0,
-                                    color: Colors.white.withOpacity(0.05),
-                                  )
+                              width: 1.0,
+                              color: Colors.white.withOpacity(0.05),
+                            )
                                 : null,
                             borderRadius: BorderRadius.only(
                               topRight: Radius.circular(20),
@@ -174,7 +176,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                             child: StretchBox(
                               child: Column(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Expanded(
@@ -182,7 +184,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                       key: _formKey,
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Row(
                                             children: [
@@ -190,7 +192,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                 titleText,
                                                 style: headline2.copyWith(
                                                     fontWeight:
-                                                        FontWeight.w700),
+                                                    FontWeight.w700),
                                                 textAlign: TextAlign.start,
                                                 softWrap: true,
                                               ),
@@ -220,6 +222,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                             assets: getTokensList(
                                               accountState,
                                               tokensState,
+                                              assets,
                                             ),
                                           ),
                                           SizedBox(height: 16),
@@ -245,30 +248,30 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                           SizedBox(height: 16),
                                           Container(
                                               child: widget.isNewIban ||
-                                                      fiatState.activeIban ==
-                                                          null
+                                                  fiatState.activeIban ==
+                                                      null
                                                   ? IbanField(
-                                                      isBorder: false,
-                                                      ibanController:
-                                                          _ibanController,
-                                                      hintText:
-                                                          'DE89 37XX XXXX XXXX XXXX XX',
-                                                      maskFormat:
-                                                          'AA## #### #### #### #### ##',
-                                                    )
+                                                isBorder: false,
+                                                ibanController:
+                                                _ibanController,
+                                                hintText:
+                                                'DE89 37XX XXXX XXXX XXXX XX',
+                                                maskFormat:
+                                                'AA## #### #### #### #### ##',
+                                              )
                                                   : IbanSelector(
-                                                      isBorder: false,
-                                                      key: selectKeyIban,
-                                                      onAnotherSelect:
-                                                          hideOverlay,
-                                                      routeWidget: Selling(
-                                                        isNewIban:
-                                                            widget.isNewIban,
-                                                      ),
-                                                      ibanList: uniqueIbans,
-                                                      selectedIban:
-                                                          fiatState.activeIban!,
-                                                    )),
+                                                isBorder: false,
+                                                key: selectKeyIban,
+                                                onAnotherSelect:
+                                                hideOverlay,
+                                                routeWidget: Selling(
+                                                  isNewIban:
+                                                  widget.isNewIban,
+                                                ),
+                                                ibanList: uniqueIbans,
+                                                selectedIban:
+                                                fiatState.activeIban!,
+                                              )),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 vertical: 6),
@@ -278,7 +281,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                           Container(
                                             child: Row(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                               children: [
                                                 Column(
                                                   children: [
@@ -298,33 +301,33 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                           children: [
                                                             TextSpan(
                                                                 text:
-                                                                    'Over 900 € transfer volume per day KYC (Know Your Customer) process is necessary. If you would like to remove this limit, please complete the ',
+                                                                'Over 900 € transfer volume per day KYC (Know Your Customer) process is necessary. If you would like to remove this limit, please complete the ',
                                                                 style: Theme.of(
-                                                                        context)
+                                                                    context)
                                                                     .textTheme
                                                                     .headline6!
                                                                     .copyWith(
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .w600,
-                                                                        color: Theme.of(context)
-                                                                            .textTheme
-                                                                            .headline6!
-                                                                            .color!
-                                                                            .withOpacity(0.6))),
+                                                                    fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                    color: Theme.of(context)
+                                                                        .textTheme
+                                                                        .headline6!
+                                                                        .color!
+                                                                        .withOpacity(0.6))),
                                                             TextSpan(
                                                               text:
-                                                                  'KYC process here.',
+                                                              'KYC process here.',
                                                               style: Theme.of(
-                                                                      context)
+                                                                  context)
                                                                   .textTheme
                                                                   .headline6!
                                                                   .copyWith(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600,
-                                                                      color: AppTheme
-                                                                          .pinkColor),
+                                                                  fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                                  color: AppTheme
+                                                                      .pinkColor),
                                                             ),
                                                           ],
                                                         ),
@@ -351,7 +354,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                             lockHelper.provideWithLockChecker(
                                                 context, () async {
                                               if (txState
-                                                  is TransactionLoadingState) {
+                                              is TransactionLoadingState) {
                                                 parent.emitPending(false);
                                                 showSnackBar(
                                                   context,
@@ -368,40 +371,40 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                 return;
                                               }
                                               bool isEnough =
-                                                  isEnoughBalance(accountState);
+                                              isEnoughBalance(accountState);
                                               hideOverlay();
                                               if (_formKey.currentState!
                                                   .validate()) {
                                                 if (isEnough) {
                                                   showDialog(
                                                     barrierColor:
-                                                        Color(0x0f180245),
+                                                    Color(0x0f180245),
                                                     barrierDismissible: false,
                                                     context: context,
                                                     builder:
                                                         (BuildContext context1) {
                                                       return PassConfirmDialog(
-                                                        onCancel: () {
-                                                          parent.emitPending(false);
-                                                        },
+                                                          onCancel: () {
+                                                            parent.emitPending(false);
+                                                          },
                                                           onSubmit:
                                                               (password) async {
 
-                                                        await _submitSell(
-                                                          accountState,
-                                                          tokensState,
-                                                          fiatState,
-                                                          password,
-                                                        );
-                                                        parent.emitPending(false);
-                                                      });
+                                                            await _submitSell(
+                                                              accountState,
+                                                              tokensState,
+                                                              fiatState,
+                                                              password,
+                                                            );
+                                                            parent.emitPending(false);
+                                                          });
                                                     },
                                                   );
                                                 } else {
                                                   if (double.parse(
-                                                          amountController.text
-                                                              .replaceAll(
-                                                                  ',', '.')) ==
+                                                      amountController.text
+                                                          .replaceAll(
+                                                          ',', '.')) ==
                                                       0) {
                                                     ScaffoldMessenger.of(context)
                                                         .showSnackBar(
@@ -413,9 +416,9 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                               .headline5,
                                                         ),
                                                         backgroundColor:
-                                                            Theme.of(context)
-                                                                .snackBarTheme
-                                                                .backgroundColor,
+                                                        Theme.of(context)
+                                                            .snackBarTheme
+                                                            .backgroundColor,
                                                       ),
                                                     );
                                                   } else {
@@ -429,9 +432,9 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                               .headline5,
                                                         ),
                                                         backgroundColor:
-                                                            Theme.of(context)
-                                                                .snackBarTheme
-                                                                .backgroundColor,
+                                                        Theme.of(context)
+                                                            .snackBarTheme
+                                                            .backgroundColor,
                                                       ),
                                                     );
                                                   }
@@ -460,11 +463,19 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
     );
   }
 
-  getTokensList(accountState, tokensState) {
+  getTokensList(accountState, tokensState, targetAssets) {
+    List<TokensModel> tempList = [];
     List<TokensModel> resList = [];
     accountState.balances!.forEach((element) {
       tokensState.tokens!.forEach((el) {
         if (element.token == el.symbol) {
+          tempList.add(el);
+        }
+      });
+    });
+    targetAssets.forEach((element) {
+      tempList.forEach((el) {
+        if (element == el.symbol) {
           resList.add(el);
         }
       });
@@ -488,18 +499,18 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
   }
 
   _submitSell(
-    AccountState accountState,
-    TokensState tokensState,
-    FiatState fiatState,
-    String password,
-  ) async {
+      AccountState accountState,
+      TokensState tokensState,
+      FiatState fiatState,
+      String password,
+      ) async {
     try {
       String address;
       double amount = double.parse(amountController.text.replaceAll(',', '.'));
       IbanModel? foundedIban;
       try {
         foundedIban = fiatState.ibanList!.firstWhere((el) =>
-            el.active! &&
+        el.active! &&
             el.type == "Sell" &&
             el.iban == fiatState.activeIban!.iban &&
             el.fiat!.name == selectedFiat.name);
@@ -511,12 +522,12 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
           : fiatState.activeIban!.iban!;
       if (foundedIban == null || widget.isNewIban) {
         Map sellDetails =
-            await dfxRequests.sell(iban, selectedFiat, fiatState.accessToken!);
+        await dfxRequests.sell(iban, selectedFiat, fiatState.accessToken!);
         address = sellDetails["deposit"]["address"];
       } else {
         address = foundedIban.deposit["address"];
       }
-      await _sendTransaction(context, tokensState, assetFrom,
+      await _sendTransaction(context, tokensState, currentAsset!.symbol!,
           accountState.activeAccount!, address, amount, password);
     } catch (err) {
       showSnackBar(
@@ -537,19 +548,6 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
     } catch (_) {}
   }
 
-  double getAvailableAmount(accountState, assetFrom) {
-    int fee = 3000;
-    int balance = accountState.activeAccount.balanceList!
-        .firstWhere((el) => el.token! == assetFrom && !el.isHidden)
-        .balance!;
-    balance -= fee;
-    if (balance < 0) {
-      balance = 0;
-    }
-
-    return convertFromSatoshi(balance);
-  }
-
   double getAvailableBalance(accountState) {
     int balance = accountState.activeAccount!.balanceList!
         .firstWhere((el) => el.token! == currentAsset!.symbol! && !el.isHidden!)
@@ -560,10 +558,10 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
 
   bool isEnoughBalance(state) {
     int balance = state.activeAccount.balanceList!
-        .firstWhere((el) => el.token! == assetFrom && !el.isHidden)
+        .firstWhere((el) => el.token! == currentAsset!.symbol! && !el.isHidden)
         .balance!;
     return convertFromSatoshi(balance) >=
-            double.parse(amountController.text.replaceAll(',', '.')) &&
+        double.parse(amountController.text.replaceAll(',', '.')) &&
         double.parse(amountController.text.replaceAll(',', '.')) > 0;
   }
 
@@ -594,7 +592,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
     }
     if (!txResponse!.isError!) {
       TransactionCubit transactionCubit =
-        BlocProvider.of<TransactionCubit>(context);
+      BlocProvider.of<TransactionCubit>(context);
 
       transactionCubit.setOngoingTransaction(txResponse);
     }
@@ -626,7 +624,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
             await _sendTransaction(
               context,
               tokensState,
-              assetFrom,
+              currentAsset!.symbol!,
               account,
               address,
               amount,
