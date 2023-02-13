@@ -350,7 +350,6 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                             parent.emitPending(true);
                                             lockHelper.provideWithLockChecker(
                                                 context, () async {
-                                                  print(txState);
                                               if (txState
                                                   is TransactionLoadingState) {
                                                 parent.emitPending(false);
@@ -593,6 +592,12 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
     } catch (err) {
       print(err);
     }
+    if (!txResponse!.isError!) {
+      TransactionCubit transactionCubit =
+        BlocProvider.of<TransactionCubit>(context);
+
+      transactionCubit.setOngoingTransaction(txResponse);
+    }
     showDialog(
       barrierColor: Color(0x0f180245),
       barrierDismissible: false,
@@ -604,12 +609,6 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
           buttonLabel: 'Done',
           txResponse: txResponse,
           callbackOk: () {
-            if (!SettingsHelper.isBitcoin()) {
-              TransactionCubit transactionCubit =
-              BlocProvider.of<TransactionCubit>(context);
-
-              // transactionCubit.setOngoingTransaction(txResponse!.txid!);
-            }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
