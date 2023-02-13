@@ -254,7 +254,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                       hintText:
                                                           'DE89 37XX XXXX XXXX XXXX XX',
                                                       maskFormat:
-                                                          'AA## #### #### #### #### ##',
+                                                          'AA## #### #### #### #### #### ###',
                                                     )
                                                   : IbanSelector(
                                                       isBorder: false,
