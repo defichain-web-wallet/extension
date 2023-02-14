@@ -54,6 +54,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       'DeFiChain address. Simply send the DFI to this staking deposit address.';
   final FocusNode _focusNode = FocusNode();
   String savedAvailable = '';
+  String usdAmount = '';
   TextEditingController controller = TextEditingController();
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
@@ -115,9 +116,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                             accountState,
                             lockState.lockStakingDetails!.asset!,
                           )}';
-                    String usdAmount = '\$${getUsdBalance(
+                    usdAmount = '\$${getUsdBalance(
                       context,
-                      availableAmount,
+                      controller.text,
                       lockState.lockStakingDetails!.asset!,
                     )}';
                     return Scaffold(
@@ -259,7 +260,15 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                           controller:
                                                               controller,
                                                           focusNode: _focusNode,
-                                                          onChanged: (value) {},
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              usdAmount = '\$${getUsdBalance(
+                                                                context,
+                                                                controller.text,
+                                                                lockState.lockStakingDetails!.asset!,
+                                                              )}';
+                                                            });
+                                                          },
                                                           style:
                                                               Theme.of(context)
                                                                   .textTheme
@@ -374,23 +383,42 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                         ),
                                                   ),
                                                   if (widget.isUnstake)
-                                                    Text(
-                                                      'Available: '
-                                                      '${(lockState.lockStakingDetails!.balance! - lockState.lockStakingDetails!.pendingWithdrawals!)}',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .headline6!
-                                                          .copyWith(
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .headline6!
-                                                                .color!
-                                                                .withOpacity(
-                                                                    0.3),
-                                                          ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          controller
+                                                              .text = (lockState
+                                                                      .lockStakingDetails!
+                                                                      .balance! -
+                                                                  lockState
+                                                                      .lockStakingDetails!
+                                                                      .pendingWithdrawals!)
+                                                              .toString();
+                                                          usdAmount = '\$${getUsdBalance(
+                                                            context,
+                                                            controller.text,
+                                                            lockState.lockStakingDetails!.asset!,
+                                                          )}';
+                                                        });
+                                                      },
+                                                      child: Text(
+                                                        'Available: '
+                                                        '${(lockState.lockStakingDetails!.balance! - lockState.lockStakingDetails!.pendingWithdrawals!)}',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline6!
+                                                            .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight.w600,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .headline6!
+                                                                  .color!
+                                                                  .withOpacity(
+                                                                      0.3),
+                                                            ),
+                                                      ),
                                                     ),
                                                   if (!widget.isUnstake)
                                                     BlocBuilder<
@@ -431,9 +459,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                               .toString();
                                                           return GestureDetector(
                                                             onTap: () {
-                                                              print('wwww');
                                                               setState(() {
-                                                                // print('wwww');
                                                                 controller
                                                                         .text =
                                                                     availableAmountState
