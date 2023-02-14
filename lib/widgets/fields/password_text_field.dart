@@ -56,7 +56,8 @@ class PasswordTextField extends StatefulWidget {
 }
 
 class _PasswordTextFieldState extends State<PasswordTextField> {
-  final int maxLines = 1;
+  static const String obscureSymbolCharacter = '●';
+  static const int maxLines = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +96,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
               TextFormField(
                 autofocus: widget.autofocus,
                 maxLines: maxLines,
+                obscuringCharacter: obscureSymbolCharacter,
                 onFieldSubmitted: widget.onSubmitted,
                 textAlignVertical: TextAlignVertical.center,
                 obscureText: widget.isObscure,
@@ -108,17 +110,31 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                   ),
                   hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                   filled: true,
-                  fillColor: widget.isOpasity ? Color(0xff020C51).withOpacity(0.33) : Theme.of(context).inputDecorationTheme.fillColor,
-                  enabledBorder:
-                      widget.isOpasity ? Theme.of(context).inputDecorationTheme.enabledBorder!.copyWith(
-                        borderSide: BorderSide(
-                          color: AppColors.lavenderPurple.withOpacity(0.33),
-                        )
-                      ) : Theme.of(context).inputDecorationTheme.enabledBorder,
+                  fillColor: widget.isOpasity
+                      ? AppColors.inputSplashFillColor.withOpacity(0.33)
+                      : Theme.of(context).inputDecorationTheme.fillColor,
+                  enabledBorder: widget.isOpasity
+                      ? Theme.of(context)
+                          .inputDecorationTheme
+                          .enabledBorder!
+                          .copyWith(
+                              borderSide: BorderSide(
+                            color: AppColors.lavenderPurple.withOpacity(0.33),
+                          ))
+                      : Theme.of(context).inputDecorationTheme.enabledBorder,
                   focusedBorder:
                       Theme.of(context).inputDecorationTheme.focusedBorder,
                   hintText: widget.hint,
-                  hintStyle: widget.isOpasity ? TextStyle(color: Colors.white.withOpacity(0.6)) : null,
+                  hintStyle: widget.isOpasity
+                      ? TextStyle(
+                          fontSize: passwordField.fontSize,
+                          color: Colors.white.withOpacity(0.6),
+                          letterSpacing: 0,
+                        )
+                      : TextStyle(
+                          fontSize: passwordField.fontSize,
+                          letterSpacing: 0,
+                        ),
                   suffixIconConstraints:
                       BoxConstraints(minHeight: 24, minWidth: 24),
                   suffixIcon: Padding(
@@ -130,8 +146,12 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                     ),
                   ),
                 ),
-                style: passwordField.apply(
-                  color: widget.isOpasity ? Colors.white : Theme.of(context).textTheme.headline1!.color!,
+                style: passwordField.copyWith(
+                  fontSize: widget.isObscure ? 6 : passwordField.fontSize,
+                  letterSpacing: widget.isObscure ? 4 : 0,
+                  color: widget.isOpasity
+                      ? Colors.white
+                      : Theme.of(context).textTheme.headline1!.color!,
                 ),
                 onChanged: widget.onChanged,
                 validator: widget.validator,
