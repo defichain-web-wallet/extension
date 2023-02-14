@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_new_kyc_process_screen.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_select_verification_screen.dart';
@@ -107,8 +108,20 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                           height: 4,
                                         ),
                                         Text(
-                                          '${lockState.lockAnalyticsDetails!.apy! * 100}% '
-                                          'APY / ${lockState.lockAnalyticsDetails!.apr! * 100}% APR',
+                                          '${BalancesHelper().numberStyling(
+                                            (lockState.lockAnalyticsDetails!
+                                                    .apy! *
+                                                100),
+                                            fixed: true,
+                                            fixedCount: 2,
+                                          )}% '
+                                          'APY / ${BalancesHelper().numberStyling(
+                                            (lockState.lockAnalyticsDetails!
+                                                    .apr! *
+                                                100),
+                                            fixed: true,
+                                            fixedCount: 2,
+                                          )}% APR',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
