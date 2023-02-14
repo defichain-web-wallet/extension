@@ -49,10 +49,12 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
               )
             : IconButton(
                 padding: const EdgeInsets.only(left: logoLeftPadding - 2),
-                icon: SvgPicture.asset(
-                  'assets/icons/arrow_back.svg',
+                icon: Container(
                   width: iconSize,
                   height: iconSize,
+                  child: Image.asset(
+                    'assets/icons/arrow.png',
+                  ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
                 hoverColor: Colors.transparent,

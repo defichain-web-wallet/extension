@@ -118,6 +118,14 @@ flutter:
     - assets/tokens/
     - assets/currencies/
     - assets/pair_icons/
+    - assets/icons/earn.png
+    - assets/icons/wallet.png
+    - assets/icons/wallet.png
+    - assets/icons/network.png
+    - assets/icons/buy.png
+    - assets/icons/sell.png
+    - assets/icons/increase_limits.png
+    - assets/icons/camera.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
