@@ -211,10 +211,12 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                             children: [
                               Row(
                                 children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/network_icon.svg',
+                                  Container(
                                     width: 18,
                                     height: 18,
+                                    child: Image.asset(
+                                      'assets/icons/network.png',
+                                    ),
                                   ),
                                   SizedBox(
                                     width: 10,
