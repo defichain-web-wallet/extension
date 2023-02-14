@@ -307,6 +307,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             height: 5,
                           ),
                           AccountMenuButton(
+                            isTheme: true,
                             callback: (index) {
                               ThemeManager.changeTheme(context);
                             },
