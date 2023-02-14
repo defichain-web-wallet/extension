@@ -257,7 +257,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                       title: tabs[index]['name'],
                                       callback: () {
                                         if (tabs[index]['value'] ==
-                                            NetworkTabs.test) {
+                                            NetworkTabs.all) {
                                           networkCubit
                                               .updateTestnetNetworksList(
                                                   !networkState.isShownTestnet);

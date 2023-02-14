@@ -38,8 +38,13 @@ class _SuffixIconState extends State<SuffixIcon> {
             iconUrl,
             width: 16,
             height: 16,
-            color:
-                widget.isOpasity ? Theme.of(context).textTheme.headline1!.color! : Theme.of(context).textTheme.headline1!.color!.withOpacity(0.6),
+            color: widget.isOpasity
+                ? AppColors.white
+                : Theme.of(context)
+                    .textTheme
+                    .headline1!
+                    .color!
+                    .withOpacity(0.6),
           ),
         ),
       );

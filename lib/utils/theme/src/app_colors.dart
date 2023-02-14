@@ -25,11 +25,13 @@ abstract class AppColors {
   static const viridian = Color(0xff498F69);
   static const ebony = Color(0xFF120C23);
   static const mirage = Color(0xFF1B162C);
+  static const gulfBlue = Color(0xFF020C51);
 
   static const textPrimaryColor = blackRock;
 
   // input
   static const inputSuffixIconColor = white;
+  static const inputSplashFillColor = gulfBlue;
 
   static const lightGreyColor = Color(0xFFEDEDED);
   static const pinkColor = Color(0xFFFF00A3);
