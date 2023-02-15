@@ -71,6 +71,7 @@ class SwapStatusScreen extends StatelessWidget {
     } else {
       LoggerService.invokeInfoLogg('user was swap token successfully');
 
+      // TODO(eth): use current network's interface
       if (!SettingsHelper.isBitcoin()) {
         TransactionCubit transactionCubit =
           BlocProvider.of<TransactionCubit>(context);
@@ -159,6 +160,8 @@ class SwapStatusScreen extends StatelessWidget {
                                 style: AppTheme.defiUnderlineText,
                               ),
                               onTap: () {
+                                // TODO(eth): Networks should implement a method getTransactionExplorerUrl(txId)
+                                // the following code seems broken. If no one has noticed yet it's probably dead code...
                                 if (SettingsHelper.isBitcoin()) {
                                   if (SettingsHelper.settings.network! ==
                                       'mainnet') {

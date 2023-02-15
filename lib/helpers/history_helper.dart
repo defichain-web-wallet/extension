@@ -42,6 +42,7 @@ class HistoryHelper {
   }
 
   void openExplorerLink(String txId) {
+    // TODO(eth): SettingsHelper.getNetwork().getExplorerUrl()
     if (SettingsHelper.isBitcoin()) {
       if (SettingsHelper.settings.network! ==
           'mainnet') {

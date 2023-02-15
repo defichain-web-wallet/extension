@@ -42,6 +42,11 @@ class HDWalletService {
     var networkString = NetworkHelper().getNetworkString();
     String network;
     String boxKey;
+    // TODO(eth): one of these 2 solutions
+    //    - Each network implements a method getKeypairFromStorage()
+    //    - Use the same masterKeys, or something that can be algorithmically
+    //    derived from it, for all networks and still separate testnet from
+    //    mainnet keys
     if(SettingsHelper.isBitcoin()){
       if(networkString == 'testnet'){
         network = 'bitcoin_testnet';

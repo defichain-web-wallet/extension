@@ -170,6 +170,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                         isPrimary: false,
                         iconPath: 'assets/icons/change_icon.svg',
                         callback: () {
+                          // TODO(eth): if network.supports(Features.Change)
                           if (SettingsHelper.isBitcoin() &&
                               SettingsHelper.settings.network == 'testnet') {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -183,6 +184,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                             );
                             return;
                           }
+                          // TODO(eth): not sure why we show SwapGuideScreen only for Bitcoin
                           if (accountState.swapTutorialStatus == 'show' && SettingsHelper.isBitcoin()) {
                             Navigator.push(
                               context,

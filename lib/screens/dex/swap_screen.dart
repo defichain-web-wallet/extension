@@ -352,6 +352,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                       amount,
                                       fixedCount: 2,
                                       fixed: true);
+                                  // TODO(eth): network.convertTo(currency)
                                   if (SettingsHelper.isBitcoin()) {
                                     amountFromInUsd = getUdsAmount(
                                         double.parse(value), tokensState);
@@ -410,6 +411,7 @@ class _SwapScreenState extends State<SwapScreen> {
                               ),
                             ),
                           SizedBox(height: 24),
+                          // TODO(eth): Use a table of supported features by currentNetwork
                           if (!SettingsHelper.isBitcoin())
                             SizedBox(
                               height: 30,
@@ -622,6 +624,7 @@ class _SwapScreenState extends State<SwapScreen> {
                             builder: (context, fiatState) {
                           FiatCubit fiatCubit =
                               BlocProvider.of<FiatCubit>(context);
+                          // TODO(eth): not sure what's happening here...
                           if (iterator == 0 && SettingsHelper.isBitcoin()) {
                             fiatCubit.loadCryptoRoute(accountTo);
                             iterator++;
@@ -709,6 +712,7 @@ class _SwapScreenState extends State<SwapScreen> {
     DexCubit dexCubit = BlocProvider.of<DexCubit>(context);
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     late double balance;
+    // TODO(eth): selectedNetwork.convertTo(currency)
     if (SettingsHelper.isBitcoin()) {
       balance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
       amountFromController.text = balance.toString();
@@ -738,6 +742,7 @@ class _SwapScreenState extends State<SwapScreen> {
       setState(() {
         amountFromInUsd =
             balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
+        // TODO: selectedNetwork.convertTo(currency)
         if (SettingsHelper.isBitcoin()) {
           amountToInUsd = getUdsAmount(dValue, tokensState);
         } else {
@@ -754,6 +759,7 @@ class _SwapScreenState extends State<SwapScreen> {
       accountState,
       dexState,
     );
+    // TODO(eth): network specific objects should have a list of supported swapping pairs
     if (SettingsHelper.isBitcoin()) {
       assetFrom = 'BTC';
       assetTo = 'dBTC';
@@ -791,6 +797,7 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   bool isEnoughBalance(state) {
+    // TODO(eth): Network object should implement getBalance() and maybe hasEnoughBalance(number)
     if (SettingsHelper.isBitcoin()) {
       BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
       var amount = convertFromSatoshi(bitcoinCubit.state.totalBalance);
@@ -806,8 +813,10 @@ class _SwapScreenState extends State<SwapScreen> {
   submitReviewSwap(parent, state, transactionState, context, bool isFullScreen,
       {CryptoRouteModel? cryptoRoute}) async {
     hideOverlay();
+    // TODO(eth): have a way to simply access the minDeposit per network
     if (SettingsHelper.isBitcoin()) {
       double minDeposit = convertFromSatoshi(cryptoRoute!.minDeposit!);
+      // TODO(ask): isn't the minDeposit an acceptable amount? Why '='
       if (minDeposit >= double.parse(amountFromController.text)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -846,6 +855,7 @@ class _SwapScreenState extends State<SwapScreen> {
       return;
     }
     if (isNumeric(amountFromController.text)) {
+      // TODO(eth): use the network specific object's methods
       if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
         isFullScreen
             ? PasswordBottomSheet.provideWithPasswordFullScreen(
@@ -1029,6 +1039,7 @@ class _SwapScreenState extends State<SwapScreen> {
 
     var availableAmountFrom;
     var availableAmountTo;
+    // TODO(eth): not sure what's happening here. Are amounts in bitcoin printed differently?
     if (SettingsHelper.isBitcoin()) {
       double balance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
       String balanceFormat;
@@ -1088,6 +1099,7 @@ class _SwapScreenState extends State<SwapScreen> {
       if (assetFrom == assetTo) {
         amountToController.text = amountFromController.text;
       } else {
+        // TODO(eth): not sure again... the text style depends on whether we're on Bitcoin?
         if (SettingsHelper.isBitcoin()) {
           FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
           double amount = double.parse(amountFromController.text);
@@ -1117,6 +1129,7 @@ class _SwapScreenState extends State<SwapScreen> {
     debounce = Timer(const Duration(milliseconds: 800), () {
       waitingTo = true;
       if (assetFrom == assetTo) {
+        // TODO(eth): same as previous
         if (SettingsHelper.isBitcoin()) {
           FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
           double amount = double.parse(amountToController.text);

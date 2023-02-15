@@ -40,6 +40,7 @@ class _CurrencySelectorState extends State<CurrencySelector> with ThemeMixin {
   ];
   String selectedCurrencyLogoPath = 'assets/currencies/eur.svg';
 
+  // TODO(eth): network.getName()
   getNetworkName() {
     SettingsModel settings = SettingsHelper.settings;
     String network = settings.network!;

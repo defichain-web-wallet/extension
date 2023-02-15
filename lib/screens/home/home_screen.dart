@@ -85,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen>
     double countAssets = 0;
     double countTransactions = 0;
 
+    // TODO(eth): use the specific network's interface
     if (SettingsHelper.isBitcoin()) {
       late List<dynamic> tempHistoryList;
       countAssets = 1;

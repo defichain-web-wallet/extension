@@ -179,6 +179,7 @@ class _AddressBookAddScreenState extends State<AddressBookAddScreen> {
                               controller: addressController,
                               onChanged: (value) async {
                                 checkButtonStatus();
+                                // TODO(eth): selectedNetwork.validateAddress()
                                 if (SettingsHelper.isBitcoin()) {
                                   isValidAddress = await addressHelper
                                       .validateBtcAddress(addressController.text);

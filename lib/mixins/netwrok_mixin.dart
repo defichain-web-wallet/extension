@@ -5,6 +5,7 @@ mixin NetworkMixin {
   String currentNetworkName() {
     SettingsModel settings = SettingsHelper.settings;
     String network = settings.network!;
+    // TODO(eth): network.getName()
     if (network == 'mainnet') {
       return (settings.isBitcoin!) ? 'Bitcoin Mainnet' : 'DefiChain Mainnet';
     } else {

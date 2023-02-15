@@ -4,6 +4,7 @@ class SettingsModel {
   String? currency;
   String? theme;
   String? network;
+  // TODO(eth): replace this prop by something like `string selectedNetworkKey`
   bool? isBitcoin;
   ApiName? apiName;
 

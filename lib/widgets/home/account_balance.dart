@@ -42,6 +42,7 @@ class _AccountBalanceState extends State<AccountBalance> {
                     late double totalBalance;
                     late double unconfirmedBalance;
                     late double totalBtcBalance;
+                    // TODO(eth): Each network should implement a `int getPrice(string currency) {}`
                     if (SettingsHelper.isBitcoin()) {
                       if (widget.asset == 'USD') {
                         totalBalance = tokensHelper.getAmountByUsd(
