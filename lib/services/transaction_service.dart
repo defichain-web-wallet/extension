@@ -208,7 +208,7 @@ class TransactionService {
           amount: 0,
           account: account,
           additional: (txb, nw, newUtxo) {
-            final mintingStartsAt = txb.tx!.ins.length + 1;
+            final mintingStartsAt = txb.tx!.outs.length + 1;
             newUtxo.add(UtxoModel(
                 address: account.addressList![0].address!,
                 value: tokenDFIbalance,
