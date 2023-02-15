@@ -76,6 +76,8 @@ class _AmountSelectorFieldState extends State<AmountSelectorField> {
                 style: Theme.of(context).textTheme.headline2,
               ),
             ),
+            // TODO(eth): simply list assets that are supported by selectedNetwork
+            // TODO: widget.label
             if (SettingsHelper.isBitcoin()) ...[
               Expanded(
                 flex: 2,
@@ -108,18 +110,6 @@ class _AmountSelectorFieldState extends State<AmountSelectorField> {
               SizedBox(
                 width: 1,
               ),
-              // Expanded(
-              //   flex: 2,
-              //   child: SwapAccountSelector(
-              //     isFullSize: widget.isBorder,
-              //     account: widget.account!,
-              //     callback: (int index) {
-              //       if (widget.onChangeAccount != null) {
-              //         widget.onChangeAccount!(index);
-              //       }
-              //     },
-              //   ),
-              // ),
             ],
           ],
         ),

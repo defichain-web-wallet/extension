@@ -37,6 +37,7 @@ class SettingsHelper {
     await box.close();
   }
 
+  // TODO(eth): This will be unused after the refacto
   static bool isBitcoin() {
     return settings.isBitcoin != null && settings.isBitcoin!;
   }

@@ -1,4 +1,6 @@
-class TxModel {
+import 'abstract_tx_model.dart';
+
+class TxModel implements AbstractTransaction {
   String? txid;
   String? type;
   String? hash;

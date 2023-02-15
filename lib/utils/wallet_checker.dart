@@ -74,6 +74,7 @@ class _WalletCheckerState extends State<WalletChecker> {
             } catch (err) {
               print(err);
             }
+            // TODO(eth): just iterate over all accounts and load their details
             if (SettingsHelper.isBitcoin()) {
               await bitcoinCubit
                   .loadDetails(accountCubit.state.accounts![0].bitcoinAddress!);

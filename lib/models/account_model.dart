@@ -9,6 +9,7 @@ import 'package:bip32_defichain/bip32.dart' as bip32;
 class AccountModel {
   @required int? index;
   List<AddressModel>? addressList;
+  // TODO(eth): store the addresses for each network in a HashMap or a List
   AddressModel? bitcoinAddress;
   List<BalanceModel>? balanceList;
   List<HistoryNew>? historyList;

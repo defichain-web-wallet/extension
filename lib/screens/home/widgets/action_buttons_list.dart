@@ -48,6 +48,7 @@ class ActionButtonsList extends StatelessWidget {
       );
     };
 
+    // TODO(eth): use supported Features from the new network system. Also... is this widget ever used?
     var swapCallback = () {
       if (SettingsHelper.isBitcoin() &&
           SettingsHelper.settings.network == 'testnet') {

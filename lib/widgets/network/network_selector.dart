@@ -17,6 +17,7 @@ class NetworkSelector extends StatefulWidget {
 class _NetworkSelectorState extends State<NetworkSelector> {
   SettingsHelper settingsHelper = SettingsHelper();
 
+  // TODO(eth): network.getName()
   String getNetworkType() {
     if (SettingsHelper.isBitcoin()) {
       switch (SettingsHelper.settings.network) {

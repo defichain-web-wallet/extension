@@ -20,6 +20,7 @@ class _NetworkSelectorSwapState extends State<NetworkSelectorSwap> {
   SettingsHelper settingsHelper = SettingsHelper();
 
   String getNetworkType() {
+    // TODO(eth): return settings.network.getName()
     if (SettingsHelper.isBitcoin()) {
       switch (SettingsHelper.settings.network) {
         case 'testnet':
@@ -91,6 +92,7 @@ class _NetworkSelectorSwapState extends State<NetworkSelectorSwap> {
                       ),
                       child: ListBody(
                         children: [
+                          // TODO(eth): iterate over supported networks
                           ListEntry(
                             iconUrl: 'assets/tokens/bitcoin.svg',
                             label: 'Bitcoin Mainnet',

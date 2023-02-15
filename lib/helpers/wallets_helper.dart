@@ -35,7 +35,7 @@ class WalletsHelper {
     return account;
   }
 
-//TODO: restore for HD-wallets.
+//TODO(eth): restore for HD-wallets.
   Future<List<AccountModel>> restoreWallet(bip32.BIP32 masterKeyPair, String network, Function(int, int) statusBar) async {
     List<AccountModel> accountList = [];
     int lastIndexWithHistory = 0;

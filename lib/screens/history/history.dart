@@ -109,6 +109,7 @@ class _HistoryState extends State<History> {
                   var historyList = [];
                   var testnetHistoryList = [];
 
+                  // TODO(eth): network objects must have `getTransactionHistory()` + maybe allow filters 'send/receive' for bitcoins too, no?
                   if (SettingsHelper.isBitcoin()) {
                     historyList = bitcoinState.history ?? [];
                   } else {

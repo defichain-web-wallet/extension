@@ -32,6 +32,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var jsonString = json.encode(resultJSON);
 
     var box = await Hive.openBox(HiveBoxes.client);
+    // TODO(eth): Refactor the address book so that each address has a key "networkType"
     if (SettingsHelper.isBitcoin()) {
       await box.put(HiveNames.btcAddressBook, jsonString);
     } else {
@@ -119,6 +120,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var jsonString = json.encode(resultJSON);
 
     var box = await Hive.openBox(HiveBoxes.client);
+    // TODO(eth): View line 35
     if (SettingsHelper.isBitcoin()) {
       await box.put(HiveNames.btcAddressBook, jsonString);
     } else {
@@ -143,6 +145,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var box = await Hive.openBox(HiveBoxes.client);
     var addressBookJson;
     var lastSentJson;
+    // TODO(eth): view line 35
     if (SettingsHelper.isBitcoin()) {
       addressBookJson = await box.get(HiveNames.btcAddressBook);
     } else {
@@ -191,6 +194,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var jsonString = json.encode(resultJSON);
 
     var box = await Hive.openBox(HiveBoxes.client);
+    // TODO(eth): view line 35
     if (SettingsHelper.isBitcoin()) {
       await box.put(HiveNames.btcAddressBook, jsonString);
     } else {
