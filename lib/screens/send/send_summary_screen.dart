@@ -272,7 +272,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                               border: Border.all(
-                                                strokeAlign: StrokeAlign.center,
                                                 color: AppColors.lavenderPurple
                                                     .withOpacity(0.32),
                                                 width: 0.5,

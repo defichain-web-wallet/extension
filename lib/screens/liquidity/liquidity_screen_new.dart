@@ -223,7 +223,7 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                           : LightColors.drawerBgColor,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        strokeAlign: StrokeAlign.center,
+                                        // strokeAlign: BorderSide.strokeAlignCenter,
                                         color: AppColors.lavenderPurple
                                             .withOpacity(0.32),
                                         width: 0.5,
