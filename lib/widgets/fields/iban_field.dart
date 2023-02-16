@@ -135,18 +135,13 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
                         onPressed: () {},
                       ),
                     ),
+                    hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                     filled: true,
-                    fillColor: Theme.of(context).cardColor,
-                    hoverColor: Colors.transparent,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: AppColors.portage.withOpacity(0.12),
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppTheme.pinkColor),
+                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                    enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                    focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                    hintStyle: passwordField.copyWith(
+                      color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                     hintText: widget.hintText,

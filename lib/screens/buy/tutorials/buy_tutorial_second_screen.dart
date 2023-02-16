@@ -21,10 +21,12 @@ class BuyTutorialSecondScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _BuyTutorialSecondScreenState createState() => _BuyTutorialSecondScreenState();
+  _BuyTutorialSecondScreenState createState() =>
+      _BuyTutorialSecondScreenState();
 }
 
-class _BuyTutorialSecondScreenState extends State<BuyTutorialSecondScreen> with ThemeMixin{
+class _BuyTutorialSecondScreenState extends State<BuyTutorialSecondScreen>
+    with ThemeMixin {
   String titleText = 'Fiat to crypto: How it works!';
   FocusNode checkBoxFocusNode = FocusNode();
 
@@ -32,10 +34,10 @@ class _BuyTutorialSecondScreenState extends State<BuyTutorialSecondScreen> with 
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       builder: (
-          BuildContext context,
-          bool isFullScreen,
-          TransactionState txState,
-          ) {
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState txState,
+      ) {
         return Scaffold(
           drawerScrimColor: Color(0x0f180245),
           endDrawer: AccountDrawer(
@@ -55,13 +57,13 @@ class _BuyTutorialSecondScreenState extends State<BuyTutorialSecondScreen> with 
             height: double.infinity,
             decoration: BoxDecoration(
               color: isDarkTheme()
-                  ? DarkColors.scaffoldContainerBgColor
+                  ? DarkColors.drawerBgColor
                   : LightColors.scaffoldContainerBgColor,
               border: isDarkTheme()
                   ? Border.all(
-                width: 1.0,
-                color: Colors.white.withOpacity(0.05),
-              )
+                      width: 1.0,
+                      color: Colors.white.withOpacity(0.05),
+                    )
                   : null,
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(20),
@@ -141,9 +143,9 @@ class _BuyTutorialSecondScreenState extends State<BuyTutorialSecondScreen> with 
                           child: Text(
                             '2. Make a bank transfer to our partner DFX AG for the purchase.',
                             style:
-                            Theme.of(context).textTheme.headline5!.copyWith(
-                              fontSize: 20,
-                            ),
+                                Theme.of(context).textTheme.headline5!.copyWith(
+                                      fontSize: 20,
+                                    ),
                             softWrap: true,
                             textAlign: TextAlign.center,
                           ),
@@ -165,12 +167,12 @@ class _BuyTutorialSecondScreenState extends State<BuyTutorialSecondScreen> with 
                                   .textTheme
                                   .subtitle1!
                                   .copyWith(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .subtitle1!
-                                    .color!
-                                    .withOpacity(0.8),
-                              ),
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .subtitle1!
+                                        .color!
+                                        .withOpacity(0.8),
+                                  ),
                             ),
                           ),
                         ),
@@ -197,9 +199,9 @@ class _BuyTutorialSecondScreenState extends State<BuyTutorialSecondScreen> with 
                                   PageRouteBuilder(
                                     pageBuilder:
                                         (context, animation1, animation2) =>
-                                        BuyTutorialThirdScreen(
-                                          isConfirm: widget.isConfirm,
-                                        ),
+                                            BuyTutorialThirdScreen(
+                                      isConfirm: widget.isConfirm,
+                                    ),
                                     transitionDuration: Duration.zero,
                                     reverseTransitionDuration: Duration.zero,
                                   ),

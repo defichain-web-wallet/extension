@@ -52,7 +52,7 @@ class _BuyTutorialFirstScreenState extends State<BuyTutorialFirstScreen>
             height: double.infinity,
             decoration: BoxDecoration(
               color: isDarkTheme()
-                  ? DarkColors.scaffoldContainerBgColor
+                  ? DarkColors.drawerBgColor
                   : LightColors.scaffoldContainerBgColor,
               border: isDarkTheme()
                   ? Border.all(

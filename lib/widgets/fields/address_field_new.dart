@@ -55,6 +55,14 @@ class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin{
             controller: widget.controller,
             onChanged: widget.onChange,
             decoration: InputDecoration(
+                hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                filled: true,
+                fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                hintStyle: passwordField.copyWith(
+                  color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                ),
                 prefixIcon: (widget.contact.name != null &&
                         widget.controller.text == '')
                     ? Padding(

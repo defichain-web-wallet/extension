@@ -97,8 +97,14 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                 height: double.infinity,
                 decoration: BoxDecoration(
                   color: isDarkTheme()
-                      ? DarkColors.scaffoldContainerBgColor
+                      ? DarkColors.drawerBgColor
                       : LightColors.scaffoldContainerBgColor,
+                  border: isDarkTheme()
+                      ? Border.all(
+                          width: 1.0,
+                          color: Colors.white.withOpacity(0.05),
+                        )
+                      : null,
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20),
                     topLeft: Radius.circular(20),
