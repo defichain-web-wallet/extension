@@ -331,10 +331,6 @@ class _SearchBuyTokenState extends State<SearchBuyToken> with ThemeMixin {
                                       ),
                                     );
                                   } else {
-                                    FiatCubit fiatCubit =
-                                        BlocProvider.of<FiatCubit>(context);
-                                    await fiatCubit.loadIbanList();
-
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(
@@ -342,9 +338,6 @@ class _SearchBuyTokenState extends State<SearchBuyToken> with ThemeMixin {
                                             (context, animation1, animation2) {
                                           return IbanScreen(
                                             asset: selectedAsset!,
-                                            routeWidget: BuySummaryScreen(
-                                              asset: selectedAsset!,
-                                            ),
                                           );
                                         },
                                         transitionDuration: Duration.zero,
