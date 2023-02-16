@@ -92,13 +92,15 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                     height: 123,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                          color:
-                                              AppColors.appSelectorBorderColor),
                                       color: isDarkTheme()
-                                          ? DarkColors.scaffoldContainerBgColor
-                                          : LightColors
-                                              .scaffoldContainerBgColor,
+                                          ? AppColors.white.withOpacity(0.04)
+                                          : LightColors.scaffoldContainerBgColor,
+                                      border: isDarkTheme()
+                                          ? Border.all(
+                                        width: 1.0,
+                                        color: Colors.white.withOpacity(0.05),
+                                      )
+                                          : null,
                                     ),
                                     child: Column(
                                       crossAxisAlignment:
