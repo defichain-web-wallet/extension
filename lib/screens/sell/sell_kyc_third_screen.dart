@@ -91,7 +91,7 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                   height: double.infinity,
                   decoration: BoxDecoration(
                     color: isDarkTheme()
-                        ? DarkColors.scaffoldContainerBgColor
+                        ? DarkColors.drawerBgColor
                         : LightColors.scaffoldContainerBgColor,
                     border: isDarkTheme()
                         ? Border.all(
@@ -160,6 +160,24 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                                   TextFormField(
                                     controller: _emailController,
                                     decoration: InputDecoration(
+                                        hoverColor: Theme.of(context)
+                                            .inputDecorationTheme
+                                            .hoverColor,
+                                        filled: true,
+                                        fillColor: Theme.of(context)
+                                            .inputDecorationTheme
+                                            .fillColor,
+                                        enabledBorder: Theme.of(context)
+                                            .inputDecorationTheme
+                                            .enabledBorder,
+                                        focusedBorder: Theme.of(context)
+                                            .inputDecorationTheme
+                                            .focusedBorder,
+                                        hintStyle: passwordField.copyWith(
+                                          color: isDarkTheme()
+                                              ? DarkColors.hintTextColor
+                                              : LightColors.hintTextColor,
+                                        ),
                                         contentPadding:
                                             EdgeInsets.only(left: 12),
                                         hintText: 'Enter email address'),
@@ -190,6 +208,24 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                                   TextFormField(
                                     controller: _phoneController,
                                     decoration: InputDecoration(
+                                        hoverColor: Theme.of(context)
+                                            .inputDecorationTheme
+                                            .hoverColor,
+                                        filled: true,
+                                        fillColor: Theme.of(context)
+                                            .inputDecorationTheme
+                                            .fillColor,
+                                        enabledBorder: Theme.of(context)
+                                            .inputDecorationTheme
+                                            .enabledBorder,
+                                        focusedBorder: Theme.of(context)
+                                            .inputDecorationTheme
+                                            .focusedBorder,
+                                        hintStyle: passwordField.copyWith(
+                                          color: isDarkTheme()
+                                              ? DarkColors.hintTextColor
+                                              : LightColors.hintTextColor,
+                                        ),
                                         contentPadding:
                                             EdgeInsets.only(left: 12),
                                         hintText: 'Enter phone number'),
