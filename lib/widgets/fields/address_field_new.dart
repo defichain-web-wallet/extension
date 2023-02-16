@@ -1,3 +1,4 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/widgets/dialogs/address_book_dialog.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -26,7 +27,7 @@ class AddressFieldNew extends StatefulWidget {
   State<AddressFieldNew> createState() => _AddressFieldNewState();
 }
 
-class _AddressFieldNewState extends State<AddressFieldNew> {
+class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin{
   @override
   void initState() {
     // TODO: implement initState
@@ -89,7 +90,7 @@ class _AddressFieldNewState extends State<AddressFieldNew> {
                                   onTap: widget.clearPrefix,
                                   child: Icon(
                                     Icons.close,
-                                    color: AppColors.darkTextColor
+                                    color: isDarkTheme() ? AppColors.white.withOpacity(0.5) : AppColors.darkTextColor
                                         .withOpacity(0.5),
                                     size: 12,
                                   ),

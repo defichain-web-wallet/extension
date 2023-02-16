@@ -1,3 +1,5 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -17,7 +19,7 @@ class SettingsListTile extends StatefulWidget {
   State<SettingsListTile> createState() => _SettingsListTileState();
 }
 
-class _SettingsListTileState extends State<SettingsListTile> {
+class _SettingsListTileState extends State<SettingsListTile> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -61,7 +63,12 @@ class _SettingsListTileState extends State<SettingsListTile> {
                     padding: EdgeInsets.only(
                       right: 2.5,
                     ),
-                    child: SvgPicture.asset('assets/icons/arrow_right.svg'),
+                    child: SvgPicture.asset(
+                      'assets/icons/arrow_right.svg',
+                      color: isDarkTheme()
+                          ? AppColors.white.withOpacity(0.6)
+                          : AppColors.darkTextColor,
+                    ),
                   ),
                 ],
               ),

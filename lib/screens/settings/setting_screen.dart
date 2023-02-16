@@ -89,7 +89,14 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin {
                               height: 8,
                             ),
                             CustomTextFormField(
-                              prefix: Icon(Icons.search),
+                              prefix: Icon(
+                                Icons.search,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline4!
+                                    .color!
+                                    .withOpacity(0.5),
+                              ),
                               addressController: searchController,
                               hintText: 'Search in Settings',
                               isBorder: true,

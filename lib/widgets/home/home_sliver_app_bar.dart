@@ -27,7 +27,7 @@ class _HomeSliverAppBarState extends State<HomeSliverAppBar> {
       actions: [Container()],
       automaticallyImplyLeading: false,
       toolbarHeight: 56 + 20,
-      expandedHeight: 266 + 30,
+      expandedHeight: 268 + 30,
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           sliverTopHeight = constraints.biggest.height;
@@ -109,7 +109,7 @@ class _HomeSliverAppBarState extends State<HomeSliverAppBar> {
                     )
                   : null,
               background: Container(
-                height: 266,
+                height: 268,
                 padding: const EdgeInsets.symmetric(
                   vertical: 16,
                   horizontal: 16,

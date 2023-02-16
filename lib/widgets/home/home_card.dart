@@ -42,6 +42,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20.0),
         border: isDarkTheme() ? Border.all(
+          strokeAlign: StrokeAlign.center,
             width: 1,
             color: Colors.white.withOpacity(0.04)) : null,
       ),

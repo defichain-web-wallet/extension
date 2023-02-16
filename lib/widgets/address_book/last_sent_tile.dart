@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
@@ -20,7 +21,7 @@ class LastSentTile extends StatefulWidget {
   State<LastSentTile> createState() => _LastSentTileState();
 }
 
-class _LastSentTileState extends State<LastSentTile> with NetworkMixin {
+class _LastSentTileState extends State<LastSentTile> with NetworkMixin, ThemeMixin {
   cutAddress(String s) {
     return s.substring(0, 14) + '...' + s.substring(28, 42);
   }
@@ -77,7 +78,7 @@ class _LastSentTileState extends State<LastSentTile> with NetworkMixin {
                 child: Icon(
                   Icons.add,
                   size: 16,
-                  color: AppColors.darkTextColor.withOpacity(0.5),
+                  color: isDarkTheme() ? AppColors.white.withOpacity(0.5) : AppColors.darkTextColor.withOpacity(0.5),
                 ),
               ),
               SizedBox(
@@ -92,7 +93,7 @@ class _LastSentTileState extends State<LastSentTile> with NetworkMixin {
                 child: Icon(
                   Icons.close,
                   size: 16,
-                  color: AppColors.darkTextColor.withOpacity(0.5),
+                  color: isDarkTheme() ? AppColors.white.withOpacity(0.5) : AppColors.darkTextColor.withOpacity(0.5),
                 ),
               ),
             ],
