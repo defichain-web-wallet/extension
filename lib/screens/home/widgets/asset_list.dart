@@ -5,6 +5,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance_model.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/home/asset_card.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,10 @@ class AssetList extends StatelessWidget {
                         : tokenHelper.getTokenWithPrefix(coin);
                     double tokenBalance =
                         convertFromSatoshi(balances[index].balance!);
+                    List<TokensModel> tokens = tokenHelper.getTokensList(
+                      state,
+                      tokensState,
+                    );
                     return Container(
                       padding: const EdgeInsets.only(
                         bottom: 4,
@@ -67,7 +72,7 @@ class AssetList extends StatelessWidget {
                         tokenName: tokenName,
                         tokenCode: tokenName,
                         tokensState: tokensState,
-                        balances: balances,
+                        tokens: tokens,
                       ),
                     );
                   },

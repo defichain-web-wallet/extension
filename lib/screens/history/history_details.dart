@@ -79,6 +79,7 @@ class _HistoryDetailsState extends State<HistoryDetails>
     var txValueSecond;
     var isMultipleAmounts = txCategory != 'SEND' &&
         txCategory != 'RECEIVE' &&
+        txCategory != 'AccountToUtxos' &&
         txCategory != 'UtxosToAccount';
     var isSend = txCategory == 'SEND';
     var txValuePrefix = isSend ? '-' : '';
@@ -126,10 +127,14 @@ class _HistoryDetailsState extends State<HistoryDetails>
             builder: (context, tokensState) {
               AssetPairModel? assetPairModel;
               if (txCategory == 'PoolSwap') {
-                assetPairModel = tokensState.tokensPairs!
-                    .firstWhere((element) =>
-                element.tokenB == tokenNameFirst &&
-                    element.tokenA == tokenNameSecond);
+                try {
+                  assetPairModel = tokensState.tokensPairs!
+                      .firstWhere((element) =>
+                  element.tokenA == tokenNameFirst &&
+                      element.tokenB == tokenNameSecond);
+                } catch (err) {
+                  print(err);
+                }
               }
               totalBalanceByUsd = tokensHelper.getAmountByUsd(
                 tokensState.tokensPairs!,
@@ -174,7 +179,8 @@ class _HistoryDetailsState extends State<HistoryDetails>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Expanded(
+                            if (assetPairModel != null)
+                              Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -510,7 +516,10 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                   ),
                                 ],
                               ),
-                            ),
+                            )
+                            else
+                              // TODO: need to implement error placeholder
+                              Expanded(child: Center()),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

@@ -303,8 +303,13 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                                 radius: 12,
                                                 backgroundColor:
                                                     AppColors.white,
-                                                child: SvgPicture.asset(
-                                                    'assets/icon_photo.svg'),
+                                                child: Container(
+                                                  height: 12,
+                                                  width: 12,
+                                                  child: Image.asset(
+                                                    'assets/icons/camera.png',
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),

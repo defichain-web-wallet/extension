@@ -10,6 +10,7 @@ import 'package:defi_wallet/screens/auth/signup/signup_done_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/jelly_link_text.dart';
 import 'package:defi_wallet/widgets/fields/input_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -198,8 +199,13 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
                                                 backgroundColor: isDarkTheme()
                                                     ? AppColors.mirage
                                                     : AppColors.white,
-                                                child: SvgPicture.asset(
-                                                    'assets/icon_photo.svg'),
+                                                child: Container(
+                                                  height: 12,
+                                                  width: 12,
+                                                  child: Image.asset(
+                                                    'assets/icons/camera.png',
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),

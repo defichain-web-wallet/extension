@@ -16,6 +16,7 @@ class AccountMenuButton extends StatefulWidget {
   final bool accountSelectMode;
   final AccountModel? account;
   final bool isLockType;
+  final bool isTheme;
   final bool isFuture;
   final Color? hoverBgColor;
   final Color? hoverTextColor;
@@ -31,6 +32,7 @@ class AccountMenuButton extends StatefulWidget {
     this.isHoverBackgroundEffect = true,
     this.account,
     this.isLockType = false,
+    this.isTheme = false,
     this.isFuture = false,
     this.hoverBgColor,
     this.hoverTextColor,
@@ -116,21 +118,21 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                   child: Center(
                     child: Stack(
                       children: [
-                        if (!isHover && !widget.isStaticBg)
+                        if(widget.isTheme)
+                          SvgPicture.asset(
+                            '${widget.iconPath}',
+                            color: isDarkTheme()
+                                ? isHover ? AppColors.blackRock : AppColors.white
+                                : isHover ? AppColors.white : AppColors.blackRock,
+                          ),
+                        if (!widget.isStaticBg && !widget.isTheme)
                           SvgPicture.asset(
                             '${widget.iconPath}',
                             color: isDarkTheme()
                                 ? AppColors.white
                                 : AppColors.blackRock,
                           ),
-                        if (isHover && !widget.isStaticBg)
-                          SvgPicture.asset(
-                            '${widget.iconPath}',
-                            color: widget.hoverTextColor ??
-                                AppColors.hollywoodCerise,
-                            cacheColorFilter: true,
-                          ),
-                        if (widget.isStaticBg)
+                        if (widget.isStaticBg && !widget.isTheme)
                           SvgPicture.asset(
                             '${widget.iconPath}',
                             cacheColorFilter: true,

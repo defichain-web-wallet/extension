@@ -193,7 +193,7 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                 Flexible(
                                   child: FlatButton(
                                     title: 'Buy',
-                                    iconPath: 'assets/icons/buy_icon.svg',
+                                    iconPath: 'assets/icons/buy.png',
                                     callback: () =>
                                         buyCallback(context, fiatState),
                                   ),
@@ -204,7 +204,7 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                 Flexible(
                                   child: FlatButton(
                                     title: 'Sell',
-                                    iconPath: 'assets/icons/sell_icon.svg',
+                                    iconPath: 'assets/icons/sell.png',
                                     callback: () =>
                                         sellCallback(context, fiatState),
                                   ),
@@ -215,7 +215,7 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                 Flexible(
                                   child: FlatButton(
                                     title: 'Increase limit',
-                                    iconPath: 'assets/icons/increase_limit.svg',
+                                    iconPath: 'assets/icons/increase_limits.png',
                                     callback: () {
                                       String kycHash = fiatState.kycHash!;
                                       launch(

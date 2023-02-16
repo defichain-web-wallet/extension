@@ -77,7 +77,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                 Flexible(
                   child: FlatButton(
                     title: 'Earn',
-                    iconPath: 'assets/icons/earn_icon.svg',
+                    iconPath: 'assets/icons/earn.png',
                     callback: () {
                       Navigator.push(
                         context,
@@ -97,7 +97,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                 Flexible(
                   child: FlatButton(
                     title: 'Buy/Sell',
-                    iconPath: 'assets/icons/wallet_icon.svg',
+                    iconPath: 'assets/icons/wallet.png',
                     callback: () {
                       Navigator.push(
                         context,

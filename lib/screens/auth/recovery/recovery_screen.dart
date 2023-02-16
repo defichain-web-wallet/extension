@@ -8,6 +8,7 @@ import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
+import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -42,21 +43,23 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
   final int _fieldsLength = 24;
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _wordController = TextEditingController();
-  FocusNode confirmFocusNode = FocusNode();
+  final FocusNode _confirmFocusNode = FocusNode();
 
   late List<String> _mnemonic;
+  late List<int> _invalidWordIndexes = [];
   late bool _isHoverMnemonicBox;
 
   bool _isViewTextField = true;
-  bool _incorrectPhrase = false;
+  bool _incorrectPhraseOrder = false;
   bool _onStartedReorder = false;
+
+  int? _editableWordIndex;
 
   @override
   void dispose() {
     _focusNode.dispose();
     _wordController.dispose();
-    confirmFocusNode.dispose();
-    // TODO: implement dispose
+    _confirmFocusNode.dispose();
     super.dispose();
   }
 
@@ -64,7 +67,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
   void initState() {
     super.initState();
     _focusNode.addListener(() {});
-    confirmFocusNode.addListener(() { });
+    _confirmFocusNode.addListener(() { });
     _mnemonic = [];
     super.initState();
   }
@@ -122,7 +125,9 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
       );
     } else {
       setState(() {
-        _incorrectPhrase = true;
+        if (_invalidWordIndexes.isEmpty) {
+          _incorrectPhraseOrder = true;
+        }
         _onStartedReorder = true;
       });
     }
@@ -140,30 +145,61 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
     setState(() {
       String word = _mnemonic.removeAt(oldIndex);
       _mnemonic.insert(newIndex, word);
+      _onStartedReorder = false;
     });
   }
 
   void _onFieldSubmitted(String word) {
-    setState(() {
-      if (_wordController.text != '') {
-        final phraseBySeparator = _wordController.text.replaceAll(
-          _regExpPhraseSeparators,
-          _replaceComaSeparator,
-        );
-        var s = (phraseBySeparator.split(_replaceComaSeparator));
-        s.forEach((element) {
-          _mnemonic.add(element);
+    try {
+      if (_editableWordIndex != null) {
+        setState(() {
+          _mnemonic[_editableWordIndex!] = word;
+          _wordController.text = '';
+          _editableWordIndex = null;
+          if (_mnemonic.length < 24) {
+            _focusNode.requestFocus();
+          } else {
+            _invalidWordIndexes = getInvalidControllerIndexes();
+            _isViewTextField = false;
+            _confirmFocusNode.requestFocus();
+          }
+        });
+      } else {
+        setState(() {
+          if (_wordController.text != '') {
+            final phraseBySeparator = _wordController.text.replaceAll(
+              _regExpPhraseSeparators,
+              _replaceComaSeparator,
+            );
+            var s = (phraseBySeparator.split(_replaceComaSeparator));
+            s.forEach((element) {
+              _mnemonic.add(element);
+            });
+          }
+          _wordController.text = '';
+
+          if (_mnemonic.length < 24 || _invalidWordIndexes.isNotEmpty) {
+            _focusNode.requestFocus();
+          } else {
+            _invalidWordIndexes = getInvalidControllerIndexes();
+            _isViewTextField = false;
+            _confirmFocusNode.requestFocus();
+          }
         });
       }
-      _wordController.text = '';
+    } catch (err) {
+      print(err);
+    }
+  }
 
-      if (_mnemonic.length < 24) {
-        _focusNode.requestFocus();
-      } else {
-        _isViewTextField = false;
-        confirmFocusNode.requestFocus();
+  List<int> getInvalidControllerIndexes() {
+    List<int> indexes = [];
+    for (int i = 0; i < _mnemonic.length; i++) {
+      if (!isCorrectWord(_mnemonic[i])) {
+        indexes.add(i);
       }
-    });
+    }
+    return indexes;
   }
 
   @override
@@ -172,10 +208,22 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
       _mnemonic.length,
       (index) => MouseRegion(
         cursor: SystemMouseCursors.grab,
-        child: MnemonicWord(
-          index: index + 1,
-          word: _mnemonic[index],
-          incorrect: _incorrectPhrase,
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              _isViewTextField = true;
+              _onStartedReorder = false;
+              _wordController.text = _mnemonic[index];
+              _editableWordIndex = index;
+              _focusNode.requestFocus();
+            });
+          },
+          child: MnemonicWord(
+            index: index + 1,
+            word: _mnemonic[index],
+            incorrect:
+                _invalidWordIndexes.contains(index) || _incorrectPhraseOrder,
+          ),
         ),
       ),
     );
@@ -244,9 +292,9 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                                     setState(() {
                                       _mnemonic.removeAt(index);
                                       _onStartedReorder = false;
+                                      _editableWordIndex = null;
 
                                       if (_mnemonic.length < 24) {
-
                                         _isViewTextField = true;
                                         _focusNode.requestFocus();
                                       }
@@ -330,7 +378,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                                         _mnemonic = phraseFromClipboard;
                                         _wordController.text = '';
                                         _isViewTextField = false;
-                                        confirmFocusNode.requestFocus();
+                                        _confirmFocusNode.requestFocus();
                                       });
                                     }
                                   } catch (err) {
@@ -339,7 +387,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                                 },
                               )
                             : NewPrimaryButton(
-                                focusNode: confirmFocusNode,
+                                focusNode: _confirmFocusNode,
                                 title: 'Restore Wallet',
                                 width: isFullScreen
                                     ? buttonFullWidth

@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -8,6 +9,7 @@ import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/app_tooltip.dart';
 import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/invested_field.dart';
@@ -116,7 +118,20 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                           height: 4,
                                         ),
                                         Text(
-                                          '${lockState.lockAnalyticsDetails!.apy! * 100}% APY / ${lockState.lockAnalyticsDetails!.apr! * 100}% APR',
+                                          '${BalancesHelper().numberStyling(
+                                            (lockState.lockAnalyticsDetails!
+                                                    .apy! *
+                                                100),
+                                            fixed: true,
+                                            fixedCount: 2,
+                                          )}% APY / '
+                                          '${BalancesHelper().numberStyling(
+                                            (lockState.lockAnalyticsDetails!
+                                                    .apr! *
+                                                100),
+                                            fixed: true,
+                                            fixedCount: 2,
+                                          )}% APR',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -393,22 +408,28 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                                               );
                                                             },
                                                           )
-                                                        : GestureDetector(
-                                                            onTap: () {
-                                                              setState(() {
-                                                                isEdit = true;
-                                                              });
-                                                            },
-                                                            child: MouseRegion(
-                                                              cursor:
-                                                                  SystemMouseCursors
-                                                                      .click,
-                                                              child: SvgPicture
-                                                                  .asset(
-                                                                'assets/icons/edit_gradient.svg',
+                                                        : AppTooltip(
+                                                          message: 'Coming soon',
+                                                          margin: 0,
+                                                          child: GestureDetector(
+                                                              onTap: () {
+                                                                // TODO: need to uncomment later
+                                                                // setState(() {
+                                                                //   isEdit = true;
+                                                                // });
+                                                              },
+                                                              child: MouseRegion(
+                                                                cursor:
+                                                                    SystemMouseCursors
+                                                                        .click,
+                                                                child: SvgPicture
+                                                                    .asset(
+                                                                  'assets/icons/edit_gradient.svg',
+                                                                  color: AppColors.grey,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
+                                                        ),
                                                   ),
                                                 ),
                                               ],

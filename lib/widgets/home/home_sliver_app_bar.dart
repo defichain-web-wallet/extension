@@ -59,7 +59,7 @@ class _HomeSliverAppBarState extends State<HomeSliverAppBar> {
                                 message: 'Earn',
                                 child: FlatButton(
                                   title: '',
-                                  iconPath: 'assets/icons/earn_icon.svg',
+                                  iconPath: 'assets/icons/earn.png',
                                   isSmall: true,
                                   callback: () {
                                     Navigator.push(
@@ -86,7 +86,7 @@ class _HomeSliverAppBarState extends State<HomeSliverAppBar> {
                                 message: 'Buy/Sell',
                                 child: FlatButton(
                                   title: '',
-                                  iconPath: 'assets/icons/wallet_icon.svg',
+                                  iconPath: 'assets/icons/wallet.png',
                                   isSmall: true,
                                   callback: () {
                                     Navigator.push(

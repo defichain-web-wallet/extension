@@ -44,8 +44,13 @@ class _NameAccountState extends State<NameAccount> {
                     child: CircleAvatar(
                       radius: 12,
                       backgroundColor: AppColors.white,
-                      child: SvgPicture.asset(
-                          'assets/icon_photo.svg'),
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        child: Image.asset(
+                          'assets/icons/camera.png',
+                        ),
+                      ),
                     ),
                   ),
                 ),

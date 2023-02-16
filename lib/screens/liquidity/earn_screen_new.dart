@@ -186,7 +186,15 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                         ),
                                                   ),
                                                   Text(
-                                                    'up to ${(lockState.lockAnalyticsDetails!.apy! * 100)}% APY',
+                                                    'up to '
+                                                    '${BalancesHelper().numberStyling(
+                                                      (lockState
+                                                              .lockAnalyticsDetails!
+                                                              .apy! *
+                                                          100),
+                                                      fixed: true,
+                                                      fixedCount: 2,
+                                                    )}% APY',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .headline5!

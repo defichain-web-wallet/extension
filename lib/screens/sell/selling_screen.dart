@@ -88,7 +88,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
           builder: (accountContext, accountState) {
             if (iteratorFiat == 0) {
               FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-              fiatCubit.loadAllAssets();
+              fiatCubit.loadAllAssets(isSell: true);
               iteratorFiat++;
             }
             return BlocBuilder<TokensCubit, TokensState>(
@@ -115,10 +115,9 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                           try {
                             var assetList = fiatState.assets!.where((element) =>
                             element.dexName == el.token && !el.isHidden!);
-                            print(List.from(assetList));
                             assets.add(List.from(assetList)[0].dexName);
                           } catch (_) {
-                            print('123');
+                            print(_);
                           }
                         });
                         currentAsset = currentAsset ??
@@ -264,10 +263,6 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                       key: selectKeyIban,
                                                       onAnotherSelect:
                                                           hideOverlay,
-                                                      routeWidget: Selling(
-                                                        isNewIban:
-                                                            widget.isNewIban,
-                                                      ),
                                                       ibanList: uniqueIbans,
                                                       selectedIban:
                                                           fiatState.activeIban!,

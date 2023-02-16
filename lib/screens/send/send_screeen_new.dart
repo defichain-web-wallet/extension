@@ -66,14 +66,24 @@ class _SendScreenNewState extends State<SendScreenNew>
 
   double getAvailableBalance(accountState, bitcoinState) {
     if (SettingsHelper.isBitcoin()) {
-      return convertFromSatoshi(bitcoinState.totalBalance);
+      if (bitcoinState.totalBalance <= 0) {
+        return 0.0;
+      } else {
+        return convertFromSatoshi(bitcoinState.totalBalance);
+      }
     } else {
       int balance = accountState.activeAccount!.balanceList!
           .firstWhere(
               (el) => el.token! == currentAsset!.symbol! && !el.isHidden!)
           .balance!;
-      final int fee = 3000;
-      return convertFromSatoshi(balance - fee);
+      int fee = 3000;
+      int resultBalance = balance - fee;
+
+      if (resultBalance <= 0) {
+        return 0.0;
+      } else {
+        return convertFromSatoshi(balance - fee);
+      }
     }
   }
 
@@ -120,6 +130,10 @@ class _SendScreenNewState extends State<SendScreenNew>
           builder: (accountContext, accountState) {
             return BlocBuilder<TokensCubit, TokensState>(
               builder: (tokenContext, tokensState) {
+                List<TokensModel> tokens = getTokensList(
+                  accountState,
+                  tokensState,
+                );
                 return BlocBuilder<BitcoinCubit, BitcoinState>(
                     builder: (bitcoinContext, bitcoinState) {
                   BitcoinCubit bitcoinCubit =
@@ -279,10 +293,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       },
                                       controller: assetController,
                                       selectedAsset: currentAsset!,
-                                      assets: getTokensList(
-                                        accountState,
-                                        tokensState,
-                                      ),
+                                      assets: tokens,
                                     ),
                                     SizedBox(
                                       height: 16,
