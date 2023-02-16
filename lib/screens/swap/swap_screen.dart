@@ -874,7 +874,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                           'Please complete the KYC process to enable this feature',
                                       style: Theme.of(context)
                                           .textTheme
-                                          .headline3
+                                          .headline5
                                           ?.apply(color: AppTheme.pinkColor),
                                     ),
                                   ),
@@ -1272,35 +1272,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
         valueFormat, dexState, dexCubit, accountState, tokensState);
   }
 
-  getFieldMsg(accountState,
-      dexState,) {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-
-    var availableAmountFrom;
-    var availableAmountTo;
-    if (SettingsHelper.isBitcoin()) {
-      double balance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
-      String balanceFormat;
-      if (balance > 0) {
-        balanceFormat =
-            balancesHelper.numberStyling(balance, fixed: true, fixedCount: 6);
-      } else {
-        balanceFormat =
-            balancesHelper.numberStyling(0, fixed: true, fixedCount: 6);
-      }
-      swapFromMsg = '$balanceFormat $assetFrom';
-      swapToMsg = '$balanceFormat $assetTo';
-    } else {
-      availableAmountFrom =
-          getAvailableAmount(accountState, assetFrom.symbol, dexState);
-      availableAmountTo =
-          getAvailableAmount(accountState, assetTo!.symbol, dexState);
-      swapFromMsg =
-      '${balancesHelper.numberStyling(availableAmountFrom)} $assetFrom';
-      swapToMsg = '${balancesHelper.numberStyling(availableAmountTo)} $assetTo';
-    }
-  }
-
   bool isNumeric(String string) {
     final numericRegex = RegExp(r'^-?(([0-9]*)|(([0-9]*)\.([0-9]*)))$');
     return numericRegex.hasMatch(string);
@@ -1448,7 +1419,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
     int fee = 0;
 
     if (isBitcoin) {
-      return convertFromSatoshi(bitcoinCubit.state.availableBalance);
+      if (bitcoinCubit.state.availableBalance <= 0) {
+        return 0.0;
+      } else {
+        return convertFromSatoshi(bitcoinCubit.state.availableBalance);
+      }
     }
 
     if (accountState.status == AccountStatusList.success &&

@@ -64,14 +64,24 @@ class _SendScreenNewState extends State<SendScreenNew>
 
   double getAvailableBalance(accountState, bitcoinState) {
     if (SettingsHelper.isBitcoin()) {
-      return convertFromSatoshi(bitcoinState.totalBalance);
+      if (bitcoinState.totalBalance <= 0) {
+        return 0.0;
+      } else {
+        return convertFromSatoshi(bitcoinState.totalBalance);
+      }
     } else {
       int balance = accountState.activeAccount!.balanceList!
           .firstWhere(
               (el) => el.token! == currentAsset!.symbol! && !el.isHidden!)
           .balance!;
-      final int fee = 3000;
-      return convertFromSatoshi(balance - fee);
+      int fee = 3000;
+      int resultBalance = balance - fee;
+
+      if (resultBalance <= 0) {
+        return 0.0;
+      } else {
+        return convertFromSatoshi(balance - fee);
+      }
     }
   }
 
