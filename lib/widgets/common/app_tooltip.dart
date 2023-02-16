@@ -5,17 +5,19 @@ import 'package:flutter/material.dart';
 class AppTooltip extends StatelessWidget with ThemeMixin {
   final Widget child;
   final String message;
+  final double margin;
 
   AppTooltip({
     Key? key,
     required this.child,
     required this.message,
+    this.margin = 8
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      margin: EdgeInsets.only(top: 8),
+      margin: EdgeInsets.only(top: margin),
       padding: EdgeInsets.symmetric(
         vertical: 6,
         horizontal: 12,
