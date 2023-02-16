@@ -315,6 +315,32 @@ class TokensHelper {
     }
   }
 
+  List<TokensModel> getTokensList(
+    accountState,
+    tokensState, {
+    List<TokensModel>? targetList,
+  }) {
+    List<TokensModel> resList = [];
+    if (targetList == null) {
+      accountState.balances!.forEach((element) {
+        tokensState.tokens!.forEach((el) {
+          if (element.token == el.symbol) {
+            resList.add(el);
+          }
+        });
+      });
+    } else {
+      targetList.forEach((element) {
+        tokensState.tokens!.forEach((el) {
+          if (element.symbol == el.symbol) {
+            resList.add(el);
+          }
+        });
+      });
+    }
+    return resList;
+  }
+
   bool isDfiToken(String token) {
     if (token == DefiAccountSymbol || token == DefiTokenSymbol) return true;
     return false;

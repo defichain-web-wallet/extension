@@ -1,5 +1,6 @@
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
           Flexible(
             child: TickerText(
               child: Text(
-                widget.assetCode,
+                tokenHelper.getTokenWithPrefix(widget.assetCode),
                 style: Theme.of(context)
                     .textTheme
                     .headline5!

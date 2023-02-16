@@ -25,6 +25,8 @@ class AssetItemSelector extends StatefulWidget {
 }
 
 class _AssetItemSelectorState extends State<AssetItemSelector> {
+  TokensHelper tokensHelper = TokensHelper();
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -83,7 +85,7 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
                 padding: const EdgeInsets.only(right: 10),
                 child: TickerText(
                   child: Text(
-                    widget.assetCode,
+                    tokensHelper.getTokenWithPrefix(widget.assetCode),
                     style: Theme.of(context).textTheme.headline5!.copyWith(
                           fontSize: 16,
                         ),

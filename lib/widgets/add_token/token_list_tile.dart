@@ -1,4 +1,5 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:flutter/material.dart';
@@ -96,7 +97,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${widget.tokenName}',
+                                  '${tokenHelper.getTokenWithPrefix(widget.tokenName)}',
                                   style: Theme.of(context).textTheme.headline5,
                                 ),
                                 SizedBox(
@@ -135,7 +136,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                           Padding(
                             padding: EdgeInsets.only(right: 16),
                             child: Text(
-                              '0 ${widget.availableTokenName}',
+                              '0 ${tokenHelper.getTokenWithPrefix(widget.availableTokenName)}',
                               style: Theme.of(context).textTheme.headline5,
                             ),
                           ),

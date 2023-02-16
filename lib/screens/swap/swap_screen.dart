@@ -207,6 +207,16 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         }
                       }
                     }
+                    assets = tokensHelper.getTokensList(
+                      accountState,
+                      tokensState,
+                      targetList: assets,
+                    );
+                    tokensForSwap = tokensHelper.getTokensList(
+                      accountState,
+                      tokensState,
+                      targetList: tokensForSwap,
+                    );
                     return Scaffold(
                       appBar: NewMainAppBar(
                         isShowLogo: false,

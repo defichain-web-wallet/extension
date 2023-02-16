@@ -3,6 +3,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance_model.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/assets/asset_icon.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
@@ -15,7 +16,7 @@ class AssetCard extends StatefulWidget {
   final String tokenName;
   final double tokenBalance;
   final TokensState tokensState;
-  final List<BalanceModel> balances;
+  final List<TokensModel> tokens;
 
   const AssetCard({
     Key? key,
@@ -24,7 +25,7 @@ class AssetCard extends StatefulWidget {
     required this.tokenName,
     required this.tokenBalance,
     required this.tokensState,
-    required this.balances,
+    required this.tokens,
   }) : super(key: key);
 
   @override
@@ -35,13 +36,13 @@ class _AssetCardState extends State<AssetCard> {
   TokensHelper tokensHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 
-  Widget _buildTokenIcon(BalanceModel token) {
+  Widget _buildTokenIcon(TokensModel token) {
     if (token.isPair!) {
-      return AssetPair(pair: token.token!, size: 20,);
+      return AssetPair(pair: token.symbol!, size: 20,);
     } else {
       return AssetIcon(
-        url: tokensHelper.getImageNameByTokenName(token.token!),
-        color: tokensHelper.getColorByTokenName(token.token!),
+        url: tokensHelper.getImageNameByTokenName(token.symbol!),
+        color: tokensHelper.getColorByTokenName(token.symbol!),
       );
     }
   }
@@ -91,7 +92,7 @@ class _AssetCardState extends State<AssetCard> {
             SizedBox(
               height: 42,
               width: 42,
-              child: _buildTokenIcon(widget.balances[widget.index]),
+              child: _buildTokenIcon(widget.tokens![widget.index]),
             ),
             SizedBox(
               width: 10,
@@ -109,7 +110,7 @@ class _AssetCardState extends State<AssetCard> {
                       style: Theme.of(context).textTheme.headline5,
                     ),
                     Text(
-                      widget.tokenName,
+                      widget.tokens[widget.index].name!,
                       style: Theme.of(context).textTheme.headline6!.copyWith(
                             color: Theme.of(context)
                                 .textTheme

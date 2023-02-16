@@ -128,6 +128,10 @@ class _SendScreenNewState extends State<SendScreenNew>
           builder: (accountContext, accountState) {
             return BlocBuilder<TokensCubit, TokensState>(
               builder: (tokenContext, tokensState) {
+                List<TokensModel> tokens = getTokensList(
+                  accountState,
+                  tokensState,
+                );
                 return BlocBuilder<BitcoinCubit, BitcoinState>(
                     builder: (bitcoinContext, bitcoinState) {
                   BitcoinCubit bitcoinCubit =
@@ -284,10 +288,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       },
                                       controller: assetController,
                                       selectedAsset: currentAsset!,
-                                      assets: getTokensList(
-                                        accountState,
-                                        tokensState,
-                                      ),
+                                      assets: tokens,
                                     ),
                                     SizedBox(
                                       height: 16,
