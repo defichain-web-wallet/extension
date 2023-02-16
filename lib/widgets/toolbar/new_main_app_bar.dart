@@ -11,11 +11,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isShowLogo;
   final Color? bgColor;
+  final void Function()? callback;
 
   const NewMainAppBar({
     Key? key,
     this.isShowLogo = true,
     this.bgColor,
+    this.callback,
   }) : super(key: key);
 
   static const double toolbarHeight = 54.0;
@@ -56,7 +58,12 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     'assets/icons/arrow.png',
                   ),
                 ),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  if (callback != null) {
+                    callback!();
+                  }
+                  Navigator.of(context).pop();
+                },
                 hoverColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 splashColor: Colors.transparent,

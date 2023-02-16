@@ -4,10 +4,11 @@ import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
+import 'package:defi_wallet/screens/buy/buy_summary_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -18,19 +19,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class IbanScreen extends StatefulWidget {
-  AssetByFiatModel asset;
-  bool isNewIban;
-  final Widget? routeWidget;
+  final AssetByFiatModel asset;
+  final bool isNewIban;
 
-  IbanScreen(
-      {Key? key, required this.asset, this.isNewIban = false, this.routeWidget})
-      : super(key: key);
+  IbanScreen({
+    Key? key,
+    required this.asset,
+    this.isNewIban = false,
+  }) : super(key: key);
 
   @override
   _IbanScreenState createState() => _IbanScreenState();
 }
 
-class _IbanScreenState extends State<IbanScreen> with ThemeMixin, SnackBarMixin {
+class _IbanScreenState extends State<IbanScreen>
+    with ThemeMixin, SnackBarMixin {
   final _formKey = GlobalKey<FormState>();
   final _ibanController = TextEditingController();
   final GlobalKey<IbanSelectorState> selectKeyIban =
@@ -39,15 +42,23 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin, SnackBarMixin 
   String subtitleText = 'The purchase of the selected token '
       'is carried out by our partner company DFX AG. '
       'To be able to allocate your deposit your IBAN number is required. ';
+  int iterator = 0;
 
   @override
   void dispose() {
     _ibanController.dispose();
+    hideOverlay();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    if (iterator == 0) {
+      fiatCubit.loadIbanList(asset: widget.asset);
+      iterator++;
+    }
+
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
@@ -58,10 +69,7 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin, SnackBarMixin 
           builder: (context, fiatState) {
             if (fiatState.status == FiatStatusList.loading) {
               return Loader();
-            } else {
-              List<IbanModel> ibanList = fiatState.ibanList!
-                  .where((element) => element.type == "Wallet")
-                  .toList();
+            } else if (fiatState.status == FiatStatusList.success) {
 
               List<String> stringIbans = [];
               List<IbanModel> uniqueIbans = [];
@@ -83,6 +91,7 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin, SnackBarMixin 
                 ),
                 appBar: NewMainAppBar(
                   isShowLogo: false,
+                  callback: hideOverlay,
                 ),
                 body: Container(
                   padding: EdgeInsets.only(
@@ -162,7 +171,6 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin, SnackBarMixin 
                                             asset: widget.asset,
                                             key: selectKeyIban,
                                             onAnotherSelect: hideOverlay,
-                                            routeWidget: widget.routeWidget,
                                             ibanList: uniqueIbans,
                                             selectedIban: fiatState.activeIban!,
                                           )
@@ -181,13 +189,21 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin, SnackBarMixin 
                                   callback: () => Navigator.of(context).pop(),
                                 ),
                               ),
-                              NewPrimaryButton(
+                              SizedBox(
                                 width: 104,
-                                callback: () {
-                                  hideOverlay();
-                                  submit(context, fiatState);
-                                },
-                                title: 'Next',
+                                child: PendingButton(
+                                  'Next',
+                                  pendingText: 'Pending...',
+                                  callback: (parent) async {
+                                    parent.emitPending(true);
+                                    try {
+                                      hideOverlay();
+                                      await submit(context, fiatState);
+                                    } finally {
+                                      parent.emitPending(false);
+                                    }
+                                  },
+                                ),
                               ),
                             ],
                           ),
@@ -197,6 +213,8 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin, SnackBarMixin 
                   ),
                 ),
               );
+            } else {
+              return Container();
             }
           },
         );
@@ -210,19 +228,24 @@ class _IbanScreenState extends State<IbanScreen> with ThemeMixin, SnackBarMixin 
       String iban = (widget.isNewIban || fiatState.activeIban == null)
           ? _ibanController.text
           : fiatState.activeIban.iban;
+      bool isNewIban = widget.isNewIban || iban.isNotEmpty;
       try {
-        if (widget.isNewIban) {
+        if (widget.isNewIban || fiatState.activeIban == null) {
           await fiatCubit.saveBuyDetails(
             iban,
             widget.asset,
             fiatState.accessToken!,
           );
         }
+
         Navigator.push(
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
-              widget.routeWidget!,
+                  BuySummaryScreen(
+                asset: widget.asset,
+                isNewIban: isNewIban,
+              ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ));

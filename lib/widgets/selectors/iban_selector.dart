@@ -13,10 +13,9 @@ import 'package:flutter_svg/svg.dart';
 
 class IbanSelector extends StatefulWidget {
   final List<IbanModel> ibanList;
-  AssetByFiatModel? asset;
-  IbanModel selectedIban;
-  void Function()? onAnotherSelect;
-  final Widget? routeWidget;
+  final AssetByFiatModel? asset;
+  final IbanModel selectedIban;
+  final void Function()? onAnotherSelect;
   final bool isShowAsset;
   final bool isBorder;
 
@@ -26,7 +25,6 @@ class IbanSelector extends StatefulWidget {
     this.asset,
     required this.selectedIban,
     this.onAnotherSelect,
-    this.routeWidget,
     this.isShowAsset = false,
     this.isBorder = false,
   }) : super(key: key);
@@ -228,7 +226,6 @@ class IbanSelectorState extends State<IbanSelector> {
                                 return IbanScreen(
                                   asset: widget.asset!,
                                   isNewIban: true,
-                                  routeWidget: widget.routeWidget,
                                 );
                               },
                               transitionDuration: Duration.zero,
@@ -251,7 +248,6 @@ class IbanSelectorState extends State<IbanSelector> {
                       },
                     );
                   } else {
-                    print(index);
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(0),
@@ -321,7 +317,6 @@ class IbanSelectorState extends State<IbanSelector> {
                         ),
                       ),
                       onPressed: () async {
-                        widget.selectedIban = widget.ibanList[index];
                         FiatCubit fiatCubit =
                             BlocProvider.of<FiatCubit>(context);
                         fiatCubit.changeCurrentIban(widget.selectedIban);
