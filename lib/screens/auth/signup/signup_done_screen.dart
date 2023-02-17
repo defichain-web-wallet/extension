@@ -36,8 +36,9 @@ class SignupDoneScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           Image.asset(
-                            'assets/images/defi_cake_hacking_1.png',
-                            width: imageWidth,
+                            'assets/images/jelly_success.png',
+                            width: 239,
+                            height: 211,
                           ),
                           SizedBox(
                             height: 24,

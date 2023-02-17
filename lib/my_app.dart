@@ -11,6 +11,7 @@ import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
+import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/bloc/auth/auth_bloc.dart';
@@ -38,6 +39,12 @@ class App extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        builder: (context, widget) {
+          ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+            return ErrorScreen(errorDetails: errorDetails);
+          };
+          return widget!;
+        },
         home: WalletChecker(),
       ),
     );

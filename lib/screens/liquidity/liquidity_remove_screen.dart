@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
@@ -33,7 +34,7 @@ class LiquidityRemoveScreen extends StatefulWidget {
 }
 
 class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
-    with ThemeMixin {
+    with ThemeMixin, SnackBarMixin {
   String titleText = 'Remove liquidity';
   TokensHelper tokensHelper = TokensHelper();
 
@@ -157,7 +158,7 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
             height: double.infinity,
             decoration: BoxDecoration(
               color: isDarkTheme()
-                  ? DarkColors.scaffoldContainerBgColor
+                  ? DarkColors.drawerBgColor
                   : LightColors.scaffoldContainerBgColor,
               border: isDarkTheme()
                   ? Border.all(
@@ -482,26 +483,39 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
                     NewPrimaryButton(
                       width: buttonSmallWidth,
                       callback: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                LiquidityConfirmation(
-                              assetPair: widget.assetPair,
-                              baseAmount: amountA,
-                              quoteAmount: amountB,
-                              shareOfPool: shareOfPool,
-                              amountUSD: amountUSD,
-                              balanceUSD: balanceUSD,
-                              balanceA: balanceA,
-                              balanceB: balanceB,
-                              amount: 0,
-                              removeLT: getRemoveAmount(),
+                        if (txState is! TransactionLoadingState) {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  LiquidityConfirmation(
+                                assetPair: widget.assetPair,
+                                baseAmount: amountA,
+                                quoteAmount: amountB,
+                                shareOfPool: shareOfPool,
+                                amountUSD: amountUSD,
+                                balanceUSD: balanceUSD,
+                                balanceA: balanceA,
+                                balanceB: balanceB,
+                                amount: 0,
+                                removeLT: getRemoveAmount(),
+                              ),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
                             ),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
+                          );
+                        } else {
+                          showSnackBar(
+                            context,
+                            title: 'Please wait for the previous '
+                                'transaction',
+                            color: AppColors.txStatusError.withOpacity(0.1),
+                            prefix: Icon(
+                              Icons.close,
+                              color: AppColors.txStatusError,
+                            ),
+                          );
+                        }
                       },
                       title: 'Continue',
                     ),

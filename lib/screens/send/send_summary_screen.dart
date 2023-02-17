@@ -72,7 +72,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   void initState() {
     if (widget.contact != null) {
       address =
-        widget.address != null ? widget.address! : widget.contact!.address!;
+          widget.address != null ? widget.address! : widget.contact!.address!;
     } else {
       address = widget.address!;
     }
@@ -124,13 +124,13 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                       height: double.infinity,
                       decoration: BoxDecoration(
                         color: isDarkTheme()
-                            ? DarkColors.scaffoldContainerBgColor
+                            ? DarkColors.drawerBgColor
                             : LightColors.scaffoldContainerBgColor,
                         border: isDarkTheme()
                             ? Border.all(
-                                width: 1.0,
-                                color: Colors.white.withOpacity(0.05),
-                              )
+                          width: 1.0,
+                          color: Colors.white.withOpacity(0.05),
+                        )
                             : null,
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
@@ -193,7 +193,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                             SvgPicture.asset(
                                               TokensHelper()
                                                   .getImageNameByTokenName(
-                                                      widget.token.symbol),  height: 20,
+                                                      widget.token.symbol),
+                                              height: 20,
                                             ),
                                             SizedBox(
                                               width: 6.4,
@@ -271,7 +272,9 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                               border: Border.all(
-                                                color: AppColors.whiteLilac,
+                                                color: AppColors.lavenderPurple
+                                                    .withOpacity(0.32),
+                                                width: 0.5,
                                               ),
                                             ),
                                             textStyle: Theme.of(context)
@@ -477,7 +480,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   Future _sendTransaction(context, List<TokensModel> tokens, String token,
       AccountModel account, ECPair keyPair) async {
     AddressBookCubit addressBookCubit =
-    BlocProvider.of<AddressBookCubit>(context);
+        BlocProvider.of<AddressBookCubit>(context);
     TxErrorModel? txResponse;
     if (token == 'DFI') {
       txResponse = await transactionService.createAndSendTransaction(
@@ -514,19 +517,18 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
           callbackOk: () async {
             if (!SettingsHelper.isBitcoin()) {
               TransactionCubit transactionCubit =
-              BlocProvider.of<TransactionCubit>(context);
+                  BlocProvider.of<TransactionCubit>(context);
 
               await transactionCubit.setOngoingTransaction(txResponse!);
             }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder:
-                    (context, animation1, animation2) =>
-                    HomeScreen(isLoadTokens: true,),
+                pageBuilder: (context, animation1, animation2) => HomeScreen(
+                  isLoadTokens: true,
+                ),
                 transitionDuration: Duration.zero,
-                reverseTransitionDuration:
-                Duration.zero,
+                reverseTransitionDuration: Duration.zero,
               ),
             );
           },

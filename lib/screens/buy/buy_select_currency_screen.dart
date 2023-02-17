@@ -21,14 +21,16 @@ import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SearchBuyToken extends StatefulWidget {
-  const SearchBuyToken({Key? key}) : super(key: key);
+class BuySelectCurrencyScreen extends StatefulWidget {
+  const BuySelectCurrencyScreen({Key? key}) : super(key: key);
 
   @override
-  _SearchBuyTokenState createState() => _SearchBuyTokenState();
+  _BuySelectCurrencyScreenState createState() =>
+      _BuySelectCurrencyScreenState();
 }
 
-class _SearchBuyTokenState extends State<SearchBuyToken> with ThemeMixin {
+class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
+    with ThemeMixin {
   String symbol = '';
   String titleText = 'Select currency';
   String subtitleText = 'Select the token you want to buy';
@@ -102,7 +104,7 @@ class _SearchBuyTokenState extends State<SearchBuyToken> with ThemeMixin {
                     height: double.infinity,
                     decoration: BoxDecoration(
                       color: isDarkTheme()
-                          ? DarkColors.scaffoldContainerBgColor
+                          ? DarkColors.drawerBgColor
                           : LightColors.scaffoldContainerBgColor,
                       border: isDarkTheme()
                           ? Border.all(
@@ -111,10 +113,9 @@ class _SearchBuyTokenState extends State<SearchBuyToken> with ThemeMixin {
                       )
                           : null,
                       borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        topLeft: Radius.circular(20),
-                      ),
-                    ),
+                          topRight: Radius.circular(20),
+                          topLeft: Radius.circular(20)
+                    )),
                     child: Center(
                       child: StretchBox(
                         child: Column(

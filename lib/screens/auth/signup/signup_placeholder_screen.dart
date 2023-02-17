@@ -81,29 +81,10 @@ class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen>
                           Stack(
                             children: [
                               Positioned(
-                                child: SvgPicture.asset(
-                                  isDarkTheme()
-                                      ? 'assets/secure_placeholder_dark.svg'
-                                      : 'assets/secure_placeholder_light.svg',
-                                  width: _coverWidth,
-                                  height: _coverHeight,
-                                ),
-                              ),
-                              Positioned.fill(
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: Transform.rotate(
-                                    angle: -math.pi / _logoRotateDeg,
-                                    child: Container(
-                                      height: _logoWidth,
-                                      width: _logoHeight,
-                                      child: Image(
-                                        image: AssetImage(
-                                          'assets/welcome_logo.png',
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                child: Image.asset(
+                                  'assets/images/jelly_protect.png',
+                                  width: 191,
+                                  height: 306,
                                 ),
                               ),
                             ],

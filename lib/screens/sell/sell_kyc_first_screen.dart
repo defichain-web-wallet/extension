@@ -93,7 +93,7 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                   height: double.infinity,
                   decoration: BoxDecoration(
                     color: isDarkTheme()
-                        ? DarkColors.scaffoldContainerBgColor
+                        ? DarkColors.drawerBgColor
                         : LightColors.scaffoldContainerBgColor,
                     border: isDarkTheme()
                         ? Border.all(
@@ -165,6 +165,14 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                                   TextFormField(
                                     controller: _nameController,
                                     decoration: InputDecoration(
+                                      hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                      filled: true,
+                                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                      enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                      focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                      hintStyle: passwordField.copyWith(
+                                        color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                      ),
                                       contentPadding: EdgeInsets.only(left: 12),
                                       hintText: 'Enter your First name',
                                     ),
@@ -194,6 +202,14 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                                   TextFormField(
                                     controller: _surnameController,
                                     decoration: InputDecoration(
+                                      hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                      filled: true,
+                                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                      enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                      focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                      hintStyle: passwordField.copyWith(
+                                        color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                      ),
                                       contentPadding: EdgeInsets.only(left: 12),
                                       hintText: 'Enter your Last name',
                                     ),
@@ -259,5 +275,4 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
       },
     );
   }
-
 }

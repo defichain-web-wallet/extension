@@ -77,7 +77,7 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                   height: double.infinity,
                   decoration: BoxDecoration(
                     color: isDarkTheme()
-                        ? DarkColors.scaffoldContainerBgColor
+                        ? DarkColors.drawerBgColor
                         : LightColors.scaffoldContainerBgColor,
                     border: isDarkTheme()
                         ? Border.all(
@@ -215,7 +215,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                 Flexible(
                                   child: FlatButton(
                                     title: 'Increase limit',
-                                    iconPath: 'assets/icons/increase_limits.png',
+                                    iconPath:
+                                        'assets/icons/increase_limits.png',
                                     callback: () {
                                       String kycHash = fiatState.kycHash!;
                                       launch(
@@ -275,7 +276,7 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SearchBuyToken(),
+          pageBuilder: (context, animation1, animation2) => BuySelectCurrencyScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),

@@ -48,9 +48,11 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
     double arrowRotateDeg = _isShowDropdown ? 180 : 0;
 
     return ScaffoldWrapper(
-      builder: (BuildContext context,
-          bool isFullScreen,
-          TransactionState txState,) {
+      builder: (
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState txState,
+      ) {
         return BlocBuilder<FiatCubit, FiatState>(
           builder: (BuildContext context, fiatState) {
             if (fiatState.personalInfo!.country != null) {
@@ -61,15 +63,14 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
             if (fiatState.status == FiatStatusList.loading) {
               return Loader();
             } else if (fiatState.status == FiatStatusList.expired) {
-              Future.microtask(() =>
-                  Navigator.pushReplacement(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) =>
-                            LockScreen(),
-                        transitionDuration: Duration.zero,
-                        reverseTransitionDuration: Duration.zero,
-                      )));
+              Future.microtask(() => Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) =>
+                        LockScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  )));
               return Container();
             } else {
               return Scaffold(
@@ -91,13 +92,13 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                   height: double.infinity,
                   decoration: BoxDecoration(
                     color: isDarkTheme()
-                        ? DarkColors.scaffoldContainerBgColor
+                        ? DarkColors.drawerBgColor
                         : LightColors.scaffoldContainerBgColor,
                     border: isDarkTheme()
                         ? Border.all(
-                      width: 1.0,
-                      color: Colors.white.withOpacity(0.05),
-                    )
+                            width: 1.0,
+                            color: Colors.white.withOpacity(0.05),
+                          )
                         : null,
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
@@ -120,8 +121,8 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment
-                                          .start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           titleText,
@@ -135,18 +136,16 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                         ),
                                         Text(
                                           subtitleText,
-                                          style: Theme
-                                              .of(context)
+                                          style: Theme.of(context)
                                               .textTheme
                                               .headline5!
                                               .apply(
-                                            color: Theme
-                                                .of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .color!
-                                                .withOpacity(0.6),
-                                          ),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color!
+                                                    .withOpacity(0.6),
+                                              ),
                                           softWrap: true,
                                         ),
                                       ],
@@ -160,68 +159,68 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                       child: Column(
                                         children: [
                                           Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(horizontal: 16),
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    'Your Country',
-                                                    style: Theme
-                                                        .of(context)
-                                                        .textTheme
-                                                        .headline5,
-                                                    softWrap: true,
-                                                  ),
-                                                ],
-                                              ),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Your Country',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5,
+                                                  softWrap: true,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                           SizedBox(
                                             height: 6,
                                           ),
-
                                           CountryListPick(
-                                              pickerBuilder: (context,
-                                                  country) {
+                                              pickerBuilder:
+                                                  (context, country) {
                                                 return Container(
                                                   height: 44,
                                                   padding: const EdgeInsets
-                                                      .symmetric(
+                                                          .symmetric(
                                                       horizontal: 12),
                                                   decoration: BoxDecoration(
-                                                    color: Theme
-                                                        .of(context)
+                                                    color: Theme.of(context)
                                                         .cardColor,
-                                                    borderRadius: BorderRadius
-                                                        .circular(12),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
                                                     border: Border.all(
                                                       color: AppColors.portage
                                                           .withOpacity(0.12),
                                                     ),
                                                   ),
                                                   child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment
-                                                        .spaceBetween,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
                                                       Text(
                                                         selectedCountry['name'],
-                                                        style: Theme
-                                                            .of(context)
+                                                        style: Theme.of(context)
                                                             .textTheme
                                                             .headline6!
                                                             .copyWith(
-                                                          fontWeight: FontWeight
-                                                              .w600,
-                                                        ),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
                                                       ),
                                                       RotationTransition(
-                                                        turns: AlwaysStoppedAnimation(
-                                                            arrowRotateDeg /
-                                                                360),
+                                                        turns:
+                                                            AlwaysStoppedAnimation(
+                                                                arrowRotateDeg /
+                                                                    360),
                                                         child: SizedBox(
                                                           width: 10,
                                                           height: 10,
-                                                          child: SvgPicture
-                                                              .asset(
+                                                          child:
+                                                              SvgPicture.asset(
                                                             'assets/icons/arrow_down.svg',
                                                           ),
                                                         ),
@@ -231,7 +230,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                 );
                                               },
                                               initialSelection:
-                                              selectedCountry['symbol'],
+                                                  selectedCountry['symbol'],
                                               onChanged: (CountryCode? code) {
                                                 print(code!.code);
                                                 selectedCountry =
@@ -242,15 +241,15 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                             height: 16,
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16),
                                             child: Column(
                                               children: [
                                                 Row(
                                                   children: [
                                                     Text(
                                                       'Street Address',
-                                                      style: Theme
-                                                          .of(context)
+                                                      style: Theme.of(context)
                                                           .textTheme
                                                           .headline5,
                                                       softWrap: true,
@@ -262,16 +261,41 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                 ),
                                                 TextFormField(
                                                   controller:
-                                                  _streetAddressController,
+                                                      _streetAddressController,
                                                   decoration: InputDecoration(
+                                                    hoverColor: Theme.of(
+                                                            context)
+                                                        .inputDecorationTheme
+                                                        .hoverColor,
+                                                    filled: true,
+                                                    fillColor: Theme.of(context)
+                                                        .inputDecorationTheme
+                                                        .fillColor,
+                                                    enabledBorder: Theme.of(
+                                                            context)
+                                                        .inputDecorationTheme
+                                                        .enabledBorder,
+                                                    focusedBorder: Theme.of(
+                                                            context)
+                                                        .inputDecorationTheme
+                                                        .focusedBorder,
+                                                    hintStyle:
+                                                        passwordField.copyWith(
+                                                      color: isDarkTheme()
+                                                          ? DarkColors
+                                                              .hintTextColor
+                                                          : LightColors
+                                                              .hintTextColor,
+                                                    ),
                                                     contentPadding:
-                                                    EdgeInsets.only(left: 12),
+                                                        EdgeInsets.only(
+                                                            left: 12),
                                                     hintText:
-                                                    'Enter your Street Address',
+                                                        'Enter your Street Address',
                                                   ),
                                                   validator: (value) {
                                                     return value == null ||
-                                                        value.isEmpty
+                                                            value.isEmpty
                                                         ? 'Please enter this field'
                                                         : null;
                                                   },
@@ -283,8 +307,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                   children: [
                                                     Text(
                                                       'City',
-                                                      style: Theme
-                                                          .of(context)
+                                                      style: Theme.of(context)
                                                           .textTheme
                                                           .headline5,
                                                       softWrap: true,
@@ -297,13 +320,38 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                 TextFormField(
                                                   controller: _cityController,
                                                   decoration: InputDecoration(
+                                                    hoverColor: Theme.of(
+                                                            context)
+                                                        .inputDecorationTheme
+                                                        .hoverColor,
+                                                    filled: true,
+                                                    fillColor: Theme.of(context)
+                                                        .inputDecorationTheme
+                                                        .fillColor,
+                                                    enabledBorder: Theme.of(
+                                                            context)
+                                                        .inputDecorationTheme
+                                                        .enabledBorder,
+                                                    focusedBorder: Theme.of(
+                                                            context)
+                                                        .inputDecorationTheme
+                                                        .focusedBorder,
+                                                    hintStyle:
+                                                        passwordField.copyWith(
+                                                      color: isDarkTheme()
+                                                          ? DarkColors
+                                                              .hintTextColor
+                                                          : LightColors
+                                                              .hintTextColor,
+                                                    ),
                                                     contentPadding:
-                                                    EdgeInsets.only(left: 12),
+                                                        EdgeInsets.only(
+                                                            left: 12),
                                                     hintText: 'Enter your City',
                                                   ),
                                                   validator: (value) {
                                                     return value == null ||
-                                                        value.isEmpty
+                                                            value.isEmpty
                                                         ? 'Please enter this field'
                                                         : null;
                                                   },
@@ -315,8 +363,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                   children: [
                                                     Text(
                                                       'Zip code',
-                                                      style: Theme
-                                                          .of(context)
+                                                      style: Theme.of(context)
                                                           .textTheme
                                                           .headline5,
                                                       softWrap: true,
@@ -327,15 +374,42 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                   height: 6,
                                                 ),
                                                 TextFormField(
-                                                  controller: _zipCodeController,
+                                                  controller:
+                                                      _zipCodeController,
                                                   decoration: InputDecoration(
+                                                    hoverColor: Theme.of(
+                                                            context)
+                                                        .inputDecorationTheme
+                                                        .hoverColor,
+                                                    filled: true,
+                                                    fillColor: Theme.of(context)
+                                                        .inputDecorationTheme
+                                                        .fillColor,
+                                                    enabledBorder: Theme.of(
+                                                            context)
+                                                        .inputDecorationTheme
+                                                        .enabledBorder,
+                                                    focusedBorder: Theme.of(
+                                                            context)
+                                                        .inputDecorationTheme
+                                                        .focusedBorder,
+                                                    hintStyle:
+                                                        passwordField.copyWith(
+                                                      color: isDarkTheme()
+                                                          ? DarkColors
+                                                              .hintTextColor
+                                                          : LightColors
+                                                              .hintTextColor,
+                                                    ),
                                                     contentPadding:
-                                                    EdgeInsets.only(left: 12),
-                                                    hintText: 'Enter your Zip Code',
+                                                        EdgeInsets.only(
+                                                            left: 12),
+                                                    hintText:
+                                                        'Enter your Zip Code',
                                                   ),
                                                   validator: (value) {
                                                     return value == null ||
-                                                        value.isEmpty
+                                                            value.isEmpty
                                                         ? 'Please enter this field'
                                                         : null;
                                                   },
@@ -367,12 +441,13 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
                                 child: NewPrimaryButton(
                                   width: 104,
                                   callback: () async {
                                     FiatCubit fiatCubit =
-                                    BlocProvider.of<FiatCubit>(context);
+                                        BlocProvider.of<FiatCubit>(context);
                                     fiatCubit.setCountry(selectedCountry);
                                     if (_formKey.currentState!.validate()) {
                                       try {
@@ -386,18 +461,21 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                           context,
                                           PageRouteBuilder(
                                             pageBuilder: (context, animation1,
-                                                animation2) =>
+                                                    animation2) =>
                                                 SellKycThirdScreen(),
                                             transitionDuration: Duration.zero,
                                             reverseTransitionDuration:
-                                            Duration.zero,
+                                                Duration.zero,
                                           ),
                                         );
                                       } catch (err) {
                                         showSnackBar(
                                           context,
-                                          title: err.toString().replaceAll('"', ''),
-                                          color: AppColors.txStatusError.withOpacity(0.1),
+                                          title: err
+                                              .toString()
+                                              .replaceAll('"', ''),
+                                          color: AppColors.txStatusError
+                                              .withOpacity(0.1),
                                           prefix: Icon(
                                             Icons.close,
                                             color: AppColors.txStatusError,

@@ -23,9 +23,13 @@ class FlatButton extends StatelessWidget with ThemeMixin {
   static const double largeHeight = 54.0;
 
   MaterialStatePropertyAll<Color> getSpecificBackgroundColor() {
-    if (isPrimary) {
+    if (isPrimary && callback != null) {
       return MaterialStatePropertyAll(
         AppColors.purplePizzazz.withOpacity(0.1),
+      );
+    } else if (callback == null) {
+      return MaterialStatePropertyAll(
+        AppColors.portage.withOpacity(0.15),
       );
     } else {
       return MaterialStatePropertyAll(
@@ -77,6 +81,7 @@ class FlatButton extends StatelessWidget with ThemeMixin {
                 height: isPrimary ? 16 : 14,
                 child: (isPrimary) ? Image.asset(iconPath!) : SvgPicture.asset(
                   iconPath!,
+                  color: isDarkTheme() ? Colors.white : AppColors.darkTextColor,
                 ),
               ),
             if (!isSmall)
@@ -88,7 +93,14 @@ class FlatButton extends StatelessWidget with ThemeMixin {
                   title,
                   style: Theme.of(context).textTheme.button!.copyWith(
                     fontSize: 13,
-                  ),
+                    color: (callback == null)
+                          ? Theme.of(context)
+                              .textTheme
+                              .button!
+                              .color!
+                              .withOpacity(0.2)
+                          : Theme.of(context).textTheme.button!.color!,
+                    ),
                 )
               ]
           ],

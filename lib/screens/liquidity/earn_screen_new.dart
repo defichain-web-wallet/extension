@@ -114,13 +114,13 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                     height: double.infinity,
                     decoration: BoxDecoration(
                       color: isDarkTheme()
-                          ? DarkColors.scaffoldContainerBgColor
+                          ? DarkColors.drawerBgColor
                           : LightColors.scaffoldContainerBgColor,
                       border: isDarkTheme()
                           ? Border.all(
-                              width: 1.0,
-                              color: Colors.white.withOpacity(0.05),
-                            )
+                        width: 1.0,
+                        color: Colors.white.withOpacity(0.05),
+                      )
                           : null,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20),
@@ -656,7 +656,6 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
   liquidityCallback(double totalLiquidityBalance, txState) {
     Widget redirectTo = LiquidityScreenNew();
 
-    if (txState is! TransactionLoadingState) {
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -665,19 +664,5 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
           reverseTransitionDuration: Duration.zero,
         ),
       );
-    } else {
-      showSnackBar(
-        context,
-        title:
-        'Please wait for the previous '
-            'transaction',
-        color: AppColors.txStatusError
-            .withOpacity(0.1),
-        prefix: Icon(
-          Icons.close,
-          color: AppColors.txStatusError,
-        ),
-      );
-    }
   }
 }

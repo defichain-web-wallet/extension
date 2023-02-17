@@ -270,33 +270,38 @@ class _HomeScreenState extends State<HomeScreen>
                                                   SizedBox(
                                                     width: 12,
                                                   ),
-                                                  SizedBox(
-                                                    width: 32,
-                                                    height: 32,
-                                                    child: NewActionButton(
-                                                      iconPath:
-                                                          'assets/icons/add_black.svg',
-                                                      onPressed: () async {
-                                                        await lockHelper
-                                                            .provideWithLockChecker(
-                                                          context,
-                                                          () => Navigator.push(
+                                                  if (!SettingsHelper
+                                                      .isBitcoin())
+                                                    SizedBox(
+                                                      width: 32,
+                                                      height: 32,
+                                                      child: NewActionButton(
+                                                        iconPath:
+                                                            'assets/icons/add_black.svg',
+                                                        onPressed: () async {
+                                                          await lockHelper
+                                                              .provideWithLockChecker(
                                                             context,
-                                                            PageRouteBuilder(
-                                                              pageBuilder: (context,
-                                                                      animation1,
-                                                                      animation2) =>
-                                                                  AddTokenScreen(),
-                                                              transitionDuration:
-                                                                  Duration.zero,
-                                                              reverseTransitionDuration:
-                                                                  Duration.zero,
+                                                            () =>
+                                                                Navigator.push(
+                                                              context,
+                                                              PageRouteBuilder(
+                                                                pageBuilder: (context,
+                                                                        animation1,
+                                                                        animation2) =>
+                                                                    AddTokenScreen(),
+                                                                transitionDuration:
+                                                                    Duration
+                                                                        .zero,
+                                                                reverseTransitionDuration:
+                                                                    Duration
+                                                                        .zero,
+                                                              ),
                                                             ),
-                                                          ),
-                                                        );
-                                                      },
+                                                          );
+                                                        },
+                                                      ),
                                                     ),
-                                                  ),
                                                 ],
                                               ),
                                             ),

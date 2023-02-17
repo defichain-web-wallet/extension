@@ -37,7 +37,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
             )),
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).backgroundColor,
+            // color: Theme.of(context).backgroundColor,
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
           child: Column(
@@ -224,7 +224,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
               ),
             ),
             Container(
-              width: 91,
+              width: 75,
               child: TickerText(
                 child: Text(
                   getTotalAmountByUsd(widget.assetPair.totalLiquidityUsd!),

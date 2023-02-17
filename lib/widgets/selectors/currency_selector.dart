@@ -30,7 +30,6 @@ class _CurrencySelectorState extends State<CurrencySelector> with ThemeMixin {
   CustomPopupMenuController controller = CustomPopupMenuController();
   MenuHelper menuHelper = MenuHelper();
 
-
   bool isShowAllNetworks = true;
   NetworkTabs activeTab = NetworkTabs.all;
   String currentNetworkItem = 'DefiChain Mainnet';
@@ -68,7 +67,7 @@ class _CurrencySelectorState extends State<CurrencySelector> with ThemeMixin {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: Theme.of(context).inputDecorationTheme.fillColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: AppColors.portage.withOpacity(0.12),
@@ -90,18 +89,15 @@ class _CurrencySelectorState extends State<CurrencySelector> with ThemeMixin {
                   widget.selectedCurrency.name!,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.headline5!.copyWith(
-                    color: _isShowDropdown
-                        ? Theme.of(context)
-                        .textTheme
-                        .headline5!
-                        .color!
-                        .withOpacity(0.5)
-                        : Theme.of(context)
-                        .textTheme
-                        .headline5!
-                        .color!,
-                    fontSize: 12,
-                  ),
+                        color: _isShowDropdown
+                            ? Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .color!
+                                .withOpacity(0.5)
+                            : Theme.of(context).textTheme.headline5!.color!,
+                        fontSize: 12,
+                      ),
                 ),
               ],
             ),
@@ -142,9 +138,7 @@ class _CurrencySelectorState extends State<CurrencySelector> with ThemeMixin {
             child: BlocBuilder<NetworkCubit, NetworkState>(
               builder: (context, networkState) {
                 return Container(
-                  color: isDarkTheme()
-                      ? DarkColors.networkDropdownBgColor
-                      : LightColors.networkDropdownBgColor,
+                  color: Theme.of(context).inputDecorationTheme.fillColor,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
                     padding: const EdgeInsets.only(
@@ -158,43 +152,43 @@ class _CurrencySelectorState extends State<CurrencySelector> with ThemeMixin {
                         children: widget.currencies
                             .map(
                               (item) => Column(
-                            children: [
-                              MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  onTap: () {
-                                    controller.hideMenu();
-                                    widget.onSelect(item);
-                                  },
-                                  child: Container(
-                                    height: 44,
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          height: 16,
-                                          width: 16,
-                                          child: SvgPicture.asset(
-                                              'assets/currencies/${item.name!.toLowerCase()}.svg',
-                                          ),
+                                children: [
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      onTap: () {
+                                        controller.hideMenu();
+                                        widget.onSelect(item);
+                                      },
+                                      child: Container(
+                                        height: 44,
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              height: 16,
+                                              width: 16,
+                                              child: SvgPicture.asset(
+                                                'assets/currencies/${item.name!.toLowerCase()}.svg',
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 8,
+                                            ),
+                                            Text(
+                                              item.name!,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline5,
+                                            )
+                                          ],
                                         ),
-                                        SizedBox(
-                                          width: 8,
-                                        ),
-                                        Text(
-                                          item.name!,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5,
-                                        )
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        )
+                            )
                             .toList(),
                       ),
                     ),

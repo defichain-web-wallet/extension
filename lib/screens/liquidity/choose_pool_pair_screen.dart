@@ -79,7 +79,7 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                     height: double.infinity,
                     decoration: BoxDecoration(
                       color: isDarkTheme()
-                          ? DarkColors.scaffoldContainerBgColor
+                          ? DarkColors.drawerBgColor
                           : LightColors.scaffoldContainerBgColor,
                       border: isDarkTheme()
                           ? Border.all(
@@ -114,31 +114,49 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                   tokensState: tokensState,
                                 ),
                                 Expanded(
-                                  child: filter
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              filter = !filter;
-                                            });
-                                          },
-                                          child: MouseRegion(
-                                            cursor: SystemMouseCursors.click,
-                                            child: SvgPicture.asset(
-                                                'assets/icons/grid_view.svg'),
-                                          ),
-                                        )
-                                      : GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              filter = !filter;
-                                            });
-                                          },
-                                          child: MouseRegion(
-                                            cursor: SystemMouseCursors.click,
-                                            child: SvgPicture.asset(
-                                                'assets/icons/list_bullets.svg'),
-                                          ),
-                                        ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      filter
+                                          ? GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  filter = !filter;
+                                                });
+                                              },
+                                              child: MouseRegion(
+                                                cursor:
+                                                    SystemMouseCursors.click,
+                                                child: SvgPicture.asset(
+                                                  'assets/icons/grid_view.svg',
+                                                  color: isDarkTheme()
+                                                      ? AppColors.white
+                                                      : null,
+                                                ),
+                                              ),
+                                            )
+                                          : GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  filter = !filter;
+                                                });
+                                              },
+                                              child: MouseRegion(
+                                                cursor:
+                                                    SystemMouseCursors.click,
+                                                child: SvgPicture.asset(
+                                                  'assets/icons/list_bullets.svg',
+                                                  color: isDarkTheme()
+                                                      ? AppColors.white
+                                                      : null,
+                                                ),
+                                              ),
+                                            ),
+                                      SizedBox(
+                                        height: 6,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),

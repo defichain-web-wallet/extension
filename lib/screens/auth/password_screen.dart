@@ -186,21 +186,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                       'I understand that DEFI cannot recover this password for me.',
                                   style: Theme.of(context).textTheme.subtitle1,
                                 ),
-                                TextSpan(text: ' '),
-                                WidgetSpan(
-                                  child: MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      child: Text(
-                                        'Learn more',
-                                        style: jellyLink,
-                                      ),
-                                      onTap: () {
-                                        print(1);
-                                      },
-                                    ),
-                                  ),
-                                )
                               ]),
                             ),
                           ),

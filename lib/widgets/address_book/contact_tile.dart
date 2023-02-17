@@ -1,3 +1,4 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,12 +10,14 @@ class ContactTile extends StatefulWidget {
   final String networkName;
   final Function()? editCallback;
   final bool isDialog;
+  final int index;
 
   const ContactTile({
     Key? key,
     required this.contactName,
     required this.contactAddress,
     required this.networkName,
+    required this.index,
     this.editCallback,
     this.isDialog = false,
   }) : super(key: key);
@@ -23,11 +26,24 @@ class ContactTile extends StatefulWidget {
   State<ContactTile> createState() => _ContactTileState();
 }
 
-class _ContactTileState extends State<ContactTile> {
+class _ContactTileState extends State<ContactTile> with ThemeMixin {
   bool isHoverEdit = false;
+  late int index;
 
   cutAddress(String s) {
     return s.substring(0, 14) + '...' + s.substring(28, 42);
+  }
+
+  int getLastCharToInt(dynamic value) {
+    String stringValue = value.toString();
+    return int.parse(stringValue[stringValue.length - 1]);
+  }
+
+  @override
+  void initState() {
+    index = widget.index < 10 ? widget.index : getLastCharToInt(index);
+    // TODO: implement initState
+    super.initState();
   }
 
   @override
@@ -43,19 +59,20 @@ class _ContactTileState extends State<ContactTile> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               gradient: LinearGradient(colors: [
-                AppColors.redViolet.withOpacity(0.16),
-                AppColors.razzmatazz.withOpacity(0.16),
+                AppColors.accountColors[index].withOpacity(0.16),
+                AppColors.accountColors[index].withOpacity(0.16),
               ]),
             ),
             child: Center(
               child: GradientText(
                 widget.contactName[0],
-                style: headline6.copyWith(fontWeight: FontWeight.w700),
+                style: headline6.copyWith(
+                    fontWeight: FontWeight.w700, fontSize: 16),
                 gradientType: GradientType.linear,
                 gradientDirection: GradientDirection.btt,
                 colors: [
-                  AppColors.electricViolet,
-                  AppColors.hollywoodCerise,
+                  AppColors.accountColors[index],
+                  AppColors.accountColors[index],
                 ],
               ),
             ),
@@ -93,7 +110,9 @@ class _ContactTileState extends State<ContactTile> {
                         style: subtitle2.copyWith(
                           fontWeight: FontWeight.w500,
                           fontSize: 8,
-                          color: AppColors.darkTextColor.withOpacity(0.4),
+                          color: isDarkTheme()
+                              ? AppColors.white.withOpacity(0.4)
+                              : AppColors.darkTextColor.withOpacity(0.4),
                         ),
                       ),
                     ),
@@ -108,12 +127,16 @@ class _ContactTileState extends State<ContactTile> {
                       cutAddress(widget.contactAddress),
                       style: widget.isDialog
                           ? Theme.of(context).textTheme.subtitle1!.apply(
-                        fontSizeFactor: 0.9,
-                              color: AppColors.darkTextColor.withOpacity(0.5),
-                            )
+                                fontSizeFactor: 0.9,
+                                color: isDarkTheme()
+                                    ? AppColors.white.withOpacity(0.5)
+                                    : AppColors.darkTextColor.withOpacity(0.5),
+                              )
                           : Theme.of(context).textTheme.subtitle1!.apply(
-                              color: AppColors.darkTextColor.withOpacity(0.5),
-                            ),
+                                color: isDarkTheme()
+                                    ? AppColors.white.withOpacity(0.5)
+                                    : AppColors.darkTextColor.withOpacity(0.5),
+                              ),
                     ),
                   ],
                 ),
@@ -138,20 +161,26 @@ class _ContactTileState extends State<ContactTile> {
               },
               child: GestureDetector(
                 onTap: widget.editCallback,
-                child: isHoverEdit
+                child: isDarkTheme()
                     ? SvgPicture.asset(
                         'assets/icons/edit_gradient.svg',
                         width: 17,
                         height: 17,
                       )
-                    : Padding(
-                        padding: const EdgeInsets.only(right: 1.0),
-                        child: SvgPicture.asset(
-                          'assets/icons/edit.svg',
-                          width: 16,
-                          height: 16,
-                        ),
-                      ),
+                    : isHoverEdit
+                        ? SvgPicture.asset(
+                            'assets/icons/edit_gradient.svg',
+                            width: 17,
+                            height: 17,
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.only(right: 1.0),
+                            child: SvgPicture.asset(
+                              'assets/icons/edit.svg',
+                              width: 16,
+                              height: 16,
+                            ),
+                          ),
               ),
             ),
         ],

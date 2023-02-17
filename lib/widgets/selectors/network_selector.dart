@@ -30,31 +30,29 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
   NetworkTabs activeTab = NetworkTabs.all;
   String currentNetworkItem = 'DefiChain Mainnet';
 
-  static const List<dynamic> allNetworksList = [
+  static const List<dynamic> mainnetNetworksList = [
     {
       'isTestnet': false,
       'value': NetworkList.defiMainnet,
       'name': 'DefiChain Mainnet',
     },
     {
+      'isTestnet': false,
+      'value': NetworkList.btcMainnet,
+      'name': 'Bitcoin Mainnet',
+    },
+  ];
+
+  static const List<dynamic> testnetNetworksList = [
+    {
       'isTestnet': true,
       'value': NetworkList.defiTestnet,
       'name': 'DefiChain Testnet',
     },
     {
-      'isTestnet': false,
-      'value': NetworkList.btcMainnet,
-      'name': 'Bitcoin Mainnet',
-    },
-    {
       'isTestnet': true,
       'value': NetworkList.btcTestnet,
       'name': 'Bitcoin Testnet',
-    },
-    {
-      'isTestnet': true,
-      'value': NetworkList.defiMetaChainTestnet,
-      'name': 'Defi-Meta-Chain Testnet',
     },
   ];
 
@@ -190,9 +188,9 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
             child: BlocBuilder<NetworkCubit, NetworkState>(
               builder: (context, networkState) {
                 var currentNetworksList =
-                networkState.isShownTestnet
-                    ? allNetworksList
-                    : allNetworksList.where((element) => element['isTestnet']);
+                networkState.currentNetworkSelectorTab == NetworkTabs.all
+                    ? mainnetNetworksList
+                    : testnetNetworksList;
                 return Container(
                   color: isDarkTheme()
                       ? DarkColors.networkDropdownBgColor
@@ -258,12 +256,9 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                       isColoredTitle: true,
                                       title: tabs[index]['name'],
                                       callback: () {
-                                        if (tabs[index]['value'] ==
-                                            NetworkTabs.all) {
-                                          networkCubit
-                                              .updateTestnetNetworksList(
-                                                  !networkState.isShownTestnet);
-                                        }
+                                        networkCubit
+                                            .updateCurrentTab(tabs[index]['value'],
+                                        );
                                       },
                                       isSelect: networkState
                                               .currentNetworkSelectorTab ==

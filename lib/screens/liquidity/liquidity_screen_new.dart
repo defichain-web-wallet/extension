@@ -66,8 +66,10 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                   late double totalBalanceInFiat;
 
                   if (SettingsHelper.isBitcoin()) {
-                    totalBalance = convertFromSatoshi(bitcoinState.totalBalance);
-                    unconfirmedBalance = convertFromSatoshi(bitcoinState.unconfirmedBalance);
+                    totalBalance =
+                        convertFromSatoshi(bitcoinState.totalBalance);
+                    unconfirmedBalance =
+                        convertFromSatoshi(bitcoinState.unconfirmedBalance);
                   } else {
                     totalBalance = accountState.activeAccount!.balanceList!
                         .where((el) => !el.isHidden!)
@@ -94,17 +96,27 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                           );
                         }
                       } else {
-                        double balanceInSatoshi = double.parse(e.balance!.toString());
+                        double balanceInSatoshi =
+                            double.parse(e.balance!.toString());
                         if (asset == 'USD') {
                           return tokenHelper.getPairsAmountByAsset(
-                              tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'USD');
+                              tokensState.tokensPairs!,
+                              balanceInSatoshi,
+                              e.token!,
+                              'USD');
                         } else if (asset == 'EUR') {
                           var b = tokenHelper.getPairsAmountByAsset(
-                              tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'USD');
+                              tokensState.tokensPairs!,
+                              balanceInSatoshi,
+                              e.token!,
+                              'USD');
                           return b * tokensState.eurRate!;
                         } else {
                           return tokenHelper.getPairsAmountByAsset(
-                              tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'BTC');
+                              tokensState.tokensPairs!,
+                              balanceInSatoshi,
+                              e.token!,
+                              'BTC');
                         }
                       }
                     }).reduce((value, element) => value + element);
@@ -172,7 +184,7 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                       height: double.infinity,
                       decoration: BoxDecoration(
                         color: isDarkTheme()
-                            ? DarkColors.scaffoldContainerBgColor
+                            ? DarkColors.drawerBgColor
                             : LightColors.scaffoldContainerBgColor,
                         border: isDarkTheme()
                             ? Border.all(
@@ -211,7 +223,10 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                           : LightColors.drawerBgColor,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: AppColors.whiteLilac,
+                                        // strokeAlign: BorderSide.strokeAlignCenter,
+                                        color: AppColors.lavenderPurple
+                                            .withOpacity(0.32),
+                                        width: 0.5,
                                       ),
                                     ),
                                     textStyle: Theme.of(context)
@@ -234,9 +249,12 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                         Navigator.push(
                                           context,
                                           PageRouteBuilder(
-                                            pageBuilder: (context, animation1, animation2) => ChoosePoolPairScreen(),
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                ChoosePoolPairScreen(),
                                             transitionDuration: Duration.zero,
-                                            reverseTransitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
                                           ),
                                         );
                                       },
@@ -379,27 +397,34 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 24,),
+                              SizedBox(
+                                height: 24,
+                              ),
                               Expanded(
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: tokensPairsList.length,
                                   itemBuilder: (context, index) {
-                                    var foundedAssetPair = tokensState.tokensPairs!
+                                    var foundedAssetPair = tokensState
+                                        .tokensPairs!
                                         .where((element) =>
-                                    tokensPairsList[index].token ==
-                                        element.symbol);
-                                    var tokenPairs = List.from(foundedAssetPair)[0];
+                                            tokensPairsList[index].token ==
+                                            element.symbol);
+                                    var tokenPairs =
+                                        List.from(foundedAssetPair)[0];
 
                                     return Column(
                                       children: [
                                         MainLiquidityPair(
-                                          isOpen: currentAssetPair == tokenPairs,
-                                          balance: tokensPairsList[index].balance,
+                                          isOpen:
+                                              currentAssetPair == tokenPairs,
+                                          balance:
+                                              tokensPairsList[index].balance,
                                           assetPair: tokenPairs,
                                           callback: (currentPair) {
                                             setState(() {
-                                              if(currentAssetPair != currentPair) {
+                                              if (currentAssetPair !=
+                                                  currentPair) {
                                                 currentAssetPair = currentPair;
                                               } else {
                                                 currentAssetPair = null;
@@ -407,7 +432,9 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                             });
                                           },
                                         ),
-                                        SizedBox(height: 8,),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
                                       ],
                                     );
                                   },

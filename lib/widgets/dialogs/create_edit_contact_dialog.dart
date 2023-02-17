@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/helpers/addresses_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -27,7 +28,8 @@ class CreateEditContactDialog extends StatefulWidget {
       _CreateEditContactDialogState();
 }
 
-class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
+class _CreateEditContactDialogState extends State<CreateEditContactDialog>
+    with ThemeMixin {
   AddressesHelper addressHelper = AddressesHelper();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
@@ -71,12 +73,17 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
-        insetPadding: EdgeInsets.all(24),
-        elevation: 0.0,
+        backgroundColor: isDarkTheme()
+            ? DarkColors.drawerBgColor
+            : LightColors.drawerBgColor,
         shape: RoundedRectangleBorder(
-          side: BorderSide.none,
+          side: isDarkTheme()
+              ? BorderSide(color: DarkColors.drawerBorderColor)
+              : BorderSide.none,
           borderRadius: BorderRadius.circular(20),
         ),
+        insetPadding: EdgeInsets.all(24),
+        elevation: 0.0,
         actionsPadding: EdgeInsets.symmetric(
           vertical: 24,
           horizontal: 14,
@@ -202,20 +209,16 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                               child: TextFormField(
                                 controller: _nameController,
                                 decoration: InputDecoration(
+                                  hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                                   filled: true,
-                                  fillColor: AppColors.white,
-                                  hintText: hintContactName,
+                                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                  enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                  focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
                                   hintStyle: passwordField.copyWith(
-                                    color: AppColors.darkTextColor
-                                        .withOpacity(0.3),
+                                    color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
                                   ),
-                                  border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color:
-                                          AppColors.portage.withOpacity(0.12),
-                                      width: 1.0,
-                                    ),
-                                  ),
+                                  hintText: hintContactName,
+
                                 ),
                                 onChanged: (value) async {
                                   isValidAddress = await addressHelper
@@ -244,20 +247,16 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog> {
                               child: TextFormField(
                                 controller: _addressController,
                                 decoration: InputDecoration(
+                                  hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                                   filled: true,
-                                  fillColor: AppColors.white,
-                                  hintText: hintAddress,
+                                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                  enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                  focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
                                   hintStyle: passwordField.copyWith(
-                                    color: AppColors.darkTextColor
-                                        .withOpacity(0.3),
+                                    color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
                                   ),
-                                  border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color:
-                                          AppColors.portage.withOpacity(0.12),
-                                      width: 1.0,
-                                    ),
-                                  ),
+                                  hintText: hintAddress,
+
                                 ),
                                 onChanged: (value) async {
                                   isValidAddress = await addressHelper

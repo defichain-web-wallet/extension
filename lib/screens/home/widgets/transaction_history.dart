@@ -13,6 +13,7 @@ import 'package:defi_wallet/screens/history/widgets/icon_history_type.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/status_logo_and_title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -424,8 +425,10 @@ class _TransactionHistoryState extends State<TransactionHistory>
                 hasScrollBody: false,
                 child: Container(
                   color: Theme.of(context).cardColor,
-                  child: Center(
-                    child: Text('Not yet any transaction'),
+                  child: StatusLogoAndTitle(
+                    title: 'Oops!',
+                    subtitle: 'Not yet any transaction',
+                    isTitlePosBefore: true,
                   ),
                 ),
               );
