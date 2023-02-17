@@ -37,9 +37,8 @@ class _ExtensionWelcomeBgState extends State<ExtensionWelcomeBg> {
             Padding(
               padding: const EdgeInsets.only(top: 16, left: 8),
               child: Text(
-                '1.0.0',
+                '2.0.6',
                 style: TextStyle(
-                  fontFamily: 'GalanoGrotesque',
                   fontSize: 10,
                   color: Colors.white,
                 ),
