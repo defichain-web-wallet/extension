@@ -36,7 +36,7 @@ class AssetList extends StatelessWidget {
                     ));
           } else {
             balances = state.activeAccount!.balanceList!
-                .where((el) => !el.isHidden! && (!el.isPair! && el.balance != 0))
+                .where((el) => !el.isHidden! || (!el.isPair! && el.balance != 0))
                 .toList();
           }
           String currency = SettingsHelper.settings.currency!;
@@ -55,7 +55,7 @@ class AssetList extends StatelessWidget {
                     double tokenBalance =
                         convertFromSatoshi(balances[index].balance!);
                     List<TokensModel> tokens = tokenHelper.getTokensList(
-                      state,
+                      balances,
                       tokensState,
                     );
                     return Container(

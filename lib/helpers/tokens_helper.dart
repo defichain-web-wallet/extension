@@ -316,15 +316,15 @@ class TokensHelper {
   }
 
   List<TokensModel> getTokensList(
-    accountState,
+    balances,
     tokensState, {
     List<TokensModel>? targetList,
   }) {
     List<TokensModel> resList = [];
     if (targetList == null) {
-      accountState.balances!.forEach((element) {
+      balances!.forEach((element) {
         tokensState.tokens!.forEach((el) {
-          if (element.token == el.symbol && (!element.isPair && element.balance != 0)) {
+          if (element.token == el.symbol) {
             resList.add(el);
           }
         });
