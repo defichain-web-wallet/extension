@@ -57,8 +57,8 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
   ];
 
   final List<dynamic> tabs = [
-    {'value': NetworkTabs.all, 'name': 'Show/Hide'},
-    {'value': NetworkTabs.test, 'name': 'Test Networks'},
+    {'value': NetworkTabs.all, 'name': 'Mainnet'},
+    {'value': NetworkTabs.test, 'name': 'Testnet'},
   ];
 
   Color getMarkColor(bool isActive) {

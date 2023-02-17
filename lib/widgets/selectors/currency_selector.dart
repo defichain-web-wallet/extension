@@ -138,7 +138,7 @@ class _CurrencySelectorState extends State<CurrencySelector> with ThemeMixin {
             child: BlocBuilder<NetworkCubit, NetworkState>(
               builder: (context, networkState) {
                 return Container(
-                  color: Theme.of(context).inputDecorationTheme.fillColor,
+                  color: isDarkTheme() ? Theme.of(context).inputDecorationTheme.fillColor : LightColors.networkDropdownBgColor,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
                     padding: const EdgeInsets.only(

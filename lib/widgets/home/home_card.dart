@@ -118,7 +118,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
               ],
             ),
             SizedBox(
-              height: 8.0,
+              height: 7.0,
             ),
             Row(
               children: [
@@ -140,7 +140,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                   ),
                 ),
                 SizedBox(
-                  width: 8.0,
+                  width: 7,
                 ),
                 Flexible(
                   child: FlatButton(
@@ -160,7 +160,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                   ),
                 ),
                 SizedBox(
-                  width: 8.0,
+                  width: 7,
                 ),
                 Flexible(
                   child: BlocBuilder<AccountCubit, AccountState>(

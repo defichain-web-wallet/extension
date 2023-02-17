@@ -168,19 +168,6 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                                       ),
                                     ],
                                   ),
-                                  Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        'assets/icons/filter_icon.svg',
-                                        color: isDarkTheme()
-                                            ? AppColors.white
-                                            : AppColors.darkTextColor,
-                                      ),
-                                      SizedBox(
-                                        width: 4,
-                                      ),
-                                    ],
-                                  ),
                                 ],
                               ),
                               SizedBox(
