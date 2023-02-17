@@ -56,16 +56,6 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
             if (state.status == AccountStatusList.success &&
                 tokensState.status == TokensStatusList.success) {
               if (iterator == 0) {
-                var baseBalance = List.from(state.activeAccount!.balanceList!
-                    .where((element) =>
-                        element.token == widget.assetPair.tokenA))[0];
-                var quoteBalance = List.from(state.activeAccount!.balanceList!
-                    .where((element) =>
-                        element.token == widget.assetPair.tokenB))[0];
-
-                balanceA = convertFromSatoshi(baseBalance.balance!);
-                balanceB = convertFromSatoshi(quoteBalance.balance!);
-
                 balanceUsd += tokensHelper.getAmountByUsd(
                   tokensState.tokensPairs!,
                   widget.balanceA,
