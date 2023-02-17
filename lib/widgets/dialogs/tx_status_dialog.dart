@@ -110,6 +110,8 @@ class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
               width: 312,
               height: !widget.txResponse!.isError! ? 339 : 319,
               child: StatusLogoAndTitle(
+                isSmall: false,
+                isSuccess: !widget.txResponse!.isError!,
                 title:
                     !widget.txResponse!.isError! ? widget.title : 'Oops!',
                 subtitle: !widget.txResponse!.isError!

@@ -10,6 +10,8 @@ class StatusLogoAndTitle extends StatefulWidget {
   final String? subtitle;
   final bool isTitlePosBefore;
   final Widget? subtitleWidget;
+  final bool isSuccess;
+  final bool isSmall;
 
   const StatusLogoAndTitle({
     Key? key,
@@ -17,6 +19,8 @@ class StatusLogoAndTitle extends StatefulWidget {
     this.subtitle,
     this.subtitleWidget,
     this.isTitlePosBefore = false,
+    this.isSuccess = false,
+    this.isSmall = false,
   }) : super(key: key);
 
   @override
@@ -74,26 +78,12 @@ class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
           alignment: Alignment.center,
           children: [
             Positioned(
-              child: SvgPicture.asset(
-                'assets/bg_splash_dark.svg',
-                color: isDarkTheme() ? null : AppColors.white,
-              ),
-            ),
-            Positioned(
-              child: Align(
-                alignment: Alignment.center,
-                child: Transform.rotate(
-                  angle: (-math.pi / 180) * _logoRotateDeg,
-                  child: Container(
-                    height: _logoWidth,
-                    width: _logoHeight,
-                    child: Image(
-                      image: AssetImage(
-                        'assets/welcome_logo.png',
-                      ),
-                    ),
-                  ),
-                ),
+              child: Image.asset(
+                widget.isSuccess
+                    ? 'assets/images/jelly_success.png'
+                    : 'assets/images/jelly_oops.png',
+                width: widget.isSmall ? 187 : widget.isSuccess ? 223 : 225,
+                height: widget.isSmall ? 180 : widget.isSuccess ? 218 : 224,
               ),
             ),
           ],
