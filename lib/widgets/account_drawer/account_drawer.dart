@@ -67,7 +67,9 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: isDarkTheme() ? DarkColors.drawerBgColor : LightColors.drawerBgColor,
+                  color: isDarkTheme()
+                      ? DarkColors.drawerBgColor
+                      : LightColors.drawerBgColor,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     width: 1,
@@ -231,10 +233,12 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                           : (accountIndex) async {
                                                               accountCubit
                                                                   .updateActiveAccount(
-                                                                  accounts[
-                                                                  index]
-                                                                      .index!);
-                                                              Scaffold.of(context).closeEndDrawer();
+                                                                      accounts[
+                                                                              index]
+                                                                          .index!);
+                                                              Scaffold.of(
+                                                                      context)
+                                                                  .closeEndDrawer();
                                                             },
                                                       isHoverBackgroundEffect:
                                                           false,
@@ -353,14 +357,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                           AccountMenuButton(
                             isLockType: true,
                             callback: (index) {
-                              showDialog(
-                                barrierColor: Color(0x0f180245),
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return WalletLockDialog(callback: lockWallet,);
-                                },
-                              );
+                              lockWallet();
                             },
                             iconPath: 'assets/icons/lock.svg',
                             title: 'Lock Wallet',
