@@ -22,7 +22,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LiquidityScreenNew extends StatefulWidget {
-  const LiquidityScreenNew({Key? key}) : super(key: key);
+  final String averageARP;
+
+  const LiquidityScreenNew({Key? key, required this.averageARP}) : super(key: key);
 
   @override
   State<LiquidityScreenNew> createState() => _LiquidityScreenNewState();
@@ -298,8 +300,8 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          '\$ 20.84',
+                                        Row(children: [Text(
+                                          widget.averageARP ,
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline3!
@@ -307,9 +309,19 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                                 color: AppColors.malachite,
                                                 fontSize: 24,
                                               ),
-                                        ),
+                                        ), widget.averageARP != 'N/A' ? Text(
+                                          ' %',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline4!
+                                              .copyWith(
+                                            fontSize: 13,
+                                            color: AppColors
+                                                .malachite,
+                                          ),
+                                        ): Container()]),
                                         Text(
-                                          'Current reward',
+                                          'Portfolio APR',
                                           style: Theme.of(context)
                                               .textTheme
                                               .subtitle2!
@@ -380,7 +392,7 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                                     ),
                                               ),
                                               Text(
-                                                '\$ ${balancesHelper.numberStyling(totalPairsBalance, fixed: true)}',
+                                                '\$ ${balancesHelper.numberStyling(totalPairsBalance/2, fixed: true)}',
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .headline5!

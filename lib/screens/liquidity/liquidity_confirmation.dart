@@ -386,7 +386,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                                       ),
                                       Text(
                                         TokensHelper().getAprFormat(
-                                            widget.assetPair.apr!),
+                                            widget.assetPair.apr!, true),
                                         style: Theme.of(context)
                                             .textTheme
                                             .headline3!

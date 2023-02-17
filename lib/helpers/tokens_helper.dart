@@ -508,11 +508,11 @@ class TokensHelper {
     return result;
   }
 
-  String getAprFormat(double apr) {
+  String getAprFormat(double apr, bool isPersentSymbol) {
     dynamic result;
 
     if (apr != 0) {
-      result = '${(apr * 100).toStringAsFixed(2)}%';
+      result = '${(apr * 100).toStringAsFixed(2)} ${isPersentSymbol == true ? '%' : ''}';
     } else {
       result = 'N/A';
     }

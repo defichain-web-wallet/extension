@@ -307,6 +307,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             callback: (index) {},
                             iconPath: 'assets/icons/ledger.svg',
                             title: 'Ledger',
+                            isFuture: true,
                           ),
                           SizedBox(
                             height: 5,
