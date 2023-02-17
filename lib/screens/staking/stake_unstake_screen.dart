@@ -79,7 +79,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
     if (controller.text == '') {
       controller.text = '0';
     }
+    setState(() {
       _onFocused = _focusNode.hasFocus;
+    });
   }
 
   @override
@@ -178,431 +180,428 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                       SizedBox(
                                         height: 8,
                                       ),
-                                      GestureDetector(
-                                        onTap: () => _focusNode.requestFocus(),
-                                        child: Container(
-                                          padding: const EdgeInsets.only(
-                                            top: 8,
-                                            bottom: 8,
-                                            left: 12,
-                                            right: 12,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            border: _onFocused
-                                                ? GradientBoxBorder(
-                                                    gradient:
-                                                        gradientWrongMnemonicWord,
-                                                  )
-                                                : Border.all(
-                                                    color: LightColors
-                                                        .amountFieldBorderColor
-                                                        .withOpacity(0.32),
-                                                  ),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Flexible(
-                                                      child: SizedBox(
-                                                        height: 42,
-                                                        child: TextField(
-                                                          keyboardType:
-                                                              TextInputType
-                                                                  .number,
-                                                          inputFormatters: <
-                                                              TextInputFormatter>[
-                                                            FilteringTextInputFormatter
-                                                                .allow(
-                                                              RegExp(
-                                                                  "[0-9\.-]"),
-                                                              replacementString:
-                                                                  ('.'),
-                                                            ),
-                                                            FilteringTextInputFormatter
-                                                                .deny(
-                                                              RegExp(r'\.\.+'),
-                                                              replacementString:
-                                                                  '.',
-                                                            ),
-                                                            FilteringTextInputFormatter
-                                                                .deny(
-                                                              RegExp(r'^\.'),
-                                                              replacementString:
-                                                                  '0.',
-                                                            ),
-                                                            FilteringTextInputFormatter
-                                                                .deny(
-                                                              RegExp(
-                                                                  r'\.\d+\.'),
-                                                            ),
-                                                            FilteringTextInputFormatter
-                                                                .deny(
-                                                              RegExp(r'\d+-'),
-                                                            ),
-                                                            FilteringTextInputFormatter
-                                                                .deny(
-                                                              RegExp(r'-\.+'),
-                                                            ),
-                                                            FilteringTextInputFormatter
-                                                                .deny(
-                                                              RegExp(r'^0\d+'),
-                                                            ),
-                                                          ],
-                                                          controller:
-                                                              controller,
-                                                          focusNode: _focusNode,
-                                                          onChanged: (value) {
-                                                            setState(() {
-                                                              usdAmount = '\$${getUsdBalance(
-                                                                context,
-                                                                controller.text,
-                                                                lockState.lockStakingDetails!.asset!,
-                                                              )}';
-                                                            });
-                                                          },
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .headline4!
-                                                                  .copyWith(
-                                                                    fontSize:
-                                                                        20,
-                                                                  ),
-                                                          decoration:
-                                                              InputDecoration(
-                                                            border: InputBorder
-                                                                .none,
-                                                            focusedBorder:
-                                                                InputBorder
-                                                                    .none,
-                                                            enabledBorder:
-                                                                InputBorder
-                                                                    .none,
-                                                            errorBorder:
-                                                                InputBorder
-                                                                    .none,
-                                                            disabledBorder:
-                                                                InputBorder
-                                                                    .none,
-                                                            contentPadding:
-                                                                EdgeInsets.all(
-                                                                    0.0),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      height: 38,
-                                                      padding: EdgeInsets.only(
-                                                        left: 6,
-                                                        bottom: 6,
-                                                        top: 6,
-                                                        right: 8,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color: isDarkTheme()
-                                                            ? DarkColors
-                                                                .assetSelectorBgColor
-                                                                .withOpacity(
-                                                                    0.07)
-                                                            : LightColors
-                                                                .assetSelectorBgColor
-                                                                .withOpacity(
-                                                                    0.07),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                      ),
-                                                      child: Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          SvgPicture.asset(
-                                                            tokenHelper
-                                                                .getImageNameByTokenName(
-                                                              lockState
-                                                                  .lockStakingDetails!
-                                                                  .asset!,
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                            width: 8,
-                                                          ),
-                                                          Text(
-                                                            lockState
-                                                                .lockStakingDetails!
-                                                                .asset!,
-                                                            style: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .headline5!
-                                                                .copyWith(
-                                                                    fontSize:
-                                                                        20,
-                                                                    height:
-                                                                        1.26),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
+                                      Container(
+                                        padding: const EdgeInsets.only(
+                                          top: 8,
+                                          bottom: 8,
+                                          left: 12,
+                                          right: 12,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: _onFocused
+                                              ? GradientBoxBorder(
+                                                  gradient:
+                                                      gradientWrongMnemonicWord,
+                                                )
+                                              : Border.all(
+                                                  color: LightColors
+                                                      .amountFieldBorderColor
+                                                      .withOpacity(0.32),
                                                 ),
-                                              ),
-                                              Row(
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
                                                         .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
                                                 children: [
-                                                  Text(
-                                                    '$usdAmount',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline6!
-                                                        .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: Theme.of(
+                                                  Flexible(
+                                                    child: SizedBox(
+                                                      height: 42,
+                                                      child: TextField(
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        inputFormatters: <
+                                                            TextInputFormatter>[
+                                                          FilteringTextInputFormatter
+                                                              .allow(
+                                                            RegExp(
+                                                                "[0-9\.-]"),
+                                                            replacementString:
+                                                                ('.'),
+                                                          ),
+                                                          FilteringTextInputFormatter
+                                                              .deny(
+                                                            RegExp(r'\.\.+'),
+                                                            replacementString:
+                                                                '.',
+                                                          ),
+                                                          FilteringTextInputFormatter
+                                                              .deny(
+                                                            RegExp(r'^\.'),
+                                                            replacementString:
+                                                                '0.',
+                                                          ),
+                                                          FilteringTextInputFormatter
+                                                              .deny(
+                                                            RegExp(
+                                                                r'\.\d+\.'),
+                                                          ),
+                                                          FilteringTextInputFormatter
+                                                              .deny(
+                                                            RegExp(r'\d+-'),
+                                                          ),
+                                                          FilteringTextInputFormatter
+                                                              .deny(
+                                                            RegExp(r'-\.+'),
+                                                          ),
+                                                          FilteringTextInputFormatter
+                                                              .deny(
+                                                            RegExp(r'^0\d+'),
+                                                          ),
+                                                        ],
+                                                        controller:
+                                                            controller,
+                                                        focusNode: _focusNode,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            usdAmount = '\$${getUsdBalance(
+                                                              context,
+                                                              controller.text,
+                                                              lockState.lockStakingDetails!.asset!,
+                                                            )}';
+                                                          });
+                                                        },
+                                                        style:
+                                                            Theme.of(context)
+                                                                .textTheme
+                                                                .headline4!
+                                                                .copyWith(
+                                                                  fontSize:
+                                                                      20,
+                                                                ),
+                                                        decoration:
+                                                            InputDecoration(
+                                                          border: InputBorder
+                                                              .none,
+                                                          focusedBorder:
+                                                              InputBorder
+                                                                  .none,
+                                                          enabledBorder:
+                                                              InputBorder
+                                                                  .none,
+                                                          errorBorder:
+                                                              InputBorder
+                                                                  .none,
+                                                          disabledBorder:
+                                                              InputBorder
+                                                                  .none,
+                                                          contentPadding:
+                                                              EdgeInsets.all(
+                                                                  0.0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    height: 38,
+                                                    padding: EdgeInsets.only(
+                                                      left: 6,
+                                                      bottom: 6,
+                                                      top: 6,
+                                                      right: 8,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: isDarkTheme()
+                                                          ? DarkColors
+                                                              .assetSelectorBgColor
+                                                              .withOpacity(
+                                                                  0.07)
+                                                          : LightColors
+                                                              .assetSelectorBgColor
+                                                              .withOpacity(
+                                                                  0.07),
+                                                      borderRadius:
+                                                          BorderRadius
+                                                              .circular(8),
+                                                    ),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        SvgPicture.asset(
+                                                          tokenHelper
+                                                              .getImageNameByTokenName(
+                                                            lockState
+                                                                .lockStakingDetails!
+                                                                .asset!,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        Text(
+                                                          lockState
+                                                              .lockStakingDetails!
+                                                              .asset!,
+                                                          style: Theme.of(
                                                                   context)
                                                               .textTheme
-                                                              .headline6!
-                                                              .color!
-                                                              .withOpacity(0.3),
+                                                              .headline5!
+                                                              .copyWith(
+                                                                  fontSize:
+                                                                      20,
+                                                                  height:
+                                                                      1.26),
                                                         ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                  if (widget.isUnstake)
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          controller
-                                                              .text = (lockState
-                                                                      .lockStakingDetails!
-                                                                      .balance! -
-                                                                  lockState
-                                                                      .lockStakingDetails!
-                                                                      .pendingWithdrawals!)
-                                                              .toString();
-                                                          usdAmount = '\$${getUsdBalance(
-                                                            context,
-                                                            controller.text,
-                                                            lockState.lockStakingDetails!.asset!,
-                                                          )}';
-                                                        });
-                                                      },
-                                                      child: Text(
-                                                        'Available: '
-                                                        '${(lockState.lockStakingDetails!.balance! - lockState.lockStakingDetails!.pendingWithdrawals!)}',
-                                                        style: Theme.of(context)
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  '$usdAmount',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline6!
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Theme.of(
+                                                                context)
                                                             .textTheme
                                                             .headline6!
-                                                            .copyWith(
+                                                            .color!
+                                                            .withOpacity(0.3),
+                                                      ),
+                                                ),
+                                                if (widget.isUnstake)
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        controller
+                                                            .text = (lockState
+                                                                    .lockStakingDetails!
+                                                                    .balance! -
+                                                                lockState
+                                                                    .lockStakingDetails!
+                                                                    .pendingWithdrawals!)
+                                                            .toString();
+                                                        usdAmount = '\$${getUsdBalance(
+                                                          context,
+                                                          controller.text,
+                                                          lockState.lockStakingDetails!.asset!,
+                                                        )}';
+                                                      });
+                                                    },
+                                                    child: Text(
+                                                      'Available: '
+                                                      '${(lockState.lockStakingDetails!.balance! - lockState.lockStakingDetails!.pendingWithdrawals!)}',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline6!
+                                                          .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headline6!
+                                                                .color!
+                                                                .withOpacity(
+                                                                    0.3),
+                                                          ),
+                                                    ),
+                                                  ),
+                                                if (!widget.isUnstake)
+                                                  BlocBuilder<
+                                                      AvailableAmountCubit,
+                                                      AvailableAmountState>(
+                                                    builder:
+                                                        (availableAmountContext,
+                                                            availableAmountState) {
+                                                      if (availableAmountState
+                                                              .status !=
+                                                          AvailableAmountStatusList
+                                                              .success) {
+                                                        if(savedAvailable == ''){
+                                                          return Container();
+                                                        } else {
+                                                          return Text(
+                                                            'Available: '
+                                                                '$savedAvailable',
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .headline6!
+                                                                .copyWith(
                                                               fontWeight:
-                                                                  FontWeight.w600,
+                                                              FontWeight.w600,
                                                               color: Theme.of(
-                                                                      context)
+                                                                  context)
                                                                   .textTheme
                                                                   .headline6!
                                                                   .color!
                                                                   .withOpacity(
-                                                                      0.3),
-                                                            ),
-                                                      ),
-                                                    ),
-                                                  if (!widget.isUnstake)
-                                                    BlocBuilder<
-                                                        AvailableAmountCubit,
-                                                        AvailableAmountState>(
-                                                      builder:
-                                                          (availableAmountContext,
-                                                              availableAmountState) {
-                                                        if (availableAmountState
-                                                                .status !=
-                                                            AvailableAmountStatusList
-                                                                .success) {
-                                                          if(savedAvailable == ''){
-                                                            return Container();
-                                                          } else {
-                                                            return Text(
-                                                              'Available: '
-                                                                  '$savedAvailable',
-                                                              style: Theme.of(context)
-                                                                  .textTheme
-                                                                  .headline6!
-                                                                  .copyWith(
-                                                                fontWeight:
-                                                                FontWeight.w600,
-                                                                color: Theme.of(
-                                                                    context)
-                                                                    .textTheme
-                                                                    .headline6!
-                                                                    .color!
-                                                                    .withOpacity(
-                                                                    0.3),
-                                                              ),
-                                                            );
-                                                          }
-                                                        } else {
-                                                          savedAvailable = availableAmountState
-                                                              .available
-                                                              .toString();
-                                                          return GestureDetector(
-                                                            onTap: () {
-                                                              setState(() {
-                                                                controller
-                                                                        .text =
-                                                                    availableAmountState
-                                                                        .available
-                                                                        .toString();
-                                                                print(controller
-                                                                    .text);
-                                                              });
-                                                            },
-                                                            child: MouseRegion(
-                                                              cursor:
-                                                                  SystemMouseCursors
-                                                                      .click,
-                                                              child: Text(
-                                                                'Available: ${availableAmountState.available}',
-                                                                style: Theme.of(
-                                                                        context)
-                                                                    .textTheme
-                                                                    .headline6!
-                                                                    .copyWith(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600,
-                                                                      color: Theme.of(
-                                                                              context)
-                                                                          .textTheme
-                                                                          .headline6!
-                                                                          .color!
-                                                                          .withOpacity(
-                                                                              0.3),
-                                                                    ),
-                                                              ),
+                                                                  0.3),
                                                             ),
                                                           );
                                                         }
-                                                      },
-                                                    ),
-                                                ],
-                                              ),
-                                              if (widget.isUnstake)
-                                                Column(
-                                                  children: [
-                                                    Container(
-                                                      child: SliderTheme(
-                                                        data: SliderTheme.of(
-                                                                context)
-                                                            .copyWith(
-                                                          thumbShape:
-                                                              PolygonSliderThumb(
-                                                            thumbRadius: 16.0,
+                                                      } else {
+                                                        savedAvailable = availableAmountState
+                                                            .available
+                                                            .toString();
+                                                        return GestureDetector(
+                                                          onTap: () {
+                                                            setState(() {
+                                                              controller
+                                                                      .text =
+                                                                  availableAmountState
+                                                                      .available
+                                                                      .toString();
+                                                              print(controller
+                                                                  .text);
+                                                            });
+                                                          },
+                                                          child: MouseRegion(
+                                                            cursor:
+                                                                SystemMouseCursors
+                                                                    .click,
+                                                            child: Text(
+                                                              'Available: ${availableAmountState.available}',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .headline6!
+                                                                  .copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .headline6!
+                                                                        .color!
+                                                                        .withOpacity(
+                                                                            0.3),
+                                                                  ),
+                                                            ),
                                                           ),
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
+                                              ],
+                                            ),
+                                            if (widget.isUnstake)
+                                              Column(
+                                                children: [
+                                                  Container(
+                                                    child: SliderTheme(
+                                                      data: SliderTheme.of(
+                                                              context)
+                                                          .copyWith(
+                                                        thumbShape:
+                                                            PolygonSliderThumb(
+                                                          thumbRadius: 16.0,
                                                         ),
-                                                        child: Slider(
-                                                          value:
-                                                              currentSliderValue,
-                                                          max: 100,
-                                                          divisions: 100,
-                                                          label:
-                                                              currentSliderValue
-                                                                  .round()
-                                                                  .toString(),
-                                                          onChanged:
-                                                              (double value) {
+                                                      ),
+                                                      child: Slider(
+                                                        value:
+                                                            currentSliderValue,
+                                                        max: 100,
+                                                        divisions: 100,
+                                                        label:
+                                                            currentSliderValue
+                                                                .round()
+                                                                .toString(),
+                                                        onChanged:
+                                                            (double value) {
+                                                          setState(() {
+                                                            currentSliderValue =
+                                                                value;
+                                                            _setBalance(
+                                                                lockState,
+                                                                availableAmount);
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        SliderButton(
+                                                          isFullSize:
+                                                              isFullScreen,
+                                                          value: 25,
+                                                          onPressed: () {
                                                             setState(() {
                                                               currentSliderValue =
-                                                                  value;
+                                                                  25;
                                                               _setBalance(
                                                                   lockState,
                                                                   availableAmount);
                                                             });
                                                           },
                                                         ),
-                                                      ),
+                                                        SliderButton(
+                                                          isFullSize:
+                                                              isFullScreen,
+                                                          value: 50,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              currentSliderValue =
+                                                                  50;
+                                                              _setBalance(
+                                                                  lockState,
+                                                                  availableAmount);
+                                                            });
+                                                          },
+                                                        ),
+                                                        SliderButton(
+                                                          isFullSize:
+                                                              isFullScreen,
+                                                          value: 75,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              currentSliderValue =
+                                                                  75;
+                                                              _setBalance(
+                                                                  lockState,
+                                                                  availableAmount);
+                                                            });
+                                                          },
+                                                        ),
+                                                        SliderButton(
+                                                          isFullSize:
+                                                              isFullScreen,
+                                                          value: 100,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              currentSliderValue =
+                                                                  100;
+                                                              _setBalance(
+                                                                  lockState,
+                                                                  availableAmount);
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
-                                                    Container(
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceAround,
-                                                        children: [
-                                                          SliderButton(
-                                                            isFullSize:
-                                                                isFullScreen,
-                                                            value: 25,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                currentSliderValue =
-                                                                    25;
-                                                                _setBalance(
-                                                                    lockState,
-                                                                    availableAmount);
-                                                              });
-                                                            },
-                                                          ),
-                                                          SliderButton(
-                                                            isFullSize:
-                                                                isFullScreen,
-                                                            value: 50,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                currentSliderValue =
-                                                                    50;
-                                                                _setBalance(
-                                                                    lockState,
-                                                                    availableAmount);
-                                                              });
-                                                            },
-                                                          ),
-                                                          SliderButton(
-                                                            isFullSize:
-                                                                isFullScreen,
-                                                            value: 75,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                currentSliderValue =
-                                                                    75;
-                                                                _setBalance(
-                                                                    lockState,
-                                                                    availableAmount);
-                                                              });
-                                                            },
-                                                          ),
-                                                          SliderButton(
-                                                            isFullSize:
-                                                                isFullScreen,
-                                                            value: 100,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                currentSliderValue =
-                                                                    100;
-                                                                _setBalance(
-                                                                    lockState,
-                                                                    availableAmount);
-                                                              });
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                            ],
-                                          ),
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
                                         ),
                                       ),
                                       SizedBox(
