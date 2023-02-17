@@ -30,6 +30,9 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
   final _streetAddressController = TextEditingController();
   final _cityController = TextEditingController();
   final _zipCodeController = TextEditingController();
+  final FocusNode streetAddressFocusNode = FocusNode();
+  final FocusNode cityFocusNode = FocusNode();
+  final FocusNode zipCodeFocusNode = FocusNode();
   final String titleText = '2/3. Let us know where do you live';
   final String subtitleText = 'We should know your Address for ...';
   late Map selectedCountry;
@@ -40,6 +43,9 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
     _streetAddressController.dispose();
     _cityController.dispose();
     _zipCodeController.dispose();
+    streetAddressFocusNode.dispose();
+    cityFocusNode.dispose();
+    zipCodeFocusNode.dispose();
     super.dispose();
   }
 
@@ -259,46 +265,60 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                 SizedBox(
                                                   height: 6,
                                                 ),
-                                                TextFormField(
-                                                  controller:
-                                                      _streetAddressController,
-                                                  decoration: InputDecoration(
-                                                    hoverColor: Theme.of(
-                                                            context)
-                                                        .inputDecorationTheme
-                                                        .hoverColor,
-                                                    filled: true,
-                                                    fillColor: Theme.of(context)
-                                                        .inputDecorationTheme
-                                                        .fillColor,
-                                                    enabledBorder: Theme.of(
-                                                            context)
-                                                        .inputDecorationTheme
-                                                        .enabledBorder,
-                                                    focusedBorder: Theme.of(
-                                                            context)
-                                                        .inputDecorationTheme
-                                                        .focusedBorder,
-                                                    hintStyle:
-                                                        passwordField.copyWith(
-                                                      color: isDarkTheme()
-                                                          ? DarkColors
-                                                              .hintTextColor
-                                                          : LightColors
-                                                              .hintTextColor,
-                                                    ),
-                                                    contentPadding:
-                                                        EdgeInsets.only(
-                                                            left: 12),
-                                                    hintText:
-                                                        'Enter your Street Address',
-                                                  ),
-                                                  validator: (value) {
-                                                    return value == null ||
-                                                            value.isEmpty
-                                                        ? 'Please enter this field'
-                                                        : null;
+                                                GestureDetector(
+                                                  onDoubleTap: () {
+                                                    streetAddressFocusNode.requestFocus();
+                                                    if (_streetAddressController.text.isNotEmpty) {
+                                                      _streetAddressController.selection =
+                                                          TextSelection(
+                                                              baseOffset: 0,
+                                                              extentOffset:
+                                                              _streetAddressController
+                                                                  .text.length);
+                                                    }
                                                   },
+                                                  child: TextFormField(
+                                                    focusNode: streetAddressFocusNode,
+                                                    controller:
+                                                        _streetAddressController,
+                                                    decoration: InputDecoration(
+                                                      hoverColor: Theme.of(
+                                                              context)
+                                                          .inputDecorationTheme
+                                                          .hoverColor,
+                                                      filled: true,
+                                                      fillColor: Theme.of(context)
+                                                          .inputDecorationTheme
+                                                          .fillColor,
+                                                      enabledBorder: Theme.of(
+                                                              context)
+                                                          .inputDecorationTheme
+                                                          .enabledBorder,
+                                                      focusedBorder: Theme.of(
+                                                              context)
+                                                          .inputDecorationTheme
+                                                          .focusedBorder,
+                                                      hintStyle:
+                                                          passwordField.copyWith(
+                                                        color: isDarkTheme()
+                                                            ? DarkColors
+                                                                .hintTextColor
+                                                            : LightColors
+                                                                .hintTextColor,
+                                                      ),
+                                                      contentPadding:
+                                                          EdgeInsets.only(
+                                                              left: 12),
+                                                      hintText:
+                                                          'Enter your Street Address',
+                                                    ),
+                                                    validator: (value) {
+                                                      return value == null ||
+                                                              value.isEmpty
+                                                          ? 'Please enter this field'
+                                                          : null;
+                                                    },
+                                                  ),
                                                 ),
                                                 SizedBox(
                                                   height: 16,
@@ -317,44 +337,58 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                 SizedBox(
                                                   height: 6,
                                                 ),
-                                                TextFormField(
-                                                  controller: _cityController,
-                                                  decoration: InputDecoration(
-                                                    hoverColor: Theme.of(
-                                                            context)
-                                                        .inputDecorationTheme
-                                                        .hoverColor,
-                                                    filled: true,
-                                                    fillColor: Theme.of(context)
-                                                        .inputDecorationTheme
-                                                        .fillColor,
-                                                    enabledBorder: Theme.of(
-                                                            context)
-                                                        .inputDecorationTheme
-                                                        .enabledBorder,
-                                                    focusedBorder: Theme.of(
-                                                            context)
-                                                        .inputDecorationTheme
-                                                        .focusedBorder,
-                                                    hintStyle:
-                                                        passwordField.copyWith(
-                                                      color: isDarkTheme()
-                                                          ? DarkColors
-                                                              .hintTextColor
-                                                          : LightColors
-                                                              .hintTextColor,
-                                                    ),
-                                                    contentPadding:
-                                                        EdgeInsets.only(
-                                                            left: 12),
-                                                    hintText: 'Enter your City',
-                                                  ),
-                                                  validator: (value) {
-                                                    return value == null ||
-                                                            value.isEmpty
-                                                        ? 'Please enter this field'
-                                                        : null;
+                                                GestureDetector(
+                                                  onDoubleTap: () {
+                                                    cityFocusNode.requestFocus();
+                                                    if (_cityController.text.isNotEmpty) {
+                                                      _cityController.selection =
+                                                          TextSelection(
+                                                              baseOffset: 0,
+                                                              extentOffset:
+                                                              _cityController
+                                                                  .text.length);
+                                                    }
                                                   },
+                                                  child: TextFormField(
+                                                    focusNode: cityFocusNode,
+                                                    controller: _cityController,
+                                                    decoration: InputDecoration(
+                                                      hoverColor: Theme.of(
+                                                              context)
+                                                          .inputDecorationTheme
+                                                          .hoverColor,
+                                                      filled: true,
+                                                      fillColor: Theme.of(context)
+                                                          .inputDecorationTheme
+                                                          .fillColor,
+                                                      enabledBorder: Theme.of(
+                                                              context)
+                                                          .inputDecorationTheme
+                                                          .enabledBorder,
+                                                      focusedBorder: Theme.of(
+                                                              context)
+                                                          .inputDecorationTheme
+                                                          .focusedBorder,
+                                                      hintStyle:
+                                                          passwordField.copyWith(
+                                                        color: isDarkTheme()
+                                                            ? DarkColors
+                                                                .hintTextColor
+                                                            : LightColors
+                                                                .hintTextColor,
+                                                      ),
+                                                      contentPadding:
+                                                          EdgeInsets.only(
+                                                              left: 12),
+                                                      hintText: 'Enter your City',
+                                                    ),
+                                                    validator: (value) {
+                                                      return value == null ||
+                                                              value.isEmpty
+                                                          ? 'Please enter this field'
+                                                          : null;
+                                                    },
+                                                  ),
                                                 ),
                                                 SizedBox(
                                                   height: 16,
@@ -373,46 +407,60 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                 SizedBox(
                                                   height: 6,
                                                 ),
-                                                TextFormField(
-                                                  controller:
-                                                      _zipCodeController,
-                                                  decoration: InputDecoration(
-                                                    hoverColor: Theme.of(
-                                                            context)
-                                                        .inputDecorationTheme
-                                                        .hoverColor,
-                                                    filled: true,
-                                                    fillColor: Theme.of(context)
-                                                        .inputDecorationTheme
-                                                        .fillColor,
-                                                    enabledBorder: Theme.of(
-                                                            context)
-                                                        .inputDecorationTheme
-                                                        .enabledBorder,
-                                                    focusedBorder: Theme.of(
-                                                            context)
-                                                        .inputDecorationTheme
-                                                        .focusedBorder,
-                                                    hintStyle:
-                                                        passwordField.copyWith(
-                                                      color: isDarkTheme()
-                                                          ? DarkColors
-                                                              .hintTextColor
-                                                          : LightColors
-                                                              .hintTextColor,
-                                                    ),
-                                                    contentPadding:
-                                                        EdgeInsets.only(
-                                                            left: 12),
-                                                    hintText:
-                                                        'Enter your Zip Code',
-                                                  ),
-                                                  validator: (value) {
-                                                    return value == null ||
-                                                            value.isEmpty
-                                                        ? 'Please enter this field'
-                                                        : null;
+                                                GestureDetector(
+                                                  onDoubleTap: () {
+                                                    zipCodeFocusNode.requestFocus();
+                                                    if (_zipCodeController.text.isNotEmpty) {
+                                                      _zipCodeController.selection =
+                                                          TextSelection(
+                                                              baseOffset: 0,
+                                                              extentOffset:
+                                                              _zipCodeController
+                                                                  .text.length);
+                                                    }
                                                   },
+                                                  child: TextFormField(
+                                                    focusNode: zipCodeFocusNode,
+                                                    controller:
+                                                        _zipCodeController,
+                                                    decoration: InputDecoration(
+                                                      hoverColor: Theme.of(
+                                                              context)
+                                                          .inputDecorationTheme
+                                                          .hoverColor,
+                                                      filled: true,
+                                                      fillColor: Theme.of(context)
+                                                          .inputDecorationTheme
+                                                          .fillColor,
+                                                      enabledBorder: Theme.of(
+                                                              context)
+                                                          .inputDecorationTheme
+                                                          .enabledBorder,
+                                                      focusedBorder: Theme.of(
+                                                              context)
+                                                          .inputDecorationTheme
+                                                          .focusedBorder,
+                                                      hintStyle:
+                                                          passwordField.copyWith(
+                                                        color: isDarkTheme()
+                                                            ? DarkColors
+                                                                .hintTextColor
+                                                            : LightColors
+                                                                .hintTextColor,
+                                                      ),
+                                                      contentPadding:
+                                                          EdgeInsets.only(
+                                                              left: 12),
+                                                      hintText:
+                                                          'Enter your Zip Code',
+                                                    ),
+                                                    validator: (value) {
+                                                      return value == null ||
+                                                              value.isEmpty
+                                                          ? 'Please enter this field'
+                                                          : null;
+                                                    },
+                                                  ),
                                                 ),
                                                 SizedBox(
                                                   height: 24,

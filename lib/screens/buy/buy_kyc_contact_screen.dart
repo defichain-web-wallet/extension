@@ -29,6 +29,8 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode phoneFocusNode = FocusNode();
   final DfxRequests dfxRequests = DfxRequests();
   String countryCode = 'US';
   String numberPrefix = '+1';
@@ -41,6 +43,8 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
   void dispose() {
     _emailController.dispose();
     _phoneController.dispose();
+    emailFocusNode.dispose();
+    phoneFocusNode.dispose();
     super.dispose();
   }
 
@@ -165,27 +169,41 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
                                       SizedBox(
                                         height: 6,
                                       ),
-                                      TextFormField(
-                                        controller: _emailController,
-                                        decoration: InputDecoration(
-                                          hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-                                          filled: true,
-                                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                          enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                          focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                                          hintStyle: passwordField.copyWith(
-                                            color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
-                                          ),
-                                            contentPadding:
-                                                EdgeInsets.only(left: 12),
-                                            hintText: 'Enter email address',
-                                        ),
-                                        validator: (val) {
-                                          return val != null &&
-                                                  !EmailValidator.validate(val)
-                                              ? 'Enter a valid email'
-                                              : null;
+                                      GestureDetector(
+                                        onDoubleTap: () {
+                                          emailFocusNode.requestFocus();
+                                          if (_emailController.text.isNotEmpty) {
+                                            _emailController.selection =
+                                                TextSelection(
+                                                    baseOffset: 0,
+                                                    extentOffset:
+                                                    _emailController
+                                                        .text.length);
+                                          }
                                         },
+                                        child: TextFormField(
+                                          focusNode: emailFocusNode,
+                                          controller: _emailController,
+                                          decoration: InputDecoration(
+                                            hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                            filled: true,
+                                            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                            enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                            focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                            hintStyle: passwordField.copyWith(
+                                              color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                            ),
+                                              contentPadding:
+                                                  EdgeInsets.only(left: 12),
+                                              hintText: 'Enter email address',
+                                          ),
+                                          validator: (val) {
+                                            return val != null &&
+                                                    !EmailValidator.validate(val)
+                                                ? 'Enter a valid email'
+                                                : null;
+                                          },
+                                        ),
                                       ),
                                       SizedBox(
                                         height: 16,
@@ -204,20 +222,34 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
                                       SizedBox(
                                         height: 6,
                                       ),
-                                      TextFormField(
-                                        controller: _phoneController,
-                                        decoration: InputDecoration(
-                                            hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-                                            filled: true,
-                                            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                            enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                            focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                                            hintStyle: passwordField.copyWith(
-                                              color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
-                                            ),
-                                            contentPadding:
-                                                EdgeInsets.only(left: 12),
-                                            hintText: 'Enter phone number'),
+                                      GestureDetector(
+                                        onDoubleTap: () {
+                                          phoneFocusNode.requestFocus();
+                                          if (_phoneController.text.isNotEmpty) {
+                                            _phoneController.selection =
+                                                TextSelection(
+                                                    baseOffset: 0,
+                                                    extentOffset:
+                                                    _phoneController
+                                                        .text.length);
+                                          }
+                                        },
+                                        child: TextFormField(
+                                          focusNode: phoneFocusNode,
+                                          controller: _phoneController,
+                                          decoration: InputDecoration(
+                                              hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                              filled: true,
+                                              fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                              enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                              focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                              hintStyle: passwordField.copyWith(
+                                                color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                              ),
+                                              contentPadding:
+                                                  EdgeInsets.only(left: 12),
+                                              hintText: 'Enter phone number'),
+                                        ),
                                       ),
                                     ],
                                   ),

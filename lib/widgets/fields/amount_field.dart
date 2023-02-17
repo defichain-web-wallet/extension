@@ -54,6 +54,17 @@ class _AmountFieldState extends State<AmountField> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => _focusNode.requestFocus(),
+      onDoubleTap: () {
+        _focusNode.requestFocus();
+        if (widget.controller.text.isNotEmpty) {
+          widget.controller.selection =
+              TextSelection(
+                  baseOffset: 0,
+                  extentOffset:
+                  widget.controller
+                      .text.length);
+        }
+      },
       child: Container(
         height: 80,
         padding: const EdgeInsets.only(

@@ -33,6 +33,8 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _surnameController = TextEditingController();
+  final FocusNode nameFocusNode = FocusNode();
+  final FocusNode surnameFocusNode = FocusNode();
   final String titleText = '1/3. Introduce yourself';
   final String subtitleText = 'Let´s start with your first and last name';
 
@@ -42,6 +44,8 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
   void dispose() {
     _nameController.dispose();
     _surnameController.dispose();
+    nameFocusNode.dispose();
+    surnameFocusNode.dispose();
     super.dispose();
   }
 
@@ -162,25 +166,39 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                                   SizedBox(
                                     height: 6,
                                   ),
-                                  TextFormField(
-                                    controller: _nameController,
-                                    decoration: InputDecoration(
-                                      hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-                                      filled: true,
-                                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                      enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                      focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                                      hintStyle: passwordField.copyWith(
-                                        color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
-                                      ),
-                                      contentPadding: EdgeInsets.only(left: 12),
-                                      hintText: 'Enter your First name',
-                                    ),
-                                    validator: (value) {
-                                      return value == null || value.isEmpty
-                                          ? "Enter your name"
-                                          : null;
+                                  GestureDetector(
+                                    onDoubleTap: () {
+                                      nameFocusNode.requestFocus();
+                                      if (_nameController.text.isNotEmpty) {
+                                        _nameController.selection =
+                                            TextSelection(
+                                                baseOffset: 0,
+                                                extentOffset:
+                                                _nameController
+                                                    .text.length);
+                                      }
                                     },
+                                    child: TextFormField(
+                                      focusNode: nameFocusNode,
+                                      controller: _nameController,
+                                      decoration: InputDecoration(
+                                        hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                        filled: true,
+                                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                        enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                        focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                        hintStyle: passwordField.copyWith(
+                                          color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                        ),
+                                        contentPadding: EdgeInsets.only(left: 12),
+                                        hintText: 'Enter your First name',
+                                      ),
+                                      validator: (value) {
+                                        return value == null || value.isEmpty
+                                            ? "Enter your name"
+                                            : null;
+                                      },
+                                    ),
                                   ),
                                   SizedBox(
                                     height: 16,
@@ -199,25 +217,39 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                                   SizedBox(
                                     height: 6,
                                   ),
-                                  TextFormField(
-                                    controller: _surnameController,
-                                    decoration: InputDecoration(
-                                      hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-                                      filled: true,
-                                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                      enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                      focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                                      hintStyle: passwordField.copyWith(
-                                        color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
-                                      ),
-                                      contentPadding: EdgeInsets.only(left: 12),
-                                      hintText: 'Enter your Last name',
-                                    ),
-                                    validator: (value) {
-                                      return value == null || value.isEmpty
-                                          ? "Enter your surname"
-                                          : null;
+                                  GestureDetector(
+                                    onDoubleTap: () {
+                                      surnameFocusNode.requestFocus();
+                                      if (_surnameController.text.isNotEmpty) {
+                                        _surnameController.selection =
+                                            TextSelection(
+                                                baseOffset: 0,
+                                                extentOffset:
+                                                _surnameController
+                                                    .text.length);
+                                      }
                                     },
+                                    child: TextFormField(
+                                      focusNode: surnameFocusNode,
+                                      controller: _surnameController,
+                                      decoration: InputDecoration(
+                                        hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                        filled: true,
+                                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                        enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                        focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                        hintStyle: passwordField.copyWith(
+                                          color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                        ),
+                                        contentPadding: EdgeInsets.only(left: 12),
+                                        hintText: 'Enter your Last name',
+                                      ),
+                                      validator: (value) {
+                                        return value == null || value.isEmpty
+                                            ? "Enter your surname"
+                                            : null;
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),

@@ -342,35 +342,44 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with 
                                 ),
                                 Container(
                                   height: 44,
-                                  child: TextFormField(
-                                    onSaved: (val) async {
-                                      if (_nameController.text.length > 3) {
-                                        if (_pickedImage != null) {
-                                          await _saveImageToStorage();
-                                        }
-                                        widget.callback!(_nameController.text);
-                                        Navigator.pop(context);
+                                  child: GestureDetector(
+                                    onDoubleTap:() {
+                                      nameFocusNode.requestFocus();
+                                      if(_nameController.text.isNotEmpty) {
+                                        _nameController.selection = TextSelection(baseOffset: 0, extentOffset:_nameController.text.length);
                                       }
                                     },
-                                    controller: _nameController,
-                                    onEditingComplete: () =>
-                                        (globalKey.currentWidget! as ElevatedButton)
-                                            .onPressed!(),
-                                    decoration: InputDecoration(
-                                      hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-                                      filled: true,
-                                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                      enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                      focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                                      hintText: 'Enter your Account`s Name',
-                                      hintStyle: passwordField.copyWith(
-                                        color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.portage
-                                              .withOpacity(0.12),
-                                          width: 1.0,
+                                    child: TextFormField(
+                                      onSaved: (val) async {
+                                        if (_nameController.text.length > 3) {
+                                          if (_pickedImage != null) {
+                                            await _saveImageToStorage();
+                                          }
+                                          widget.callback!(_nameController.text);
+                                          Navigator.pop(context);
+                                        }
+                                      },
+                                      controller: _nameController,
+                                      focusNode: nameFocusNode,
+                                      onEditingComplete: () =>
+                                          (globalKey.currentWidget! as ElevatedButton)
+                                              .onPressed!(),
+                                      decoration: InputDecoration(
+                                        hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                        filled: true,
+                                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                        enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                        focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                        hintText: 'Enter your Account`s Name',
+                                        hintStyle: passwordField.copyWith(
+                                          color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.portage
+                                                .withOpacity(0.12),
+                                            width: 1.0,
+                                          ),
                                         ),
                                       ),
                                     ),

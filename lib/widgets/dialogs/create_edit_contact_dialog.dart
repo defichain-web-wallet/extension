@@ -33,6 +33,8 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   AddressesHelper addressHelper = AddressesHelper();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
+  FocusNode nameFocusNode = FocusNode();
+  FocusNode addressFocusNode = FocusNode();
   String editTitleText = 'Edit contact';
   String createTitleText = 'New contact';
   String titleContactName = 'Contact`s Name';
@@ -47,6 +49,16 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   late bool isEnable;
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _addressController.dispose();
+    nameFocusNode.dispose();
+    addressFocusNode.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   void initState() {
     _nameController.text = widget.contactName;
     _addressController.text = widget.address;
@@ -55,6 +67,8 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
     checkButtonStatus();
     super.initState();
   }
+
+
 
   checkButtonStatus() {
     setState(() {
@@ -206,25 +220,39 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                             ),
                             Container(
                               height: 44,
-                              child: TextFormField(
-                                controller: _nameController,
-                                decoration: InputDecoration(
-                                  hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-                                  filled: true,
-                                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                  enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                  focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                                  hintStyle: passwordField.copyWith(
-                                    color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
-                                  ),
-                                  hintText: hintContactName,
-
-                                ),
-                                onChanged: (value) async {
-                                  isValidAddress = await addressHelper
-                                      .validateAddress(_addressController.text);
-                                  checkButtonStatus();
+                              child: GestureDetector(
+                                onDoubleTap: () {
+                                  nameFocusNode.requestFocus();
+                                  if (_nameController.text.isNotEmpty) {
+                                    _nameController.selection =
+                                        TextSelection(
+                                            baseOffset: 0,
+                                            extentOffset:
+                                            _nameController
+                                                .text.length);
+                                  }
                                 },
+                                child: TextFormField(
+                                  focusNode: nameFocusNode,
+                                  controller: _nameController,
+                                  decoration: InputDecoration(
+                                    hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                    filled: true,
+                                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                    enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                    focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                    hintStyle: passwordField.copyWith(
+                                      color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                    ),
+                                    hintText: hintContactName,
+
+                                  ),
+                                  onChanged: (value) async {
+                                    isValidAddress = await addressHelper
+                                        .validateAddress(_addressController.text);
+                                    checkButtonStatus();
+                                  },
+                                ),
                               ),
                             ),
                             SizedBox(
@@ -244,25 +272,39 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                             ),
                             Container(
                               height: 44,
-                              child: TextFormField(
-                                controller: _addressController,
-                                decoration: InputDecoration(
-                                  hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-                                  filled: true,
-                                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                  enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                  focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                                  hintStyle: passwordField.copyWith(
-                                    color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
-                                  ),
-                                  hintText: hintAddress,
-
-                                ),
-                                onChanged: (value) async {
-                                  isValidAddress = await addressHelper
-                                      .validateAddress(_addressController.text);
-                                  checkButtonStatus();
+                              child: GestureDetector(
+                                onDoubleTap: () {
+                                  addressFocusNode.requestFocus();
+                                  if (_addressController.text.isNotEmpty) {
+                                    _addressController.selection =
+                                        TextSelection(
+                                            baseOffset: 0,
+                                            extentOffset:
+                                            _addressController
+                                                .text.length);
+                                  }
                                 },
+                                child: TextFormField(
+                                  focusNode: addressFocusNode,
+                                  controller: _addressController,
+                                  decoration: InputDecoration(
+                                    hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                    filled: true,
+                                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                    enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                    focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                    hintStyle: passwordField.copyWith(
+                                      color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                    ),
+                                    hintText: hintAddress,
+
+                                  ),
+                                  onChanged: (value) async {
+                                    isValidAddress = await addressHelper
+                                        .validateAddress(_addressController.text);
+                                    checkButtonStatus();
+                                  },
+                                ),
                               ),
                             ),
                           ],

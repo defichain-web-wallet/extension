@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class AddressFieldNew extends StatefulWidget {
   final TextEditingController controller;
+  final FocusNode addressFocusNode;
   final AddressBookModel contact;
   final Function(String)? onChange;
   final Function()? clearPrefix;
@@ -16,6 +17,7 @@ class AddressFieldNew extends StatefulWidget {
   AddressFieldNew({
     Key? key,
     required this.controller,
+    required this.addressFocusNode,
     required this.contact,
     this.onChange,
     this.clearPrefix,
@@ -28,10 +30,17 @@ class AddressFieldNew extends StatefulWidget {
 }
 
 class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin{
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override

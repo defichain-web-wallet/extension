@@ -38,6 +38,7 @@ class _SendScreenNewState extends State<SendScreenNew>
     with ThemeMixin, NetworkMixin, SnackBarMixin {
   TextEditingController addressController = TextEditingController();
   TextEditingController assetController = TextEditingController(text: '0');
+  FocusNode addressFocusNode = FocusNode();
   AddressBookModel contact = AddressBookModel();
   TokensModel? currentAsset;
   String suffixText = '';
@@ -114,6 +115,13 @@ class _SendScreenNewState extends State<SendScreenNew>
       }
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    addressController.dispose();
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
@@ -228,30 +236,44 @@ class _SendScreenNewState extends State<SendScreenNew>
                                     SizedBox(
                                       height: 24,
                                     ),
-                                    AddressFieldNew(
-                                      clearPrefix: () {
-                                        setState(() {
-                                          contact = AddressBookModel();
-                                        });
-                                      },
-                                      onChange: (val) {
-                                        if (val == '') {
-                                          setState(() {
-                                            isAddNewContact = false;
-                                          });
+                                    GestureDetector(
+                                      onDoubleTap: () {
+                                        addressFocusNode.requestFocus();
+                                        if (addressController.text.isNotEmpty) {
+                                          addressController.selection =
+                                              TextSelection(
+                                                  baseOffset: 0,
+                                                  extentOffset:
+                                                      addressController
+                                                          .text.length);
                                         }
                                       },
-                                      controller: addressController,
-                                      getAddress: (val) {
-                                        addressController.text = val;
-                                      },
-                                      getContact: (val) {
-                                        setState(() {
-                                          addressController.text = '';
-                                          contact = val;
-                                        });
-                                      },
-                                      contact: contact,
+                                      child: AddressFieldNew(
+                                        addressFocusNode: addressFocusNode,
+                                        clearPrefix: () {
+                                          setState(() {
+                                            contact = AddressBookModel();
+                                          });
+                                        },
+                                        onChange: (val) {
+                                          if (val == '') {
+                                            setState(() {
+                                              isAddNewContact = false;
+                                            });
+                                          }
+                                        },
+                                        controller: addressController,
+                                        getAddress: (val) {
+                                          addressController.text = val;
+                                        },
+                                        getContact: (val) {
+                                          setState(() {
+                                            addressController.text = '';
+                                            contact = val;
+                                          });
+                                        },
+                                        contact: contact,
+                                      ),
                                     ),
                                     SizedBox(
                                       height: 16,
