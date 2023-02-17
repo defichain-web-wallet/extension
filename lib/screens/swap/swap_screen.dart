@@ -101,7 +101,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
   double slippage = 0.03; //3%
-  String stabilizationFee = '';
+  String stabilizationFee = '30';
   String amountFromInUsd = '0.0';
   String amountToInUsd = '0.0';
 
@@ -303,10 +303,10 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
           try {
             AssetPairModel targetPair = tokensState.tokensPairs
                 .firstWhere((e) => e.tokenA == 'DUSD' && e.tokenB == 'DFI');
-            stabilizationFee = balancesHelper.numberStyling(
-                ((1 / (1 - targetPair.fee!)) - 1) * 100,
-                fixedCount: 2,
-                fixed: true);
+            // stabilizationFee = balancesHelper.numberStyling(
+            //     ((1 / (1 - targetPair.fee!)) - 1) * 100,
+            //     fixedCount: 2,
+            //     fixed: true);
           } catch (err) {
             print(err);
           }
@@ -814,16 +814,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                 Expanded(
                                   child: Row(
                                     children: [
-                                      SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: SvgPicture.asset(
-                                          '/icons/important_icon.svg',
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 8,
-                                      ),
                                       Text(
                                         'Stabilization fee',
                                         style: Theme
