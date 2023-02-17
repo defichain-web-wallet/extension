@@ -1,9 +1,12 @@
 import 'dart:ui';
 import 'dart:math' as math;
 
+import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class WalletLockDialog extends StatefulWidget {
   final Function() callback;
@@ -17,7 +20,7 @@ class WalletLockDialog extends StatefulWidget {
   State<WalletLockDialog> createState() => _WalletLockDialogState();
 }
 
-class _WalletLockDialogState extends State<WalletLockDialog> {
+class _WalletLockDialogState extends State<WalletLockDialog> with ThemeMixin {
   String subtitleText = 'Are you sure you want to lock your wallet? '
       'Enter your passcode in the next step.';
   String title = 'Lock wallet';
@@ -30,10 +33,15 @@ class _WalletLockDialogState extends State<WalletLockDialog> {
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
+        backgroundColor: isDarkTheme()
+            ? DarkColors.drawerBgColor
+            : LightColors.drawerBgColor,
         insetPadding: EdgeInsets.all(24),
         elevation: 48.0,
         shape: RoundedRectangleBorder(
-          side: BorderSide.none,
+          side: isDarkTheme()
+              ? BorderSide(color: DarkColors.drawerBorderColor)
+              : BorderSide.none,
           borderRadius: BorderRadius.circular(20),
         ),
         actionsPadding: EdgeInsets.symmetric(
@@ -85,11 +93,19 @@ class _WalletLockDialogState extends State<WalletLockDialog> {
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
+                          if (isDarkTheme())
+                            Positioned(
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: SvgPicture.asset(
+                                    'assets/bg_splash_dark.svg'),
+                              ),
+                            ),
                           Positioned(
                             child: Align(
                               alignment: Alignment.center,
                               child: Transform.rotate(
-                                angle: -math.pi * 2 + 0.05,
+                                angle: (math.pi / 180) * (4.23),
                                 child: Container(
                                   height: 180,
                                   width: 150,
@@ -108,7 +124,7 @@ class _WalletLockDialogState extends State<WalletLockDialog> {
                             child: Align(
                               alignment: Alignment.topLeft,
                               child: Transform.rotate(
-                                angle: -math.pi / _logoRotateDeg-0.1,
+                                angle: (math.pi / 180) * (-17.54),
                                 child: Container(
                                   height: 110,
                                   width: 105,

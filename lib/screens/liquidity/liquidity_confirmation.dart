@@ -103,7 +103,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
             ),
             decoration: BoxDecoration(
               color: isDarkTheme()
-                  ? DarkColors.scaffoldContainerBgColor
+                  ? DarkColors.drawerBgColor
                   : LightColors.scaffoldContainerBgColor,
               border: isDarkTheme()
                   ? Border.all(
@@ -583,7 +583,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
 
       if (!txError.isError) {
         TransactionCubit transactionCubit =
-          BlocProvider.of<TransactionCubit>(context);
+            BlocProvider.of<TransactionCubit>(context);
 
         transactionCubit.setOngoingTransaction(txError);
       }

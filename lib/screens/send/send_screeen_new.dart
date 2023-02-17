@@ -176,7 +176,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                         height: double.infinity,
                         decoration: BoxDecoration(
                           color: isDarkTheme()
-                              ? DarkColors.scaffoldContainerBgColor
+                              ? DarkColors.drawerBgColor
                               : LightColors.scaffoldContainerBgColor,
                           border: isDarkTheme()
                               ? Border.all(

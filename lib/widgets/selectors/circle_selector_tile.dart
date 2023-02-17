@@ -76,7 +76,7 @@ class _CircleSelectorTileState extends State<CircleSelectorTile>
                               ? Theme.of(context).scaffoldBackgroundColor
                               : isDarkTheme()
                                   ? DarkColors.scaffoldBgColor
-                                  : LightColors.scaffoldContainerBgColor,
+                                  : LightColors.scaffoldBgColor,
                           borderRadius:
                               BorderRadius.circular(widget.isSelected ? 4 : 6),
                         ),

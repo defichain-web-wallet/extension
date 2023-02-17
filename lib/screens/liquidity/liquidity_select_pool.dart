@@ -25,13 +25,15 @@ import 'package:defi_wallet/models/focus_model.dart';
 class LiquiditySelectPool extends StatefulWidget {
   final AssetPairModel assetPair;
 
-  const LiquiditySelectPool({Key? key, required this.assetPair}) : super(key: key);
+  const LiquiditySelectPool({Key? key, required this.assetPair})
+      : super(key: key);
 
   @override
   _LiquiditySelectPoolState createState() => _LiquiditySelectPoolState();
 }
 
-class _LiquiditySelectPoolState extends State<LiquiditySelectPool> with ThemeMixin, SnackBarMixin {
+class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
+    with ThemeMixin, SnackBarMixin {
   TokensHelper tokensHelper = TokensHelper();
   final TextEditingController _amountBaseController =
       TextEditingController(text: '0');
@@ -142,7 +144,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool> with ThemeMix
           ),
           decoration: BoxDecoration(
             color: isDarkTheme()
-                ? DarkColors.scaffoldContainerBgColor
+                ? DarkColors.drawerBgColor
                 : LightColors.scaffoldContainerBgColor,
             border: isDarkTheme()
                 ? Border.all(
@@ -477,7 +479,8 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool> with ThemeMix
                                           showSnackBar(
                                             context,
                                             title: 'Insufficient funds!',
-                                            color: AppColors.txStatusError.withOpacity(0.1),
+                                            color: AppColors.txStatusError
+                                                .withOpacity(0.1),
                                             prefix: Icon(
                                               Icons.close,
                                               color: AppColors.txStatusError,
@@ -627,8 +630,6 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool> with ThemeMix
         balanceTo == 0 ||
         amountFrom > balanceFrom ||
         amountTo > balanceTo;
-
-
 
     return balanceFrom == 0 ||
         balanceTo == 0 ||

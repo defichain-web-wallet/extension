@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -33,7 +34,7 @@ class CreateEditAccountDialog extends StatefulWidget {
       _CreateEditAccountDialogState();
 }
 
-class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
+class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with ThemeMixin{
   TextEditingController _nameController = TextEditingController();
   FocusNode nameFocusNode = FocusNode();
   File? _pickedImage;
@@ -118,8 +119,13 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
           child: AlertDialog(
             insetPadding: EdgeInsets.all(24),
             elevation: 0.0,
+            backgroundColor: isDarkTheme()
+                ? DarkColors.drawerBgColor
+                : LightColors.drawerBgColor,
             shape: RoundedRectangleBorder(
-              side: BorderSide.none,
+              side: isDarkTheme()
+                  ? BorderSide(color: DarkColors.drawerBorderColor)
+                  : BorderSide.none,
               borderRadius: BorderRadius.circular(20),
             ),
             actionsPadding: EdgeInsets.symmetric(
@@ -301,8 +307,9 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                               onTap: () => _pickImage(),
                                               child: CircleAvatar(
                                                 radius: 12,
-                                                backgroundColor:
-                                                    AppColors.white,
+                                                backgroundColor: isDarkTheme()
+                                                    ? AppColors.mirage
+                                                    : AppColors.white,
                                                 child: Container(
                                                   height: 12,
                                                   width: 12,
@@ -350,12 +357,14 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> {
                                         (globalKey.currentWidget! as ElevatedButton)
                                             .onPressed!(),
                                     decoration: InputDecoration(
+                                      hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                                       filled: true,
-                                      fillColor: AppColors.white,
+                                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                      enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                      focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
                                       hintText: 'Enter your Account`s Name',
                                       hintStyle: passwordField.copyWith(
-                                        color: AppColors.darkTextColor
-                                            .withOpacity(0.3),
+                                        color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
                                       ),
                                       border: OutlineInputBorder(
                                         borderSide: BorderSide(

@@ -158,7 +158,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                           height: double.infinity,
                           decoration: BoxDecoration(
                             color: isDarkTheme()
-                                ? DarkColors.scaffoldContainerBgColor
+                                ? DarkColors.drawerBgColor
                                 : LightColors.scaffoldContainerBgColor,
                             border: isDarkTheme()
                                 ? Border.all(

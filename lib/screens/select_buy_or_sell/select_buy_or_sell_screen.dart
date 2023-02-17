@@ -266,7 +266,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SearchBuyToken(),
+          pageBuilder: (context, animation1, animation2) => BuySelectCurrencyScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),

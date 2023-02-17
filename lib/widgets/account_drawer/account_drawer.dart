@@ -67,7 +67,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).drawerTheme.backgroundColor,
+                  color: isDarkTheme() ? DarkColors.drawerBgColor : LightColors.drawerBgColor,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     width: 1,

@@ -68,7 +68,7 @@ class IbanSelectorState extends State<IbanSelector> {
               key: _selectKey,
               height: _tileHeight,
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: Theme.of(context).inputDecorationTheme.fillColor,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: AppColors.portage.withOpacity(0.12),
@@ -172,7 +172,7 @@ class IbanSelectorState extends State<IbanSelector> {
                       : (widget.ibanList.length + 1) * (_tileHeight + 1)) +
                   2,
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: Theme.of(context).inputDecorationTheme.fillColor,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: AppColors.portage.withOpacity(0.12),

@@ -77,6 +77,7 @@ class FlatButton extends StatelessWidget with ThemeMixin {
                 height: isPrimary ? 16 : 14,
                 child: (isPrimary) ? Image.asset(iconPath!) : SvgPicture.asset(
                   iconPath!,
+                  color: isDarkTheme() ? Colors.white : AppColors.darkTextColor,
                 ),
               ),
             if (!isSmall)

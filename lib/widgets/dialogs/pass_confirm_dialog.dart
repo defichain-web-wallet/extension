@@ -6,6 +6,7 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
@@ -58,11 +59,16 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
         child: AlertDialog(
-          insetPadding: EdgeInsets.all(24),
+          backgroundColor: isDarkTheme()
+              ? DarkColors.drawerBgColor
+              : LightColors.drawerBgColor,
           shape: RoundedRectangleBorder(
-            side: BorderSide.none,
+            side: isDarkTheme()
+                ? BorderSide(color: DarkColors.drawerBorderColor)
+                : BorderSide.none,
             borderRadius: BorderRadius.circular(20),
           ),
+          insetPadding: EdgeInsets.all(24),
           actionsPadding: EdgeInsets.symmetric(
             vertical: 24,
             horizontal: 14,

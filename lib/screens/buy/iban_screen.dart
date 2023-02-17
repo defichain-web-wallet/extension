@@ -70,7 +70,6 @@ class _IbanScreenState extends State<IbanScreen>
             if (fiatState.status == FiatStatusList.loading) {
               return Loader();
             } else if (fiatState.status == FiatStatusList.success) {
-
               List<String> stringIbans = [];
               List<IbanModel> uniqueIbans = [];
 
@@ -104,7 +103,7 @@ class _IbanScreenState extends State<IbanScreen>
                   height: double.infinity,
                   decoration: BoxDecoration(
                     color: isDarkTheme()
-                        ? DarkColors.scaffoldContainerBgColor
+                        ? DarkColors.drawerBgColor
                         : LightColors.scaffoldContainerBgColor,
                     border: isDarkTheme()
                         ? Border.all(

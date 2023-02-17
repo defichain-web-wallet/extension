@@ -234,7 +234,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         ),
                         decoration: BoxDecoration(
                           color: isDarkTheme()
-                              ? DarkColors.scaffoldContainerBgColor
+                              ? DarkColors.networkDropdownBgColor
                               : LightColors.scaffoldContainerBgColor,
                           border: isDarkTheme()
                               ? Border.all(
