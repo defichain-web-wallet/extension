@@ -7,6 +7,7 @@ import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -215,6 +216,8 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                             height: 16,
                           ),
                           AmountField(
+                            account: accountState.activeAccount,
+                            type: TxType.addLiq,
                             suffix: balancesHelper.numberStyling(amountFromUSD,
                                 fixedCount: 2, fixed: true),
                             available:
@@ -252,6 +255,9 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                             height: 8,
                           ),
                           AmountField(
+                            account: accountState.activeAccount,
+                            type: TxType.addLiq,
+                            isAvailableTo: false,
                             suffix: balancesHelper.numberStyling(amountToUSD,
                                 fixedCount: 2, fixed: true),
                             available:
