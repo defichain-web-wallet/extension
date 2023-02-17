@@ -18,7 +18,7 @@ import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 
 class TransactionService {
-  static const DUST = 1000;
+  static const DUST = 3000;
   static const FEE = 3000;
   static const int AuthTxMin = 200000;
   var networkHelper = NetworkHelper();

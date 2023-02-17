@@ -3,11 +3,13 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
 import 'package:defi_wallet/screens/settings/settings.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -165,6 +167,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                       currentAsset = currentAsset ??
                           getTokensList(accountState, tokensState).first;
                     }
+
                     return Scaffold(
                       drawerScrimColor: Color(0x0f180245),
                       endDrawer: AccountDrawer(
@@ -292,6 +295,8 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       height: 6,
                                     ),
                                     AmountField(
+                                      type: TxType.send,
+                                      account: accountState.activeAccount!,
                                       onChanged: (value) {
                                         setState(() {
                                           balanceInUsd = getUsdBalance(context);
@@ -301,7 +306,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                           SettingsHelper.isBitcoin(),
                                       suffix: balanceInUsd ??
                                           getUsdBalance(context),
-                                      available: getAvailableBalance(
+                                      available: getAvailableBalance( //TODO
                                           accountState, bitcoinState),
                                       onAssetSelect: (t) {
                                         setState(() {

@@ -13,6 +13,7 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
 import 'package:defi_wallet/screens/swap/swap_summary_screen.dart';
@@ -419,6 +420,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         )
                       ],
                     AmountField(
+                      isAvailableTo: false,
+                      type: TxType.swap,
+                      account: accountState.activeAccount!,
                       suffix: amountFromInUsd,
                       isDisabledSelector: SettingsHelper.isBitcoin(),
                       available: getAvailableAmount(
@@ -540,6 +544,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         )
                       ],
                     AmountField(
+                      type: TxType.swap,
+                      account: accountState.activeAccount!,
                       suffix: amountToInUsd,
                       isDisabledSelector: SettingsHelper.isBitcoin(),
                       available: getAvailableAmount(

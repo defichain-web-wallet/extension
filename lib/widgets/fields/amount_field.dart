@@ -1,8 +1,13 @@
+import 'package:defi_wallet/bloc/available_amount/available_amount_cubit.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/selectors/asset/asset_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 
 class AmountField extends StatefulWidget {
@@ -14,6 +19,9 @@ class AmountField extends StatefulWidget {
   final double? available;
   final String? suffix;
   final bool isDisabledSelector;
+  final bool isAvailableTo;
+  final TxType? type;
+  final AccountModel? account;
 
   AmountField({
     required this.onAssetSelect,
@@ -21,9 +29,12 @@ class AmountField extends StatefulWidget {
     required this.controller,
     required this.selectedAsset,
     required this.assets,
+    this.type,
+    this.account,
     this.available = 35.02,
     this.suffix = '\$365.50',
     this.isDisabledSelector = false,
+    this.isAvailableTo = true,
     Key? key,
   }) : super(key: key);
 
@@ -48,6 +59,33 @@ class _AmountFieldState extends State<AmountField> {
   void initState() {
     _focusNode.addListener(_onFocusChange);
     super.initState();
+    AvailableAmountCubit availableAmountCubit =
+        BlocProvider.of<AvailableAmountCubit>(context);
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      if (widget.type == TxType.send) {
+        await availableAmountCubit.getAvailable(
+          widget.selectedAsset.symbol!,
+          widget.type!,
+          widget.account!,
+        );
+      }
+      if (widget.type == TxType.swap || widget.type == TxType.addLiq) {
+        if (widget.isAvailableTo) {
+          await availableAmountCubit.getAvailableTo(
+            widget.selectedAsset.symbol!,
+            widget.type!,
+            widget.account!,
+          );
+        } else {
+          await availableAmountCubit.getAvailableFrom(
+            widget.selectedAsset.symbol!,
+            widget.type!,
+            widget.account!,
+          );
+        }
+      }
+    });
   }
 
   @override
@@ -118,7 +156,9 @@ class _AmountFieldState extends State<AmountField> {
                           FilteringTextInputFormatter.deny(
                             RegExp(r'-\.+'),
                           ),
-                          FilteringTextInputFormatter.deny(RegExp(r'^0\d+'),),
+                          FilteringTextInputFormatter.deny(
+                            RegExp(r'^0\d+'),
+                          ),
                         ],
                         controller: widget.controller,
                         focusNode: _focusNode,
@@ -162,16 +202,50 @@ class _AmountFieldState extends State<AmountField> {
                             .withOpacity(0.3),
                       ),
                 ),
-                Text(
-                  'Available: ${widget.available.toString()}',
-                  style: Theme.of(context).textTheme.headline6!.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context)
-                            .textTheme
-                            .headline6!
-                            .color!
-                            .withOpacity(0.3),
-                      ),
+                BlocBuilder<AvailableAmountCubit, AvailableAmountState>(
+                  builder: (availableAmountContext, availableAmountState) {
+                    if (availableAmountState.status !=
+                        AvailableAmountStatusList.success) {
+                      return Container();
+                    } else {
+                      late String available;
+                      if (widget.type == TxType.send) {
+                        available = availableAmountState.available.toString();
+                      }
+                      if (widget.type == TxType.swap || widget.type == TxType.addLiq) {
+                        if (widget.isAvailableTo) {
+                          available =
+                              availableAmountState.availableTo.toString();
+                        } else {
+                          available =
+                              availableAmountState.availableFrom.toString();
+                        }
+                      }
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            widget.controller.text = available;
+                          });
+                          widget.onChanged(widget.controller.text);
+                        },
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: Text(
+                            'Available: $available',
+                            style:
+                                Theme.of(context).textTheme.headline6!.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
             )
