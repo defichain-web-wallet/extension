@@ -175,8 +175,8 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                         SizedBox(
                                           width: 10,
                                         ),
-                                        SvgPicture.asset(
-                                            'assets/icons/copy.svg')
+                                        Image.asset(
+                                            'assets/images/copy_gradient.png', width: 20, height: 20,)
                                       ],
                                     ),
                                   ),

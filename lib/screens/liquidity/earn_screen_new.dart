@@ -235,11 +235,10 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                           CrossAxisAlignment
                                                               .end,
                                                       children: [
-                                                        if (lockState.lockStakingDetails != null)
                                                         Text(
-                                                          lockState.lockUserDetails!
+                                                          (lockState.lockUserDetails!
                                                                       .kycStatus! ==
-                                                                  'Full'
+                                                                  'Full' || lockState.lockStakingDetails != null)
                                                               ? balancesHelper
                                                                   .numberStyling(
                                                                   lockState
