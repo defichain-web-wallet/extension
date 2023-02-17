@@ -242,19 +242,6 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                       ),
                                     ],
                                   ),
-                                  Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        'assets/icons/filter_icon.svg',
-                                        color: isDarkTheme()
-                                            ? AppColors.white
-                                            : AppColors.darkTextColor,
-                                      ),
-                                      SizedBox(
-                                        width: 4,
-                                      ),
-                                    ],
-                                  ),
                                 ],
                               ),
                               SizedBox(
