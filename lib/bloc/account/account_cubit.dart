@@ -6,6 +6,7 @@ import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
 import 'package:defi_wallet/helpers/history_new.dart';
@@ -219,7 +220,7 @@ class AccountCubit extends Cubit<AccountState> {
         );
       }
     }
-    await box.put(HiveNames.storageVersion, '1');
+    await box.put(HiveNames.storageVersion, StorageConstants.storageVersion);
     await box.close();
   }
 
@@ -488,20 +489,18 @@ class AccountCubit extends Cubit<AccountState> {
                 network == 'mainnet' ? 'bitcoin' : 'bitcoin_testnet');
         accountModel.bitcoinAddress!.blockchain = 'BTC';
       }
-      if (password != '' &&
-          accountModel.lockAccessToken == null &&
-          accountModel.accessToken == null) {
+      if (password != '') {
         try {
           var keyPair = await HDWalletService().getKeypairFromStorage(
             password,
             accountModel.index!,
           );
-          String accessToken = await fiatCubit.getAccessToken(
+          String accessToken = accountModel.accessToken ?? await fiatCubit.getAccessToken(
             accountModel,
             keyPair,
             needRefresh: true,
           );
-          String lockAccessToken = await lockCubit.getAccessToken(
+          String lockAccessToken = accountModel.lockAccessToken ?? await lockCubit.getAccessToken(
             accountModel,
             keyPair,
             needRefresh: true,

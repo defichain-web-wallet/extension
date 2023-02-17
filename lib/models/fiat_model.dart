@@ -15,8 +15,13 @@ class FiatModel {
   FiatModel.fromJson(Map<String, dynamic> json) {
     this.id = json["id"];
     this.name = json["name"];
-    this.buyable = json["buyable"];
-    this.sellable = json["sellable"];
+    try {
+      this.buyable = json["buyable"];
+      this.sellable = json["sellable"];
+    } catch (err) {
+      this.buyable = null;
+      this.sellable = null;
+    }
   }
 
   Map<String, dynamic> toJson() {

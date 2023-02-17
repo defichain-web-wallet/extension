@@ -24,3 +24,7 @@ class ToolbarSizes {
   static const double toolbarHeight = 55;
   static const double toolbarHeightWithBottom = 105;
 }
+
+class StorageConstants {
+  static const int storageVersion = 2;
+}

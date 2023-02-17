@@ -1,5 +1,6 @@
 import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
@@ -18,7 +19,9 @@ class StorageService {
     var box = await Hive.openBox(HiveBoxes.client);
     var storageVersion = await box.get(HiveNames.storageVersion);
     var accounts = await box.get(HiveNames.accountsMainnet);
-    if (storageVersion == null && accounts != null) {
+    if ((storageVersion == null ||
+            storageVersion != StorageConstants.storageVersion) &&
+        accounts != null) {
       Codec<String, String> stringToBase64 = utf8.fuse(base64);
       var box = await Hive.openBox(HiveBoxes.client);
       var encodedPassword = await box.get(HiveNames.password);

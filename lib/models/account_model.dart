@@ -41,7 +41,11 @@ class AccountModel {
     this.name = jsonModel["name"];
     this.activeToken = jsonModel["activeToken"];
     this.accessToken = jsonModel["accessToken"];
-    this.lockAccessToken = jsonModel["lockAccessToken"];
+    try {
+      this.lockAccessToken = jsonModel["lockAccessToken"];
+    } catch (err) {
+      this.lockAccessToken = null;
+    }
     if (jsonModel["bitcoinAddress"] == null) {
       this.bitcoinAddress = null;
     } else {
