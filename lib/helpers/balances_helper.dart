@@ -1,5 +1,6 @@
 import 'package:basic_utils/basic_utils.dart';
 import 'package:defi_wallet/models/address_balance_model.dart';
+import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 
 class BalancesHelper {
@@ -20,6 +21,14 @@ class BalancesHelper {
     });
     return newBalanceList;
     // return balanceMap.map((balance)=>BalanceModel(token: balance));
+  }
+
+  List<double> calculateAmountFromLiqudity(int amount, AssetPairModel pair){
+    var amountA = (amount / pair.totalLiquidityRaw!) *
+        pair.reserveA!;
+    var amountB = (amount / pair.totalLiquidityRaw!) *
+        pair.reserveB!;
+    return [amountA, amountB];
   }
 
   int getBalanceByTokenName(

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
@@ -90,14 +91,14 @@ class _LiquidityAssetPairState extends State<LiquidityAssetPair> with ThemeMixin
   }
 
   String getBaseBalance(balance, assetPair) {
-    double result =
-        balance * (1 / assetPair!.totalLiquidityRaw) * assetPair.reserveA!;
-    return toFixed(result, 4);
+    List<double> result =
+    BalancesHelper().calculateAmountFromLiqudity(widget.balance!, widget.assetPair!);
+    return toFixed(result[0], 4);
   }
 
   String getQuoteBalance(balance, assetPair) {
-    double result =
-        balance * (1 / assetPair!.totalLiquidityRaw) * assetPair.reserveB!;
-    return toFixed(result, 4);
+    List<double> result =
+    BalancesHelper().calculateAmountFromLiqudity(widget.balance!, widget.assetPair!);
+    return toFixed(result[1], 4);
   }
 }

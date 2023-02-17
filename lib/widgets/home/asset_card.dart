@@ -56,7 +56,7 @@ class _AssetCardState extends State<AssetCard> {
     if (tokensHelper.isPair(coin)) {
       double balanceInSatoshi = convertToSatoshi(tokenBalance) + .0;
       balanceInUsd = tokensHelper.getPairsAmountByAsset(
-          state.tokensPairs, balanceInSatoshi, coin, 'USD');
+          state.tokensPairs, balanceInSatoshi, coin, 'USD')*2;
     } else {
       balanceInUsd = tokensHelper.getAmountByUsd(
           state.tokensPairs, tokenBalance, coin.replaceAll('d', ''));

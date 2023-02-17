@@ -487,7 +487,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                       CrossAxisAlignment.end,
                                                   children: [
                                                     Text(
-                                                      balancesHelper.numberStyling(totalPairsBalance/2, fixed: true),
+                                                      balancesHelper.numberStyling(totalPairsBalance, fixed: true),
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .headline4!
