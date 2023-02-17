@@ -74,8 +74,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                     .getAprFormat(getMaxAPR(tokensState.tokensPairs!), true);
 
                 accountState.activeAccount!.balanceList!.forEach((element) {
-                  if (!element.isHidden! && !element.isPair!) {
-                  } else if (element.isPair!) {
+                  if (element.isPair! && !element.isHidden!) {
                     countPairs += 1;
                     totalPairsAPR += getAPRbyPair(tokensState.tokensPairs!,element.token!);
 
@@ -236,6 +235,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                           CrossAxisAlignment
                                                               .end,
                                                       children: [
+                                                        if (lockState.lockStakingDetails != null)
                                                         Text(
                                                           lockState.lockUserDetails!
                                                                       .kycStatus! ==
@@ -261,6 +261,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                         SizedBox(
                                                           width: 5,
                                                         ),
+                                                        if (lockState.lockStakingDetails != null)
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
