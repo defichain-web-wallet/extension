@@ -179,8 +179,7 @@ class _HistoryDetailsState extends State<HistoryDetails>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            if (assetPairModel != null)
-                              Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -199,7 +198,7 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                         txCategory,
                                       ),
                                       style:
-                                          Theme.of(context).textTheme.headline5,
+                                      Theme.of(context).textTheme.headline5,
                                     ),
                                   ),
                                   SizedBox(
@@ -211,13 +210,13 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                         .textTheme
                                         .headline6!
                                         .copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .color!
-                                              .withOpacity(0.3),
-                                        ),
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
                                   ),
                                   SizedBox(
                                     height: 12,
@@ -231,8 +230,8 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline3!
                                               .copyWith(
-                                                fontSize: 36,
-                                              ),
+                                            fontSize: 36,
+                                          ),
                                         ),
                                         if (txCategory != 'AddPoolLiquidity' && txCategory != 'RemovePoolLiquidity')
                                           SvgPicture.asset(
@@ -250,8 +249,8 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline3!
                                               .copyWith(
-                                                fontSize: 36,
-                                              ),
+                                            fontSize: 36,
+                                          ),
                                         )
                                       ],
                                     )
@@ -262,8 +261,8 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                           .textTheme
                                           .headline3!
                                           .copyWith(
-                                            fontSize: 42,
-                                          ),
+                                        fontSize: 42,
+                                      ),
                                     ),
                                   Text(
                                     '\$$totalBalanceByUsdFormat',
@@ -271,13 +270,13 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                         .textTheme
                                         .headline5!
                                         .copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .color!
-                                              .withOpacity(0.3),
-                                        ),
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
                                   ),
                                   SizedBox(
                                     height: 24,
@@ -290,8 +289,8 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                             .textTheme
                                             .headline5!
                                             .copyWith(
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                       )
                                     ],
                                   ),
@@ -338,9 +337,9 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                   if (txCategory == 'PoolSwap')
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Total',
@@ -348,16 +347,16 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline5!
                                               .copyWith(
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .color!
+                                                .withOpacity(0.3),
+                                          ),
                                         ),
                                         Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.end,
+                                          CrossAxisAlignment.end,
                                           children: [
                                             Text(
                                               '$txValueFirst $tokenNameFirst',
@@ -378,7 +377,7 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                   else
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           isSend ? 'Send to' : 'Received from',
@@ -386,12 +385,12 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline5!
                                               .copyWith(
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .color!
+                                                .withOpacity(0.3),
+                                          ),
                                         ),
                                         Text(
                                           cutAddress(
@@ -414,9 +413,9 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                   if (txCategory == 'PoolSwap')
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Price',
@@ -424,16 +423,16 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline5!
                                               .copyWith(
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .color!
+                                                .withOpacity(0.3),
+                                          ),
                                         ),
                                         Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.end,
+                                          CrossAxisAlignment.end,
                                           children: [
                                             Text(
                                               '${assetPairModel!.reserveBDivReserveA!.toStringAsFixed(6)} $tokenNameFirst per $tokenNameSecond',
@@ -490,36 +489,33 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                     ],
                                   if (txCategory != 'AddPoolLiquidity' && txCategory != 'RemovePoolLiquidity')
                                     Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Fee',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline5!
-                                            .copyWith(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .headline5!
-                                                  .color!
-                                                  .withOpacity(0.3),
-                                            ),
-                                      ),
-                                      Text(
-                                        '${widget.dfxHistoryModel!.feeValue!.toStringAsFixed(8)} $tokenNameFirst',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline5!,
-                                      ),
-                                    ],
-                                  ),
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Fee',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .copyWith(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .color!
+                                                .withOpacity(0.3),
+                                          ),
+                                        ),
+                                        Text(
+                                          '${widget.dfxHistoryModel!.feeValue!.toStringAsFixed(8)} $tokenNameFirst',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5!,
+                                        ),
+                                      ],
+                                    ),
                                 ],
                               ),
-                            )
-                            else
-                              // TODO: need to implement error placeholder
-                              Expanded(child: Center()),
+                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
