@@ -66,12 +66,19 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
               return BlocBuilder<TokensCubit, TokensState>(
                   builder: (tokensContext, tokensState) {
                 double totalPairsBalance = 0;
+                double totalPairsAPR = 0;
+                String avaragePairsAPR = '';
+                int countPairs = 0;
+
                 String maxApr = TokensHelper()
-                    .getAprFormat(getMaxAPR(tokensState.tokensPairs!));
+                    .getAprFormat(getMaxAPR(tokensState.tokensPairs!), true);
 
                 accountState.activeAccount!.balanceList!.forEach((element) {
                   if (!element.isHidden! && !element.isPair!) {
                   } else if (element.isPair!) {
+                    countPairs += 1;
+                    totalPairsAPR += getAPRbyPair(tokensState.tokensPairs!,element.token!);
+
                     var foundedAssetPair = List.from(tokensState.tokensPairs!
                         .where((item) => element.token == item.symbol))[0];
 
@@ -94,6 +101,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                     );
                   }
                 });
+                avaragePairsAPR =  TokensHelper().getAprFormat(countPairs > 0 ? totalPairsAPR/countPairs : 0, false);
 
                 return Scaffold(
                   drawerScrimColor: Color(0x0f180245),
@@ -405,7 +413,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                             ),
                             GestureDetector(
                               onTap: () =>
-                                  liquidityCallback(totalPairsBalance, txState),
+                                  liquidityCallback(avaragePairsAPR, txState),
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Container(
@@ -445,7 +453,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                     ),
                                               ),
                                               Text(
-                                                'up to ${maxApr}',
+                                                'up to ${maxApr} APR',
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .headline5!
@@ -478,7 +486,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                       CrossAxisAlignment.end,
                                                   children: [
                                                     Text(
-                                                      '142.258',
+                                                      balancesHelper.numberStyling(totalPairsBalance/2, fixed: true),
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .headline4!
@@ -494,7 +502,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                           const EdgeInsets.only(
                                                               bottom: 2.0),
                                                       child: Text(
-                                                        'DFI',
+                                                        'USD',
                                                         style: Theme.of(context)
                                                             .textTheme
                                                             .headline4!
@@ -506,7 +514,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                   ],
                                                 ),
                                                 Text(
-                                                  'pooled',
+                                                  'Pooled',
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .headline5!
@@ -533,7 +541,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                       CrossAxisAlignment.end,
                                                   children: [
                                                     Text(
-                                                      '42.8769',
+                                                      avaragePairsAPR,
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .headline4!
@@ -543,15 +551,12 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                                 .malachite,
                                                           ),
                                                     ),
-                                                    SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Padding(
+                                                    countPairs > 0 ? Padding(
                                                       padding:
                                                           const EdgeInsets.only(
                                                               bottom: 2.0),
                                                       child: Text(
-                                                        'DFI',
+                                                        '%',
                                                         style: Theme.of(context)
                                                             .textTheme
                                                             .headline4!
@@ -561,11 +566,11 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                                   .malachite,
                                                             ),
                                                       ),
-                                                    ),
+                                                    ) : Container(),
                                                   ],
                                                 ),
                                                 Text(
-                                                  'Rewards earned',
+                                                  'Portfolio APR',
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .headline5!
@@ -624,6 +629,17 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
     return maxValue;
   }
 
+  double getAPRbyPair(List<AssetPairModel> tokenPairs, String pair) {
+    double value = 0;
+
+    tokenPairs.forEach((element) {
+      if (pair == element.symbol) {
+        value = element.apr!;
+      }
+    });
+    return value;
+  }
+
   stakingCallback(lockState) async{
     if (lockState.lockUserDetails.kycStatus == 'Full') {
       Navigator.push(
@@ -653,8 +669,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
     }
   }
 
-  liquidityCallback(double totalLiquidityBalance, txState) {
-    Widget redirectTo = LiquidityScreenNew();
+  liquidityCallback(String avaragePairsAPR, txState) {
+    Widget redirectTo = LiquidityScreenNew(averageARP: avaragePairsAPR);
 
       Navigator.push(
         context,

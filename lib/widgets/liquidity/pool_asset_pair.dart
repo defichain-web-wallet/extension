@@ -99,7 +99,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
                           height: 4,
                         ),
                         Text(
-                          '${TokensHelper().getAprFormat(widget.assetPair.apr!)}',
+                          '${TokensHelper().getAprFormat(widget.assetPair.apr!, true)}',
                           style:
                               Theme.of(context).textTheme.headline5!.copyWith(
                                     fontSize: 11,
@@ -217,7 +217,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
             Container(
               width: 60,
               child: Text(
-                TokensHelper().getAprFormat(widget.assetPair.apr!),
+                TokensHelper().getAprFormat(widget.assetPair.apr!, true),
                 style: Theme.of(context).textTheme.headline5!.copyWith(
                       fontSize: 12,
                     ),

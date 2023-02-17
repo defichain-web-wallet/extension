@@ -89,7 +89,7 @@ class _EarnScreenState extends State<EarnScreen> {
                 builder: (tokensContext, tokensState) {
               double totalPairsBalance = 0;
               String maxApr = TokensHelper()
-                  .getAprFormat(getMaxAPR(tokensState.tokensPairs!));
+                  .getAprFormat(getMaxAPR(tokensState.tokensPairs!), true);
 
               accountState.activeAccount!.balanceList!.forEach((element) {
                 if (!element.isHidden! && !element.isPair!) {
