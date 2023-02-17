@@ -656,7 +656,6 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
   liquidityCallback(double totalLiquidityBalance, txState) {
     Widget redirectTo = LiquidityScreenNew();
 
-    if (txState is! TransactionLoadingState) {
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -665,19 +664,5 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
           reverseTransitionDuration: Duration.zero,
         ),
       );
-    } else {
-      showSnackBar(
-        context,
-        title:
-        'Please wait for the previous '
-            'transaction',
-        color: AppColors.txStatusError
-            .withOpacity(0.1),
-        prefix: Icon(
-          Icons.close,
-          color: AppColors.txStatusError,
-        ),
-      );
-    }
   }
 }

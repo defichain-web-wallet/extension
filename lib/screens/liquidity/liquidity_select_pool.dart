@@ -157,13 +157,13 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
               topLeft: Radius.circular(20),
             ),
           ),
-          child: _buildBody(context),
+          child: _buildBody(context, transactionState),
         ),
       );
     });
   }
 
-  Widget _buildBody(context, {isFullSize = false}) {
+  Widget _buildBody(context, transactionState, {isFullSize = false}) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
     return BlocBuilder<TokensCubit, TokensState>(
@@ -487,35 +487,56 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                                             ),
                                           );
                                         }
-                                      : () => Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation1,
-                                                      animation2) =>
-                                                  LiquidityConfirmation(
-                                                      assetPair:
-                                                          widget.assetPair,
-                                                      baseAmount: double.parse(
-                                                          _amountBaseController
-                                                              .text
-                                                              .replaceAll(
-                                                                  ',', '.')),
-                                                      quoteAmount: double.parse(
-                                                          _amountQuoteController
-                                                              .text
-                                                              .replaceAll(
-                                                                  ',', '.')),
-                                                      shareOfPool: shareOfPool,
-                                                      amountUSD: amountUSD,
-                                                      balanceUSD: balanceUSD,
-                                                      balanceA: balanceA,
-                                                      balanceB: balanceB,
-                                                      amount: amount),
-                                              transitionDuration: Duration.zero,
-                                              reverseTransitionDuration:
-                                                  Duration.zero,
-                                            ),
-                                          )
+                                      : () {
+                                          if (transactionState
+                                              is! TransactionLoadingState) {
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context,
+                                                        animation1,
+                                                        animation2) =>
+                                                    LiquidityConfirmation(
+                                                        assetPair:
+                                                            widget.assetPair,
+                                                        baseAmount: double.parse(
+                                                            _amountBaseController
+                                                                .text
+                                                                .replaceAll(
+                                                                    ',', '.')),
+                                                        quoteAmount: double.parse(
+                                                            _amountQuoteController
+                                                                .text
+                                                                .replaceAll(
+                                                                    ',', '.')),
+                                                        shareOfPool:
+                                                            shareOfPool,
+                                                        amountUSD: amountUSD,
+                                                        balanceUSD: balanceUSD,
+                                                        balanceA: balanceA,
+                                                        balanceB: balanceB,
+                                                        amount: amount),
+                                                transitionDuration:
+                                                    Duration.zero,
+                                                reverseTransitionDuration:
+                                                    Duration.zero,
+                                              ),
+                                            );
+                                          } else {
+                                            showSnackBar(
+                                              context,
+                                              title:
+                                                  'Please wait for the previous '
+                                                  'transaction',
+                                              color: AppColors.txStatusError
+                                                  .withOpacity(0.1),
+                                              prefix: Icon(
+                                                Icons.close,
+                                                color: AppColors.txStatusError,
+                                              ),
+                                            );
+                                          }
+                                        }
                                   : null,
                             ),
                           ),
