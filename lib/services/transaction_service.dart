@@ -266,13 +266,13 @@ class TransactionService {
     var responseModel = await createTransaction(
         keyPair: keyPair,
         utxoList: accountUtxoList,
-        destinationAddress: destinationAddress,
+        destinationAddress: account.getActiveAddress(isChange: false),
         account: account,
         changeAddress: account.getActiveAddress(isChange: true),
         amount: 0,
         additional: (txb, nw, newUtxo) {
           txb.addAccountToAccountOutputAt(
-              tokenId, destinationAddress, destinationAddress, amount, 0);
+              tokenId, account.getActiveAddress(isChange: false), destinationAddress, amount, 0);
         },
         useAllUtxo: true);
     if (responseModel.isError) {
