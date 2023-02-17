@@ -237,9 +237,12 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                               );
                                             },
                                           )
-                                    : StatusLogoAndTitle(
-                                      title: 'Oops!',
-                                      subtitle: subtitleTextOops,
+                                    : Center(
+                                      child: StatusLogoAndTitle(
+                                        title: 'Oops!',
+                                        subtitle: subtitleTextOops,
+                                        isSmall: true,
+                                      ),
                                     ),
                                   ),
                                 ],
