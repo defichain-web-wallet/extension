@@ -36,8 +36,10 @@ class AssetList extends StatelessWidget {
                     ));
           } else {
             balances = state.activeAccount!.balanceList!
-                .where((el) => !el.isHidden! || (!el.isPair! && el.balance != 0))
+                .where((el) => !el.isHidden!)
                 .toList();
+            balances.removeWhere(
+                (element) => element.isPair! && element.balance == 0);
           }
           String currency = SettingsHelper.settings.currency!;
 

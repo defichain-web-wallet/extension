@@ -59,8 +59,12 @@ class _AmountFieldState extends State<AmountField> {
   void initState() {
     _focusNode.addListener(_onFocusChange);
     super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     AvailableAmountCubit availableAmountCubit =
-        BlocProvider.of<AvailableAmountCubit>(context);
+      BlocProvider.of<AvailableAmountCubit>(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       if (widget.type == TxType.send) {
@@ -86,10 +90,6 @@ class _AmountFieldState extends State<AmountField> {
         }
       }
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => _focusNode.requestFocus(),
       onDoubleTap: () {
@@ -209,17 +209,21 @@ class _AmountFieldState extends State<AmountField> {
                       return Container();
                     } else {
                       late String available;
-                      if (widget.type == TxType.send) {
-                        available = availableAmountState.available.toString();
-                      }
-                      if (widget.type == TxType.swap || widget.type == TxType.addLiq) {
-                        if (widget.isAvailableTo) {
-                          available =
-                              availableAmountState.availableTo.toString();
-                        } else {
-                          available =
-                              availableAmountState.availableFrom.toString();
+                      if (widget.type != null) {
+                        if (widget.type == TxType.send) {
+                          available = availableAmountState.available.toString();
                         }
+                        if (widget.type == TxType.swap || widget.type == TxType.addLiq) {
+                          if (widget.isAvailableTo) {
+                            available =
+                                availableAmountState.availableTo.toString();
+                          } else {
+                            available =
+                                availableAmountState.availableFrom.toString();
+                          }
+                        }
+                      } else {
+                        available = widget.available.toString();
                       }
                       return GestureDetector(
                         onTap: () {
