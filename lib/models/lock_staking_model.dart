@@ -41,10 +41,10 @@ class LockStakingModel {
     this.rewardsAmount = json["rewardsAmount"];
 
     List<LockRewardRoutesModel> rewardRoutes = [];
-    json["rewardRoutes"]
-        .map((data) => rewardRoutes.add(LockRewardRoutesModel.fromJson(data)))
-        .toList();
-    this.rewardRoutes = rewardRoutes;
+    // json["rewardRoutes"]
+    //     .map((data) => rewardRoutes.add(LockRewardRoutesModel.fromJson(data)))
+    //     .toList();
+    this.rewardRoutes = [LockRewardRoutesModel(rewardPercent: 1, targetAsset: 'DFI', label: 'Reinvest')];
   }
 
   Map<String, dynamic> toJson() {
