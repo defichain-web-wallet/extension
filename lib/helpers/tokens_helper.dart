@@ -315,6 +315,12 @@ class TokensHelper {
     }
   }
 
+  String getSpecificDefiName(String value) {
+    print(value);
+    String defaultDefiTokenName = 'Default Defi token';
+    return value.replaceAll(defaultDefiTokenName, 'DFI');
+  }
+
   List<TokensModel> getTokensList(
     balances,
     tokensState, {

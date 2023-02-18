@@ -36,7 +36,7 @@ class _TabBarHeaderState extends State<TabBarHeader> {
               callback: () {
                 widget.tabController!.index = 1;
               },
-              title: 'History',
+              title: 'History (Beta)',
               isSelect: widget.tabController!.index == 1,
             )
           ],
