@@ -304,7 +304,9 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                   ],
                                                 ),
                                               ),
-                                              Expanded(
+                                              // TODO: uncomment this when API will be work
+                                              if (false)
+                                                Expanded(
                                                 flex: 1,
                                                 child: Column(
                                                   crossAxisAlignment:
