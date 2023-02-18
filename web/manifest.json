@@ -1,9 +1,6 @@
 {
     "name": "Jellywallet",
-    "version": "2.0.6",
-    "permissions": [
-        "storage"
-    ],
+    "version": "2.0.7",
     "icons": {
         "16":"/icons/jelly_logo.png",
         "48": "/icons/jelly_logo.png",
