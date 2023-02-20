@@ -13,6 +13,7 @@ import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
@@ -201,6 +202,8 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                             height: 16,
                                           ),
                                           AmountField(
+                                            type: TxType.send,
+                                            account: accountState.activeAccount!,
                                             onChanged: (value) {
                                               setState(() {
                                                 balanceInUsd =
@@ -209,8 +212,6 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                             },
                                             suffix: balanceInUsd ??
                                                 getUsdBalance(context),
-                                            available: getAvailableBalance(
-                                                accountState),
                                             onAssetSelect: (t) {
                                               setState(() {
                                                 currentAsset = t;

@@ -1,12 +1,11 @@
 import 'package:defi_wallet/bloc/available_amount/available_amount_cubit.dart';
-import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/constants/input_formatters.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/selectors/asset/asset_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 
@@ -50,23 +49,28 @@ class _AmountFieldState extends State<AmountField> {
     if (widget.controller.text == '0') {
       widget.controller.text = '';
     }
+
     setState(() {
       _onFocused = _focusNode.hasFocus;
     });
   }
 
-  @override
-  void initState() {
-    _focusNode.addListener(_onFocusChange);
-    super.initState();
+  _onSelectInputText() {
+    _focusNode.requestFocus();
+    if (widget.controller.text.isNotEmpty) {
+      widget.controller.selection =
+          TextSelection(
+              baseOffset: 0,
+              extentOffset:
+              widget.controller
+                  .text.length);
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  _loadAvailableBalance(BuildContext context) {
     AvailableAmountCubit availableAmountCubit =
       BlocProvider.of<AvailableAmountCubit>(context);
-
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (widget.type == TxType.send) {
         await availableAmountCubit.getAvailable(
           widget.selectedAsset.symbol!,
@@ -90,19 +94,21 @@ class _AmountFieldState extends State<AmountField> {
         }
       }
     });
+  }
+
+  @override
+  void initState() {
+    _focusNode.addListener(_onFocusChange);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _loadAvailableBalance(context);
+
     return GestureDetector(
       onTap: () => _focusNode.requestFocus(),
-      onDoubleTap: () {
-        _focusNode.requestFocus();
-        if (widget.controller.text.isNotEmpty) {
-          widget.controller.selection =
-              TextSelection(
-                  baseOffset: 0,
-                  extentOffset:
-                  widget.controller
-                      .text.length);
-        }
-      },
+      onDoubleTap: () => _onSelectInputText(),
       child: Container(
         height: 80,
         padding: const EdgeInsets.only(
@@ -134,32 +140,7 @@ class _AmountFieldState extends State<AmountField> {
                       height: 42,
                       child: TextField(
                         keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(
-                            RegExp("[0-9\.-]"),
-                            replacementString: ('.'),
-                          ),
-                          FilteringTextInputFormatter.deny(
-                            RegExp(r'\.\.+'),
-                            replacementString: '.',
-                          ),
-                          FilteringTextInputFormatter.deny(
-                            RegExp(r'^\.'),
-                            replacementString: '0.',
-                          ),
-                          FilteringTextInputFormatter.deny(
-                            RegExp(r'\.\d+\.'),
-                          ),
-                          FilteringTextInputFormatter.deny(
-                            RegExp(r'\d+-'),
-                          ),
-                          FilteringTextInputFormatter.deny(
-                            RegExp(r'-\.+'),
-                          ),
-                          FilteringTextInputFormatter.deny(
-                            RegExp(r'^0\d+'),
-                          ),
-                        ],
+                        inputFormatters: inputFormatters,
                         controller: widget.controller,
                         focusNode: _focusNode,
                         onChanged: (value) => widget.onChanged(value),
@@ -203,6 +184,8 @@ class _AmountFieldState extends State<AmountField> {
                       ),
                 ),
                 BlocBuilder<AvailableAmountCubit, AvailableAmountState>(
+                  buildWhen: (prev, current) => current.status ==
+                      AvailableAmountStatusList.success,
                   builder: (availableAmountContext, availableAmountState) {
                     if (availableAmountState.status !=
                         AvailableAmountStatusList.success) {
@@ -227,10 +210,11 @@ class _AmountFieldState extends State<AmountField> {
                       }
                       return GestureDetector(
                         onTap: () {
-                          setState(() {
+                          if (widget.controller.text != available) {
                             widget.controller.text = available;
-                          });
-                          widget.onChanged(widget.controller.text);
+                            widget.onChanged(widget.controller.text);
+                            _focusNode.requestFocus();
+                          }
                         },
                         child: MouseRegion(
                           cursor: SystemMouseCursors.click,

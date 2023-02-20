@@ -306,8 +306,6 @@ class _SendScreenNewState extends State<SendScreenNew>
                                           SettingsHelper.isBitcoin(),
                                       suffix: balanceInUsd ??
                                           getUsdBalance(context),
-                                      available: getAvailableBalance( //TODO
-                                          accountState, bitcoinState),
                                       onAssetSelect: (t) {
                                         setState(() {
                                           currentAsset = t;
