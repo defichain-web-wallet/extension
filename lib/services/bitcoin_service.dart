@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defi_wallet/models/address_model.dart';
-import 'package:defi_wallet/services/mnemonic_service.dart';
+import 'package:defi_wallet/models/network_type_model.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 
@@ -16,9 +16,13 @@ class BitcoinService {
 
   ECPair getKeypairForPath(
       bip32.BIP32 masterKeypair, String path, String networkString) {
-
+    AbstractNetworkType net = networkHelper.getNetwork(networkString);
+    if (net.dialect != NetworkDialect.BTC) {
+      throw Exception("Only type BTC networks are supported");
+    }
+    BtcNetworkType network = net as BtcNetworkType;
     return ECPair.fromPrivateKey(masterKeypair.derivePath(path).privateKey!,
-        network: networkHelper.getNetwork(networkString));
+        network: network);
   }
 
   ECPair getKeypairFromWIF(String wif, String networkString) {
