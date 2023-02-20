@@ -285,9 +285,6 @@ class _SellingState extends State<Selling> {
                                     isBorder: isCustomBgColor,
                                     key: selectKeyIban,
                                     onAnotherSelect: hideOverlay,
-                                    routeWidget: Selling(
-                                      isNewIban: widget.isNewIban,
-                                    ),
                                     ibanList: uniqueIbans,
                                     selectedIban: fiatState.activeIban,
                                   )),

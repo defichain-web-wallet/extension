@@ -1,5 +1,5 @@
-import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
-import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
+// import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
+// import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/logo_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';
@@ -67,12 +67,20 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
       title: isSmall
           ? Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              AccountSelect(key: selectKey, width: accountSelectSmallHeight)
+              AccountSelect(
+                key: selectKey,
+                width: accountSelectSmallHeight,
+                isFullScreen: false,
+              )
             ])
           : Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                AccountSelect(key: selectKey, width: accountSelectMediumHeight)
+                AccountSelect(
+                  key: selectKey,
+                  width: accountSelectMediumHeight,
+                  isFullScreen: true,
+                )
               ],
             ),
       actions: [
@@ -87,10 +95,11 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                     icon: FullSizeIcon(),
                     splashRadius: 18,
                     onPressed: () async {
-                      lockHelper.provideWithLockChecker(
-                          context,
-                          () => js.context.callMethod(
-                              'open', [window.location.toString()]));
+                      // TODO: uncomment later
+                      // lockHelper.provideWithLockChecker(
+                      //     context,
+                      //     () => js.context.callMethod(
+                      //         'open', [window.location.toString()]));
                     },
                   ),
                 ),

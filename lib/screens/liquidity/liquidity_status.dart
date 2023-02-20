@@ -82,7 +82,7 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
 
   Widget _buildBody(context) {
     var actionName = widget.isRemove ? 'remove liquidity' : 'add liquidity';
-    if (widget.txError.isError) {
+    if (widget.txError.isError!) {
       LoggerService.invokeInfoLogg('user was $actionName token failed: ${widget.txError.error}');
     } else {
       LoggerService.invokeInfoLogg('user was $actionName token successfully');
@@ -90,7 +90,7 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
       TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
 
-      transactionCubit.setOngoingTransaction(widget.txError.txid!);
+      transactionCubit.setOngoingTransaction(widget.txError);
     }
     return Container(
       color: Theme
@@ -110,7 +110,7 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
                         padding: const EdgeInsets.only(top: 24),
                         child: Column(
                           children: [
-                            widget.txError.isError
+                            widget.txError.isError!
                                 ? Image.asset(
                               'assets/error_gif.gif',
                               height: 106,
@@ -124,7 +124,7 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
                             Padding(
                               padding: const EdgeInsets.only(top: 32),
                               child: Text(
-                                widget.txError.isError
+                                widget.txError.isError!
                                     ? 'Something went wrong!'
                                     : widget.isRemove
                                     ? 'Liquidity has been removed successfully!'
@@ -186,7 +186,7 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
               SizedBox(
                 height: 15,
               ),
-              widget.txError.isError ? Text(
+              widget.txError.isError! ? Text(
                 widget.txError.error.toString() ==
                     'txn-mempool-conflict (code 18)'
                     ? 'Wait for approval the previous tx'
@@ -208,11 +208,7 @@ class _LiquidityStatusState extends State<LiquidityStatus> {
                       'View on Explorer',
                       style: AppTheme.defiUnderlineText,
                     ),
-                    onTap: () =>
-                        launch(
-                            'https://defiscan.live/transactions/${widget.txError
-                                .txid}?network=${SettingsHelper.settings
-                                .network!}'),
+                    onTap: () => null,
                   ),
                 ],
               ),

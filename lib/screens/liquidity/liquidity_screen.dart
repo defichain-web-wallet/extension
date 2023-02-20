@@ -163,7 +163,7 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                                 var tokenPairs = List.from(foundedAssetPair)[0];
 
                                 return MainLiquidityPair(
-                                  isBorder: isFullSize,
+                                  isOpen: isFullSize,
                                   balance: tokensPairsList[index].balance,
                                   assetPair: tokenPairs,
                                 );
@@ -172,42 +172,35 @@ class _LiquidityScreenState extends State<LiquidityScreen> {
                           )
                         else
                           Expanded(
-                            child: Center(
-                              child: Text(
-                                'Not yet any asset pairs',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .apply(color: Colors.grey.shade600),
-                              ),
-                            ),
+                            child: Loader(),
                           ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                              child: Text(
-                                ' +  Add liquidity ',
-                                style: Theme.of(context).textTheme.headline6,
+                        if (tokensPairsList.length != 0)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                child: Text(
+                                  ' +  Add liquidity ',
+                                  style: Theme.of(context).textTheme.headline6,
+                                ),
+                                onPressed: () async {
+                                  await lockHelper.provideWithLockChecker(
+                                      context,
+                                          () => Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1,
+                                              animation2) =>
+                                              LiquidityPoolList(),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                          Duration.zero,
+                                        ),
+                                      ));
+                                },
                               ),
-                              onPressed: () async {
-                                await lockHelper.provideWithLockChecker(
-                                    context,
-                                    () => Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                    animation2) =>
-                                                LiquidityPoolList(),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
-                                          ),
-                                        ));
-                              },
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     ),
                   ),

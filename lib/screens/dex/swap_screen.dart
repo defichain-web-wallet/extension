@@ -12,6 +12,7 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
+import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -49,11 +50,12 @@ class _SwapScreenState extends State<SwapScreen> {
   final TextEditingController amountFromController = TextEditingController();
   final TextEditingController amountToController = TextEditingController();
   final TextEditingController slippageController = TextEditingController();
-  final GlobalKey<AssetSelectState> selectKeyFrom =
-      GlobalKey<AssetSelectState>();
+  final GlobalKey<AssetSelectSwapState> selectKeyFrom =
+      GlobalKey<AssetSelectSwapState>();
   final GlobalKey<PendingButtonState> pendingButton =
       GlobalKey<PendingButtonState>();
-  final GlobalKey<AssetSelectState> selectKeyTo = GlobalKey<AssetSelectState>();
+  final GlobalKey<AssetSelectSwapState> selectKeyTo =
+      GlobalKey<AssetSelectSwapState>();
 
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
@@ -246,7 +248,7 @@ class _SwapScreenState extends State<SwapScreen> {
                             selectedAsset: assetFrom,
                             account: accountFrom,
                             assets: assets,
-                            selectKey: selectKeyFrom,
+                            selectSwapKey: selectKeyFrom,
                             amountController: amountFromController,
                             onAnotherSelect: hideOverlay,
                             amountInUsd: amountFromInUsd,
@@ -311,12 +313,15 @@ class _SwapScreenState extends State<SwapScreen> {
                             ),
                             child: Text(
                               'Available balance: $swapFromMsg',
-                              style: Theme.of(context).textTheme.headline4!.apply(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .headline4!
-                                      .color!
-                                      .withOpacity(0.5)),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline4!
+                                  .apply(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline4!
+                                          .color!
+                                          .withOpacity(0.5)),
                             ),
                           ),
                           SizedBox(height: 30),
@@ -327,7 +332,7 @@ class _SwapScreenState extends State<SwapScreen> {
                             selectedAsset: assetTo,
                             account: accountTo,
                             assets: tokensForSwap,
-                            selectKey: selectKeyTo,
+                            selectSwapKey: selectKeyTo,
                             amountController: amountToController,
                             onAnotherSelect: hideOverlay,
                             amountInUsd: amountToInUsd,
@@ -467,6 +472,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                                   onPressed: () => setState(() {
                                                     slippage = 0.03;
                                                     isShowSlippageField = false;
+                                                    hideOverlay();
                                                   }),
                                                 ),
                                               ),
@@ -493,8 +499,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                                     isBorder: isCustomBgColor,
                                                     label: '0.5%',
                                                     isActive: slippage == 0.005,
-                                                    callback: () => setState(
-                                                        () => slippage = 0.005),
+                                                    callback: () =>
+                                                        setState(() {
+                                                      slippage = 0.005;
+                                                      hideOverlay();
+                                                    }),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -506,8 +515,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                                     isBorder: isCustomBgColor,
                                                     label: '1%',
                                                     isActive: slippage == 0.01,
-                                                    callback: () => setState(
-                                                        () => slippage = 0.01),
+                                                    callback: () =>
+                                                        setState(() {
+                                                      slippage = 0.01;
+                                                      hideOverlay();
+                                                    }),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -519,8 +531,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                                     isBorder: isCustomBgColor,
                                                     label: '3%',
                                                     isActive: slippage == 0.03,
-                                                    callback: () => setState(
-                                                        () => slippage = 0.03),
+                                                    callback: () =>
+                                                        setState(() {
+                                                      slippage = 0.03;
+                                                      hideOverlay();
+                                                    }),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -532,8 +547,11 @@ class _SwapScreenState extends State<SwapScreen> {
                                                     isBorder: isCustomBgColor,
                                                     label: '5%',
                                                     isActive: slippage == 0.05,
-                                                    callback: () => setState(
-                                                        () => slippage = 0.05),
+                                                    callback: () =>
+                                                        setState(() {
+                                                      slippage = 0.05;
+                                                      hideOverlay();
+                                                    }),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -575,10 +593,12 @@ class _SwapScreenState extends State<SwapScreen> {
                                                         Icons.edit,
                                                         size: 16,
                                                       ),
-                                                      onPressed: () => setState(
-                                                          () =>
-                                                              isShowSlippageField =
-                                                                  true),
+                                                      onPressed: () =>
+                                                          setState(() {
+                                                        isShowSlippageField =
+                                                            true;
+                                                        hideOverlay();
+                                                      }),
                                                     ),
                                                   ),
                                                 )
@@ -615,23 +635,22 @@ class _SwapScreenState extends State<SwapScreen> {
                                     padding:
                                         const EdgeInsets.only(bottom: 14.0),
                                     child: InkWell(
-                                      onTap: () {
-                                        String kycHash = fiatState.kycHash!;
-                                        launch(
-                                            'https://payment.dfx.swiss/kyc?code=$kycHash');
-                                      },
-                                      child: RichText(
-                                        text: TextSpan(
-                                          text: 'Please complete the KYC process to enable this feature',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline3
-                                              ?.apply(
-                                              color:
-                                              AppTheme.pinkColor),
-                                        ),
-                                      )
-                                    ),
+                                        onTap: () {
+                                          String kycHash = fiatState.kycHash!;
+                                          launch(
+                                              'https://payment.dfx.swiss/kyc?code=$kycHash');
+                                        },
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text:
+                                                'Please complete the KYC process to enable this feature',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline3
+                                                ?.apply(
+                                                    color: AppTheme.pinkColor),
+                                          ),
+                                        )),
                                   ),
                                 PendingButton(
                                   'Next',
@@ -644,6 +663,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                             accountState,
                                             transactionState,
                                             context,
+                                            isCustomBgColor,
                                             cryptoRoute: fiatState.cryptoRoute,
                                           )
                                       : null,
@@ -661,6 +681,7 @@ class _SwapScreenState extends State<SwapScreen> {
                                         accountState,
                                         transactionState,
                                         context,
+                                        isCustomBgColor,
                                       )
                                   : null,
                             );
@@ -692,17 +713,16 @@ class _SwapScreenState extends State<SwapScreen> {
       balance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
       amountFromController.text = balance.toString();
     } else {
-      balance =
-          getAvailableAmount(accountState, asset, dexState);
+      balance = getAvailableAmount(accountState, asset, dexState);
     }
 
     calculateSecondAmount(balance.toString(), tokensState);
     if (asset == assetFrom) {
-      onChangeFromAsset(balance.toString(), accountState, dexState,
-          dexCubit, tokensState);
+      onChangeFromAsset(
+          balance.toString(), accountState, dexState, dexCubit, tokensState);
     } else {
-      onChangeToAsset(balance.toString(), accountState, dexState,
-          dexCubit, tokensState);
+      onChangeToAsset(
+          balance.toString(), accountState, dexState, dexCubit, tokensState);
     }
   }
 
@@ -717,8 +737,7 @@ class _SwapScreenState extends State<SwapScreen> {
       );
       setState(() {
         amountFromInUsd =
-            balancesHelper.numberStyling(amount,
-                fixedCount: 2, fixed: true);
+            balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
         if (SettingsHelper.isBitcoin()) {
           amountToInUsd = getUdsAmount(dValue, tokensState);
         } else {
@@ -784,7 +803,7 @@ class _SwapScreenState extends State<SwapScreen> {
         double.parse(amountFromController.text);
   }
 
-  submitReviewSwap(parent, state, transactionState, context,
+  submitReviewSwap(parent, state, transactionState, context, bool isFullScreen,
       {CryptoRouteModel? cryptoRoute}) async {
     hideOverlay();
     if (SettingsHelper.isBitcoin()) {
@@ -828,56 +847,95 @@ class _SwapScreenState extends State<SwapScreen> {
     }
     if (isNumeric(amountFromController.text)) {
       if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
-        PasswordBottomSheet.provideWithPassword(
-            context, state.activeAccount, (password) async {
-          try {
-            BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(
-                context);
-            ECPair keyPair = await HDWalletService()
-                .getKeypairFromStorage(
-                password, state.activeAccount.index!);
-            var tx = await transactionService.createBTCTransaction(
-              keyPair: keyPair,
-              account: state.activeAccount,
-              destinationAddress: cryptoRoute.address!,
-              amount: balancesHelper.toSatoshi(
-                  amountFromController.text),
-              satPerByte: bitcoinCubit.state.networkFee!.medium!,
-            );
-            Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) =>
-                      ReviewSwapScreen(
-                        assetFrom,
-                        assetTo.replaceAll('d', ''),
-                        double.parse(amountFromController.text),
-                        double.parse(amountToController.text),
-                        slippage,
-                        btcTx: tx,
+        isFullScreen
+            ? PasswordBottomSheet.provideWithPasswordFullScreen(
+                context, state.activeAccount, (password) async {
+                try {
+                  BitcoinCubit bitcoinCubit =
+                      BlocProvider.of<BitcoinCubit>(context);
+                  ECPair keyPair = await HDWalletService()
+                      .getKeypairFromStorage(
+                          password, state.activeAccount.index!);
+                  var tx = await transactionService.createBTCTransaction(
+                    keyPair: keyPair,
+                    account: state.activeAccount,
+                    destinationAddress: cryptoRoute.address!,
+                    amount: balancesHelper.toSatoshi(amountFromController.text),
+                    satPerByte: bitcoinCubit.state.networkFee!.medium!,
+                  );
+                  Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation1, animation2) =>
+                            ReviewSwapScreen(
+                          assetFrom,
+                          assetTo.replaceAll('d', ''),
+                          double.parse(amountFromController.text),
+                          double.parse(amountToController.text),
+                          slippage,
+                          btcTx: tx,
+                        ),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ));
+                } catch (err) {
+                  print(err);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Something went wrong',
+                        style: Theme.of(context).textTheme.headline5,
                       ),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ));
-          } catch (err) {
-            print(err);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Something went wrong',
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .headline5,
-                ),
-                backgroundColor: Theme
-                    .of(context)
-                    .snackBarTheme
-                    .backgroundColor,
-              ),
-            );
-          }
-        });
+                      backgroundColor:
+                          Theme.of(context).snackBarTheme.backgroundColor,
+                    ),
+                  );
+                }
+              })
+            : PasswordBottomSheet.provideWithPassword(
+                context, state.activeAccount, (password) async {
+                try {
+                  BitcoinCubit bitcoinCubit =
+                      BlocProvider.of<BitcoinCubit>(context);
+                  ECPair keyPair = await HDWalletService()
+                      .getKeypairFromStorage(
+                          password, state.activeAccount.index!);
+                  var tx = await transactionService.createBTCTransaction(
+                    keyPair: keyPair,
+                    account: state.activeAccount,
+                    destinationAddress: cryptoRoute.address!,
+                    amount: balancesHelper.toSatoshi(amountFromController.text),
+                    satPerByte: bitcoinCubit.state.networkFee!.medium!,
+                  );
+                  Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation1, animation2) =>
+                            ReviewSwapScreen(
+                          assetFrom,
+                          assetTo.replaceAll('d', ''),
+                          double.parse(amountFromController.text),
+                          double.parse(amountToController.text),
+                          slippage,
+                          btcTx: tx,
+                        ),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ));
+                } catch (err) {
+                  print(err);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Something went wrong',
+                        style: Theme.of(context).textTheme.headline5,
+                      ),
+                      backgroundColor:
+                          Theme.of(context).snackBarTheme.backgroundColor,
+                    ),
+                  );
+                }
+              });
       } else {
         Navigator.push(
             context,
@@ -1034,8 +1092,7 @@ class _SwapScreenState extends State<SwapScreen> {
           FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
           double amount = double.parse(amountFromController.text);
 
-          var a =
-          (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+          var a = (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
               .toString();
           amountToController.text = balancesHelper.numberStyling(
             double.parse(a),

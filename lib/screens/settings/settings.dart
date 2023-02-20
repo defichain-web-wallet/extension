@@ -9,7 +9,7 @@ import 'package:defi_wallet/screens/settings/preview_seed.dart';
 import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
-import 'package:defi_wallet/widgets/modal_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/modal_dialog.dart';
 import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
@@ -104,11 +104,19 @@ class _SettingsState extends State<Settings> {
                                 // if (accountCubit.mnemonic!.length > 0)
                                 ListTile(
                                   onTap: () {
-                                    PasswordBottomSheet.provideWithPassword(
-                                        context, state.activeAccount!,
-                                        (password) async {
-                                      showMnemonic(password);
-                                    });
+                                    isCustomBgColor
+                                        ? PasswordBottomSheet
+                                            .provideWithPasswordFullScreen(
+                                                context, state.activeAccount!,
+                                                (password) async {
+                                            showMnemonic(password);
+                                          })
+                                        : PasswordBottomSheet
+                                            .provideWithPassword(
+                                                context, state.activeAccount!,
+                                                (password) async {
+                                            showMnemonic(password);
+                                          });
                                   },
                                   title: Padding(
                                     padding: const EdgeInsets.only(bottom: 4),

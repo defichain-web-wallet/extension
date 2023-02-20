@@ -39,93 +39,93 @@ class CurrencySelectorState extends State<CurrencySelector> {
 
   @override
   Widget build(BuildContext context) => Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text(
-                'Your bank account',
-                style: Theme.of(context).textTheme.headline2,
-                textAlign: TextAlign.start,
-              ),
-            ),
-          ],
+    Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            'Your bank account',
+            style: Theme.of(context).textTheme.headline2,
+            textAlign: TextAlign.start,
+          ),
         ),
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            child: Container(
-              key: _selectKey,
-              height: _tileHeight,
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  topLeft: Radius.circular(10),
-                  bottomRight:
-                      _isOpen ? Radius.circular(0) : Radius.circular(10),
-                  bottomLeft:
-                      _isOpen ? Radius.circular(0) : Radius.circular(10),
-                ),
-                border: Border.all(
-                  color: Colors.transparent,
-                ),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      ],
+    ),
+    MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        child: Container(
+          key: _selectKey,
+          height: _tileHeight,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(10),
+              topLeft: Radius.circular(10),
+              bottomRight:
+              _isOpen ? Radius.circular(0) : Radius.circular(10),
+              bottomLeft:
+              _isOpen ? Radius.circular(0) : Radius.circular(10),
+            ),
+            border: Border.all(
+              color: Colors.transparent,
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(
-                                top: 12.0, bottom: 12.0, left: 22, right: 22),
-                            child: SvgPicture.asset(selectedCurrencyLogoPath),
-                          ),
-                          // SizedBox(width: 16),
-                          Text(
-                            widget.selectedCurrency.name!,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.headline3!.apply(
-                                  color: _isOpen
-                                      ? Theme.of(context)
-                                          .textTheme
-                                          .headline3!
-                                          .color!
-                                          .withOpacity(0.5)
-                                      : Theme.of(context)
-                                          .textTheme
-                                          .headline3!
-                                          .color!,
-                                ),
-                          ),
-                        ],
+                      Container(
+                        padding: EdgeInsets.only(
+                            top: 12.0, bottom: 12.0, left: 22, right: 22),
+                        child: SvgPicture.asset(selectedCurrencyLogoPath),
                       ),
-                      SvgPicture.asset(
-                        _isOpen
-                            ? 'assets/arrow_up.svg'
-                            : 'assets/arrow_down.svg',
-                        color: Theme.of(context).textTheme.button!.color,
+                      // SizedBox(width: 16),
+                      Text(
+                        widget.selectedCurrency.name!,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.headline3!.apply(
+                          color: _isOpen
+                              ? Theme.of(context)
+                              .textTheme
+                              .headline3!
+                              .color!
+                              .withOpacity(0.5)
+                              : Theme.of(context)
+                              .textTheme
+                              .headline3!
+                              .color!,
+                        ),
                       ),
                     ],
                   ),
-                ),
+                  SvgPicture.asset(
+                    _isOpen
+                        ? 'assets/arrow_up.svg'
+                        : 'assets/arrow_down.svg',
+                    color: Theme.of(context).textTheme.button!.color,
+                  ),
+                ],
               ),
             ),
-            onTap: () async {
-              await lockHelper.provideWithLockChecker(context, () {
-                if (!_isOpen && widget.onAnotherSelect != null) {
-                  widget.onAnotherSelect!();
-                }
-                _showOverlay();
-              });
-            },
           ),
         ),
-      ]);
+        onTap: () async {
+          await lockHelper.provideWithLockChecker(context, () {
+            if (!_isOpen && widget.onAnotherSelect != null) {
+              widget.onAnotherSelect!();
+            }
+            _showOverlay();
+          });
+        },
+      ),
+    ),
+  ]);
 
   void _showOverlay() async {
     if (_isOpen) {
@@ -195,7 +195,7 @@ class CurrencySelectorState extends State<CurrencySelector> {
                                   widget.currencies[index].name!,
                                   overflow: TextOverflow.ellipsis,
                                   style: widget.currencies[index].name ==
-                                          widget.selectedCurrency.name
+                                      widget.selectedCurrency.name
                                       ? Theme.of(context).textTheme.headline2
                                       : Theme.of(context).textTheme.headline3,
                                 ),
@@ -203,7 +203,7 @@ class CurrencySelectorState extends State<CurrencySelector> {
                             ),
                             SvgPicture.asset(
                               widget.currencies[index].name ==
-                                      widget.selectedCurrency.name
+                                  widget.selectedCurrency.name
                                   ? 'assets/wallet_enable_pink.svg'
                                   : 'assets/wallet_disable.svg',
                               color: AppTheme.pinkColor,

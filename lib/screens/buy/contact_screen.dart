@@ -1,8 +1,7 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
-import 'package:defi_wallet/screens/buy/search_buy_token.dart';
-import 'package:defi_wallet/screens/buy/tutorials/first_step_buy_screen.dart';
+import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -196,7 +195,7 @@ class _ContactScreenState extends State<ContactScreen> {
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) =>
-              SearchBuyToken(),
+              HomeScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),

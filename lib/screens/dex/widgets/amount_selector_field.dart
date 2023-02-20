@@ -5,7 +5,7 @@ import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field_swap.dart';
 import 'package:defi_wallet/widgets/network/network_selector.dart';
-import 'package:defi_wallet/widgets/swap/swap_account_selector.dart';
+import 'package:defi_wallet/widgets/swap/swap_account_selector_dialog.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +18,7 @@ class AmountSelectorField extends StatefulWidget {
   final AccountModel? account;
   final List<String>? assets;
   final GlobalKey<AssetSelectState>? selectKey;
+  final GlobalKey<AssetSelectSwapState>? selectSwapKey;
   final TextEditingController? amountController;
   final Function(String)? onSelect;
   final Function(int)? onChangeAccount;
@@ -39,6 +40,7 @@ class AmountSelectorField extends StatefulWidget {
     this.account,
     this.assets,
     this.selectKey,
+    this.selectSwapKey,
     this.amountController,
     this.onSelect,
     this.onChangeAccount,
@@ -106,18 +108,18 @@ class _AmountSelectorFieldState extends State<AmountSelectorField> {
               SizedBox(
                 width: 1,
               ),
-              Expanded(
-                flex: 2,
-                child: SwapAccountSelector(
-                  isFullSize: widget.isBorder,
-                  account: widget.account!,
-                  callback: (int index) {
-                    if (widget.onChangeAccount != null) {
-                      widget.onChangeAccount!(index);
-                    }
-                  },
-                ),
-              ),
+              // Expanded(
+              //   flex: 2,
+              //   child: SwapAccountSelector(
+              //     isFullSize: widget.isBorder,
+              //     account: widget.account!,
+              //     callback: (int index) {
+              //       if (widget.onChangeAccount != null) {
+              //         widget.onChangeAccount!(index);
+              //       }
+              //     },
+              //   ),
+              // ),
             ],
           ],
         ),
@@ -131,7 +133,7 @@ class _AmountSelectorFieldState extends State<AmountSelectorField> {
                 child: widget.isSwap
                     ? AssetSelectSwap(
                         isBorder: widget.isBorder,
-                        key: widget.selectKey,
+                        key: widget.selectSwapKey,
                         tokensForSwap: widget.assets!,
                         selectedToken: widget.selectedAsset!,
                         onSelect: widget.onSelect!,

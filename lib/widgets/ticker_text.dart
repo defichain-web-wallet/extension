@@ -9,8 +9,8 @@ class TickerText extends StatefulWidget {
     Key? key,
     required this.child,
     this.direction = Axis.horizontal,
-    this.animationDuration = const Duration(seconds: 2),
-    this.backDuration = const Duration(seconds: 2),
+    this.animationDuration = const Duration(seconds: 10),
+    this.backDuration = const Duration(seconds: 10),
     this.pauseDuration = const Duration(seconds: 1),
   }) : super(key: key);
 
@@ -23,7 +23,7 @@ class _TickerTextState extends State<TickerText> {
 
   @override
   void initState() {
-    scrollController = ScrollController(initialScrollOffset: 50.0);
+    scrollController = ScrollController(initialScrollOffset: 0.0);
     WidgetsBinding.instance!.addPostFrameCallback(scroll);
     super.initState();
   }

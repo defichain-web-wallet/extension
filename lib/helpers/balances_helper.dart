@@ -1,9 +1,51 @@
 import 'package:basic_utils/basic_utils.dart';
+import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_balance_model.dart';
+import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/requests/balance_requests.dart';
 
 class BalancesHelper {
   static const int COIN = 100000000;
+  static const int DUST = 3000; //TODO: move to constants file
+  static const int FEE = 3000; //TODO: move to constants file
+
+  Future<double> getAvailableBalance(String currency, TxType type, AccountModel account) async {
+    var addressBalanceList = await BalanceRequests()
+        .getAddressBalanceListByAddressList(account.addressList!);
+    if(currency == 'DFI'){
+        var tokenDFIbalance =
+        getBalanceByTokenName(addressBalanceList, 'DFI');
+
+        var coinDFIbalance =
+        getBalanceByTokenName(addressBalanceList, '\$DFI');
+        switch (type) {
+          case TxType.send:
+            if(tokenDFIbalance > FEE){
+              return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE*2));
+            } else {
+              return fromSatohi(coinDFIbalance - (FEE));
+            }
+          case TxType.swap:
+            if(coinDFIbalance > (FEE*2)+DUST){
+              return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE*2));
+            } else {
+              return fromSatohi(tokenDFIbalance);
+            }
+          case TxType.addLiq:
+            if(coinDFIbalance > (FEE*2)+DUST){
+              return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE*2));
+            } else {
+              return fromSatohi(tokenDFIbalance);
+            }
+          default:
+            return 0;
+        }
+    } else {
+      return fromSatohi(getBalanceByTokenName(addressBalanceList, currency));
+    }
+  }
 
   List<BalanceModel> findAndSumDuplicates(List<BalanceModel> balanceList) {
     List<BalanceModel> newBalanceList = [];
@@ -20,6 +62,14 @@ class BalancesHelper {
     });
     return newBalanceList;
     // return balanceMap.map((balance)=>BalanceModel(token: balance));
+  }
+
+  List<double> calculateAmountFromLiqudity(int amount, AssetPairModel pair){
+    var amountA = (amount / pair.totalLiquidityRaw!) *
+        pair.reserveA!;
+    var amountB = (amount / pair.totalLiquidityRaw!) *
+        pair.reserveB!;
+    return [amountA, amountB];
   }
 
   int getBalanceByTokenName(

@@ -2,6 +2,8 @@ class Hosts {
   static const String oceanDefichain = 'https://ocean.defichain.com/v0';
   static const String myDefichain = 'http://ocean.mydefichain.com:3000/v0';
   static const String ocean = 'https://testnet-ocean.mydefichain.com:8443/v0';
+
+  static const String defiScanLiveTx = 'https://defiscan.live/transactions/';
 }
 
 class DfxApi {
@@ -21,4 +23,8 @@ class TickerTimes {
 class ToolbarSizes {
   static const double toolbarHeight = 55;
   static const double toolbarHeightWithBottom = 105;
+}
+
+class StorageConstants {
+  static const int storageVersion = 2;
 }

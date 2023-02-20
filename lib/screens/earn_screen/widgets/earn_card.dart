@@ -116,7 +116,7 @@ class _EarnCardState extends State<EarnCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'up to ' + widget.percent,
+                      'up to ${widget.percent} APR',
                       style: Theme.of(context).textTheme.headline4,
                     ),
                     Column(

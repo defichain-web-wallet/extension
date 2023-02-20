@@ -1,7 +1,7 @@
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/screens/auth_screen/lock_screen.dart';
-import 'package:defi_wallet/utils/theme_checker.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
+import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 

@@ -4,7 +4,6 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/screens/auth_screen/secure_wallet/secure_done_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
@@ -277,9 +276,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation1, animation2) =>
-                widget.showDoneScreen
-                    ? SecureDoneScreen()
-                    : HomeScreen(
+                    HomeScreen(
                         isLoadTokens: true,
                       ),
             transitionDuration: Duration.zero,
