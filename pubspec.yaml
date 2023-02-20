@@ -53,7 +53,7 @@ dependencies:
   dotted_border: ^2.0.0
   awesome_dropdown: ^0.0.4
 
-  flutter_svg: ^1.1.6
+  flutter_svg: ^2.0.1
   url_launcher: ^6.0.9
 
   cron: ^0.3.0

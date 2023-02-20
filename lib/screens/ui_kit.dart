@@ -5,6 +5,7 @@ import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/gradient_svg_icon.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
@@ -69,6 +70,22 @@ class _UiKitState extends State<UiKit>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Container(
+                color: Colors.red.withOpacity(0.4),
+                child: GradientSvgIcon(
+                  'assets/icons/earn_icon.svg',
+                  width: 200,
+                  height: 200,
+                ),
+              ),
+              Container(
+                color: Colors.green.withOpacity(0.4),
+                child: GradientSvgIcon(
+                  'assets/icons/wallet_icon.svg',
+                  width: 200,
+                  height: 200,
+                ),
+              ),
               AmountField(
                 onChanged: (value) {
                   //

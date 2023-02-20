@@ -1,5 +1,6 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/common/gradient_svg_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -79,9 +80,11 @@ class FlatButton extends StatelessWidget with ThemeMixin {
               Container(
                 width: isPrimary ? 16 : 14,
                 height: isPrimary ? 16 : 14,
-                child: (isPrimary) ? Image.asset(iconPath!) : SvgPicture.asset(
+                child: (isPrimary) ? GradientSvgIcon(
                   iconPath!,
-                  color: isDarkTheme() ? Colors.white : AppColors.darkTextColor,
+                ) : SvgPicture.asset(
+                  iconPath!,
+                  color: getSpecificIconColor(),
                 ),
               ),
             if (!isSmall)

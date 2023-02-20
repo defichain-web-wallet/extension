@@ -77,9 +77,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                 Flexible(
                   child: FlatButton(
                     title: 'Earn',
-                    iconPath: SettingsHelper.isBitcoin()
-                        ? 'assets/icons/earn_disabled.png'
-                        : 'assets/icons/earn.png',
+                    iconPath: 'assets/icons/earn_icon.svg',
                     callback: SettingsHelper.isBitcoin() ? null : () {
                       Navigator.push(
                         context,
@@ -99,9 +97,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                 Flexible(
                   child: FlatButton(
                     title: 'Buy/Sell',
-                    iconPath: SettingsHelper.isBitcoin()
-                        ? 'assets/icons/wallet_disabled.png'
-                        : 'assets/icons/wallet.png',
+                    iconPath: 'assets/icons/wallet_icon.svg',
                     callback: SettingsHelper.isBitcoin() ? null : () {
                       Navigator.push(
                         context,
