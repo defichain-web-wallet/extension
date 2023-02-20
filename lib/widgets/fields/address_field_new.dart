@@ -136,8 +136,9 @@ class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin{
                           },
                         );
                       },
-                      child: SvgPicture.asset(
-                        'assets/icons/address_book_icon.svg',
+                      child: Image.asset(
+                        'assets/images/address_book.png',
+                        width: 16, height: 16,
                       ),
                     ),
                   ),
