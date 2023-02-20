@@ -1,7 +1,8 @@
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_model.dart';
-import 'package:defi_wallet/models/network_type_model.dart';
+import 'package:defichaindart/defichaindart.dart';
+import 'package:http/http.dart' as http;
 
 class AddressesHelper {
   var networkHelper = NetworkHelper();
@@ -16,11 +17,9 @@ class AddressesHelper {
   }
 
   Future<bool> validateBtcAddress(String address) async {
-    var type = networkHelper.getNetwork(SettingsHelper.settings.network!);
-    if (type.dialect != NetworkDialect.BTC) {
-      throw Exception("Only type BTC networks are supported");
-    }
-    BtcNetworkType t = type as BtcNetworkType;
-    return Address.validateAddress(address, t);
+    NetworkType type = SettingsHelper.settings.network == 'mainnet'
+        ? networkHelper.getNetwork('bitcoin')
+        : networkHelper.getNetwork('bitcoin_testnet');
+    return Address.validateAddress(address, type);
   }
 }

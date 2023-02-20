@@ -4,6 +4,8 @@ import 'package:defi_wallet/models/abstract_tx_model.dart';
 import 'package:defi_wallet/models/network_feature.dart';
 import 'package:defi_wallet/models/network_type_model.dart';
 
+import 'evm_transaction_receipt.dart';
+
 
 class EvmNetwork implements AbstractNetwork {
   NetworkDialect dialect = NetworkDialect.EVM;
@@ -54,11 +56,17 @@ class EvmNetwork implements AbstractNetwork {
   }
 
   EvmTransactionReceipt sendTransaction(dynamic data) {
-
+    return EvmTransactionReceipt(
+      hash: '',
+      blockHeight: 0
+    );
   }
 
   String signMessage(dynamic data) {
-    return EthereumService.signMesasge();
+    return '';
   }
 
+  bool validateAddress(String address) {
+    return false;
+  }
 }

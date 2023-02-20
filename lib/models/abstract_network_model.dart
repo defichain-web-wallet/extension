@@ -16,4 +16,5 @@ abstract class AbstractNetwork {
   Uri getTransactionExplorerUrl(String txHash);
   Uri getAccountExplorerUrl(String account);
   String signMessage(dynamic data);
+  bool validateAddress(String address);
 }
