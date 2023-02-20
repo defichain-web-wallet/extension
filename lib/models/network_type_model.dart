@@ -3,6 +3,7 @@ import 'bip32_type_model.dart';
 enum NetworkDialect {
   BTC,
   EVM,
+  DFI
 }
 
 abstract class AbstractNetworkType {

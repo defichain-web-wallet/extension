@@ -2,10 +2,11 @@ import 'package:defi_wallet/models/abstract_explorer_model.dart';
 import 'package:defi_wallet/models/abstract_network_model.dart';
 import 'package:defi_wallet/models/abstract_tx_model.dart';
 import 'package:defi_wallet/models/network_feature.dart';
+import 'package:defi_wallet/models/network_type_model.dart';
 
 
 class EvmNetwork implements AbstractNetwork {
-  String type = 'EVM';
+  NetworkDialect dialect = NetworkDialect.EVM;
   String name;
   String displayName;
   bool isTestnet;
@@ -50,6 +51,14 @@ class EvmNetwork implements AbstractNetwork {
   }
   Uri getAccountExplorerUrl(String account) {
     return explorer.getAccount(account);
+  }
+
+  EvmTransactionReceipt sendTransaction(dynamic data) {
+
+  }
+
+  String signMessage(dynamic data) {
+    return EthereumService.signMesasge();
   }
 
 }
