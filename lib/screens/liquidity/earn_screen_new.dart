@@ -260,16 +260,15 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                         SizedBox(
                                                           width: 5,
                                                         ),
-                                                        if (lockState.lockStakingDetails != null)
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
                                                                       .only(
                                                                   bottom: 2.0),
                                                           child: Text(
-                                                            lockState.lockUserDetails!
+                                                            (lockState.lockUserDetails!
                                                                         .kycStatus! ==
-                                                                    'Full'
+                                                                    'Full' && lockState.lockStakingDetails != null)
                                                                 ? lockState
                                                                     .lockStakingDetails!
                                                                     .asset!
