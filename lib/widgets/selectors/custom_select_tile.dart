@@ -50,7 +50,9 @@ class _CustomSelectTileState extends State<CustomSelectTile> with ThemeMixin {
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: 2,),
+                  SizedBox(
+                    height: 2,
+                  ),
                   Container(
                     width: 16,
                     height: 16,
@@ -68,10 +70,32 @@ class _CustomSelectTileState extends State<CustomSelectTile> with ThemeMixin {
                         height: widget.isSelected ? 8 : 12,
                         decoration: BoxDecoration(
                           color: isDarkTheme()
-                              ? DarkColors.scaffoldBgColor
-                              : LightColors.scaffoldContainerBgColor,
+                              ? Theme.of(context).scaffoldBackgroundColor
+                              : Colors.transparent,
                           borderRadius:
-                              BorderRadius.circular(widget.isSelected ? 4 : 6),
+                          BorderRadius.circular(widget.isSelected ? 4 : 6),
+                        ),
+                        child: Container(
+                          width: widget.isSelected ? 8 : 12,
+                          height: widget.isSelected ? 8 : 12,
+                          decoration: BoxDecoration(
+                            color: isDarkTheme()
+                                ? AppColors.viridian.withOpacity(0.16)
+                                : Colors.transparent,
+                            borderRadius:
+                                BorderRadius.circular(widget.isSelected ? 4 : 6),
+                          ),
+                          child: Container(
+                            width: widget.isSelected ? 8 : 12,
+                            height: widget.isSelected ? 8 : 12,
+                            decoration: BoxDecoration(
+                              color: isDarkTheme()
+                                  ? DarkColors.scaffoldContainerBgColor
+                                  : LightColors.scaffoldContainerBgColor,
+                              borderRadius: BorderRadius.circular(
+                                  widget.isSelected ? 4 : 6),
+                            ),
+                          ),
                         ),
                       ),
                     ),

@@ -317,7 +317,7 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                         ),
                                   ),
                                 ),
-                                SizedBox(height: 18),
+                                SizedBox(height: 16),
                                 NewPrimaryButton(
                                   callback: () {
                                     if (fiatState.kycStatus == 'Completed') {

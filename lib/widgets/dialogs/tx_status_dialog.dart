@@ -47,13 +47,11 @@ class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
         insetPadding: EdgeInsets.all(24),
         elevation: 48.0,
         backgroundColor: isDarkTheme()
-            ? DarkColors.networkDropdownBgColor
-            : LightColors.scaffoldContainerBgColor,
+            ? DarkColors.drawerBgColor
+            : LightColors.drawerBgColor,
         shape: RoundedRectangleBorder(
           side: isDarkTheme()
-              ? BorderSide(
-                  color: Colors.white.withOpacity(0.05),
-                )
+              ? BorderSide(color: DarkColors.drawerBorderColor)
               : BorderSide.none,
           borderRadius: BorderRadius.circular(20),
         ),

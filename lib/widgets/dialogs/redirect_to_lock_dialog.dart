@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class RedirectToLockDialog extends StatefulWidget {
   State<RedirectToLockDialog> createState() => _RedirectToLockDialogState();
 }
 
-class _RedirectToLockDialogState extends State<RedirectToLockDialog> {
+class _RedirectToLockDialogState extends State<RedirectToLockDialog> with ThemeMixin{
   final String titleText = 'You will be redirected to LOCK';
   final String subtitleText = 'Jelly is now processing your transaction in the '
       'background. Your account balance will be updated in a few minutes.';
@@ -28,8 +29,13 @@ class _RedirectToLockDialogState extends State<RedirectToLockDialog> {
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
         insetPadding: EdgeInsets.all(24),
+        backgroundColor: isDarkTheme()
+            ? DarkColors.drawerBgColor
+            : LightColors.drawerBgColor,
         shape: RoundedRectangleBorder(
-          side: BorderSide.none,
+          side: isDarkTheme()
+              ? BorderSide(color: DarkColors.drawerBorderColor)
+              : BorderSide.none,
           borderRadius: BorderRadius.circular(20),
         ),
         actionsPadding: EdgeInsets.symmetric(
