@@ -21,7 +21,11 @@ class DfxRequests {
 
   Future<String> signUp(AccountModel account, ECPair keyPair) async {
     try {
-      dynamic data = dfxService.getAddressAndSignature(account, keyPair);
+      dynamic data = dfxService.getAddressAndSignature(
+        account,
+        keyPair,
+        isDefaultWalletId: false,
+      );
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/auth/signUp');
 
