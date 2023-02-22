@@ -18,7 +18,16 @@ class LockCubit extends Cubit<LockState> {
   TransactionService transactionService = TransactionService();
   AccountState accountState = AccountState();
 
-
+  bool checkVerifiedUser({bool isCheckOnlyKycStatus = false}) {
+    if (isCheckOnlyKycStatus) {
+      return state.lockUserDetails!.kycStatus! == 'Full' ||
+          state.lockUserDetails!.kycStatus! == 'Light';
+    } else {
+      return state.lockStakingDetails != null &&
+          (state.lockUserDetails!.kycStatus! == 'Full' ||
+              state.lockUserDetails!.kycStatus! == 'Light');
+    }
+  }
 
   Future<String> getAccessToken(
     AccountModel account,

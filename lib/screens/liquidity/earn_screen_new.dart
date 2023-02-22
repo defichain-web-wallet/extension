@@ -58,6 +58,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
         bool isFullScreen,
         TransactionState txState,
       ) {
+        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
         return BlocBuilder<AccountCubit, AccountState>(
             builder: (accountContext, accountState) {
           return BlocBuilder<LockCubit, LockState>(
@@ -236,9 +237,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                               .end,
                                                       children: [
                                                         Text(
-                                                          (lockState.lockUserDetails!
-                                                                      .kycStatus! ==
-                                                                  'Full' || lockState.lockStakingDetails != null)
+                                                          lockCubit
+                                                                  .checkVerifiedUser()
                                                               ? balancesHelper
                                                                   .numberStyling(
                                                                   lockState
@@ -266,9 +266,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                                       .only(
                                                                   bottom: 2.0),
                                                           child: Text(
-                                                            (lockState.lockUserDetails!
-                                                                        .kycStatus! ==
-                                                                    'Full' && lockState.lockStakingDetails != null)
+                                                            lockCubit
+                                                                    .checkVerifiedUser()
                                                                 ? lockState
                                                                     .lockStakingDetails!
                                                                     .asset!
@@ -642,7 +641,9 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
   }
 
   stakingCallback(lockState) async{
-    if (lockState.lockUserDetails.kycStatus == 'Full') {
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    if (lockCubit.checkVerifiedUser(isCheckOnlyKycStatus: true)) {
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -653,8 +654,6 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
       );
     } else {
       if (lockState.lockUserDetails.kycLink == 'https://kyc.lock.space?code=null'){
-        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
         await lockCubit.loadKycDetails(accountCubit.state.activeAccount!);
         await lockCubit.loadUserDetails(accountCubit.state.activeAccount!);
       }
