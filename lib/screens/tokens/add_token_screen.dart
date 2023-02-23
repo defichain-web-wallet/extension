@@ -136,7 +136,7 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                   CustomTextFormField(
                                     prefix: Icon(Icons.search),
                                     addressController: searchController,
-                                    hintText: 'Search in Settings',
+                                    hintText: 'Search Token',
                                     isBorder: true,
                                     onChanged: (value) {
                                       TokensCubit token =
