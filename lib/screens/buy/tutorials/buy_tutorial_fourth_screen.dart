@@ -31,7 +31,7 @@ class _BuyTutorialFourthScreenState extends State<BuyTutorialFourthScreen>
     with ThemeMixin {
   String titleText = 'Fiat to crypto: How it works!';
   String stepText =
-      'This service is provided by DFX Swiss. Swaps may take up to 4 hours to be processed. You will not be redirected.';
+      'This service is provided by DFX Swiss. Swaps may take up to 4 hours to be processed.';
   FocusNode checkBoxFocusNode = FocusNode();
 
   @override

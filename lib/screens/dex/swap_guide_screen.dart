@@ -97,7 +97,7 @@ class _SwapGuideScreenState extends State<SwapGuideScreen> with ThemeMixin {
                               height: 34,
                             ),
                             Text(
-                              'This service is provided by DFX Swiss. Swaps may take up to 4 hours to be processed. You will not be redirected.',
+                              'This service is provided by DFX Swiss. Swaps may take up to 4 hours to be processed.',
                               textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme
