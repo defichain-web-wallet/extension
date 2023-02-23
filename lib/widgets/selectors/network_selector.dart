@@ -170,14 +170,6 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
           borderRadius: BorderRadius.all(
             Radius.circular(16),
           ),
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: Theme.of(context).shadowColor,
-          //     spreadRadius: 4,
-          //     blurRadius: 12,
-          //     offset: Offset(0, 8),
-          //   ),
-          // ],
           border: Border.all(color: isDarkTheme() ? DarkColors.drawerBorderColor : AppColors.appSelectorBorderColor)
         ),
         child: CustomPaint(
