@@ -234,7 +234,7 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                                       child: StatusLogoAndTitle(
                                         title: 'Oops!',
                                         subtitle:
-                                            'Jelly can\'t see any contact in your address book',
+                                            'Jelly can\'t see any contacts in your address book',
                                         isTitlePosBefore: true,
                                       ),
                                     ),
