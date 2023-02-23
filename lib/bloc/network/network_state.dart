@@ -11,7 +11,6 @@ enum NetworkList {
 enum NetworkTabs { all, test }
 
 extension NetworkListExtention on NetworkList {
-  // String get name => describeEnum(this);
   String get displayTitle {
     switch (this) {
       case NetworkList.defiMainnet:
@@ -33,25 +32,30 @@ extension NetworkListExtention on NetworkList {
 class NetworkState extends Equatable {
   final NetworkList currentNetwork;
   final NetworkTabs currentNetworkSelectorTab;
+  final bool isShownTestnet;
 
   NetworkState({
     this.currentNetwork = NetworkList.defiMainnet,
     this.currentNetworkSelectorTab = NetworkTabs.all,
+    this.isShownTestnet = true,
   });
 
   @override
   List<Object?> get props => [
     currentNetwork,
     currentNetworkSelectorTab,
+    isShownTestnet,
   ];
 
   NetworkState copyWith({
     NetworkList? currentNetwork,
     NetworkTabs? currentNetworkSelectorTab,
+    bool? isShownTestnet,
   }) {
     return NetworkState(
       currentNetwork: currentNetwork ?? this.currentNetwork,
       currentNetworkSelectorTab: currentNetworkSelectorTab ?? this.currentNetworkSelectorTab,
+      isShownTestnet: isShownTestnet ?? this.isShownTestnet,
     );
   }
 }

@@ -37,7 +37,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
             )),
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).backgroundColor,
+            // color: Theme.of(context).backgroundColor,
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
           child: Column(
@@ -46,7 +46,6 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
             children: [
               AssetPair(
                 pair: widget.assetPair.symbol!,
-                size: 34,
                 isTransform: false,
               ),
               SizedBox(
@@ -100,7 +99,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
                           height: 4,
                         ),
                         Text(
-                          '${TokensHelper().getAprFormat(widget.assetPair.apr!)}',
+                          '${TokensHelper().getAprFormat(widget.assetPair.apr!, true)}',
                           style:
                               Theme.of(context).textTheme.headline5!.copyWith(
                                     fontSize: 11,
@@ -156,12 +155,10 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
           children: [
             Container(
               width: 70,
-              child: Center(
-                child: AssetPair(
-                  pair: widget.assetPair.symbol!,
-                  size: 30,
-                  isTransform: false,
-                ),
+              alignment: Alignment.centerLeft,
+              child: AssetPair(
+                pair: widget.assetPair.symbol!,
+                isTransform: false,
               ),
             ),
             Container(
@@ -220,14 +217,14 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
             Container(
               width: 60,
               child: Text(
-                TokensHelper().getAprFormat(widget.assetPair.apr!),
+                TokensHelper().getAprFormat(widget.assetPair.apr!, true),
                 style: Theme.of(context).textTheme.headline5!.copyWith(
                       fontSize: 12,
                     ),
               ),
             ),
             Container(
-              width: 91,
+              width: 75,
               child: TickerText(
                 child: Text(
                   getTotalAmountByUsd(widget.assetPair.totalLiquidityUsd!),

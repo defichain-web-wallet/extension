@@ -11,8 +11,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AccountBalance extends StatefulWidget {
   final String asset;
+  final bool isSmall;
 
-  const AccountBalance({Key? key, required this.asset}) : super(key: key);
+  const AccountBalance({
+    Key? key,
+    required this.asset,
+    this.isSmall = false,
+  }) : super(key: key);
 
   @override
   State<AccountBalance> createState() => _AccountBalanceState();
@@ -99,6 +104,7 @@ class _AccountBalanceState extends State<AccountBalance> {
 
                     return Container(
                       child: BalanceText(
+                        isSmallFont: widget.isSmall,
                         balance: totalBalance,
                         assetName: widget.asset,
                       ),

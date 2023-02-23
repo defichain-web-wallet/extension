@@ -3,19 +3,21 @@ import 'dart:ui';
 
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/delete_contact_dialog.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/address_book/contact_tile.dart';
-import 'package:defi_wallet/widgets/address_book/create_edit_contact_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/address_book/last_sent_tile.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/create_edit_account/create_edit_account_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/create_edit_account_dialog.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field_new.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
+import 'package:defi_wallet/widgets/status_logo_and_title.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,10 +34,11 @@ class AddressBookScreenNew extends StatefulWidget {
 }
 
 class _AddressBookScreenNewState extends State<AddressBookScreenNew>
-    with ThemeMixin {
+    with ThemeMixin, NetworkMixin {
   int iterator = 0;
   TextEditingController controller = TextEditingController();
   List<AddressBookModel>? viewList = [];
+  List<AddressBookModel>? lastSent = [];
   bool isSelectedContacts = true;
   bool isSelectedLastSent = false;
   bool isDeleted = false;
@@ -43,7 +46,6 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
   showDeletedTooltip() {
     setState(() {
       isDeleted = true;
-
     });
     Timer(Duration(milliseconds: 1500), () {
       setState(() {
@@ -72,6 +74,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
             if (iterator == 1 &&
                 addressBookState.status == AddressBookStatusList.success) {
               viewList = addressBookState.addressBookList;
+              lastSent = addressBookState.lastSentList;
               iterator++;
             }
             return Scaffold(
@@ -94,8 +97,14 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                 height: double.infinity,
                 decoration: BoxDecoration(
                   color: isDarkTheme()
-                      ? DarkColors.scaffoldContainerBgColor
+                      ? DarkColors.drawerBgColor
                       : LightColors.scaffoldContainerBgColor,
+                  border: isDarkTheme()
+                      ? Border.all(
+                          width: 1.0,
+                          color: Colors.white.withOpacity(0.05),
+                        )
+                      : null,
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20),
                     topLeft: Radius.circular(20),
@@ -134,11 +143,13 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                               confirmCallback: (name, address) {
                                                 setState(() {
                                                   addressBookCubit.addAddress(
-                                                      AddressBookModel(
-                                                          name: name,
-                                                          address: address,
-                                                          network:
-                                                              'DefiChain Mainnet'));
+                                                    AddressBookModel(
+                                                      name: name,
+                                                      address: address,
+                                                      network:
+                                                          currentNetworkName(),
+                                                    ),
+                                                  );
                                                   controller.text = '';
                                                   viewList = addressBookState
                                                       .addressBookList;
@@ -174,15 +185,16 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                 hintText: 'Name or Contact Address',
                                 isBorder: true,
                                 onChanged: (value) {
-                                  print(
-                                      addressBookState.addressBookList!.length);
                                   setState(() {
                                     if (addressBookState.addressBookList !=
                                         null) {
                                       List<AddressBookModel>? list = [];
                                       addressBookState.addressBookList!
                                           .forEach((element) {
-                                        if (element.name!.contains(value) ||
+                                        if (element.name!
+                                                .toLowerCase()
+                                                .contains(
+                                                    value.toLowerCase()) ||
                                             element.address!.contains(value)) {
                                           list.add(element);
                                         }
@@ -230,17 +242,6 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                       ),
                                     ],
                                   ),
-                                  Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        'assets/icons/filter_icon.svg',
-                                        color: AppColors.darkTextColor,
-                                      ),
-                                      SizedBox(
-                                        width: 4,
-                                      ),
-                                    ],
-                                  ),
                                 ],
                               ),
                               SizedBox(
@@ -264,6 +265,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                           child: Column(
                                             children: [
                                               ContactTile(
+                                                index: index,
                                                 contactName:
                                                     viewList![index].name!,
                                                 contactAddress:
@@ -349,9 +351,13 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                         );
                                       },
                                     )
-                                  : Center(
-                                      child: Text(
-                                        'Oops!',
+                                  : Padding(
+                                      padding: const EdgeInsets.only(right: 16),
+                                      child: StatusLogoAndTitle(
+                                        title: 'Oops!',
+                                        subtitle:
+                                            'Jelly can\'t see any contact in your address book',
+                                        isTitlePosBefore: true,
                                       ),
                                     ),
                             ),
@@ -360,9 +366,9 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                           Expanded(
                             child: Container(
                               width: double.infinity,
-                              child: (true)
+                              child: (lastSent != null && lastSent!.isNotEmpty)
                                   ? ListView.builder(
-                                      itemCount: 12,
+                                      itemCount: lastSent!.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return Padding(
@@ -372,7 +378,8 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                             children: [
                                               LastSentTile(
                                                 address:
-                                                    'df1q3lyukeychd55pt2u3xknnuxqzwuhdasgvwuuhc',
+                                                    lastSent![index].address!,
+                                                index: index,
                                               ),
                                               Divider(
                                                 height: 1,
@@ -384,9 +391,13 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                         );
                                       },
                                     )
-                                  : Center(
-                                      child: Text(
-                                        'Oops!',
+                                  : Padding(
+                                      padding: const EdgeInsets.only(right: 16),
+                                      child: StatusLogoAndTitle(
+                                        title: 'Oops!',
+                                        subtitle:
+                                            'You don\'t have addresses yet',
+                                        isTitlePosBefore: true,
                                       ),
                                     ),
                             ),

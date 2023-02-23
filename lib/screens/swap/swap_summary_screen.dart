@@ -14,7 +14,7 @@ import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
-import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
@@ -22,7 +22,7 @@ import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
-import 'package:defi_wallet/widgets/tx_status_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,7 +36,9 @@ class SwapSummaryScreen extends StatefulWidget {
   final double slippage;
   final String btcTx;
 
-  const SwapSummaryScreen(this.assetFrom, this.assetTo, this.amountFrom, this.amountTo, this.slippage, {this.btcTx = ''});
+  const SwapSummaryScreen(this.assetFrom, this.assetTo, this.amountFrom,
+      this.amountTo, this.slippage,
+      {this.btcTx = ''});
 
   @override
   _SwapSummaryScreenState createState() => _SwapSummaryScreenState();
@@ -48,7 +50,8 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
   bool isFailed = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
-  String secondStepLoaderText = 'One second, Jelly is preparing your transaction!';
+  String secondStepLoaderText =
+      'One second, Jelly is preparing your transaction!';
   String appBarTitle = 'Swap';
 
   @override
@@ -77,7 +80,9 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                   right: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: isDarkTheme() ? DarkColors.scaffoldContainerBgColor : LightColors.scaffoldContainerBgColor,
+                  color: isDarkTheme()
+                      ? DarkColors.scaffoldContainerBgColor
+                      : LightColors.scaffoldContainerBgColor,
                   border: isDarkTheme()
                       ? Border.all(
                           width: 1.0,
@@ -134,9 +139,16 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                             children: [
                               Text(
                                 'Do you really want to change',
-                                style: Theme.of(context).textTheme.headline5!.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
                                       fontSize: 12,
-                                      color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.5),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.5),
                                     ),
                               ),
                               SizedBox(
@@ -149,7 +161,8 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     width: 24,
                                     height: 24,
                                     child: SvgPicture.asset(
-                                      TokensHelper().getImageNameByTokenName(widget.assetFrom),
+                                      TokensHelper().getImageNameByTokenName(
+                                          widget.assetFrom),
                                     ),
                                   ),
                                   SizedBox(
@@ -157,7 +170,10 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                   ),
                                   Text(
                                     widget.amountFrom.toString(),
-                                    style: Theme.of(context).textTheme.headline3!.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline3!
+                                        .copyWith(
                                           fontSize: 20,
                                         ),
                                   )
@@ -168,10 +184,15 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                         ),
                         Text(
                           'to',
-                          style: Theme.of(context).textTheme.headline5!.copyWith(
-                                fontSize: 12,
-                                color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.5),
-                              ),
+                          style:
+                              Theme.of(context).textTheme.headline5!.copyWith(
+                                    fontSize: 12,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .color!
+                                        .withOpacity(0.5),
+                                  ),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -180,7 +201,8 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               width: 24,
                               height: 24,
                               child: SvgPicture.asset(
-                                TokensHelper().getImageNameByTokenName(widget.assetTo),
+                                TokensHelper()
+                                    .getImageNameByTokenName(widget.assetTo),
                               ),
                             ),
                             SizedBox(
@@ -188,7 +210,10 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                             ),
                             Text(
                               widget.amountTo.toString(),
-                              style: Theme.of(context).textTheme.headline3!.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline3!
+                                  .copyWith(
                                     fontSize: 20,
                                   ),
                             )
@@ -202,7 +227,9 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                     child: Text(
                       'Some error. Please try later',
                       style: Theme.of(context).textTheme.headline4!.copyWith(
-                            color: isFailed ? AppTheme.redErrorColor : Colors.transparent,
+                            color: isFailed
+                                ? AppTheme.redErrorColor
+                                : Colors.transparent,
                           ),
                     ),
                   ),
@@ -211,7 +238,8 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
+              child: BlocBuilder<AccountCubit, AccountState>(
+                  builder: (context, state) {
                 return BlocBuilder<TokensCubit, TokensState>(
                   builder: (context, tokensState) {
                     if (tokensState.status == TokensStatusList.success) {
@@ -235,8 +263,10 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               pendingText: 'Pending',
                               isCheckLock: false,
                               callback: (parent) async {
-                                final isLedger = await SettingsHelper.isLedger();
-                                final passwordScreenNeeded = await SettingsHelper.needPasswordScreen();
+                                final isLedger =
+                                    await SettingsHelper.isLedger();
+                                final passwordScreenNeeded =
+                                    await SettingsHelper.needPasswordScreen();
 
                                 parent.emitPending(true);
                                 if (widget.btcTx != '') {
@@ -247,7 +277,8 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext context1) {
-                                      return PassConfirmDialog(onSubmit: (password) async {
+                                      return PassConfirmDialog(
+                                          onSubmit: (password) async {
                                         parent.emitPending(true);
                                         await submitSwap(
                                           state,
@@ -264,10 +295,13 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext context1) {
-                                      return LedgerCheckScreen(onStartSign: (p, c) async {
+                                      return LedgerCheckScreen(
+                                          onStartSign: (p, c) async {
                                         parent.emitPending(true);
                                         p.emitPending(true);
-                                        await submitSwap(state, tokensState, null, callbackOk: () {
+                                        await submitSwap(
+                                            state, tokensState, null,
+                                            callbackOk: () {
                                           Navigator.pop(c);
                                         }, callbackFail: () {
                                           parent.emitPending(true);
@@ -279,7 +313,6 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     },
                                   );
                                 }
-                                parent.emitPending(false);
                               },
                             ),
                           ),
@@ -296,7 +329,8 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
         ),
       );
 
-  submitSwap(state, tokenState, String? password, {final Function()? callbackOk, final Function()? callbackFail}) async {
+  submitSwap(state, tokenState, String? password,
+      {final Function()? callbackOk, final Function()? callbackFail}) async {
     if (state.status == AccountStatusList.success) {
       late TxErrorModel txResponse;
 
@@ -307,7 +341,10 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
         }
         if (widget.assetFrom != widget.assetTo) {
           txResponse = await transactionService.createAndSendSwap(
-              keyPair: password != null ? (await HDWalletService().getKeypairFromStorage(password, state.activeAccount.index!)) : null,
+              keyPair: password != null
+                  ? (await HDWalletService().getKeypairFromStorage(
+                      password, state.activeAccount.index!))
+                  : null,
               account: state.activeAccount,
               tokenFrom: widget.assetFrom,
               tokenTo: widget.assetTo,
@@ -333,6 +370,12 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
             callbackOk: () {
               if (callbackOk != null) {
                 callbackOk();
+              }
+              if (!txResponse.isError!) {
+                TransactionCubit transactionCubit =
+                    BlocProvider.of<TransactionCubit>(context);
+
+                transactionCubit.setOngoingTransaction(txResponse);
               }
               Navigator.pushReplacement(
                 context,

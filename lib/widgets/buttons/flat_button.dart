@@ -8,6 +8,7 @@ class FlatButton extends StatelessWidget with ThemeMixin {
   final String title;
   final String? iconPath;
   final bool isPrimary;
+  final bool isSmall;
 
   FlatButton({
     Key? key,
@@ -15,15 +16,20 @@ class FlatButton extends StatelessWidget with ThemeMixin {
     this.iconPath,
     required this.title,
     this.isPrimary = true,
+    this.isSmall = false,
   }) : super(key: key);
 
   static const double mediumHeight = 48.0;
   static const double largeHeight = 54.0;
 
   MaterialStatePropertyAll<Color> getSpecificBackgroundColor() {
-    if (isPrimary) {
+    if (isPrimary && callback != null) {
       return MaterialStatePropertyAll(
         AppColors.purplePizzazz.withOpacity(0.1),
+      );
+    } else if (callback == null) {
+      return MaterialStatePropertyAll(
+        AppColors.portage.withOpacity(0.15),
       );
     } else {
       return MaterialStatePropertyAll(
@@ -71,20 +77,32 @@ class FlatButton extends StatelessWidget with ThemeMixin {
           children: [
             if (iconPath != null)
               Container(
-                width: isPrimary ? 22 : 20,
-                height: isPrimary ? 22 : 20,
-                padding: const EdgeInsets.only(right: 6.4),
-                child: SvgPicture.asset(
+                width: isPrimary ? 16 : 14,
+                height: isPrimary ? 16 : 14,
+                child: (isPrimary) ? Image.asset(iconPath!) : SvgPicture.asset(
                   iconPath!,
-                  color: getSpecificIconColor(),
+                  color: isDarkTheme() ? Colors.white : AppColors.darkTextColor,
                 ),
               ),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.button!.copyWith(
-                    fontSize: isPrimary ? 14 : 12,
-                  ),
-            )
+            if (!isSmall)
+              ...[
+                SizedBox(
+                  width: 6.4,
+                ),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.button!.copyWith(
+                    fontSize: 13,
+                    color: (callback == null)
+                          ? Theme.of(context)
+                              .textTheme
+                              .button!
+                              .color!
+                              .withOpacity(0.2)
+                          : Theme.of(context).textTheme.button!.color!,
+                    ),
+                )
+              ]
           ],
         ),
       ),

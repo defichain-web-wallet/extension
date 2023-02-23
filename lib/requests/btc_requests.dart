@@ -10,6 +10,7 @@ import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:defi_wallet/services/dfx_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
@@ -153,7 +154,7 @@ class BtcRequests {
       final response = await http.post(_url, headers: _headers, body: _body);
       final data = jsonDecode(response.body);
       if (response.statusCode == 201) {
-        return TxErrorModel(isError: false, txid: data['tx']['hash']);
+        return TxErrorModel(isError: false, txLoaderList: [TxLoaderModel(txId: data['tx']['hash'], txHex: txHex)]);
       } else {
         return TxErrorModel(isError: true, error: data['error']);
       }

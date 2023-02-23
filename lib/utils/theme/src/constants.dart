@@ -8,6 +8,7 @@ const double buttonFullWidth = double.infinity;
 const double boxSmallWidth = 312;
 const double boxFullWidth = double.infinity;
 const double buttonBorderRadius = 12.0;
+const double accentButtonBorderRadius = 16.0;
 const double inputBorderRadius = 12.0;
 
 
@@ -63,6 +64,10 @@ const passwordField = TextStyle(
   fontSize: 12,
   fontWeight: FontWeight.w600,
 );
+const inputField = TextStyle(
+  fontSize: 12,
+  fontWeight: FontWeight.w600,
+);
 
 const gradientButton = LinearGradient(
   begin: Alignment.centerLeft,
@@ -111,11 +116,12 @@ LinearGradient gradientActionButtonBg = LinearGradient(
 LinearGradient gradientDisableButton = LinearGradient(
   begin: Alignment.centerLeft,
   end: Alignment.centerRight,
+  transform: GradientRotation(4.6),
+  stops: [2, 172],
   colors: [
     AppColors.pinkColor.withOpacity(0.3),
     AppColors.electricViolet.withOpacity(0.3),
   ],
-  transform: GradientRotation(4.7),
 );
 
 const noSelectBorder = Border(

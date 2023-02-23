@@ -21,7 +21,11 @@ class DfxRequests {
 
   Future<String> signUp(AccountModel account, ECPair keyPair) async {
     try {
-      dynamic data = dfxService.getAddressAndSignature(account, keyPair);
+      dynamic data = dfxService.getAddressAndSignature(
+        account,
+        keyPair,
+        isDefaultWalletId: false,
+      );
 
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/auth/signUp');
 
@@ -146,6 +150,31 @@ class DfxRequests {
     }
   }
 
+  Future<bool> transferKYC(String accessToken) async {
+    try {
+      final Uri url = Uri.parse('https://api.dfx.swiss/v1/kyc/transfer');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final body = jsonEncode({
+        "walletName": "LOCK.space"
+      });
+
+      final response = await http.put(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
   Future<Map<String, dynamic>> getUserDetails(String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/user');
@@ -234,7 +263,14 @@ class DfxRequests {
 
       final response = await http.post(url, headers: headers, body: body);
 
-    } catch (_) {
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        var errorMessage = jsonDecode(response.body);
+        throw Error.safeToString(errorMessage['message'] is List
+            ? errorMessage['message'][0]
+            : errorMessage['message']);
+      }
+    } catch (err) {
+      throw err;
     }
   }
 
@@ -302,8 +338,11 @@ class DfxRequests {
       final body = jsonEncode(kyc.toJson());
 
       final response = await http.post(url, headers: headers, body: body);
-    } catch (_) {
-      print(_);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Error.safeToString(jsonDecode(response.body)['message']);
+      }
+    } catch (err) {
+      throw err;
     }
   }
 
@@ -352,11 +391,10 @@ class DfxRequests {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
-        if (response.statusCode == 409) {
-          throw Error.safeToString('Iban already exist');
-        } else {
-          throw Error.safeToString('Other error');
-        }
+        var errorMessage = jsonDecode(response.body);
+        throw Error.safeToString(errorMessage['message'] is List
+            ? errorMessage['message'][0]
+            : errorMessage['message']);
       }
     } catch (err) {
       throw err;

@@ -16,6 +16,7 @@ import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/status_logo_and_title.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -69,10 +70,12 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                         accountState.activeAccount!.balanceList!
                             .firstWhere((token) => token.token == el.symbol);
                       } catch (err) {
-                        if (SettingsHelper.settings.network == "mainnet") {
-                          availableTokens.add(el);
-                        } else if (el.symbol != "TSLA") {
-                          availableTokens.add(el);
+                        if (!el.symbol.contains('v1')) {
+                          if (SettingsHelper.settings.network == "mainnet") {
+                            availableTokens.add(el);
+                          } else if (el.symbol != "TSLA") {
+                            availableTokens.add(el);
+                          }
                         }
                       }
                     }
@@ -163,7 +166,7 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                     textAlign: TextAlign.start,
                                   ),
                                   Container(
-                                    height: 288,
+                                    height: availableTokens.length != 0 ? 288 : 297,
                                     child: availableTokens.length != 0
                                         ? ListView.builder(
                                             itemCount: availableTokens.length,
@@ -234,69 +237,13 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                               );
                                             },
                                           )
-                                        : Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  Positioned(
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: Transform.rotate(
-                                                        angle: -math.pi /
-                                                            _logoRotateDeg,
-                                                        child: Container(
-                                                          height: _logoWidth,
-                                                          width: _logoHeight,
-                                                          child: Image(
-                                                            image: AssetImage(
-                                                              'assets/welcome_logo.png',
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Text(
-                                                'Oops!',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline2!
-                                                    .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Theme.of(context)
-                                                          .textTheme
-                                                          .headline5!
-                                                          .color,
-                                                    ),
-                                              ),
-                                              SizedBox(
-                                                height: 3,
-                                              ),
-                                              Text(
-                                                subtitleTextOops,
-                                                softWrap: true,
-                                                textAlign: TextAlign.center,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .copyWith(
-                                                      fontSize: 14,
-                                                      color: Theme.of(context)
-                                                          .textTheme
-                                                          .headline5!
-                                                          .color!
-                                                          .withOpacity(0.6),
-                                                    ),
-                                              )
-                                            ],
-                                          ),
+                                    : Center(
+                                      child: StatusLogoAndTitle(
+                                        title: 'Oops!',
+                                        subtitle: subtitleTextOops,
+                                        isSmall: true,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),

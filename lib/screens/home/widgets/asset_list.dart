@@ -5,12 +5,11 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance_model.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/home/asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 
 // ignore: must_be_immutable
 class AssetList extends StatelessWidget {
@@ -39,104 +38,69 @@ class AssetList extends StatelessWidget {
             balances = state.activeAccount!.balanceList!
                 .where((el) => !el.isHidden!)
                 .toList();
+            balances.removeWhere(
+                (element) => element.isPair! && element.balance == 0);
           }
           String currency = SettingsHelper.settings.currency!;
 
           return BlocBuilder<TokensCubit, TokensState>(
               builder: (context, tokensState) {
             if (tokensState.status == TokensStatusList.success) {
-              return ListView.builder(
-                itemCount: balances.length,
-                itemBuilder: (context, index) {
-                  String coin = balances[index].token!;
-                  String tokenName = SettingsHelper.isBitcoin()
-                      ? coin
-                      : tokenHelper.getTokenWithPrefix(coin);
-                  double tokenBalance =
-                      convertFromSatoshi(balances[index].balance!);
-
-                  return Padding(
-                    padding: const EdgeInsets.only(
-                        bottom: 8, left: 16, right: 16, top: 2),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Theme.of(context).listTileTheme.tileColor!,
-                        ),
-                        color: Theme.of(context).listTileTheme.selectedColor,
+              return SliverFixedExtentList(
+                itemExtent: 64.0 + 6,
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    String coin = balances[index].token!;
+                    String tokenName = SettingsHelper.isBitcoin()
+                        ? coin
+                        : tokenHelper.getTokenWithPrefix(coin);
+                    double tokenBalance =
+                        convertFromSatoshi(balances[index].balance!);
+                    List<TokensModel> tokens = tokenHelper.getTokensList(
+                      balances,
+                      tokensState,
+                    );
+                    return Container(
+                      padding: const EdgeInsets.only(
+                        bottom: 4,
+                        left: 16,
+                        right: 16,
+                        top: 2,
                       ),
-                      child: ListTile(
-                        leading: _buildTokenIcon(balances[index]),
-                        title: Text(
-                          tokenName,
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              getFormatTokenBalance(tokenBalance),
-                              style: Theme.of(context).textTheme.headline6!.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 2,
-                            ),
-                            Text(
-                              getFormatTokenBalanceByFiat(
-                                  tokensState, coin, tokenBalance, currency),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline6!
-                                        .color!
-                                        .withOpacity(0.3),
-                                  ),
-                            ),
-                          ],
-                        ),
-                        subtitle: Text(
-                          tokenName,
-                          style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .color!
-                                .withOpacity(0.3),
-                          ),
-                        ),
+                      color: Theme.of(context).cardColor,
+                      child: AssetCard(
+                        index: index,
+                        tokenBalance: tokenBalance,
+                        tokenName: tokenName,
+                        tokenCode: tokenName,
+                        tokensState: tokensState,
+                        tokens: tokens,
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                  childCount: balances.length,
+                ),
               );
             } else {
-              return Container();
+              return SliverFillRemaining(
+                hasScrollBody: false,
+                child: Container(
+                  color: Theme.of(context).cardColor,
+                  child: Center(
+                    child: Text('Not yet any tokens'),
+                  ),
+                ),
+              );
             }
           });
         } else {
-          return Container();
+          return SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(),
+          );
         }
       });
     });
-  }
-
-  Widget _buildTokenIcon(BalanceModel token) {
-    if (token.isPair!) {
-      return AssetPair(pair: token.token!);
-    } else {
-      return SvgPicture.asset(
-        tokenHelper.getImageNameByTokenName(token.token!),
-        height: 40,
-        width: 40,
-      );
-    }
   }
 
   String getFormatTokenBalance(double tokenBalance) =>

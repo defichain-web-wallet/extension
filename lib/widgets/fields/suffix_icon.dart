@@ -1,3 +1,4 @@
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -7,12 +8,14 @@ class SuffixIcon extends StatefulWidget {
   final SuffixTypes suffixType;
   final Function() callback;
   final bool isObscure;
+  final bool isOpasity;
 
   const SuffixIcon({
     Key? key,
     required this.callback,
     this.suffixType = SuffixTypes.password,
     this.isObscure = false,
+    this.isOpasity = false,
   }) : super(key: key);
 
   @override
@@ -35,6 +38,13 @@ class _SuffixIconState extends State<SuffixIcon> {
             iconUrl,
             width: 16,
             height: 16,
+            color: widget.isOpasity
+                ? AppColors.white
+                : Theme.of(context)
+                    .textTheme
+                    .headline1!
+                    .color!
+                    .withOpacity(0.6),
           ),
         ),
       );

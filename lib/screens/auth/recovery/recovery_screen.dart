@@ -3,10 +3,12 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
+import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -17,6 +19,7 @@ import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -32,23 +35,39 @@ class RecoveryScreen extends StatefulWidget {
   State<RecoveryScreen> createState() => _RecoveryScreenState();
 }
 
-class _RecoveryScreenState extends State<RecoveryScreen> {
+class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
   static const double _mnemonicBoxWidth = 328;
+  static final RegExp _regExpPhraseSeparators = RegExp('[ .,;:|/-]');
+  static final String _replaceComaSeparator = ',';
 
   final int _fieldsLength = 24;
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _wordController = TextEditingController();
+  final FocusNode _confirmFocusNode = FocusNode();
 
   late List<String> _mnemonic;
+  late List<int> _invalidWordIndexes = [];
   late bool _isHoverMnemonicBox;
 
   bool _isViewTextField = true;
-  bool _incorrectPhrase = false;
+  bool _incorrectPhraseOrder = false;
+  bool _onStartedReorder = false;
+
+  int? _editableWordIndex;
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _wordController.dispose();
+    _confirmFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
     _focusNode.addListener(() {});
+    _confirmFocusNode.addListener(() { });
     _mnemonic = [];
     super.initState();
   }
@@ -106,7 +125,10 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
       );
     } else {
       setState(() {
-        _incorrectPhrase = true;
+        if (_invalidWordIndexes.isEmpty) {
+          _incorrectPhraseOrder = true;
+        }
+        _onStartedReorder = true;
       });
     }
   }
@@ -123,25 +145,61 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     setState(() {
       String word = _mnemonic.removeAt(oldIndex);
       _mnemonic.insert(newIndex, word);
+      _onStartedReorder = false;
     });
   }
 
   void _onFieldSubmitted(String word) {
-    setState(() {
-      if (_wordController.text != '') {
-        var s = (_wordController.text.split(','));
-        s.forEach((element) {
-          _mnemonic.add(element);
+    try {
+      if (_editableWordIndex != null) {
+        setState(() {
+          _mnemonic[_editableWordIndex!] = word;
+          _wordController.text = '';
+          _editableWordIndex = null;
+          if (_mnemonic.length < 24) {
+            _focusNode.requestFocus();
+          } else {
+            _invalidWordIndexes = getInvalidControllerIndexes();
+            _isViewTextField = false;
+            _confirmFocusNode.requestFocus();
+          }
+        });
+      } else {
+        setState(() {
+          if (_wordController.text != '') {
+            final phraseBySeparator = _wordController.text.replaceAll(
+              _regExpPhraseSeparators,
+              _replaceComaSeparator,
+            );
+            var s = (phraseBySeparator.split(_replaceComaSeparator));
+            s.forEach((element) {
+              _mnemonic.add(element);
+            });
+          }
+          _wordController.text = '';
+
+          if (_mnemonic.length < 24 || _invalidWordIndexes.isNotEmpty) {
+            _focusNode.requestFocus();
+          } else {
+            _invalidWordIndexes = getInvalidControllerIndexes();
+            _isViewTextField = false;
+            _confirmFocusNode.requestFocus();
+          }
         });
       }
-      _wordController.text = '';
+    } catch (err) {
+      print(err);
+    }
+  }
 
-      if (_mnemonic.length < 24) {
-        FocusScope.of(context).requestFocus(_focusNode);
-      } else {
-        _isViewTextField = false;
+  List<int> getInvalidControllerIndexes() {
+    List<int> indexes = [];
+    for (int i = 0; i < _mnemonic.length; i++) {
+      if (!isCorrectWord(_mnemonic[i])) {
+        indexes.add(i);
       }
-    });
+    }
+    return indexes;
   }
 
   @override
@@ -150,10 +208,22 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
       _mnemonic.length,
       (index) => MouseRegion(
         cursor: SystemMouseCursors.grab,
-        child: MnemonicWord(
-          index: index + 1,
-          word: _mnemonic[index],
-          incorrect: _incorrectPhrase,
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              _isViewTextField = true;
+              _onStartedReorder = false;
+              _wordController.text = _mnemonic[index];
+              _editableWordIndex = index;
+              _focusNode.requestFocus();
+            });
+          },
+          child: MnemonicWord(
+            index: index + 1,
+            word: _mnemonic[index],
+            incorrect:
+                _invalidWordIndexes.contains(index) || _incorrectPhraseOrder,
+          ),
         ),
       ),
     );
@@ -205,6 +275,11 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                             child: Container(
                               width: _mnemonicBoxWidth,
                               child: ReorderableWrap(
+                                onReorderStarted: (index) {
+                                  setState(() {
+                                    _onStartedReorder = true;
+                                  });
+                                },
                                 alignment: WrapAlignment.center,
                                 spacing: 6.0,
                                 runSpacing: 6.0,
@@ -216,12 +291,17 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                                   if (!_isHoverMnemonicBox) {
                                     setState(() {
                                       _mnemonic.removeAt(index);
+                                      _onStartedReorder = false;
+                                      _editableWordIndex = null;
 
                                       if (_mnemonic.length < 24) {
-                                        FocusScope.of(context)
-                                            .requestFocus(_focusNode);
                                         _isViewTextField = true;
+                                        _focusNode.requestFocus();
                                       }
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _onStartedReorder = false;
                                     });
                                   }
                                 },
@@ -232,39 +312,89 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                         ],
                       ),
                     ),
-                    Container(
-                      child: _isViewTextField
-                          ? DefiTextFormField(
-                              controller: _wordController,
-                              onFieldSubmitted: _onFieldSubmitted,
-                              autofocus: true,
-                              focusNode: _focusNode,
-                              readOnly: !_isViewTextField,
-                              onChanged: (String value) {
-                                try {
-                                  List<String> phraseFromClipboard =
-                                      value.split(' ');
-                                  if (phraseFromClipboard.length ==
-                                      _fieldsLength) {
-                                    setState(() {
-                                      _mnemonic = phraseFromClipboard;
-                                      _wordController.text = '';
-                                      _isViewTextField = false;
-                                    });
-                                  }
-                                } catch (err) {
-                                  print(err);
-                                }
-                              },
-                            )
-                          : NewPrimaryButton(
-                              title: 'Restore Wallet',
-                              width: isFullScreen
-                                  ? buttonFullWidth
-                                  : buttonSmallWidth,
-                              callback: _onSubmitRecovery,
+                    if (_onStartedReorder)
+                      Container(
+                        height: 44,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            width: 1,
+                            color:
+                                Theme.of(context).dividerColor.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 14,
+                              height: 15,
+                              child: SvgPicture.asset(
+                                'assets/icons/trash.svg',
+                                color: isDarkTheme()
+                                    ? DarkColors.iconDragBoxColor
+                                    : LightColors.iconDragBoxColor,
+                              ),
                             ),
-                    )
+                            SizedBox(
+                              width: 16,
+                            ),
+                            Text(
+                              'Drag word here to remove',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .color!
+                                      .withOpacity(0.24)),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Container(
+                        child: _isViewTextField
+                            ? DefiTextFormField(
+                                controller: _wordController,
+                                onFieldSubmitted: _onFieldSubmitted,
+                                autofocus: true,
+                                focusNode: _focusNode,
+                                readOnly: !_isViewTextField,
+                                onChanged: (String value) {
+                                  try {
+                                    final phraseBySeparator = value.replaceAll(
+                                      _regExpPhraseSeparators,
+                                      _replaceComaSeparator,
+                                    );
+                                    List<String> phraseFromClipboard =
+                                      phraseBySeparator.split(_replaceComaSeparator);
+                                    if (phraseFromClipboard.length ==
+                                        _fieldsLength) {
+                                      setState(() {
+                                        _mnemonic = phraseFromClipboard;
+                                        _wordController.text = '';
+                                        _isViewTextField = false;
+                                        _confirmFocusNode.requestFocus();
+                                      });
+                                    }
+                                  } catch (err) {
+                                    print(err);
+                                  }
+                                },
+                              )
+                            : NewPrimaryButton(
+                                focusNode: _confirmFocusNode,
+                                title: 'Restore Wallet',
+                                width: isFullScreen
+                                    ? buttonFullWidth
+                                    : buttonSmallWidth,
+                                callback: _onSubmitRecovery,
+                              ),
+                      )
                   ],
                 ),
               ),

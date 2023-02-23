@@ -1,16 +1,17 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
-import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
+import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/screens/liquidity/liquidity_pool_list.dart';
-import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
-import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
+import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
+import 'package:defi_wallet/screens/staking/staking_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
@@ -21,7 +22,6 @@ import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:hive/hive.dart';
 
 class EarnScreenNew extends StatefulWidget {
   const EarnScreenNew({Key? key}) : super(key: key);
@@ -30,23 +30,24 @@ class EarnScreenNew extends StatefulWidget {
   State<EarnScreenNew> createState() => _EarnScreenNewState();
 }
 
-class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
+class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBarMixin {
+  BalancesHelper balancesHelper = BalancesHelper();
   String titleText = 'Earn';
+  int iterator = 0;
 
   @override
   void initState() {
     super.initState();
-
-    loadCubits();
-  }
-
-  loadCubits() async {
-    StakingCubit stakingCubit = BlocProvider.of<StakingCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
 
-    //await fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
-    //await stakingCubit.loadStakingRouteBalance(fiatCubit.state.accessToken!, accountCubit.state.activeAccount!.addressList![0].address!);
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await fiatCubit.loadUserDetails(accountCubit.state.accounts!.first);
+      await lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
+      await lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
+      await lockCubit.loadAnalyticsDetails(accountCubit.state.accounts!.first);
+    });
   }
 
   @override
@@ -57,20 +58,36 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(builder: (accountContext, accountState) {
-          return BlocBuilder<StakingCubit, StakingState>(builder: (context, stakingState) {
-            if (stakingState.status == StakingStatusList.success) {
-              return BlocBuilder<TokensCubit, TokensState>(builder: (tokensContext, tokensState) {
+        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+        return BlocBuilder<AccountCubit, AccountState>(
+            builder: (accountContext, accountState) {
+          return BlocBuilder<LockCubit, LockState>(
+              builder: (lockContext, lockState) {
+            if (lockState.status == LockStatusList.success) {
+              return BlocBuilder<TokensCubit, TokensState>(
+                  builder: (tokensContext, tokensState) {
                 double totalPairsBalance = 0;
-                String maxApr = TokensHelper().getAprFormat(getMaxAPR(tokensState.tokensPairs!));
+                double totalPairsAPR = 0;
+                String avaragePairsAPR = '';
+                int countPairs = 0;
+
+                String maxApr = TokensHelper()
+                    .getAprFormat(getMaxAPR(tokensState.tokensPairs!), true);
 
                 accountState.activeAccount!.balanceList!.forEach((element) {
-                  if (!element.isHidden! && !element.isPair!) {
-                  } else if (element.isPair!) {
-                    var foundedAssetPair = List.from(tokensState.tokensPairs!.where((item) => element.token == item.symbol))[0];
+                  if (element.isPair! && !element.isHidden!) {
+                    countPairs += 1;
+                    totalPairsAPR += getAPRbyPair(tokensState.tokensPairs!,element.token!);
 
-                    double baseBalance = element.balance! * (1 / foundedAssetPair.totalLiquidityRaw) * foundedAssetPair.reserveA!;
-                    double quoteBalance = element.balance! * (1 / foundedAssetPair.totalLiquidityRaw) * foundedAssetPair.reserveB!;
+                    var foundedAssetPair = List.from(tokensState.tokensPairs!
+                        .where((item) => element.token == item.symbol))[0];
+
+                    double baseBalance = element.balance! *
+                        (1 / foundedAssetPair.totalLiquidityRaw) *
+                        foundedAssetPair.reserveA!;
+                    double quoteBalance = element.balance! *
+                        (1 / foundedAssetPair.totalLiquidityRaw) *
+                        foundedAssetPair.reserveB!;
 
                     totalPairsBalance += tokenHelper.getAmountByUsd(
                       tokensState.tokensPairs!,
@@ -84,6 +101,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                     );
                   }
                 });
+                avaragePairsAPR =  TokensHelper().getAprFormat(countPairs > 0 ? totalPairsAPR/countPairs : 0, false);
 
                 return Scaffold(
                   drawerScrimColor: Color(0x0f180245),
@@ -103,12 +121,14 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                     width: double.infinity,
                     height: double.infinity,
                     decoration: BoxDecoration(
-                      color: isDarkTheme() ? DarkColors.scaffoldContainerBgColor : LightColors.scaffoldContainerBgColor,
+                      color: isDarkTheme()
+                          ? DarkColors.drawerBgColor
+                          : LightColors.scaffoldContainerBgColor,
                       border: isDarkTheme()
                           ? Border.all(
-                              width: 1.0,
-                              color: Colors.white.withOpacity(0.05),
-                            )
+                        width: 1.0,
+                        color: Colors.white.withOpacity(0.05),
+                      )
                           : null,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20),
@@ -123,7 +143,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                               children: [
                                 Text(
                                   titleText,
-                                  style: headline2.copyWith(fontWeight: FontWeight.w700),
+                                  style: headline2.copyWith(
+                                      fontWeight: FontWeight.w700),
                                 )
                               ],
                             ),
@@ -131,7 +152,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                               height: 19,
                             ),
                             GestureDetector(
-                              onTap: () => stakingCallback(context),
+                              onTap: () => stakingCallback(lockState),
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Stack(
@@ -142,7 +163,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                       padding: EdgeInsets.all(16),
                                       decoration: BoxDecoration(
                                         border: Border.all(
-                                          color: AppColors.portageBg.withOpacity(0.24),
+                                          color: AppColors.portageBg
+                                              .withOpacity(0.24),
                                         ),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -152,29 +174,50 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                             children: [
                                               Container(
                                                 height: 40,
-                                                child: Image.asset('assets/images/dfi_staking.png'),
+                                                child: Image.asset(
+                                                    'assets/images/dfi_staking.png'),
                                               ),
                                               SizedBox(
                                                 width: 12,
                                               ),
                                               Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     'Staking',
-                                                    style: Theme.of(context).textTheme.headline5!.copyWith(
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .copyWith(
                                                           fontSize: 16,
                                                         ),
                                                   ),
                                                   Text(
-                                                    'up to 43% APY',
-                                                    style: Theme.of(context).textTheme.headline5!.copyWith(
+                                                    'up to '
+                                                    '${BalancesHelper().numberStyling(
+                                                      (lockState
+                                                              .lockAnalyticsDetails!
+                                                              .apy! *
+                                                          100),
+                                                      fixed: true,
+                                                      fixedCount: 2,
+                                                    )}% APY',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .copyWith(
                                                           fontSize: 12,
-                                                          color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                                                          color: Theme.of(
+                                                                  context)
+                                                              .textTheme
+                                                              .headline5!
+                                                              .color!
+                                                              .withOpacity(0.3),
                                                         ),
                                                   ),
                                                 ],
-                                              )
+                                              ),
                                             ],
                                           ),
                                           SizedBox(
@@ -185,25 +228,55 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                               Expanded(
                                                 flex: 1,
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Row(
-                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .end,
                                                       children: [
                                                         Text(
-                                                          '0.00',
-                                                          style: Theme.of(context).textTheme.headline4!.copyWith(
-                                                                fontSize: 20,
-                                                              ),
+                                                          lockCubit
+                                                                  .checkVerifiedUser()
+                                                              ? balancesHelper
+                                                                  .numberStyling(
+                                                                  lockState
+                                                                      .lockStakingDetails!
+                                                                      .balance!,
+                                                                  fixed: true,
+                                                                  fixedCount: 2,
+                                                                )
+                                                              : '0.00',
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline4!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        20,
+                                                                  ),
                                                         ),
                                                         SizedBox(
                                                           width: 5,
                                                         ),
                                                         Padding(
-                                                          padding: const EdgeInsets.only(bottom: 2.0),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  bottom: 2.0),
                                                           child: Text(
-                                                            'DFI',
-                                                            style: Theme.of(context).textTheme.headline4!.copyWith(
+                                                            lockCubit
+                                                                    .checkVerifiedUser()
+                                                                ? lockState
+                                                                    .lockStakingDetails!
+                                                                    .asset!
+                                                                : 'DFI',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headline4!
+                                                                .copyWith(
                                                                   fontSize: 13,
                                                                 ),
                                                           ),
@@ -212,39 +285,67 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                     ),
                                                     Text(
                                                       'Staked',
-                                                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline5!
+                                                          .copyWith(
                                                             fontSize: 12,
-                                                            color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headline5!
+                                                                .color!
+                                                                .withOpacity(
+                                                                    0.3),
                                                           ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
-                                              Expanded(
+                                              // TODO: uncomment this when API will be work
+                                              if (false)
+                                                Expanded(
                                                 flex: 1,
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Row(
-                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .end,
                                                       children: [
                                                         Text(
                                                           '0.00',
-                                                          style: Theme.of(context).textTheme.headline4!.copyWith(
-                                                                fontSize: 20,
-                                                                color: AppColors.malachite,
-                                                              ),
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline4!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: AppColors
+                                                                        .malachite,
+                                                                  ),
                                                         ),
                                                         SizedBox(
                                                           width: 5,
                                                         ),
                                                         Padding(
-                                                          padding: const EdgeInsets.only(bottom: 2.0),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  bottom: 2.0),
                                                           child: Text(
                                                             'DFI',
-                                                            style: Theme.of(context).textTheme.headline4!.copyWith(
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headline4!
+                                                                .copyWith(
                                                                   fontSize: 13,
-                                                                  color: AppColors.malachite,
+                                                                  color: AppColors
+                                                                      .malachite,
                                                                 ),
                                                           ),
                                                         ),
@@ -252,9 +353,18 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                     ),
                                                     Text(
                                                       'Rewards earned',
-                                                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline5!
+                                                          .copyWith(
                                                             fontSize: 12,
-                                                            color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headline5!
+                                                                .color!
+                                                                .withOpacity(
+                                                                    0.3),
                                                           ),
                                                     ),
                                                   ],
@@ -266,9 +376,11 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(right: 1, top: 1),
+                                      padding: const EdgeInsets.only(
+                                          right: 1, top: 1),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
                                         children: [
                                           Container(
                                             padding: EdgeInsets.only(
@@ -286,7 +398,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                 bottomLeft: Radius.circular(20),
                                               ),
                                             ),
-                                            child: SvgPicture.asset('assets/icons/staking_lock.svg'),
+                                            child: SvgPicture.asset(
+                                                'assets/icons/staking_lock.svg'),
                                           ),
                                         ],
                                       ),
@@ -299,7 +412,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                               height: 18,
                             ),
                             GestureDetector(
-                              onTap: () => liquidityCallback(totalPairsBalance, txState),
+                              onTap: () =>
+                                  liquidityCallback(avaragePairsAPR, txState),
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Container(
@@ -308,7 +422,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                   padding: EdgeInsets.all(16),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: AppColors.portageBg.withOpacity(0.24),
+                                      color:
+                                          AppColors.portageBg.withOpacity(0.24),
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -318,25 +433,37 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                         children: [
                                           Container(
                                             height: 40,
-                                            child: Image.asset('assets/pair_icons/dfi_btc.png'),
+                                            child: Image.asset(
+                                                'assets/pair_icons/dfi_btc.png'),
                                           ),
                                           SizedBox(
                                             width: 12,
                                           ),
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 'Liquidity mining',
-                                                style: Theme.of(context).textTheme.headline5!.copyWith(
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .copyWith(
                                                       fontSize: 16,
                                                     ),
                                               ),
                                               Text(
-                                                'up to ${maxApr}',
-                                                style: Theme.of(context).textTheme.headline5!.copyWith(
+                                                'up to ${maxApr} APR',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .copyWith(
                                                       fontSize: 12,
-                                                      color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                                                      color: Theme.of(context)
+                                                          .textTheme
+                                                          .headline5!
+                                                          .color!
+                                                          .withOpacity(0.3),
                                                     ),
                                               ),
                                             ],
@@ -351,14 +478,19 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                           Expanded(
                                             flex: 1,
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
                                                   children: [
                                                     Text(
-                                                      '142.258',
-                                                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                                                      balancesHelper.numberStyling(totalPairsBalance, fixed: true),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline4!
+                                                          .copyWith(
                                                             fontSize: 20,
                                                           ),
                                                     ),
@@ -366,10 +498,15 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                       width: 5,
                                                     ),
                                                     Padding(
-                                                      padding: const EdgeInsets.only(bottom: 2.0),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 2.0),
                                                       child: Text(
-                                                        'DFI',
-                                                        style: Theme.of(context).textTheme.headline4!.copyWith(
+                                                        'USD',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline4!
+                                                            .copyWith(
                                                               fontSize: 13,
                                                             ),
                                                       ),
@@ -377,10 +514,17 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                                   ],
                                                 ),
                                                 Text(
-                                                  'pooled',
-                                                  style: Theme.of(context).textTheme.headline5!.copyWith(
+                                                  'Pooled',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5!
+                                                      .copyWith(
                                                         fontSize: 12,
-                                                        color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                                                        color: Theme.of(context)
+                                                            .textTheme
+                                                            .headline5!
+                                                            .color!
+                                                            .withOpacity(0.3),
                                                       ),
                                                 ),
                                               ],
@@ -389,38 +533,54 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                                           Expanded(
                                             flex: 1,
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
                                                   children: [
                                                     Text(
-                                                      '42.8769',
-                                                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                                                      avaragePairsAPR,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline4!
+                                                          .copyWith(
                                                             fontSize: 20,
-                                                            color: AppColors.malachite,
+                                                            color: AppColors
+                                                                .malachite,
                                                           ),
                                                     ),
-                                                    SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets.only(bottom: 2.0),
+                                                    countPairs > 0 ? Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 2.0),
                                                       child: Text(
-                                                        'DFI',
-                                                        style: Theme.of(context).textTheme.headline4!.copyWith(
+                                                        '%',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline4!
+                                                            .copyWith(
                                                               fontSize: 13,
-                                                              color: AppColors.malachite,
+                                                              color: AppColors
+                                                                  .malachite,
                                                             ),
                                                       ),
-                                                    ),
+                                                    ) : Container(),
                                                   ],
                                                 ),
                                                 Text(
-                                                  'Rewards earned',
-                                                  style: Theme.of(context).textTheme.headline5!.copyWith(
+                                                  'Portfolio APR',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5!
+                                                      .copyWith(
                                                         fontSize: 12,
-                                                        color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                                                        color: Theme.of(context)
+                                                            .textTheme
+                                                            .headline5!
+                                                            .color!
+                                                            .withOpacity(0.3),
                                                       ),
                                                 ),
                                               ],
@@ -440,7 +600,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
                   ),
                 );
               });
-            } else if (stakingState.status == StakingStatusList.failure) {
+            } else if (lockState.status == LockStatusList.failure) {
               return Container(
                 child: Center(
                   child: ErrorPlaceholder(
@@ -469,35 +629,49 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
     return maxValue;
   }
 
-  stakingCallback(context) {
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+  double getAPRbyPair(List<AssetPairModel> tokenPairs, String pair) {
+    double value = 0;
 
-    if (fiatCubit.state.isKycDataComplete! && fiatCubit.state.history.length > 0) {
+    tokenPairs.forEach((element) {
+      if (pair == element.symbol) {
+        value = element.apr!;
+      }
+    });
+    return value;
+  }
+
+  stakingCallback(lockState) async{
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    if (lockCubit.checkVerifiedUser(isCheckOnlyKycStatus: true)) {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendStakingRewardsScreen(),
+          pageBuilder: (context, animation1, animation2) => StakingScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'To use this feature, you must first successfully complete a bank transaction (buy or sell)!',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+      if (lockState.lockUserDetails.kycLink == 'https://kyc.lock.space?code=null'){
+        await lockCubit.loadKycDetails(accountCubit.state.activeAccount!);
+        await lockCubit.loadUserDetails(accountCubit.state.activeAccount!);
+      }
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) =>
+              StakingKycStartScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
         ),
       );
     }
   }
 
-  liquidityCallback(double totalLiquidityBalance, txState) {
-    Widget redirectTo = LiquidityScreenNew();
+  liquidityCallback(String avaragePairsAPR, txState) {
+    Widget redirectTo = LiquidityScreenNew(averageARP: avaragePairsAPR);
 
-    if (!(txState is TransactionLoadingState)) {
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -506,16 +680,5 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin {
           reverseTransitionDuration: Duration.zero,
         ),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Wait for the previous transaction to complete',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-        ),
-      );
-    }
   }
 }

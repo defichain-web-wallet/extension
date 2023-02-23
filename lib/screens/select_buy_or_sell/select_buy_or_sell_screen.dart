@@ -4,12 +4,12 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/screens/buy/contact_screen.dart';
-import 'package:defi_wallet/screens/buy/search_buy_token.dart';
-import 'package:defi_wallet/screens/buy/tutorials/first_step_buy_screen.dart';
+import 'package:defi_wallet/screens/buy/buy_kyc_contact_screen.dart';
+import 'package:defi_wallet/screens/buy/buy_select_currency_screen.dart';
+import 'package:defi_wallet/screens/buy/tutorials/buy_tutorial_first_screen.dart';
 import 'package:defi_wallet/screens/home/widgets/action_buttons_list.dart';
-import 'package:defi_wallet/screens/sell/account_type_sell.dart';
-import 'package:defi_wallet/screens/sell/selling.dart';
+import 'package:defi_wallet/screens/sell/sell_kyc_first_screen.dart';
+import 'package:defi_wallet/screens/sell/selling_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
@@ -257,7 +257,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => FirstStepBuyScreen(),
+          pageBuilder: (context, animation1, animation2) => BuyTutorialFirstScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
@@ -266,7 +266,7 @@ class _SelectBuyOrSellScreenState extends State<SelectBuyOrSellScreen> {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SearchBuyToken(),
+          pageBuilder: (context, animation1, animation2) => BuySelectCurrencyScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),

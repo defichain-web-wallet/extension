@@ -12,8 +12,9 @@ typedef ScaffoldWrapperBuilder = Widget Function(
 
 class ScaffoldWrapper extends StatefulWidget {
   final ScaffoldWrapperBuilder builder;
+  final bool isUpdate;
 
-  ScaffoldWrapper({required this.builder});
+  ScaffoldWrapper({required this.builder, this.isUpdate = false});
 
   @override
   State<ScaffoldWrapper> createState() => _ScaffoldWrapperState();
@@ -31,6 +32,7 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               return BlocBuilder<TransactionCubit, TransactionState>(
+                buildWhen: (prev, current) => widget.isUpdate,
                 builder: (context, txState) {
                   bool isFullScreenMode =
                       constraints.maxWidth == ScreenSizes.medium;

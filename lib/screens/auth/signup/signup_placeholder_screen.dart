@@ -1,10 +1,14 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/storage_phrase_mixin.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/screens/auth/signup/signup_account_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:math' as math;
@@ -22,7 +26,9 @@ class SignupPlaceholderScreen extends StatefulWidget {
       _SignupPlaceholderScreenState();
 }
 
-class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen> {
+class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen>
+    with ThemeMixin, StoragePhraseMixin {
+  static const int _mnemonicStrength = 256;
   final double _progress = 0.7;
   final double _coverWidth = 296.0;
   final double _coverHeight = 258.0;
@@ -75,27 +81,10 @@ class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen> {
                           Stack(
                             children: [
                               Positioned(
-                                child: SvgPicture.asset(
-                                  'assets/secure_placeholder.svg',
-                                  width: _coverWidth,
-                                  height: _coverHeight,
-                                ),
-                              ),
-                              Positioned.fill(
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: Transform.rotate(
-                                    angle: -math.pi / _logoRotateDeg,
-                                    child: Container(
-                                      height: _logoWidth,
-                                      width: _logoHeight,
-                                      child: Image(
-                                        image: AssetImage(
-                                          'assets/welcome_logo.png',
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                child: Image.asset(
+                                  'assets/images/jelly_protect.png',
+                                  width: 191,
+                                  height: 306,
                                 ),
                               ),
                             ],
@@ -115,10 +104,25 @@ class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen> {
                                     'Remind me later ',
                                     style: jellyLink,
                                   ),
-                                  onTap: () => ScaffoldMessenger.of(context)
-                                      .showSnackBar(
-                                    SnackBar(content: Text('Work in progress')),
-                                  ),
+                                  onTap: () {
+                                    List<String> mnemonic = generateMnemonic(
+                                            strength: _mnemonicStrength)
+                                        .split(' ');
+                                    savePhraseToStorage(mnemonic.join(','));
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder:
+                                            (context, animation1, animation2) =>
+                                            SignupAccountScreen(
+                                              password: widget.password,
+                                              mnemonic: mnemonic,
+                                            ),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration: Duration.zero,
+                                      ),
+                                    );
+                                  },
                                 ),
                                 Text(
                                   ' (not recommended)',

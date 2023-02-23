@@ -1,6 +1,17 @@
 part of '../../theme.dart';
 
 abstract class LightColors {
+  // button
+  static const accentButtonBgColor = Colors.white;
+
+  // input
+  static const inputTextSelectionColor = Colors.grey;
+  static Color inputSuffixIconColor = AppColors.white.withOpacity(0.3);
+  static Color hintTextColor = AppColors.darkTextColor.withOpacity(0.3);
+
+  // icons
+  static Color iconDragBoxColor = AppColors.blackRock.withOpacity(0.24);
+
   static const cardColor = Colors.white;
 
   static const scaffoldBgColor = AppColors.whiteLilac;
@@ -30,4 +41,6 @@ abstract class LightColors {
   static Color feesDropdownActiveBgColor = AppColors.portageBg.withOpacity(0.07);
 
   static Color swapNetworkMarkBgColor = AppColors.portage.withOpacity(0.15);
+
+  static Color historyDataLabel = AppColors.portage.withOpacity(0.15);
 }

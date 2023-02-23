@@ -1,8 +1,10 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hive/hive.dart';
 
 class TokenListTile extends StatefulWidget {
   final Function()? onTap;
@@ -95,7 +97,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${widget.tokenName}',
+                                  '${tokenHelper.getTokenWithPrefix(widget.tokenName)}',
                                   style: Theme.of(context).textTheme.headline5,
                                 ),
                                 SizedBox(
@@ -134,30 +136,45 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                           Padding(
                             padding: EdgeInsets.only(right: 16),
                             child: Text(
-                              '0 ${widget.availableTokenName}',
+                              '0 ${tokenHelper.getTokenWithPrefix(widget.availableTokenName)}',
                               style: Theme.of(context).textTheme.headline5,
                             ),
                           ),
-                        if(widget.isSingleSelect)
+                        if (widget.isSingleSelect)
                           Container(
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
                               color: widget.isSelect
                                   ? null
-                                  : Theme.of(context).dividerColor.withOpacity(0.1),
+                                  : Theme.of(context)
+                                      .dividerColor
+                                      .withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
-                              gradient:
-                              widget.isSelect ? gradientBottomToUpCenter : null,
+                              gradient: widget.isSelect
+                                  ? gradientBottomToUpCenter
+                                  : null,
                             ),
                             child: Center(
                               child: Container(
                                 width: widget.isSelect ? 8 : 12,
                                 height: widget.isSelect ? 8 : 12,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius:
-                                  BorderRadius.circular(widget.isSelect ? 4 : 6),
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                  borderRadius: BorderRadius.circular(
+                                      widget.isSelect ? 4 : 6),
+                                ),
+                                child: Container(
+                                  width: widget.isSelect ? 8 : 12,
+                                  height: widget.isSelect ? 8 : 12,
+                                  decoration: BoxDecoration(
+                                    color: isDarkTheme()
+                                        ? DarkColors.scaffoldContainerBgColor
+                                        : LightColors.scaffoldContainerBgColor,
+                                    borderRadius: BorderRadius.circular(
+                                        widget.isSelect ? 4 : 6),
+                                  ),
                                 ),
                               ),
                             ),

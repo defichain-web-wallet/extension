@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class BalanceText extends StatefulWidget {
   final double balance;
   final String assetName;
+  final bool isSmallFont;
 
   const BalanceText({
     Key? key,
     required this.balance,
     required this.assetName,
+    this.isSmallFont = false,
   }) : super(key: key);
 
   @override
@@ -66,7 +68,7 @@ class _BalanceTextState extends State<BalanceText> {
           TextSpan(
             text: getFormatBalance(),
             style: Theme.of(context).textTheme.headline1!.copyWith(
-                  fontSize: 42,
+                  fontSize: widget.isSmallFont ? 28 : 42,
                   fontWeight: FontWeight.w900,
                   color: _getBalanceTextColor(context),
                 ),
@@ -74,7 +76,7 @@ class _BalanceTextState extends State<BalanceText> {
           TextSpan(
             text: widget.assetName == 'BTC' ? 'BTC' : decimalPart,
             style: Theme.of(context).textTheme.headline1!.copyWith(
-                  fontSize: 20,
+                  fontSize: widget.isSmallFont ? 20 : 28,
                   fontWeight: FontWeight.w900,
                   color: _getBalanceTextColor(context),
                 ),

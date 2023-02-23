@@ -17,12 +17,15 @@ import 'package:defi_wallet/widgets/liquidity/main_liquidity_pair.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/status_logo_and_title.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LiquidityScreenNew extends StatefulWidget {
-  const LiquidityScreenNew({Key? key}) : super(key: key);
+  final String averageARP;
+
+  const LiquidityScreenNew({Key? key, required this.averageARP}) : super(key: key);
 
   @override
   State<LiquidityScreenNew> createState() => _LiquidityScreenNewState();
@@ -66,8 +69,10 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                   late double totalBalanceInFiat;
 
                   if (SettingsHelper.isBitcoin()) {
-                    totalBalance = convertFromSatoshi(bitcoinState.totalBalance);
-                    unconfirmedBalance = convertFromSatoshi(bitcoinState.unconfirmedBalance);
+                    totalBalance =
+                        convertFromSatoshi(bitcoinState.totalBalance);
+                    unconfirmedBalance =
+                        convertFromSatoshi(bitcoinState.unconfirmedBalance);
                   } else {
                     totalBalance = accountState.activeAccount!.balanceList!
                         .where((el) => !el.isHidden!)
@@ -94,17 +99,27 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                           );
                         }
                       } else {
-                        double balanceInSatoshi = double.parse(e.balance!.toString());
+                        double balanceInSatoshi =
+                            double.parse(e.balance!.toString());
                         if (asset == 'USD') {
                           return tokenHelper.getPairsAmountByAsset(
-                              tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'USD');
+                              tokensState.tokensPairs!,
+                              balanceInSatoshi,
+                              e.token!,
+                              'USD');
                         } else if (asset == 'EUR') {
                           var b = tokenHelper.getPairsAmountByAsset(
-                              tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'USD');
+                              tokensState.tokensPairs!,
+                              balanceInSatoshi,
+                              e.token!,
+                              'USD');
                           return b * tokensState.eurRate!;
                         } else {
                           return tokenHelper.getPairsAmountByAsset(
-                              tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'BTC');
+                              tokensState.tokensPairs!,
+                              balanceInSatoshi,
+                              e.token!,
+                              'BTC');
                         }
                       }
                     }).reduce((value, element) => value + element);
@@ -172,7 +187,7 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                       height: double.infinity,
                       decoration: BoxDecoration(
                         color: isDarkTheme()
-                            ? DarkColors.scaffoldContainerBgColor
+                            ? DarkColors.drawerBgColor
                             : LightColors.scaffoldContainerBgColor,
                         border: isDarkTheme()
                             ? Border.all(
@@ -211,7 +226,10 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                           : LightColors.drawerBgColor,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: AppColors.whiteLilac,
+                                        // strokeAlign: BorderSide.strokeAlignCenter,
+                                        color: AppColors.lavenderPurple
+                                            .withOpacity(0.32),
+                                        width: 0.5,
                                       ),
                                     ),
                                     textStyle: Theme.of(context)
@@ -227,16 +245,20 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                         ),
                                     message: 'Add liquidity pool',
                                     child: NewActionButton(
+                                      isSvg: false,
                                       isStaticColor: true,
                                       bgGradient: gradientActionButtonBg,
-                                      iconPath: 'assets/icons/add.svg',
+                                      iconPath: 'assets/images/add_gradient.png',
                                       onPressed: () {
                                         Navigator.push(
                                           context,
                                           PageRouteBuilder(
-                                            pageBuilder: (context, animation1, animation2) => ChoosePoolPairScreen(),
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                ChoosePoolPairScreen(),
                                             transitionDuration: Duration.zero,
-                                            reverseTransitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
                                           ),
                                         );
                                       },
@@ -280,8 +302,8 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          '\$ 20.84',
+                                        Row(children: [Text(
+                                          widget.averageARP ,
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline3!
@@ -289,9 +311,19 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                                 color: AppColors.malachite,
                                                 fontSize: 24,
                                               ),
-                                        ),
+                                        ), widget.averageARP != 'N/A' ? Text(
+                                          ' %',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline4!
+                                              .copyWith(
+                                            fontSize: 13,
+                                            color: AppColors
+                                                .malachite,
+                                          ),
+                                        ): Container()]),
                                         Text(
-                                          'Current reward',
+                                          'Portfolio APR',
                                           style: Theme.of(context)
                                               .textTheme
                                               .subtitle2!
@@ -379,39 +411,59 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 24,),
+                              SizedBox(
+                                height: 24,
+                              ),
                               Expanded(
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: tokensPairsList.length,
-                                  itemBuilder: (context, index) {
-                                    var foundedAssetPair = tokensState.tokensPairs!
-                                        .where((element) =>
-                                    tokensPairsList[index].token ==
-                                        element.symbol);
-                                    var tokenPairs = List.from(foundedAssetPair)[0];
+                                child: tokensPairsList.length != 0
+                                    ? ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: tokensPairsList.length,
+                                        itemBuilder: (context, index) {
+                                          var foundedAssetPair = tokensState
+                                              .tokensPairs!
+                                              .where((element) =>
+                                                  tokensPairsList[index]
+                                                      .token ==
+                                                  element.symbol);
+                                          var tokenPairs =
+                                              List.from(foundedAssetPair)[0];
 
-                                    return Column(
-                                      children: [
-                                        MainLiquidityPair(
-                                          isOpen: currentAssetPair == tokenPairs,
-                                          balance: tokensPairsList[index].balance,
-                                          assetPair: tokenPairs,
-                                          callback: (currentPair) {
-                                            setState(() {
-                                              if(currentAssetPair != currentPair) {
-                                                currentAssetPair = currentPair;
-                                              } else {
-                                                currentAssetPair = null;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                        SizedBox(height: 8,),
-                                      ],
-                                    );
-                                  },
-                                ),
+                                          return Column(
+                                            children: [
+                                              MainLiquidityPair(
+                                                isOpen: currentAssetPair ==
+                                                    tokenPairs,
+                                                balance: tokensPairsList[index]
+                                                    .balance,
+                                                assetPair: tokenPairs,
+                                                callback: (currentPair) {
+                                                  setState(() {
+                                                    if (currentAssetPair !=
+                                                        currentPair) {
+                                                      currentAssetPair =
+                                                          currentPair;
+                                                    } else {
+                                                      currentAssetPair = null;
+                                                    }
+                                                  });
+                                                },
+                                              ),
+                                              SizedBox(
+                                                height: 8,
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      )
+                                    : StatusLogoAndTitle(
+                                        title: 'Oops!',
+                                        subtitle:
+                                            'Jelly noticed you have no liquidity pools '
+                                            'yet. Add a pool by clicking +',
+                                        isTitlePosBefore: false,
+                                  isSmall: true,
+                                      ),
                               )
                             ],
                           ),

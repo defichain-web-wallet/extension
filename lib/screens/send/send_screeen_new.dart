@@ -3,16 +3,20 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
 import 'package:defi_wallet/screens/settings/settings.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/address_book/create_edit_contact_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
@@ -32,9 +36,11 @@ class SendScreenNew extends StatefulWidget {
   State<SendScreenNew> createState() => _SendScreenNewState();
 }
 
-class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
+class _SendScreenNewState extends State<SendScreenNew>
+    with ThemeMixin, NetworkMixin, SnackBarMixin {
   TextEditingController addressController = TextEditingController();
   TextEditingController assetController = TextEditingController(text: '0');
+  FocusNode addressFocusNode = FocusNode();
   AddressBookModel contact = AddressBookModel();
   TokensModel? currentAsset;
   String suffixText = '';
@@ -61,14 +67,24 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
 
   double getAvailableBalance(accountState, bitcoinState) {
     if (SettingsHelper.isBitcoin()) {
-      return convertFromSatoshi(bitcoinState.totalBalance);
+      if (bitcoinState.totalBalance <= 0) {
+        return 0.0;
+      } else {
+        return convertFromSatoshi(bitcoinState.totalBalance);
+      }
     } else {
       int balance = accountState.activeAccount!.balanceList!
           .firstWhere(
               (el) => el.token! == currentAsset!.symbol! && !el.isHidden!)
           .balance!;
-      final int fee = 3000;
-      return convertFromSatoshi(balance - fee);
+      int fee = 3000;
+      int resultBalance = balance - fee;
+
+      if (resultBalance <= 0) {
+        return 0.0;
+      } else {
+        return convertFromSatoshi(balance - fee);
+      }
     }
   }
 
@@ -104,6 +120,13 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
   }
 
   @override
+  void dispose() {
+    addressController.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       builder: (
@@ -112,11 +135,15 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
         TransactionState txState,
       ) {
         return BlocBuilder<AccountCubit, AccountState>(
-          builder: (context, accountState) {
+          builder: (accountContext, accountState) {
             return BlocBuilder<TokensCubit, TokensState>(
-              builder: (context, tokensState) {
+              builder: (tokenContext, tokensState) {
+                List<TokensModel> tokens = getTokensList(
+                  accountState,
+                  tokensState,
+                );
                 return BlocBuilder<BitcoinCubit, BitcoinState>(
-                    builder: (context, bitcoinState) {
+                    builder: (bitcoinContext, bitcoinState) {
                   BitcoinCubit bitcoinCubit =
                       BlocProvider.of<BitcoinCubit>(context);
                   AddressBookCubit addressBookCubit =
@@ -140,6 +167,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                       currentAsset = currentAsset ??
                           getTokensList(accountState, tokensState).first;
                     }
+
                     return Scaffold(
                       drawerScrimColor: Color(0x0f180245),
                       endDrawer: AccountDrawer(
@@ -159,7 +187,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                         height: double.infinity,
                         decoration: BoxDecoration(
                           color: isDarkTheme()
-                              ? DarkColors.scaffoldContainerBgColor
+                              ? DarkColors.drawerBgColor
                               : LightColors.scaffoldContainerBgColor,
                           border: isDarkTheme()
                               ? Border.all(
@@ -211,30 +239,44 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                     SizedBox(
                                       height: 24,
                                     ),
-                                    AddressFieldNew(
-                                      clearPrefix: () {
-                                        setState(() {
-                                          contact = AddressBookModel();
-                                        });
-                                      },
-                                      onChange: (val) {
-                                        if (val == '') {
-                                          setState(() {
-                                            isAddNewContact = false;
-                                          });
+                                    GestureDetector(
+                                      onDoubleTap: () {
+                                        addressFocusNode.requestFocus();
+                                        if (addressController.text.isNotEmpty) {
+                                          addressController.selection =
+                                              TextSelection(
+                                                  baseOffset: 0,
+                                                  extentOffset:
+                                                      addressController
+                                                          .text.length);
                                         }
                                       },
-                                      controller: addressController,
-                                      getAddress: (val) {
-                                        addressController.text = val;
-                                      },
-                                      getContact: (val) {
-                                        setState(() {
-                                          addressController.text = '';
-                                          contact = val;
-                                        });
-                                      },
-                                      contact: contact,
+                                      child: AddressFieldNew(
+                                        addressFocusNode: addressFocusNode,
+                                        clearPrefix: () {
+                                          setState(() {
+                                            contact = AddressBookModel();
+                                          });
+                                        },
+                                        onChange: (val) {
+                                          if (val == '') {
+                                            setState(() {
+                                              isAddNewContact = false;
+                                            });
+                                          }
+                                        },
+                                        controller: addressController,
+                                        getAddress: (val) {
+                                          addressController.text = val;
+                                        },
+                                        getContact: (val) {
+                                          setState(() {
+                                            addressController.text = '';
+                                            contact = val;
+                                          });
+                                        },
+                                        contact: contact,
+                                      ),
                                     ),
                                     SizedBox(
                                       height: 16,
@@ -253,15 +295,17 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                       height: 6,
                                     ),
                                     AmountField(
+                                      type: TxType.send,
+                                      account: accountState.activeAccount!,
                                       onChanged: (value) {
                                         setState(() {
                                           balanceInUsd = getUsdBalance(context);
                                         });
                                       },
+                                      isDisabledSelector:
+                                          SettingsHelper.isBitcoin(),
                                       suffix: balanceInUsd ??
                                           getUsdBalance(context),
-                                      available: getAvailableBalance(
-                                          accountState, bitcoinState),
                                       onAssetSelect: (t) {
                                         setState(() {
                                           currentAsset = t;
@@ -269,10 +313,7 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                       },
                                       controller: assetController,
                                       selectedAsset: currentAsset!,
-                                      assets: getTokensList(
-                                        accountState,
-                                        tokensState,
-                                      ),
+                                      assets: tokens,
                                     ),
                                     SizedBox(
                                       height: 16,
@@ -344,55 +385,84 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                     NewPrimaryButton(
                                       width: buttonSmallWidth,
                                       callback: () {
-                                        if (addressController.text != '') {
-                                          if (isAddNewContact) {
-                                            showDialog(
-                                              barrierColor: Color(0x0f180245),
-                                              barrierDismissible: false,
-                                              context: context,
-                                              builder:
-                                                  (BuildContext dialogContext) {
-                                                return CreateEditContactDialog(
-                                                  address:
-                                                      addressController.text,
-                                                  isEdit: false,
-                                                  confirmCallback:
-                                                      (name, address) {
-                                                    addressBookCubit.addAddress(
-                                                      AddressBookModel(
-                                                          name: name,
-                                                          address: address,
-                                                          network:
-                                                              'DefiChain Mainnet'),
-                                                    );
-                                                    Navigator.push(
-                                                      context,
-                                                      PageRouteBuilder(
-                                                        pageBuilder: (context,
-                                                                animation1,
-                                                                animation2) =>
-                                                            SendSummaryScreen(
-                                                          contact: addressBookCubit
-                                                              .getLastContact(),
-                                                          isAfterAddContact:
-                                                              true,
-                                                          amount: double.parse(
-                                                              assetController
-                                                                  .text),
-                                                          token: currentAsset!,
-                                                          fee: bitcoinState.activeFee,
+                                        if (txState is! TransactionLoadingState) {
+                                          if (addressController.text != '') {
+                                            if (isAddNewContact) {
+                                              showDialog(
+                                                barrierColor: Color(0x0f180245),
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder: (BuildContext
+                                                    dialogContext) {
+                                                  return CreateEditContactDialog(
+                                                    address:
+                                                        addressController.text,
+                                                    isEdit: false,
+                                                    confirmCallback:
+                                                        (name, address) {
+                                                      addressBookCubit
+                                                          .addAddress(
+                                                        AddressBookModel(
+                                                            name: name,
+                                                            address: address,
+                                                            network:
+                                                                currentNetworkName()),
+                                                      );
+                                                      Navigator.push(
+                                                        context,
+                                                        PageRouteBuilder(
+                                                          pageBuilder: (context,
+                                                                  animation1,
+                                                                  animation2) =>
+                                                              SendSummaryScreen(
+                                                            address:
+                                                                addressController
+                                                                    .text,
+                                                            isAfterAddContact:
+                                                                true,
+                                                            amount: double.parse(
+                                                                assetController
+                                                                    .text),
+                                                            token:
+                                                                currentAsset!,
+                                                            fee: bitcoinState
+                                                                .activeFee,
+                                                          ),
+                                                          transitionDuration:
+                                                              Duration.zero,
+                                                          reverseTransitionDuration:
+                                                              Duration.zero,
                                                         ),
-                                                        transitionDuration:
-                                                            Duration.zero,
-                                                        reverseTransitionDuration:
-                                                            Duration.zero,
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            );
-                                          } else {
+                                                      );
+                                                      Navigator.pop(
+                                                          dialogContext);
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              Navigator.push(
+                                                context,
+                                                PageRouteBuilder(
+                                                  pageBuilder: (context,
+                                                          animation1,
+                                                          animation2) =>
+                                                      SendSummaryScreen(
+                                                    address:
+                                                        addressController.text,
+                                                    amount: double.parse(
+                                                        assetController.text),
+                                                    token: currentAsset!,
+                                                    fee: bitcoinState.activeFee,
+                                                  ),
+                                                  transitionDuration:
+                                                      Duration.zero,
+                                                  reverseTransitionDuration:
+                                                      Duration.zero,
+                                                ),
+                                              );
+                                            }
+                                          } else if (contact.name != null) {
                                             Navigator.push(
                                               context,
                                               PageRouteBuilder(
@@ -400,11 +470,10 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                                         animation1,
                                                         animation2) =>
                                                     SendSummaryScreen(
-                                                  address:
-                                                      addressController.text,
                                                   amount: double.parse(
                                                       assetController.text),
                                                   token: currentAsset!,
+                                                  contact: contact,
                                                   fee: bitcoinState.activeFee,
                                                 ),
                                                 transitionDuration:
@@ -414,22 +483,17 @@ class _SendScreenNewState extends State<SendScreenNew> with ThemeMixin {
                                               ),
                                             );
                                           }
-                                        } else if (contact.name != null) {
-                                          Navigator.push(
+                                        } else {
+                                          showSnackBar(
                                             context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation1,
-                                                      animation2) =>
-                                                  SendSummaryScreen(
-                                                amount: double.parse(
-                                                    assetController.text),
-                                                token: currentAsset!,
-                                                contact: contact,
-                                                fee: bitcoinState.activeFee,
-                                              ),
-                                              transitionDuration: Duration.zero,
-                                              reverseTransitionDuration:
-                                                  Duration.zero,
+                                            title:
+                                                'Please wait for the previous '
+                                                    'transaction',
+                                            color: AppColors.txStatusError
+                                                .withOpacity(0.1),
+                                            prefix: Icon(
+                                              Icons.close,
+                                              color: AppColors.txStatusError,
                                             ),
                                           );
                                         }

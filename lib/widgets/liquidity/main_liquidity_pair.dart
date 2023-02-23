@@ -5,13 +5,14 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_remove_screen.dart';
 import 'package:defi_wallet/screens/liquidity/remove_liquidity.dart';
-import 'package:defi_wallet/screens/liquidity/select_pool.dart';
+import 'package:defi_wallet/screens/liquidity/liquidity_select_pool.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/liquidity_asset_pair.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
@@ -82,16 +83,21 @@ class _MainLiquidityPairState extends State<MainLiquidityPair> with ThemeMixin {
                             SizedBox(
                               width: 11,
                             ),
-                            Text(
-                              TokensHelper()
-                                  .getTokenFormat(widget.assetPair!.symbol),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                    fontSize: 16,
-                                  ),
+                            Expanded(
+                              child: TickerText(
+                                child: Text(
+                                  TokensHelper()
+                                      .getTokenFormat(widget.assetPair!.symbol),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                        fontSize: 16,
+                                      ),
+                                ),
+                              ),
                             ),
+                            SizedBox(width: 5,),
                           ],
                         ),
                       ],
@@ -138,7 +144,7 @@ class _MainLiquidityPairState extends State<MainLiquidityPair> with ThemeMixin {
                           context,
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
-                                SelectPool(
+                                LiquiditySelectPool(
                                   assetPair: widget.assetPair!,
                                 ),
                             transitionDuration: Duration.zero,

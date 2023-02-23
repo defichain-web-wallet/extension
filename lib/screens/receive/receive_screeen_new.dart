@@ -10,6 +10,7 @@ import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -101,7 +102,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(19.2),
                                   color: isDarkTheme() ? Colors.white : null,
-                                  border: isDarkTheme()
+                                  border: !isDarkTheme()
                                       ? Border.all(
                                           color: AppColors.lavenderPurple
                                               .withOpacity(0.32),
@@ -163,15 +164,19 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          cutAddress(address),
-                                          style: headline5,
+                                        Expanded(
+                                          child: TickerText(
+                                            child: Text(
+                                              address,
+                                              style: headline5,
+                                            ),
+                                          ),
                                         ),
                                         SizedBox(
                                           width: 10,
                                         ),
-                                        SvgPicture.asset(
-                                            'assets/icons/copy.svg')
+                                        Image.asset(
+                                            'assets/images/copy_gradient.png', width: 20, height: 20,)
                                       ],
                                     ),
                                   ),

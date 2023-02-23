@@ -25,7 +25,7 @@ import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair_details.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_status.dart';
 import 'package:defi_wallet/widgets/loader/loader_new.dart';
-import 'package:defi_wallet/widgets/pass_confirm_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/password_bottom_sheet.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
@@ -33,7 +33,7 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
-import 'package:defi_wallet/widgets/tx_status_dialog.dart';
+import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -69,11 +69,14 @@ class LiquidityConfirmation extends StatefulWidget {
   State<LiquidityConfirmation> createState() => _LiquidityConfirmationState();
 }
 
-class _LiquidityConfirmationState extends State<LiquidityConfirmation> with ThemeMixin {
+class _LiquidityConfirmationState extends State<LiquidityConfirmation>
+    with ThemeMixin {
   String appBarTitle = 'Confirmation';
   String submitLabel = '';
-  String secondStepLoaderTextAdd = 'Did you know that DeFiChain is working without smart contracts? It\'s all based on so called custom-transactions. Makes things more secure!';
-  String secondStepLoaderTextRemove = 'Do you like Jellywallet? Leave us a review on the Google Store to support us!';
+  String secondStepLoaderTextAdd =
+      'Did you know that DeFiChain is working without smart contracts? It\'s all based on so called custom-transactions. Makes things more secure!';
+  String secondStepLoaderTextRemove =
+      'Do you like Jellywallet? Leave us a review on the Google Store to support us!';
   TokensHelper tokenHelper = TokensHelper();
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
@@ -103,7 +106,9 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
               right: 16,
             ),
             decoration: BoxDecoration(
-              color: isDarkTheme() ? DarkColors.scaffoldContainerBgColor : LightColors.scaffoldContainerBgColor,
+              color: isDarkTheme()
+                  ? DarkColors.drawerBgColor
+                  : LightColors.scaffoldContainerBgColor,
               border: isDarkTheme()
                   ? Border.all(
                       width: 1.0,
@@ -127,7 +132,8 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
-          if (state.status == AccountStatusList.success && tokensState.status == TokensStatusList.success) {
+          if (state.status == AccountStatusList.success &&
+              tokensState.status == TokensStatusList.success) {
             submitLabel = widget.removeLT == 0 ? 'Add' : 'Remove';
             return StretchBox(
               child: Column(
@@ -147,7 +153,8 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                         Container(
                           width: double.infinity,
                           height: widget.removeLT == 0 ? 148 : 88,
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 18),
                           decoration: BoxDecoration(
                             border: Border.all(
                               width: 1.0,
@@ -162,13 +169,21 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                               if (widget.removeLT != 0) ...[
                                 Flexible(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'You will receive',
-                                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
                                               fontWeight: FontWeight.w400,
-                                              color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.5),
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6!
+                                                  .color!
+                                                  .withOpacity(0.5),
                                             ),
                                       ),
                                       SizedBox(
@@ -179,21 +194,31 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                                           Flexible(
                                             child: Container(
                                               child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
                                                 children: [
                                                   SizedBox(
                                                     width: 24,
                                                     height: 24,
                                                     child: SvgPicture.asset(
-                                                      TokensHelper().getImageNameByTokenName(widget.assetPair.tokenA),
+                                                      TokensHelper()
+                                                          .getImageNameByTokenName(
+                                                              widget.assetPair
+                                                                  .tokenA),
                                                     ),
                                                   ),
                                                   SizedBox(
                                                     width: 6,
                                                   ),
                                                   Text(
-                                                    balancesHelper.numberStyling(widget.baseAmount, fixed: true),
-                                                    style: Theme.of(context).textTheme.headline3!.copyWith(
+                                                    balancesHelper
+                                                        .numberStyling(
+                                                            widget.baseAmount,
+                                                            fixed: true),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline3!
+                                                        .copyWith(
                                                           fontSize: 20,
                                                         ),
                                                   ),
@@ -210,21 +235,31 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                                           Flexible(
                                             child: Container(
                                               child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
                                                 children: [
                                                   SizedBox(
                                                     width: 24,
                                                     height: 24,
                                                     child: SvgPicture.asset(
-                                                      TokensHelper().getImageNameByTokenName(widget.assetPair.tokenB),
+                                                      TokensHelper()
+                                                          .getImageNameByTokenName(
+                                                              widget.assetPair
+                                                                  .tokenB),
                                                     ),
                                                   ),
                                                   SizedBox(
                                                     width: 6,
                                                   ),
                                                   Text(
-                                                    balancesHelper.numberStyling(widget.quoteAmount, fixed: true),
-                                                    style: Theme.of(context).textTheme.headline3!.copyWith(
+                                                    balancesHelper
+                                                        .numberStyling(
+                                                            widget.quoteAmount,
+                                                            fixed: true),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline3!
+                                                        .copyWith(
                                                           fontSize: 20,
                                                         ),
                                                   ),
@@ -244,34 +279,50 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                               if (widget.removeLT == 0) ...[
                                 Flexible(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'You will receive',
-                                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
                                               fontWeight: FontWeight.w400,
-                                              color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.5),
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6!
+                                                  .color!
+                                                  .withOpacity(0.5),
                                             ),
                                       ),
                                       SizedBox(
                                         height: 8,
                                       ),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
                                           SizedBox(
                                             width: 24,
                                             height: 24,
                                             child: SvgPicture.asset(
-                                              TokensHelper().getImageNameByTokenName(widget.assetPair.tokenA),
+                                              TokensHelper()
+                                                  .getImageNameByTokenName(
+                                                      widget.assetPair.tokenA),
                                             ),
                                           ),
                                           SizedBox(
                                             width: 6,
                                           ),
                                           Text(
-                                            balancesHelper.numberStyling(widget.baseAmount, fixed: true),
-                                            style: Theme.of(context).textTheme.headline3!.copyWith(
+                                            balancesHelper.numberStyling(
+                                                widget.baseAmount,
+                                                fixed: true),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline3!
+                                                .copyWith(
                                                   fontSize: 20,
                                                 ),
                                           )
@@ -281,21 +332,29 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                                         height: 10,
                                       ),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
                                           SizedBox(
                                             width: 24,
                                             height: 24,
                                             child: SvgPicture.asset(
-                                              TokensHelper().getImageNameByTokenName(widget.assetPair.tokenB),
+                                              TokensHelper()
+                                                  .getImageNameByTokenName(
+                                                      widget.assetPair.tokenB),
                                             ),
                                           ),
                                           SizedBox(
                                             width: 6,
                                           ),
                                           Text(
-                                            balancesHelper.numberStyling(widget.quoteAmount, fixed: true),
-                                            style: Theme.of(context).textTheme.headline3!.copyWith(
+                                            balancesHelper.numberStyling(
+                                                widget.quoteAmount,
+                                                fixed: true),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline3!
+                                                .copyWith(
                                                   fontSize: 20,
                                                 ),
                                           )
@@ -309,21 +368,33 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                                 ),
                                 Flexible(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Yield',
-                                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
                                               fontWeight: FontWeight.w400,
-                                              color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.5),
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6!
+                                                  .color!
+                                                  .withOpacity(0.5),
                                             ),
                                       ),
                                       SizedBox(
                                         height: 8,
                                       ),
                                       Text(
-                                        TokensHelper().getAprFormat(widget.assetPair.apr!),
-                                        style: Theme.of(context).textTheme.headline3!.copyWith(
+                                        TokensHelper().getAprFormat(
+                                            widget.assetPair.apr!, true),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline3!
+                                            .copyWith(
                                               fontSize: 20,
                                             ),
                                       )
@@ -348,7 +419,10 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                             children: [
                               Text(
                                 'Show less',
-                                style: Theme.of(context).textTheme.headline5!.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(
                                       fontWeight: FontWeight.w700,
                                     ),
                               ),
@@ -356,7 +430,8 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                                 width: 8,
                               ),
                               RotationTransition(
-                                turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
+                                turns: AlwaysStoppedAnimation(
+                                    arrowRotateDeg / 360),
                                 child: SizedBox(
                                   width: 8,
                                   height: 8,
@@ -387,16 +462,31 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                                 children: [
                                   TextSpan(
                                     text: 'Note: ',
-                                    style: Theme.of(context).textTheme.headline6!.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline6!
+                                        .copyWith(
                                           fontWeight: FontWeight.w400,
-                                          color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .color!
+                                              .withOpacity(0.3),
                                         ),
                                   ),
                                   TextSpan(
-                                    text: 'Liquidity tokens represent a share of the liquidity pool',
-                                    style: Theme.of(context).textTheme.headline6!.copyWith(
+                                    text:
+                                        'Liquidity tokens represent a share of the liquidity pool',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline6!
+                                        .copyWith(
                                           fontWeight: FontWeight.w400,
-                                          color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .color!
+                                              .withOpacity(0.3),
                                         ),
                                   ),
                                 ],
@@ -432,10 +522,15 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                                   barrierDismissible: false,
                                   context: context,
                                   builder: (BuildContext context1) {
-                                    return LedgerCheckScreen(onStartSign: (p, c) async {
+                                    return LedgerCheckScreen(
+                                        onStartSign: (p, c) async {
                                       parent.emitPending(true);
                                       p.emitPending(true);
-                                      await submitLiquidityAction(state, tokensState, transactionState, null, callbackOk: (() {
+                                      await submitLiquidityAction(
+                                          state,
+                                          tokensState,
+                                          transactionState,
+                                          null, callbackOk: (() {
                                         Navigator.pop(c);
                                       }));
                                       parent.emitPending(false);
@@ -449,7 +544,8 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
                                   barrierDismissible: false,
                                   context: context,
                                   builder: (BuildContext context1) {
-                                    return PassConfirmDialog(onSubmit: (password) async {
+                                    return PassConfirmDialog(
+                                        onSubmit: (password) async {
                                       parent.emitPending(true);
                                       await submitLiquidityAction(
                                         state,
@@ -479,7 +575,8 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
     });
   }
 
-  submitLiquidityAction(state, tokensState, transactionState, password, {final Function()? callbackOk}) async {
+  submitLiquidityAction(state, tokensState, transactionState, password,
+      {final Function()? callbackOk}) async {
     if (transactionState is TransactionLoadingState) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -498,10 +595,15 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
       ECPair? keyPair;
       final isLedger = await SettingsHelper.isLedger();
       if (!isLedger) {
-        keyPair = await HDWalletService().getKeypairFromStorage(password, state.activeAccount.index!);
+        keyPair = await HDWalletService()
+            .getKeypairFromStorage(password, state.activeAccount.index!);
       }
       if (widget.removeLT != 0) {
-        txError = await txser.removeLiqudity(keyPair: keyPair, account: state.activeAccount, token: widget.assetPair, amount: convertToSatoshi(widget.removeLT));
+        txError = await txser.removeLiqudity(
+            keyPair: keyPair,
+            account: state.activeAccount,
+            token: widget.assetPair,
+            amount: convertToSatoshi(widget.removeLT));
       } else {
         txError = await txser.createAndSendLiqudity(
             keyPair: keyPair,
@@ -511,6 +613,13 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation> with Them
             amountA: convertToSatoshi(widget.baseAmount),
             amountB: convertToSatoshi(widget.quoteAmount),
             tokens: tokensState.tokens);
+      }
+
+      if (!txError.isError) {
+        TransactionCubit transactionCubit =
+            BlocProvider.of<TransactionCubit>(context);
+
+        transactionCubit.setOngoingTransaction(txError);
       }
 
       showDialog(

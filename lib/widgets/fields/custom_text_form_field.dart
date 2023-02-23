@@ -1,3 +1,4 @@
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class CustomTextFormField extends StatefulWidget {
   State<CustomTextFormField> createState() => _CustomTextFormFieldState();
 }
 
-class _CustomTextFormFieldState extends State<CustomTextFormField> {
+class _CustomTextFormFieldState extends State<CustomTextFormField> with ThemeMixin{
   final _focusNode = FocusNode();
 
   @override
@@ -51,32 +52,17 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           textAlignVertical: TextAlignVertical.center,
           style: Theme.of(context).textTheme.button,
           decoration: InputDecoration(
-            prefixIcon: widget.prefix,
+            hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
             filled: true,
-            fillColor: Theme.of(context).cardColor,
-            hoverColor: Colors.transparent,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: widget.isBorder
-                    ? AppColors.portage.withOpacity(0.12)
-                    : Colors.transparent,
-              ),
+            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+            enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+            focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+            hintStyle: passwordField.copyWith(
+              color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: AppTheme.pinkColor),
-            ),
+            prefixIcon: widget.prefix,
             contentPadding: const EdgeInsets.symmetric(horizontal: 10),
             hintText: widget.hintText,
-            hintStyle: Theme.of(context).textTheme.headline6!.copyWith(
-                  color: Theme.of(context)
-                      .textTheme
-                      .headline5!
-                      .color!
-                      .withOpacity(0.3),
-                  fontWeight: FontWeight.w600,
-                ),
           ),
           onChanged: widget.onChanged,
           focusNode: _focusNode,

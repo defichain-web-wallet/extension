@@ -55,7 +55,9 @@ class _DefiCheckboxState extends State<DefiCheckbox> with ThemeMixin {
                   borderRadius: BorderRadius.circular(6),
                   border: !widget.value
                       ? Border.all(
-                          color: AppColors.darkTextColor.withOpacity(0.10),
+                          color: isDarkTheme()
+                              ? AppColors.white.withOpacity(0.10)
+                              : AppColors.darkTextColor.withOpacity(0.10),
                           width: 2,
                         )
                       : null,

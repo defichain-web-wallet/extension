@@ -1,13 +1,12 @@
 {
-    "name": "Jellywallet Beta",
-    "version": "0.8.1",
-    "permissions": ["storage"],
-    "icons": [
-      { "src": "/icons/jelly_logo.png", "sizes": "16x16" },
-      { "src": "/icons/jelly_logo.png", "sizes": "48x48" },
-      { "src": "/icons/jelly_logo.png", "sizes": "128x128" }
-    ],
-    "description": "Jellywallet Beta extension",
+    "name": "Jellywallet",
+    "version": "2.0.9",
+    "icons": {
+        "16":"/icons/jelly_logo.png",
+        "48": "/icons/jelly_logo.png",
+        "128":"/icons/jelly_logo.png"
+    },
+    "description": "Jellywallet extension",
     "content_security_policy": {
       "extension_pages": "script-src 'self'; object-src 'self'"
     },

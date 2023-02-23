@@ -1,14 +1,14 @@
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:flutter/material.dart';
 
 class TabBarHeader extends StatefulWidget {
+  final int currentTabIndex;
   final TabController? tabController;
-  final double width;
 
   const TabBarHeader({
     Key? key,
+    required this.currentTabIndex,
     this.tabController,
-    this.width = 150,
   }) : super(key: key);
 
   @override
@@ -18,29 +18,28 @@ class TabBarHeader extends StatefulWidget {
 class _TabBarHeaderState extends State<TabBarHeader> {
   @override
   Widget build(BuildContext context) => Container(
-        width: widget.width,
-        height: 38,
-        child: Ink(
-          child: TabBar(
-            labelStyle: Theme.of(context).textTheme.headline6,
-            unselectedLabelColor:
-                Theme.of(context).textTheme.headline1!.color!.withOpacity(0.6),
-            labelColor: Theme.of(context).textTheme.headline1!.color,
-            indicator: UnderlineTabIndicator(
-              borderSide: BorderSide(
-                width: 2.0,
-                color: AppTheme.pinkColor,
-              ),
-              insets: EdgeInsets.symmetric(
-                horizontal: widget.width * 0.3,
-              ),
+        height: 22,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Row(
+          children: [
+            SelectorTabElement(
+              callback: () {
+                widget.tabController!.index = 0;
+              },
+              title: 'Assets',
+              isSelect: widget.tabController!.index == 0,
             ),
-            tabs: [
-              Tab(text: 'Assets'),
-              Tab(text: 'History'),
-            ],
-            controller: widget.tabController,
-          ),
+            SizedBox(
+              width: 24,
+            ),
+            SelectorTabElement(
+              callback: () {
+                widget.tabController!.index = 1;
+              },
+              title: 'History (Beta)',
+              isSelect: widget.tabController!.index == 1,
+            )
+          ],
         ),
       );
 }

@@ -65,7 +65,7 @@ class SwapStatusScreen extends StatelessWidget {
       );
 
   Widget _buildBody(context, {isCustomBgColor = false}) {
-    if (txResponse!.isError) {
+    if (txResponse!.isError!) {
       LoggerService.invokeInfoLogg(
           'user was swap token failed ${txResponse!.error}');
     } else {
@@ -75,7 +75,7 @@ class SwapStatusScreen extends StatelessWidget {
         TransactionCubit transactionCubit =
           BlocProvider.of<TransactionCubit>(context);
 
-        transactionCubit.setOngoingTransaction(txResponse!.txid!);
+        transactionCubit.setOngoingTransaction(txResponse!);
       }
     }
     return Container(
@@ -89,7 +89,7 @@ class SwapStatusScreen extends StatelessWidget {
               txResponse: txResponse,
             ),
             Flexible(
-              child: txResponse!.isError
+              child: txResponse!.isError!
                   ? Flexible(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -163,14 +163,14 @@ class SwapStatusScreen extends StatelessWidget {
                                   if (SettingsHelper.settings.network! ==
                                       'mainnet') {
                                     launch(
-                                        'https://live.blockcypher.com/btc/tx/${txResponse!.txid}');
+                                        'https://live.blockcypher.com/btc/tx/txResponse!.txid}');
                                   } else {
                                     launch(
-                                        'https://live.blockcypher.com/btc-testnet/tx/${txResponse!.txid}');
+                                        'https://live.blockcypher.com/btc-testnet/tx/txResponse!.txid}');
                                   }
                                 } else {
                                   launch(
-                                      'https://defiscan.live/transactions/${txResponse!.txid}?network=${SettingsHelper.settings.network!}');
+                                      'https://defiscan.live/transactions/txResponse!.txid}?network=${SettingsHelper.settings.network!}');
                                 }
                               },
                             ),

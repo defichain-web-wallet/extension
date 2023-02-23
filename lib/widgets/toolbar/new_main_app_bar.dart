@@ -4,20 +4,25 @@ import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/selectors/network_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 // import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
 // import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 
 class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isShowLogo;
+  final Color? bgColor;
+  final void Function()? callback;
 
   const NewMainAppBar({
     Key? key,
     this.isShowLogo = true,
+    this.bgColor,
+    this.callback,
   }) : super(key: key);
 
   static const double toolbarHeight = 54.0;
   static const double iconSize = 20.0;
-  static const double logoWidth = 42.0;
+  static const double logoWidth = 26.0;
   static const double logoLeftPadding = 16.0;
   static const double leadingWidth = logoWidth + logoLeftPadding;
 
@@ -33,7 +38,9 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         shadowColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: bgColor != null
+            ? bgColor
+            : Theme.of(context).scaffoldBackgroundColor,
         toolbarHeight: toolbarHeight,
         elevation: 0,
         leadingWidth: leadingWidth,
@@ -43,34 +50,29 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: LogoHelper().getLogo(),
               )
             : IconButton(
-                icon: SvgPicture.asset(
-                  'assets/icons/arrow_back.svg',
+                padding: const EdgeInsets.only(left: logoLeftPadding - 2),
+                icon: Container(
                   width: iconSize,
                   height: iconSize,
+                  child: Image.asset(
+                    'assets/icons/arrow.png',
+                  ),
                 ),
-                onPressed: () => Navigator.of(context).pop(),
-                splashRadius: 20,
-              ),
-        title: NetworkSelector(onSelect: () {},),
-        actions: [
-          SizedBox(
-            width: 32,
-            height: 32,
-            child: NewActionButton(
-              iconPath: 'assets/icons/fullscreen_icon.svg',
-              onPressed: () => lockHelper.provideWithLockChecker(
-                context,
-                () {
-                  // js.context.callMethod('open', [
-                  //   window.location.toString(),
-                  // ]);
+                onPressed: () {
+                  if (callback != null) {
+                    callback!();
+                  }
+                  Navigator.of(context).pop();
                 },
+                hoverColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                focusColor: Colors.transparent,
               ),
-            ),
-          ),
-          SizedBox(
-            width: 12,
-          ),
+        title: NetworkSelector(
+          onSelect: () {},
+        ),
+        actions: [
           SizedBox(
             width: 32,
             height: 32,
