@@ -19,13 +19,16 @@ class HttpError implements Exception {
 class TransactionRequests {
   var addressesHelper = AddressesHelper();
 
-  Future<List<UtxoModel>> getUTXOs({required List<AddressModel> addresses, String fallbackUrl = ''}) async {
+  Future<List<UtxoModel>> getUTXOs(
+      {required List<AddressModel> addresses, String fallbackUrl = ''}) async {
     List<UtxoModel> utxos = [];
 
     for (var i = 0; i < addresses.length; i++) {
       try {
         String hostUrl = SettingsHelper.getHostApiUrl();
-        String urlAddress = fallbackUrl.isEmpty ? '$hostUrl/${SettingsHelper.settings.network}/address/${addresses[i].address}/transactions/unspent' : fallbackUrl;
+        String urlAddress = fallbackUrl.isEmpty
+            ? '$hostUrl/${SettingsHelper.settings.network}/address/${addresses[i].address}/transactions/unspent'
+            : fallbackUrl;
 
         final Uri _url = Uri.parse(urlAddress);
         final _headers = {
@@ -33,18 +36,22 @@ class TransactionRequests {
         };
 
         final _response = await http.get(_url, headers: _headers);
-        final _data = jsonDecode(_response.body)['data'].cast<Map<String, dynamic>>();
+        final _data =
+            jsonDecode(_response.body)['data'].cast<Map<String, dynamic>>();
         _data.forEach((utxo) {
           var utxoModel = UtxoModel.fromJson(utxo);
           utxoModel.address = addresses[i].address;
           utxos.add(utxoModel);
         });
       } catch (err) {
-        if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
-          String fallbackUrlAddress = SettingsHelper.settings.network == 'mainnet'
+        if (fallbackUrl.isEmpty &&
+            SettingsHelper.settings.apiName == ApiName.auto) {
+          String fallbackUrlAddress = SettingsHelper.settings.network ==
+                  'mainnet'
               ? 'http://ocean.mydefichain.com:3000/v0/mainnet/address/${addresses[i].address}/transactions/unspent'
               : 'https://testnet-ocean.mydefichain.com:8443/v0/testnet/address/${addresses[i].address}/transactions/unspent';
-          return getUTXOs(addresses: addresses, fallbackUrl: fallbackUrlAddress);
+          return getUTXOs(
+              addresses: addresses, fallbackUrl: fallbackUrlAddress);
         } else {
           throw err;
         }
@@ -56,8 +63,9 @@ class TransactionRequests {
 
   Future<String> loadRawTransaction({required String txId}) async {
     try {
-      String hostUrl = Hosts.ocean;
-      String urlAddress = '$hostUrl/${SettingsHelper.settings.network}/rawtx/$txId';
+      String hostUrl = Hosts.oceanDefichain;
+      String urlAddress =
+          '$hostUrl/${SettingsHelper.settings.network}/rawtx/$txId';
 
       final Uri _url = Uri.parse(urlAddress);
       final _headers = {
@@ -85,10 +93,13 @@ class TransactionRequests {
     }
   }
 
-  Future<Map<String, dynamic>> loadTransaction({required String txId, String fallbackUrl = ''}) async {
+  Future<Map<String, dynamic>> loadTransaction(
+      {required String txId, String fallbackUrl = ''}) async {
     try {
       String hostUrl = SettingsHelper.getHostApiUrl();
-      String urlAddress = fallbackUrl.isEmpty ? '$hostUrl/${SettingsHelper.settings.network}/transactions/$txId' : fallbackUrl;
+      String urlAddress = fallbackUrl.isEmpty
+          ? '$hostUrl/${SettingsHelper.settings.network}/transactions/$txId'
+          : fallbackUrl;
 
       final Uri _url = Uri.parse(urlAddress);
       final _headers = {
@@ -107,7 +118,8 @@ class TransactionRequests {
     } on HttpError catch (_) {
       throw _;
     } catch (err) {
-      if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
+      if (fallbackUrl.isEmpty &&
+          SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = SettingsHelper.settings.network == 'mainnet'
             ? 'http://ocean.mydefichain.com:3000/v0/mainnet/transactions/$txId'
             : 'https://testnet-ocean.mydefichain.com:8443/v0/testnet/transactions/$txId';
@@ -118,10 +130,13 @@ class TransactionRequests {
     }
   }
 
-  Future<List<dynamic>> loadTransactionVins({required String txId, String fallbackUrl = ''}) async {
+  Future<List<dynamic>> loadTransactionVins(
+      {required String txId, String fallbackUrl = ''}) async {
     try {
       String hostUrl = SettingsHelper.getHostApiUrl();
-      String urlAddress = fallbackUrl.isEmpty ? '$hostUrl/${SettingsHelper.settings.network}/transactions/$txId/vins' : fallbackUrl;
+      String urlAddress = fallbackUrl.isEmpty
+          ? '$hostUrl/${SettingsHelper.settings.network}/transactions/$txId/vins'
+          : fallbackUrl;
 
       final Uri _url = Uri.parse(urlAddress);
       final _headers = {
@@ -137,7 +152,8 @@ class TransactionRequests {
 
       return data;
     } catch (err) {
-      if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
+      if (fallbackUrl.isEmpty &&
+          SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = SettingsHelper.settings.network == 'mainnet'
             ? 'http://ocean.mydefichain.com:3000/v0/mainnet/transactions/$txId/vins'
             : 'https://testnet-ocean.mydefichain.com:8443/v0/testnet/transactions/$txId/vins';
@@ -148,10 +164,13 @@ class TransactionRequests {
     }
   }
 
-  Future<List<dynamic>> loadTransactionVouts({required String txId, String fallbackUrl = ''}) async {
+  Future<List<dynamic>> loadTransactionVouts(
+      {required String txId, String fallbackUrl = ''}) async {
     try {
       String hostUrl = SettingsHelper.getHostApiUrl();
-      String urlAddress = fallbackUrl.isEmpty ? '$hostUrl/${SettingsHelper.settings.network}/transactions/$txId/vouts' : fallbackUrl;
+      String urlAddress = fallbackUrl.isEmpty
+          ? '$hostUrl/${SettingsHelper.settings.network}/transactions/$txId/vouts'
+          : fallbackUrl;
 
       final Uri _url = Uri.parse(urlAddress);
       final _headers = {
@@ -167,21 +186,26 @@ class TransactionRequests {
 
       return data;
     } catch (err) {
-      if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
+      if (fallbackUrl.isEmpty &&
+          SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = SettingsHelper.settings.network == 'mainnet'
             ? 'http://ocean.mydefichain.com:3000/v0/mainnet/transactions/$txId/vouts'
             : 'https://testnet-ocean.mydefichain.com:8443/v0/testnet/transactions/$txId/vouts';
-        return loadTransactionVouts(txId: txId, fallbackUrl: fallbackUrlAddress);
+        return loadTransactionVouts(
+            txId: txId, fallbackUrl: fallbackUrlAddress);
       } else {
         throw err;
       }
     }
   }
 
-  Future<TxErrorModel> sendTxHex(String txHex, {String fallbackUrl = ''}) async {
+  Future<TxErrorModel> sendTxHex(String txHex,
+      {String fallbackUrl = ''}) async {
     try {
       String hostUrl = SettingsHelper.getHostApiUrl();
-      String urlAddress = fallbackUrl.isEmpty ? '$hostUrl/${SettingsHelper.settings.network}/rawtx/send' : fallbackUrl;
+      String urlAddress = fallbackUrl.isEmpty
+          ? '$hostUrl/${SettingsHelper.settings.network}/rawtx/send'
+          : fallbackUrl;
 
       final Uri _url = Uri.parse(urlAddress);
 
@@ -196,12 +220,15 @@ class TransactionRequests {
       final response = await http.post(_url, headers: _headers, body: _body);
       final data = jsonDecode(response.body);
       if (response.statusCode == 201) {
-        return TxErrorModel(isError: false, txLoaderList: [TxLoaderModel(txId: data['data'], txHex: txHex)]);
+        return TxErrorModel(
+            isError: false,
+            txLoaderList: [TxLoaderModel(txId: data['data'], txHex: txHex)]);
       } else {
         return TxErrorModel(isError: true, error: data['error']['message']);
       }
     } catch (err) {
-      if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
+      if (fallbackUrl.isEmpty &&
+          SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = SettingsHelper.settings.network == 'mainnet'
             ? 'http://ocean.mydefichain.com:3000/v0/mainnet/address/mainnet/rawtx/send'
             : 'https://testnet-ocean.mydefichain.com:8443/v0/testnet/rawtx/send';

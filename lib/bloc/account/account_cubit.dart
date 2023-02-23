@@ -771,6 +771,21 @@ class AccountCubit extends Cubit<AccountState> {
     ));
   }
 
+  loadAccounts() async {
+    var accountList = await loadAccountDetails([state.activeAccount!],
+        isUpdateWithHistory: false);
+    emit(state.copyWith(
+      status: AccountStatusList.success,
+      accounts: state.accounts,
+      balances: state.balances,
+      masterKeyPairPublicKey: state.masterKeyPairPublicKey,
+      activeAccount: accountList[0],
+      activeToken: state.activeToken,
+      historyFilterBy: state.historyFilterBy,
+      swapTutorialStatus: state.swapTutorialStatus,
+    ));
+  }
+
   restoreLedgerAccount(String? network, Function(int, int) statusBar) async {
     network = network ?? mainnet;
     var box = await Hive.openBox(HiveBoxes.client);

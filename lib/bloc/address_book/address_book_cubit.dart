@@ -111,7 +111,6 @@ class AddressBookCubit extends Cubit<AddressBookState> {
 
     final resultJSON = [];
 
-
     for (var element in addressBookList) {
       resultJSON.add(element.toJson());
     }
@@ -180,9 +179,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
 
     addressBookList.removeWhere((element) => element.id == addressBook.id);
 
-
     final resultJSON = [];
-
 
     for (var element in addressBookList) {
       resultJSON.add(element.toJson());
@@ -204,7 +201,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     ));
   }
 
-  getLastContact(){
+  getLastContact() {
     return state.addressBookList!.last;
   }
 }

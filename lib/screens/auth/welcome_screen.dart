@@ -101,6 +101,7 @@ class WelcomeScreen extends StatelessWidget {
                                   ? buttonFullWidth
                                   : buttonSmallWidth,
                               child: AccentButton(
+                                isOpasity: true,
                                 isCheckLock: false,
                                 label: 'Set up wallet with Ledger',
                                 callback: () {
