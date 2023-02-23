@@ -297,7 +297,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                           children: [
                                                             TextSpan(
                                                                 text:
-                                                                'Over 900 € transfer volume per day KYC (Know Your Customer) process is necessary. If you would like to remove this limit, please complete the ',
+                                                                'Your account needs to get verified once your daily transaction volume exceeds 900 €. If you want to increase the daily trading limit, please complete the ',
                                                                 style: Theme.of(
                                                                     context)
                                                                     .textTheme
@@ -313,7 +313,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                                         .withOpacity(0.6))),
                                                             TextSpan(
                                                               text:
-                                                              'KYC process here.',
+                                                              'KYC (Know-Your-Customer) process.',
                                                               style: Theme.of(
                                                                   context)
                                                                   .textTheme
