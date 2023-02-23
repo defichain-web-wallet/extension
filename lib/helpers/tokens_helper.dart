@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 
@@ -316,8 +317,15 @@ class TokensHelper {
   }
 
   String getSpecificDefiName(String value) {
-    String defaultDefiTokenName = 'Default Defi token';
-    return value.replaceAll(defaultDefiTokenName, 'DFI');
+    if (!SettingsHelper.isBitcoin()) {
+      String defaultDefiTokenName = 'Default Defi token';
+      String defaultBitcoinTokenName = 'Bitcoin';
+      return value
+          .replaceAll(defaultDefiTokenName, 'DeFiChain')
+          .replaceAll(defaultBitcoinTokenName, 'DeFiChain Bitcoin');
+    } else {
+      return value;
+    }
   }
 
   List<TokensModel> getTokensList(
