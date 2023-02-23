@@ -148,6 +148,7 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin {
                                       .withOpacity(0.16),
                                 ),
                                 SettingsListTile(
+                                  isComingSoon: true,
                                   titleText: 'Language',
                                   subtitleText:
                                       'Click to choose your main language',
