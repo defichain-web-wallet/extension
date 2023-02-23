@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/helpers/fiat_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/screens/buy/iban_screen.dart';
@@ -33,7 +34,7 @@ class IbanSelector extends StatefulWidget {
   State<IbanSelector> createState() => IbanSelectorState();
 }
 
-class IbanSelectorState extends State<IbanSelector> {
+class IbanSelectorState extends State<IbanSelector> with ThemeMixin{
   GlobalKey _selectKey = GlobalKey();
   bool _isOpen = false;
   late OverlayState? _overlayState;
@@ -172,7 +173,9 @@ class IbanSelectorState extends State<IbanSelector> {
                       : (widget.ibanList.length + 1) * (_tileHeight + 1)) +
                   2,
               decoration: BoxDecoration(
-                color: Theme.of(context).inputDecorationTheme.fillColor,
+                color: isDarkTheme()
+                    ? Theme.of(context).inputDecorationTheme.fillColor
+                    : LightColors.drawerBgColor,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: AppColors.portage.withOpacity(0.12),
@@ -254,7 +257,12 @@ class IbanSelectorState extends State<IbanSelector> {
                         shadowColor: Colors.transparent,
                         primary: Colors.transparent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(0),
+                          borderRadius: index == 0
+                              ? BorderRadius.only(
+                                  topLeft: Radius.circular(10.0),
+                                  topRight: Radius.circular(10.0),
+                                )
+                              : BorderRadius.circular(0),
                         ),
                         side: BorderSide(
                           color: Colors.transparent,
