@@ -1,12 +1,8 @@
-import 'dart:js_util';
-
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_final_screen.dart';
 import 'package:defi_wallet/screens/ledger/loaders/ledger_auth_loader_screen.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/dotted_tab.dart';
@@ -14,16 +10,20 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:js/js_util.dart';
 
 class ConnectLedgerFourthScreen extends StatefulWidget {
   const ConnectLedgerFourthScreen({Key? key}) : super(key: key);
 
   @override
-  State<ConnectLedgerFourthScreen> createState() => _ConnectLedgerFourthScreenState();
+  State<ConnectLedgerFourthScreen> createState() =>
+      _ConnectLedgerFourthScreenState();
 }
 
-class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen> with ThemeMixin {
-  String subtitleText = 'Once you set up the wallet with Ledger you can only use Jellywallet with Ledger.';
+class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
+    with ThemeMixin {
+  String subtitleText =
+      'Once you set up the wallet with Ledger you can only use Jellywallet with Ledger.';
   String titleText = '4.';
 
   @override
@@ -87,8 +87,15 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen> w
                             height: 105,
                             child: Text(
                               subtitleText,
-                              style: Theme.of(context).textTheme.headline5!.copyWith(
-                                    color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .color!
+                                        .withOpacity(0.6),
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -108,7 +115,8 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen> w
                               NewPrimaryButton(
                                 width: 104,
                                 callback: () async {
-                                  var result = await promiseToFuture(openLedgerDefichain("DeFiChain"));
+                                  var result = await promiseToFuture(
+                                      openLedgerDefichain("DeFiChain"));
                                   print(result);
                                   if (result > 0) {
                                     // 1 = app not installed
@@ -119,20 +127,28 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen> w
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(
-                                        pageBuilder: (context, animation1, animation2) => LedgerAuthLoaderScreen(
+                                        pageBuilder:
+                                            (context, animation1, animation2) =>
+                                                LedgerAuthLoaderScreen(
                                           callback: () {
                                             Navigator.pushReplacement(
                                               context,
                                               PageRouteBuilder(
-                                                pageBuilder: (context, animation1, animation2) => ConnectLedgerFinalScreen(),
-                                                transitionDuration: Duration.zero,
-                                                reverseTransitionDuration: Duration.zero,
+                                                pageBuilder: (context,
+                                                        animation1,
+                                                        animation2) =>
+                                                    ConnectLedgerFinalScreen(),
+                                                transitionDuration:
+                                                    Duration.zero,
+                                                reverseTransitionDuration:
+                                                    Duration.zero,
                                               ),
                                             );
                                           },
                                         ),
                                         transitionDuration: Duration.zero,
-                                        reverseTransitionDuration: Duration.zero,
+                                        reverseTransitionDuration:
+                                            Duration.zero,
                                       ),
                                     );
                                   }

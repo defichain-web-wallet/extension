@@ -31,7 +31,8 @@ class LedgerAuthLoaderScreen extends StatefulWidget {
   State<LedgerAuthLoaderScreen> createState() => _LedgerAuthLoaderScreenState();
 }
 
-class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen> with ThemeMixin {
+class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
+    with ThemeMixin {
   String firstStepText = 'One second, Jelly is searching for your addresses...';
   String secondStepText = 'Ugh.. What a mess...';
   String thirdStepText = 'Okay, almost done...';
@@ -105,7 +106,9 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen> with Th
                     Column(
                       children: [
                         Image.asset(
-                          isDarkTheme() ? 'assets/images/loader_dark_bg.gif' : 'assets/images/loader_white_bg.gif',
+                          isDarkTheme()
+                              ? 'assets/images/loader_dark_bg.gif'
+                              : 'assets/images/loader_white_bg.gif',
                           width: loaderImageWidth,
                         ),
                         SizedBox(
@@ -117,9 +120,14 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen> with Th
                             currentText,
                             textAlign: TextAlign.center,
                             softWrap: true,
-                            style: Theme.of(context).textTheme.headline5!.copyWith(
-                                  color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
-                                ),
+                            style:
+                                Theme.of(context).textTheme.headline5!.copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.6),
+                                    ),
                           ),
                         ),
                       ],
@@ -138,13 +146,15 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen> with Th
     await init();
     try {
       AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-      await accountCubit.restoreLedgerAccount(SettingsHelper.settings.network, (need, restored) {
+      await accountCubit.restoreLedgerAccount(SettingsHelper.settings.network,
+          (need, restored) {
         getStatusText(widget.currentStatus, need, restored);
       });
 
       widget.callback!();
     } on Exception catch (error) {
-      showDialog(
+      print(error);
+      await showDialog(
         barrierColor: Color(0x0f180245),
         barrierDismissible: false,
         context: context,

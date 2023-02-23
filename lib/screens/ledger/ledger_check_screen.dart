@@ -12,7 +12,8 @@ import 'package:flutter/material.dart';
 class LedgerCheckScreen extends StatefulWidget {
   final Function(dynamic parent, BuildContext context) onStartSign;
 
-  const LedgerCheckScreen({Key? key, required this.onStartSign}) : super(key: key);
+  const LedgerCheckScreen({Key? key, required this.onStartSign})
+      : super(key: key);
 
   @override
   State<LedgerCheckScreen> createState() => _LedgerCheckScreenState();
@@ -50,7 +51,9 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
-            color: isDarkTheme() ? DarkColors.scaffoldContainerBgColor : LightColors.scaffoldContainerBgColor,
+            color: isDarkTheme()
+                ? DarkColors.scaffoldContainerBgColor
+                : LightColors.scaffoldContainerBgColor,
             border: isDarkTheme()
                 ? Border.all(
                     width: 1.0,
@@ -74,7 +77,8 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                         children: [
                           Text(
                             titleText,
-                            style: headline2.copyWith(fontWeight: FontWeight.w700),
+                            style:
+                                headline2.copyWith(fontWeight: FontWeight.w700),
                           )
                         ],
                       ),
@@ -92,7 +96,11 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                       Text(
                         'Now connect your Ledger device and open the DeFiChain Application',
                         style: Theme.of(context).textTheme.headline5!.copyWith(
-                              color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .color!
+                                  .withOpacity(0.6),
                             ),
                         textAlign: TextAlign.center,
                       ),
@@ -106,11 +114,14 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                             ),
                         textAlign: TextAlign.center,
                       ),
-                      PendingButton('Start', pendingText: 'Sign on your ledger', isCheckLock: false, callback: (parent) async {
+                      PendingButton('Start',
+                          pendingText: 'Sign on your ledger',
+                          isCheckLock: false, callback: (parent) async {
                         parent.emitPending(true);
                         try {
                           await this.widget.onStartSign(parent, context);
                         } on Exception catch (error) {
+                          print(error);
                           showDialog(
                             barrierColor: Color(0x0f180245),
                             barrierDismissible: false,

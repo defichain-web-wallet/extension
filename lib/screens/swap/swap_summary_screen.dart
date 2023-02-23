@@ -8,7 +8,6 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
-import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -23,7 +22,6 @@ import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -354,8 +352,10 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
               tokens: tokenState.tokens);
         }
       } on Exception catch (err) {
+        print(err);
         throw err;
       } catch (err) {
+        print(err);
         txResponse = TxErrorModel(isError: true);
         if (callbackFail != null) callbackFail();
       }

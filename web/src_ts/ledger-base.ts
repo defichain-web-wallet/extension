@@ -54,7 +54,7 @@ export class JellyWalletLedger {
     }
   }
 
-  public async getAddress(path: string, verify: boolean) {
+  public async getAddress(path: string, verify: boolean): Promise<string> {
     try {
 
       const appDfi = await this.appLedgerDefichain();
@@ -68,17 +68,19 @@ export class JellyWalletLedger {
           reject(timeoutError);
         }, 2000);
       });
-      
-     const address = await Promise.race([addressPromise, timeoutPromise]);
+
+      const address = await Promise.race([addressPromise, timeoutPromise]);
 
       console.log(address);
-      return address;
+      return JSON.stringify(address);
     } catch (e) {
       throw e;
     }
   };
 
-  public async signTransactionRaw(transaction: LedgerTransactionRaw[], paths: string[], newTx: string, networkStr: string, changePath: string): Promise<string> {
+  public async signTransactionRaw(transactionsJson: string, paths: string[], newTx: string, networkStr: string, changePath: string): Promise<string> {
+    const transaction: LedgerTransactionRaw[] = JSON.parse(transactionsJson);
+
     const ledger = await this.appLedgerDefichain();
     const splitNewTx = await ledger.splitTransaction(newTx, true);
     const outputScriptHex = await ledger.serializeTransactionOutputs(splitNewTx).toString("hex");
