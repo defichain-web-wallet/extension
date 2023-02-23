@@ -72,7 +72,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
 
   checkButtonStatus() {
     setState(() {
-      if (_nameController.text.length > 3 &&
+      if (_nameController.text.length > 0 &&
           _addressController.text.isNotEmpty &&
           isValidAddress) {
         isEnable = true;
