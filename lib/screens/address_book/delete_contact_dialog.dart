@@ -103,7 +103,7 @@ class _DeleteContactDialogState extends State<DeleteContactDialog> {
                       children: [
                         Expanded(
                           child: Text(
-                            'Are you sure you want to delete this contact from your Address Book?',
+                            'Are you sure you want to delete this contact from your address book?',
                             style: Theme.of(context).textTheme.headline5!.apply(
                                   color: Theme.of(context)
                                       .textTheme
