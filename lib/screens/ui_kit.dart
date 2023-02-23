@@ -9,9 +9,13 @@ import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:defi_wallet/widgets/selectors/fees_selector.dart';
+import 'package:dotlottie_loader/dotlottie_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
+import 'package:logging/logging.dart';
+import 'package:overlay_lottie/overlay_lottie.dart';
 
 import '../widgets/selectors/app_selector.dart';
 
@@ -23,7 +27,7 @@ class UiKit extends StatefulWidget {
 }
 
 class _UiKitState extends State<UiKit>
-    with SnackBarMixin, SingleTickerProviderStateMixin {
+    with SnackBarMixin, TickerProviderStateMixin, OverlayLottie {
   late final AnimationController animationController = AnimationController(
     vsync: this,
     duration: Duration(seconds: 2),
@@ -69,6 +73,25 @@ class _UiKitState extends State<UiKit>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              SizedBox(
+                height: 100,
+                width: 100,
+                child: Lottie.asset(
+                  'assets/animations/loading_jelly.json',
+                ),
+              ),
+              SizedBox(
+                height: 100,
+                width: 100,
+                child: DotLottieLoader.fromAsset("assets/animations/loading_animation.lottie",
+                    frameBuilder: (BuildContext ctx, DotLottie? dotlottie) {
+                      if (dotlottie != null) {
+                        return Lottie.memory(dotlottie.animations.values.single);
+                      } else {
+                        return Container();
+                      }
+                    }),
+              ),
               AmountField(
                 onChanged: (value) {
                   //

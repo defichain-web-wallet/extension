@@ -89,7 +89,11 @@ dependencies:
   gradient_borders: ^0.2.0
   simple_gradient_text: ^1.2.4
   flutter_switch: ^0.3.2
-
+  lottie: ^2.2.0
+  flare_flutter: ^3.0.2
+  dotlottie_loader: ^0.0.3
+#  flame_lottie: ^0.2.0
+  overlay_lottie: ^1.0.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -118,6 +122,8 @@ flutter:
     - assets/tokens/
     - assets/currencies/
     - assets/pair_icons/
+    - assets/animations/loading_jelly.json
+    - assets/animations/loading_animation.lottie
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
