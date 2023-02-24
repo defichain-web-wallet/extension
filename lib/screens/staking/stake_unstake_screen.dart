@@ -131,6 +131,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                       appBar: NewMainAppBar(
                         bgColor: AppColors.viridian.withOpacity(0.16),
                         isShowLogo: false,
+                        isShowNetworkSelector: false,
                       ),
                       body: Container(
                         decoration: BoxDecoration(

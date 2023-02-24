@@ -10,12 +10,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isShowLogo;
+  final bool isShowNetworkSelector;
   final Color? bgColor;
   final void Function()? callback;
 
   const NewMainAppBar({
     Key? key,
     this.isShowLogo = true,
+    this.isShowNetworkSelector = true,
     this.bgColor,
     this.callback,
   }) : super(key: key);
@@ -69,9 +71,9 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 splashColor: Colors.transparent,
                 focusColor: Colors.transparent,
               ),
-        title: NetworkSelector(
+        title: isShowNetworkSelector ? NetworkSelector(
           onSelect: () {},
-        ),
+        ) : Container(),
         actions: [
           SizedBox(
             width: 32,
