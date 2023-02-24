@@ -49,6 +49,8 @@ class _StakingSelectVerificationScreenState
       'processing based on your consent before its withdrawal. For further '
       'information please see our Privacy Notice or contact us: '
       'info@lock.space .';
+  final double infoWidth = 273;
+  final double infoHeight = 350;
 
   bool isKycHandover = true;
   bool isNewKycProcess = false;
@@ -313,13 +315,13 @@ class _StakingSelectVerificationScreenState
                     ),
                     if (isShowInfo)
                       Padding(
-                        padding: const EdgeInsets.only(top: 115),
+                        padding: const EdgeInsets.only(top: 90),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              width: 273,
-                              height: 332,
+                              width: infoWidth,
+                              height: infoHeight,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(12.8),
                                 child: BackdropFilter(
