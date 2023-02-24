@@ -11,6 +11,7 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WelcomeScreen extends StatelessWidget {
   signUpFlowCallback(BuildContext context) {
@@ -115,7 +116,11 @@ class WelcomeScreen extends StatelessWidget {
                                     'Terms and Conditions',
                                     style: jellyLink,
                                   ),
-                                  onTap: () {},
+                                  onTap: () {
+                                    launch(
+                                      'https://jellywallet.io/terms-and-conditions/',
+                                    );
+                                  },
                                 ),
                               ],
                             ),
