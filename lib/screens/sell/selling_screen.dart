@@ -111,7 +111,8 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                     } else {
                       IbanModel? currentIban;
                       if (iterator == 0) {
-                        selectedFiat = fiatState.sellableFiatList![0];
+                        selectedFiat = fiatState.sellableFiatList!
+                            .firstWhere((element) => element.name == 'EUR');
                         accountState.activeAccount!.balanceList!.forEach((el) {
                           try {
                             var assetList = fiatState.assets!.where((element) =>
