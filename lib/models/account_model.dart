@@ -40,7 +40,11 @@ class AccountModel {
     this.index = jsonModel["index"];
     this.name = jsonModel["name"];
     this.activeToken = jsonModel["activeToken"];
-    this.accessToken = jsonModel["accessToken"];
+    try {
+      this.accessToken = jsonModel["accessToken"];
+    } catch (err) {
+      this.accessToken = null;
+    }
     try {
       this.lockAccessToken = jsonModel["lockAccessToken"];
     } catch (err) {
