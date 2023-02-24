@@ -187,24 +187,30 @@ class FiatCubit extends Cubit<FiatState> {
         history: history,
       ));
     } catch (err) {
-      emit(state.copyWith(
-        status: FiatStatusList.failure,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        kycHash: state.kycHash,
-        kycStatus: state.kycStatus,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        assets: state.assets,
-        isShowTutorial: isShowTutorial,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
-      ));
+      if (err == '401') {
+        emit(state.copyWith(
+          status: FiatStatusList.expired,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: FiatStatusList.failure,
+          phone: state.phone,
+          countryCode: state.countryCode,
+          phoneWithoutPrefix: state.phoneWithoutPrefix,
+          numberPrefix: state.numberPrefix,
+          kycHash: state.kycHash,
+          kycStatus: state.kycStatus,
+          email: state.email,
+          currentIban: state.currentIban,
+          ibansList: state.ibansList,
+          assets: state.assets,
+          isShowTutorial: isShowTutorial,
+          isKycDataComplete: state.isKycDataComplete,
+          limit: state.limit,
+          history: state.history,
+          accessToken: state.accessToken,
+        ));
+      }
     }
   }
 

@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ErrorScreen extends StatelessWidget {
-  final FlutterErrorDetails errorDetails;
+  final FlutterErrorDetails? errorDetails;
 
   const ErrorScreen({
     Key? key,
-    required this.errorDetails,
+    this.errorDetails,
   }) : super(key: key);
 
   @override

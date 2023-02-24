@@ -715,4 +715,15 @@ class AccountCubit extends Cubit<AccountState> {
       swapTutorialStatus: state.swapTutorialStatus,
     ));
   }
+
+  clearAccessTokens() async {
+    state.accounts!.forEach((element) {
+      element.accessToken = null;
+      element.lockAccessToken = null;
+    });
+    await saveAccountsToStorage(
+      accountsMainnet: state.accounts,
+      masterKeyPairMainnetPublicKey: state.masterKeyPairPublicKey,
+    );
+  }
 }
