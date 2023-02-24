@@ -90,11 +90,16 @@ class LockRequests {
       };
 
       final response = await http.get(url, headers: headers);
-      dynamic data = jsonDecode(response.body);
-      return LockUserModel.fromJson(data);
-    } catch (_) {
-      print(_);
-      return null;
+
+      if (response.statusCode == 200) {
+        dynamic data = jsonDecode(response.body);
+
+        return LockUserModel.fromJson(data);
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -111,8 +116,7 @@ class LockRequests {
       final response = await http.get(url, headers: headers);
       dynamic data = jsonDecode(response.body);
       return LockStakingModel.fromJson(data);
-    } catch (_) {
-      print(_);
+    } catch (error) {
       return null;
     }
   }
