@@ -11,7 +11,7 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/earn_screen/widgets/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_pool_list.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen.dart';
-import 'package:defi_wallet/screens/staking/send_staking_rewards.dart';
+import 'package:defi_wallet/screens/staking/staking_screen.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
@@ -89,7 +89,7 @@ class _EarnScreenState extends State<EarnScreen> {
                 builder: (tokensContext, tokensState) {
               double totalPairsBalance = 0;
               String maxApr = TokensHelper()
-                  .getAprFormat(getMaxAPR(tokensState.tokensPairs!));
+                  .getAprFormat(getMaxAPR(tokensState.tokensPairs!), true);
 
               accountState.activeAccount!.balanceList!.forEach((element) {
                 if (!element.isHidden! && !element.isPair!) {
@@ -312,7 +312,7 @@ class _EarnScreenState extends State<EarnScreen> {
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) =>
-              SendStakingRewardsScreen(),
+              StakingScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),

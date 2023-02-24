@@ -24,4 +24,12 @@ class HiveNames {
   static const String swapTutorialStatus = 'swap_tutorial_status';
   static const String kycStatus = 'kyc_status';
   static const String storageVersion = 'storage_version';
+
+  static const String accountName = 'account_name';
+  static const String accountAvatar = 'account_avatar';
+
+  // address book
+  static const String defiAddressBook = 'defi_address_book';
+  static const String btcAddressBook = 'btc_address_book';
+  static const String lastSent = 'last_sent';
 }

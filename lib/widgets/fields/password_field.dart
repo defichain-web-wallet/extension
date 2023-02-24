@@ -6,7 +6,8 @@ class PasswordField extends StatefulWidget {
   final Function(String text)? onChanged;
   final Function()? onIconPressed;
   final Function()? onEditComplete;
-  final Function(String value)? onSubmitted;
+  final Function(String)? onSubmitted;
+  final Function(String?)? onSaved;
   final bool obscureText;
   final bool autofocus;
   final bool isObscureIcon;
@@ -19,6 +20,7 @@ class PasswordField extends StatefulWidget {
     this.onIconPressed,
     this.onEditComplete,
     this.onSubmitted,
+    this.onSaved,
     this.obscureText = false,
     this.autofocus = false,
     this.isObscureIcon = true,
@@ -51,6 +53,7 @@ class _PasswordFieldState extends State<PasswordField> {
           autofocus: widget.autofocus,
           maxLines: 1,
           onFieldSubmitted: widget.onSubmitted,
+          onSaved: widget.onSaved,
           textAlignVertical: TextAlignVertical.center,
           obscureText: widget.obscureText,
           onEditingComplete: widget.onEditComplete,

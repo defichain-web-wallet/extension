@@ -23,7 +23,7 @@ class HistoryRequests {
   Future<List<HistoryNew>> getHistory(AddressModel addressModel, String token,
       String network) async {
     try {
-      String urlAddress = '${DfxApi.url}${addressModel.address}/2022/USD';
+      String urlAddress = '${DfxApi.url}${addressModel.address}/2023/USD';
 
       final Uri url = Uri.parse(urlAddress);
 

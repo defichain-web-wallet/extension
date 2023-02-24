@@ -53,7 +53,7 @@ dependencies:
   dotted_border: ^2.0.0
   awesome_dropdown: ^0.0.4
 
-  flutter_svg: ^0.22.0
+  flutter_svg: ^1.1.6
   url_launcher: ^6.0.9
 
   cron: ^0.3.0
@@ -64,7 +64,7 @@ dependencies:
 
   simple_tooltip: ^1.0.0
 
-  custom_pop_up_menu: ^1.2.2
+  custom_pop_up_menu: ^1.2.4
 
   basic_utils: ^3.6.0
 
@@ -74,7 +74,7 @@ dependencies:
 
   encrypt: ^5.0.1
 
-  sentry_flutter: ^6.3.0
+  sentry_flutter: ^6.17.0
 
   percent_indicator: ^4.0.0
 
@@ -83,11 +83,17 @@ dependencies:
   intl_phone_field: ^3.1.0
   iban_form_field: ^0.2.2
   country_list_pick: ^1.0.1+6
+  reorderables: ^0.5.1
+  image_picker: ^0.8.6
+  image_picker_for_web: ^2.1.10
+  gradient_borders: ^0.2.0
+  simple_gradient_text: ^1.2.4
+  flutter_switch: ^0.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  
+
   build_runner: ^2.0.4
   hive_generator: ^1.1.0
 
@@ -106,8 +112,12 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/history/
+    - assets/icons/
     - assets/images/
     - assets/tokens/
+    - assets/currencies/
+    - assets/pair_icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -121,14 +131,22 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: IBM Plex Sans
+    - family: RedHatDisplay
       fonts:
-        - asset: fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf
-          style: normal
-    - family: IBM Plex Medium
+        - asset: fonts/RedHatDisplay/RedHatDisplay-Light.ttf
+          weight: 300
+        - asset: fonts/RedHatDisplay/RedHatDisplay-Medium.ttf
+          weight: 400
+        - asset: fonts/RedHatDisplay/RedHatDisplay-SemiBold.ttf
+          weight: 600
+        - asset: fonts/RedHatDisplay/RedHatDisplay-Bold.ttf
+          weight: 700
+        - asset: fonts/RedHatDisplay/RedHatDisplay-ExtraBold.ttf
+          weight: 900
+    - family: GalanoGrotesque
       fonts:
-        - asset: fonts/IBM_Plex_Sans/IBMPlexSans-Medium.ttf
-          style: normal
+        - asset: fonts/GalanoGrotesque/GalanoGrotesque-SemiBold.ttf
+          weight: 600
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

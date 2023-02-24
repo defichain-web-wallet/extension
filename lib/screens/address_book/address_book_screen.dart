@@ -69,49 +69,45 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                     left: 18, right: 12, top: 24, bottom: 24),
                 child: Center(
                   child: StretchBox(
-                    child: addressBookState.addressBookList != null
-                        ? addressBookState.addressBookList!.isNotEmpty
-                            ? ListView.builder(
-                                itemCount:
-                                    addressBookState.addressBookList!.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return AddressBookCard(
-                                    name: addressBookState
-                                        .addressBookList![index].name!,
-                                    address: addressBookState
-                                        .addressBookList![index].address!,
-                                    id: addressBookState
-                                        .addressBookList![index].id,
-                                    editCallback: () => Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder:
-                                            (context, animation1, animation2) =>
-                                                AddressBookAddScreen(
-                                          name: addressBookState
-                                              .addressBookList![index].name!,
-                                          address: addressBookState
-                                              .addressBookList![index].address!,
-                                          id: addressBookState
-                                              .addressBookList![index].id,
+                    child: (addressBookState.addressBookList != null &&
+                            addressBookState.addressBookList!.isNotEmpty)
+                        ? ListView.builder(
+                            itemCount: addressBookState.addressBookList!.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return AddressBookCard(
+                                  name: addressBookState
+                                      .addressBookList![index].name!,
+                                  address: addressBookState
+                                      .addressBookList![index].address!,
+                                  id: addressBookState
+                                      .addressBookList![index].id,
+                                  editCallback: () => Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1,
+                                                  animation2) =>
+                                              AddressBookAddScreen(
+                                            name: addressBookState
+                                                .addressBookList![index].name!,
+                                            address: addressBookState
+                                                .addressBookList![index]
+                                                .address!,
+                                            id: addressBookState
+                                                .addressBookList![index].id,
+                                          ),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                              Duration.zero,
                                         ),
-                                        transitionDuration: Duration.zero,
-                                        reverseTransitionDuration:
-                                            Duration.zero,
                                       ),
-                                    ),
-                                    deleteCallback: () => setState(() =>
-                                        addressBookCubit.deleteAddress(
-                                            addressBookState
-                                                .addressBookList![index])),
-                                  );
-                                },
-                              )
-                            : Center(
-                                child: Text(
-                                  'Address book is empty',
-                                ),
-                              )
+                                  deleteCallback: () => setState(
+                                        () => addressBookCubit.deleteAddress(
+                                          addressBookState
+                                              .addressBookList![index],
+                                        ),
+                                      ));
+                            },
+                          )
                         : Center(
                             child: Text(
                               'Address book is empty',

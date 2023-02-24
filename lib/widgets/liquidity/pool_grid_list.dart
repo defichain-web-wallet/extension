@@ -1,5 +1,5 @@
 import 'package:defi_wallet/models/asset_pair_model.dart';
-import 'package:defi_wallet/screens/liquidity/select_pool.dart';
+import 'package:defi_wallet/screens/liquidity/liquidity_select_pool.dart';
 import 'package:defi_wallet/widgets/liquidity/pool_asset_pair.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +32,7 @@ class PoolGridList extends StatelessWidget {
                   Navigator.push(
                     context,
                     PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) => SelectPool(
+                      pageBuilder: (context, animation1, animation2) => LiquiditySelectPool(
                               assetPair: tokensPairs![index],
                             ),
                       transitionDuration: Duration.zero,
@@ -41,7 +41,7 @@ class PoolGridList extends StatelessWidget {
                 },
                 child: PoolAssetPair(
                   assetPair: tokensPairs![index],
-                  isFullSize: isFullSize!,
+                  isGrid: isFullSize!,
                 ),
               );
             },

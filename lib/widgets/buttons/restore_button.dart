@@ -1,4 +1,4 @@
-import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:flutter/material.dart';
 
 class PendingButton extends StatefulWidget {
@@ -25,10 +25,9 @@ class PendingButtonState extends State<PendingButton> {
 
   @override
   Widget build(BuildContext context) {
-    return PrimaryButton(
-      label: pending ? widget.pendingText : widget.text,
+    return NewPrimaryButton(
+      title: pending ? widget.pendingText : widget.text,
       globalKey: widget.globalKey,
-      isCheckLock: widget.isCheckLock,
       callback: (!pending && widget.callback != null)
           ? () async => widget.callback(this)
           : null,

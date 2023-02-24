@@ -1,15 +1,12 @@
 {
-    "name": "Jellywallet Beta",
-    "version": "1.0.0",
-    "permissions": [
-        "storage"
-    ],
+    "name": "Jellywallet",
+    "version": "2.1.0",
     "icons": {
         "16":"/icons/jelly_logo.png",
         "48": "/icons/jelly_logo.png",
         "128":"/icons/jelly_logo.png"
     },
-    "description": "Jellywallet Beta extension",
+    "description": "Jellywallet extension",
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'"
     },

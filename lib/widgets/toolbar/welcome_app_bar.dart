@@ -1,27 +1,61 @@
+import 'package:defi_wallet/widgets/toolbar/auth_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class WelcomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  static const double toolbarHeight = 50;
-  static const double iconHeight = 30;
+  final double progress;
+  final Function()? onBack;
 
-  const WelcomeAppBar({Key? key}) : super(key: key);
+  const WelcomeAppBar({
+    Key? key,
+    this.progress = 0,
+    this.onBack,
+  }) : super(key: key);
+
+  static const String title = 'JellyWallet';
+  static const double toolbarHeight = 54;
+  static const double iconSize = 20;
 
   @override
   Size get preferredSize => const Size.fromHeight(toolbarHeight);
 
+  // TODO: review it for try to remove unnecessary call [onBack]
+  _onPressedBack(BuildContext context) {
+    if (onBack == null) {
+      Navigator.pop(context);
+    } else {
+      onBack!();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      shadowColor: Colors.transparent,
-      automaticallyImplyLeading: false,
-      backgroundColor: Theme.of(context).dialogBackgroundColor,
-    toolbarHeight: toolbarHeight,
-      elevation: 0,
-      title: Center(
-        child: SvgPicture.asset(
-          'assets/jelly_logo_wallet.svg',
-          height: iconHeight,
+    return PreferredSize(
+      preferredSize: Size.fromHeight(toolbarHeight),
+      child: AppBar(
+        shadowColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        toolbarHeight: toolbarHeight,
+        bottom: progress != 0
+            ? AuthProgressBar(
+                fill: progress,
+              )
+            : null,
+        elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/arrow_back.svg',
+            width: iconSize,
+            height: iconSize,
+          ),
+          onPressed: () => _onPressedBack(context),
+          splashRadius: 20,
+        ),
+        title: SvgPicture.asset(
+          'assets/welcome_logo.svg',
+          color: Theme.of(context).textTheme.headline4!.color,
+          width: 94,
         ),
       ),
     );

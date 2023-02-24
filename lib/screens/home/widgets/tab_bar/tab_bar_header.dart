@@ -1,26 +1,45 @@
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:flutter/material.dart';
 
-class TabBarHeader extends StatelessWidget {
+class TabBarHeader extends StatefulWidget {
+  final int currentTabIndex;
   final TabController? tabController;
 
-  const TabBarHeader({Key? key, this.tabController}) : super(key: key);
+  const TabBarHeader({
+    Key? key,
+    required this.currentTabIndex,
+    this.tabController,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Ink(
-        child: TabBar(
-          labelStyle: TextStyle(
-            fontWeight: FontWeight.normal,
-          ),
-          unselectedLabelColor:
-              Theme.of(context).textTheme.headline1!.color!.withOpacity(0.6),
-          labelColor: AppTheme.pinkColor,
-          indicatorColor: AppTheme.pinkColor,
-          tabs: [
-            Tab(text: 'Assets'),
-            Tab(text: 'History'),
+  State<TabBarHeader> createState() => _TabBarHeaderState();
+}
+
+class _TabBarHeaderState extends State<TabBarHeader> {
+  @override
+  Widget build(BuildContext context) => Container(
+        height: 22,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Row(
+          children: [
+            SelectorTabElement(
+              callback: () {
+                widget.tabController!.index = 0;
+              },
+              title: 'Assets',
+              isSelect: widget.tabController!.index == 0,
+            ),
+            SizedBox(
+              width: 24,
+            ),
+            SelectorTabElement(
+              callback: () {
+                widget.tabController!.index = 1;
+              },
+              title: 'History (Beta)',
+              isSelect: widget.tabController!.index == 1,
+            )
           ],
-          controller: tabController,
         ),
       );
 }

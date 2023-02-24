@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 
@@ -159,15 +160,15 @@ class TokensHelper {
     switch (tokenName) {
       case 'DFI':
         {
-          return Color(0xffFF00A3);
+          return Color(0xFFFF00AF);
         }
       case 'ETH':
         {
-          return Color(0xff627EEA);
+          return Color(0xFF627EEA);
         }
       case 'BTC':
         {
-          return Color(0xffF7931A);
+          return Color(0xFFF7931A);
         }
       case 'LTC':
         {
@@ -315,6 +316,44 @@ class TokensHelper {
     }
   }
 
+  String getSpecificDefiName(String value) {
+    if (!SettingsHelper.isBitcoin()) {
+      String defaultDefiTokenName = 'Default Defi token';
+      String defaultBitcoinTokenName = 'Bitcoin';
+      return value
+          .replaceAll(defaultDefiTokenName, 'DeFiChain')
+          .replaceAll(defaultBitcoinTokenName, 'DeFiChain Bitcoin');
+    } else {
+      return value;
+    }
+  }
+
+  List<TokensModel> getTokensList(
+    balances,
+    tokensState, {
+    List<TokensModel>? targetList,
+  }) {
+    List<TokensModel> resList = [];
+    if (targetList == null) {
+      balances!.forEach((element) {
+        tokensState.tokens!.forEach((el) {
+          if (element.token == el.symbol) {
+            resList.add(el);
+          }
+        });
+      });
+    } else {
+      targetList.forEach((element) {
+        tokensState.tokens!.forEach((el) {
+          if (element.symbol == el.symbol) {
+            resList.add(el);
+          }
+        });
+      });
+    }
+    return resList;
+  }
+
   bool isDfiToken(String token) {
     if (token == DefiAccountSymbol || token == DefiTokenSymbol) return true;
     return false;
@@ -345,7 +384,7 @@ class TokensHelper {
   }
 
   String getTokenWithPrefix(token) {
-    return (token != 'DFI' && token != 'DUSD') ? 'd' + token : token;
+    return (token != 'DFI' && token != 'DUSD' && token != 'csETH') ? 'd' + token : token;
   }
 
   bool isPair(symbol) {
@@ -440,8 +479,8 @@ class TokensHelper {
     String symbol,
     String resultAsset,
   ) {
-    AssetPairModel assetPair =
-      tokensPairs.firstWhere((element) => element.symbol! == symbol);
+    AssetPairModel assetPair = tokensPairs
+        .firstWhere((element) => element.symbol! == symbol.replaceAll('d', ''));
     double baseBalance = getBaseBalance(amount, assetPair);
     double quoteBalance = getQuoteBalance(amount, assetPair);
     double baseBalanceByAsset;
@@ -482,14 +521,14 @@ class TokensHelper {
     return result;
   }
 
-  String getAprFormat(double apr) {
+  String getAprFormat(double apr, bool isPersentSymbol) {
     dynamic result;
 
     if (apr != 0) {
-      result = '${(apr * 100).toStringAsFixed(2)}%';
+      result = '${(apr * 100).toStringAsFixed(2)} ${isPersentSymbol == true ? '%' : ''}';
     } else {
       result = 'N/A';
     }
-    return '$result APR';
+    return '$result';
   }
 }

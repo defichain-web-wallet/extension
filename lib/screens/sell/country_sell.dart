@@ -1,6 +1,6 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/screens/sell/address_sell.dart';
+import 'package:defi_wallet/screens/sell/sell_kyc_second_screen.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -129,7 +129,7 @@ class _CountrySellState extends State<CountrySell> {
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation1, animation2) =>
-                              AddressSell(),
+                              SellKycSecondScreen(),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
                         ));

@@ -18,8 +18,15 @@ class DexHelper {
   DexRequests _dexRequests = DexRequests();
   TransactionRequests _txRequests = TransactionRequests();
 
-  Future<TestPoolSwapModel> calculateDex(String tokenFrom, String tokenTo,
-      double? amountFrom, double? amountTo, String address, List<AddressModel> addressList, TokensState tokensState) async {
+  Future<TestPoolSwapModel> calculateDex(
+    String tokenFrom,
+    String tokenTo,
+    double? amountFrom,
+    double? amountTo,
+    String address,
+    List<AddressModel> addressList,
+    TokensState tokensState,
+  ) async {
     List<double> rates = [];
     if(tokenTo == tokenFrom){
       rates = [1, 1];

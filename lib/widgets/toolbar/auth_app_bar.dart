@@ -1,7 +1,6 @@
-import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
-import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
+// import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
+// import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/screens/auth_screen/auth_screen.dart';
 import 'package:defi_wallet/widgets/buttons/back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -50,22 +49,7 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
         padding: const EdgeInsets.only(left: 8),
         child: Row(
           children: [
-            isSavedMnemonic
-                ? backButton(context, callback: () async {
-                    var box = await Hive.openBox(HiveBoxes.client);
-                    await box.put(HiveNames.openedMnemonic, null);
-                    await box.close();
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) =>
-                            AuthScreen(),
-                        transitionDuration: Duration.zero,
-                        reverseTransitionDuration: Duration.zero,
-                      ),
-                    );
-                  })
-                : backButton(context)
+            backButton(context),
           ],
         ),
       ) : null,
@@ -96,8 +80,9 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
                                 HiveNames.recoveryMnemonic, mnemonic.join(','));
                             await box.close();
                           }
-                          js.context
-                              .callMethod('open', [window.location.toString()]);
+                          // TODO: uncomment later
+                          // js.context
+                          //     .callMethod('open', [window.location.toString()]);
                         },
                       ),
                     ),
