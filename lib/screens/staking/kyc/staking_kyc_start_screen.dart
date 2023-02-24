@@ -53,6 +53,7 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                   appBar: NewMainAppBar(
                     bgColor: AppColors.viridian.withOpacity(0.16),
                     isShowLogo: false,
+                    isShowNetworkSelector: false,
                   ),
                   body: Container(
                     decoration: BoxDecoration(
