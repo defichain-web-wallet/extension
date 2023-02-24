@@ -31,7 +31,7 @@ class BuySellScreen extends StatefulWidget {
 
 class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
   String titleText = 'Buy / Sell';
-  String subtitleText = 'Choose the operation you want to go through';
+  String subtitleText = 'Choose your next step';
   BalancesHelper balancesHelper = BalancesHelper();
   int iterator = 0;
 
