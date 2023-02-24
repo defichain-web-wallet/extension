@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/netwrok_mixin.dart';
@@ -99,6 +100,101 @@ class _SendScreenNewState extends State<SendScreenNew>
       return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
     } catch (err) {
       return '0.00';
+    }
+  }
+
+  sendSubmit(addressBookCubit, bitcoinState) async {
+    if (addressController.text != '') {
+      bool isValidAddress =
+          await AddressesHelper().validateAddress(addressController.text);
+      if (isValidAddress) {
+        if (isAddNewContact) {
+          showDialog(
+            barrierColor: Color(0x0f180245),
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext dialogContext) {
+              return CreateEditContactDialog(
+                address: addressController.text,
+                isEdit: false,
+                confirmCallback: (name, address) {
+                  addressBookCubit.addAddress(
+                    AddressBookModel(
+                        name: name,
+                        address: address,
+                        network: currentNetworkName()),
+                  );
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) =>
+                          SendSummaryScreen(
+                        address: addressController.text,
+                        isAfterAddContact: true,
+                        amount: double.parse(assetController.text),
+                        token: currentAsset!,
+                        fee: bitcoinState.activeFee,
+                      ),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                  Navigator.pop(dialogContext);
+                },
+              );
+            },
+          );
+        } else {
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  SendSummaryScreen(
+                address: addressController.text,
+                amount: double.parse(assetController.text),
+                token: currentAsset!,
+                fee: bitcoinState.activeFee,
+              ),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        }
+      } else {
+        showSnackBar(
+          context,
+          title: 'Invalid address!',
+          color: AppColors.txStatusError.withOpacity(0.1),
+          prefix: Icon(
+            Icons.close,
+            color: AppColors.txStatusError,
+          ),
+        );
+      }
+    } else if (contact.name != null) {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => SendSummaryScreen(
+            amount: double.parse(assetController.text),
+            token: currentAsset!,
+            contact: contact,
+            fee: bitcoinState.activeFee,
+          ),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    } else {
+      showSnackBar(
+        context,
+        title: 'Address is empty',
+        color: AppColors.txStatusError.withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
+        ),
+      );
     }
   }
 
@@ -384,120 +480,42 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       ),
                                     NewPrimaryButton(
                                       width: buttonSmallWidth,
-                                      callback: () {
-                                        if (txState is! TransactionLoadingState) {
-                                          if (addressController.text != '') {
-                                            if (isAddNewContact) {
-                                              showDialog(
-                                                barrierColor: Color(0x0f180245),
-                                                barrierDismissible: false,
-                                                context: context,
-                                                builder: (BuildContext
-                                                    dialogContext) {
-                                                  return CreateEditContactDialog(
-                                                    address:
-                                                        addressController.text,
-                                                    isEdit: false,
-                                                    confirmCallback:
-                                                        (name, address) {
-                                                      addressBookCubit
-                                                          .addAddress(
-                                                        AddressBookModel(
-                                                            name: name,
-                                                            address: address,
-                                                            network:
-                                                                currentNetworkName()),
-                                                      );
-                                                      Navigator.push(
-                                                        context,
-                                                        PageRouteBuilder(
-                                                          pageBuilder: (context,
-                                                                  animation1,
-                                                                  animation2) =>
-                                                              SendSummaryScreen(
-                                                            address:
-                                                                addressController
-                                                                    .text,
-                                                            isAfterAddContact:
-                                                                true,
-                                                            amount: double.parse(
-                                                                assetController
-                                                                    .text),
-                                                            token:
-                                                                currentAsset!,
-                                                            fee: bitcoinState
-                                                                .activeFee,
-                                                          ),
-                                                          transitionDuration:
-                                                              Duration.zero,
-                                                          reverseTransitionDuration:
-                                                              Duration.zero,
-                                                        ),
-                                                      );
-                                                      Navigator.pop(
-                                                          dialogContext);
-                                                    },
-                                                  );
-                                                },
-                                              );
-                                            } else {
-                                              Navigator.push(
+                                      callback: BalancesHelper().isAmountEmpty(
+                                              assetController.text)
+                                          ? () {
+                                              showSnackBar(
                                                 context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                          animation1,
-                                                          animation2) =>
-                                                      SendSummaryScreen(
-                                                    address:
-                                                        addressController.text,
-                                                    amount: double.parse(
-                                                        assetController.text),
-                                                    token: currentAsset!,
-                                                    fee: bitcoinState.activeFee,
-                                                  ),
-                                                  transitionDuration:
-                                                      Duration.zero,
-                                                  reverseTransitionDuration:
-                                                      Duration.zero,
+                                                title: 'Amount is empty',
+                                                color: AppColors.txStatusError
+                                                    .withOpacity(0.1),
+                                                prefix: Icon(
+                                                  Icons.close,
+                                                  color:
+                                                      AppColors.txStatusError,
                                                 ),
                                               );
                                             }
-                                          } else if (contact.name != null) {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    SendSummaryScreen(
-                                                  amount: double.parse(
-                                                      assetController.text),
-                                                  token: currentAsset!,
-                                                  contact: contact,
-                                                  fee: bitcoinState.activeFee,
-                                                ),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
-                                          }
-                                        } else {
-                                          showSnackBar(
-                                            context,
-                                            title:
-                                                'Please wait for the previous '
-                                                    'transaction',
-                                            color: AppColors.txStatusError
-                                                .withOpacity(0.1),
-                                            prefix: Icon(
-                                              Icons.close,
-                                              color: AppColors.txStatusError,
-                                            ),
-                                          );
-                                        }
-                                      },
+                                          : () {
+                                              if (txState
+                                                  is! TransactionLoadingState) {
+                                                sendSubmit(addressBookCubit,
+                                                    bitcoinState);
+                                              } else {
+                                                showSnackBar(
+                                                  context,
+                                                  title:
+                                                      'Please wait for the previous '
+                                                      'transaction',
+                                                  color: AppColors.txStatusError
+                                                      .withOpacity(0.1),
+                                                  prefix: Icon(
+                                                    Icons.close,
+                                                    color:
+                                                        AppColors.txStatusError,
+                                                  ),
+                                                );
+                                              }
+                                            },
                                       title: 'Continue',
                                     ),
                                   ],
