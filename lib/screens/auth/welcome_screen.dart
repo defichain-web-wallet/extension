@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_placeholder_screen.dart';
@@ -118,7 +119,7 @@ class WelcomeScreen extends StatelessWidget {
                                   ),
                                   onTap: () {
                                     launch(
-                                      'https://jellywallet.io/terms-and-conditions/',
+                                      JellyLinks.termsAndConditions,
                                     );
                                   },
                                 ),
