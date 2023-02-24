@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_placeholder_screen.dart';
@@ -11,6 +12,7 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WelcomeScreen extends StatelessWidget {
   signUpFlowCallback(BuildContext context) {
@@ -115,7 +117,11 @@ class WelcomeScreen extends StatelessWidget {
                                     'Terms and Conditions',
                                     style: jellyLink,
                                   ),
-                                  onTap: () {},
+                                  onTap: () {
+                                    launch(
+                                      JellyLinks.termsAndConditions,
+                                    );
+                                  },
                                 ),
                               ],
                             ),

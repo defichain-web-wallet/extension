@@ -10,6 +10,10 @@ class DfxApi {
   static const String url = 'https://api.dfi.tax/p01/hst/';
 }
 
+class JellyLinks {
+  static const String termsAndConditions = 'https://jellywallet.io/terms-and-conditions/';
+}
+
 class ScreenSizes {
   static const double xSmall = 328;
   static const double small = 458;
