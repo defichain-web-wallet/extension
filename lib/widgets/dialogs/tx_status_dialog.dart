@@ -41,7 +41,8 @@ class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
       'Jelly is now processing your transaction in the background. Your account balance will be updated in a few minutes.';
 
   String formatErrorMessage() {
-    if (widget.txResponse!.error! == specificError) {
+    if (widget.txResponse!.error != null &&
+        widget.txResponse!.error! == specificError) {
       return 'Swap price is higher than the'
           'range allowed by the slippage'
           'tolerance. Increase tolerance'
