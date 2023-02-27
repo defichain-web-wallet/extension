@@ -45,20 +45,8 @@ class _HomeScreenState extends State<HomeScreen>
     with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
   static const int tickerTimerUpdate = 15;
   Timer? timer;
-  final scaffoldKey = GlobalKey<ScaffoldState>();
   TabController? tabController;
-  bool isSaveOpenTime = false;
   LockHelper lockHelper = LockHelper();
-  double toolbarHeight = 55;
-  double toolbarHeightWithBottom = 105;
-  bool isFullSizeScreen = false;
-  double assetsTabBodyHeight = 0;
-  double historyTabBodyHeight = 0;
-  double minDefaultTabBodyHeight = 255;
-  double maxDefaultTabBodyHeight = 475;
-  double maxHistoryEntries = 30;
-  double heightListEntry = 74;
-  double heightAdditionalAction = 60;
   bool isShownSnackBar = false;
   double sliverTopHeight = 0.0;
   double targetSliverTopHeight = 76.0;
