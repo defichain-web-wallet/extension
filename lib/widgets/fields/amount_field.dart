@@ -162,6 +162,8 @@ class _AmountFieldState extends State<AmountField> {
                     assets: widget.assets,
                     selectedAsset: widget.selectedAsset,
                     onSelect: (token) {
+                      widget.controller.text = '0';
+                      widget.onChanged(widget.controller.text);
                       widget.onAssetSelect(token);
                     },
                     isDisabled: widget.isDisabledSelector,
