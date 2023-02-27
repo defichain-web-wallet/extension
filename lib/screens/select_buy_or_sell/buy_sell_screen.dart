@@ -3,9 +3,12 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/buy/buy_select_currency_screen.dart';
 import 'package:defi_wallet/screens/buy/tutorials/buy_tutorial_first_screen.dart';
+import 'package:defi_wallet/screens/error_screen.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_first_screen.dart';
 import 'package:defi_wallet/screens/sell/selling_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -55,7 +58,22 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
         }
         return BlocBuilder<FiatCubit, FiatState>(
           builder: (context, fiatState) {
-            if (fiatState.status == FiatStatusList.success) {
+            if (fiatState.status == FiatStatusList.expired) {
+              accountCubit.clearAccessTokens();
+              LockHelper().lockWallet();
+              Future.microtask(
+                () => Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) =>
+                        LockScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                ),
+              );
+              return Container();
+            } else if (fiatState.status == FiatStatusList.success) {
               double limit = fiatState.limit!.value!;
               String period = fiatState.limit!.period!;
               return Scaffold(
@@ -244,14 +262,7 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                 ),
               );
             } else if (fiatState.status == FiatStatusList.failure) {
-              return Container(
-                child: Center(
-                  child: ErrorPlaceholder(
-                    description: 'Please check again later',
-                    message: 'API is under maintenance',
-                  ),
-                ),
-              );
+              return ErrorScreen();
             } else {
               return Loader();
             }

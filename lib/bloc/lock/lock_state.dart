@@ -1,6 +1,6 @@
 part of 'lock_cubit.dart';
 
-enum LockStatusList { initial, loading, success, failure }
+enum LockStatusList { initial, loading, success, failure, expired }
 
 class LockState extends Equatable {
   final LockStatusList status;
