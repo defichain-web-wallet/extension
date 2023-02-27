@@ -1,3 +1,4 @@
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -23,6 +24,16 @@ class AssetHeaderSelector extends StatefulWidget {
 
 class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
     with ThemeMixin {
+
+  String formatAssetName(String value) {
+    if (SettingsHelper.isBitcoin()) {
+      return widget.assetCode;
+    } else {
+      return TokensHelper().getTokenWithPrefix(
+        widget.assetCode,
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     double arrowRotateDeg = widget.isShown ? 180 : 0;
@@ -58,7 +69,7 @@ class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
           Flexible(
             child: TickerText(
               child: Text(
-                tokenHelper.getTokenWithPrefix(widget.assetCode),
+                formatAssetName(widget.assetCode),
                 style: Theme.of(context)
                     .textTheme
                     .headline5!

@@ -91,4 +91,13 @@ class AvailableAmountCubit extends Cubit<AvailableAmountState> {
     }
   }
 
+  btcAvailableBalance(double available) {
+    emit(state.copyWith(
+      status: AvailableAmountStatusList.success,
+      available: state.available,
+      availableTo: state.availableTo,
+      availableFrom: state.availableFrom,
+    ));
+  }
+
 }

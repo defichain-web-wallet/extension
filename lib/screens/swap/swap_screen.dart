@@ -54,6 +54,8 @@ class SwapScreen extends StatefulWidget {
 }
 
 class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin {
+  static const completeKycType = 'Completed';
+
   final TextEditingController amountFromController = TextEditingController(
     text: '0.00',
   );
@@ -421,7 +423,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                       ],
                     AmountField(
                       isAvailableTo: false,
-                      type: TxType.swap,
+                      type: SettingsHelper.isBitcoin() ? null : TxType.swap,
                       account: accountState.activeAccount!,
                       suffix: amountFromInUsd,
                       isDisabledSelector: SettingsHelper.isBitcoin(),
@@ -440,14 +442,18 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         );
                       },
                       onChanged: (value) {
-                        calculateSecondAmount(value, tokensState);
-                        onChangeFromAsset(
-                          value,
-                          accountState,
-                          dexState,
-                          dexCubit,
-                          tokensState,
-                        );
+                        try {
+                          calculateSecondAmount(value, tokensState);
+                          onChangeFromAsset(
+                            value,
+                            accountState,
+                            dexState,
+                            dexCubit,
+                            tokensState,
+                          );
+                        } catch (err) {
+                          print(err);
+                        }
                       },
                       controller: amountFromController,
                       selectedAsset: assetFrom,
@@ -548,11 +554,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                       account: accountState.activeAccount!,
                       suffix: amountToInUsd,
                       isDisabledSelector: SettingsHelper.isBitcoin(),
-                      available: getAvailableAmount(
-                        accountState,
-                        assetTo!.symbol,
-                        dexState,
-                      ),
                       onAssetSelect: (asset) {
                         onSelectToAsset(
                           asset,
@@ -571,13 +572,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                           setState(() {
                             amountToInUsd = balancesHelper.numberStyling(amount,
                                 fixedCount: 2, fixed: true);
-                            if (SettingsHelper.isBitcoin()) {
-                              amountFromInUsd =
-                                  getUdsAmount(
-                                      double.parse(value), tokensState);
-                            } else {
-                              amountFromInUsd = amountToInUsd;
-                            }
+                            amountFromInUsd = amountToInUsd;
                           });
                         } catch (err) {
                           print(err);
@@ -865,7 +860,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                           SettingsHelper.isBitcoin()) {
                         return Column(
                           children: [
-                            if (!fiatState.isKycDataComplete!)
+                            if (fiatState.kycStatus != completeKycType)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 14.0),
                                 child: InkWell(
@@ -915,7 +910,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                 ],
                               ),
                               callback: !isDisableSubmit() &&
-                                      fiatState.isKycDataComplete!
+                                      (fiatState.kycStatus != completeKycType)
                                   ? () => submitReviewSwap(
                                         accountState,
                                         transactionState,
@@ -1001,31 +996,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
     return '1 ${assetFrom.symbol} = $priceFrom ${assetTo!.symbol}';
   }
 
-  putAvailableBalance(String asset,
-      TextEditingController controller,
-      TokensState tokensState,
-      AccountState accountState,
-      DexState dexState,) {
-    DexCubit dexCubit = BlocProvider.of<DexCubit>(context);
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-    late double balance;
-    if (SettingsHelper.isBitcoin()) {
-      balance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
-      amountFromController.text = balance.toString();
-    } else {
-      balance = getAvailableAmount(accountState, asset, dexState);
-    }
-
-    calculateSecondAmount(balance.toString(), tokensState);
-    if (asset == assetFrom.symbol) {
-      onChangeFromAsset(
-          balance.toString(), accountState, dexState, dexCubit, tokensState);
-    } else {
-      onChangeToAsset(
-          balance.toString(), accountState, dexState, dexCubit, tokensState);
-    }
-  }
-
   calculateSecondAmount(String value, TokensState tokensState) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     try {
@@ -1038,11 +1008,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
       setState(() {
         amountFromInUsd =
             balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
-        if (SettingsHelper.isBitcoin()) {
-          amountToInUsd = getUdsAmount(dValue, tokensState);
-        } else {
-          amountToInUsd = amountFromInUsd;
-        }
+        amountToInUsd = amountFromInUsd;
       });
     } catch (err) {
       print(err);
@@ -1320,14 +1286,23 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
         if (SettingsHelper.isBitcoin()) {
           FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
           double amount = double.parse(amountFromController.text);
+          FiatState f = fiatCubit.state;
+          try {
+            var a = (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+                .toString();
+            amountToController.text = balancesHelper.numberStyling(
+              double.parse(a),
+              fixedCount: 4,
+              fixed: true,
+            );
+          } catch (err) {
+            amountToController.text = balancesHelper.numberStyling(
+              amount,
+              fixedCount: 4,
+              fixed: true,
+            );
+          }
 
-          var a = (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
-              .toString();
-          amountToController.text = balancesHelper.numberStyling(
-            double.parse(a),
-            fixedCount: 4,
-            fixed: true,
-          );
           dexCubit.updateBtcDex(assetFrom.symbol, assetTo!.symbol, amount,
               double.parse(amountToController.text));
         } else {
