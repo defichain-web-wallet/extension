@@ -64,7 +64,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
   TokensModel? currentAsset;
 
   TransactionService transactionService = TransactionService();
-
+  static const String defaultCurrency = 'EUR';
   List<String> assets = [];
   String? balanceInUsd;
   String titleText = 'Selling';
@@ -111,7 +111,8 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                     } else {
                       IbanModel? currentIban;
                       if (iterator == 0) {
-                        selectedFiat = fiatState.sellableFiatList![0];
+                        selectedFiat = fiatState.sellableFiatList!
+                            .firstWhere((element) => element.name == defaultCurrency);
                         accountState.activeAccount!.balanceList!.forEach((el) {
                           try {
                             var assetList = fiatState.assets!.where((element) =>
@@ -345,99 +346,127 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                         width: buttonSmallWidth,
                                         child: PendingButton(
                                           'Sell',
-                                          callback: (parent) async {
-                                            parent.emitPending(true);
-                                            lockHelper.provideWithLockChecker(
-                                                context, () async {
-                                              if (txState
-                                              is TransactionLoadingState) {
-                                                parent.emitPending(false);
-                                                showSnackBar(
-                                                  context,
-                                                  title:
-                                                  'Please wait for the previous '
-                                                      'transaction',
-                                                  color: AppColors.txStatusError
-                                                      .withOpacity(0.1),
-                                                  prefix: Icon(
-                                                    Icons.close,
-                                                    color: AppColors.txStatusError,
-                                                  ),
-                                                );
-                                                return;
-                                              }
-                                              bool isEnough =
-                                              isEnoughBalance(accountState);
-                                              hideOverlay();
-                                              if (_formKey.currentState!
-                                                  .validate()) {
-                                                if (isEnough) {
-                                                  showDialog(
-                                                    barrierColor:
-                                                    Color(0x0f180245),
-                                                    barrierDismissible: false,
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context1) {
-                                                      return PassConfirmDialog(
-                                                          onCancel: () {
-                                                            parent.emitPending(false);
-                                                          },
-                                                          onSubmit:
-                                                              (password) async {
-
-                                                            await _submitSell(
-                                                              accountState,
-                                                              tokensState,
-                                                              fiatState,
-                                                              password,
-                                                            );
-                                                            parent.emitPending(false);
-                                                          });
-                                                    },
+                                          callback: BalancesHelper().isAmountEmpty(amountController.text)
+                                              ? (parent) {
+                                                  showSnackBar(
+                                                    context,
+                                                    title: 'Amount is empty',
+                                                    color: AppColors
+                                                        .txStatusError
+                                                        .withOpacity(0.1),
+                                                    prefix: Icon(
+                                                      Icons.close,
+                                                      color: AppColors
+                                                          .txStatusError,
+                                                    ),
                                                   );
-                                                } else {
-                                                  if (double.parse(
-                                                      amountController.text
-                                                          .replaceAll(
-                                                          ',', '.')) ==
-                                                      0) {
-                                                    ScaffoldMessenger.of(context)
-                                                        .showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          'Amount is empty',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .headline5,
-                                                        ),
-                                                        backgroundColor:
-                                                        Theme.of(context)
-                                                            .snackBarTheme
-                                                            .backgroundColor,
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    ScaffoldMessenger.of(context)
-                                                        .showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          'Insufficient funds',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .headline5,
-                                                        ),
-                                                        backgroundColor:
-                                                        Theme.of(context)
-                                                            .snackBarTheme
-                                                            .backgroundColor,
-                                                      ),
-                                                    );
-                                                  }
                                                 }
-                                              }
-                                            });
-                                          },
+                                              : (parent) async {
+                                                  parent.emitPending(true);
+                                                  lockHelper
+                                                      .provideWithLockChecker(
+                                                          context, () async {
+                                                    if (txState
+                                                        is TransactionLoadingState) {
+                                                      parent.emitPending(false);
+                                                      showSnackBar(
+                                                        context,
+                                                        title:
+                                                            'Please wait for the previous '
+                                                            'transaction',
+                                                        color: AppColors
+                                                            .txStatusError
+                                                            .withOpacity(0.1),
+                                                        prefix: Icon(
+                                                          Icons.close,
+                                                          color: AppColors
+                                                              .txStatusError,
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+                                                    bool isEnough =
+                                                        isEnoughBalance(
+                                                            accountState);
+                                                    hideOverlay();
+                                                    if (_formKey.currentState!
+                                                        .validate()) {
+                                                      if (isEnough) {
+                                                        showDialog(
+                                                          barrierColor:
+                                                              Color(0x0f180245),
+                                                          barrierDismissible:
+                                                              false,
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context1) {
+                                                            return PassConfirmDialog(
+                                                                onCancel: () {
+                                                              parent
+                                                                  .emitPending(
+                                                                      false);
+                                                            }, onSubmit:
+                                                                    (password) async {
+                                                              await _submitSell(
+                                                                accountState,
+                                                                tokensState,
+                                                                fiatState,
+                                                                password,
+                                                              );
+                                                              parent
+                                                                  .emitPending(
+                                                                      false);
+                                                            });
+                                                          },
+                                                        );
+                                                      } else {
+                                                        if (double.parse(
+                                                                amountController
+                                                                    .text
+                                                                    .replaceAll(
+                                                                        ',',
+                                                                        '.')) ==
+                                                            0) {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(
+                                                                'Amount is empty',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headline5,
+                                                              ),
+                                                              backgroundColor: Theme
+                                                                      .of(context)
+                                                                  .snackBarTheme
+                                                                  .backgroundColor,
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(
+                                                                'Insufficient funds',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headline5,
+                                                              ),
+                                                              backgroundColor: Theme
+                                                                      .of(context)
+                                                                  .snackBarTheme
+                                                                  .backgroundColor,
+                                                            ),
+                                                          );
+                                                        }
+                                                      }
+                                                    }
+                                                  });
+                                                },
                                         ),
                                       ),
                                     ],
