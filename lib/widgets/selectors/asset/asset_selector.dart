@@ -141,6 +141,7 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
       verticalMargin: -5,
       horizontalMargin: horizontalMargin,
       controller: controller,
+      enablePassEvent: false,
     );
   }
 }

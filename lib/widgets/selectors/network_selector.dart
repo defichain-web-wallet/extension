@@ -351,6 +351,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
       verticalMargin: -5,
       horizontalMargin: horizontalMargin,
       controller: controller,
+      enablePassEvent: false,
     );
   }
 }
