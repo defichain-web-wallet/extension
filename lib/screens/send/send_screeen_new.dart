@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
@@ -11,6 +12,7 @@ import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
 import 'package:defi_wallet/screens/settings/settings.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -67,25 +69,10 @@ class _SendScreenNewState extends State<SendScreenNew>
   }
 
   double getAvailableBalance(accountState, bitcoinState) {
-    if (SettingsHelper.isBitcoin()) {
-      if (bitcoinState.totalBalance <= 0) {
-        return 0.0;
-      } else {
-        return convertFromSatoshi(bitcoinState.totalBalance);
-      }
+    if (bitcoinState.totalBalance <= 0) {
+      return 0.0;
     } else {
-      int balance = accountState.activeAccount!.balanceList!
-          .firstWhere(
-              (el) => el.token! == currentAsset!.symbol! && !el.isHidden!)
-          .balance!;
-      int fee = 3000;
-      int resultBalance = balance - fee;
-
-      if (resultBalance <= 0) {
-        return 0.0;
-      } else {
-        return convertFromSatoshi(balance - fee);
-      }
+      return convertFromSatoshi(bitcoinState.totalBalance);
     }
   }
 
@@ -255,6 +242,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                       (bitcoinState.status == BitcoinStatusList.success ||
                           !SettingsHelper.isBitcoin())) {
                     if (SettingsHelper.isBitcoin()) {
+                      print(bitcoinState);
                       currentAsset = TokensModel(
                         name: 'Bitcoin',
                         symbol: 'BTC',
@@ -391,13 +379,17 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       height: 6,
                                     ),
                                     AmountField(
-                                      type: TxType.send,
+                                      type: SettingsHelper.isBitcoin() ? null : TxType.send,
                                       account: accountState.activeAccount!,
                                       onChanged: (value) {
                                         setState(() {
                                           balanceInUsd = getUsdBalance(context);
                                         });
                                       },
+                                      available: getAvailableBalance(
+                                        accountState,
+                                        bitcoinState,
+                                      ),
                                       isDisabledSelector:
                                           SettingsHelper.isBitcoin(),
                                       suffix: balanceInUsd ??
@@ -527,14 +519,9 @@ class _SendScreenNewState extends State<SendScreenNew>
                       ),
                     );
                   } else if (bitcoinState.status == BitcoinStatusList.failure) {
-                    return Container(
-                      child: Center(
-                        child: ErrorPlaceholder(
-                          message: 'BTC error',
-                          description:
-                              'Something error when loading BTC balance',
-                        ),
-                      ),
+                    return ErrorScreen(
+                      errorDetails:
+                          FlutterErrorDetails(exception: 'Bitcoin API error'),
                     );
                   } else {
                     return Container();

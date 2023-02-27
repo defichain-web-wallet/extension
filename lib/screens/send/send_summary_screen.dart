@@ -11,6 +11,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
@@ -59,7 +60,7 @@ class SendSummaryScreen extends StatefulWidget {
 }
 
 class _SendSummaryScreenState extends State<SendSummaryScreen>
-    with ThemeMixin, NetworkMixin {
+    with ThemeMixin, NetworkMixin, SnackBarMixin {
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
   String secondStepLoaderText =
@@ -427,19 +428,14 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       }
     } catch (_err) {
       print(_err);
-      Navigator.pushReplacement(
+      showSnackBar(
         context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-            errorBTC: _err.toString(),
-            appBarTitle: 'Change',
-            txResponse: null,
-            amount: widget.amount,
-            token: 'BTC',
-            address: address,
-          ),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
+        title: 'Something went wrong',
+        color: AppColors.txStatusError
+            .withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
         ),
       );
     }
@@ -458,18 +454,32 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
         satPerByte: widget.fee!,
       );
       var txResponse = await bitcoinCubit.sendTransaction(tx);
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-              appBarTitle: 'Change',
-              txResponse: txResponse,
-              amount: widget.amount,
-              token: 'BTC',
-              address: address),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
+      showDialog(
+        barrierColor: Color(0x0f180245),
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return TxStatusDialog(
+            txResponse: txResponse,
+            callbackOk: () async {
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) => HomeScreen(
+                    isLoadTokens: true,
+                  ),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
+            },
+            callbackTryAgain: () async {
+              print('TryAgain');
+              await _sendTransaction(
+                  context, tokens, widget.token.symbol!, account, keyPair);
+            },
+          );
+        },
       );
     } else {
       await _sendTransaction(

@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/available_amount/available_amount_cubit.dart';
 import 'package:defi_wallet/constants/input_formatters.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
@@ -77,11 +78,18 @@ class _AmountFieldState extends State<AmountField> {
           widget.type!,
           widget.account!,
         );
+      } else if (widget.type == null) {
+        await availableAmountCubit.btcAvailableBalance(
+          widget.available!,
+        );
       }
       if (widget.type == TxType.swap || widget.type == TxType.addLiq) {
         if (widget.isAvailableTo) {
+          String assetSymbol = SettingsHelper.isBitcoin()
+              ? widget.selectedAsset.symbol!.replaceAll('d', '')
+              : widget.selectedAsset.symbol!;
           await availableAmountCubit.getAvailableTo(
-            widget.selectedAsset.symbol!,
+            assetSymbol,
             widget.type!,
             widget.account!,
           );
@@ -197,8 +205,8 @@ class _AmountFieldState extends State<AmountField> {
                       if (widget.type != null) {
                         if (widget.type == TxType.send) {
                           available = availableAmountState.available.toString();
-                        }
-                        if (widget.type == TxType.swap || widget.type == TxType.addLiq) {
+                        } else if (widget.type == TxType.swap ||
+                            widget.type == TxType.addLiq) {
                           if (widget.isAvailableTo) {
                             available =
                                 availableAmountState.availableTo.toString();

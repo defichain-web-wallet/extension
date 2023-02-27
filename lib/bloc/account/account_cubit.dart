@@ -685,7 +685,15 @@ class AccountCubit extends Cubit<AccountState> {
       activeToken: state.activeToken,
       historyFilterBy: state.historyFilterBy,
     ));
-    await restoreAccountFromStorage(network);
+    emit(state.copyWith(
+      status: AccountStatusList.success,
+      accounts: state.accounts,
+      balances: state.balances,
+      masterKeyPairPublicKey: state.masterKeyPairPublicKey,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+      historyFilterBy: state.historyFilterBy,
+    ));
   }
 
   updateSwapTutorialStatus(String status) {

@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/network/network_cubit.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -73,6 +74,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
 
   void onChangeLocalSettings(NetworkList networkModel) async {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
 
     bool isBitcoin = networkModel == NetworkList.btcMainnet ||
         networkModel == NetworkList.btcTestnet;
@@ -87,6 +89,9 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
     SettingsHelper.settings.network = network;
     SettingsHelper.settings.isBitcoin = isBitcoin;
     await settingsHelper.saveSettings();
+    if (isBitcoin) {
+      await bitcoinCubit.loadDetails(accountCubit.state.activeAccount!.bitcoinAddress!);
+    }
     await accountCubit.changeNetwork(
         SettingsHelper.settings.network!,
     );
@@ -99,6 +104,19 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
       return (settings.isBitcoin!) ? 'Bitcoin Mainnet' : 'DefiChain Mainnet';
     } else {
       return (settings.isBitcoin!) ? 'Bitcoin Testnet' : 'DefiChain Testnet';
+    }
+  }
+
+  onChangeNetwork(dynamic item) {
+    NetworkCubit networkCubit = BlocProvider.of<NetworkCubit>(context);
+    controller.hideMenu();
+    if (item['value'] != NetworkList.defiMetaChainTestnet) {
+      networkCubit.updateCurrentNetwork(item['value']);
+
+      setState(() {
+        currentNetworkItem = item['name'];
+      });
+      onChangeLocalSettings(item['value']);
     }
   }
 
@@ -283,16 +301,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                     cursor: SystemMouseCursors.click,
                                     child: GestureDetector(
                                       behavior: HitTestBehavior.translucent,
-                                      onTap: () {
-                                        controller.hideMenu();
-                                        if (item['value'] != NetworkList.defiMetaChainTestnet) {
-                                          networkCubit.updateCurrentNetwork(item['value']);
-                                          setState(() {
-                                            currentNetworkItem = item['name'];
-                                          });
-                                          onChangeLocalSettings(item['value']);
-                                        }
-                                      },
+                                      onTap: () => onChangeNetwork(item),
                                       child: Container(
                                         height: 44,
                                         child: Row(

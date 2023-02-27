@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
@@ -10,22 +9,14 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
-import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_body.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
-import 'package:defi_wallet/screens/home/widgets/account_select.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/home/widgets/transaction_history.dart';
-import 'package:defi_wallet/screens/liquidity/earn_screen_new.dart';
-import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
 import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
-import 'package:defi_wallet/widgets/common/app_tooltip.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
-import 'package:defi_wallet/widgets/home/account_balance.dart';
-import 'package:defi_wallet/widgets/home/home_card.dart';
 import 'package:defi_wallet/widgets/home/home_sliver_app_bar.dart';
 import 'package:defi_wallet/widgets/home/transaction_status_bar.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -35,8 +26,6 @@ import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
-
-import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isLoadTokens;
@@ -56,20 +45,8 @@ class _HomeScreenState extends State<HomeScreen>
     with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
   static const int tickerTimerUpdate = 15;
   Timer? timer;
-  final scaffoldKey = GlobalKey<ScaffoldState>();
   TabController? tabController;
-  bool isSaveOpenTime = false;
   LockHelper lockHelper = LockHelper();
-  double toolbarHeight = 55;
-  double toolbarHeightWithBottom = 105;
-  bool isFullSizeScreen = false;
-  double assetsTabBodyHeight = 0;
-  double historyTabBodyHeight = 0;
-  double minDefaultTabBodyHeight = 255;
-  double maxDefaultTabBodyHeight = 475;
-  double maxHistoryEntries = 30;
-  double heightListEntry = 74;
-  double heightAdditionalAction = 60;
   bool isShownSnackBar = false;
   double sliverTopHeight = 0.0;
   double targetSliverTopHeight = 76.0;
@@ -79,60 +56,9 @@ class _HomeScreenState extends State<HomeScreen>
     homeCubit.updateTabIndex(index: tabController!.index);
   }
 
-  setTabBody({int tabIndex = 0}) {
-    AccountState accountState = BlocProvider.of<AccountCubit>(context).state;
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-    double countAssets = 0;
-    double countTransactions = 0;
-
-    if (SettingsHelper.isBitcoin()) {
-      late List<dynamic> tempHistoryList;
-      countAssets = 1;
-      tempHistoryList = bitcoinCubit.state.history ?? [];
-      countTransactions = tempHistoryList.length.toDouble();
-      bitcoinCubit.loadDetails(accountState.activeAccount!.bitcoinAddress!);
-    } else {
-      countAssets = accountState.activeAccount!.balanceList!
-          .where((el) => !el.isHidden!)
-          .length
-          .toDouble();
-      countTransactions =
-          accountState.activeAccount!.historyList!.length.toDouble();
-    }
-    assetsTabBodyHeight =
-        countAssets * heightListEntry + heightAdditionalAction;
-
-    if (countTransactions < maxHistoryEntries) {
-      historyTabBodyHeight =
-          countTransactions * heightListEntry + heightAdditionalAction;
-    } else {
-      historyTabBodyHeight =
-          maxHistoryEntries * heightListEntry + heightAdditionalAction;
-    }
-
-    if (isFullSizeScreen) {
-      if (assetsTabBodyHeight < maxDefaultTabBodyHeight) {
-        assetsTabBodyHeight = maxDefaultTabBodyHeight;
-      }
-
-      if (historyTabBodyHeight < maxDefaultTabBodyHeight) {
-        historyTabBodyHeight = maxDefaultTabBodyHeight;
-      }
-    } else {
-      if (assetsTabBodyHeight < minDefaultTabBodyHeight) {
-        assetsTabBodyHeight = minDefaultTabBodyHeight;
-      }
-
-      if (historyTabBodyHeight < minDefaultTabBodyHeight) {
-        historyTabBodyHeight = minDefaultTabBodyHeight;
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    setTabBody();
     tabController = TabController(
       length: 2,
       vsync: this,
@@ -159,11 +85,15 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     if (widget.isLoadTokens) {
       tokensCubit.loadTokensFromStorage();
     }
 
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
+      if (SettingsHelper.isBitcoin()) {
+        bitcoinCubit.loadDetails(state.activeAccount!.bitcoinAddress!);
+      }
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
           return ScaffoldWrapper(
@@ -351,41 +281,6 @@ class _HomeScreenState extends State<HomeScreen>
           );
         },
       );
-    });
-  }
-
-  bool isExistHistory(state) {
-    late List<dynamic> tempHistoryList;
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-
-    tempHistoryList = bitcoinCubit.state.history ?? [];
-
-    if (SettingsHelper.isBitcoin()) {
-      return tempHistoryList.length > 30;
-    } else if (SettingsHelper.settings.network == 'mainnet') {
-      return state.activeAccount.historyList!.length > 30;
-    } else {
-      return state.activeAccount.testnetHistoryList!.length > 30;
-    }
-  }
-
-  updateAccountDetails(context, state) async {
-    lockHelper.provideWithLockChecker(context, () async {
-      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-      if (state.status == AccountStatusList.success) {
-        await accountCubit.updateAccountDetails();
-
-        Future.delayed(const Duration(milliseconds: 1), () async {
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => HomeScreen(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
-        });
-      }
     });
   }
 }
