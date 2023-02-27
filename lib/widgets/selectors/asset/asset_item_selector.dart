@@ -1,7 +1,7 @@
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
-import 'package:defi_wallet/widgets/selectors/circle_selector.dart';
+import 'package:defi_wallet/widgets/common/app_radio_button.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -69,7 +69,7 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
                     ),
                   ),
                   Container(
-                    child: CircleSelector(
+                    child: AppRadioButton(
                       callback: () {
                         widget.onChange();
                       },
