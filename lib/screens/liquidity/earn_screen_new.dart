@@ -4,17 +4,19 @@ import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -30,7 +32,8 @@ class EarnScreenNew extends StatefulWidget {
   State<EarnScreenNew> createState() => _EarnScreenNewState();
 }
 
-class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBarMixin {
+class _EarnScreenNewState extends State<EarnScreenNew>
+    with ThemeMixin, SnackBarMixin {
   BalancesHelper balancesHelper = BalancesHelper();
   String titleText = 'Earn';
   int iterator = 0;
@@ -44,14 +47,16 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       await fiatCubit.loadUserDetails(accountCubit.state.accounts!.first);
+      await lockCubit.loadAnalyticsDetails(accountCubit.state.accounts!.first);
       await lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
       await lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
-      await lockCubit.loadAnalyticsDetails(accountCubit.state.accounts!.first);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
@@ -63,7 +68,19 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
             builder: (accountContext, accountState) {
           return BlocBuilder<LockCubit, LockState>(
               builder: (lockContext, lockState) {
-            if (lockState.status == LockStatusList.success) {
+            if (lockState.status == LockStatusList.expired) {
+              accountCubit.clearAccessTokens();
+              LockHelper().lockWallet();
+              Future.microtask(() => Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) =>
+                        LockScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  )));
+              return Container();
+            } else if (lockState.status == LockStatusList.success) {
               return BlocBuilder<TokensCubit, TokensState>(
                   builder: (tokensContext, tokensState) {
                 double totalPairsBalance = 0;
@@ -77,7 +94,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                 accountState.activeAccount!.balanceList!.forEach((element) {
                   if (element.isPair! && !element.isHidden!) {
                     countPairs += 1;
-                    totalPairsAPR += getAPRbyPair(tokensState.tokensPairs!,element.token!);
+                    totalPairsAPR +=
+                        getAPRbyPair(tokensState.tokensPairs!, element.token!);
 
                     var foundedAssetPair = List.from(tokensState.tokensPairs!
                         .where((item) => element.token == item.symbol))[0];
@@ -101,7 +119,8 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                     );
                   }
                 });
-                avaragePairsAPR =  TokensHelper().getAprFormat(countPairs > 0 ? totalPairsAPR/countPairs : 0, false);
+                avaragePairsAPR = TokensHelper().getAprFormat(
+                    countPairs > 0 ? totalPairsAPR / countPairs : 0, false);
 
                 return Scaffold(
                   drawerScrimColor: Color(0x0f180245),
@@ -126,9 +145,9 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                           : LightColors.scaffoldContainerBgColor,
                       border: isDarkTheme()
                           ? Border.all(
-                        width: 1.0,
-                        color: Colors.white.withOpacity(0.05),
-                      )
+                              width: 1.0,
+                              color: Colors.white.withOpacity(0.05),
+                            )
                           : null,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20),
@@ -305,71 +324,73 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                               // TODO: uncomment this when API will be work
                                               if (false)
                                                 Expanded(
-                                                flex: 1,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
-                                                      children: [
-                                                        Text(
-                                                          '0.00',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .headline4!
-                                                                  .copyWith(
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: AppColors
-                                                                        .malachite,
-                                                                  ),
-                                                        ),
-                                                        SizedBox(
-                                                          width: 5,
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .only(
-                                                                  bottom: 2.0),
-                                                          child: Text(
-                                                            'DFI',
+                                                  flex: 1,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Text(
+                                                            '0.00',
                                                             style: Theme.of(
                                                                     context)
                                                                 .textTheme
                                                                 .headline4!
                                                                 .copyWith(
-                                                                  fontSize: 13,
+                                                                  fontSize: 20,
                                                                   color: AppColors
                                                                       .malachite,
                                                                 ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      'Rewards earned',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .headline5!
-                                                          .copyWith(
-                                                            fontSize: 12,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .headline5!
-                                                                .color!
-                                                                .withOpacity(
-                                                                    0.3),
+                                                          SizedBox(
+                                                            width: 5,
                                                           ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    bottom:
+                                                                        2.0),
+                                                            child: Text(
+                                                              'DFI',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .headline4!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        13,
+                                                                    color: AppColors
+                                                                        .malachite,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Text(
+                                                        'Rewards earned',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline5!
+                                                            .copyWith(
+                                                              fontSize: 12,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .headline5!
+                                                                  .color!
+                                                                  .withOpacity(
+                                                                      0.3),
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
                                             ],
                                           )
                                         ],
@@ -486,7 +507,10 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                       CrossAxisAlignment.end,
                                                   children: [
                                                     Text(
-                                                      balancesHelper.numberStyling(totalPairsBalance, fixed: true),
+                                                      balancesHelper
+                                                          .numberStyling(
+                                                              totalPairsBalance,
+                                                              fixed: true),
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .headline4!
@@ -551,22 +575,28 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                                                                 .malachite,
                                                           ),
                                                     ),
-                                                    countPairs > 0 ? Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              bottom: 2.0),
-                                                      child: Text(
-                                                        '%',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline4!
-                                                            .copyWith(
-                                                              fontSize: 13,
-                                                              color: AppColors
-                                                                  .malachite,
+                                                    countPairs > 0
+                                                        ? Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    bottom:
+                                                                        2.0),
+                                                            child: Text(
+                                                              '%',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .headline4!
+                                                                  .copyWith(
+                                                                    fontSize:
+                                                                        13,
+                                                                    color: AppColors
+                                                                        .malachite,
+                                                                  ),
                                                             ),
-                                                      ),
-                                                    ) : Container(),
+                                                          )
+                                                        : Container(),
                                                   ],
                                                 ),
                                                 Text(
@@ -601,14 +631,7 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
                 );
               });
             } else if (lockState.status == LockStatusList.failure) {
-              return Container(
-                child: Center(
-                  child: ErrorPlaceholder(
-                    description: 'Please check again later',
-                    message: 'API is under maintenance',
-                  ),
-                ),
-              );
+              return ErrorScreen();
             } else {
               return Loader();
             }
@@ -653,7 +676,10 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
         ),
       );
     } else {
-      if (lockState.lockUserDetails.kycLink == 'https://kyc.lock.space?code=null'){
+      if (lockState.lockUserDetails.kycLink ==
+          'https://kyc.lock.space?code=null') {
+        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
         await lockCubit.loadKycDetails(accountCubit.state.activeAccount!);
         await lockCubit.loadUserDetails(accountCubit.state.activeAccount!);
       }
@@ -672,13 +698,13 @@ class _EarnScreenNewState extends State<EarnScreenNew> with ThemeMixin, SnackBar
   liquidityCallback(String avaragePairsAPR, txState) {
     Widget redirectTo = LiquidityScreenNew(averageARP: avaragePairsAPR);
 
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => redirectTo,
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) => redirectTo,
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
   }
 }
