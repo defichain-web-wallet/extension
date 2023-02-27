@@ -12,6 +12,7 @@ class DfxApi {
 
 class JellyLinks {
   static const String termsAndConditions = 'https://jellywallet.io/terms-and-conditions/';
+  static const String telegramGroup = 'https://t.me/jellywallet_eng';
 }
 
 class ScreenSizes {
