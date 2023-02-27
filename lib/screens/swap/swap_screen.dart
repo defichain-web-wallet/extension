@@ -1160,7 +1160,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                     assetTo!.symbol!,
                     double.parse(amountFromController.text),
                     double.parse(amountToController.text),
-                    slippage,
+                    assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ? slippage + 0.3 : slippage,
                   ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
