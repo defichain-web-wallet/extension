@@ -62,7 +62,9 @@ class TransactionService {
 
     var utxos = await BtcRequests().getUTXOs(address: account.bitcoinAddress!);
     var fee = calculateBTCFee(2, 2, satPerByte);
-    int sumUTXO = utxos.map((item) => item.value!).reduce((a, b) => a + b);
+    int sumUTXO = utxos.length > 0
+        ? utxos.map((item) => item.value!).reduce((a, b) => a + b)
+        : 0;
     if(sumUTXO < fee+amount){
       return TxErrorModel(isError: true, error: 'Not enough balance. Please wait for the previous transaction');
     }

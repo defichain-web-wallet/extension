@@ -1068,38 +1068,28 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
     if (SettingsHelper.isBitcoin()) {
       double minDeposit = convertFromSatoshi(cryptoRoute!.minDeposit!);
       if (minDeposit >= double.parse(amountFromController.text)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Min amount must be more than $minDeposit BTC',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headline5,
-            ),
-            backgroundColor: Theme
-                .of(context)
-                .snackBarTheme
-                .backgroundColor,
+        showSnackBar(
+          context,
+          title: 'Min amount must be more than $minDeposit BTC',
+          color: AppColors.txStatusError
+              .withOpacity(0.1),
+          prefix: Icon(
+            Icons.close,
+            color: AppColors.txStatusError,
           ),
         );
         return;
       }
     }
     if (isEnoughBalance(state)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Insufficient funds',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headline5,
-          ),
-          backgroundColor: Theme
-              .of(context)
-              .snackBarTheme
-              .backgroundColor,
+      showSnackBar(
+        context,
+        title: 'Insufficient funds',
+        color: AppColors.txStatusError
+            .withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
         ),
       );
       return;
@@ -1126,37 +1116,43 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                       amount: balancesHelper.toSatoshi(amountFromController.text),
                       satPerByte: bitcoinCubit.state.networkFee!.medium!,
                     );
-                    Navigator.push(
+                    if (tx.isError!) {
+                      showSnackBar(
                         context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              SwapSummaryScreen(
-                                assetFrom.symbol!,
-                                assetTo!.symbol!.replaceAll('d', ''),
-                                double.parse(amountFromController.text),
-                                double.parse(amountToController.text),
-                                slippage,
-                                btcTx: tx,
-                              ),
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
-                        ));
-                  } catch (err) {
-                    print(err);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Something went wrong',
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .headline5,
+                        title: tx.error!,
+                        color: AppColors.txStatusError
+                            .withOpacity(0.1),
+                        prefix: Icon(
+                          Icons.close,
+                          color: AppColors.txStatusError,
                         ),
-                        backgroundColor:
-                        Theme
-                            .of(context)
-                            .snackBarTheme
-                            .backgroundColor,
+                      );
+                    } else {
+                      Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                SwapSummaryScreen(
+                                  assetFrom.symbol!,
+                                  assetTo!.symbol!.replaceAll('d', ''),
+                                  double.parse(amountFromController.text),
+                                  double.parse(amountToController.text),
+                                  slippage,
+                                  btcTx: tx.txLoaderList![0].txHex!,
+                                ),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          ));
+                    }
+                  } catch (err) {
+                    showSnackBar(
+                      context,
+                      title: 'Something went wrong',
+                      color: AppColors.txStatusError
+                          .withOpacity(0.1),
+                      prefix: Icon(
+                        Icons.close,
+                        color: AppColors.txStatusError,
                       ),
                     );
                   }
