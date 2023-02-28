@@ -1,6 +1,8 @@
 import 'package:defi_wallet/helpers/addresses_helper.dart';
+import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/settings_model.dart';
+import 'package:defichaindart/defichaindart.dart';
 
 mixin NetworkMixin {
   String currentNetworkName() {
@@ -14,10 +16,18 @@ mixin NetworkMixin {
   }
 
   Future<String> addressNetwork(String address) async {
-    if (await AddressesHelper().validateAddress(address)) {
+    if (Address.validateAddress(
+        address, NetworkHelper().getNetwork('mainnet'))) {
       return 'DefiChain Mainnet';
-    } else if (await AddressesHelper().validateBtcAddress(address)) {
+    } else if (Address.validateAddress(
+        address, NetworkHelper().getNetwork('testnet'))) {
+      return 'DefiChain Testnet';
+    } else if (Address.validateAddress(
+        address, NetworkHelper().getNetwork('bitcoin'))) {
       return 'Bitcoin Mainnet';
+    } else if (Address.validateAddress(
+        address, NetworkHelper().getNetwork('bitcoin_testnet'))) {
+      return 'Bitcoin Testnet';
     } else {
       return 'Unknown network';
     }
