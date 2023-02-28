@@ -29,7 +29,10 @@ class HiveNames {
   static const String accountAvatar = 'account_avatar';
 
   // address book
+  //TODO: remove in future (start)
   static const String defiAddressBook = 'defi_address_book';
   static const String btcAddressBook = 'btc_address_book';
+  //TODO: remove in future (end)
+  static const String addressBook = 'address_book';
   static const String lastSent = 'last_sent';
 }

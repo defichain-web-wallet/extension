@@ -17,7 +17,7 @@ mixin NetworkMixin {
     if (await AddressesHelper().validateAddress(address)) {
       return 'DefiChain Mainnet';
     } else if (await AddressesHelper().validateBtcAddress(address)) {
-      return 'Bitcoin Testnet';
+      return 'Bitcoin Mainnet';
     } else {
       return 'Unknown network';
     }
