@@ -94,7 +94,8 @@ class _SendScreenNewState extends State<SendScreenNew>
     if (addressController.text != '') {
       bool isValidAddress =
           await AddressesHelper().validateAddress(addressController.text);
-      if (isValidAddress) {
+      bool isValidBitcoinAddress = await AddressesHelper().validateBtcAddress(addressController.text);
+      if (isValidAddress || isValidBitcoinAddress) {
         if (isAddNewContact) {
           showDialog(
             barrierColor: Color(0x0f180245),
