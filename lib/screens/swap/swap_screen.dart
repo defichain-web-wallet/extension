@@ -856,11 +856,10 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         fiatCubit.loadCryptoRoute(accountTo);
                         iterator++;
                       }
-                      if (fiatState.status == FiatStatusList.success &&
-                          SettingsHelper.isBitcoin()) {
+                      if (SettingsHelper.isBitcoin()) {
                         return Column(
                           children: [
-                            if (fiatState.kycStatus != completeKycType)
+                            if (fiatState.status == FiatStatusList.success && fiatState.kycStatus != completeKycType)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 14.0),
                                 child: InkWell(
@@ -879,6 +878,19 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                           ?.apply(color: AppTheme.pinkColor),
                                     ),
                                   ),
+                                ),
+                              )
+                            else if (fiatState.errorMessage == "\"Missing bank transaction\"")
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 14.0),
+                                child: Text(
+                                  'Please do buy or sell first',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5
+                                      ?.apply(color: Theme.of(context)
+                                      .textTheme
+                                      .headline5!.color!.withOpacity(0.6)),
                                 ),
                               ),
                             NewPrimaryButton(
@@ -910,7 +922,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                 ],
                               ),
                               callback: !isDisableSubmit() &&
-                                      (fiatState.kycStatus != completeKycType)
+                                      (fiatState.kycStatus ==
+                                          completeKycType) &&
+                                      fiatState.errorMessage == null
                                   ? () => submitReviewSwap(
                                         accountState,
                                         transactionState,
