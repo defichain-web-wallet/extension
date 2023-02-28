@@ -789,7 +789,7 @@ class FiatCubit extends Cubit<FiatState> {
       CryptoRouteModel? route;
       if (data['kycDataComplete']) {
         route = await dfxRequests.getCryptoRoutes(accessToken);
-        if (route == null && data['kycStatus'] == 'Complete') {
+        if (route == null && data['kycStatus'] == 'Completed') {
           route = await dfxRequests.createCryptoRoute(accessToken);
         }
       }
@@ -804,6 +804,7 @@ class FiatCubit extends Cubit<FiatState> {
     } catch (err) {
       emit(state.copyWith(
         status: FiatStatusList.failure,
+        errorMessage: err.toString(),
         phone: state.phone,
         countryCode: state.countryCode,
         phoneWithoutPrefix: state.phoneWithoutPrefix,

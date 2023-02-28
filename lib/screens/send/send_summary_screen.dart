@@ -453,34 +453,48 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
         amount: balancesHelper.toSatoshi(widget.amount.toString()),
         satPerByte: widget.fee!,
       );
-      var txResponse = await bitcoinCubit.sendTransaction(tx);
-      showDialog(
-        barrierColor: Color(0x0f180245),
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext dialogContext) {
-          return TxStatusDialog(
-            txResponse: txResponse,
-            callbackOk: () async {
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) => HomeScreen(
-                    isLoadTokens: true,
+      if (tx.isError!) {
+        showSnackBar(
+          context,
+          title: tx.error!,
+          color: AppColors.txStatusError
+              .withOpacity(0.1),
+          prefix: Icon(
+            Icons.close,
+            color: AppColors.txStatusError,
+          ),
+        );
+      } else {
+        var txResponse = await bitcoinCubit.sendTransaction(tx.txLoaderList![0].txHex!);
+
+        showDialog(
+          barrierColor: Color(0x0f180245),
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext dialogContext) {
+            return TxStatusDialog(
+              txResponse: txResponse,
+              callbackOk: () async {
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => HomeScreen(
+                      isLoadTokens: true,
+                    ),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ),
-              );
-            },
-            callbackTryAgain: () async {
-              print('TryAgain');
-              await _sendTransaction(
-                  context, tokens, widget.token.symbol!, account, keyPair);
-            },
-          );
-        },
-      );
+                );
+              },
+              callbackTryAgain: () async {
+                print('TryAgain');
+                await _sendTransaction(
+                    context, tokens, widget.token.symbol!, account, keyPair);
+              },
+            );
+          },
+        );
+      }
     } else {
       await _sendTransaction(
           context, tokens, widget.token.symbol!, account, keyPair);

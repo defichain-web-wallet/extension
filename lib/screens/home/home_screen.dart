@@ -131,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {
-                      if (timer == null) {
+                      if (timer == null && !SettingsHelper.isBitcoin()) {
                         timer =
                             Timer.periodic(Duration(seconds: tickerTimerUpdate),
                                 (timer) async {
