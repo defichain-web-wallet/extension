@@ -51,7 +51,7 @@ class TransactionService {
     return await prepareTx(responseModel, TxType.removeLiq);
   }
 
-  Future<String> createBTCTransaction(
+  Future<TxErrorModel> createBTCTransaction(
       {required ECPair keyPair,
       required AccountModel account,
       required String destinationAddress,
@@ -62,6 +62,10 @@ class TransactionService {
 
     var utxos = await BtcRequests().getUTXOs(address: account.bitcoinAddress!);
     var fee = calculateBTCFee(2, 2, satPerByte);
+    int sumUTXO = utxos.map((item) => item.value!).reduce((a, b) => a + b);
+    if(sumUTXO < fee+amount){
+      return TxErrorModel(isError: true, error: 'Not enough balance. Please wait for the previous transaction');
+    }
     var selectedUtxo = _utxoSelector(utxos, fee, amount);
     if (selectedUtxo.length > 2) {
       selectedUtxo = _utxoSelector(
@@ -96,7 +100,7 @@ class TransactionService {
       _txb.sign(vin: index, keyPair: keyPair, witnessValue: utxo.value);
     });
 
-    return _txb.build().toHex();
+    return TxErrorModel(isError: false, txLoaderList: [TxLoaderModel(txHex: _txb.build().toHex(), type: TxType.send)]);
   }
 
   Future<TxErrorModel> createAndSendLiqudity(
