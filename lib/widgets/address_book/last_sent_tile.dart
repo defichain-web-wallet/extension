@@ -1,5 +1,5 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
-import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -61,12 +61,12 @@ class _LastSentTileState extends State<LastSentTile> with NetworkMixin, ThemeMix
                         address: widget.address,
                         isEdit: false,
                         confirmCallback:
-                            (name, address) {
+                            (name, address, network) {
                           addressBookCubit.addAddress(
                             AddressBookModel(
                                 name: name,
                                 address: address,
-                                network: currentNetworkName(),
+                                network: network,
                             ),
                           );
                           Navigator.pop(dialogContext);

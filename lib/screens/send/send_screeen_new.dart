@@ -7,7 +7,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -104,12 +104,13 @@ class _SendScreenNewState extends State<SendScreenNew>
               return CreateEditContactDialog(
                 address: addressController.text,
                 isEdit: false,
-                confirmCallback: (name, address) {
+                confirmCallback: (name, address, network) {
                   addressBookCubit.addAddress(
                     AddressBookModel(
-                        name: name,
-                        address: address,
-                        network: currentNetworkName()),
+                      name: name,
+                      address: address,
+                      network: network,
+                    ),
                   );
                   Navigator.push(
                     context,
