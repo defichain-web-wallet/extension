@@ -92,10 +92,15 @@ class _SendScreenNewState extends State<SendScreenNew>
 
   sendSubmit(addressBookCubit, bitcoinState) async {
     if (addressController.text != '') {
-      bool isValidAddress =
-          await AddressesHelper().validateAddress(addressController.text);
-      bool isValidBitcoinAddress = await AddressesHelper().validateBtcAddress(addressController.text);
-      if (isValidAddress || isValidBitcoinAddress) {
+      late bool isValidAddress;
+      if (SettingsHelper.isBitcoin()) {
+        isValidAddress =
+        await AddressesHelper().validateBtcAddress(addressController.text);
+      } else {
+        isValidAddress =
+        await AddressesHelper().validateAddress(addressController.text);
+      }
+      if (isValidAddress)  {
         if (isAddNewContact) {
           showDialog(
             barrierColor: Color(0x0f180245),
