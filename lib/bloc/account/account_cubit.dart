@@ -395,7 +395,7 @@ class AccountCubit extends Cubit<AccountState> {
           masterKeyPairMainnetPublicKey, mainnet, (need, restored) {
         emit(state.copyWith(
           status: AccountStatusList.restore,
-          needRestore: need + 10,
+          needRestore: need,
           restored: restored,
         ));
       });
@@ -411,18 +411,18 @@ class AccountCubit extends Cubit<AccountState> {
           masterKeyPairTestnetPublicKey, testnet, (need, restored) {
         emit(state.copyWith(
           status: AccountStatusList.restore,
-          needRestore: need + 10,
-          restored: restored + 10,
+          needRestore: accountsMainnet.length*2+2,
+          restored: restored+accountsMainnet.length+1,
         ));
       });
       final balances = accountsMainnet[0].balanceList!;
       for (var account in accountsMainnet) {
-        String accessToken = await fiatCubit.getAccessToken(
+        String? accessTokenDFX = await fiatCubit.signIn(
             account, masterKeyPairMainnetPrivateKey);
-        String lockAccessToken = await lockCubit.getAccessToken(
+        String? accessTokenLOCK = await lockCubit.signIn(
             account, masterKeyPairMainnetPrivateKey);
-        account.accessToken = accessToken;
-        account.lockAccessToken = lockAccessToken;
+        account.accessToken = accessTokenDFX;
+        account.lockAccessToken = accessTokenLOCK;
       }
       await saveAccountsToStorage(
         accountsMainnet: accountsMainnet,
