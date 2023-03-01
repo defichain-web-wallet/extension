@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -334,7 +335,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
           return TxStatusDialog(
             txResponse: txResponse,
             callbackOk: () {
-              if (!txResponse.isError!) {
+              if (!txResponse.isError! && !SettingsHelper.isBitcoin()) {
                 TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
