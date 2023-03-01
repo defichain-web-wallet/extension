@@ -863,21 +863,21 @@ class _SwapScreenState extends State<SwapScreen> {
                     amount: balancesHelper.toSatoshi(amountFromController.text),
                     satPerByte: bitcoinCubit.state.networkFee!.medium!,
                   );
-                  Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) =>
-                            ReviewSwapScreen(
-                          assetFrom,
-                          assetTo.replaceAll('d', ''),
-                          double.parse(amountFromController.text),
-                          double.parse(amountToController.text),
-                          slippage,
-                          btcTx: tx,
-                        ),
-                        transitionDuration: Duration.zero,
-                        reverseTransitionDuration: Duration.zero,
-                      ));
+                  // Navigator.push(
+                  //     context,
+                  //     PageRouteBuilder(
+                  //       pageBuilder: (context, animation1, animation2) =>
+                  //           ReviewSwapScreen(
+                  //         assetFrom,
+                  //         assetTo.replaceAll('d', ''),
+                  //         double.parse(amountFromController.text),
+                  //         double.parse(amountToController.text),
+                  //         slippage,
+                  //         btcTx: tx,
+                  //       ),
+                  //       transitionDuration: Duration.zero,
+                  //       reverseTransitionDuration: Duration.zero,
+                  //     ));
                 } catch (err) {
                   print(err);
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -907,21 +907,21 @@ class _SwapScreenState extends State<SwapScreen> {
                     amount: balancesHelper.toSatoshi(amountFromController.text),
                     satPerByte: bitcoinCubit.state.networkFee!.medium!,
                   );
-                  Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation1, animation2) =>
-                            ReviewSwapScreen(
-                          assetFrom,
-                          assetTo.replaceAll('d', ''),
-                          double.parse(amountFromController.text),
-                          double.parse(amountToController.text),
-                          slippage,
-                          btcTx: tx,
-                        ),
-                        transitionDuration: Duration.zero,
-                        reverseTransitionDuration: Duration.zero,
-                      ));
+                  // Navigator.push(
+                  //     context,
+                  //     PageRouteBuilder(
+                  //       pageBuilder: (context, animation1, animation2) =>
+                  //           ReviewSwapScreen(
+                  //         assetFrom,
+                  //         assetTo.replaceAll('d', ''),
+                  //         double.parse(amountFromController.text),
+                  //         double.parse(amountToController.text),
+                  //         slippage,
+                  //         btcTx: tx,
+                  //       ),
+                  //       transitionDuration: Duration.zero,
+                  //       reverseTransitionDuration: Duration.zero,
+                  //     ));
                 } catch (err) {
                   print(err);
                   ScaffoldMessenger.of(context).showSnackBar(

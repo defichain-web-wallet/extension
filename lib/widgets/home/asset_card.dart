@@ -89,11 +89,13 @@ class _AssetCardState extends State<AssetCard> {
       child: Container(
         child: Row(
           children: [
-            SizedBox(
-              height: 42,
-              width: 42,
-              child: _buildTokenIcon(widget.tokens![widget.index]),
-            ),
+            if (widget.tokens[widget.index].isPair!)
+              AssetPair(
+                pair: widget.tokens[widget.index].symbol!,
+                size: 38,
+              ),
+            if (!widget.tokens[widget.index].isPair!)
+              TokensHelper().getLogoToken(widget.tokens[widget.index].symbol!),
             SizedBox(
               width: 10,
             ),

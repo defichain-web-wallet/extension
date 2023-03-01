@@ -115,6 +115,7 @@ flutter:
     - assets/history/
     - assets/icons/
     - assets/images/
+    - assets/images/tokens/
     - assets/tokens/
     - assets/currencies/
     - assets/pair_icons/

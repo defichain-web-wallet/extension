@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:flutter/material.dart';
 
 class TokensHelper {
   static const String DefiAccountSymbol = 'DFI';
@@ -152,6 +153,174 @@ class TokensHelper {
       default:
         {
           return 'assets/tokens/defi.svg';
+        }
+    }
+  }
+
+  String? getImagePathByTokenName(tokenName) {
+    switch (tokenName) {
+      case 'DFI':
+        {
+          return 'assets/images/tokens/dfi.png';
+        }
+      case 'ETH':
+        {
+          return 'assets/images/tokens/eth.png';
+        }
+      case 'BTC':
+        {
+          return 'assets/images/tokens/btc.png';
+        }
+      case 'LTC':
+        {
+          return 'assets/images/tokens/ltc.png';
+        }
+      case 'USDT':
+        {
+          return 'assets/images/tokens/usdt.png';
+        }
+      case 'BCH':
+        {
+          return 'assets/images/tokens/bch.png';
+        }
+      case 'DOGE':
+        {
+          return 'assets/images/tokens/doge.png';
+        }
+      case 'DUSD':
+        {
+          return 'assets/images/tokens/dusd.png';
+        }
+      case 'USDC':
+        {
+          return 'assets/images/tokens/usdc.png';
+        }
+      default:
+        {
+          return null;
+        }
+    }
+  }
+
+  Widget getLogoToken(String tokenName, {double size = 42}) {
+    if (getImagePathByTokenName(tokenName) != null) {
+      return Container(
+        width: size,
+        height: size,
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(colors: getColorsByTokenName(tokenName))
+        ),
+        child: Image.asset(
+          getImagePathByTokenName(tokenName)!,
+        ),
+      );
+    } else {
+      return Container(
+        width: size,
+        height: size,
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(colors: getColorsByTokenName(tokenName))
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.asset(
+              'assets/images/tokens/default.png',
+            ),
+            Text(
+              tokenName,
+              style: TextStyle(
+                fontSize: (tokenName.length < 4)
+                    ? ((8 * size) / 50)
+                    : (tokenName.length == 4)
+                        ? ((7 * size) / 50)
+                        : ((5 * size) / 50),
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFFFFFFF),
+                letterSpacing: 0.93,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  List<Color> getColorsByTokenName(tokenName){
+    switch (tokenName) {
+      case 'DFI':
+        {
+          return [
+            Color(0xffFF00AF).withOpacity(0.16),
+            Color(0xffBF0083).withOpacity(0.16),
+          ];
+        }
+      case 'ETH':
+        {
+          return [
+            Color(0xff627EEA).withOpacity(0.16),
+            Color(0xff3C61F1).withOpacity(0.16),
+          ];
+        }
+      case 'BTC':
+        {
+          return [
+            Color(0xffF7931A).withOpacity(0.16),
+            Color(0xffE2820F).withOpacity(0.16),
+          ];
+        }
+      case 'LTC':
+        {
+          return [
+            Color(0xff3A69B1).withOpacity(0.16),
+            Color(0xff2D528B).withOpacity(0.16),
+          ];
+        }
+      case 'USDT':
+        {
+          return [
+            Color(0xff499F88).withOpacity(0.16),
+            Color(0xff5BC1A5).withOpacity(0.16),
+          ];
+        }
+      case 'BCH':
+        {
+          return [
+            Color(0xff08AE80).withOpacity(0.16),
+            Color(0xff0CCD97).withOpacity(0.16),
+          ];
+        }
+      case 'DOGE':
+        {
+          return [
+            Color(0xffAE9530).withOpacity(0.16),
+            Color(0xffC7AA37).withOpacity(0.16),
+          ];
+        }
+      case 'DUSD':
+        {
+          return [
+            Color(0xffF001A5).withOpacity(0.16),
+            Color(0xffF001A5).withOpacity(0.16),
+          ];
+        }
+      case 'USDC':
+        {
+          return [
+            Color(0xff287BD6).withOpacity(0.16),
+            Color(0xff256BB7).withOpacity(0.16),
+          ];
+        }
+      default:
+        {
+          return [
+            Color(0xff4285F4).withOpacity(0.16),
+            Color(0xff0F9D58).withOpacity(0.16),
+          ];
         }
     }
   }

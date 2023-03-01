@@ -52,9 +52,9 @@ class _AssetPairState extends State<AssetPair> with ThemeMixin {
               child: Stack(
                 children: [
                   Positioned(
-                    child: SvgPicture.asset(
+                    child: Image.asset(
                       tokenHelper
-                          .getImageNameByTokenName(widget.pair.split('-')[0]),
+                          .getImagePathByTokenName(widget.pair.split('-')[0])!,
                       height: widget.size,
                       width: widget.size,
                     ),
@@ -63,7 +63,7 @@ class _AssetPairState extends State<AssetPair> with ThemeMixin {
                     left: widget.size! - 6,
                     child: SvgPicture.asset(
                       tokenHelper
-                          .getImageNameByTokenName(widget.pair.split('-')[1]),
+                          .getImagePathByTokenName(widget.pair.split('-')[1])!,
                       height: widget.size,
                       width: widget.size,
                     ),
