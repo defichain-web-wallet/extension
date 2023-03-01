@@ -1,4 +1,5 @@
-import 'package:defi_wallet/models/abstract_explorer_model.dart';
+
+import 'package:defi_wallet/providers/abstract_explorer_provider.dart';
 
 class Etherscan implements AbstractExplorer {
   Uri getTransaction(String txHash) {

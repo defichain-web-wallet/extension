@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 
+// TODO: Make all methods static
 class SettingsHelper {
   static SettingsModel settings = SettingsModel();
 

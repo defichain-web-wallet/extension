@@ -19,6 +19,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:defi_wallet/helpers/settings_helper.dart';
 
+// TODO: Make all methods static
 class BtcRequests {
   String host = 'https://api.blockcypher.com/v1';
 

@@ -1,7 +1,7 @@
 import 'package:defi_wallet/models/network_type_model.dart';
 
-import 'abstract_tx_model.dart';
-import 'network_feature.dart';
+import '../models/abstract_tx_model.dart';
+import '../models/network_feature.dart';
 
 abstract class AbstractNetwork {
   NetworkDialect get dialect;

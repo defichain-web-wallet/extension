@@ -1,10 +1,10 @@
-import 'package:defi_wallet/models/abstract_explorer_model.dart';
-import 'package:defi_wallet/models/abstract_network_model.dart';
 import 'package:defi_wallet/models/abstract_tx_model.dart';
 import 'package:defi_wallet/models/network_feature.dart';
 import 'package:defi_wallet/models/network_type_model.dart';
+import 'package:defi_wallet/providers/abstract_explorer_provider.dart';
+import 'package:defi_wallet/providers/abstract_network_provider.dart';
 
-import 'evm_transaction_receipt.dart';
+import '../models/evm_transaction_receipt.dart';
 
 
 class EvmNetwork implements AbstractNetwork {

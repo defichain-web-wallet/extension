@@ -1,8 +1,8 @@
-import 'package:defi_wallet/models/abstract_network_model.dart';
 import 'package:defi_wallet/models/abstract_tx_model.dart';
 import 'package:defi_wallet/models/defi_transaction_receipt.dart';
 import 'package:defi_wallet/models/network_feature.dart';
 import 'package:defi_wallet/models/network_type_model.dart';
+import 'package:defi_wallet/providers/abstract_network_provider.dart';
 
 class DefiNetworkModel extends AbstractNetwork {
   String displayName;

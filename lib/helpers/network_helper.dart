@@ -2,6 +2,8 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:defichaindart/src/models/networks.dart' as networks;
 import 'package:bip32_defichain/bip32.dart' as bip32;
+
+// TODO: Make all methods static
 class NetworkHelper {
   final SettingsHelper settingsHelper = SettingsHelper();
   final localSettings = SettingsHelper.settings;

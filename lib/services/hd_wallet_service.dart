@@ -4,11 +4,11 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_model.dart';
-import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+// TODO: Make all methods static
 class HDWalletService {
   final networkHelper = NetworkHelper();
 

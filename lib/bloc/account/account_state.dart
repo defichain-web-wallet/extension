@@ -31,18 +31,18 @@ class AccountState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        accounts,
-        balances,
-        masterKeyPairPublicKey,
-        activeAccount,
-        activeToken,
-        historyFilterBy,
-        needRestore,
-        restored,
-        exception,
-        swapTutorialStatus,
-      ];
+    status,
+    accounts,
+    balances,
+    masterKeyPairPublicKey,
+    activeAccount,
+    activeToken,
+    historyFilterBy,
+    needRestore,
+    restored,
+    exception,
+    swapTutorialStatus,
+  ];
 
   AccountState copyWith({
     AccountStatusList? status,

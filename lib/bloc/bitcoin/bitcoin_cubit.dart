@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/address_model.dart';
+import 'package:defi_wallet/providers/btc_account_provider.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
