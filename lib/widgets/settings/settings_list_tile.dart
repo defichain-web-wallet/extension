@@ -7,11 +7,13 @@ class SettingsListTile extends StatefulWidget {
   final String titleText;
   final String subtitleText;
   final Function()? onTap;
+  final bool isComingSoon;
 
   const SettingsListTile({
     Key? key,
     required this.titleText,
     required this.subtitleText,
+    this.isComingSoon = false,
     this.onTap,
   }) : super(key: key);
 
@@ -23,7 +25,7 @@ class _SettingsListTileState extends State<SettingsListTile> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: widget.isComingSoon ? (){} : widget.onTap,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: Container(
@@ -35,11 +37,34 @@ class _SettingsListTileState extends State<SettingsListTile> with ThemeMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      widget.titleText,
-                      style: Theme.of(context).textTheme.headline4!.copyWith(
-                            fontSize: 16,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.titleText,
+                          style: Theme.of(context).textTheme.headline4!.copyWith(
+                                fontSize: 16,
+                              ),
+                        ),
+                        if (widget.isComingSoon) ...[
+                          SizedBox(
+                            width: 8,
                           ),
+                          Text(
+                            '(coming soon)',
+                            style:
+                                Theme.of(context).textTheme.subtitle1!.copyWith(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline4!
+                                          .color!
+                                          .withOpacity(0.5),
+                                    ),
+                          ),
+                        ]
+                      ],
                     ),
                     Text(
                       widget.subtitleText,

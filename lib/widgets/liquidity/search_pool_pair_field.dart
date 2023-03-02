@@ -1,6 +1,8 @@
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,13 +10,16 @@ class SearchPoolPairField extends StatefulWidget {
   final TextEditingController controller;
   final TokensState tokensState;
 
-  const SearchPoolPairField({Key? key, required this.controller, required this.tokensState}) : super(key: key);
+  const SearchPoolPairField(
+      {Key? key, required this.controller, required this.tokensState})
+      : super(key: key);
 
   @override
   State<SearchPoolPairField> createState() => _SearchPoolPairFieldState();
 }
 
-class _SearchPoolPairFieldState extends State<SearchPoolPairField> with ThemeMixin {
+class _SearchPoolPairFieldState extends State<SearchPoolPairField>
+    with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
@@ -38,7 +43,11 @@ class _SearchPoolPairFieldState extends State<SearchPoolPairField> with ThemeMix
           hintText: 'Search for pool pairs',
           hintStyle: Theme.of(context).textTheme.headline5!.copyWith(
                 fontSize: 12,
-                color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                color: Theme.of(context)
+                    .textTheme
+                    .headline5!
+                    .color!
+                    .withOpacity(0.3),
               ),
           prefixIcon: Icon(
             Icons.search,

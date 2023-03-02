@@ -15,32 +15,33 @@ class CaptionText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 22,
+      width: (status == 'error' || status == 'success') ? 160 : 134,
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: getCaptionColor(opacity: 0.08),
       ),
-      child: RichText(
-        text: TextSpan(children: [
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
           if (status == 'error' || status == 'success')
-            WidgetSpan(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Icon(
-                  status == 'error' ? Icons.clear : Icons.done,
-                  color: getCaptionColor(),
-                  size: 13,
-                ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Icon(
+                status == 'error' ? Icons.clear : Icons.done,
+                color: getCaptionColor(),
+                size: 14,
               ),
             ),
-          TextSpan(
-            text: text ?? defaultCaptionText,
-            style: Theme.of(context)
-                .textTheme
-                .caption!
-                .apply(color: getCaptionColor()),
+          Text(
+            text ?? defaultCaptionText,
+            style: Theme.of(context).textTheme.caption!.copyWith(
+                  color: getCaptionColor(),
+                ),
           )
-        ]),
+        ],
       ),
     );
   }

@@ -131,6 +131,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                       appBar: NewMainAppBar(
                         bgColor: AppColors.viridian.withOpacity(0.16),
                         isShowLogo: false,
+                        isShowNetworkSelector: false,
                       ),
                       body: Container(
                         decoration: BoxDecoration(
@@ -758,7 +759,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                         callback: (parent) {
                                           if (txState
                                               is! TransactionLoadingState) {
-                                            if (double.parse(controller.text) >=
+                                            if (double.parse(controller.text.replaceAll(',', '')) >=
                                                 lockState.lockStakingDetails!
                                                     .minimalDeposit!) {
                                               parent.emitPending(true);
@@ -902,7 +903,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       lockCubit.stake(
         lockAccessToken,
         stakingId,
-        double.parse(controller.text),
+        double.parse(controller.text.replaceAll(',', '')),
         txResponse.txLoaderList![0].txId!,
       );
     }
@@ -969,7 +970,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       keyPair,
       lockAccessToken,
       stakingId,
-      double.parse(controller.text),
+      double.parse(controller.text.replaceAll(',', '')),
     );
     TxErrorModel txResponse = TxErrorModel(isError: !isUnstakeSuccess);
     showDialog(

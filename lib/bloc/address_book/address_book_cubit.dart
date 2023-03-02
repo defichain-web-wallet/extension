@@ -32,11 +32,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var jsonString = json.encode(resultJSON);
 
     var box = await Hive.openBox(HiveBoxes.client);
-    if (SettingsHelper.isBitcoin()) {
-      await box.put(HiveNames.btcAddressBook, jsonString);
-    } else {
-      await box.put(HiveNames.defiAddressBook, jsonString);
-    }
+      await box.put(HiveNames.addressBook, jsonString);
     await box.close();
 
     emit(state.copyWith(
@@ -111,6 +107,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
 
     final resultJSON = [];
 
+
     for (var element in addressBookList) {
       resultJSON.add(element.toJson());
     }
@@ -118,11 +115,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var jsonString = json.encode(resultJSON);
 
     var box = await Hive.openBox(HiveBoxes.client);
-    if (SettingsHelper.isBitcoin()) {
-      await box.put(HiveNames.btcAddressBook, jsonString);
-    } else {
-      await box.put(HiveNames.defiAddressBook, jsonString);
-    }
+      await box.put(HiveNames.addressBook, jsonString);
     await box.close();
 
     emit(state.copyWith(
@@ -142,12 +135,30 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var box = await Hive.openBox(HiveBoxes.client);
     var addressBookJson;
     var lastSentJson;
-    if (SettingsHelper.isBitcoin()) {
-      addressBookJson = await box.get(HiveNames.btcAddressBook);
-    } else {
-      addressBookJson = await box.get(HiveNames.defiAddressBook);
-    }
     lastSentJson = await box.get(HiveNames.lastSent);
+    addressBookJson = await box.get(HiveNames.addressBook);
+
+    //TODO: remove in future (start)
+      if(addressBookJson == null) {
+      var addressBookBTCJson;
+      var addressBookDFIJson;
+      addressBookBTCJson = await box.get(HiveNames.btcAddressBook);
+      addressBookDFIJson = await box.get(HiveNames.defiAddressBook);
+      if (addressBookBTCJson != null) {
+        List<dynamic> jsonFromString = json.decode(addressBookBTCJson);
+        for (var element in jsonFromString) {
+          addressBookList.add(AddressBookModel.fromJson(element));
+        }
+      }
+      if (addressBookDFIJson != null) {
+        List<dynamic> jsonFromString = json.decode(addressBookDFIJson);
+        for (var element in jsonFromString) {
+          addressBookList.add(AddressBookModel.fromJson(element));
+        }
+      }
+    }
+
+    //TODO: remove in future (end)
 
     if (addressBookJson != null) {
       List<dynamic> jsonFromString = json.decode(addressBookJson);
@@ -179,7 +190,9 @@ class AddressBookCubit extends Cubit<AddressBookState> {
 
     addressBookList.removeWhere((element) => element.id == addressBook.id);
 
+
     final resultJSON = [];
+
 
     for (var element in addressBookList) {
       resultJSON.add(element.toJson());
@@ -188,11 +201,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var jsonString = json.encode(resultJSON);
 
     var box = await Hive.openBox(HiveBoxes.client);
-    if (SettingsHelper.isBitcoin()) {
-      await box.put(HiveNames.btcAddressBook, jsonString);
-    } else {
-      await box.put(HiveNames.defiAddressBook, jsonString);
-    }
+      await box.put(HiveNames.addressBook, jsonString);
     await box.close();
 
     emit(state.copyWith(
@@ -201,7 +210,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     ));
   }
 
-  getLastContact() {
+  getLastContact(){
     return state.addressBookList!.last;
   }
 }

@@ -37,7 +37,7 @@ class RecoveryScreen extends StatefulWidget {
 
 class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
   static const double _mnemonicBoxWidth = 328;
-  static final RegExp _regExpPhraseSeparators = RegExp('[ .,;:|/-]');
+  static final RegExp _regExpPhraseSeparators = RegExp('[ .,;:|/-]+');
   static final String _replaceComaSeparator = ',';
 
   final int _fieldsLength = 24;
@@ -173,7 +173,9 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
             );
             var s = (phraseBySeparator.split(_replaceComaSeparator));
             s.forEach((element) {
-              _mnemonic.add(element);
+              if (element != '') {
+                _mnemonic.add(element);
+              }
             });
           }
           _wordController.text = '';

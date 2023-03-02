@@ -29,7 +29,6 @@ class PendingButtonState extends State<PendingButton> {
   @override
   Widget build(BuildContext context) {
     return NewPrimaryButton(
-      width: widget.width ?? double.infinity,
       title: pending ? widget.pendingText : widget.text,
       globalKey: widget.globalKey,
       callback: (!pending && widget.callback != null)

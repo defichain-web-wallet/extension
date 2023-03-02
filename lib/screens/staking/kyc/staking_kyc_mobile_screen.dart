@@ -42,6 +42,7 @@ class _StakingKycMobileScreenState extends State<StakingKycMobileScreen>
           appBar: NewMainAppBar(
             bgColor: AppColors.viridian.withOpacity(0.16),
             isShowLogo: false,
+            isShowNetworkSelector: false,
           ),
           body: Container(
             decoration:

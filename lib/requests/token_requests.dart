@@ -9,17 +9,23 @@ class TokenRequests {
   var networkHelper = NetworkHelper();
   var tokenHelper = TokensHelper();
 
-  Future<List<dynamic>> getTokensResponse() async {
+  Future<List<dynamic>> getTokensResponse({String? next}) async {
     String hostUrl = SettingsHelper.getHostApiUrl();
     String urlAddress =
-        '$hostUrl/${SettingsHelper.settings.network}/tokens?size=200';
+        '$hostUrl/${SettingsHelper.settings.network}/tokens?size=200${next != null ? '&next=$next' : ''}';
     final Uri url = Uri.parse(urlAddress);
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         var json = jsonDecode(response.body);
-        return List.from(json['data']);
+        var tokens = List.from(json['data']);
+        if(json['page'] != null){
+          var nextTokenList = await getTokensResponse(next: json['page']['next']);
+          tokens.addAll(nextTokenList);
+        }
+
+        return tokens;
       } else {
         return [];
       }

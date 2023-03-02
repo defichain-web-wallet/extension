@@ -1,3 +1,4 @@
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -6,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ErrorScreen extends StatelessWidget {
-  final FlutterErrorDetails errorDetails;
+  final FlutterErrorDetails? errorDetails;
 
   const ErrorScreen({
     Key? key,
-    required this.errorDetails,
+    this.errorDetails,
   }) : super(key: key);
 
   @override
@@ -63,7 +64,7 @@ class ErrorScreen extends StatelessWidget {
                                     ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () => launch(
-                                'https://t.me/jellywallet_en',
+                                JellyLinks.telegramGroup,
                               )),
                         TextSpan(
                           text: ' and try again later.',

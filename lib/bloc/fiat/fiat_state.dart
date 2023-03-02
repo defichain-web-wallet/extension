@@ -4,6 +4,7 @@ enum FiatStatusList { initial, loading, success, expired, failure }
 
 class FiatState extends Equatable {
   final FiatStatusList status;
+  final String? errorMessage;
   final String? phone;
   final String? countryCode;
   final String? phoneWithoutPrefix;
@@ -29,7 +30,8 @@ class FiatState extends Equatable {
   final CryptoRouteModel? cryptoRoute;
 
   FiatState({
-    this.status = FiatStatusList.success,
+    this.status = FiatStatusList.initial,
+    this.errorMessage,
     this.phone,
     this.countryCode,
     this.phoneWithoutPrefix,
@@ -57,34 +59,36 @@ class FiatState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        phone,
-        countryCode,
-        phoneWithoutPrefix,
-        numberPrefix,
-        email,
-        currentIban,
-        kycHash,
-        kycStatus,
-        accessToken,
-        ibansList,
-        assets,
-        foundAssets,
-        history,
-        activeIban,
-        ibanList,
-        personalInfo,
-        countryList,
-        buyableFiatList,
-        sellableFiatList,
-        isShowTutorial,
-        isKycDataComplete,
-        limit,
-        cryptoRoute,
-      ];
+    status,
+    errorMessage,
+    phone,
+    countryCode,
+    phoneWithoutPrefix,
+    numberPrefix,
+    email,
+    currentIban,
+    kycHash,
+    kycStatus,
+    accessToken,
+    ibansList,
+    assets,
+    foundAssets,
+    history,
+    activeIban,
+    ibanList,
+    personalInfo,
+    countryList,
+    buyableFiatList,
+    sellableFiatList,
+    isShowTutorial,
+    isKycDataComplete,
+    limit,
+    cryptoRoute,
+  ];
 
   FiatState copyWith({
     FiatStatusList? status,
+    String? errorMessage,
     String? phone,
     String? countryCode,
     String? phoneWithoutPrefix,
@@ -111,6 +115,7 @@ class FiatState extends Equatable {
   }) {
     return FiatState(
       status: status ?? this.status,
+      errorMessage: errorMessage ?? this.errorMessage,
       phone: phone ?? this.phone,
       countryCode: countryCode ?? this.countryCode,
       phoneWithoutPrefix: phoneWithoutPrefix ?? this.phoneWithoutPrefix,

@@ -60,13 +60,19 @@ class LockCubit extends Cubit<LockState> {
         lockStakingDetails: state.lockStakingDetails,
         lockAnalyticsDetails: state.lockAnalyticsDetails,
       ));
-    } catch (_) {
-      emit(state.copyWith(
-        status: LockStatusList.failure,
-        lockUserDetails: state.lockUserDetails,
-        lockStakingDetails: state.lockStakingDetails,
-        lockAnalyticsDetails: state.lockAnalyticsDetails,
-      ));
+    } catch (err) {
+      if (err == '401') {
+        emit(state.copyWith(
+          status: LockStatusList.expired,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: LockStatusList.failure,
+          lockUserDetails: state.lockUserDetails,
+          lockStakingDetails: state.lockStakingDetails,
+          lockAnalyticsDetails: state.lockAnalyticsDetails,
+        ));
+      }
     }
   }
   loadKycDetails(AccountModel account) async {
@@ -97,29 +103,37 @@ class LockCubit extends Cubit<LockState> {
   }
 
   loadStakingDetails(AccountModel account) async {
-    emit(state.copyWith(
-      status: LockStatusList.loading,
-      lockStakingDetails: state.lockStakingDetails,
-      lockUserDetails: state.lockUserDetails,
-      lockAnalyticsDetails: state.lockAnalyticsDetails,
-    ));
-
-    try {
-      LockStakingModel? data =
-          await lockRequests.getStaking(account.lockAccessToken!);
+    if (state.status != LockStatusList.expired) {
       emit(state.copyWith(
-        status: LockStatusList.success,
-        lockStakingDetails: data,
-        lockUserDetails: state.lockUserDetails,
-        lockAnalyticsDetails: state.lockAnalyticsDetails,
-      ));
-    } catch (_) {
-      emit(state.copyWith(
-        status: LockStatusList.failure,
+        status: LockStatusList.loading,
         lockStakingDetails: state.lockStakingDetails,
         lockUserDetails: state.lockUserDetails,
         lockAnalyticsDetails: state.lockAnalyticsDetails,
       ));
+
+      try {
+        LockStakingModel? data =
+        await lockRequests.getStaking(account.lockAccessToken!);
+        emit(state.copyWith(
+          status: LockStatusList.success,
+          lockStakingDetails: data,
+          lockUserDetails: state.lockUserDetails,
+          lockAnalyticsDetails: state.lockAnalyticsDetails,
+        ));
+      } catch (err) {
+        if (err == '401') {
+          emit(state.copyWith(
+            status: LockStatusList.expired,
+          ));
+        } else {
+          emit(state.copyWith(
+            status: LockStatusList.failure,
+            lockStakingDetails: state.lockStakingDetails,
+            lockUserDetails: state.lockUserDetails,
+            lockAnalyticsDetails: state.lockAnalyticsDetails,
+          ));
+        }
+      }
     }
   }
 
@@ -140,12 +154,18 @@ class LockCubit extends Cubit<LockState> {
         lockUserDetails: state.lockUserDetails,
         lockAnalyticsDetails: data,
       ));
-    } catch (_) {
-      emit(state.copyWith(
-        status: LockStatusList.failure,
-        lockStakingDetails: state.lockStakingDetails,
-        lockUserDetails: state.lockUserDetails,
-      ));
+    } catch (err) {
+      if (err == '401') {
+        emit(state.copyWith(
+          status: LockStatusList.expired,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: LockStatusList.failure,
+          lockStakingDetails: state.lockStakingDetails,
+          lockUserDetails: state.lockUserDetails,
+        ));
+      }
     }
   }
 

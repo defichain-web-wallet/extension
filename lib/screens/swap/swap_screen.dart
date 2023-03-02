@@ -54,6 +54,8 @@ class SwapScreen extends StatefulWidget {
 }
 
 class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin {
+  static const completeKycType = 'Completed';
+
   final TextEditingController amountFromController = TextEditingController(
     text: '0.00',
   );
@@ -421,7 +423,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                       ],
                     AmountField(
                       isAvailableTo: false,
-                      type: TxType.swap,
+                      type: SettingsHelper.isBitcoin() ? null : TxType.swap,
                       account: accountState.activeAccount!,
                       suffix: amountFromInUsd,
                       isDisabledSelector: SettingsHelper.isBitcoin(),
@@ -440,14 +442,18 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         );
                       },
                       onChanged: (value) {
-                        calculateSecondAmount(value, tokensState);
-                        onChangeFromAsset(
-                          value,
-                          accountState,
-                          dexState,
-                          dexCubit,
-                          tokensState,
-                        );
+                        try {
+                          calculateSecondAmount(value, tokensState);
+                          onChangeFromAsset(
+                            value,
+                            accountState,
+                            dexState,
+                            dexCubit,
+                            tokensState,
+                          );
+                        } catch (err) {
+                          print(err);
+                        }
                       },
                       controller: amountFromController,
                       selectedAsset: assetFrom,
@@ -548,11 +554,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                       account: accountState.activeAccount!,
                       suffix: amountToInUsd,
                       isDisabledSelector: SettingsHelper.isBitcoin(),
-                      available: getAvailableAmount(
-                        accountState,
-                        assetTo!.symbol,
-                        dexState,
-                      ),
                       onAssetSelect: (asset) {
                         onSelectToAsset(
                           asset,
@@ -571,13 +572,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                           setState(() {
                             amountToInUsd = balancesHelper.numberStyling(amount,
                                 fixedCount: 2, fixed: true);
-                            if (SettingsHelper.isBitcoin()) {
-                              amountFromInUsd =
-                                  getUdsAmount(
-                                      double.parse(value), tokensState);
-                            } else {
-                              amountFromInUsd = amountToInUsd;
-                            }
+                            amountFromInUsd = amountToInUsd;
                           });
                         } catch (err) {
                           print(err);
@@ -861,11 +856,10 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         fiatCubit.loadCryptoRoute(accountTo);
                         iterator++;
                       }
-                      if (fiatState.status == FiatStatusList.success &&
-                          SettingsHelper.isBitcoin()) {
+                      if (SettingsHelper.isBitcoin()) {
                         return Column(
                           children: [
-                            if (!fiatState.isKycDataComplete!)
+                            if (fiatState.status == FiatStatusList.success && fiatState.kycStatus != completeKycType)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 14.0),
                                 child: InkWell(
@@ -884,6 +878,19 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                           ?.apply(color: AppTheme.pinkColor),
                                     ),
                                   ),
+                                ),
+                              )
+                            else if (fiatState.errorMessage == "\"Missing bank transaction\"")
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 14.0),
+                                child: Text(
+                                  'Please do buy or sell first',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5
+                                      ?.apply(color: Theme.of(context)
+                                      .textTheme
+                                      .headline5!.color!.withOpacity(0.6)),
                                 ),
                               ),
                             NewPrimaryButton(
@@ -915,7 +922,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                 ],
                               ),
                               callback: !isDisableSubmit() &&
-                                      fiatState.isKycDataComplete!
+                                      (fiatState.kycStatus ==
+                                          completeKycType) &&
+                                      fiatState.errorMessage == null
                                   ? () => submitReviewSwap(
                                         accountState,
                                         transactionState,
@@ -1001,31 +1010,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
     return '1 ${assetFrom.symbol} = $priceFrom ${assetTo!.symbol}';
   }
 
-  putAvailableBalance(String asset,
-      TextEditingController controller,
-      TokensState tokensState,
-      AccountState accountState,
-      DexState dexState,) {
-    DexCubit dexCubit = BlocProvider.of<DexCubit>(context);
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-    late double balance;
-    if (SettingsHelper.isBitcoin()) {
-      balance = convertFromSatoshi(bitcoinCubit.state.totalBalance);
-      amountFromController.text = balance.toString();
-    } else {
-      balance = getAvailableAmount(accountState, asset, dexState);
-    }
-
-    calculateSecondAmount(balance.toString(), tokensState);
-    if (asset == assetFrom.symbol) {
-      onChangeFromAsset(
-          balance.toString(), accountState, dexState, dexCubit, tokensState);
-    } else {
-      onChangeToAsset(
-          balance.toString(), accountState, dexState, dexCubit, tokensState);
-    }
-  }
-
   calculateSecondAmount(String value, TokensState tokensState) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     try {
@@ -1038,11 +1022,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
       setState(() {
         amountFromInUsd =
             balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
-        if (SettingsHelper.isBitcoin()) {
-          amountToInUsd = getUdsAmount(dValue, tokensState);
-        } else {
-          amountToInUsd = amountFromInUsd;
-        }
+        amountToInUsd = amountFromInUsd;
       });
     } catch (err) {
       print(err);
@@ -1088,38 +1068,28 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
     if (SettingsHelper.isBitcoin()) {
       double minDeposit = convertFromSatoshi(cryptoRoute!.minDeposit!);
       if (minDeposit >= double.parse(amountFromController.text)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Min amount must be more than $minDeposit BTC',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headline5,
-            ),
-            backgroundColor: Theme
-                .of(context)
-                .snackBarTheme
-                .backgroundColor,
+        showSnackBar(
+          context,
+          title: 'Min amount must be more than $minDeposit BTC',
+          color: AppColors.txStatusError
+              .withOpacity(0.1),
+          prefix: Icon(
+            Icons.close,
+            color: AppColors.txStatusError,
           ),
         );
         return;
       }
     }
     if (isEnoughBalance(state)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Insufficient funds',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headline5,
-          ),
-          backgroundColor: Theme
-              .of(context)
-              .snackBarTheme
-              .backgroundColor,
+      showSnackBar(
+        context,
+        title: 'Insufficient funds',
+        color: AppColors.txStatusError
+            .withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
         ),
       );
       return;
@@ -1146,37 +1116,43 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                       amount: balancesHelper.toSatoshi(amountFromController.text),
                       satPerByte: bitcoinCubit.state.networkFee!.medium!,
                     );
-                    Navigator.push(
+                    if (tx.isError!) {
+                      showSnackBar(
                         context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              SwapSummaryScreen(
-                                assetFrom.symbol!,
-                                assetTo!.symbol!.replaceAll('d', ''),
-                                double.parse(amountFromController.text),
-                                double.parse(amountToController.text),
-                                slippage,
-                                btcTx: tx,
-                              ),
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
-                        ));
-                  } catch (err) {
-                    print(err);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Something went wrong',
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .headline5,
+                        title: tx.error!,
+                        color: AppColors.txStatusError
+                            .withOpacity(0.1),
+                        prefix: Icon(
+                          Icons.close,
+                          color: AppColors.txStatusError,
                         ),
-                        backgroundColor:
-                        Theme
-                            .of(context)
-                            .snackBarTheme
-                            .backgroundColor,
+                      );
+                    } else {
+                      Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                SwapSummaryScreen(
+                                  assetFrom.symbol!,
+                                  assetTo!.symbol!.replaceAll('d', ''),
+                                  double.parse(amountFromController.text),
+                                  double.parse(amountToController.text),
+                                  slippage,
+                                  btcTx: tx.txLoaderList![0].txHex!,
+                                ),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          ));
+                    }
+                  } catch (err) {
+                    showSnackBar(
+                      context,
+                      title: 'Something went wrong',
+                      color: AppColors.txStatusError
+                          .withOpacity(0.1),
+                      prefix: Icon(
+                        Icons.close,
+                        color: AppColors.txStatusError,
                       ),
                     );
                   }
@@ -1194,7 +1170,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                     assetTo!.symbol!,
                     double.parse(amountFromController.text),
                     double.parse(amountToController.text),
-                    slippage,
+                    assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ? slippage + 0.3 : slippage,
                   ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
@@ -1320,14 +1296,23 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
         if (SettingsHelper.isBitcoin()) {
           FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
           double amount = double.parse(amountFromController.text);
+          FiatState f = fiatCubit.state;
+          try {
+            var a = (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
+                .toString();
+            amountToController.text = balancesHelper.numberStyling(
+              double.parse(a),
+              fixedCount: 4,
+              fixed: true,
+            );
+          } catch (err) {
+            amountToController.text = balancesHelper.numberStyling(
+              amount,
+              fixedCount: 4,
+              fixed: true,
+            );
+          }
 
-          var a = (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
-              .toString();
-          amountToController.text = balancesHelper.numberStyling(
-            double.parse(a),
-            fixedCount: 4,
-            fixed: true,
-          );
           dexCubit.updateBtcDex(assetFrom.symbol, assetTo!.symbol, amount,
               double.parse(amountToController.text));
         } else {

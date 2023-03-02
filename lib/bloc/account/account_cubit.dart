@@ -563,18 +563,16 @@ class AccountCubit extends Cubit<AccountState> {
             password,
             accountModel.index!,
           );
-          String accessToken = accountModel.accessToken ??
-              await fiatCubit.getAccessToken(
-                accountModel,
-                keyPair,
-                needRefresh: true,
-              );
-          String lockAccessToken = accountModel.lockAccessToken ??
-              await lockCubit.getAccessToken(
-                accountModel,
-                keyPair,
-                needRefresh: true,
-              );
+          String accessToken = accountModel.accessToken ?? await fiatCubit.getAccessToken(
+            accountModel,
+            keyPair,
+            needRefresh: true,
+          );
+          String lockAccessToken = accountModel.lockAccessToken ?? await lockCubit.getAccessToken(
+            accountModel,
+            keyPair,
+            needRefresh: true,
+          );
           accountModel.lockAccessToken = lockAccessToken;
           accountModel.accessToken = accessToken;
         } catch (err) {
@@ -755,7 +753,15 @@ class AccountCubit extends Cubit<AccountState> {
       activeToken: state.activeToken,
       historyFilterBy: state.historyFilterBy,
     ));
-    await restoreAccountFromStorage(network);
+    emit(state.copyWith(
+      status: AccountStatusList.success,
+      accounts: state.accounts,
+      balances: state.balances,
+      masterKeyPairPublicKey: state.masterKeyPairPublicKey,
+      activeAccount: state.activeAccount,
+      activeToken: state.activeToken,
+      historyFilterBy: state.historyFilterBy,
+    ));
   }
 
   updateSwapTutorialStatus(String status) {
@@ -830,5 +836,14 @@ class AccountCubit extends Cubit<AccountState> {
     } catch (err) {
       throw err;
     }
+  clearAccessTokens() async {
+    state.accounts!.forEach((element) {
+      element.accessToken = null;
+      element.lockAccessToken = null;
+    });
+    await saveAccountsToStorage(
+      accountsMainnet: state.accounts,
+      masterKeyPairMainnetPublicKey: state.masterKeyPairPublicKey,
+    );
   }
 }

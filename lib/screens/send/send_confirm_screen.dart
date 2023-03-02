@@ -236,7 +236,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
         amount: balancesHelper.toSatoshi(widget.amount.toString()),
         satPerByte: widget.fee,
       );
-      var txResponse = await bitcoinCubit.sendTransaction(tx);
+      var txResponse = await bitcoinCubit.sendTransaction(tx.txLoaderList![0].txHex!);
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(

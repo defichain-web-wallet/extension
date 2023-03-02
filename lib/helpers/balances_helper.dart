@@ -138,4 +138,8 @@ class BalancesHelper {
         .join();
     return stringList.join('.');
   }
+
+  bool isAmountEmpty(String amount) {
+    return (amount == '0' || amount == '0.0' || amount == '');
+  }
 }

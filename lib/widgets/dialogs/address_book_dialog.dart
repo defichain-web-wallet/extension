@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -27,10 +28,12 @@ class AddressBookDialog extends StatefulWidget {
   State<AddressBookDialog> createState() => _AddressBookDialogState();
 }
 
-class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
+class _AddressBookDialogState extends State<AddressBookDialog>
+    with ThemeMixin, NetworkMixin {
   int iterator = 0;
   TextEditingController controller = TextEditingController();
   List<AddressBookModel>? viewList = [];
+  List<AddressBookModel>? allContactsList = [];
   List<AddressBookModel>? lastSent = [];
   bool isSelectedContacts = true;
   bool isSelectedLastSent = false;
@@ -48,7 +51,12 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
       builder: (context, addressBookState) {
         if (iterator == 1 &&
             addressBookState.status == AddressBookStatusList.success) {
-          viewList = addressBookState.addressBookList;
+          allContactsList = addressBookState.addressBookList;
+          allContactsList!.forEach((element) {
+            if (element.network == currentNetworkName()) {
+              viewList!.add(element);
+            }
+          });
           lastSent = addressBookState.lastSentList;
           iterator++;
         }
@@ -234,7 +242,7 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin {
                                       child: StatusLogoAndTitle(
                                         title: 'Oops!',
                                         subtitle:
-                                            'Jelly can\'t see any contact in your address book',
+                                            'Jelly can\'t see any contacts in your address book',
                                         isTitlePosBefore: true,
                                       ),
                                     ),

@@ -46,20 +46,22 @@ class AssetList extends StatelessWidget {
           return BlocBuilder<TokensCubit, TokensState>(
               builder: (context, tokensState) {
             if (tokensState.status == TokensStatusList.success) {
+              List<TokensModel> tokens = tokenHelper.getTokensList(
+                balances,
+                tokensState,
+              );
+
               return SliverFixedExtentList(
                 itemExtent: 64.0 + 6,
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    String coin = balances[index].token!;
+                    String coin = tokens[index].symbol!;
                     String tokenName = SettingsHelper.isBitcoin()
                         ? coin
                         : tokenHelper.getTokenWithPrefix(coin);
-                    double tokenBalance =
-                        convertFromSatoshi(balances[index].balance!);
-                    List<TokensModel> tokens = tokenHelper.getTokensList(
-                      balances,
-                      tokensState,
-                    );
+                    double tokenBalance = convertFromSatoshi(balances
+                        .firstWhere((element) => element.token == coin)
+                        .balance!);
                     return Container(
                       padding: const EdgeInsets.only(
                         bottom: 4,
@@ -78,7 +80,7 @@ class AssetList extends StatelessWidget {
                       ),
                     );
                   },
-                  childCount: balances.length,
+                  childCount: tokens.length,
                 ),
               );
             } else {

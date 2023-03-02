@@ -30,6 +30,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
   late String address;
   String hintText =
       'This is your personal wallet address.\nYou can use it to receive DFI and DST tokens like dBTC, dETH, dTSLA & more.';
+  String btcHintText = 'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
 
   cutAddress(String s) {
     return s.substring(0, 14) + '...' + s.substring(28, 42);
@@ -192,7 +193,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     width: 272,
                                     height: 48,
                                     child: Text(
-                                      hintText,
+                                      SettingsHelper.isBitcoin() ? btcHintText : hintText,
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context).textTheme.headline6!.apply(
                                           color: Theme.of(context).textTheme.headline6!.color!

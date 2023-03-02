@@ -1,6 +1,6 @@
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:defi_wallet/widgets/defi_checkbox.dart';
+import 'package:defi_wallet/widgets/common/app_radio_button.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -38,7 +38,8 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
         child: Container(
           width: 94,
           height: 82,
-          padding: const EdgeInsets.only(left: 10, top: 10, bottom: 12),
+          padding:
+              const EdgeInsets.only(left: 10, top: 10, bottom: 12, right: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8)),
             color: widget.isActive
@@ -49,8 +50,8 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
                     gradient: gradientWrongMnemonicWord,
                   )
                 : Border.all(
-                    color:
-                        LightColors.assetItemSelectorBorderColor.withOpacity(0.24),
+                    color: LightColors.assetItemSelectorBorderColor
+                        .withOpacity(0.24),
                   ),
           ),
           child: Column(
@@ -68,15 +69,11 @@ class _AssetItemSelectorState extends State<AssetItemSelector> {
                     ),
                   ),
                   Container(
-                    child: DefiCheckbox(
-                      width: 34,
-                      callback: (val) {
+                    child: AppRadioButton(
+                      callback: () {
                         widget.onChange();
                       },
-                      isShowLabel: false,
-                      value: widget.isActive,
-                      focusNode: FocusNode(),
-                      textWidget: Container(),
+                      isSelect: widget.isActive,
                     ),
                   )
                 ],

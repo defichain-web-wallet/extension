@@ -1,3 +1,5 @@
+// import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
+// import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/widgets/buttons/back_button.dart';
 import 'package:flutter/material.dart';
@@ -43,16 +45,14 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: toolbarHeight,
       leadingWidth: leadingWidth,
       automaticallyImplyLeading: false,
-      leading: isWidgetBack
-          ? Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: Row(
-                children: [
-                  backButton(context),
-                ],
-              ),
-            )
-          : null,
+      leading: isWidgetBack ? Padding(
+        padding: const EdgeInsets.only(left: 8),
+        child: Row(
+          children: [
+            backButton(context),
+          ],
+        ),
+      ) : null,
       centerTitle: true,
       title: SvgPicture.asset(
         'assets/jelly_logo_wallet.svg',

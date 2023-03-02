@@ -164,11 +164,9 @@ class FiatCubit extends Cubit<FiatState> {
     ));
 
     try {
-      String accessToken =
-          state.accessToken ?? await getAccessTokenFromStorage(account);
+      String accessToken = state.accessToken ?? await getAccessTokenFromStorage(account);
       Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
-      List<FiatHistoryModel> history =
-          await dfxRequests.getHistory(accessToken);
+      List<FiatHistoryModel> history = await dfxRequests.getHistory(accessToken);
 
       emit(state.copyWith(
         status: FiatStatusList.success,
@@ -189,24 +187,30 @@ class FiatCubit extends Cubit<FiatState> {
         history: history,
       ));
     } catch (err) {
-      emit(state.copyWith(
-        status: FiatStatusList.failure,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        kycHash: state.kycHash,
-        kycStatus: state.kycStatus,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        assets: state.assets,
-        isShowTutorial: isShowTutorial,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
-      ));
+      if (err == '401') {
+        emit(state.copyWith(
+          status: FiatStatusList.expired,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: FiatStatusList.failure,
+          phone: state.phone,
+          countryCode: state.countryCode,
+          phoneWithoutPrefix: state.phoneWithoutPrefix,
+          numberPrefix: state.numberPrefix,
+          kycHash: state.kycHash,
+          kycStatus: state.kycStatus,
+          email: state.email,
+          currentIban: state.currentIban,
+          ibansList: state.ibansList,
+          assets: state.assets,
+          isShowTutorial: isShowTutorial,
+          isKycDataComplete: state.isKycDataComplete,
+          limit: state.limit,
+          history: state.history,
+          accessToken: state.accessToken,
+        ));
+      }
     }
   }
 
@@ -235,7 +239,7 @@ class FiatCubit extends Cubit<FiatState> {
     ));
     try {
       List<AssetByFiatModel> buyableAssets =
-          await dfxRequests.getAvailableAssets(state.accessToken!);
+      await dfxRequests.getAvailableAssets(state.accessToken!);
 
       List<AssetByFiatModel> result =
           buyableAssets.where((element) => element.buyable!).toList();
@@ -335,18 +339,19 @@ class FiatCubit extends Cubit<FiatState> {
       history: state.history,
       accessToken: state.accessToken,
     ));
-    List<IbanModel> ibanList =
-        await dfxRequests.getIbanList(state.accessToken!);
+    List<IbanModel> ibanList = await dfxRequests.getIbanList(state.accessToken!);
     List<IbanModel> activeIbanList = ibanList
         .where((el) =>
-            el.active! && el.type == 'Wallet' && asset!.name == el.asset!.name)
+            el.active! &&
+            el.type == 'Wallet' &&
+            asset!.name == el.asset!.name)
         .toList();
     IbanModel? iban;
 
     try {
       if (asset != null) {
-        iban = activeIbanList
-            .firstWhere((element) => element.asset!.name == asset.name);
+        iban = activeIbanList.firstWhere((element) =>
+          element.asset!.name == asset.name);
       } else if (isNewIban && asset != null) {
         iban = activeIbanList.firstWhere(
           (element) =>
@@ -439,8 +444,7 @@ class FiatCubit extends Cubit<FiatState> {
     ));
 
     try {
-      List<dynamic> countryList =
-          await dfxRequests.getCountryList(state.accessToken!);
+      List<dynamic> countryList = await dfxRequests.getCountryList(state.accessToken!);
       emit(state.copyWith(
         status: FiatStatusList.success,
         phone: state.phone,
@@ -690,31 +694,28 @@ class FiatCubit extends Cubit<FiatState> {
       buyableFiatList: state.buyableFiatList,
     ));
     try {
-      List<FiatModel> fiatList =
-          await dfxRequests.getFiatList(state.accessToken!);
+      List<FiatModel> fiatList = await dfxRequests.getFiatList(state.accessToken!);
       List<FiatModel> sellableFiatList =
-          fiatList.where((el) => el.sellable!).toList();
+        fiatList.where((el) => el.sellable!).toList();
       List<FiatModel> buyableFiatList =
-          fiatList.where((el) => el.buyable!).toList();
+        fiatList.where((el) => el.buyable!).toList();
 
       List<AssetByFiatModel> assets =
-          await dfxRequests.getAvailableAssets(state.accessToken!);
+      await dfxRequests.getAvailableAssets(state.accessToken!);
 
-      List<IbanModel> ibanList =
-          await dfxRequests.getIbanList(state.accessToken!);
+      List<IbanModel> ibanList = await dfxRequests.getIbanList(state.accessToken!);
       String targetType = (isSell) ? 'Sell' : 'Wallet';
       List<IbanModel> activeIbanList =
-          ibanList.where((el) => el.active! && el.type == targetType).toList();
+      ibanList.where((el) => el.active! && el.type == targetType).toList();
       IbanModel? iban;
 
       try {
         if (state.currentIban != null && state.currentIban != '') {
-          iban = activeIbanList.firstWhere((element) =>
-              (element.iban == state.currentIban!.replaceAll(' ', '')));
+          iban = activeIbanList
+              .firstWhere((element) => (element.iban == state.currentIban!.replaceAll(' ', '')));
         } else {
           if (isSell) {
-            iban =
-                activeIbanList.firstWhere((element) => element.type == 'Sell');
+            iban = activeIbanList.firstWhere((element) => element.type == 'Sell');
           } else {
             iban = activeIbanList[0];
           }
@@ -782,14 +783,13 @@ class FiatCubit extends Cubit<FiatState> {
       accessToken: state.accessToken,
     ));
     try {
-      String accessToken =
-          state.accessToken ?? await getAccessTokenFromStorage(account);
+      String accessToken = state.accessToken ?? await getAccessTokenFromStorage(account);
       Map<String, dynamic> data = await dfxRequests.getUserDetails(accessToken);
 
       CryptoRouteModel? route;
       if (data['kycDataComplete']) {
         route = await dfxRequests.getCryptoRoutes(accessToken);
-        if (route == null) {
+        if (route == null && data['kycStatus'] == 'Completed') {
           route = await dfxRequests.createCryptoRoute(accessToken);
         }
       }
@@ -799,10 +799,12 @@ class FiatCubit extends Cubit<FiatState> {
         accessToken: accessToken,
         kycHash: data['kycHash'],
         isKycDataComplete: data['kycDataComplete'],
+        kycStatus: data['kycStatus'],
       ));
     } catch (err) {
       emit(state.copyWith(
         status: FiatStatusList.failure,
+        errorMessage: err.toString(),
         phone: state.phone,
         countryCode: state.countryCode,
         phoneWithoutPrefix: state.phoneWithoutPrefix,

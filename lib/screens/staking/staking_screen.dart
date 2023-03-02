@@ -65,6 +65,7 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                 appBar: NewMainAppBar(
                   bgColor: AppColors.viridian.withOpacity(0.16),
                   isShowLogo: false,
+                  isShowNetworkSelector: false,
                 ),
                 body: Container(
                   decoration: BoxDecoration(

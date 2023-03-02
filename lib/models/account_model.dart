@@ -7,7 +7,8 @@ import 'address_model.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 
 class AccountModel {
-  @required int? index;
+  @required
+  int? index;
   List<AddressModel>? addressList;
   AddressModel? bitcoinAddress;
   List<BalanceModel>? balanceList;
@@ -32,7 +33,7 @@ class AccountModel {
     this.activeToken,
     this.accessToken,
     this.lockAccessToken,
-  }){
+  }) {
     this.name = 'Account ${this.index! + 1}';
   }
 
@@ -40,7 +41,11 @@ class AccountModel {
     this.index = jsonModel["index"];
     this.name = jsonModel["name"];
     this.activeToken = jsonModel["activeToken"];
-    this.accessToken = jsonModel["accessToken"];
+    try {
+      this.accessToken = jsonModel["accessToken"];
+    } catch (err) {
+      this.accessToken = null;
+    }
     try {
       this.lockAccessToken = jsonModel["lockAccessToken"];
     } catch (err) {
@@ -84,6 +89,7 @@ class AccountModel {
   String getActiveAddress({required bool isChange}) {
     return this.addressList!.first.address!;
   }
+
   AddressModel getActiveAddressModel({required bool isChange}) {
     return this.addressList!.first;
   }
@@ -99,7 +105,8 @@ class AccountModel {
     data['addressList'] = this.addressList?.map((e) => e.toJson()).toList();
     data['balanceList'] = this.balanceList?.map((e) => e.toJson()).toList();
     data['historyList'] = this.historyList?.map((e) => e.toJson()).toList();
-    data['testnetHistoryList'] = this.testnetHistoryList?.map((e) => e.toJson()).toList();
+    data['testnetHistoryList'] =
+        this.testnetHistoryList?.map((e) => e.toJson()).toList();
     return data;
   }
 }

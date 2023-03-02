@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/helpers/addresses_helper.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -10,7 +11,7 @@ import 'package:flutter/material.dart';
 class CreateEditContactDialog extends StatefulWidget {
   final bool isEdit;
   final Function()? deleteCallback;
-  final Function(String name, String address) confirmCallback;
+  final Function(String name, String address, String network) confirmCallback;
   final String contactName;
   final String address;
 
@@ -29,7 +30,7 @@ class CreateEditContactDialog extends StatefulWidget {
 }
 
 class _CreateEditContactDialogState extends State<CreateEditContactDialog>
-    with ThemeMixin {
+    with ThemeMixin, NetworkMixin {
   AddressesHelper addressHelper = AddressesHelper();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
@@ -44,9 +45,11 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   String subtitleText = 'Enter name and address';
   String titleDeleteContact = 'Delete contact';
   bool isValidAddress = false;
+  bool isValidBitcoinAddress = false;
   late String titleText;
   late double contentHeight;
   late bool isEnable;
+  late String network;
 
   @override
   void dispose() {
@@ -68,13 +71,11 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
     super.initState();
   }
 
-
-
   checkButtonStatus() {
     setState(() {
-      if (_nameController.text.length > 3 &&
+      if (_nameController.text.length > 0 &&
           _addressController.text.isNotEmpty &&
-          isValidAddress) {
+          (isValidAddress || isValidBitcoinAddress)) {
         isEnable = true;
       } else {
         isEnable = false;
@@ -118,10 +119,12 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
               NewPrimaryButton(
                 width: 104,
                 callback: isEnable
-                    ? () {
+                    ? () async {
+                        network = await addressNetwork(_addressController.text);
                         widget.confirmCallback!(
                           _nameController.text,
                           _addressController.text,
+                          network,
                         );
                       }
                     : null,
@@ -224,32 +227,43 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                 onDoubleTap: () {
                                   nameFocusNode.requestFocus();
                                   if (_nameController.text.isNotEmpty) {
-                                    _nameController.selection =
-                                        TextSelection(
-                                            baseOffset: 0,
-                                            extentOffset:
-                                            _nameController
-                                                .text.length);
+                                    _nameController.selection = TextSelection(
+                                        baseOffset: 0,
+                                        extentOffset:
+                                            _nameController.text.length);
                                   }
                                 },
                                 child: TextFormField(
                                   focusNode: nameFocusNode,
                                   controller: _nameController,
                                   decoration: InputDecoration(
-                                    hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                    hoverColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .hoverColor,
                                     filled: true,
-                                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                    enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                    focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                    fillColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .fillColor,
+                                    enabledBorder: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .enabledBorder,
+                                    focusedBorder: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .focusedBorder,
                                     hintStyle: passwordField.copyWith(
-                                      color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                      color: isDarkTheme()
+                                          ? DarkColors.hintTextColor
+                                          : LightColors.hintTextColor,
                                     ),
                                     hintText: hintContactName,
-
                                   ),
                                   onChanged: (value) async {
-                                    isValidAddress = await addressHelper
-                                        .validateAddress(_addressController.text);
+                                    isValidAddress =
+                                        await addressHelper.validateAddress(
+                                            _addressController.text);
+                                    isValidBitcoinAddress =
+                                        await addressHelper.validateBtcAddress(
+                                            _addressController.text);
                                     checkButtonStatus();
                                   },
                                 ),
@@ -280,28 +294,40 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                         TextSelection(
                                             baseOffset: 0,
                                             extentOffset:
-                                            _addressController
-                                                .text.length);
+                                                _addressController.text.length);
                                   }
                                 },
                                 child: TextFormField(
                                   focusNode: addressFocusNode,
                                   controller: _addressController,
                                   decoration: InputDecoration(
-                                    hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                    hoverColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .hoverColor,
                                     filled: true,
-                                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                    enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                    focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                    fillColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .fillColor,
+                                    enabledBorder: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .enabledBorder,
+                                    focusedBorder: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .focusedBorder,
                                     hintStyle: passwordField.copyWith(
-                                      color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                      color: isDarkTheme()
+                                          ? DarkColors.hintTextColor
+                                          : LightColors.hintTextColor,
                                     ),
                                     hintText: hintAddress,
-
                                   ),
                                   onChanged: (value) async {
-                                    isValidAddress = await addressHelper
-                                        .validateAddress(_addressController.text);
+                                    isValidAddress =
+                                        await addressHelper.validateAddress(
+                                            _addressController.text);
+                                    isValidBitcoinAddress =
+                                        await addressHelper.validateBtcAddress(
+                                            _addressController.text);
                                     checkButtonStatus();
                                   },
                                 ),

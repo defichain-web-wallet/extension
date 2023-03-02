@@ -39,4 +39,7 @@ class HiveNames {
   static const String defiAddressBook = 'defi_address_book';
   static const String btcAddressBook = 'btc_address_book';
   static const String lastSent = 'last_sent';
+
+  // address book
+  static const String addressBook = 'address_book';
 }

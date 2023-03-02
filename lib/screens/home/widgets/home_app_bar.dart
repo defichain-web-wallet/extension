@@ -1,3 +1,5 @@
+// import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
+// import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/logo_helper.dart';
 import 'package:defi_wallet/screens/home/widgets/account_select.dart';

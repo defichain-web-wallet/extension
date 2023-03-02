@@ -118,7 +118,6 @@ class DfxRequests {
   }
 
   Future<CryptoRouteModel> createCryptoRoute(String accessToken) async {
-    print('1');
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/cryptoRoute');
 
@@ -135,17 +134,39 @@ class DfxRequests {
           "id": 2}
       });
       final response = await http.post(url, headers: headers, body: body);
-      print(response);
       if (response.statusCode == 200) {
         dynamic data = jsonDecode(response.body);
 
         return CryptoRouteModel.fromJson(data);
       } else {
-        print(2);
+        throw Error.safeToString(jsonDecode(response.body)['message']);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  Future<bool> transferKYC(String accessToken) async {
+    try {
+      final Uri url = Uri.parse('https://api.dfx.swiss/v1/kyc/transfer');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final body = jsonEncode({
+        "walletName": "LOCK.space"
+      });
+
+      final response = await http.put(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
         throw Error.safeToString(response.statusCode);
       }
     } catch (err) {
-      print(3);
       throw err;
     }
   }

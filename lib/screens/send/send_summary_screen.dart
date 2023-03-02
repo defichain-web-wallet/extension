@@ -10,17 +10,16 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
-import 'package:defi_wallet/my_app.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/screens/send/send_status_screen.dart';
-import 'package:defi_wallet/screens/settings/settings.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -64,14 +63,15 @@ class SendSummaryScreen extends StatefulWidget {
 }
 
 class _SendSummaryScreenState extends State<SendSummaryScreen>
-    with ThemeMixin, NetworkMixin {
+    with ThemeMixin, NetworkMixin, SnackBarMixin {
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
   String secondStepLoaderText =
       'One second, Jelly is preparing your transaction!';
-  String titleText = 'Summary';
+
   String subtitleText =
       'Please confirm the process on your device to complete it.';
+  String titleText = 'Summary';
   bool isShowAdded = false;
   late String address;
 
@@ -570,20 +570,50 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
         amount: balancesHelper.toSatoshi(widget.amount.toString()),
         satPerByte: widget.fee!,
       );
-      var txResponse = await bitcoinCubit.sendTransaction(tx);
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-              appBarTitle: 'Change',
+      if (tx.isError!) {
+        showSnackBar(
+          context,
+          title: tx.error!,
+          color: AppColors.txStatusError.withOpacity(0.1),
+          prefix: Icon(
+            Icons.close,
+            color: AppColors.txStatusError,
+          ),
+        );
+      } else {
+        var txResponse =
+            await bitcoinCubit.sendTransaction(tx.txLoaderList![0].txHex!);
+
+        showDialog(
+          barrierColor: Color(0x0f180245),
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext dialogContext) {
+            return TxStatusDialog(
               txResponse: txResponse,
-              amount: widget.amount,
-              token: 'BTC',
-              address: address),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+              callbackOk: () async {
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) =>
+                        HomeScreen(
+                      isLoadTokens: true,
+                    ),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                );
+              },
+              callbackTryAgain: () async {
+                print('TryAgain');
+                await _sendTransaction(
+                    context, tokens, widget.token.symbol!, account, password,
+                    callbackOk: callbackOk);
+              },
+            );
+          },
+        );
+      }
     } else {
       await _sendTransaction(
           context, tokens, widget.token.symbol!, account, password,

@@ -8,14 +8,9 @@ Jellywallet supports Google Chrome, and Chromium-based browsers. We recommend us
 
 1. Install flutter from [official site](https://docs.flutter.dev/get-started/install):
 
-2. At the command prompt, go to the flutter directory and change the flutter version:
+2. Clone this repository:
 
-        cd flutter
-        git checkout 2.10.3
-
-3. Clone this repository:
-
-4. Go to directory with app and install dependencies:
+3. Go to directory with app and install dependencies:
 
         flutter pub get
 

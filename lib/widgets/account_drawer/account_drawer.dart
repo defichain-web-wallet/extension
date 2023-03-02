@@ -4,8 +4,6 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
-import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
-import 'package:defi_wallet/screens/ledger/loaders/ledger_send_loader_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_screen.dart';
 import 'package:defi_wallet/utils/theme/theme_manager.dart';
@@ -306,34 +304,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                             height: 5,
                           ),
                           AccountMenuButton(
-                            callback: (index) {
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          LedgerSendLoaderScreen(
-                                    callback: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              LedgerCheckScreen(
-                                            onStartSign: (p, c) async => {},
-                                          ),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
-                              );
-                            },
+                            callback: (index) {},
                             iconPath: 'assets/icons/ledger.svg',
                             title: 'Ledger',
                             isFuture: true,

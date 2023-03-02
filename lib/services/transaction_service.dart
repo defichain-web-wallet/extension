@@ -12,7 +12,6 @@ import 'package:defi_wallet/requests/btc_requests.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
 import 'package:defi_wallet/requests/token_requests.dart';
 import 'package:defi_wallet/requests/transaction_requests.dart';
-import 'package:defi_wallet/services/signing_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 import 'package:defi_wallet/models/utxo_model.dart';
@@ -29,11 +28,10 @@ class TransactionService {
   var balancesHelper = BalancesHelper();
   var tokensRequests = TokenRequests();
   List<UtxoModel> accountUtxoList = [];
-  var signingSelector = SigningServiceSelector();
 
   Future<TxErrorModel> removeLiqudity(
       {required AccountModel account,
-      required ECPair? keyPair,
+      required ECPair keyPair,
       required AssetPairModel token,
       required int amount}) async {
     await _getUtxoList(account);
@@ -53,7 +51,7 @@ class TransactionService {
     return await prepareTx(responseModel, TxType.removeLiq);
   }
 
-  Future<String> createBTCTransaction(
+  Future<TxErrorModel> createBTCTransaction(
       {required ECPair keyPair,
       required AccountModel account,
       required String destinationAddress,
@@ -64,6 +62,12 @@ class TransactionService {
 
     var utxos = await BtcRequests().getUTXOs(address: account.bitcoinAddress!);
     var fee = calculateBTCFee(2, 2, satPerByte);
+    int sumUTXO = utxos.length > 0
+        ? utxos.map((item) => item.value!).reduce((a, b) => a + b)
+        : 0;
+    if(sumUTXO < fee+amount){
+      return TxErrorModel(isError: true, error: 'Not enough balance. Please wait for the previous transaction');
+    }
     var selectedUtxo = _utxoSelector(utxos, fee, amount);
     if (selectedUtxo.length > 2) {
       selectedUtxo = _utxoSelector(
@@ -98,12 +102,12 @@ class TransactionService {
       _txb.sign(vin: index, keyPair: keyPair, witnessValue: utxo.value);
     });
 
-    return _txb.build().toHex();
+    return TxErrorModel(isError: false, txLoaderList: [TxLoaderModel(txHex: _txb.build().toHex(), type: TxType.send)]);
   }
 
   Future<TxErrorModel> createAndSendLiqudity(
       {required AccountModel account,
-      required ECPair? keyPair,
+      required ECPair keyPair,
       required String tokenA,
       required String tokenB,
       required int amountA,
@@ -185,7 +189,7 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendTransaction(
       {required AccountModel account,
-      required ECPair? keyPair,
+      required ECPair keyPair,
       required String destinationAddress,
       required int amount,
       required List<TokensModel> tokens}) async {
@@ -256,7 +260,7 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendToken(
       {required AccountModel account,
-      required ECPair? keyPair,
+      required ECPair keyPair,
       required String token,
       required String destinationAddress,
       required int amount,
@@ -274,11 +278,7 @@ class TransactionService {
         amount: 0,
         additional: (txb, nw, newUtxo) {
           txb.addAccountToAccountOutputAt(
-              tokenId,
-              account.getActiveAddress(isChange: false),
-              destinationAddress,
-              amount,
-              0);
+              tokenId, account.getActiveAddress(isChange: false), destinationAddress, amount, 0);
         },
         useAllUtxo: true);
     if (responseModel.isError) {
@@ -290,7 +290,7 @@ class TransactionService {
 
   Future<TxErrorModel> createAndSendSwap(
       {required AccountModel account,
-      required ECPair? keyPair,
+      required ECPair keyPair,
       required String tokenFrom,
       required String tokenTo,
       required int amount,
@@ -326,7 +326,7 @@ class TransactionService {
           return TxErrorModel(isError: true, error: responseModel.error);
         }
 
-        txErrorModel = await prepareTx(responseModel, TxType.convertUtxo);
+         txErrorModel = await prepareTx(responseModel, TxType.convertUtxo);
         if (txErrorModel.isError!) {
           return txErrorModel;
         }
@@ -364,7 +364,7 @@ class TransactionService {
 
   Future<TxResponseModel> utxoToAccountTransaction(
       {required AccountModel account,
-      required ECPair? keyPair,
+      required ECPair keyPair,
       required int amount,
       required int tokenId}) {
     return createTransaction(
@@ -382,7 +382,7 @@ class TransactionService {
   }
 
   Future<TxResponseModel> createTransaction(
-      {required ECPair? keyPair,
+      {required ECPair keyPair,
       required List<UtxoModel> utxoList,
       required String destinationAddress,
       required String changeAddress,
@@ -397,7 +397,6 @@ class TransactionService {
     List<UtxoModel> selectedUTXO = [];
     List<UtxoModel> newUTXO = [];
 
-    var signingService = await signingSelector.get();
     if (utxoList.length == 0) {
       return TxResponseModel(
           isError: true,
@@ -413,21 +412,23 @@ class TransactionService {
       selectedUTXO = _utxoSelector(utxoList, FEE, amount);
     }
 
-    final network = networkHelper.getNetwork(SettingsHelper.settings.network!);
     final _txb = TransactionBuilder(
         network: networkHelper.getNetwork(SettingsHelper.settings.network!));
     _txb.setVersion(2);
 
-    for (var utxo in selectedUTXO) {
-      var pubKey = await signingService.getPublicKey(
-          account, utxo.address!, SettingsHelper.settings.network!);
-      final p2wpkh =
-          P2WPKH(data: PaymentData(pubkey: pubKey), network: network).data!;
-      final redeemScript = p2wpkh.output;
-
-      _txb.addInput(utxo.mintTxId, utxo.mintIndex, 0xffffffff, redeemScript);
+    selectedUTXO.forEach((utxo) {
+      _txb.addInput(
+          utxo.mintTxId,
+          utxo.mintIndex,
+          null,
+          P2WPKH(
+                  data: PaymentData(pubkey: keyPair.publicKey),
+                  network: networkHelper
+                      .getNetwork(SettingsHelper.settings.network!))
+              .data!
+              .output);
       sum += utxo.value!;
-    }
+    });
 
     if (sum < amount + FEE) {
       return TxResponseModel(
@@ -459,11 +460,13 @@ class TransactionService {
       await additional(_txb,
           networkHelper.getNetwork(SettingsHelper.settings.network!), newUTXO);
     }
-    var txHex = await signingService.signTransaction(_txb, account,
-        selectedUTXO, SettingsHelper.settings.network!, changeAddress);
+
+    selectedUTXO.asMap().forEach((index, utxo) {
+      _txb.sign(vin: index, keyPair: keyPair, witnessValue: utxo.value);
+    });
 
     TxResponseModel responseModel = TxResponseModel(
-        hex: txHex,
+        hex: _txb.build().toHex(),
         usingUTXO: selectedUTXO,
         newUTXO: newUTXO,
         isError: false,

@@ -30,6 +30,7 @@
 .pub-cache/
 .pub/
 /build/
+/scripts/client_secrets.json
 
 # Web related
 
@@ -49,5 +50,7 @@ web/node_modules
 web/js
 web/dist
 web/.parcel-cache
+pubspec.lock
+/ios/Podfile.lock
 pubspec.lock
 /ios/Podfile.lock
