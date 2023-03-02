@@ -44,13 +44,11 @@ class _EarnScreenNewState extends State<EarnScreenNew>
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
-      await tokensCubit.calculateEarnPage(context);
-      await fiatCubit.loadUserDetails(accountCubit.state.accounts!.first);
-      await lockCubit.loadAnalyticsDetails(accountCubit.state.accounts!.first);
-      await lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
-      await lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
-    });
+    tokensCubit.calculateEarnPage(context);
+    fiatCubit.loadUserDetails(accountCubit.state.accounts!.first);
+    lockCubit.loadAnalyticsDetails(accountCubit.state.accounts!.first);
+    lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
+    lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
   }
 
   @override
@@ -133,12 +131,13 @@ class _EarnScreenNewState extends State<EarnScreenNew>
                           height: 18,
                         ),
                         BlocBuilder<TokensCubit, TokensState>(
-                            builder: (tokensContext, tokensState) {
-                              print(tokensState.status);
-                              //TODO remove comment
-                          return Container();
-                          // return liqudityMiningCard(tokensState, tokensState.status == TokensStatusList.loading);
-                        }),
+                          builder: (tokensContext, tokensState) {
+                            return liqudityMiningCard(
+                              tokensState,
+                              tokensState.status == TokensStatusList.loading,
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
