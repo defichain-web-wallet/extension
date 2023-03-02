@@ -6,6 +6,7 @@ import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/assets/asset_icon.dart';
+import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -91,11 +92,10 @@ class _AssetCardState extends State<AssetCard> {
           children: [
             if (widget.tokens[widget.index].isPair!)
               AssetPair(
-                pair: widget.tokens[widget.index].symbol!,
-                size: 38,
+                pair: widget.tokens[widget.index].symbol!
               ),
             if (!widget.tokens[widget.index].isPair!)
-              TokensHelper().getLogoToken(widget.tokens[widget.index].symbol!),
+              AssetLogo(tokenName: widget.tokens[widget.index].symbol!),
             SizedBox(
               width: 10,
             ),

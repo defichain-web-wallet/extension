@@ -1,6 +1,7 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,10 +12,8 @@ class TokenListTile extends StatefulWidget {
   final bool isSelect;
   final bool isSingleSelect;
   final bool isConfirm;
-  final String imgPath;
   final String tokenName;
   final String availableTokenName;
-  final Color? tokenColor;
 
   const TokenListTile({
     Key? key,
@@ -22,10 +21,8 @@ class TokenListTile extends StatefulWidget {
     required this.isSelect,
     this.isSingleSelect = false,
     this.isConfirm = false,
-    required this.imgPath,
     required this.tokenName,
     required this.availableTokenName,
-    this.tokenColor,
   }) : super(key: key);
 
   @override
@@ -77,18 +74,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                             SizedBox(
                               width: 11,
                             ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: widget.tokenColor!.withOpacity(0.16),
-                              ),
-                              child: SvgPicture.asset(
-                                widget.imgPath,
-                                height: 32,
-                                width: 32,
-                              ),
-                            ),
+                            AssetLogo(tokenName: widget.tokenName,),
                             SizedBox(
                               width: 11,
                             ),
