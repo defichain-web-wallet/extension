@@ -56,6 +56,10 @@ class _TransactionHistoryState extends State<TransactionHistory>
     }
   }
 
+  _getTypeFormat(String value, String token) {
+    return (value == 'AccountToAccount' && token == 'BTC') ? 'RECEIVE' : value;
+  }
+
   @override
   void initState() {
     _controller = ScrollController();
@@ -150,7 +154,7 @@ class _TransactionHistoryState extends State<TransactionHistory>
                           tokenName = historyList[index].tokens![0].code;
                           txValue = historyList[index].value;
                           isSend = historyList[index].category == 'SEND';
-                          type = historyList[index].category;
+                          type = _getTypeFormat(historyList[index].category, historyList[index].tokens[0].code);
                           DateTime dateTime =
                               DateTime.parse(historyList[index].date);
                           date = formatter.format(
@@ -239,20 +243,26 @@ class _TransactionHistoryState extends State<TransactionHistory>
                               ),
                               child: ListTile(
                                 onTap: () {
-                                  if (!SettingsHelper.isBitcoin() && SettingsHelper.settings.network == 'mainnet') {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation1, animation2) =>
-                                            HistoryDetails(
-                                              dfxHistoryModel: historyList[index],
-                                            ),
-                                        transitionDuration: Duration.zero,
-                                        reverseTransitionDuration: Duration.zero,
-                                      ),
-                                    );
-                                  } else {
-                                    historyHelper.openExplorerLink(historyList[index].txid);
+                                  if (SettingsHelper.settings.network == 'mainnet') {
+                                    if (SettingsHelper.isBitcoin() ||
+                                        historyList[index].category ==
+                                                'AccountToAccount' &&
+                                            historyList[index].tokens[0].code ==
+                                                'BTC') {
+                                      historyHelper.openExplorerLink(historyList[index].txid);
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1, animation2) =>
+                                              HistoryDetails(
+                                                dfxHistoryModel: historyList[index],
+                                              ),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration: Duration.zero,
+                                        ),
+                                      );
+                                    }
                                   }
                                 },
                                 contentPadding: const EdgeInsets.all(0),

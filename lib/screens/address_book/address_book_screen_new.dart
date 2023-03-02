@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/delete_contact_dialog.dart';
@@ -37,6 +37,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
     with ThemeMixin, NetworkMixin {
   int iterator = 0;
   TextEditingController controller = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
   List<AddressBookModel>? viewList = [];
   List<AddressBookModel>? lastSent = [];
   bool isSelectedContacts = true;
@@ -139,15 +140,15 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                           context: context,
                                           builder: (BuildContext context) {
                                             return CreateEditContactDialog(
+                                              address: addressController.text,
                                               isEdit: false,
-                                              confirmCallback: (name, address) {
+                                              confirmCallback: (name, address, network) {
                                                 setState(() {
                                                   addressBookCubit.addAddress(
                                                     AddressBookModel(
                                                       name: name,
                                                       address: address,
-                                                      network:
-                                                          currentNetworkName(),
+                                                      network: network,
                                                     ),
                                                   );
                                                   controller.text = '';
@@ -289,17 +290,18 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                                                 .address!,
                                                         isEdit: true,
                                                         confirmCallback:
-                                                            (name, address) {
+                                                            (name, address, network) {
                                                           setState(() {
                                                             addressBookCubit.editAddress(
                                                                 AddressBookModel(
-                                                                    name: name,
-                                                                    address:
-                                                                        address,
-                                                                    network: viewList![
-                                                                            index]
-                                                                        .network),
-                                                                viewList![index]
+                                                                      name:
+                                                                          name,
+                                                                      address:
+                                                                          address,
+                                                                      network:
+                                                                          network,
+                                                                    ),
+                                                                    viewList![index]
                                                                     .id);
                                                             Navigator.pop(
                                                                 context);
