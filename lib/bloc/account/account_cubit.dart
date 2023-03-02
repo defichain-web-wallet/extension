@@ -563,16 +563,18 @@ class AccountCubit extends Cubit<AccountState> {
             password,
             accountModel.index!,
           );
-          String accessToken = accountModel.accessToken ?? await fiatCubit.getAccessToken(
-            accountModel,
-            keyPair,
-            needRefresh: true,
-          );
-          String lockAccessToken = accountModel.lockAccessToken ?? await lockCubit.getAccessToken(
-            accountModel,
-            keyPair,
-            needRefresh: true,
-          );
+          String accessToken = accountModel.accessToken ??
+              await fiatCubit.getAccessToken(
+                accountModel,
+                keyPair,
+                needRefresh: true,
+              );
+          String lockAccessToken = accountModel.lockAccessToken ??
+              await lockCubit.getAccessToken(
+                accountModel,
+                keyPair,
+                needRefresh: true,
+              );
           accountModel.lockAccessToken = lockAccessToken;
           accountModel.accessToken = accessToken;
         } catch (err) {
@@ -836,6 +838,8 @@ class AccountCubit extends Cubit<AccountState> {
     } catch (err) {
       throw err;
     }
+  }
+
   clearAccessTokens() async {
     state.accounts!.forEach((element) {
       element.accessToken = null;

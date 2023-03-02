@@ -59,8 +59,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
         return BlocBuilder<FiatCubit, FiatState>(
           builder: (context, fiatState) {
             if (fiatState.status == FiatStatusList.expired) {
-              accountCubit.clearAccessTokens();
               LockHelper().lockWallet();
+              accountCubit.clearAccessTokens();
               Future.microtask(
                 () => Navigator.pushReplacement(
                   context,
@@ -287,7 +287,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => BuySelectCurrencyScreen(),
+          pageBuilder: (context, animation1, animation2) =>
+              BuySelectCurrencyScreen(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),

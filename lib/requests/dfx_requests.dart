@@ -71,8 +71,8 @@ class DfxRequests {
     }
   }
 
-  Future<void> createUser(String email, String phone,
-      String accessToken) async {
+  Future<void> createUser(
+      String email, String phone, String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/user');
 
@@ -87,9 +87,7 @@ class DfxRequests {
       });
 
       final response = await http.put(url, headers: headers, body: body);
-
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   Future<CryptoRouteModel?> getCryptoRoutes(String accessToken) async {
@@ -101,11 +99,10 @@ class DfxRequests {
         'Authorization': 'Bearer $accessToken'
       };
 
-
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
-        if(data.length == 0){
+        if (data.length == 0) {
           return null;
         }
         return CryptoRouteModel.fromJson(data[0]);
@@ -126,12 +123,10 @@ class DfxRequests {
         'Authorization': 'Bearer $accessToken'
       };
 
-
       final body = jsonEncode({
         "type": "Wallet",
         "blockchain": "Bitcoin",
-        "asset": {
-          "id": 2}
+        "asset": {"id": 2}
       });
       final response = await http.post(url, headers: headers, body: body);
       if (response.statusCode == 200) {
@@ -155,34 +150,7 @@ class DfxRequests {
         'Authorization': 'Bearer $accessToken'
       };
 
-      final body = jsonEncode({
-        "walletName": "LOCK.space"
-      });
-
-      final response = await http.put(url, headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        throw Error.safeToString(response.statusCode);
-      }
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  Future<bool> transferKYC(String accessToken) async {
-    try {
-      final Uri url = Uri.parse('https://api.dfx.swiss/v1/kyc/transfer');
-
-      final headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Bearer $accessToken'
-      };
-
-      final body = jsonEncode({
-        "walletName": "LOCK.space"
-      });
+      final body = jsonEncode({"walletName": "LOCK.space"});
 
       final response = await http.put(url, headers: headers, body: body);
 
@@ -241,8 +209,7 @@ class DfxRequests {
     }
   }
 
-  Future<List<AssetByFiatModel>> getAvailableAssets(
-      String accessToken) async {
+  Future<List<AssetByFiatModel>> getAvailableAssets(String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/asset');
 
@@ -266,8 +233,8 @@ class DfxRequests {
     }
   }
 
-  Future<void> saveBuyDetails(String iban, AssetByFiatModel asset,
-      String accessToken) async {
+  Future<void> saveBuyDetails(
+      String iban, AssetByFiatModel asset, String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/buy');
 
@@ -295,8 +262,7 @@ class DfxRequests {
     }
   }
 
-  Future<List<IbanModel>> getIbanList(
-      String accessToken) async {
+  Future<List<IbanModel>> getIbanList(String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/route');
 
@@ -346,8 +312,7 @@ class DfxRequests {
     }
   }
 
-  Future<void> saveKycData(KycModel kyc,
-      String accessToken) async {
+  Future<void> saveKycData(KycModel kyc, String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/kyc/data');
 
@@ -367,8 +332,7 @@ class DfxRequests {
     }
   }
 
-  Future<List<FiatModel>> getFiatList(
-      String accessToken) async {
+  Future<List<FiatModel>> getFiatList(String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/fiat');
 
@@ -392,8 +356,7 @@ class DfxRequests {
     }
   }
 
-  Future<Map> sell(String iban, FiatModel fiat,
-      String accessToken) async {
+  Future<Map> sell(String iban, FiatModel fiat, String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/sell');
 
@@ -472,18 +435,17 @@ class DfxRequests {
   }
 
   Future<Map<String, dynamic>> postStaking(
-    String rewardType,
-    String paymentType,
-    AssetByFiatModel? rewardAsset,
-    AssetByFiatModel? paybackAsset,
-    IbanModel? rewardSell,
-    IbanModel? paybackSell,
-    String accessToken,
-    { bool isActive = false, int stakingId = 0 }
-  ) async {
+      String rewardType,
+      String paymentType,
+      AssetByFiatModel? rewardAsset,
+      AssetByFiatModel? paybackAsset,
+      IbanModel? rewardSell,
+      IbanModel? paybackSell,
+      String accessToken,
+      {bool isActive = false,
+      int stakingId = 0}) async {
     try {
-      final Uri url = Uri.parse(
-          'https://api.dfx.swiss/v1/staking/' +
+      final Uri url = Uri.parse('https://api.dfx.swiss/v1/staking/' +
           (isActive ? stakingId.toString() : ''));
 
       final headers = {
