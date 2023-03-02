@@ -64,7 +64,7 @@ class _AssetCardState extends State<AssetCard> {
     if (fiat == 'EUR') {
       balanceInUsd *= state.eurRate;
     }
-    return '\$${balancesHelper.numberStyling(balanceInUsd, fixed: true)}';
+    return '\$${balancesHelper.numberStyling(balanceInUsd, fixed: true, fixedCount: 8)}';
   }
 
   @override

@@ -107,21 +107,4 @@ class AssetList extends StatelessWidget {
 
   String getFormatTokenBalance(double tokenBalance) =>
       '${balancesHelper.numberStyling(tokenBalance)}';
-
-  String getFormatTokenBalanceByFiat(
-      state, String coin, double tokenBalance, String fiat) {
-    double balanceInUsd;
-    if (tokenHelper.isPair(coin)) {
-      double balanceInSatoshi = convertToSatoshi(tokenBalance) + .0;
-      balanceInUsd = tokenHelper.getPairsAmountByAsset(
-          state.tokensPairs, balanceInSatoshi, coin, 'USD');
-    } else {
-      balanceInUsd =
-          tokenHelper.getAmountByUsd(state.tokensPairs, tokenBalance, coin);
-    }
-    if (fiat == 'EUR') {
-      balanceInUsd *= state.eurRate;
-    }
-    return '\$${balancesHelper.numberStyling(balanceInUsd, fixed: true)}';
-  }
 }

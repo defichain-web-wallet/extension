@@ -392,13 +392,16 @@ class TokensHelper {
   }
 
   double getAmountByUsd(
-      List<dynamic> tokensPairs, double amount, String token) {
+    List<dynamic> tokensPairs,
+    double amount,
+    String token, {
+    String target = 'USDT',
+  }) {
     String symbol = 'USDT-DFI';
-    String testnetSymbol = 'DFI-USDT';
 
     try {
       AssetPairModel assetPair = tokensPairs.firstWhere((element) =>
-          element.symbol! == symbol || element.symbol! == testnetSymbol);
+          element.symbol! == symbol && element.status);
       if (token == 'DFI') {
         return assetPair.reserveADivReserveB! * amount;
       }
@@ -412,7 +415,10 @@ class TokensHelper {
 
       double result;
       if (targetPair.tokenB == 'DUSD') {
-        result = (dfiByToken * amount);
+        var temp = (dfiByToken * amount);
+        AssetPairModel targetD = tokensPairs.firstWhere(
+            (item) => item.tokenA == target && item.tokenB == 'DUSD');
+        result = (targetD.reserveADivReserveB! * temp);
         return result;
       } else {
         double result = (dfiByToken * amount) * dfiByUsd;
