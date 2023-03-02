@@ -47,6 +47,8 @@ class AccountCubit extends Cubit<AccountState> {
   FiatCubit fiatCubit = FiatCubit();
   LockCubit lockCubit = LockCubit();
 
+  AccountState get accountState => state;
+
   createAccount(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: AccountStatusList.loading));
 

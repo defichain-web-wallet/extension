@@ -8,9 +8,8 @@ import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/asset_pair_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
+import 'package:defi_wallet/screens/liquidity/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
@@ -23,7 +22,6 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
 class EarnScreenNew extends StatefulWidget {
   const EarnScreenNew({Key? key}) : super(key: key);
@@ -44,8 +42,10 @@ class _EarnScreenNewState extends State<EarnScreenNew>
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await tokensCubit.calculateEarnPage(context);
       await fiatCubit.loadUserDetails(accountCubit.state.accounts!.first);
       await lockCubit.loadAnalyticsDetails(accountCubit.state.accounts!.first);
       await lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
@@ -63,608 +63,154 @@ class _EarnScreenNewState extends State<EarnScreenNew>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-        return BlocBuilder<AccountCubit, AccountState>(
-            builder: (accountContext, accountState) {
-          return BlocBuilder<LockCubit, LockState>(
-              builder: (lockContext, lockState) {
-            if (lockState.status == LockStatusList.expired) {
-              accountCubit.clearAccessTokens();
-              LockHelper().lockWallet();
-              Future.microtask(() => Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) =>
-                        LockScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  )));
-              return Container();
-            } else if (lockState.status == LockStatusList.success) {
-              return BlocBuilder<TokensCubit, TokensState>(
-                  builder: (tokensContext, tokensState) {
-                double totalPairsBalance = 0;
-                double totalPairsAPR = 0;
-                String avaragePairsAPR = '';
-                int countPairs = 0;
-
-                String maxApr = TokensHelper()
-                    .getAprFormat(getMaxAPR(tokensState.tokensPairs!), true);
-
-                accountState.activeAccount!.balanceList!.forEach((element) {
-                  if (element.isPair! && !element.isHidden!) {
-                    countPairs += 1;
-                    totalPairsAPR +=
-                        getAPRbyPair(tokensState.tokensPairs!, element.token!);
-
-                    var foundedAssetPair = List.from(tokensState.tokensPairs!
-                        .where((item) => element.token == item.symbol))[0];
-
-                    double baseBalance = element.balance! *
-                        (1 / foundedAssetPair.totalLiquidityRaw) *
-                        foundedAssetPair.reserveA!;
-                    double quoteBalance = element.balance! *
-                        (1 / foundedAssetPair.totalLiquidityRaw) *
-                        foundedAssetPair.reserveB!;
-
-                    totalPairsBalance += tokenHelper.getAmountByUsd(
-                      tokensState.tokensPairs!,
-                      baseBalance,
-                      foundedAssetPair.tokenA,
-                    );
-                    totalPairsBalance += tokenHelper.getAmountByUsd(
-                      tokensState.tokensPairs!,
-                      quoteBalance,
-                      foundedAssetPair.tokenB,
-                    );
-                  }
-                });
-                avaragePairsAPR = TokensHelper().getAprFormat(
-                    countPairs > 0 ? totalPairsAPR / countPairs : 0, false);
-
-                return Scaffold(
-                  drawerScrimColor: Color(0x0f180245),
-                  endDrawer: AccountDrawer(
-                    width: buttonSmallWidth,
+        return BlocBuilder<LockCubit, LockState>(
+            builder: (lockContext, lockState) {
+              var isLoading = lockState.status == LockStatusList.initial || lockState.status == LockStatusList.loading;
+          if (lockState.status == LockStatusList.expired) {
+            accountCubit.clearAccessTokens();
+            LockHelper().lockWallet();
+            Future.microtask(() => Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      LockScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                )));
+            return Container();
+          } else if (lockState.status == LockStatusList.success || isLoading) {
+            return Scaffold(
+              drawerScrimColor: Color(0x0f180245),
+              endDrawer: AccountDrawer(
+                width: buttonSmallWidth,
+              ),
+              appBar: NewMainAppBar(
+                isShowLogo: false,
+              ),
+              body: Container(
+                padding: EdgeInsets.only(
+                  top: 22,
+                  bottom: 24,
+                  left: 16,
+                  right: 16,
+                ),
+                width: double.infinity,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  color: isDarkTheme()
+                      ? DarkColors.drawerBgColor
+                      : LightColors.scaffoldContainerBgColor,
+                  border: isDarkTheme()
+                      ? Border.all(
+                          width: 1.0,
+                          color: Colors.white.withOpacity(0.05),
+                        )
+                      : null,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(20),
                   ),
-                  appBar: NewMainAppBar(
-                    isShowLogo: false,
-                  ),
-                  body: Container(
-                    padding: EdgeInsets.only(
-                      top: 22,
-                      bottom: 24,
-                      left: 16,
-                      right: 16,
-                    ),
-                    width: double.infinity,
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      color: isDarkTheme()
-                          ? DarkColors.drawerBgColor
-                          : LightColors.scaffoldContainerBgColor,
-                      border: isDarkTheme()
-                          ? Border.all(
-                              width: 1.0,
-                              color: Colors.white.withOpacity(0.05),
-                            )
-                          : null,
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        topLeft: Radius.circular(20),
-                      ),
-                    ),
-                    child: Center(
-                      child: StretchBox(
-                        child: Column(
+                ),
+                child: Center(
+                  child: StretchBox(
+                    child: Column(
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  titleText,
-                                  style: headline2.copyWith(
-                                      fontWeight: FontWeight.w700),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: 19,
-                            ),
-                            GestureDetector(
-                              onTap: () => stakingCallback(lockState),
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      width: double.infinity,
-                                      height: 129,
-                                      padding: EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: AppColors.portageBg
-                                              .withOpacity(0.24),
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Container(
-                                                height: 40,
-                                                child: Image.asset(
-                                                    'assets/images/dfi_staking.png'),
-                                              ),
-                                              SizedBox(
-                                                width: 12,
-                                              ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Staking',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline5!
-                                                        .copyWith(
-                                                          fontSize: 16,
-                                                        ),
-                                                  ),
-                                                  Text(
-                                                    'up to '
-                                                    '${BalancesHelper().numberStyling(
-                                                      (lockState
-                                                              .lockAnalyticsDetails!
-                                                              .apy! *
-                                                          100),
-                                                      fixed: true,
-                                                      fixedCount: 2,
-                                                    )}% APY',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline5!
-                                                        .copyWith(
-                                                          fontSize: 12,
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .headline5!
-                                                              .color!
-                                                              .withOpacity(0.3),
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: 12,
-                                          ),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
-                                                      children: [
-                                                        Text(
-                                                          lockCubit
-                                                                  .checkVerifiedUser()
-                                                              ? balancesHelper
-                                                                  .numberStyling(
-                                                                  lockState
-                                                                      .lockStakingDetails!
-                                                                      .balance!,
-                                                                  fixed: true,
-                                                                  fixedCount: 2,
-                                                                )
-                                                              : '0.00',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .headline4!
-                                                                  .copyWith(
-                                                                    fontSize:
-                                                                        20,
-                                                                  ),
-                                                        ),
-                                                        SizedBox(
-                                                          width: 5,
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .only(
-                                                                  bottom: 2.0),
-                                                          child: Text(
-                                                            lockCubit
-                                                                    .checkVerifiedUser()
-                                                                ? lockState
-                                                                    .lockStakingDetails!
-                                                                    .asset!
-                                                                : 'DFI',
-                                                            style: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .headline4!
-                                                                .copyWith(
-                                                                  fontSize: 13,
-                                                                ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      'Staked',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .headline5!
-                                                          .copyWith(
-                                                            fontSize: 12,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .headline5!
-                                                                .color!
-                                                                .withOpacity(
-                                                                    0.3),
-                                                          ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              // TODO: uncomment this when API will be work
-                                              if (false)
-                                                Expanded(
-                                                  flex: 1,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .end,
-                                                        children: [
-                                                          Text(
-                                                            '0.00',
-                                                            style: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .headline4!
-                                                                .copyWith(
-                                                                  fontSize: 20,
-                                                                  color: AppColors
-                                                                      .malachite,
-                                                                ),
-                                                          ),
-                                                          SizedBox(
-                                                            width: 5,
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    bottom:
-                                                                        2.0),
-                                                            child: Text(
-                                                              'DFI',
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .headline4!
-                                                                  .copyWith(
-                                                                    fontSize:
-                                                                        13,
-                                                                    color: AppColors
-                                                                        .malachite,
-                                                                  ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Text(
-                                                        'Rewards earned',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline5!
-                                                            .copyWith(
-                                                              fontSize: 12,
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .headline5!
-                                                                  .color!
-                                                                  .withOpacity(
-                                                                      0.3),
-                                                            ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 1, top: 1),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.only(
-                                              left: 9,
-                                              top: 11,
-                                              right: 13,
-                                              bottom: 13,
-                                            ),
-                                            width: 40,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                              color: Color(0xFF167156),
-                                              borderRadius: BorderRadius.only(
-                                                topRight: Radius.circular(11),
-                                                bottomLeft: Radius.circular(20),
-                                              ),
-                                            ),
-                                            child: SvgPicture.asset(
-                                                'assets/icons/staking_lock.svg'),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 18,
-                            ),
-                            GestureDetector(
-                              onTap: () =>
-                                  liquidityCallback(avaragePairsAPR, txState),
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 129,
-                                  padding: EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color:
-                                          AppColors.portageBg.withOpacity(0.24),
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            height: 40,
-                                            child: Image.asset(
-                                                'assets/pair_icons/dfi_btc.png'),
-                                          ),
-                                          SizedBox(
-                                            width: 12,
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Liquidity mining',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .copyWith(
-                                                      fontSize: 16,
-                                                    ),
-                                              ),
-                                              Text(
-                                                'up to ${maxApr} APR',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .copyWith(
-                                                      fontSize: 12,
-                                                      color: Theme.of(context)
-                                                          .textTheme
-                                                          .headline5!
-                                                          .color!
-                                                          .withOpacity(0.3),
-                                                    ),
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 12,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 1,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  children: [
-                                                    Text(
-                                                      balancesHelper
-                                                          .numberStyling(
-                                                              totalPairsBalance,
-                                                              fixed: true),
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .headline4!
-                                                          .copyWith(
-                                                            fontSize: 20,
-                                                          ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              bottom: 2.0),
-                                                      child: Text(
-                                                        'USD',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline4!
-                                                            .copyWith(
-                                                              fontSize: 13,
-                                                            ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'Pooled',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline5!
-                                                      .copyWith(
-                                                        fontSize: 12,
-                                                        color: Theme.of(context)
-                                                            .textTheme
-                                                            .headline5!
-                                                            .color!
-                                                            .withOpacity(0.3),
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Expanded(
-                                            flex: 1,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  children: [
-                                                    Text(
-                                                      avaragePairsAPR,
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .headline4!
-                                                          .copyWith(
-                                                            fontSize: 20,
-                                                            color: AppColors
-                                                                .malachite,
-                                                          ),
-                                                    ),
-                                                    countPairs > 0
-                                                        ? Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    bottom:
-                                                                        2.0),
-                                                            child: Text(
-                                                              '%',
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .headline4!
-                                                                  .copyWith(
-                                                                    fontSize:
-                                                                        13,
-                                                                    color: AppColors
-                                                                        .malachite,
-                                                                  ),
-                                                            ),
-                                                          )
-                                                        : Container(),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'Portfolio APR',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline5!
-                                                      .copyWith(
-                                                        fontSize: 12,
-                                                        color: Theme.of(context)
-                                                            .textTheme
-                                                            .headline5!
-                                                            .color!
-                                                            .withOpacity(0.3),
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
+                            Text(
+                              titleText,
+                              style: headline2.copyWith(
+                                  fontWeight: FontWeight.w700),
+                            )
                           ],
                         ),
-                      ),
+                        SizedBox(
+                          height: 19,
+                        ),
+                        // stakingCard(lockState, isLoading),
+                        SizedBox(
+                          height: 18,
+                        ),
+                        BlocBuilder<TokensCubit, TokensState>(
+                            builder: (tokensContext, tokensState) {
+                              print(tokensState.status);
+                          return Container();
+                          // return liqudityMiningCard(tokensState, tokensState.status == TokensStatusList.success);
+                        }),
+                      ],
                     ),
                   ),
-                );
-              });
-            } else if (lockState.status == LockStatusList.failure) {
-              return ErrorScreen();
-            } else {
-              return Loader();
-            }
-          });
+                ),
+              ),
+            );
+          } else  {
+            return ErrorScreen();
+          }
         });
       },
     );
   }
 
-  double getMaxAPR(List<AssetPairModel> tokenPairs) {
-    double maxValue = 0;
-
-    tokenPairs.forEach((element) {
-      if (maxValue < element.apr!) {
-        maxValue = element.apr!;
-      }
-    });
-    return maxValue;
+  Widget liqudityMiningCard(TokensState tokensState, bool isLoading) {
+    print(tokensState.averageAccountAPR);
+    String avaragePairsAPR =
+        TokensHelper().getAprFormat(tokensState.averageAccountAPR!, false);
+    return EarnCard(
+        isLoading: isLoading,
+        title: 'Liquidity mining',
+        subTitle:
+            'up to ${TokensHelper().getAprFormat(tokensState.maxAPR!, true)} APR',
+        imagePath: 'assets/pair_icons/dfi_btc.png',
+        firstColumnNumber: balancesHelper
+            .numberStyling(tokensState.totalPairsBalance!, fixed: true),
+        firstColumnAsset: 'USD',
+        firstColumnSubTitle: 'Pooled',
+        secondColumnNumber: avaragePairsAPR,
+        secondColumnAsset: '%',
+        secondColumnSubTitle: 'Portfolio APR',
+        isStaking: false,
+        callback: () => liquidityCallback(avaragePairsAPR));
   }
 
-  double getAPRbyPair(List<AssetPairModel> tokenPairs, String pair) {
-    double value = 0;
-
-    tokenPairs.forEach((element) {
-      if (pair == element.symbol) {
-        value = element.apr!;
-      }
-    });
-    return value;
+  Widget stakingCard(LockState lockState, bool isLoading) {
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    if (lockState.status == LockStatusList.success ||
+        isLoading) {
+      return EarnCard(
+          isLoading: isLoading,
+          title: 'Staking',
+          subTitle: lockState.status == LockStatusList.loading
+              ? ''
+              : 'up to '
+                  '${BalancesHelper().numberStyling(
+                  (lockState.lockAnalyticsDetails!.apy! * 100),
+                  fixed: true,
+                  fixedCount: 2,
+                )}% APY',
+          imagePath: 'assets/images/dfi_staking.png',
+          firstColumnNumber: lockState.status == LockStatusList.loading
+              ? ''
+              : lockCubit.checkVerifiedUser()
+                  ? balancesHelper.numberStyling(
+                      lockState.lockStakingDetails!.balance!,
+                      fixed: true,
+                      fixedCount: 2,
+                    )
+                  : '0.00',
+          firstColumnAsset: lockCubit.checkVerifiedUser()
+              ? lockState.lockStakingDetails!.asset!
+              : 'DFI',
+          firstColumnSubTitle: 'Staked',
+          isStaking: true,
+          callback: () => lockState.status == LockStatusList.loading
+              ? () => {}
+              : stakingCallback());
+    } else {
+      return ErrorScreen();
+    }
   }
 
-  stakingCallback(lockState) async{
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+  stakingCallback() async {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     if (lockCubit.checkVerifiedUser(isCheckOnlyKycStatus: true)) {
       Navigator.push(
@@ -676,8 +222,7 @@ class _EarnScreenNewState extends State<EarnScreenNew>
         ),
       );
     } else {
-      if (lockState.lockUserDetails.kycLink ==
-          'https://kyc.lock.space?code=null') {
+      if (lockCubit.checkValidKycLink()) {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
         LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
         await lockCubit.loadKycDetails(accountCubit.state.activeAccount!);
@@ -695,7 +240,7 @@ class _EarnScreenNewState extends State<EarnScreenNew>
     }
   }
 
-  liquidityCallback(String avaragePairsAPR, txState) {
+  liquidityCallback(String avaragePairsAPR) {
     Widget redirectTo = LiquidityScreenNew(averageARP: avaragePairsAPR);
 
     Navigator.push(

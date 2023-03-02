@@ -90,6 +90,8 @@ dependencies:
   simple_gradient_text: ^1.2.4
   flutter_switch: ^0.3.2
 
+  skeletons: ^0.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

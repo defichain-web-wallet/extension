@@ -9,6 +9,9 @@ class TokensState extends Equatable {
   final Map<dynamic, dynamic>? tokensForSwap;
   final List<AssetPairModel>? tokensPairs;
   final double? eurRate;
+  final double? maxAPR;
+  final double? averageAccountAPR;
+  final double? totalPairsBalance;
 
   TokensState({
     this.status = TokensStatusList.initial,
@@ -17,6 +20,9 @@ class TokensState extends Equatable {
     this.tokensForSwap,
     this.tokensPairs,
     this.eurRate,
+    this.maxAPR,
+    this.averageAccountAPR,
+    this.totalPairsBalance,
   });
 
   @override
@@ -27,6 +33,9 @@ class TokensState extends Equatable {
         tokensForSwap,
         tokensPairs,
         eurRate,
+        maxAPR,
+        averageAccountAPR,
+        totalPairsBalance,
       ];
 
   TokensState copyWith({
@@ -36,6 +45,9 @@ class TokensState extends Equatable {
     Map<dynamic, dynamic>? tokensForSwap,
     List<AssetPairModel>? tokensPairs,
     double? eurRate,
+    double? maxAPR,
+    double? averageAccountAPR,
+    double? totalPairsBalance,
   }) {
     return TokensState(
       status: status ?? this.status,
@@ -44,6 +56,9 @@ class TokensState extends Equatable {
       tokensForSwap: tokensForSwap ?? this.tokensForSwap,
       tokensPairs: tokensPairs ?? this.tokensPairs,
       eurRate: eurRate ?? this.eurRate,
+      maxAPR: maxAPR ?? this.maxAPR,
+      averageAccountAPR: averageAccountAPR ?? this.averageAccountAPR,
+      totalPairsBalance: totalPairsBalance ?? this.totalPairsBalance,
     );
   }
 }
