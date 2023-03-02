@@ -67,6 +67,7 @@ class _EarnScreenNewState extends State<EarnScreenNew>
             builder: (lockContext, lockState) {
               var isLoading = lockState.status == LockStatusList.initial || lockState.status == LockStatusList.loading;
           if (lockState.status == LockStatusList.expired) {
+            //TODO: ask user password on this screen. and pull data from the API
             accountCubit.clearAccessTokens();
             LockHelper().lockWallet();
             Future.microtask(() => Navigator.pushReplacement(
@@ -78,7 +79,7 @@ class _EarnScreenNewState extends State<EarnScreenNew>
                   reverseTransitionDuration: Duration.zero,
                 )));
             return Container();
-          } else if (lockState.status == LockStatusList.success || isLoading) {
+          } else {
             return Scaffold(
               drawerScrimColor: Color(0x0f180245),
               endDrawer: AccountDrawer(
@@ -127,15 +128,16 @@ class _EarnScreenNewState extends State<EarnScreenNew>
                         SizedBox(
                           height: 19,
                         ),
-                        // stakingCard(lockState, isLoading),
+                          stakingCard(lockState, isLoading),
                         SizedBox(
                           height: 18,
                         ),
                         BlocBuilder<TokensCubit, TokensState>(
                             builder: (tokensContext, tokensState) {
                               print(tokensState.status);
+                              //TODO remove comment
                           return Container();
-                          // return liqudityMiningCard(tokensState, tokensState.status == TokensStatusList.success);
+                          // return liqudityMiningCard(tokensState, tokensState.status == TokensStatusList.loading);
                         }),
                       ],
                     ),
@@ -143,8 +145,6 @@ class _EarnScreenNewState extends State<EarnScreenNew>
                 ),
               ),
             );
-          } else  {
-            return ErrorScreen();
           }
         });
       },
@@ -174,12 +174,13 @@ class _EarnScreenNewState extends State<EarnScreenNew>
 
   Widget stakingCard(LockState lockState, bool isLoading) {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    print(lockState.status);
     if (lockState.status == LockStatusList.success ||
         isLoading) {
       return EarnCard(
           isLoading: isLoading,
           title: 'Staking',
-          subTitle: lockState.status == LockStatusList.loading
+          subTitle: isLoading
               ? ''
               : 'up to '
                   '${BalancesHelper().numberStyling(
@@ -188,7 +189,7 @@ class _EarnScreenNewState extends State<EarnScreenNew>
                   fixedCount: 2,
                 )}% APY',
           imagePath: 'assets/images/dfi_staking.png',
-          firstColumnNumber: lockState.status == LockStatusList.loading
+          firstColumnNumber: isLoading
               ? ''
               : lockCubit.checkVerifiedUser()
                   ? balancesHelper.numberStyling(
@@ -202,10 +203,11 @@ class _EarnScreenNewState extends State<EarnScreenNew>
               : 'DFI',
           firstColumnSubTitle: 'Staked',
           isStaking: true,
-          callback: () => lockState.status == LockStatusList.loading
+          callback: () => isLoading
               ? () => {}
               : stakingCallback());
     } else {
+      //TODO: add error card if LOCK is offline
       return ErrorScreen();
     }
   }
