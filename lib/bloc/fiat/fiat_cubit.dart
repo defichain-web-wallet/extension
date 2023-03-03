@@ -876,4 +876,13 @@ class FiatCubit extends Cubit<FiatState> {
       await box.close();
     }
   }
+
+  List<AssetByFiatModel> getAssetsWithoutPair(List<AssetByFiatModel> assets) {
+    List<AssetByFiatModel> filteredAssets = [];
+    assets.forEach((element) { if(!element.isPair!) {
+      filteredAssets.add(element);
+    } });
+    return filteredAssets;
+  }
+
 }
