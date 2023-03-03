@@ -77,7 +77,7 @@ class LedgerSigningService implements SigningWalletService {
 
     try {
       var jsonString = json.encode(prevOutsJson);
-
+      jellyLedgerInit();
       var txHex = await promiseToFuture(signTransactionLedgerRaw(
           jsonString, paths, txhex, network, changePath));
       return txHex;
