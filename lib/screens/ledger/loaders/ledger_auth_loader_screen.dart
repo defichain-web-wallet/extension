@@ -17,12 +17,14 @@ import 'package:hive/hive.dart';
 
 class LedgerAuthLoaderScreen extends StatefulWidget {
   final bool isFullSize;
-  final Function()? callback;
+  final Function() callback;
+  final Function() errorCallback;
   String currentStatus;
 
   LedgerAuthLoaderScreen({
     Key? key,
-    this.callback,
+    required this.callback,
+    required this.errorCallback,
     this.isFullSize = true,
     this.currentStatus = 'first-step',
   }) : super(key: key);
@@ -162,6 +164,7 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
           return LedgerErrorDialog(error: error);
         },
       );
+      widget.errorCallback();
     }
   }
 

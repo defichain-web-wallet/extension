@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_final_screen.dart';
+import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
 import 'package:defi_wallet/screens/ledger/loaders/ledger_auth_loader_screen.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -115,6 +116,27 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                               NewPrimaryButton(
                                 width: 104,
                                 callback: () async {
+                                  var usbSupported =
+                                      await promiseToFuture(isUsbSupported());
+
+                                  if (usbSupported > 0) {
+                                    await showDialog(
+                                      barrierColor: Color(0x0f180245),
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (BuildContext dialogContext) {
+                                        return LedgerErrorDialog(
+                                            error: new Exception(usbSupported ==
+                                                    1
+                                                ? "USB_NOT_ALLOWED_IN_POPUP"
+                                                : "NO_USB_DEVICE_SELECTED"));
+                                      },
+                                    );
+                                    if (usbSupported == 1) {
+                                      openInTab();
+                                    }
+                                    return;
+                                  }
                                   var result = await promiseToFuture(
                                       openLedgerDefichain("DeFiChain"));
                                   print(result);
@@ -144,6 +166,9 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                                                     Duration.zero,
                                               ),
                                             );
+                                          },
+                                          errorCallback: () {
+                                            Navigator.pop(context);
                                           },
                                         ),
                                         transitionDuration: Duration.zero,

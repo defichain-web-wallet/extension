@@ -19,6 +19,7 @@
     "@ledgerhq/hw-transport-webhid": "6.24.1",
     "@ledgerhq/hw-transport-webusb": "6.24.1",
     "@ledgerhq/logs": "^6.10.0",
+    "@types/chrome": "^0.0.218",
     "@types/node": "^16.11.7",
     "@types/w3c-web-usb": "^1.0.6",
     "bip174": "^2.0.1",

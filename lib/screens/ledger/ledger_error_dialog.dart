@@ -17,9 +17,16 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
   final double _logoWidth = 210.0;
   final double _logoHeight = 200.0;
   final double _logoRotateDeg = 17.5;
-  String subtitleTextOops = 'Something went wrong, Jelly couldn\'t communicate with your ledger. Make sure you have connected your ledger and opened the DeFiChain application!';
-  String deviceLocked = 'Something went wrong, Jelly detected that your ledger is still locked. Please unlock your ledger and retry!';
-  String transactionAborted = 'Something went wrong, Jelly detected that you have aborted the transaction.';
+  String subtitleTextOops =
+      'Something went wrong, Jelly couldn\'t communicate with your ledger. Make sure you have connected your ledger and opened the DeFiChain application!';
+  String deviceLocked =
+      'Something went wrong, Jelly detected that your ledger is still locked. Please unlock your ledger and retry!';
+  String transactionAborted =
+      'Something went wrong, Jelly detected that you have aborted the transaction.';
+  String usbNotAllowedInPopup =
+      'Usb selection is not allowed in popup mode. We need to open Jellywallet in a tab. Jelly is taking care of it for you!';
+  String noUsbDeviceSelected =
+      'Jelly detected that you did not select any USB device. Please select and allow an USB connection to continue!';
 
   late String errorMessage;
 
@@ -34,6 +41,11 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
     } else if (widget.error.toString().contains("0x6985")) {
       //transaction rejected by user
       errorMessage = transactionAborted;
+    } else if (widget.error.toString().contains("USB_NOT_ALLOWED_IN_POPUP")) {
+      //usb not allowed in popup mode!
+      errorMessage = usbNotAllowedInPopup;
+    } else if (widget.error.toString().contains("NO_USB_DEVICE_SELECTED")) {
+      errorMessage = noUsbDeviceSelected;
     }
   }
 
@@ -121,7 +133,11 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline5!.copyWith(
                           fontSize: 14,
-                          color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.6),
+                          color: Theme.of(context)
+                              .textTheme
+                              .headline5!
+                              .color!
+                              .withOpacity(0.6),
                         ),
                   )
                 ],

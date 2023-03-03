@@ -32,6 +32,12 @@ class LedgerTransactionRaw {
 @JS('jelly_init')
 external void jellyLedgerInit();
 
+@JS('openAppInTab')
+external void openInTab();
+
+@JS('isUsbSupported')
+external bool isUsbSupported();
+
 @JS('ledger.openLedgerDefichain')
 external int openLedgerDefichain(String appName);
 

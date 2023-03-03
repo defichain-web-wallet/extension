@@ -30,11 +30,17 @@ export class JellyWalletLedger {
   //"DeFiChain Test" = testnet
   //"DeFiChain" = mainnet
   public async openLedgerDefichain(appName: string): Promise<number> {
-    await this.getTransport();
+    try {
+      await this.getTransport();
 
-    listen((log) => console.log(log));
+      listen((log) => console.log(log));
 
-    return 0;
+      return 0;
+    }
+    catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 
 

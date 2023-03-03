@@ -4,7 +4,8 @@
     "module": "commonjs",
     "outDir": "./js",    
     "types": [
-      "node"
+      "node",
+      "chrome"
     ],
     "declaration": true,
     "rootDir": "./src_ts",
