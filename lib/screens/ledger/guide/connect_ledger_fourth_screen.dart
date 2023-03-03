@@ -137,46 +137,33 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                                     }
                                     return;
                                   }
-                                  var result = await promiseToFuture(
-                                      openLedgerDefichain("DeFiChain"));
-                                  print(result);
-                                  if (result > 0) {
-                                    // 1 = app not installed
-                                    // 2 = unknown error
-                                    // 3 = app already opened, or other app is open?
-                                    //TODO error message!
-                                  } else {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder:
-                                            (context, animation1, animation2) =>
-                                                LedgerAuthLoaderScreen(
-                                          callback: () {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    ConnectLedgerFinalScreen(),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
-                                          },
-                                          errorCallback: () {
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                        transitionDuration: Duration.zero,
-                                        reverseTransitionDuration:
-                                            Duration.zero,
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (context, animation1, animation2) =>
+                                              LedgerAuthLoaderScreen(
+                                        callback: () {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation1,
+                                                      animation2) =>
+                                                  ConnectLedgerFinalScreen(),
+                                              transitionDuration: Duration.zero,
+                                              reverseTransitionDuration:
+                                                  Duration.zero,
+                                            ),
+                                          );
+                                        },
+                                        errorCallback: () {
+                                          Navigator.pop(context);
+                                        },
                                       ),
-                                    );
-                                  }
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  );
                                 },
                                 title: 'Next',
                               ),

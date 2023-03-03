@@ -27,6 +27,8 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
       'Usb selection is not allowed in popup mode. We need to open Jellywallet in a tab. Jelly is taking care of it for you!';
   String noUsbDeviceSelected =
       'Jelly detected that you did not select any USB device. Please select and allow an USB connection to continue!';
+  String couldNotClaimUsbDevice =
+      'Jelly could not claim your ledger. Please check if some other application is using the device.';
 
   late String errorMessage;
 
@@ -45,6 +47,8 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
       //usb not allowed in popup mode!
       errorMessage = usbNotAllowedInPopup;
     } else if (widget.error.toString().contains("NO_USB_DEVICE_SELECTED")) {
+      errorMessage = noUsbDeviceSelected;
+    } else if (widget.error.toString().contains("claim")) {
       errorMessage = noUsbDeviceSelected;
     }
   }
