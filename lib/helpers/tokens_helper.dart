@@ -1392,6 +1392,13 @@ class TokensHelper {
     return result;
   }
 
+  String getBaseAssetName(String assetPairName) {
+    return assetPairName.split('-')[0];
+  }
+  String getQuoteAssetName(String assetPairName) {
+    return assetPairName.split('-')[1];
+  }
+
   String getAprFormat(double apr, bool isPersentSymbol) {
     dynamic result;
 

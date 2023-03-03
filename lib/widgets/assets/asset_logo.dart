@@ -16,8 +16,6 @@ class AssetLogo extends StatelessWidget {
     this.isBorder = true,
   }) : super(key: key);
 
-  TokensHelper tokensHelper = TokensHelper();
-
   @override
   Widget build(BuildContext context) {
     if (assetStyle.isUniqueLogo!) {
@@ -27,21 +25,23 @@ class AssetLogo extends StatelessWidget {
         padding: EdgeInsets.all(borderWidth),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: isBorder ? LinearGradient(
-            transform: assetStyle.rotateRadian != null
-                ? GradientRotation(assetStyle.rotateRadian!)
-                : null,
-            stops: assetStyle.stops,
-            colors: assetStyle.tokenName == 'DUSD'
-                ? [
-              assetStyle.gradientColors![0].withOpacity(0.1),
-              assetStyle.gradientColors![1].withOpacity(0.1),
-                  ]
-                : [
-              assetStyle.gradientColors![0].withOpacity(0.16),
-              assetStyle.gradientColors![1].withOpacity(0.16),
-                  ],
-          ) : null,
+          gradient: isBorder
+              ? LinearGradient(
+                  transform: assetStyle.rotateRadian != null
+                      ? GradientRotation(assetStyle.rotateRadian!)
+                      : null,
+                  stops: assetStyle.stops,
+                  colors: assetStyle.tokenName == 'DUSD'
+                      ? [
+                          assetStyle.gradientColors![0].withOpacity(0.1),
+                          assetStyle.gradientColors![1].withOpacity(0.1),
+                        ]
+                      : [
+                          assetStyle.gradientColors![0].withOpacity(0.16),
+                          assetStyle.gradientColors![1].withOpacity(0.16),
+                        ],
+                )
+              : null,
         ),
         child: Image.asset(
           assetStyle.imgPath!,
@@ -54,13 +54,15 @@ class AssetLogo extends StatelessWidget {
         padding: EdgeInsets.all(borderWidth),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: isBorder ? LinearGradient(
-            stops: assetStyle.stops,
-            colors: [
-              assetStyle.gradientColors![0].withOpacity(0.16),
-              assetStyle.gradientColors![1].withOpacity(0.16),
-            ],
-          ) : null,
+          gradient: isBorder
+              ? LinearGradient(
+                  stops: assetStyle.stops,
+                  colors: [
+                    assetStyle.gradientColors![0].withOpacity(0.16),
+                    assetStyle.gradientColors![1].withOpacity(0.16),
+                  ],
+                )
+              : null,
         ),
         child: Stack(
           alignment: Alignment.center,
@@ -82,7 +84,10 @@ class AssetLogo extends StatelessWidget {
             Text(
               assetStyle.tokenName!,
               style: TextStyle(
-                fontSize: tokensHelper.calculateFontSizeFromAssetLogo(assetStyle.tokenName!, size),
+                fontSize: TokensHelper().calculateFontSizeFromAssetLogo(
+                  assetStyle.tokenName!,
+                  size,
+                ),
                 fontWeight: FontWeight.bold,
                 color: Color(0xFFFFFFFF),
                 letterSpacing: 0.93,
