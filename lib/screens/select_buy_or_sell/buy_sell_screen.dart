@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/helpers/access_token_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -23,6 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
+import 'package:skeletons/skeletons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BuySellScreen extends StatefulWidget {
@@ -37,45 +39,52 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
   String subtitleText = 'Choose your next step';
   BalancesHelper balancesHelper = BalancesHelper();
   int iterator = 0;
+  late bool hasAccessToken;
+
+  @override
+  void initState() {
+    super.initState();
+    loadDfxData();
+  }
+
+  loadDfxData() {
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    hasAccessToken = accountCubit.state.accounts!.first.accessToken != null &&
+        accountCubit.state.accounts!.first.accessToken!.isNotEmpty;
+    if (hasAccessToken) {
+      fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
         bool isFullScreen,
         TransactionState txState,
       ) {
-        FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-        if (iterator == 0) {
-          try {
-            fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
-          } catch (err) {
-            print(err);
-          }
-          iterator++;
-        }
         return BlocBuilder<FiatCubit, FiatState>(
           builder: (context, fiatState) {
+            var isLoading = fiatState.status == FiatStatusList.initial ||
+                fiatState.status == FiatStatusList.loading;
             if (fiatState.status == FiatStatusList.expired) {
-              accountCubit.clearAccessTokens();
-              LockHelper().lockWallet();
-              Future.microtask(
-                () => Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) =>
-                        LockScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                ),
+              AccessTokenHelper.setupLockAccessToken(
+                context,
+                loadDfxData,
+                isLock: false,
               );
               return Container();
-            } else if (fiatState.status == FiatStatusList.success) {
-              double limit = fiatState.limit!.value!;
-              String period = fiatState.limit!.period!;
+            } else {
+              double limit = 0;
+              String period = 'Day';
+              if (hasAccessToken && !isLoading) {
+                limit = fiatState.limit!.value!;
+                period = fiatState.limit!.period!;
+              }
               return Scaffold(
                 drawerScrimColor: Color(0x0f180245),
                 endDrawer: AccountDrawer(
@@ -182,24 +191,37 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.end,
                                         children: [
-                                          Text(
-                                            '${balancesHelper.numberStyling(limit)}€',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline1!
-                                                .copyWith(
+                                          if (isLoading)
+                                            SkeletonLine(
+                                              style: SkeletonLineStyle(
+                                                  padding:
+                                                      EdgeInsets.only(top: 1),
+                                                  height: 22,
+                                                  width: 124,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8)),
+                                            )
+                                          else
+                                            ...[
+                                              Text(
+                                                '${balancesHelper.numberStyling(limit)}€',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline1!
+                                                    .copyWith(
                                                   fontSize: 40,
                                                 ),
-                                          ),
-                                          Text(
-                                            ' / $period',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .copyWith(
+                                              ),
+                                              Text(
+                                                ' / $period',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .copyWith(
                                                   fontSize: 24,
                                                 ),
-                                          ),
+                                              ),
+                                            ]
                                         ],
                                       ),
                                     ],
@@ -208,40 +230,74 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                 SizedBox(
                                   height: 16,
                                 ),
-                                Flexible(
-                                  child: FlatButton(
-                                    title: 'Buy',
-                                    iconPath: 'assets/icons/buy.png',
-                                    callback: () =>
-                                        buyCallback(context, fiatState),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 12,
-                                ),
-                                Flexible(
-                                  child: FlatButton(
-                                    title: 'Sell',
-                                    iconPath: 'assets/icons/sell.png',
-                                    callback: () =>
-                                        sellCallback(context, fiatState),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 12,
-                                ),
-                                Flexible(
-                                  child: FlatButton(
-                                    title: 'Increase limit',
-                                    iconPath:
+                                if (hasAccessToken)
+                                  ...[
+                                    Flexible(
+                                      child: FlatButton(
+                                        title: 'Buy',
+                                        iconPath: 'assets/icons/buy.png',
+                                        callback: () =>
+                                            buyCallback(context, fiatState),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Flexible(
+                                      child: FlatButton(
+                                        title: 'Sell',
+                                        iconPath: 'assets/icons/sell.png',
+                                        callback: () =>
+                                            sellCallback(context, fiatState),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Flexible(
+                                      child: FlatButton(
+                                        title: 'Increase limit',
+                                        iconPath:
                                         'assets/icons/increase_limits.png',
-                                    callback: () {
-                                      String kycHash = fiatState.kycHash!;
-                                      launch(
-                                          'https://payment.dfx.swiss/kyc?code=$kycHash');
-                                    },
-                                  ),
-                                ),
+                                        callback: () {
+                                          if (hasAccessToken) {
+                                            String kycHash = fiatState.kycHash!;
+                                            launch(
+                                              'https://payment.dfx.swiss/kyc?code=$kycHash',
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ]
+                                else
+                                  ...[
+                                    Text(
+                                      'Need to create an account for DFX',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Flexible(
+                                      child: FlatButton(
+                                        title: 'Create DFX account',
+                                        iconPath: 'assets/icons/increase_limits.png',
+                                        callback: () {
+                                          AccessTokenHelper.setupLockAccessToken(
+                                            context,
+                                            loadDfxData,
+                                            isLock: false,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ]
                               ],
                             ),
                           ),
@@ -261,10 +317,6 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                   ),
                 ),
               );
-            } else if (fiatState.status == FiatStatusList.failure) {
-              return ErrorScreen();
-            } else {
-              return Loader();
             }
           },
         );

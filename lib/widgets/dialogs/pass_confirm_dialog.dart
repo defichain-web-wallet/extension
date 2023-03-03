@@ -16,13 +16,15 @@ import 'package:hive/hive.dart';
 class PassConfirmDialog extends StatefulWidget {
   final Function(String) onSubmit;
   final Function()? onCancel;
+  final String message;
   final context;
 
   const PassConfirmDialog({
     Key? key,
     required this.onSubmit,
     this.onCancel,
-    this.context
+    this.context,
+    this.message = 'Please confirm the transaction\nby entering your password',
   }) : super(key: key);
 
   @override
@@ -163,7 +165,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
                           Row(
                             children: [
                               Text(
-                                'Please confirm the transaction\nby entering your password',
+                                widget.message,
                                 style: Theme.of(context)
                                     .textTheme
                                     .subtitle1!

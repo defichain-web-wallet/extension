@@ -46,6 +46,19 @@ class LockCubit extends Cubit<LockState> {
     }
   }
 
+  Future<String> createLockAccount(
+    AccountModel account,
+    ECPair keyPair,
+  ) async {
+    try {
+      late String accessToken;
+      accessToken = await lockRequests.signUp(account, keyPair);
+      return accessToken;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   Future<String> getAccessToken(
     AccountModel account,
     ECPair keyPair, {

@@ -3,20 +3,20 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/helpers/access_token_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/liquidity/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
-import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_screen.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -39,16 +39,26 @@ class _EarnScreenNewState extends State<EarnScreenNew>
   @override
   void initState() {
     super.initState();
+    loadEarnData();
+  }
+
+  loadEarnData() {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
 
     tokensCubit.calculateEarnPage(context);
-    fiatCubit.loadUserDetails(accountCubit.state.accounts!.first);
-    lockCubit.loadAnalyticsDetails(accountCubit.state.accounts!.first);
-    lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
-    lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
+    if (accountCubit.state.activeAccount!.accessToken != null &&
+        accountCubit.state.activeAccount!.accessToken!.isNotEmpty) {
+      fiatCubit.loadUserDetails(accountCubit.state.accounts!.first);
+    }
+    if (accountCubit.state.activeAccount!.lockAccessToken != null &&
+        accountCubit.state.activeAccount!.lockAccessToken!.isNotEmpty) {
+      lockCubit.loadAnalyticsDetails(accountCubit.state.accounts!.first);
+      lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
+      lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
+    }
   }
 
   @override
@@ -63,19 +73,15 @@ class _EarnScreenNewState extends State<EarnScreenNew>
       ) {
         return BlocBuilder<LockCubit, LockState>(
             builder: (lockContext, lockState) {
-              var isLoading = lockState.status == LockStatusList.initial || lockState.status == LockStatusList.loading;
+          var isLoading = lockState.status == LockStatusList.initial ||
+              lockState.status == LockStatusList.loading;
           if (lockState.status == LockStatusList.expired) {
-            //TODO: ask user password on this screen. and pull data from the API
-            accountCubit.clearAccessTokens();
-            LockHelper().lockWallet();
-            Future.microtask(() => Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) =>
-                      LockScreen(),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                )));
+            AccessTokenHelper.setupLockAccessToken(
+              context,
+              loadEarnData,
+              isDfx: accountCubit.state.accounts!.first.accessToken == null ||
+                  accountCubit.state.activeAccount!.accessToken!.isEmpty,
+            );
             return Container();
           } else {
             return Scaffold(
@@ -126,7 +132,12 @@ class _EarnScreenNewState extends State<EarnScreenNew>
                         SizedBox(
                           height: 19,
                         ),
-                          stakingCard(lockState, isLoading),
+                        stakingCard(
+                          lockState,
+                          accountCubit.state.accounts!.first.lockAccessToken ==
+                              null || accountCubit.state.activeAccount!.lockAccessToken!.isEmpty,
+                          isLoading,
+                        ),
                         SizedBox(
                           height: 18,
                         ),
@@ -150,61 +161,81 @@ class _EarnScreenNewState extends State<EarnScreenNew>
     );
   }
 
-  Widget liqudityMiningCard(TokensState tokensState, bool isLoading) {
-    print(tokensState.averageAccountAPR);
+  Widget liqudityMiningCard(
+    TokensState tokensState,
+    bool isLoading,
+  ) {
     String avaragePairsAPR =
         TokensHelper().getAprFormat(tokensState.averageAccountAPR!, false);
     return EarnCard(
-        isLoading: isLoading,
-        title: 'Liquidity mining',
-        subTitle:
-            'up to ${TokensHelper().getAprFormat(tokensState.maxAPR!, true)} APR',
-        imagePath: 'assets/pair_icons/dfi_btc.png',
-        firstColumnNumber: balancesHelper
-            .numberStyling(tokensState.totalPairsBalance!, fixed: true),
-        firstColumnAsset: 'USD',
-        firstColumnSubTitle: 'Pooled',
-        secondColumnNumber: avaragePairsAPR,
-        secondColumnAsset: '%',
-        secondColumnSubTitle: 'Portfolio APR',
-        isStaking: false,
-        callback: () => liquidityCallback(avaragePairsAPR));
+      isLoading: isLoading,
+      title: 'Liquidity mining',
+      subTitle:
+          'up to ${TokensHelper().getAprFormat(tokensState.maxAPR!, true)} APR',
+      imagePath: 'assets/pair_icons/dfi_btc.png',
+      firstColumnNumber: balancesHelper
+          .numberStyling(tokensState.totalPairsBalance!, fixed: true),
+      firstColumnAsset: 'USD',
+      firstColumnSubTitle: 'Pooled',
+      secondColumnNumber: avaragePairsAPR,
+      secondColumnAsset: '%',
+      secondColumnSubTitle: 'Portfolio APR',
+      isStaking: false,
+      callback: () => liquidityCallback(avaragePairsAPR),
+    );
   }
 
-  Widget stakingCard(LockState lockState, bool isLoading) {
+  Widget stakingCard(
+    LockState lockState,
+    bool isEmptyToken,
+    bool isLoading,
+  ) {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-    print(lockState.status);
-    if (lockState.status == LockStatusList.success ||
-        isLoading) {
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    if (lockState.status == LockStatusList.success || isLoading) {
       return EarnCard(
-          isLoading: isLoading,
-          title: 'Staking',
-          subTitle: isLoading
-              ? ''
-              : 'up to '
-                  '${BalancesHelper().numberStyling(
-                  (lockState.lockAnalyticsDetails!.apy! * 100),
-                  fixed: true,
-                  fixedCount: 2,
-                )}% APY',
-          imagePath: 'assets/images/dfi_staking.png',
-          firstColumnNumber: isLoading
-              ? ''
-              : lockCubit.checkVerifiedUser()
-                  ? balancesHelper.numberStyling(
-                      lockState.lockStakingDetails!.balance!,
-                      fixed: true,
-                      fixedCount: 2,
-                    )
-                  : '0.00',
-          firstColumnAsset: lockCubit.checkVerifiedUser()
-              ? lockState.lockStakingDetails!.asset!
-              : 'DFI',
-          firstColumnSubTitle: 'Staked',
-          isStaking: true,
-          callback: () => isLoading
-              ? () => {}
-              : stakingCallback());
+        isLoading: isLoading,
+        title: 'Staking',
+        subTitle: isLoading
+            ? ''
+            : 'up to '
+                '${BalancesHelper().numberStyling(
+                (lockState.lockAnalyticsDetails!.apy! * 100),
+                fixed: true,
+                fixedCount: 2,
+              )}% APY',
+        imagePath: 'assets/images/dfi_staking.png',
+        firstColumnNumber: isLoading
+            ? ''
+            : lockCubit.checkVerifiedUser()
+                ? balancesHelper.numberStyling(
+                    lockState.lockStakingDetails!.balance!,
+                    fixed: true,
+                    fixedCount: 2,
+                  )
+                : '0.00',
+        firstColumnAsset: lockCubit.checkVerifiedUser()
+            ? lockState.lockStakingDetails!.asset!
+            : 'DFI',
+        firstColumnSubTitle: 'Staked',
+        isStaking: true,
+        needSignUp: isEmptyToken,
+        callback: () {
+          if (isEmptyToken) {
+            AccessTokenHelper.setupLockAccessToken(
+              context,
+              loadEarnData,
+              isDfx:
+                  accountCubit.state.accounts!.first.accessToken == null ||
+                      accountCubit.state.activeAccount!.accessToken!.isEmpty,
+            );
+          } else {
+            if (!isLoading) {
+              stakingCallback();
+            }
+          }
+        },
+      );
     } else {
       //TODO: add error card if LOCK is offline
       return ErrorScreen();
@@ -251,6 +282,46 @@ class _EarnScreenNewState extends State<EarnScreenNew>
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),
+    );
+  }
+
+  setupLockAccessToken() async {
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
+    showDialog(
+      barrierColor: Color(0x0f180245),
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context1) {
+        return PassConfirmDialog(
+          onCancel: () {
+            //
+          },
+          onSubmit: (password) async {
+            var keyPair = await HDWalletService().getKeypairFromStorage(
+              password,
+              accountCubit.state.accounts!.first.index!,
+            );
+            String? lockAccessToken = await lockCubit.createLockAccount(
+              accountCubit.state.accounts!.first,
+              keyPair,
+            );
+            String? accessToken = await fiatCubit.signUp(
+              accountCubit.state.accounts!.first,
+              keyPair,
+            );
+            accountCubit.state.accounts!.first.lockAccessToken = lockAccessToken;
+            accountCubit.state.accounts!.first.accessToken = accessToken;
+            await accountCubit.saveAccountsToStorage(
+              accountsMainnet: accountCubit.state.accounts!,
+            );
+            loadEarnData();
+          },
+          context: context,
+        );
+      },
     );
   }
 }

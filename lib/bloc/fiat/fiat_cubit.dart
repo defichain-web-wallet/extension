@@ -827,6 +827,19 @@ class FiatCubit extends Cubit<FiatState> {
     }
   }
 
+  Future<String?> signUp(
+    AccountModel account,
+    ECPair keyPair,
+  ) async {
+    try {
+      late String accessToken;
+      accessToken = await dfxRequests.signUp(account, keyPair);
+      return accessToken == '' ? null : accessToken;
+    } catch (err) {
+      return null;
+    }
+  }
+
   Future<String> getAccessToken(
     AccountModel account,
     ECPair keyPair, {
