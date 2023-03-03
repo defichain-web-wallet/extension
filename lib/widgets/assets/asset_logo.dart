@@ -1,15 +1,16 @@
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/models/asset_style_model.dart';
 import 'package:flutter/material.dart';
 
 class AssetLogo extends StatelessWidget {
-  final String tokenName;
+  final AssetStyleModel assetStyle;
   final double size;
   final bool isBorder;
   final double borderWidth;
 
   AssetLogo({
     Key? key,
-    required this.tokenName,
+    required this.assetStyle,
     this.size = 42,
     this.borderWidth = 5,
     this.isBorder = true,
@@ -19,7 +20,7 @@ class AssetLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (tokensHelper.getImagePathByTokenName(tokenName) != null) {
+    if (assetStyle.isUniqueLogo!) {
       return Container(
         width: size,
         height: size,
@@ -27,23 +28,23 @@ class AssetLogo extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: isBorder ? LinearGradient(
-            transform: tokensHelper.getDegRotateByTokenName(tokenName) != null
-                ? GradientRotation(tokensHelper.getDegRotateByTokenName(tokenName)!)
+            transform: assetStyle.rotateRadian != null
+                ? GradientRotation(assetStyle.rotateRadian!)
                 : null,
-            stops: tokensHelper.getStopsByTokenName(tokenName),
-            colors: tokenName == 'DUSD'
+            stops: assetStyle.stops,
+            colors: assetStyle.tokenName == 'DUSD'
                 ? [
-              tokensHelper.getColorsByTokenName(tokenName)[0].withOpacity(0.1),
-              tokensHelper.getColorsByTokenName(tokenName)[1].withOpacity(0.1),
+              assetStyle.gradientColors![0].withOpacity(0.1),
+              assetStyle.gradientColors![1].withOpacity(0.1),
                   ]
                 : [
-              tokensHelper.getColorsByTokenName(tokenName)[0].withOpacity(0.16),
-              tokensHelper.getColorsByTokenName(tokenName)[1].withOpacity(0.16),
+              assetStyle.gradientColors![0].withOpacity(0.16),
+              assetStyle.gradientColors![1].withOpacity(0.16),
                   ],
           ) : null,
         ),
         child: Image.asset(
-          tokensHelper.getImagePathByTokenName(tokenName)!,
+          assetStyle.imgPath!,
         ),
       );
     } else {
@@ -54,10 +55,10 @@ class AssetLogo extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: isBorder ? LinearGradient(
-            stops: tokensHelper.getStopsByTokenName(tokenName),
+            stops: assetStyle.stops,
             colors: [
-              tokensHelper.getColorsByTokenName(tokenName)[0].withOpacity(0.16),
-              tokensHelper.getColorsByTokenName(tokenName)[1].withOpacity(0.16),
+              assetStyle.gradientColors![0].withOpacity(0.16),
+              assetStyle.gradientColors![1].withOpacity(0.16),
             ],
           ) : null,
         ),
@@ -70,8 +71,8 @@ class AssetLogo extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  stops: tokensHelper.getStopsByTokenName(tokenName),
-                  colors: tokensHelper.getColorsByTokenName(tokenName),
+                  stops: assetStyle.stops,
+                  colors: assetStyle.gradientColors!,
                 ),
               ),
             ),
@@ -79,13 +80,9 @@ class AssetLogo extends StatelessWidget {
               'assets/images/tokens/default.png',
             ),
             Text(
-              tokenName,
+              assetStyle.tokenName!,
               style: TextStyle(
-                fontSize: (tokenName.length < 4)
-                    ? ((8 * size) / 50)
-                    : (tokenName.length == 4)
-                        ? ((7 * size) / 50)
-                        : ((5 * size) / 50),
+                fontSize: tokensHelper.calculateFontSizeFromAssetLogo(assetStyle.tokenName!, size),
                 fontWeight: FontWeight.bold,
                 color: Color(0xFFFFFFFF),
                 letterSpacing: 0.93,

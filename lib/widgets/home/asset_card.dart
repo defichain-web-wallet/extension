@@ -95,7 +95,10 @@ class _AssetCardState extends State<AssetCard> {
                 pair: widget.tokens[widget.index].symbol!
               ),
             if (!widget.tokens[widget.index].isPair!)
-              AssetLogo(tokenName: widget.tokens[widget.index].symbol!),
+              AssetLogo(
+                assetStyle: tokensHelper.getAssetStyleByTokenName(
+                    widget.tokens[widget.index].symbol!),
+              ),
             SizedBox(
               width: 10,
             ),

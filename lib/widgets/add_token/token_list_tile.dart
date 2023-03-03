@@ -1,3 +1,4 @@
+import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -74,7 +75,10 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                             SizedBox(
                               width: 11,
                             ),
-                            AssetLogo(tokenName: widget.tokenName,),
+                            AssetLogo(
+                              assetStyle: tokenHelper
+                                  .getAssetStyleByTokenName(widget.tokenName),
+                            ),
                             SizedBox(
                               width: 11,
                             ),

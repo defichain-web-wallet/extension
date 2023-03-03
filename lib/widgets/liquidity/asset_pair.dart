@@ -42,14 +42,16 @@ class _AssetPairState extends State<AssetPair> with ThemeMixin {
             height: height,
           ),
           AssetLogo(
-            tokenName: widget.pair.split('-')[0],
+            assetStyle:
+                tokenHelper.getAssetStyleByTokenName(widget.pair.split('-')[1]),
             size: height,
             isBorder: false,
           ),
           Padding(
             padding: EdgeInsets.only(left: 20),
             child: AssetLogo(
-              tokenName: widget.pair.split('-')[1],
+              assetStyle: tokenHelper
+                  .getAssetStyleByTokenName(widget.pair.split('-')[1]),
               size: height,
               isBorder: false,
             ),
