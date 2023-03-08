@@ -284,44 +284,4 @@ class _EarnScreenNewState extends State<EarnScreenNew>
       ),
     );
   }
-
-  setupLockAccessToken() async {
-    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-
-    showDialog(
-      barrierColor: Color(0x0f180245),
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context1) {
-        return PassConfirmDialog(
-          onCancel: () {
-            //
-          },
-          onSubmit: (password) async {
-            var keyPair = await HDWalletService().getKeypairFromStorage(
-              password,
-              accountCubit.state.accounts!.first.index!,
-            );
-            String? lockAccessToken = await lockCubit.createLockAccount(
-              accountCubit.state.accounts!.first,
-              keyPair,
-            );
-            String? accessToken = await fiatCubit.signUp(
-              accountCubit.state.accounts!.first,
-              keyPair,
-            );
-            accountCubit.state.accounts!.first.lockAccessToken = lockAccessToken;
-            accountCubit.state.accounts!.first.accessToken = accessToken;
-            await accountCubit.saveAccountsToStorage(
-              accountsMainnet: accountCubit.state.accounts!,
-            );
-            loadEarnData();
-          },
-          context: context,
-        );
-      },
-    );
-  }
 }
