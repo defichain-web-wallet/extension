@@ -384,7 +384,9 @@ class TokensHelper {
   }
 
   String getTokenWithPrefix(token) {
-    return (token != 'DFI' && token != 'DUSD' && token != 'csETH') ? 'd' + token : token;
+    return (token != 'DFI' && token != 'DUSD' && token != 'csETH')
+        ? 'd' + token
+        : token;
   }
 
   bool isPair(symbol) {
@@ -399,12 +401,11 @@ class TokensHelper {
     try {
       AssetPairModel assetPair = tokensPairs.firstWhere((element) =>
           element.symbol! == symbol || element.symbol! == testnetSymbol);
-      if (token == 'DFI') {
-        return assetPair.reserveADivReserveB! * amount;
-      }
-      AssetPairModel targetPair = tokensPairs
-          .firstWhere((item) {
-          return item.tokenA == token && (item.tokenB == 'DFI' || item.tokenB == 'DUSD');
+      return assetPair.reserveADivReserveB! * amount;
+      if (token == 'DFI') {}
+      AssetPairModel targetPair = tokensPairs.firstWhere((item) {
+        return item.tokenA == token &&
+            (item.tokenB == 'DFI' || item.tokenB == 'DUSD');
       });
 
       double dfiByUsd = assetPair.reserveADivReserveB!;
@@ -431,13 +432,13 @@ class TokensHelper {
 
     try {
       AssetPairModel assetPair = tokensPairs.firstWhere((element) =>
-      element.symbol! == symbol || element.symbol! == testnetSymbol);
+          element.symbol! == symbol || element.symbol! == testnetSymbol);
       if (token == 'DFI') {
         return assetPair.reserveADivReserveB! * amount;
       }
-      AssetPairModel targetPair = tokensPairs
-          .firstWhere((item) {
-        return item.tokenA == token && (item.tokenB == 'DFI' || item.tokenB == 'BTC');
+      AssetPairModel targetPair = tokensPairs.firstWhere((item) {
+        return item.tokenA == token &&
+            (item.tokenB == 'DFI' || item.tokenB == 'BTC');
       });
 
       double dfiByUsd = assetPair.reserveADivReserveB!;
@@ -463,8 +464,7 @@ class TokensHelper {
       if (baseAsset == 'DFI') {
         return amount;
       } else {
-        AssetPairModel assetPair =
-        tokensPairs.firstWhere((element) =>
+        AssetPairModel assetPair = tokensPairs.firstWhere((element) =>
             element.tokenA! == baseAsset && !element.tokenB!.contains('v1'));
         return assetPair.reserveBDivReserveA! * amount;
       }
@@ -490,18 +490,15 @@ class TokensHelper {
     String quoteAsset = symbol.split('-')[1];
 
     if (resultAsset == 'USD') {
-      baseBalanceByAsset =
-          getAmountByUsd(tokensPairs, baseBalance, baseAsset);
+      baseBalanceByAsset = getAmountByUsd(tokensPairs, baseBalance, baseAsset);
       quoteBalanceByAsset =
           getAmountByUsd(tokensPairs, quoteBalance, quoteAsset);
     } else if (resultAsset == 'BTC') {
-      baseBalanceByAsset =
-        getAmountByBtc(tokensPairs, baseBalance, baseAsset);
+      baseBalanceByAsset = getAmountByBtc(tokensPairs, baseBalance, baseAsset);
       quoteBalanceByAsset =
-        getAmountByBtc(tokensPairs, quoteBalance, quoteAsset);
+          getAmountByBtc(tokensPairs, quoteBalance, quoteAsset);
     } else {
-      baseBalanceByAsset =
-          getAmountByDfi(tokensPairs, baseBalance, baseAsset);
+      baseBalanceByAsset = getAmountByDfi(tokensPairs, baseBalance, baseAsset);
       quoteBalanceByAsset =
           getAmountByDfi(tokensPairs, quoteBalance, quoteAsset);
     }
@@ -525,7 +522,8 @@ class TokensHelper {
     dynamic result;
 
     if (apr != 0) {
-      result = '${(apr * 100).toStringAsFixed(2)} ${isPersentSymbol == true ? '%' : ''}';
+      result =
+          '${(apr * 100).toStringAsFixed(2)} ${isPersentSymbol == true ? '%' : ''}';
     } else {
       result = 'N/A';
     }

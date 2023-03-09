@@ -17,7 +17,8 @@ class LedgerSigningService implements SigningWalletService {
 
   @override
   Future<Uint8List> getPublicKey(
-      AccountModel accountModel, String address, String network) async {
+      AccountModel accountModel, String address, String network,
+      {ECPair? key}) async {
     var addressModel = accountModel.addressList!
         .firstWhere((element) => element.address == address);
     var compressedKey = _compressPubkey(pubkey: addressModel.pubKey!);
@@ -30,7 +31,8 @@ class LedgerSigningService implements SigningWalletService {
       AccountModel accountModel,
       List<UtxoModel> utxoModel,
       String network,
-      String changePath) async {
+      String changePath,
+      {ECPair? key}) async {
     var prevOuts = List<LedgerTransactionRaw>.empty(growable: true);
     var prevOutsJson = List<dynamic>.empty(growable: true);
     var paths = List<String>.empty(growable: true);
@@ -88,8 +90,9 @@ class LedgerSigningService implements SigningWalletService {
   }
 
   @override
-  Future<String> signMessage(AccountModel accountModel, String address,
-      String message, String network) async {
+  Future<String> signMessage(
+      AccountModel accountModel, String address, String message, String network,
+      {ECPair? key}) async {
     var signature = await promiseToFuture(
         signMessageLedger(accountModel.addressList![0].getPath(), message));
     return signature;

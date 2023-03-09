@@ -263,8 +263,6 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               callback: (parent) async {
                                 final isLedger =
                                     await SettingsHelper.isLedger();
-                                final passwordScreenNeeded =
-                                    await SettingsHelper.needPasswordScreen();
 
                                 parent.emitPending(true);
                                 if (widget.btcTx != '') {

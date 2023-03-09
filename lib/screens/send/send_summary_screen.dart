@@ -95,7 +95,10 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   }
 
   cutAddress(String s) {
-    return s.substring(0, 14) + '...' + s.substring(28, 42);
+    if (s.length >= 42) {
+      return s.substring(0, 14) + '...' + s.substring(28, 42);
+    }
+    return s;
   }
 
   @override
@@ -440,24 +443,26 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                 },
                                               );
                                             } else {
+                                              parent.emitPending(true);
                                               showDialog(
                                                 barrierColor: Color(0x0f180245),
                                                 barrierDismissible: false,
                                                 context: context,
                                                 builder:
                                                     (BuildContext context1) {
-                                                  parent.emitPending(true);
                                                   return PassConfirmDialog(
-                                                      onSubmit:
-                                                          (password) async {
-                                                    await submitSend(
-                                                      state,
-                                                      tokensState,
-                                                      password,
-                                                    );
-
-                                                    parent.emitPending(false);
-                                                  });
+                                                    onCancel: () {
+                                                      parent.emitPending(false);
+                                                    },
+                                                    onSubmit: (password) async {
+                                                      await submitSend(
+                                                        state,
+                                                        tokensState,
+                                                        password,
+                                                      );
+                                                    },
+                                                    context: context,
+                                                  );
                                                 },
                                               );
                                             }

@@ -10,11 +10,21 @@ import 'package:defichaindart/defichaindart.dart';
 import 'package:hive/hive.dart';
 
 abstract class SigningWalletService {
-  Future<Uint8List> getPublicKey(AccountModel accountModel, String address, String network);
+  Future<Uint8List> getPublicKey(
+      AccountModel accountModel, String address, String network,
+      {ECPair? key});
 
-  Future<String> signTransaction(TransactionBuilder txBuilder, AccountModel accountModel, List<UtxoModel> utxoModel, String network, String changePath);
+  Future<String> signTransaction(
+      TransactionBuilder txBuilder,
+      AccountModel accountModel,
+      List<UtxoModel> utxoModel,
+      String network,
+      String changePath,
+      {ECPair? key});
 
-  Future<String> signMessage(AccountModel accountModel, String address, String message, String network);
+  Future<String> signMessage(
+      AccountModel accountModel, String address, String message, String network,
+      {ECPair? key});
 }
 
 class SigningServiceSelector {
