@@ -414,7 +414,7 @@ class FiatCubit extends Cubit<FiatState> {
       CryptoRouteModel? route;
       if (data['kycDataComplete']) {
         route = await dfxRequests.getCryptoRoutes(accessToken);
-        if (route == null && data['kycStatus'] == 'Complete') {
+        if (route == null && data['kycStatus'] == 'Completed') {
           route = await dfxRequests.createCryptoRoute(accessToken);
         }
       }
@@ -502,5 +502,15 @@ class FiatCubit extends Cubit<FiatState> {
     } finally {
       await box.close();
     }
+  }
+
+  List<AssetByFiatModel> getAssetsWithoutPair(List<AssetByFiatModel> assets) {
+    List<AssetByFiatModel> filteredAssets = [];
+    assets.forEach((element) {
+      if(!element.isPair!) {
+        filteredAssets.add(element);
+      }
+    });
+    return filteredAssets;
   }
 }

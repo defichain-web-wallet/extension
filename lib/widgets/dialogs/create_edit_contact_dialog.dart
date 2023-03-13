@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/helpers/addresses_helper.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -10,7 +11,7 @@ import 'package:flutter/material.dart';
 class CreateEditContactDialog extends StatefulWidget {
   final bool isEdit;
   final Function()? deleteCallback;
-  final Function(String name, String address) confirmCallback;
+  final Function(String name, String address, String network) confirmCallback;
   final String contactName;
   final String address;
 
@@ -29,7 +30,7 @@ class CreateEditContactDialog extends StatefulWidget {
 }
 
 class _CreateEditContactDialogState extends State<CreateEditContactDialog>
-    with ThemeMixin {
+    with ThemeMixin, NetworkMixin {
   AddressesHelper addressHelper = AddressesHelper();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
@@ -44,9 +45,11 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   String subtitleText = 'Enter name and address';
   String titleDeleteContact = 'Delete contact';
   bool isValidAddress = false;
+  bool isValidBitcoinAddress = false;
   late String titleText;
   late double contentHeight;
   late bool isEnable;
+  late String network;
 
   @override
   void dispose() {
@@ -74,7 +77,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
     setState(() {
       if (_nameController.text.length > 0 &&
           _addressController.text.isNotEmpty &&
-          isValidAddress) {
+          (isValidAddress || isValidBitcoinAddress)) {
         isEnable = true;
       } else {
         isEnable = false;
@@ -118,10 +121,12 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
               NewPrimaryButton(
                 width: 104,
                 callback: isEnable
-                    ? () {
+                    ? () async {
+                  network = await addressNetwork(_addressController.text);
                         widget.confirmCallback!(
                           _nameController.text,
                           _addressController.text,
+                          network,
                         );
                       }
                     : null,
@@ -250,6 +255,9 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                   onChanged: (value) async {
                                     isValidAddress = await addressHelper
                                         .validateAddress(_addressController.text);
+                                    isValidBitcoinAddress =
+                                        await addressHelper.validateBtcAddress(
+                                            _addressController.text);
                                     checkButtonStatus();
                                   },
                                 ),
@@ -302,6 +310,9 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                   onChanged: (value) async {
                                     isValidAddress = await addressHelper
                                         .validateAddress(_addressController.text);
+                                    isValidBitcoinAddress =
+                                        await addressHelper.validateBtcAddress(
+                                            _addressController.text);
                                     checkButtonStatus();
                                   },
                                 ),

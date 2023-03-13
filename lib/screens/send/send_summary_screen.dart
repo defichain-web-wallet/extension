@@ -10,7 +10,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
@@ -453,34 +453,48 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
         amount: balancesHelper.toSatoshi(widget.amount.toString()),
         satPerByte: widget.fee!,
       );
-      var txResponse = await bitcoinCubit.sendTransaction(tx);
-      showDialog(
-        barrierColor: Color(0x0f180245),
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext dialogContext) {
-          return TxStatusDialog(
-            txResponse: txResponse,
-            callbackOk: () async {
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) => HomeScreen(
-                    isLoadTokens: true,
+      if (tx.isError!) {
+        showSnackBar(
+          context,
+          title: tx.error!,
+          color: AppColors.txStatusError
+              .withOpacity(0.1),
+          prefix: Icon(
+            Icons.close,
+            color: AppColors.txStatusError,
+          ),
+        );
+      } else {
+        var txResponse = await bitcoinCubit.sendTransaction(tx.txLoaderList![0].txHex!);
+
+        showDialog(
+          barrierColor: Color(0x0f180245),
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext dialogContext) {
+            return TxStatusDialog(
+              txResponse: txResponse,
+              callbackOk: () async {
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => HomeScreen(
+                      isLoadTokens: true,
+                    ),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ),
-              );
-            },
-            callbackTryAgain: () async {
-              print('TryAgain');
-              await _sendTransaction(
-                  context, tokens, widget.token.symbol!, account, keyPair);
-            },
-          );
-        },
-      );
+                );
+              },
+              callbackTryAgain: () async {
+                print('TryAgain');
+                await _sendTransaction(
+                    context, tokens, widget.token.symbol!, account, keyPair);
+              },
+            );
+          },
+        );
+      }
     } else {
       await _sendTransaction(
           context, tokens, widget.token.symbol!, account, keyPair);

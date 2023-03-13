@@ -224,14 +224,9 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                                     isSelect: symbols.contains(
                                                         availableTokens[index]
                                                             .symbol),
-                                                    imgPath:
-                                                        '${tokenHelper.getImageNameByTokenName(tokenName)}',
                                                     tokenName: '$tokenName',
                                                     availableTokenName:
                                                         '${availableTokens[index].name}',
-                                                    tokenColor:
-                                                        availableTokens[index]
-                                                            .color,
                                                   ),
                                                 ],
                                               );

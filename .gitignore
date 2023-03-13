@@ -30,6 +30,7 @@
 .pub-cache/
 .pub/
 /build/
+/scripts/client_secrets.json
 
 # Web related
 
