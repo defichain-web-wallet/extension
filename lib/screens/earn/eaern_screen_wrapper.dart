@@ -131,10 +131,10 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
       isLoading: isLoading,
       title: 'Liquidity mining',
       subTitle:
-          'up to ${TokensHelper().getAprFormat(tokensState.maxAPR!, true)} APR',
+          'up to ${TokensHelper().getAprFormat(tokensState.maxAPR ?? 0, true)} APR',
       imagePath: 'assets/pair_icons/dfi_btc.png',
       firstColumnNumber: balancesHelper
-          .numberStyling(tokensState.totalPairsBalance!, fixed: true),
+          .numberStyling(tokensState.totalPairsBalance ?? 0, fixed: true),
       firstColumnAsset: 'USD',
       firstColumnSubTitle: 'Pooled',
       secondColumnNumber: avaragePairsAPR,
