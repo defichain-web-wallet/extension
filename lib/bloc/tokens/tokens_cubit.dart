@@ -45,7 +45,6 @@ class TokensCubit extends Cubit<TokensState> {
   }
 
   calculateEarnPage(context) async {
-    print('sss');
     emit(state.copyWith(
       status: TokensStatusList.loading,
     ));
