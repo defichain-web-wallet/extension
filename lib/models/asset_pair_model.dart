@@ -5,6 +5,7 @@ class AssetPairModel {
   int? idA;
   int? idB;
   String? symbol;
+  String? name;
   String? tokenA;
   String? tokenB;
   bool? status;
@@ -23,6 +24,7 @@ class AssetPairModel {
     this.idA,
     this.idB,
     this.symbol,
+    this.name,
     this.tokenA,
     this.tokenB,
     this.status,
@@ -42,6 +44,7 @@ class AssetPairModel {
     this.idA = int.parse(json["tokenA"]["id"]);
     this.idB = int.parse(json["tokenB"]["id"]);
     this.symbol = json["symbol"];
+    this.name = json["name"];
     this.tokenA = json["symbol"].split('-')[0];
     this.tokenB = json["symbol"].split('-')[1];
     this.status = json["status"];
@@ -79,6 +82,7 @@ class AssetPairModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data["id"] = this.id;
     data["symbol"] = this.symbol;
+    data["name"] = this.name;
     data["tokenA"] = this.tokenA;
     data["tokenB"] = this.tokenB;
     data["status"] = this.status;
