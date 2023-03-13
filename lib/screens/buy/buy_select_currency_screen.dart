@@ -236,13 +236,8 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                                             },
                                             isSelect: symbol ==
                                                 availableTokens[index].name,
-                                            imgPath:
-                                            '${tokenHelper.getImageNameByTokenName(tokenName)}',
                                             tokenName: '$tokenName',
                                             availableTokenName: getFullTokenName(tokensState, tokenName),
-                                            tokenColor:
-                                            availableTokens[index]
-                                                .color,
                                           ),
                                         ],
                                       );

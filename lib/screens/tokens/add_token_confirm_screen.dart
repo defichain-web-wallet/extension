@@ -143,13 +143,9 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
                                             print('12');
                                           },
                                           isSelect: false,
-                                          imgPath:
-                                              '${tokenHelper.getImageNameByTokenName(tokenName)}',
                                           tokenName: '$tokenName',
                                           availableTokenName:
                                               '${symbols[index]}',
-                                          tokenColor: tokenHelper
-                                              .getColorByTokenName(tokenName),
                                         ),
                                       ],
                                     );
