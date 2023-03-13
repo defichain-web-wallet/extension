@@ -127,41 +127,39 @@ class LockCubit extends Cubit<LockState> {
     bool needUserDetails = false,
     bool needKycDetails = false,
   }) async {
-    if (state.status != LockStatusList.expired) {
+    emit(state.copyWith(
+      status: LockStatusList.loading,
+    ));
+
+    try {
+      LockUserModel? userData;
+      LockAnalyticsModel? analyticsData;
+      LockStakingModel? stakingData =
+      await lockRequests.getStaking(account.lockAccessToken!);
+
+      if (needUserDetails) {
+        userData =
+        await lockRequests.getUser(account.lockAccessToken!);
+      }
+      if (needKycDetails) {
+        analyticsData =
+        await lockRequests.getAnalytics(account.lockAccessToken!);
+      }
       emit(state.copyWith(
-        status: LockStatusList.loading,
+        status: LockStatusList.success,
+        lockStakingDetails: stakingData,
+        lockUserDetails: userData,
+        lockAnalyticsDetails: analyticsData,
       ));
-
-      try {
-        LockUserModel? userData;
-        LockAnalyticsModel? analyticsData;
-        LockStakingModel? stakingData =
-          await lockRequests.getStaking(account.lockAccessToken!);
-
-        if (needUserDetails) {
-          userData =
-            await lockRequests.getUser(account.lockAccessToken!);
-        }
-        if (needKycDetails) {
-          analyticsData =
-            await lockRequests.getAnalytics(account.lockAccessToken!);
-        }
+    } catch (err) {
+      if (err == '401') {
         emit(state.copyWith(
-          status: LockStatusList.success,
-          lockStakingDetails: stakingData,
-          lockUserDetails: userData,
-          lockAnalyticsDetails: analyticsData,
+          status: LockStatusList.expired,
         ));
-      } catch (err) {
-        if (err == '401') {
-          emit(state.copyWith(
-            status: LockStatusList.expired,
-          ));
-        } else {
-          emit(state.copyWith(
-            status: LockStatusList.failure,
-          ));
-        }
+      } else {
+        emit(state.copyWith(
+          status: LockStatusList.failure,
+        ));
       }
     }
   }

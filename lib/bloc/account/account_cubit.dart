@@ -50,6 +50,7 @@ class AccountCubit extends Cubit<AccountState> {
   AccountState get accountState => state;
 
   createAccount(List<String> mnemonic, String password) async {
+    int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
     emit(state.copyWith(status: AccountStatusList.loading));
 
     var box = await Hive.openBox(HiveBoxes.client);
@@ -58,6 +59,7 @@ class AccountCubit extends Cubit<AccountState> {
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     var encryptedPassword = Crypt.sha256(password).toString();
     await box.put(HiveNames.password, encryptedPassword);
+    await box.put(HiveNames.generatedAccessToken, currentTimestamp);
     await box.close();
 
     final seed = convertMnemonicToSeed(mnemonic);
@@ -95,9 +97,9 @@ class AccountCubit extends Cubit<AccountState> {
     accountsMainnet.add(accountMainnet);
     accountsTestnet.add(accountTestnet);
 
-    String accessToken = await fiatCubit.getAccessToken(
+    String? accessToken = await fiatCubit.signUp(
         accountMainnet, masterKeyPairMainnetPrivateKey);
-    String lockAccessToken = await lockCubit.getAccessToken(
+    String? lockAccessToken = await lockCubit.createLockAccount(
         accountMainnet, masterKeyPairMainnetPrivateKey);
 
     accountMainnet.accessToken = accessToken;
@@ -366,9 +368,12 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   restoreAccount(List<String> mnemonic, String password) async {
+    int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
+
     var box = await Hive.openBox(HiveBoxes.client);
     await box.put(HiveNames.kycStatus, 'show');
     await box.put(HiveNames.tutorialStatus, 'show');
+    await box.put(HiveNames.generatedAccessToken, currentTimestamp);
     await box.close();
     SettingsHelper settingsHelper = SettingsHelper();
 
@@ -473,12 +478,14 @@ class AccountCubit extends Cubit<AccountState> {
     String network, {
     String password = '',
   }) async {
+    int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
     List<AccountModel> accounts = [];
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     var masterKeyName;
     var accountsName;
     var box = await Hive.openBox(HiveBoxes.client);
     var swapTutorialStatus = await box.get(HiveNames.swapTutorialStatus);
+    var generatedAccessToken = await box.get(HiveNames.generatedAccessToken);
 
     if (network == testnet) {
       masterKeyName = HiveNames.masterKeyPairTestnetPublic;
@@ -517,6 +524,27 @@ class AccountCubit extends Cubit<AccountState> {
     accounts = accountList;
 
     if (password.isNotEmpty) {
+      if (generatedAccessToken == null ||
+          generatedAccessToken + TickerTimes.durationAccessToken <
+              currentTimestamp) {
+        var keyPair = await HDWalletService().getKeypairFromStorage(
+          password,
+          accounts.first.index!,
+        );
+
+        String? accessTokenDFX = await fiatCubit.signIn(
+          accounts.first,
+          keyPair,
+        );
+        String? accessTokenLOCK = await lockCubit.signIn(
+          accounts.first,
+          keyPair,
+        );
+
+        accounts.first.accessToken = accessTokenDFX;
+        accounts.first.lockAccessToken = accessTokenLOCK;
+      }
+
       if (SettingsHelper.settings.network! == testnet) {
         await saveAccountsToStorage(
           accountsTestnet: accounts,

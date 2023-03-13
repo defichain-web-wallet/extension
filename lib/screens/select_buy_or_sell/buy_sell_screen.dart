@@ -183,14 +183,14 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                           CrossAxisAlignment.end,
                                       children: [
                                         if (isLoading && hasAccessToken)
-                                          SkeletonLine(
-                                            style: SkeletonLineStyle(
-                                                padding:
-                                                    EdgeInsets.only(top: 1),
-                                                height: 22,
-                                                width: 124,
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
+                                          Text(
+                                            'N/A',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline1!
+                                                .copyWith(
+                                                  fontSize: 40,
+                                                ),
                                           )
                                         else ...[
                                           Text(
@@ -281,7 +281,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                     iconPath:
                                         'assets/icons/increase_limits.png',
                                     callback: () {
-                                      FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+                                      FiatCubit fiatCubit =
+                                          BlocProvider.of<FiatCubit>(context);
                                       fiatCubit.setLoadingState();
 
                                       AccessTokenHelper.setupLockAccessToken(

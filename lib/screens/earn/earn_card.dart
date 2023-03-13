@@ -92,29 +92,20 @@ class _EarnCardState extends State<EarnCard> {
                                   ),
                             )
                           else
-                            widget.isLoading
-                              ? SkeletonLine(
-                                  style: SkeletonLineStyle(
-                                      padding: EdgeInsets.only(
-                                          top: 1),
-                                      height: 10,
-                                      width: 64,
-                                      borderRadius: BorderRadius.circular(8)),
-                                )
-                              : Text(
-                                  widget.subTitle!,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline5!
-                                      .copyWith(
-                                        fontSize: 12,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .headline5!
-                                            .color!
-                                            .withOpacity(0.3),
-                                      ),
-                                ),
+                            Text(
+                              widget.isLoading ? 'N/A' : widget.subTitle!,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .copyWith(
+                                    fontSize: 12,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .color!
+                                        .withOpacity(0.3),
+                                  ),
+                            ),
                         ],
                       ),
                     ],
@@ -131,14 +122,14 @@ class _EarnCardState extends State<EarnCard> {
                           children: [
                             if (!widget.needUpdateAccessToken) ...[
                               widget.isLoading
-                                  ? SkeletonLine(
-                                      style: SkeletonLineStyle(
-                                          padding: EdgeInsets.only(
-                                              top: 4, bottom: 3),
-                                          height: 20,
-                                          width: 64,
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
+                                  ? Text(
+                                      'N/A',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline4!
+                                          .copyWith(
+                                            fontSize: 20,
+                                          ),
                                     )
                                   : Row(
                                       crossAxisAlignment:
@@ -197,45 +188,49 @@ class _EarnCardState extends State<EarnCard> {
                             children: [
                               if (!widget.needUpdateAccessToken)
                                 widget.isLoading
-                                    ? SkeletonLine(
-                                  style: SkeletonLineStyle(
-                                      padding: EdgeInsets.only(
-                                          top: 4, bottom: 3),
-                                      height: 20,
-                                      width: 64,
-                                      borderRadius: BorderRadius.circular(8)),
-                                )
-                                    :Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      widget.secondColumnNumber!,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline4!
-                                          .copyWith(
-                                        fontSize: 20,
-                                        color: AppColors.malachite,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: 2.0),
-                                      child: Text(
-                                        widget.secondColumnAsset!,
+                                    ? Text(
+                                        'N/A',
                                         style: Theme.of(context)
                                             .textTheme
                                             .headline4!
                                             .copyWith(
-                                          fontSize: 13,
-                                          color: AppColors.malachite,
-                                        ),
+                                              fontSize: 20,
+                                              color: AppColors.malachite,
+                                            ),
+                                      )
+                                    : Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            widget.secondColumnNumber!,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline4!
+                                                .copyWith(
+                                                  fontSize: 20,
+                                                  color: AppColors.malachite,
+                                                ),
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 2.0),
+                                            child: Text(
+                                              widget.secondColumnAsset!,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline4!
+                                                  .copyWith(
+                                                    fontSize: 13,
+                                                    color: AppColors.malachite,
+                                                  ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
                               Text(
                                 widget.secondColumnSubTitle!,
                                 style: Theme.of(context)

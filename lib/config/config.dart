@@ -23,6 +23,7 @@ class ScreenSizes {
 
 class TickerTimes {
   static const int tickerBeforeLockMilliseconds = 60000 * 5;
+  static const int durationAccessToken = 162000000; // 45h
 }
 
 class ToolbarSizes {
