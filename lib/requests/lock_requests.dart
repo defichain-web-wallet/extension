@@ -55,7 +55,7 @@ class LockRequests {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body)['accessToken'];
       } else {
-        return await signUp(account, keyPair);
+        return '';
       }
     } catch (_) {
       return '';

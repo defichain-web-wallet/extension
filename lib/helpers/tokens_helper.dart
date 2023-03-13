@@ -12,6 +12,28 @@ class TokensHelper {
   static const String DefiTokenSymbol = '\$DFI';
   final _random = math.Random();
 
+  double getMaxAPR(List<AssetPairModel> tokenPairs) {
+    double maxValue = 0;
+
+    tokenPairs.forEach((element) {
+      if (maxValue < element.apr!) {
+        maxValue = element.apr!;
+      }
+    });
+    return maxValue;
+  }
+
+  double getAPRbyPair(List<AssetPairModel> tokenPairs, String pair) {
+    double value = 0;
+
+    tokenPairs.forEach((element) {
+      if (pair == element.symbol) {
+        value = element.apr!;
+      }
+    });
+    return value;
+  }
+
   String getImageNameByTokenName(tokenName) {
     switch (tokenName) {
       case 'DFI':

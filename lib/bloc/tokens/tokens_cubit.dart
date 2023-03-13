@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -8,6 +9,7 @@ import 'package:defi_wallet/requests/token_requests.dart';
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 
 part 'tokens_state.dart';
@@ -29,6 +31,7 @@ class TokensCubit extends Cubit<TokensState> {
       emit(state.copyWith(
         status: TokensStatusList.success,
         tokens: tokens,
+        maxAPR: TokensHelper().getMaxAPR(List.from(tokensDex[1])),
         foundTokens: List.from(tokens),
         tokensForSwap: tokensDex[0],
         tokensPairs: List.from(tokensDex[1]),
@@ -39,6 +42,66 @@ class TokensCubit extends Cubit<TokensState> {
         status: TokensStatusList.failure,
       ));
     }
+  }
+
+  calculateEarnPage(context) async {
+    print('sss');
+    emit(state.copyWith(
+      status: TokensStatusList.loading,
+    ));
+    var averageAccountAPR = calculateAverageAccountAPR(context);
+    var totalPairsBalance =  calculateTotalPairsBalance(context);
+    emit(state.copyWith(
+      averageAccountAPR: averageAccountAPR,
+      totalPairsBalance: totalPairsBalance,
+      status: TokensStatusList.success,
+    ));
+  }
+
+  double calculateAverageAccountAPR(context) {
+    double totalPairsAPR = 0;
+    int countPairs = 0;
+    var accountState = BlocProvider.of<AccountCubit>(context).accountState;
+    accountState.activeAccount!.balanceList!.forEach((element) {
+      if (element.isPair! && !element.isHidden!) {
+        countPairs += 1;
+        totalPairsAPR +=
+            TokensHelper().getAPRbyPair(state.tokensPairs!, element.token!);
+      }});
+
+    return countPairs > 0 ? totalPairsAPR / countPairs : 0;
+  }
+
+  //TODO: maybe need to create balance cubit
+  double calculateTotalPairsBalance(context)  {
+    double totalPairsBalance = 0;
+    var accountState = BlocProvider.of<AccountCubit>(context).accountState;
+    accountState.activeAccount!.balanceList!.forEach((element) {
+      if (element.isPair! && !element.isHidden!) {
+        var foundedAssetPair = List.from(state.tokensPairs!
+            .where((item) => element.token == item.symbol))[0];
+
+        double baseBalance = element.balance! *
+            (1 / foundedAssetPair.totalLiquidityRaw) *
+            foundedAssetPair.reserveA!;
+        double quoteBalance = element.balance! *
+            (1 / foundedAssetPair.totalLiquidityRaw) *
+            foundedAssetPair.reserveB!;
+
+        totalPairsBalance += tokenHelper.getAmountByUsd(
+          state.tokensPairs!,
+          baseBalance,
+          foundedAssetPair.tokenA,
+        );
+        totalPairsBalance += tokenHelper.getAmountByUsd(
+          state.tokensPairs!,
+          quoteBalance,
+          foundedAssetPair.tokenB,
+        );
+      }
+    });
+
+    return totalPairsBalance;
   }
 
   loadTokensFromStorage() async {

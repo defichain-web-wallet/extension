@@ -3,9 +3,11 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
+import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:defi_wallet/widgets/selectors/fees_selector.dart';
@@ -155,9 +157,25 @@ class _UiKitState extends State<UiKit>
               Row(
                 children: [
                   FlatButton(
-                    title: 'Buy/Sell',
+                    title: 'TxStatusDialog',
                     callback: () {
-                      //
+                      showDialog(
+                        barrierColor: Color(0x0f180245),
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (BuildContext dialogContext) {
+                          return TxStatusDialog(
+                            title: 'Transaction initiated',
+                            subtitle: 'Your transaction is now processed in the background. It will take up to 48h until the money arrives in your bank account. Thanks for choosing DFX.',
+                            buttonLabel: 'Done',
+                            txResponse: TxErrorModel(isError: true),
+                            callbackOk: () {
+                            },
+                            callbackTryAgain: () async {
+                            },
+                          );
+                        },
+                      );
                     },
                   ),
                   FlatButton(

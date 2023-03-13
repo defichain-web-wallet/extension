@@ -39,8 +39,10 @@ class WalletsHelper {
   Future<List<AccountModel>> restoreWallet(bip32.BIP32 masterKeyPair, String network, Function(int, int) statusBar) async {
     List<AccountModel> accountList = [];
     int lastIndexWithHistory = 0;
-    for (var accountIndex = 0; accountIndex < 10; accountIndex++) {
-      statusBar(10, accountIndex);
+    bool hasHistory = true;
+    int accountIndex = 0;
+    while(hasHistory) {
+      statusBar(accountIndex+1, accountIndex);
       List<AddressModel> addressList = [];
       List<HistoryNew> historyList = [];
       List<HistoryModel> testnetHistoryList = [];
@@ -49,18 +51,21 @@ class WalletsHelper {
       var balances =
           await _balanceRequests.getBalanceListByAddressList(addressList, network);
 
-      if (network == 'mainnet') {
-        List<HistoryNew> txListModel = await _historyRequests.getHistory(
-            addressList[0], 'DFI', network);
-        historyList.addAll(txListModel);
-      } else {
-        TxListModel testnetTxListModel = await _historyRequests.getFullHistoryList(
-            addressList[0], 'DFI', network
-        );
-        testnetHistoryList.addAll(testnetTxListModel.list!);
-      }
+      // if (network == 'mainnet') {
+      //   List<HistoryNew> txListModel = await _historyRequests.getHistory(
+      //       addressList[0], 'DFI', network);
+      //   historyList.addAll(txListModel);
+      // } else {
+      //   TxListModel testnetTxListModel = await _historyRequests.getFullHistoryList(
+      //       addressList[0], 'DFI', network
+      //   );
+      //   testnetHistoryList.addAll(testnetTxListModel.list!);
+      // }
       if (balances.length == 0) {
         balances.add(BalanceModel(token: 'DFI', balance: 0));
+        if(accountIndex > lastIndexWithHistory+1){
+          hasHistory = false;
+        }
       } else {
         lastIndexWithHistory = accountIndex;
       }
@@ -80,6 +85,7 @@ class WalletsHelper {
         activeToken: balances[0].token,
         bitcoinAddress: bitcoinAddress
       ));
+      accountIndex++;
     }
     List<AccountModel> resultList = [];
     accountList.forEach((element) async {
