@@ -164,21 +164,23 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
                           ),
                           Row(
                             children: [
-                              Text(
-                                widget.message,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .subtitle1!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .subtitle1!
-                                          .color!
-                                          .withOpacity(0.6),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                    ),
-                                softWrap: true,
+                              Flexible(
+                                child: Text(
+                                  widget.message,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .subtitle1!
+                                            .color!
+                                            .withOpacity(0.6),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                      ),
+                                  softWrap: true,
+                                ),
                               ),
                             ],
                           ),

@@ -108,7 +108,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                 availableAmountCubit.getAvailable(
                   lockState.lockStakingDetails!.asset!,
                   TxType.send,
-                  accountState.activeAccount!,
+                  accountState.accounts!.first,
                 );
                 return BlocBuilder<TokensCubit, TokensState>(
                   builder: (tokensContext, tokensState) {
@@ -780,9 +780,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                         unstakeCallback(
                                                           password,
                                                           accountState
-                                                              .activeAccount!,
+                                                              .accounts!.first,
                                                           accountState
-                                                              .activeAccount!
+                                                              .accounts!.first
                                                               .lockAccessToken!,
                                                           lockState
                                                               .lockStakingDetails!
@@ -809,13 +809,13 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                         stakeCallback(
                                                           password,
                                                           accountState
-                                                              .activeAccount!,
+                                                              .accounts!.first,
                                                           lockState
                                                               .lockStakingDetails!
                                                               .depositAddress!,
                                                           tokensState.tokens!,
                                                           accountState
-                                                              .activeAccount!
+                                                              .accounts!.first
                                                               .lockAccessToken!,
                                                           lockState
                                                               .lockStakingDetails!
@@ -1031,7 +1031,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
   }
 
   double getAvailableBalance(accountState, asset) {
-    int balance = accountState.activeAccount!.balanceList!
+    int balance = accountState.accounts!.first.balanceList!
         .firstWhere((el) => el.token! == asset && !el.isHidden!)
         .balance!;
     final int fee = 3000;

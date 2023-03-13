@@ -7,6 +7,7 @@ class EarnCard extends StatefulWidget {
   final String? title;
   final String? subTitle;
   final String? imagePath;
+  final String? errorMessage;
   final void Function()? callback;
   final String? firstColumnNumber;
   final String? firstColumnAsset;
@@ -16,7 +17,7 @@ class EarnCard extends StatefulWidget {
   final String? secondColumnSubTitle;
   final bool isStaking;
   final bool isLoading;
-  final bool needSignUp;
+  final bool needUpdateAccessToken;
 
   const EarnCard({
     Key? key,
@@ -32,7 +33,8 @@ class EarnCard extends StatefulWidget {
     required this.isStaking,
     required this.callback,
     required this.isLoading,
-    this.needSignUp = false,
+    this.errorMessage = '',
+    this.needUpdateAccessToken = false,
   }) : super(key: key);
 
   @override
@@ -79,9 +81,9 @@ class _EarnCardState extends State<EarnCard> {
                                       fontSize: 16,
                                     ),
                           ),
-                          if (widget.needSignUp)
+                          if (widget.needUpdateAccessToken)
                             Text(
-                              'Need to create an account for LOCK',
+                              widget.errorMessage!,
                               style: Theme.of(context)
                                   .textTheme
                                   .headline6!
@@ -95,7 +97,7 @@ class _EarnCardState extends State<EarnCard> {
                                   style: SkeletonLineStyle(
                                       padding: EdgeInsets.only(
                                           top: 1),
-                                      height: 12,
+                                      height: 10,
                                       width: 64,
                                       borderRadius: BorderRadius.circular(8)),
                                 )
@@ -127,7 +129,7 @@ class _EarnCardState extends State<EarnCard> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (!widget.needSignUp) ...[
+                            if (!widget.needUpdateAccessToken) ...[
                               widget.isLoading
                                   ? SkeletonLine(
                                       style: SkeletonLineStyle(
@@ -193,7 +195,7 @@ class _EarnCardState extends State<EarnCard> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (!widget.needSignUp)
+                              if (!widget.needUpdateAccessToken)
                                 widget.isLoading
                                     ? SkeletonLine(
                                   style: SkeletonLineStyle(

@@ -10,12 +10,12 @@ class AccessTokenHelper {
   static setupLockAccessToken(
     BuildContext context,
     Function callback, {
-    bool isDfx = true,
-    bool isLock = true,
+    String dialogMessage = '',
+    bool needUpdateDfx = true,
+    bool needUpdateLock = true,
+    bool isExistingAccount = false,
   }) async {
-    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
 
     showDialog(
       barrierColor: Color(0x0f180245),
@@ -23,37 +23,72 @@ class AccessTokenHelper {
       context: context,
       builder: (BuildContext context1) {
         return PassConfirmDialog(
-          message: 'Please entering your password for create account',
+          message: dialogMessage,
           onSubmit: (password) async {
-            var keyPair = await HDWalletService().getKeypairFromStorage(
+            await _onSubmitAccessTokenDialog(
+              context,
               password,
-              accountCubit.state.accounts!.first.index!,
+              needUpdateDfx: needUpdateDfx,
+              needUpdateLock: needUpdateLock,
+              isExistingAccount: isExistingAccount,
             );
-            if (isLock) {
-              String? lockAccessToken = await lockCubit.createLockAccount(
-                accountCubit.state.accounts!.first,
-                keyPair,
-              );
-              accountCubit.state.accounts!.first.lockAccessToken = lockAccessToken;
-            }
-
-            if (isDfx) {
-              String? accessToken = await fiatCubit.signUp(
-                accountCubit.state.accounts!.first,
-                keyPair,
-              );
-              accountCubit.state.accounts!.first.accessToken = accessToken;
-            }
-
-            await accountCubit.saveAccountsToStorage(
-              accountsMainnet: accountCubit.state.accounts!,
-            );
-
             callback();
           },
           context: context,
         );
       },
+    );
+  }
+
+  static _onSubmitAccessTokenDialog(
+    BuildContext context,
+    String password, {
+    bool needUpdateDfx = true,
+    bool needUpdateLock = true,
+    bool isExistingAccount = false,
+  }) async {
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
+    var keyPair = await HDWalletService().getKeypairFromStorage(
+      password,
+      accountCubit.state.accounts!.first.index!,
+    );
+    if (needUpdateLock) {
+      String? lockAccessToken;
+      if (isExistingAccount) {
+        lockAccessToken = await lockCubit.signIn(
+          accountCubit.state.accounts!.first,
+          keyPair,
+        );
+      } else {
+        lockAccessToken = await lockCubit.createLockAccount(
+          accountCubit.state.accounts!.first,
+          keyPair,
+        );
+      }
+      accountCubit.state.accounts!.first.lockAccessToken = lockAccessToken;
+    }
+
+    if (needUpdateDfx) {
+      String? dfxAccessToken;
+      if (isExistingAccount) {
+        dfxAccessToken = await fiatCubit.signIn(
+          accountCubit.state.accounts!.first,
+          keyPair,
+        );
+      } else {
+        dfxAccessToken = await fiatCubit.signUp(
+          accountCubit.state.accounts!.first,
+          keyPair,
+        );
+      }
+      accountCubit.state.accounts!.first.accessToken = dfxAccessToken;
+    }
+
+    await accountCubit.saveAccountsToStorage(
+      accountsMainnet: accountCubit.state.accounts!,
     );
   }
 }
