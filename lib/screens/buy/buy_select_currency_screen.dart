@@ -84,7 +84,8 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                     )));
                 return Container();
               } else {
-                List<AssetByFiatModel> availableTokens = fiatState.foundAssets!;
+                FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+                List<AssetByFiatModel> availableTokens = fiatCubit.getAssetsWithoutPair(fiatState.foundAssets!);
                 return Scaffold(
                   drawerScrimColor: Color(0x0f180245),
                   endDrawer: AccountDrawer(
