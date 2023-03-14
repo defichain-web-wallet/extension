@@ -49,7 +49,7 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
         if (isFirstBuild) {
           AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
           LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-          lockCubit.loadStakingDetails(accountCubit.state.activeAccount!);
+          lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
           isFirstBuild = false;
         }
         return BlocBuilder<LockCubit, LockState>(
