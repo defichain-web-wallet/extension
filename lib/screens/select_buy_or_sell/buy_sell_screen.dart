@@ -53,7 +53,7 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
     hasAccessToken = accountCubit.state.accounts!.first.accessToken != null &&
         accountCubit.state.accounts!.first.accessToken!.isNotEmpty;
     if (hasAccessToken) {
-      fiatCubit.loadUserDetails(accountCubit.state.activeAccount!);
+      fiatCubit.loadUserDetails(accountCubit.state.accounts!.first);
     }
   }
 

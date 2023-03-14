@@ -608,7 +608,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                       SizedBox(
                                         height: 16,
                                       ),
-                                      if (!widget.isUnstake) ...[
+                                      if (!widget.isUnstake && lockState.lockStakingDetails!.balance! != 0) ...[
                                         Row(
                                           children: [
                                             Text(

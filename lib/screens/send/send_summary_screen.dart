@@ -89,7 +89,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   }
 
   cutAddress(String s) {
-    return s.substring(0, 14) + '...' + s.substring(28, 42);
+    return s.substring(0, 14) + '...' + s.substring(s.length - 6, s.length);
   }
 
   @override
