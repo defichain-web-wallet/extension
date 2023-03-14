@@ -25,6 +25,7 @@ class StorageService {
       Codec<String, String> stringToBase64 = utf8.fuse(base64);
       var box = await Hive.openBox(HiveBoxes.client);
       var encodedPassword = await box.get(HiveNames.password);
+      await box.put(HiveNames.openedMnemonic, null);
 
       var mnemonic;
       var password = stringToBase64.decode(encodedPassword);
