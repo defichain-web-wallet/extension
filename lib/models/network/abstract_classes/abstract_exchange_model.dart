@@ -1,19 +1,20 @@
 import 'package:defi_wallet/models/token_model.dart';
 
-import 'AbstractAccount.dart';
+import 'abstract_account_model.dart';
 
-class ExchangePairs {
+class ExchangePairsModel {
   TokensModel token1;
   TokensModel token2;
   double ratio;
   bool isBidirectional = true;
-  ExchangePairs(this.token1, this.token2, this.ratio, this.isBidirectional);
+  ExchangePairsModel(
+      this.token1, this.token2, this.ratio, this.isBidirectional);
 }
 
-abstract class AbstractExchange {
-  List<ExchangePairs> getAvailableExchangePairs();
+abstract class AbstractExchangeModel {
+  List<ExchangePairsModel> getAvailableExchangePairs();
   String exchange(
-      AbstractAccount account,
+      AbstractAccountModel account,
       String password,
       TokensModel fromToken,
       double amount,
