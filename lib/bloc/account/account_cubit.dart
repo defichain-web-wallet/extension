@@ -50,7 +50,6 @@ class AccountCubit extends Cubit<AccountState> {
   AccountState get accountState => state;
 
   createAccount(List<String> mnemonic, String password) async {
-    int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
     emit(state.copyWith(status: AccountStatusList.loading));
 
     var box = await Hive.openBox(HiveBoxes.client);
@@ -59,7 +58,6 @@ class AccountCubit extends Cubit<AccountState> {
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     var encryptedPassword = Crypt.sha256(password).toString();
     await box.put(HiveNames.password, encryptedPassword);
-    await box.put(HiveNames.generatedAccessToken, currentTimestamp);
     await box.put(HiveNames.openedMnemonic, null);
     await box.close();
 
@@ -86,10 +84,6 @@ class AccountCubit extends Cubit<AccountState> {
         masterKeyPairMainnet.chainCode,
         networkHelper.getNetworkType(mainnet));
 
-    final masterKeyPairMainnetPrivateKey = HDWalletService()
-        .getKeypairForPathPrivateKey(
-            masterKeyPairMainnet, HDWalletService().derivePath(0), mainnet);
-
     final accountMainnet = await walletsHelper.createNewAccount(
         masterKeyPairMainnetPublicKey, mainnet);
 
@@ -98,13 +92,6 @@ class AccountCubit extends Cubit<AccountState> {
     accountsMainnet.add(accountMainnet);
     accountsTestnet.add(accountTestnet);
 
-    String? accessToken = await fiatCubit.signUp(
-        accountMainnet, masterKeyPairMainnetPrivateKey);
-    String? lockAccessToken = await lockCubit.createLockAccount(
-        accountMainnet, masterKeyPairMainnetPrivateKey);
-
-    accountMainnet.accessToken = accessToken;
-    accountMainnet.lockAccessToken = lockAccessToken;
     await saveAccountsToStorage(
       accountsMainnet: accountsMainnet,
       masterKeyPairMainnetPublicKey: masterKeyPairMainnetPublicKey,
@@ -545,6 +532,8 @@ class AccountCubit extends Cubit<AccountState> {
 
         accounts.first.accessToken = accessTokenDFX;
         accounts.first.lockAccessToken = accessTokenLOCK;
+
+        await box.put(HiveNames.generatedAccessToken, currentTimestamp);
       }
 
       if (SettingsHelper.settings.network! == testnet) {
