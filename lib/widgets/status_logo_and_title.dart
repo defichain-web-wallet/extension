@@ -1,12 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class StatusLogoAndTitle extends StatefulWidget {
-  final String title;
+  final String? title;
   final String? subtitle;
   final bool isTitlePosBefore;
   final Widget? subtitleWidget;
@@ -15,7 +13,7 @@ class StatusLogoAndTitle extends StatefulWidget {
 
   const StatusLogoAndTitle({
     Key? key,
-    required this.title,
+    this.title,
     this.subtitle,
     this.subtitleWidget,
     this.isTitlePosBefore = false,
@@ -29,9 +27,6 @@ class StatusLogoAndTitle extends StatefulWidget {
 
 class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
     with ThemeMixin {
-  final double _logoWidth = 158.0;
-  final double _logoHeight = 167.0;
-  final double _logoRotateDeg = 17.5;
 
   @override
   Widget build(BuildContext context) {
@@ -42,14 +37,15 @@ class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                widget.title,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headline2!.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).textTheme.headline5!.color,
-                    ),
-              ),
+              if (widget.title != null)
+                Text(
+                  widget.title!,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headline2!.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: Theme.of(context).textTheme.headline5!.color,
+                      ),
+                ),
               if (widget.subtitle != null) ...[
                 SizedBox(
                   height: 8,
@@ -89,13 +85,14 @@ class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
           ],
         ),
         if (!widget.isTitlePosBefore) ...[
-          Text(
-            widget.title,
-            style: Theme.of(context).textTheme.headline2!.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).textTheme.headline5!.color,
-                ),
-          ),
+          if (widget.title != null)
+            Text(
+              widget.title!,
+              style: Theme.of(context).textTheme.headline2!.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).textTheme.headline5!.color,
+                  ),
+            ),
           if (widget.subtitle != null) ...[
             SizedBox(
               height: 8,
