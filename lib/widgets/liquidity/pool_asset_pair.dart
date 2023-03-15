@@ -23,16 +23,6 @@ class PoolAssetPair extends StatefulWidget {
 
 class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
   TokensHelper tokensHelper = TokensHelper();
-  late String assetPairName;
-
-  @override
-  void initState() {
-    assetPairName =
-        '${tokensHelper.getTokenWithPrefix(tokensHelper.getBaseAssetName(widget.assetPair.symbol!))}-'
-        '${tokensHelper.getTokenWithPrefix(tokensHelper.getQuoteAssetName(widget.assetPair.symbol!))}';
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +54,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
               ),
               TickerText(
                 child: Text(
-                  // '${widget.assetPair.symbol!}',
-                  assetPairName,
+                  tokensHelper.getPairNameWithPrefix(widget.assetPair.symbol!),
                   style: Theme.of(context).textTheme.headline5!.copyWith(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -77,7 +66,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
               ),
               TickerText(
                 child: Text(
-                  widget.assetPair.name!,
+                  tokensHelper.getSpecificDefiPairName(widget.assetPair.name!),
                   style: Theme.of(context).textTheme.subtitle1!.copyWith(
                         fontSize: 11,
                         color: Theme.of(context)
