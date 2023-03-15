@@ -180,7 +180,7 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
             : 'DFI',
         firstColumnSubTitle: 'Staked',
         isStaking: true,
-        needUpdateAccessToken: isEmptyToken || isExpiredAccessToken,
+        needUpdateAccessToken: false,
         errorMessage: 'Need to create account of LOCK',
         callback: () {
           if (isEmptyToken || isExpiredAccessToken) {
