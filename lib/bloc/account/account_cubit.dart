@@ -60,6 +60,7 @@ class AccountCubit extends Cubit<AccountState> {
     var encryptedPassword = Crypt.sha256(password).toString();
     await box.put(HiveNames.password, encryptedPassword);
     await box.put(HiveNames.generatedAccessToken, currentTimestamp);
+    await box.put(HiveNames.openedMnemonic, null);
     await box.close();
 
     final seed = convertMnemonicToSeed(mnemonic);
@@ -374,6 +375,7 @@ class AccountCubit extends Cubit<AccountState> {
     await box.put(HiveNames.kycStatus, 'show');
     await box.put(HiveNames.tutorialStatus, 'show');
     await box.put(HiveNames.generatedAccessToken, currentTimestamp);
+    await box.put(HiveNames.openedMnemonic, null);
     await box.close();
     SettingsHelper settingsHelper = SettingsHelper();
 
