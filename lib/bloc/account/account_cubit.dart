@@ -545,6 +545,8 @@ class AccountCubit extends Cubit<AccountState> {
 
         accounts.first.accessToken = accessTokenDFX;
         accounts.first.lockAccessToken = accessTokenLOCK;
+
+        await box.put(HiveNames.generatedAccessToken, currentTimestamp);
       }
 
       if (SettingsHelper.settings.network! == testnet) {
