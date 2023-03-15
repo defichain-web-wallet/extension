@@ -121,7 +121,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
             Container(
               constraints: BoxConstraints(maxWidth: 312),
               width: 312,
-              height: !widget.txResponse!.isError! ? 339 : 335,
+              height: !widget.txResponse!.isError! ? 350 : 335,
               child: StatusLogoAndTitle(
                 isSmall: false,
                 isSuccess: !widget.txResponse!.isError!,

@@ -18,6 +18,12 @@ class LockCubit extends Cubit<LockState> {
   TransactionService transactionService = TransactionService();
   AccountState accountState = AccountState();
 
+  setLoadingState() {
+    emit(state.copyWith(
+      status: LockStatusList.loading,
+    ));
+  }
+
   bool checkVerifiedUser({bool isCheckOnlyKycStatus = false}) {
     if (isCheckOnlyKycStatus) {
       return state.lockUserDetails!.kycStatus! == 'Full' ||
@@ -26,6 +32,36 @@ class LockCubit extends Cubit<LockState> {
       return state.lockStakingDetails != null &&
           (state.lockUserDetails!.kycStatus! == 'Full' ||
               state.lockUserDetails!.kycStatus! == 'Light');
+    }
+  }
+
+  bool checkValidKycLink() {
+    return state.lockUserDetails!.kycLink ==
+        'https://kyc.lock.space?code=null';
+  }
+
+  Future<String?> signIn(
+      AccountModel account,
+      ECPair keyPair) async {
+    try {
+      late String accessToken;
+      accessToken = await lockRequests.signIn(account, keyPair);
+      return accessToken == '' ? null : accessToken;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  Future<String> createLockAccount(
+    AccountModel account,
+    ECPair keyPair,
+  ) async {
+    try {
+      late String accessToken;
+      accessToken = await lockRequests.signUp(account, keyPair);
+      return accessToken;
+    } catch (err) {
+      throw err;
     }
   }
 
@@ -46,9 +82,6 @@ class LockCubit extends Cubit<LockState> {
   loadUserDetails(AccountModel account) async {
     emit(state.copyWith(
       status: LockStatusList.loading,
-      lockUserDetails: state.lockUserDetails,
-      lockStakingDetails: state.lockStakingDetails,
-      lockAnalyticsDetails: state.lockAnalyticsDetails,
     ));
 
     try {
@@ -57,8 +90,6 @@ class LockCubit extends Cubit<LockState> {
       emit(state.copyWith(
         status: LockStatusList.success,
         lockUserDetails: data,
-        lockStakingDetails: state.lockStakingDetails,
-        lockAnalyticsDetails: state.lockAnalyticsDetails,
       ));
     } catch (err) {
       if (err == '401') {
@@ -68,9 +99,6 @@ class LockCubit extends Cubit<LockState> {
       } else {
         emit(state.copyWith(
           status: LockStatusList.failure,
-          lockUserDetails: state.lockUserDetails,
-          lockStakingDetails: state.lockStakingDetails,
-          lockAnalyticsDetails: state.lockAnalyticsDetails,
         ));
       }
     }
@@ -78,9 +106,6 @@ class LockCubit extends Cubit<LockState> {
   loadKycDetails(AccountModel account) async {
     emit(state.copyWith(
       status: LockStatusList.loading,
-      lockUserDetails: state.lockUserDetails,
-      lockStakingDetails: state.lockStakingDetails,
-      lockAnalyticsDetails: state.lockAnalyticsDetails,
     ));
 
     try {
@@ -89,50 +114,52 @@ class LockCubit extends Cubit<LockState> {
       emit(state.copyWith(
         status: LockStatusList.success,
         lockUserDetails: data,
-        lockStakingDetails: state.lockStakingDetails,
-        lockAnalyticsDetails: state.lockAnalyticsDetails,
       ));
     } catch (_) {
       emit(state.copyWith(
         status: LockStatusList.failure,
-        lockUserDetails: state.lockUserDetails,
-        lockStakingDetails: state.lockStakingDetails,
-        lockAnalyticsDetails: state.lockAnalyticsDetails,
       ));
     }
   }
 
-  loadStakingDetails(AccountModel account) async {
-    if (state.status != LockStatusList.expired) {
-      emit(state.copyWith(
-        status: LockStatusList.loading,
-        lockStakingDetails: state.lockStakingDetails,
-        lockUserDetails: state.lockUserDetails,
-        lockAnalyticsDetails: state.lockAnalyticsDetails,
-      ));
+  loadStakingDetails(
+    AccountModel account, {
+    bool needUserDetails = false,
+    bool needKycDetails = false,
+  }) async {
+    emit(state.copyWith(
+      status: LockStatusList.loading,
+    ));
 
-      try {
-        LockStakingModel? data =
-        await lockRequests.getStaking(account.lockAccessToken!);
+    try {
+      LockUserModel? userData;
+      LockAnalyticsModel? analyticsData;
+      LockStakingModel? stakingData =
+      await lockRequests.getStaking(account.lockAccessToken!);
+
+      if (needUserDetails) {
+        userData =
+        await lockRequests.getUser(account.lockAccessToken!);
+      }
+      if (needKycDetails) {
+        analyticsData =
+        await lockRequests.getAnalytics(account.lockAccessToken!);
+      }
+      emit(state.copyWith(
+        status: LockStatusList.success,
+        lockStakingDetails: stakingData,
+        lockUserDetails: userData,
+        lockAnalyticsDetails: analyticsData,
+      ));
+    } catch (err) {
+      if (err == '401') {
         emit(state.copyWith(
-          status: LockStatusList.success,
-          lockStakingDetails: data,
-          lockUserDetails: state.lockUserDetails,
-          lockAnalyticsDetails: state.lockAnalyticsDetails,
+          status: LockStatusList.expired,
         ));
-      } catch (err) {
-        if (err == '401') {
-          emit(state.copyWith(
-            status: LockStatusList.expired,
-          ));
-        } else {
-          emit(state.copyWith(
-            status: LockStatusList.failure,
-            lockStakingDetails: state.lockStakingDetails,
-            lockUserDetails: state.lockUserDetails,
-            lockAnalyticsDetails: state.lockAnalyticsDetails,
-          ));
-        }
+      } else {
+        emit(state.copyWith(
+          status: LockStatusList.failure,
+        ));
       }
     }
   }
@@ -140,9 +167,6 @@ class LockCubit extends Cubit<LockState> {
   loadAnalyticsDetails(AccountModel account) async {
     emit(state.copyWith(
       status: LockStatusList.loading,
-      lockStakingDetails: state.lockStakingDetails,
-      lockUserDetails: state.lockUserDetails,
-      lockAnalyticsDetails: state.lockAnalyticsDetails,
     ));
 
     try {
@@ -150,8 +174,6 @@ class LockCubit extends Cubit<LockState> {
           await lockRequests.getAnalytics(account.lockAccessToken!);
       emit(state.copyWith(
         status: LockStatusList.success,
-        lockStakingDetails: state.lockStakingDetails,
-        lockUserDetails: state.lockUserDetails,
         lockAnalyticsDetails: data,
       ));
     } catch (err) {
@@ -162,8 +184,6 @@ class LockCubit extends Cubit<LockState> {
       } else {
         emit(state.copyWith(
           status: LockStatusList.failure,
-          lockStakingDetails: state.lockStakingDetails,
-          lockUserDetails: state.lockUserDetails,
         ));
       }
     }
@@ -177,8 +197,6 @@ class LockCubit extends Cubit<LockState> {
   ) {
     emit(state.copyWith(
       status: LockStatusList.loading,
-      lockStakingDetails: state.lockStakingDetails,
-      lockUserDetails: state.lockUserDetails,
     ));
     try {
       lockRequests.setDeposit(
@@ -189,14 +207,10 @@ class LockCubit extends Cubit<LockState> {
       );
       emit(state.copyWith(
         status: LockStatusList.success,
-        lockStakingDetails: state.lockStakingDetails,
-        lockUserDetails: state.lockUserDetails,
       ));
     } catch (_) {
       emit(state.copyWith(
         status: LockStatusList.failure,
-        lockStakingDetails: state.lockStakingDetails,
-        lockUserDetails: state.lockUserDetails,
       ));
     }
   }
