@@ -1,10 +1,12 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class AccessTokenHelper {
   static setupLockAccessToken(
@@ -15,8 +17,6 @@ class AccessTokenHelper {
     bool needUpdateLock = true,
     bool isExistingAccount = false,
   }) async {
-
-
     showDialog(
       barrierColor: Color(0x0f180245),
       barrierDismissible: false,
@@ -86,6 +86,11 @@ class AccessTokenHelper {
       }
       accountCubit.state.accounts!.first.accessToken = dfxAccessToken;
     }
+
+    int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
+    var box = await Hive.openBox(HiveBoxes.client);
+    await box.put(HiveNames.generatedAccessToken, currentTimestamp);
+    await box.close();
 
     await accountCubit.saveAccountsToStorage(
       accountsMainnet: accountCubit.state.accounts!,
