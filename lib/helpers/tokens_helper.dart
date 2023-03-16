@@ -199,15 +199,15 @@ class TokensHelper {
       case 'ETH':
         {
           return AssetStyleModel(
-              tokenName: tokenName,
-              imgPath: 'assets/images/tokens/eth.png',
-              isUniqueLogo: true,
-              gradientColors: [
-                Color(0xff627EEA),
-                Color(0xff3C61F1),
-              ],
-              rotateRadian: getRadianByDeg(219.64),
-              stops: [0.1028, 0.9523],
+            tokenName: tokenName,
+            imgPath: 'assets/images/tokens/eth.png',
+            isUniqueLogo: true,
+            gradientColors: [
+              Color(0xff627EEA),
+              Color(0xff3C61F1),
+            ],
+            rotateRadian: getRadianByDeg(219.64),
+            stops: [0.1028, 0.9523],
           );
         }
       case 'BTC':
@@ -304,8 +304,8 @@ class TokensHelper {
               Color(0xff287BD6),
               Color(0xff256BB7),
             ],
-              rotateRadian: getRadianByDeg(225.51),
-              stops: [0.0955, 0.9265],
+            rotateRadian: getRadianByDeg(225.51),
+            stops: [0.0955, 0.9265],
           );
         }
       case 'SPY':
@@ -1417,6 +1417,7 @@ class TokensHelper {
   String getBaseAssetName(String assetPairName) {
     return assetPairName.split('-')[0];
   }
+
   String getQuoteAssetName(String assetPairName) {
     return assetPairName.split('-')[1];
   }

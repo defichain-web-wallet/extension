@@ -29,8 +29,7 @@ class SendConfirmScreen extends StatefulWidget {
   final double amount;
   final int fee;
 
-  const SendConfirmScreen(this.address, this.token, this.amount,
-      {this.fee = 0});
+  const SendConfirmScreen(this.address, this.token, this.amount, {this.fee = 0});
 
   @override
   State<SendConfirmScreen> createState() => _SendConfirmState();
@@ -40,8 +39,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
   BalancesHelper balancesHelper = BalancesHelper();
   TransactionService transactionService = TransactionService();
   String appBarTitle = 'Send';
-  String secondStepLoaderText =
-      'One second, Jelly is preparing your transaction!';
+  String secondStepLoaderText = 'One second, Jelly is preparing your transaction!';
 
   @override
   Widget build(BuildContext context) => ScaffoldWrapper(
@@ -54,9 +52,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
             appBar: MainAppBar(
               title: appBarTitle,
               isShowBottom: !(txState is TransactionInitialState),
-              height: !(txState is TransactionInitialState)
-                  ? ToolbarSizes.toolbarHeightWithBottom
-                  : ToolbarSizes.toolbarHeight,
+              height: !(txState is TransactionInitialState) ? ToolbarSizes.toolbarHeightWithBottom : ToolbarSizes.toolbarHeight,
               isSmall: isFullScreen,
             ),
             body: BlocBuilder<AccountCubit, AccountState>(
@@ -65,8 +61,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                   builder: (context, tokensState) {
                     return BlocBuilder<BitcoinCubit, BitcoinState>(
                       builder: (context, bitcoinState) {
-                        if (state.status == AccountStatusList.success &&
-                            tokensState.status == TokensStatusList.success) {
+                        if (state.status == AccountStatusList.success && tokensState.status == TokensStatusList.success) {
                           return Container(
                             color: Theme.of(context).dialogBackgroundColor,
                             padding: const EdgeInsets.symmetric(
@@ -76,25 +71,20 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                             child: Center(
                               child: StretchBox(
                                 child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
                                       children: [
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8.0),
+                                          padding: const EdgeInsets.only(top: 8.0),
                                           child: Text(
                                             'Do you really want to send',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline6,
+                                            style: Theme.of(context).textTheme.headline6,
                                           ),
                                         ),
                                         SizedBox(height: 32),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Flexible(
                                               child: Text(
@@ -102,55 +92,41 @@ class _SendConfirmState extends State<SendConfirmScreen> {
                                                   widget.amount,
                                                 )} ',
                                                 overflow: TextOverflow.ellipsis,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline1,
+                                                style: Theme.of(context).textTheme.headline1,
                                               ),
                                             ),
                                             Text(
-                                              (widget.token != 'DFI')
-                                                  ? 'd' + widget.token
-                                                  : widget.token,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline1,
+                                              (widget.token != 'DFI') ? 'd' + widget.token : widget.token,
+                                              style: Theme.of(context).textTheme.headline1,
                                             ),
                                           ],
                                         ),
                                         SizedBox(height: 28),
                                         Text(
                                           'To',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6,
+                                          style: Theme.of(context).textTheme.headline6,
                                         ),
                                         SizedBox(height: 28),
                                         Text(
                                           'Address:',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6,
+                                          style: Theme.of(context).textTheme.headline6,
                                         ),
                                         SizedBox(height: 16),
                                         Text(
                                           widget.address,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline2,
+                                          style: Theme.of(context).textTheme.headline2,
                                         ),
                                       ],
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 16),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Expanded(
                                             child: AccentButton(
                                               label: 'Cancel',
-                                              callback: () =>
-                                                  Navigator.of(context).pop(),
+                                              callback: () => Navigator.of(context).pop(),
                                             ),
                                           ),
                                           SizedBox(width: 16),
@@ -188,8 +164,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
 
   submit(state, tokensState, isFullScreen) {
     isFullScreen
-        ? PasswordBottomSheet.provideWithPasswordFullScreen(
-            context, state.activeAccount, (password) {
+        ? PasswordBottomSheet.provideWithPasswordFullScreen(context, state.activeAccount, (password) {
             Navigator.push(
               context,
               PageRouteBuilder(
@@ -209,8 +184,7 @@ class _SendConfirmState extends State<SendConfirmScreen> {
               ),
             );
           })
-        : PasswordBottomSheet.provideWithPassword(context, state.activeAccount,
-            (password) {
+        : PasswordBottomSheet.provideWithPassword(context, state.activeAccount, (password) {
             Navigator.push(
               context,
               PageRouteBuilder(
@@ -236,21 +210,15 @@ class _SendConfirmState extends State<SendConfirmScreen> {
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
-        _callback(
-            state.activeAccount, password, bitcoinCubit, tokensState.tokens);
+        _callback(state.activeAccount, password, bitcoinCubit, tokensState.tokens);
       }
     } catch (_err) {
       print(_err);
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-              errorBTC: _err.toString(),
-              appBarTitle: appBarTitle,
-              txResponse: null,
-              amount: widget.amount,
-              token: 'BTC',
-              address: widget.address),
+          pageBuilder: (context, animation1, animation2) =>
+              SendStatusScreen(errorBTC: _err.toString(), appBarTitle: appBarTitle, txResponse: null, amount: widget.amount, token: 'BTC', address: widget.address),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
@@ -258,10 +226,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
     }
   }
 
-  Future _callback(AccountModel account, String password,
-      BitcoinCubit bitcoinCubit, List<TokensModel> tokens) async {
-    ECPair keyPair =
-        await HDWalletService().getKeypairFromStorage(password, account.index!);
+  Future _callback(AccountModel account, String password, BitcoinCubit bitcoinCubit, List<TokensModel> tokens) async {
+    ECPair keyPair = await HDWalletService().getKeypairFromStorage(password, account.index!);
     if (SettingsHelper.isBitcoin()) {
       var tx = await transactionService.createBTCTransaction(
         keyPair: keyPair,
@@ -274,12 +240,8 @@ class _SendConfirmState extends State<SendConfirmScreen> {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-              appBarTitle: appBarTitle,
-              txResponse: txResponse,
-              amount: widget.amount,
-              token: 'BTC',
-              address: widget.address),
+          pageBuilder: (context, animation1, animation2) =>
+              SendStatusScreen(appBarTitle: appBarTitle, txResponse: txResponse, amount: widget.amount, token: 'BTC', address: widget.address),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
@@ -289,34 +251,20 @@ class _SendConfirmState extends State<SendConfirmScreen> {
     }
   }
 
-  Future _sendTransaction(context, List<TokensModel> tokens, String token,
-      AccountModel account, ECPair keyPair) async {
+  Future _sendTransaction(context, List<TokensModel> tokens, String token, AccountModel account, ECPair keyPair) async {
     TxErrorModel? txResponse;
     if (token == 'DFI') {
       txResponse = await transactionService.createAndSendTransaction(
-          keyPair: keyPair,
-          account: account,
-          destinationAddress: widget.address,
-          amount: balancesHelper.toSatoshi(widget.amount.toString()),
-          tokens: tokens);
+          keyPair: keyPair, account: account, destinationAddress: widget.address, amount: balancesHelper.toSatoshi(widget.amount.toString()), tokens: tokens);
     } else {
       txResponse = await transactionService.createAndSendToken(
-          keyPair: keyPair,
-          account: account,
-          token: token,
-          destinationAddress: widget.address,
-          amount: balancesHelper.toSatoshi(widget.amount.toString()),
-          tokens: tokens);
+          keyPair: keyPair, account: account, token: token, destinationAddress: widget.address, amount: balancesHelper.toSatoshi(widget.amount.toString()), tokens: tokens);
     }
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-            appBarTitle: appBarTitle,
-            txResponse: txResponse,
-            amount: widget.amount,
-            token: token,
-            address: widget.address),
+        pageBuilder: (context, animation1, animation2) =>
+            SendStatusScreen(appBarTitle: appBarTitle, txResponse: txResponse, amount: widget.amount, token: token, address: widget.address),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),

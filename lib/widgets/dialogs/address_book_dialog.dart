@@ -28,7 +28,8 @@ class AddressBookDialog extends StatefulWidget {
   State<AddressBookDialog> createState() => _AddressBookDialogState();
 }
 
-class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin, NetworkMixin {
+class _AddressBookDialogState extends State<AddressBookDialog>
+    with ThemeMixin, NetworkMixin {
   int iterator = 0;
   TextEditingController controller = TextEditingController();
   List<AddressBookModel>? viewList = [];

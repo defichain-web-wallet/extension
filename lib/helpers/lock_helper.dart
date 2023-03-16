@@ -9,15 +9,15 @@ class LockHelper {
   Future<void> provideWithLockChecker(context, Function() callback) async {
     var box = await Hive.openBox(HiveBoxes.client);
     var openTime = await box.get(HiveNames.openTime);
+    bool isLedger = await box.get(HiveNames.ledgerWalletSetup, defaultValue: false);
+
     await box.close();
 
-    if (openTime != null &&
-        openTime + TickerTimes.tickerBeforeLockMilliseconds <
-            DateTime.now().millisecondsSinceEpoch) {
+    if (!isLedger && openTime != null && openTime + TickerTimes.tickerBeforeLockMilliseconds < DateTime.now().millisecondsSinceEpoch) {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2)  => ThemeChecker(LockScreen()),
+          pageBuilder: (context, animation1, animation2) => ThemeChecker(LockScreen()),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),

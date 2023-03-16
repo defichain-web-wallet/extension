@@ -24,7 +24,6 @@ class AssetHeaderSelector extends StatefulWidget {
 
 class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
     with ThemeMixin {
-
   String formatAssetName(String value) {
     if (SettingsHelper.isBitcoin()) {
       return widget.assetCode;
@@ -34,6 +33,7 @@ class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     double arrowRotateDeg = widget.isShown ? 180 : 0;

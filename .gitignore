@@ -45,5 +45,12 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+
+web/node_modules
+web/js
+web/dist
+web/.parcel-cache
+pubspec.lock
+/ios/Podfile.lock
 pubspec.lock
 /ios/Podfile.lock

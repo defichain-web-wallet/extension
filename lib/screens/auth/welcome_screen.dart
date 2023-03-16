@@ -3,6 +3,7 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_placeholder_screen.dart';
+import 'package:defi_wallet/screens/ledger/guide/connect_ledger_first_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -92,6 +93,29 @@ class WelcomeScreen extends StatelessWidget {
                                 },
                               ),
                             ),
+                            // SizedBox(height: 12),
+                            // Container(
+                            //   width: isFullScreen
+                            //       ? buttonFullWidth
+                            //       : buttonSmallWidth,
+                            //   child: AccentButton(
+                            //     isOpasity: true,
+                            //     isCheckLock: false,
+                            //     label: 'Set up wallet with Ledger',
+                            //     callback: () {
+                            //       Navigator.push(
+                            //         context,
+                            //         PageRouteBuilder(
+                            //           pageBuilder:
+                            //               (context, animation1, animation2) =>
+                            //                   ConnectLedgerFirstScreen(),
+                            //           transitionDuration: Duration.zero,
+                            //           reverseTransitionDuration: Duration.zero,
+                            //         ),
+                            //       );
+                            //     },
+                            //   ),
+                            // ),
                             SizedBox(height: 12),
                             NewPrimaryButton(
                               width: isFullScreen
