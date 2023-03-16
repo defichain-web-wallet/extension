@@ -37,17 +37,6 @@ class _AssetCardState extends State<AssetCard> {
   TokensHelper tokensHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 
-  Widget _buildTokenIcon(TokensModel token) {
-    if (token.isPair!) {
-      return AssetPair(pair: token.symbol!, size: 20,);
-    } else {
-      return AssetIcon(
-        url: tokensHelper.getImageNameByTokenName(token.symbol!),
-        color: tokensHelper.getColorByTokenName(token.symbol!),
-      );
-    }
-  }
-
   String getFormatTokenBalance(double tokenBalance) =>
       '${balancesHelper.numberStyling(tokenBalance)}';
 
@@ -115,9 +104,11 @@ class _AssetCardState extends State<AssetCard> {
                       style: Theme.of(context).textTheme.headline5,
                     ),
                     Text(
-                      tokensHelper.getSpecificDefiName(
-                        widget.tokens[widget.index].name!,
-                      ),
+                      tokensHelper.isPair(widget.tokens[widget.index].symbol!)
+                          ? tokensHelper.getSpecificDefiPairName(
+                              widget.tokens[widget.index].name!)
+                          : tokensHelper.getSpecificDefiName(
+                              widget.tokens[widget.index].name!),
                       style: Theme.of(context).textTheme.headline6!.copyWith(
                             color: Theme.of(context)
                                 .textTheme

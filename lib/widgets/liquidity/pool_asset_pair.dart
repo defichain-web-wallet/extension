@@ -22,6 +22,8 @@ class PoolAssetPair extends StatefulWidget {
 }
 
 class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
+  TokensHelper tokensHelper = TokensHelper();
+
   @override
   Widget build(BuildContext context) {
     if (widget.isGrid) {
@@ -37,7 +39,6 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
             )),
         child: Container(
           decoration: BoxDecoration(
-            // color: Theme.of(context).backgroundColor,
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
           child: Column(
@@ -53,7 +54,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
               ),
               TickerText(
                 child: Text(
-                  '${widget.assetPair.symbol!}',
+                  tokensHelper.getPairNameWithPrefix(widget.assetPair.symbol!),
                   style: Theme.of(context).textTheme.headline5!.copyWith(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -63,16 +64,18 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
               SizedBox(
                 height: 4,
               ),
-              Text(
-                '${widget.assetPair.symbol!}',
-                style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                      fontSize: 11,
-                      color: Theme.of(context)
-                          .textTheme
-                          .headline5!
-                          .color!
-                          .withOpacity(0.5),
-                    ),
+              TickerText(
+                child: Text(
+                  tokensHelper.getSpecificDefiPairName(widget.assetPair.name!),
+                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                        fontSize: 11,
+                        color: Theme.of(context)
+                            .textTheme
+                            .headline5!
+                            .color!
+                            .withOpacity(0.5),
+                      ),
+                ),
               ),
               SizedBox(
                 height: 12,
@@ -181,7 +184,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
                               : LightColors.assetItemSelectorBorderColor
                                   .withOpacity(0.07)),
                       child: Text(
-                        widget.assetPair.tokenA!,
+                        tokensHelper.getTokenWithPrefix(widget.assetPair.tokenA!),
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                               fontSize: 11,
                             ),
@@ -204,7 +207,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
                               : LightColors.assetItemSelectorBorderColor
                                   .withOpacity(0.07)),
                       child: Text(
-                        widget.assetPair.tokenB!,
+                        tokensHelper.getTokenWithPrefix(widget.assetPair.tokenB!),
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                               fontSize: 11,
                             ),
