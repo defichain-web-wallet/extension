@@ -226,7 +226,6 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                           : LightColors.drawerBgColor,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        // strokeAlign: BorderSide.strokeAlignCenter,
                                         color: AppColors.lavenderPurple
                                             .withOpacity(0.32),
                                         width: 0.5,
@@ -270,7 +269,6 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                 height: 24,
                               ),
                               Container(
-                                // height: 76,
                                 padding: EdgeInsets.only(
                                   right: 20,
                                   top: 16,
@@ -457,7 +455,6 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                         },
                                       )
                                     : StatusLogoAndTitle(
-                                        title: 'Oops!',
                                         subtitle:
                                             'Jelly noticed you have no liquidity pools '
                                             'yet. Add a pool by clicking +',

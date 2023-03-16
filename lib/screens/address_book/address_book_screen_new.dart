@@ -12,17 +12,12 @@ import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/address_book/contact_tile.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/address_book/last_sent_tile.dart';
-import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/dialogs/create_edit_account_dialog.dart';
-import 'package:defi_wallet/widgets/fields/decoration_text_field_new.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:defi_wallet/widgets/status_logo_and_title.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 import '../../widgets/fields/custom_text_form_field.dart';
 
@@ -356,7 +351,6 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                   : Padding(
                                       padding: const EdgeInsets.only(right: 16),
                                       child: StatusLogoAndTitle(
-                                        title: 'Oops!',
                                         subtitle:
                                             'Jelly can\'t see any contacts in your address book',
                                         isTitlePosBefore: true,
@@ -396,7 +390,6 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                   : Padding(
                                       padding: const EdgeInsets.only(right: 16),
                                       child: StatusLogoAndTitle(
-                                        title: 'Oops!',
                                         subtitle:
                                             'You don\'t have addresses yet',
                                         isTitlePosBefore: true,

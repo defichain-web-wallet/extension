@@ -239,7 +239,6 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin, 
                                   : Padding(
                                       padding: const EdgeInsets.only(right: 16),
                                       child: StatusLogoAndTitle(
-                                        title: 'Oops!',
                                         subtitle:
                                             'Jelly can\'t see any contacts in your address book',
                                         isTitlePosBefore: true,
@@ -294,7 +293,6 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin, 
                                   : Padding(
                                       padding: const EdgeInsets.only(right: 16),
                                       child: StatusLogoAndTitle(
-                                        title: 'Oops!',
                                         subtitle:
                                             'You don\'t have addresses yet',
                                         isTitlePosBefore: true,
