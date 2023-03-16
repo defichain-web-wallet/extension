@@ -184,7 +184,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
                               : LightColors.assetItemSelectorBorderColor
                                   .withOpacity(0.07)),
                       child: Text(
-                        widget.assetPair.tokenA!,
+                        tokensHelper.getTokenWithPrefix(widget.assetPair.tokenA!),
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                               fontSize: 11,
                             ),
@@ -207,7 +207,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
                               : LightColors.assetItemSelectorBorderColor
                                   .withOpacity(0.07)),
                       child: Text(
-                        widget.assetPair.tokenB!,
+                        tokensHelper.getTokenWithPrefix(widget.assetPair.tokenB!),
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                               fontSize: 11,
                             ),
