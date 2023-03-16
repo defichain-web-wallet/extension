@@ -55,7 +55,7 @@ class LockRequests {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body)['accessToken'];
       } else {
-        return await signUp(account, keyPair);
+        return '';
       }
     } catch (_) {
       return '';
@@ -135,7 +135,11 @@ class LockRequests {
         'Content-type': 'application/json',
         'Authorization': 'Bearer $accessToken'
       };
-      final body = jsonEncode({'amount': amount, 'txId': txId});
+      final body = jsonEncode({
+        'amount': amount,
+        'txId': txId,
+        'asset': 'DFI', // TODO: remove 'DFI' and implement token selector
+      });
 
       final response = await http.post(url, headers: headers, body: body);
       dynamic data = jsonDecode(response.body);
@@ -165,6 +169,7 @@ class LockRequests {
       };
       final body = jsonEncode({
         'amount': amount,
+        'asset': 'DFI', // TODO: remove 'DFI' and implement token selector
       });
 
       final response = await http.post(url, headers: headers, body: body);

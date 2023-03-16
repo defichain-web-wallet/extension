@@ -266,7 +266,7 @@ class _StakingSelectVerificationScreenState
                                         try {
                                           await dfxRequests.transferKYC(
                                               accountState
-                                                  .activeAccount!.accessToken!);
+                                                  .accounts!.first.accessToken!);
                                         } catch (_) {
                                           showSnackBar('User not found');
                                         }

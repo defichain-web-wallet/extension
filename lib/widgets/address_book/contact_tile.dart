@@ -64,16 +64,20 @@ class _ContactTileState extends State<ContactTile> with ThemeMixin {
               ]),
             ),
             child: Center(
-              child: GradientText(
-                widget.contactName[0],
-                style: headline6.copyWith(
-                    fontWeight: FontWeight.w700, fontSize: 16),
-                gradientType: GradientType.linear,
-                gradientDirection: GradientDirection.btt,
-                colors: [
-                  AppColors.accountColors[index],
-                  AppColors.accountColors[index],
-                ],
+              child: Container(
+                width: 25,
+                child: GradientText(
+                  widget.contactName[0],
+                  style: headline6.copyWith(
+                      fontWeight: FontWeight.w700, fontSize: 16),
+                  gradientType: GradientType.linear,
+                  gradientDirection: GradientDirection.btt,
+                  colors: [
+                    AppColors.accountColors[index],
+                    AppColors.accountColors[index],
+                  ],
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),

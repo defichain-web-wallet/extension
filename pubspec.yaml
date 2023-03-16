@@ -94,6 +94,8 @@ dependencies:
   retry: ^3.1.0 
 
 
+  skeletons: ^0.0.3
+
 dev_dependencies:
 
   build_runner: ^2.0.4
@@ -117,6 +119,7 @@ flutter:
     - assets/history/
     - assets/icons/
     - assets/images/
+    - assets/images/tokens/
     - assets/tokens/
     - assets/currencies/
     - assets/pair_icons/

@@ -63,7 +63,7 @@ class TransactionService {
     //https://api.blockcypher.com/v1/btc/test3/addrs/tb1qhwqqsktldqypttltr59px506p890ce0sgj0fe7?unspentOnly=true
 
     var utxos = await BtcRequests().getUTXOs(address: account.bitcoinAddress!);
-    var fee = calculateBTCFee(2, 2, satPerByte);
+    var fee = calculateBTCFee(utxos.length > 1 ? 2 : 1, 2, satPerByte);
     int sumUTXO = utxos.length > 0
         ? utxos.map((item) => item.value!).reduce((a, b) => a + b)
         : 0;
@@ -76,7 +76,7 @@ class TransactionService {
     var selectedUtxo = _utxoSelector(utxos, fee, amount);
     if (selectedUtxo.length > 2) {
       selectedUtxo = _utxoSelector(
-          utxos, calculateBTCFee(2, selectedUtxo.length, satPerByte), amount);
+          utxos, calculateBTCFee(selectedUtxo.length, 2, satPerByte), amount);
     }
     String network = SettingsHelper.settings.network! == 'mainnet'
         ? 'bitcoin'

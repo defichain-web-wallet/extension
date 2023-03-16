@@ -148,157 +148,176 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                         ),
                         appBar: NewMainAppBar(
                           isShowLogo: false,
+                          callback: hideOverlay,
                         ),
-                        body: Container(
-                          padding: EdgeInsets.only(
-                            top: 22,
-                            bottom: 24,
-                            left: 16,
-                            right: 16,
-                          ),
-                          width: double.infinity,
-                          height: double.infinity,
-                          decoration: BoxDecoration(
-                            color: isDarkTheme()
-                                ? DarkColors.drawerBgColor
-                                : LightColors.scaffoldContainerBgColor,
-                            border: isDarkTheme()
-                                ? Border.all(
-                              width: 1.0,
-                              color: Colors.white.withOpacity(0.05),
-                            )
-                                : null,
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(20),
-                              topLeft: Radius.circular(20),
+                        body: GestureDetector(
+                          onTap: hideOverlay,
+                          child: Container(
+                            padding: EdgeInsets.only(
+                              top: 22,
+                              bottom: 24,
+                              left: 16,
+                              right: 16,
                             ),
-                          ),
-                          child: Center(
-                            child: StretchBox(
-                              child: Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    child: Form(
-                                      key: _formKey,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                titleText,
-                                                style: headline2.copyWith(
-                                                    fontWeight:
-                                                    FontWeight.w700),
-                                                textAlign: TextAlign.start,
-                                                softWrap: true,
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: 16,
-                                          ),
-                                          AmountField(
-                                            type: TxType.send,
-                                            account: accountState.activeAccount!,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                balanceInUsd =
-                                                    getUsdBalance(context);
-                                              });
-                                            },
-                                            suffix: balanceInUsd ??
-                                                getUsdBalance(context),
-                                            onAssetSelect: (t) {
-                                              setState(() {
-                                                currentAsset = t;
-                                              });
-                                            },
-                                            controller: amountController,
-                                            selectedAsset: currentAsset!,
-                                            assets: getTokensList(
-                                              accountState,
-                                              tokensState,
-                                              assets,
-                                            ),
-                                          ),
-                                          SizedBox(height: 16),
-                                          Text(
-                                            'Fiat Currency',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5,
-                                            textAlign: TextAlign.start,
-                                          ),
-                                          SizedBox(
-                                            height: 6,
-                                          ),
-                                          CurrencySelector(
-                                            currencies: fiatState.sellableFiatList!,
-                                            selectedCurrency: selectedFiat,
-                                            onSelect: (selected) {
-                                              setState(() {
-                                                selectedFiat = selected;
-                                              });
-                                            },
-                                          ),
-                                          SizedBox(height: 16),
-                                          Container(
-                                              child: widget.isNewIban ||
-                                                      fiatState.activeIban ==
-                                                          null
-                                                  ? IbanField(
-                                                      isBorder: false,
-                                                      ibanController:
-                                                          _ibanController,
-                                                      hintText:
-                                                          'DE89 37XX XXXX XXXX XXXX XX',
-                                                      maskFormat:
-                                                          'AA## #### #### #### #### #### ###',
-                                                    )
-                                                  : IbanSelector(
-                                                      isBorder: false,
-                                                      key: selectKeyIban,
-                                                      onAnotherSelect:
-                                                          hideOverlay,
-                                                      ibanList: uniqueIbans,
-                                                      selectedIban:
-                                                          fiatState.activeIban!,
-                                                    )),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 6),
-                                            child: Divider(
-                                                color: AppTheme.lightGreyColor),
-                                          ),
-                                          Container(
-                                            child: Row(
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              color: isDarkTheme()
+                                  ? DarkColors.drawerBgColor
+                                  : LightColors.scaffoldContainerBgColor,
+                              border: isDarkTheme()
+                                  ? Border.all(
+                                width: 1.0,
+                                color: Colors.white.withOpacity(0.05),
+                              )
+                                  : null,
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(20),
+                                topLeft: Radius.circular(20),
+                              ),
+                            ),
+                            child: Center(
+                              child: StretchBox(
+                                child: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Form(
+                                        key: _formKey,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
                                               children: [
-                                                Column(
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.only(
-                                                          right: 10),
-                                                      child: SvgPicture.asset(
-                                                          'assets/icons/important_icon.svg'),
-                                                    ),
-                                                  ],
+                                                Text(
+                                                  titleText,
+                                                  style: headline2.copyWith(
+                                                      fontWeight:
+                                                      FontWeight.w700),
+                                                  textAlign: TextAlign.start,
+                                                  softWrap: true,
                                                 ),
-                                                Expanded(
-                                                  child: Column(
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 16,
+                                            ),
+                                            AmountField(
+                                              type: TxType.send,
+                                              account: accountState.activeAccount!,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  balanceInUsd =
+                                                      getUsdBalance(context);
+                                                });
+                                              },
+                                              suffix: balanceInUsd ??
+                                                  getUsdBalance(context),
+                                              onAssetSelect: (t) {
+                                                setState(() {
+                                                  currentAsset = t;
+                                                });
+                                              },
+                                              controller: amountController,
+                                              selectedAsset: currentAsset!,
+                                              assets: getTokensList(
+                                                accountState,
+                                                tokensState,
+                                                assets,
+                                              ),
+                                            ),
+                                            SizedBox(height: 16),
+                                            Text(
+                                              'Fiat Currency',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline5,
+                                              textAlign: TextAlign.start,
+                                            ),
+                                            SizedBox(
+                                              height: 6,
+                                            ),
+                                            CurrencySelector(
+                                              currencies: fiatState.sellableFiatList!,
+                                              selectedCurrency: selectedFiat,
+                                              onSelect: (selected) {
+                                                setState(() {
+                                                  selectedFiat = selected;
+                                                });
+                                              },
+                                            ),
+                                            SizedBox(height: 16),
+                                            Container(
+                                                child: widget.isNewIban ||
+                                                        fiatState.activeIban ==
+                                                            null
+                                                    ? IbanField(
+                                                        isBorder: false,
+                                                        ibanController:
+                                                            _ibanController,
+                                                        hintText:
+                                                            'DE89 37XX XXXX XXXX XXXX XX',
+                                                        maskFormat:
+                                                            'AA## #### #### #### #### #### ###',
+                                                      )
+                                                    : IbanSelector(
+                                                        isBorder: false,
+                                                        key: selectKeyIban,
+                                                        onAnotherSelect:
+                                                            hideOverlay,
+                                                        ibanList: uniqueIbans,
+                                                        selectedIban:
+                                                            fiatState.activeIban!,
+                                                      )),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                  vertical: 6),
+                                              child: Divider(
+                                                  color: AppTheme.lightGreyColor),
+                                            ),
+                                            Container(
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                                children: [
+                                                  Column(
                                                     children: [
-                                                      RichText(
-                                                        text: TextSpan(
-                                                          children: [
-                                                            TextSpan(
+                                                      Container(
+                                                        padding: EdgeInsets.only(
+                                                            right: 10),
+                                                        child: SvgPicture.asset(
+                                                            'assets/icons/important_icon.svg'),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Expanded(
+                                                    child: Column(
+                                                      children: [
+                                                        RichText(
+                                                          text: TextSpan(
+                                                            children: [
+                                                              TextSpan(
+                                                                  text:
+                                                                  'Your account needs to get verified once your daily transaction volume exceeds 900 €. If you want to increase the daily trading limit, please complete the ',
+                                                                  style: Theme.of(
+                                                                      context)
+                                                                      .textTheme
+                                                                      .headline6!
+                                                                      .copyWith(
+                                                                      fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                      color: Theme.of(context)
+                                                                          .textTheme
+                                                                          .headline6!
+                                                                          .color!
+                                                                          .withOpacity(0.6))),
+                                                              TextSpan(
                                                                 text:
-                                                                'Your account needs to get verified once your daily transaction volume exceeds 900 €. If you want to increase the daily trading limit, please complete the ',
+                                                                'KYC (Know-Your-Customer) process.',
                                                                 style: Theme.of(
                                                                     context)
                                                                     .textTheme
@@ -307,171 +326,156 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                                     fontWeight:
                                                                     FontWeight
                                                                         .w600,
-                                                                    color: Theme.of(context)
-                                                                        .textTheme
-                                                                        .headline6!
-                                                                        .color!
-                                                                        .withOpacity(0.6))),
-                                                            TextSpan(
-                                                              text:
-                                                              'KYC (Know-Your-Customer) process.',
-                                                              style: Theme.of(
-                                                                  context)
-                                                                  .textTheme
-                                                                  .headline6!
-                                                                  .copyWith(
-                                                                  fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                                  color: AppTheme
-                                                                      .pinkColor),
-                                                            ),
-                                                          ],
+                                                                    color: AppTheme
+                                                                        .pinkColor),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: buttonSmallWidth,
-                                        child: PendingButton(
-                                          'Sell',
-                                          callback: BalancesHelper().isAmountEmpty(amountController.text)
-                                              ? (parent) {
-                                                  showSnackBar(
-                                                    context,
-                                                    title: 'Amount is empty',
-                                                    color: AppColors
-                                                        .txStatusError
-                                                        .withOpacity(0.1),
-                                                    prefix: Icon(
-                                                      Icons.close,
-                                                      color: AppColors
-                                                          .txStatusError,
+                                                      ],
                                                     ),
-                                                  );
-                                                }
-                                              : (parent) async {
-                                                  parent.emitPending(true);
-                                                  lockHelper
-                                                      .provideWithLockChecker(
-                                                          context, () async {
-                                                    if (txState
-                                                        is TransactionLoadingState) {
-                                                      parent.emitPending(false);
-                                                      showSnackBar(
-                                                        context,
-                                                        title:
-                                                            'Please wait for the previous '
-                                                            'transaction',
-                                                        color: AppColors
-                                                            .txStatusError
-                                                            .withOpacity(0.1),
-                                                        prefix: Icon(
-                                                          Icons.close,
-                                                          color: AppColors
-                                                              .txStatusError,
-                                                        ),
-                                                      );
-                                                      return;
-                                                    }
-                                                    bool isEnough =
-                                                        isEnoughBalance(
-                                                            accountState);
-                                                    hideOverlay();
-                                                    if (_formKey.currentState!
-                                                        .validate()) {
-                                                      if (isEnough) {
-                                                        showDialog(
-                                                          barrierColor:
-                                                              Color(0x0f180245),
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context1) {
-                                                            return PassConfirmDialog(
-                                                                onCancel: () {
-                                                              parent
-                                                                  .emitPending(
-                                                                      false);
-                                                            }, onSubmit:
-                                                                    (password) async {
-                                                              await _submitSell(
-                                                                accountState,
-                                                                tokensState,
-                                                                fiatState,
-                                                                password,
-                                                              );
-                                                              parent
-                                                                  .emitPending(
-                                                                      false);
-                                                            });
-                                                          },
-                                                        );
-                                                      } else {
-                                                        if (double.parse(
-                                                                amountController
-                                                                    .text
-                                                                    .replaceAll(
-                                                                        ',',
-                                                                        '.')) ==
-                                                            0) {
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(
-                                                            SnackBar(
-                                                              content: Text(
-                                                                'Amount is empty',
-                                                                style: Theme.of(
-                                                                        context)
-                                                                    .textTheme
-                                                                    .headline5,
-                                                              ),
-                                                              backgroundColor: Theme
-                                                                      .of(context)
-                                                                  .snackBarTheme
-                                                                  .backgroundColor,
-                                                            ),
-                                                          );
-                                                        } else {
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(
-                                                            SnackBar(
-                                                              content: Text(
-                                                                'Insufficient funds',
-                                                                style: Theme.of(
-                                                                        context)
-                                                                    .textTheme
-                                                                    .headline5,
-                                                              ),
-                                                              backgroundColor: Theme
-                                                                      .of(context)
-                                                                  .snackBarTheme
-                                                                  .backgroundColor,
-                                                            ),
-                                                          );
-                                                        }
-                                                      }
-                                                    }
-                                                  });
-                                                },
+                                                  )
+                                                ],
+                                              ),
+                                            )
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: buttonSmallWidth,
+                                          child: PendingButton(
+                                            'Sell',
+                                            callback: BalancesHelper().isAmountEmpty(amountController.text)
+                                                ? (parent) {
+                                                    showSnackBar(
+                                                      context,
+                                                      title: 'Amount is empty',
+                                                      color: AppColors
+                                                          .txStatusError
+                                                          .withOpacity(0.1),
+                                                      prefix: Icon(
+                                                        Icons.close,
+                                                        color: AppColors
+                                                            .txStatusError,
+                                                      ),
+                                                    );
+                                                  }
+                                                : (parent) async {
+                                                    parent.emitPending(true);
+                                                    lockHelper
+                                                        .provideWithLockChecker(
+                                                            context, () async {
+                                                      if (txState
+                                                          is TransactionLoadingState) {
+                                                        parent.emitPending(false);
+                                                        showSnackBar(
+                                                          context,
+                                                          title:
+                                                              'Please wait for the previous '
+                                                              'transaction',
+                                                          color: AppColors
+                                                              .txStatusError
+                                                              .withOpacity(0.1),
+                                                          prefix: Icon(
+                                                            Icons.close,
+                                                            color: AppColors
+                                                                .txStatusError,
+                                                          ),
+                                                        );
+                                                        return;
+                                                      }
+                                                      bool isEnough =
+                                                          isEnoughBalance(
+                                                              accountState);
+                                                      hideOverlay();
+                                                      if (_formKey.currentState!
+                                                          .validate()) {
+                                                        if (isEnough) {
+                                                          showDialog(
+                                                            barrierColor:
+                                                                Color(0x0f180245),
+                                                            barrierDismissible:
+                                                                false,
+                                                            context: context,
+                                                            builder: (BuildContext
+                                                                context1) {
+                                                              return PassConfirmDialog(
+                                                                  onCancel: () {
+                                                                parent
+                                                                    .emitPending(
+                                                                        false);
+                                                              }, onSubmit:
+                                                                      (password) async {
+                                                                await _submitSell(
+                                                                  accountState,
+                                                                  tokensState,
+                                                                  fiatState,
+                                                                  password,
+                                                                );
+                                                                parent
+                                                                    .emitPending(
+                                                                        false);
+                                                              });
+                                                            },
+                                                          );
+                                                        } else {
+                                                          if (double.parse(
+                                                                  amountController
+                                                                      .text
+                                                                      .replaceAll(
+                                                                          ',',
+                                                                          '.')) ==
+                                                              0) {
+                                                            ScaffoldMessenger.of(
+                                                                    context)
+                                                                .showSnackBar(
+                                                              SnackBar(
+                                                                content: Text(
+                                                                  'Amount is empty',
+                                                                  style: Theme.of(
+                                                                          context)
+                                                                      .textTheme
+                                                                      .headline5,
+                                                                ),
+                                                                backgroundColor: Theme
+                                                                        .of(context)
+                                                                    .snackBarTheme
+                                                                    .backgroundColor,
+                                                              ),
+                                                            );
+                                                          } else {
+                                                            ScaffoldMessenger.of(
+                                                                    context)
+                                                                .showSnackBar(
+                                                              SnackBar(
+                                                                content: Text(
+                                                                  'Insufficient funds',
+                                                                  style: Theme.of(
+                                                                          context)
+                                                                      .textTheme
+                                                                      .headline5,
+                                                                ),
+                                                                backgroundColor: Theme
+                                                                        .of(context)
+                                                                    .snackBarTheme
+                                                                    .backgroundColor,
+                                                              ),
+                                                            );
+                                                          }
+                                                        }
+                                                      }
+                                                    });
+                                                  },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
