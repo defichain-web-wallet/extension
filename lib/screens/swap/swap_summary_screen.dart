@@ -11,6 +11,7 @@ import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -155,12 +156,12 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: SvgPicture.asset(
-                                      TokensHelper().getImageNameByTokenName(widget.assetFrom),
-                                    ),
+                                  AssetLogo(
+                                    size: 24,
+                                    assetStyle:
+                                    TokensHelper().getAssetStyleByTokenName(widget.assetFrom),
+                                    borderWidth: 0,
+                                    isBorder: false,
                                   ),
                                   SizedBox(
                                     width: 6,
@@ -196,12 +197,12 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: SvgPicture.asset(
-                                TokensHelper().getImageNameByTokenName(widget.assetTo),
-                              ),
+                            AssetLogo(
+                              size: 24,
+                              assetStyle:
+                              TokensHelper().getAssetStyleByTokenName(widget.assetTo),
+                              borderWidth: 0,
+                              isBorder: false,
                             ),
                             SizedBox(
                               width: 6,

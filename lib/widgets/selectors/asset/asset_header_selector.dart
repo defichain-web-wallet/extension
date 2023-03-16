@@ -3,6 +3,8 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/assets/asset_logo.dart';
+import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -37,7 +39,7 @@ class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
   @override
   Widget build(BuildContext context) {
     double arrowRotateDeg = widget.isShown ? 180 : 0;
-
+print(widget.assetCode);
     return Container(
       padding: const EdgeInsets.only(top: 6, bottom: 6, left: 6, right: 8),
       decoration: BoxDecoration(
@@ -57,15 +59,20 @@ class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(
-            width: 16,
-            height: 16,
-            child: SvgPicture.asset(
-              TokensHelper().getImageNameByTokenName(
-                widget.assetCode.replaceAll('d', ''),
-              ),
+          if (tokenHelper.isPair(widget.assetCode))
+            AssetPair(
+              isBorder: false,
+              pair: widget.assetCode,
+              height: 16,
             ),
-          ),
+          if (!tokenHelper.isPair(widget.assetCode))
+            AssetLogo(
+              size: 16,
+              assetStyle:
+                  tokenHelper.getAssetStyleByTokenName(widget.assetCode),
+              borderWidth: 0,
+              isBorder: false,
+            ),
           Flexible(
             child: TickerText(
               child: Text(
