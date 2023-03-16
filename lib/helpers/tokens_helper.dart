@@ -1215,12 +1215,22 @@ class TokensHelper {
     if (!SettingsHelper.isBitcoin()) {
       String defaultDefiTokenName = 'Default Defi token';
       String defaultBitcoinTokenName = 'Bitcoin';
-      return value
-          .replaceAll(defaultDefiTokenName, 'DeFiChain')
-          .replaceAll(defaultBitcoinTokenName, 'DeFiChain Bitcoin');
+      if (value == defaultDefiTokenName) {
+        return 'DeFiChain';
+      } else if (value == defaultBitcoinTokenName) {
+        return 'DeFiChain Bitcoin';
+      } else {
+        return value;
+      }
     } else {
       return value;
     }
+  }
+
+  String getSpecificDefiPairName(String value) {
+      String base = value.split('-')[0];
+      String quote = value.split('-')[1];
+      return getSpecificDefiName(base) + '-' + getSpecificDefiName(quote);
   }
 
   List<TokensModel> getTokensList(
@@ -1282,6 +1292,12 @@ class TokensHelper {
     return (token != 'DFI' && token != 'DUSD' && token != 'csETH')
         ? 'd' + token
         : token;
+  }
+
+  String getPairNameWithPrefix(assetPairName) {
+    return getTokenWithPrefix(getBaseAssetName(assetPairName)) +
+        '-' +
+        getTokenWithPrefix(getQuoteAssetName(assetPairName));
   }
 
   bool isPair(symbol) {
