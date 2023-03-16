@@ -62,11 +62,14 @@ class _WalletCheckerState extends State<WalletChecker> {
           await box.get(HiveNames.recoveryMnemonic) != null;
       String? recoveryMnemonic = await box.get(HiveNames.recoveryMnemonic);
 
+      bool isLedger =
+          await box.get(HiveNames.ledgerWalletSetup, defaultValue: false);
+
       await settingsHelper.loadSettings();
       await box.close();
 
-      if (masterKeyPair != null) {
-        if (password != null) {
+      if (masterKeyPair != null || isLedger) {
+        if (password != null || isLedger) {
           lockHelper.provideWithLockChecker(context, () async {
             try {
               await accountCubit

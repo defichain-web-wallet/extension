@@ -71,8 +71,6 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
     super.initState();
   }
 
-
-
   checkButtonStatus() {
     setState(() {
       if (_nameController.text.length > 0 &&
@@ -122,7 +120,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                 width: 104,
                 callback: isEnable
                     ? () async {
-                  network = await addressNetwork(_addressController.text);
+                        network = await addressNetwork(_addressController.text);
                         widget.confirmCallback!(
                           _nameController.text,
                           _addressController.text,
@@ -229,32 +227,40 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                 onDoubleTap: () {
                                   nameFocusNode.requestFocus();
                                   if (_nameController.text.isNotEmpty) {
-                                    _nameController.selection =
-                                        TextSelection(
-                                            baseOffset: 0,
-                                            extentOffset:
-                                            _nameController
-                                                .text.length);
+                                    _nameController.selection = TextSelection(
+                                        baseOffset: 0,
+                                        extentOffset:
+                                            _nameController.text.length);
                                   }
                                 },
                                 child: TextFormField(
                                   focusNode: nameFocusNode,
                                   controller: _nameController,
                                   decoration: InputDecoration(
-                                    hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                    hoverColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .hoverColor,
                                     filled: true,
-                                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                    enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                    focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                    fillColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .fillColor,
+                                    enabledBorder: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .enabledBorder,
+                                    focusedBorder: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .focusedBorder,
                                     hintStyle: passwordField.copyWith(
-                                      color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                      color: isDarkTheme()
+                                          ? DarkColors.hintTextColor
+                                          : LightColors.hintTextColor,
                                     ),
                                     hintText: hintContactName,
-
                                   ),
                                   onChanged: (value) async {
-                                    isValidAddress = await addressHelper
-                                        .validateAddress(_addressController.text);
+                                    isValidAddress =
+                                        await addressHelper.validateAddress(
+                                            _addressController.text);
                                     isValidBitcoinAddress =
                                         await addressHelper.validateBtcAddress(
                                             _addressController.text);
@@ -288,28 +294,37 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                         TextSelection(
                                             baseOffset: 0,
                                             extentOffset:
-                                            _addressController
-                                                .text.length);
+                                                _addressController.text.length);
                                   }
                                 },
                                 child: TextFormField(
                                   focusNode: addressFocusNode,
                                   controller: _addressController,
                                   decoration: InputDecoration(
-                                    hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                    hoverColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .hoverColor,
                                     filled: true,
-                                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                    enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                    focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                    fillColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .fillColor,
+                                    enabledBorder: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .enabledBorder,
+                                    focusedBorder: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .focusedBorder,
                                     hintStyle: passwordField.copyWith(
-                                      color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                      color: isDarkTheme()
+                                          ? DarkColors.hintTextColor
+                                          : LightColors.hintTextColor,
                                     ),
                                     hintText: hintAddress,
-
                                   ),
                                   onChanged: (value) async {
-                                    isValidAddress = await addressHelper
-                                        .validateAddress(_addressController.text);
+                                    isValidAddress =
+                                        await addressHelper.validateAddress(
+                                            _addressController.text);
                                     isValidBitcoinAddress =
                                         await addressHelper.validateBtcAddress(
                                             _addressController.text);

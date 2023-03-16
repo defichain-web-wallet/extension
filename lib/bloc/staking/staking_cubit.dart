@@ -25,10 +25,8 @@ class StakingCubit extends Cubit<StakingState> {
       routes: state.routes,
     ));
     try {
-      var stakingRouteBalance =
-        await dfxRequests.getStakingRouteBalance(accessToken, address);
-      List<StakingModel> stakingRoutes =
-          await dfxRequests.getStakingRoutes(accessToken);
+      var stakingRouteBalance = await dfxRequests.getStakingRouteBalance(accessToken, address);
+      List<StakingModel> stakingRoutes = await dfxRequests.getStakingRoutes(accessToken);
       emit(state.copyWith(
         status: StakingStatusList.success,
         amount: stakingRouteBalance['totalAmount'],
@@ -112,14 +110,10 @@ class StakingCubit extends Cubit<StakingState> {
   }
 
   createStaking(String accessToken, {bool isActive = false, int id = 0}) async {
-    AssetByFiatModel? rewardAsset =
-        state.rewardType == StakingType.Wallet ? state.rewardAsset : null;
-    AssetByFiatModel? paymentAsset =
-      state.paymentType == StakingType.Wallet ? state.paymentAsset : null;
-    IbanModel? rewardSell =
-        state.rewardType == StakingType.BankAccount ? state.rewardSell : null;
-    IbanModel? paybackSell =
-        state.paymentType == StakingType.BankAccount ? state.paybackSell : null;
+    AssetByFiatModel? rewardAsset = state.rewardType == StakingType.Wallet ? state.rewardAsset : null;
+    AssetByFiatModel? paymentAsset = state.paymentType == StakingType.Wallet ? state.paymentAsset : null;
+    IbanModel? rewardSell = state.rewardType == StakingType.BankAccount ? state.rewardSell : null;
+    IbanModel? paybackSell = state.paymentType == StakingType.BankAccount ? state.paybackSell : null;
 
     String address;
     try {

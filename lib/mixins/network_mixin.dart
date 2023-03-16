@@ -1,4 +1,3 @@
-import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/settings_model.dart';

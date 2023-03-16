@@ -47,12 +47,9 @@ class AssetPairModel {
     this.status = json["status"];
     this.reserveA = double.parse(json["tokenA"]['reserve']);
     this.reserveB = double.parse(json["tokenB"]['reserve']);
-    this.reserveADivReserveB = double.parse(json["tokenA"]['reserve']) /
-        double.parse(json["tokenB"]['reserve']);
-    this.reserveBDivReserveA = double.parse(json["tokenB"]['reserve']) /
-        double.parse(json["tokenA"]['reserve']);
-    this.totalLiquidityRaw =
-        convertToSatoshi(double.parse(json["totalLiquidity"]['token']));
+    this.reserveADivReserveB = double.parse(json["tokenA"]['reserve']) / double.parse(json["tokenB"]['reserve']);
+    this.reserveBDivReserveA = double.parse(json["tokenB"]['reserve']) / double.parse(json["tokenA"]['reserve']);
+    this.totalLiquidityRaw = convertToSatoshi(double.parse(json["totalLiquidity"]['token']));
     this.totalLiquidity = double.parse(json["totalLiquidity"]['token']);
     this.totalLiquidityUsd = double.parse(json["totalLiquidity"]['usd'] ?? '0');
 
@@ -68,9 +65,9 @@ class AssetPairModel {
       this.apr = 0.0;
     }
 
-    try {
+    if (json["tokenA"]["fee"] != null && json["tokenA"]["fee"]["pct"] != null) {
       this.fee = double.parse(json["tokenA"]["fee"]["pct"]);
-    } catch (err) {
+    } else {
       this.fee = 0;
     }
   }
