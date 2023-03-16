@@ -50,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool isShownSnackBar = false;
   double sliverTopHeight = 0.0;
   double targetSliverTopHeight = 76.0;
+  GlobalKey txKey = GlobalKey();
 
   tabListener() {
     HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
@@ -78,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (timer != null) {
       timer!.cancel();
     }
+
     super.dispose();
   }
 
@@ -267,7 +269,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                 ),
                                 if (txState is! TransactionInitialState)
-                                  TransactionStatusBar(),
+                                  TransactionStatusBar(key: txKey,),
                               ],
                             ),
                           ),
