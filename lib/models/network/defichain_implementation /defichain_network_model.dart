@@ -11,7 +11,7 @@ class DefichainNetwork extends AbstractNetwork {
   DefichainNetwork(NetworkName networkName) : super(_validationNetworkName(networkName));
 
   static NetworkName _validationNetworkName(NetworkName networkName){
-    if(networkName != NetworkName.defichainTestnet || networkName != NetworkName.defichainMainnet){
+    if(networkName != NetworkName.defichainTestnet && networkName != NetworkName.defichainMainnet){
       throw 'Invalid network';
     }
     return networkName;
