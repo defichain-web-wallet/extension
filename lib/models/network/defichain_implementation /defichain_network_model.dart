@@ -8,7 +8,14 @@ import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 class DefichainNetwork extends AbstractNetwork {
-  DefichainNetwork(NetworkName networkName) : super(networkName);
+  DefichainNetwork(NetworkName networkName) : super(_validationNetworkName(networkName));
+
+  static NetworkName _validationNetworkName(NetworkName networkName){
+    if(networkName != NetworkName.defichainTestnet || networkName != NetworkName.defichainMainnet){
+      throw 'Invalid network';
+    }
+    return networkName;
+  }
 
   Uri getTransactionExplorer(String tx) {
     return Uri.parse(
