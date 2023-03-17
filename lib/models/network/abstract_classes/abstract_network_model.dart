@@ -1,6 +1,6 @@
+import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
-
 import 'abstract_account_model.dart';
 import 'abstract_bridge_model.dart';
 import 'abstract_exchange_model.dart';
@@ -9,6 +9,12 @@ import 'abstract_on_off_ramp_model.dart';
 import 'abstract_staking_provider_model.dart';
 
 abstract class AbstractNetwork {
+  static const int COIN = 100000000;
+
+  final NetworkName networkName;
+
+  AbstractNetwork(this.networkName);
+
   List<TokensModel> getAvailableTokens();
   List<AbstractAccountModel> getAccounts();
 
@@ -30,6 +36,14 @@ abstract class AbstractNetwork {
     return getStakingProviders().length > 0;
   }
 
+  int toSatoshi(double amount){
+    return (amount * COIN).round();
+  }
+
+  double fromSatoshi(int amount){
+    return amount / COIN;
+  }
+
   bool lmAvailable() {
     return getLmProviders().length > 0;
   }
@@ -46,8 +60,8 @@ abstract class AbstractNetwork {
 
   // Sending
   bool checkAddress(String address);
-  TxErrorModel send(AbstractAccountModel account, String address,
+  Future<TxErrorModel> send(AbstractAccountModel account, String address,
       String password, TokensModel token, double amount);
-  String signMessage(
+  Future<String> signMessage(
       AbstractAccountModel account, String message, String password);
 }
