@@ -31,7 +31,7 @@ dependencies:
   defichaindart:
     git:
       url: https://github.com/Jellywallet/DeFiChain-dart
-      ref: d61af72c7e90f5051d3c36c08a5e413f34c2953b
+      ref: 81aef468ffcafb77d0a7ff3fe912651d07531606
   crypto: ^3.0.1
   crypt: ^4.2.1
 
