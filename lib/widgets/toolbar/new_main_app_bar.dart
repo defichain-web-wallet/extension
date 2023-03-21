@@ -12,14 +12,14 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isShowLogo;
   final bool isShowNetworkSelector;
   final Color? bgColor;
-  final void Function()? callback;
+  final void Function()? hideOverlayCallback;
 
   const NewMainAppBar({
     Key? key,
     this.isShowLogo = true,
     this.isShowNetworkSelector = true,
     this.bgColor,
-    this.callback,
+    this.hideOverlayCallback,
   }) : super(key: key);
 
   static const double toolbarHeight = 54.0;
@@ -61,8 +61,8 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 onPressed: () {
-                  if (callback != null) {
-                    callback!();
+                  if (hideOverlayCallback != null) {
+                    hideOverlayCallback!();
                   }
                   Navigator.of(context).pop();
                 },
@@ -80,7 +80,12 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
             height: 32,
             child: NewActionButton(
               iconPath: 'assets/icons/account_icon.svg',
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              onPressed: () {
+                if (hideOverlayCallback != null) {
+                  hideOverlayCallback!();
+                }
+                Scaffold.of(context).openEndDrawer();
+              },
             ),
           ),
           SizedBox(

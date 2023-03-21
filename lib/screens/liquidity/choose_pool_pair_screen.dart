@@ -67,7 +67,7 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                   ),
                   appBar: NewMainAppBar(
                     isShowLogo: false,
-                    callback: ()=>tokensCubit.search(tokensState.tokens, ''),
+                    hideOverlayCallback: ()=>tokensCubit.search(tokensState.tokens, ''),
                   ),
                   body: Container(
                     padding: EdgeInsets.only(

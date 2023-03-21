@@ -90,7 +90,7 @@ class _IbanScreenState extends State<IbanScreen>
                 ),
                 appBar: NewMainAppBar(
                   isShowLogo: false,
-                  callback: hideOverlay,
+                  hideOverlayCallback: hideOverlay,
                 ),
                 body: Container(
                   padding: EdgeInsets.only(

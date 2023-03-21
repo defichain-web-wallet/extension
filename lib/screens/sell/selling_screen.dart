@@ -148,7 +148,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                         ),
                         appBar: NewMainAppBar(
                           isShowLogo: false,
-                          callback: hideOverlay,
+                          hideOverlayCallback: hideOverlay,
                         ),
                         body: GestureDetector(
                           onTap: hideOverlay,
