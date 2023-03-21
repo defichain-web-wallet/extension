@@ -1,6 +1,7 @@
 part of 'staking_cubit.dart';
 
 enum StakingStatusList { initial, loading, success, restore, failure }
+
 enum StakingType { Reinvest, Wallet, BankAccount }
 
 class StakingState extends Equatable {
@@ -16,7 +17,7 @@ class StakingState extends Equatable {
   final List<StakingModel>? routes;
 
   StakingState({
-    this.status = StakingStatusList.initial,
+    this.status = StakingStatusList.success,
     this.amount = 0,
     this.rewardType = StakingType.Reinvest,
     this.paymentType = StakingType.Reinvest,
@@ -30,17 +31,17 @@ class StakingState extends Equatable {
 
   @override
   List<Object?> get props => [
-    status,
-    amount,
-    rewardType,
-    paymentType,
-    rewardAsset,
-    paymentAsset,
-    paybackSell,
-    rewardSell,
-    depositAddress,
-    routes,
-  ];
+        status,
+        amount,
+        rewardType,
+        paymentType,
+        rewardAsset,
+        paymentAsset,
+        paybackSell,
+        rewardSell,
+        depositAddress,
+        routes,
+      ];
 
   StakingState copyWith({
     StakingStatusList? status,

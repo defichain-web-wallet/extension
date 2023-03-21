@@ -8,6 +8,7 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -22,7 +23,6 @@ import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -162,6 +162,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     TokensHelper().getAssetStyleByTokenName(widget.assetFrom),
                                     borderWidth: 0,
                                     isBorder: false,
+
                                   ),
                                   SizedBox(
                                     width: 6,
@@ -172,8 +173,8 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                         .textTheme
                                         .headline3!
                                         .copyWith(
-                                      fontSize: 20,
-                                    ),
+                                          fontSize: 20,
+                                        ),
                                   )
                                 ],
                               )
@@ -182,17 +183,15 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                         ),
                         Text(
                           'to',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline5!
-                              .copyWith(
-                            fontSize: 12,
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .color!
-                                .withOpacity(0.5),
-                          ),
+                          style:
+                              Theme.of(context).textTheme.headline5!.copyWith(
+                                    fontSize: 12,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .color!
+                                        .withOpacity(0.5),
+                                  ),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -213,8 +212,8 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                   .textTheme
                                   .headline3!
                                   .copyWith(
-                                fontSize: 20,
-                              ),
+                                    fontSize: 20,
+                                  ),
                             )
                           ],
                         )
@@ -261,29 +260,52 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               'Change',
                               pendingText: 'Pending',
                               isCheckLock: false,
-                              callback: (parent) {
+                              callback: (parent) async {
+                                final isLedger =
+                                    await SettingsHelper.isLedger();
+
                                 parent.emitPending(true);
                                 if (widget.btcTx != '') {
                                   submitSwap(state, tokensState, "");
-                                } else {
+                                } else if (!isLedger) {
                                   showDialog(
                                     barrierColor: Color(0x0f180245),
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext context1) {
                                       return PassConfirmDialog(
-                                        onCancel: () {
-                                          parent.emitPending(false);
-                                        },
-                                        onSubmit: (password) async {
+                                          onSubmit: (password) async {
+                                        parent.emitPending(true);
+                                        await submitSwap(
+                                          state,
+                                          tokensState,
+                                          password,
+                                        );
+                                        parent.emitPending(false);
+                                      });
+                                    },
+                                  );
+                                } else if (isLedger) {
+                                  showDialog(
+                                    barrierColor: Color(0x0f180245),
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (BuildContext context1) {
+                                      return LedgerCheckScreen(
+                                          onStartSign: (p, c) async {
+                                        parent.emitPending(true);
+                                        p.emitPending(true);
+                                        await submitSwap(
+                                            state, tokensState, null,
+                                            callbackOk: () {
+                                          Navigator.pop(c);
+                                        }, callbackFail: () {
                                           parent.emitPending(true);
-                                          await submitSwap(
-                                            state,
-                                            tokensState,
-                                            password,
-                                          );
-                                        }
-                                      );
+                                          p.emitPending(true);
+                                        });
+                                        parent.emitPending(false);
+                                        p.emitPending(false);
+                                      });
                                     },
                                   );
                                 }
@@ -303,19 +325,22 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
         ),
       );
 
-  submitSwap(state, tokenState, String password) async {
+  submitSwap(state, tokenState, String? password,
+      {final Function()? callbackOk, final Function()? callbackFail}) async {
     if (state.status == AccountStatusList.success) {
       late TxErrorModel txResponse;
+
       try {
         if (widget.btcTx != '') {
           BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
           txResponse = await bitcoinCubit.sendTransaction(widget.btcTx);
         }
         if (widget.assetFrom != widget.assetTo) {
-          ECPair keyPair = await HDWalletService()
-              .getKeypairFromStorage(password, state.activeAccount.index!);
           txResponse = await transactionService.createAndSendSwap(
-              keyPair: keyPair,
+              keyPair: password != null
+                  ? (await HDWalletService().getKeypairFromStorage(
+                      password, state.activeAccount.index!))
+                  : null,
               account: state.activeAccount,
               tokenFrom: widget.assetFrom,
               tokenTo: widget.assetTo,
@@ -324,8 +349,13 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
               slippage: widget.slippage,
               tokens: tokenState.tokens);
         }
+      } on Exception catch (err) {
+        print(err);
+        throw err;
       } catch (err) {
+        print(err);
         txResponse = TxErrorModel(isError: true);
+        if (callbackFail != null) callbackFail();
       }
 
       showDialog(
@@ -336,21 +366,23 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
           return TxStatusDialog(
             txResponse: txResponse,
             callbackOk: () {
-              if (!txResponse.isError! && !SettingsHelper.isBitcoin()) {
+              if (callbackOk != null) {
+                callbackOk();
+              }
+              if (!txResponse.isError!) {
                 TransactionCubit transactionCubit =
-                  BlocProvider.of<TransactionCubit>(context);
+                    BlocProvider.of<TransactionCubit>(context);
 
                 transactionCubit.setOngoingTransaction(txResponse);
               }
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
-                  pageBuilder:
-                      (context, animation1, animation2) =>
-                      HomeScreen(isLoadTokens: true,),
+                  pageBuilder: (context, animation1, animation2) => HomeScreen(
+                    isLoadTokens: true,
+                  ),
                   transitionDuration: Duration.zero,
-                  reverseTransitionDuration:
-                  Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
                 ),
               );
             },

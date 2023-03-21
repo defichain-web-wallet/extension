@@ -104,9 +104,11 @@ class _AssetCardState extends State<AssetCard> {
                       style: Theme.of(context).textTheme.headline5,
                     ),
                     Text(
-                      tokensHelper.getSpecificDefiName(
-                        widget.tokens[widget.index].name!,
-                      ),
+                      tokensHelper.isPair(widget.tokens[widget.index].symbol!)
+                          ? tokensHelper.getSpecificDefiPairName(
+                              widget.tokens[widget.index].name!)
+                          : tokensHelper.getSpecificDefiName(
+                              widget.tokens[widget.index].name!),
                       style: Theme.of(context).textTheme.headline6!.copyWith(
                             color: Theme.of(context)
                                 .textTheme

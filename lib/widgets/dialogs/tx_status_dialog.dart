@@ -34,7 +34,8 @@ class TxStatusDialog extends StatefulWidget {
 }
 
 class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
-  static const String specificError = 'PoolSwapTx: Price is higher than indicated. (code 16)';
+  static const String specificError =
+      'PoolSwapTx: Price is higher than indicated. (code 16)';
   String subtitleTextOops =
       'Something went wrong, Jelly couldn\'t process your transaction. Please try again!';
   String subtitleTextSuccsess =
@@ -48,9 +49,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
           'tolerance. Increase tolerance'
           'percentage to proceed';
     } else {
-      return !widget.txResponse!.isError!
-          ? widget.subtitle
-          : subtitleTextOops;
+      return !widget.txResponse!.isError! ? widget.subtitle : subtitleTextOops;
     }
   }
 
@@ -125,8 +124,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
               child: StatusLogoAndTitle(
                 isSmall: false,
                 isSuccess: !widget.txResponse!.isError!,
-                title:
-                    !widget.txResponse!.isError! ? widget.title : 'Oops!',
+                title: !widget.txResponse!.isError! ? widget.title : 'Oops!',
                 subtitle: formatErrorMessage(),
               ),
             ),

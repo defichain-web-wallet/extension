@@ -8,12 +8,15 @@ class PendingButton extends StatefulWidget {
   final globalKey;
   final isCheckLock;
 
+  final double? width;
+
   const PendingButton(this.text,
       {Key? key,
       required this.callback,
       this.pendingText = 'Pending...',
       GlobalKey? this.globalKey,
-      this.isCheckLock = true})
+      this.isCheckLock = true,
+      this.width})
       : super(key: key);
 
   @override

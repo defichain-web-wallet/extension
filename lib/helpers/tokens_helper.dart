@@ -199,15 +199,15 @@ class TokensHelper {
       case 'ETH':
         {
           return AssetStyleModel(
-              tokenName: tokenName,
-              imgPath: 'assets/images/tokens/eth.png',
-              isUniqueLogo: true,
-              gradientColors: [
-                Color(0xff627EEA),
-                Color(0xff3C61F1),
-              ],
-              rotateRadian: getRadianByDeg(219.64),
-              stops: [0.1028, 0.9523],
+            tokenName: tokenName,
+            imgPath: 'assets/images/tokens/eth.png',
+            isUniqueLogo: true,
+            gradientColors: [
+              Color(0xff627EEA),
+              Color(0xff3C61F1),
+            ],
+            rotateRadian: getRadianByDeg(219.64),
+            stops: [0.1028, 0.9523],
           );
         }
       case 'BTC':
@@ -304,8 +304,8 @@ class TokensHelper {
               Color(0xff287BD6),
               Color(0xff256BB7),
             ],
-              rotateRadian: getRadianByDeg(225.51),
-              stops: [0.0955, 0.9265],
+            rotateRadian: getRadianByDeg(225.51),
+            stops: [0.0955, 0.9265],
           );
         }
       case 'SPY':
@@ -1215,11 +1215,26 @@ class TokensHelper {
     if (!SettingsHelper.isBitcoin()) {
       String defaultDefiTokenName = 'Default Defi token';
       String defaultBitcoinTokenName = 'Bitcoin';
-      return value
-          .replaceAll(defaultDefiTokenName, 'DeFiChain')
-          .replaceAll(defaultBitcoinTokenName, 'DeFiChain Bitcoin');
+      if (value == defaultDefiTokenName) {
+        return 'DeFiChain';
+      } else if (value == defaultBitcoinTokenName) {
+        return 'DeFiChain Bitcoin';
+      } else {
+        return value;
+      }
     } else {
       return value;
+    }
+  }
+
+  String getSpecificDefiPairName(String value) {
+    final String exception = 'Cake-staked ETH-Ether';
+    if (value == exception) {
+      return value;
+    } else {
+      String base = value.split('-')[0];
+      String quote = value.split('-')[1];
+      return getSpecificDefiName(base) + '-' + getSpecificDefiName(quote);
     }
   }
 
@@ -1282,6 +1297,12 @@ class TokensHelper {
     return (token != 'DFI' && token != 'DUSD' && token != 'csETH')
         ? 'd' + token
         : token;
+  }
+
+  String getPairNameWithPrefix(assetPairName) {
+    return getTokenWithPrefix(getBaseAssetName(assetPairName)) +
+        '-' +
+        getTokenWithPrefix(getQuoteAssetName(assetPairName));
   }
 
   bool isPair(symbol) {
@@ -1417,6 +1438,7 @@ class TokensHelper {
   String getBaseAssetName(String assetPairName) {
     return assetPairName.split('-')[0];
   }
+
   String getQuoteAssetName(String assetPairName) {
     return assetPairName.split('-')[1];
   }

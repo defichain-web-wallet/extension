@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:hive/hive.dart';
 import 'package:defi_wallet/client/hive_names.dart';
@@ -41,6 +42,25 @@ class SettingsHelper {
     return settings.isBitcoin != null && settings.isBitcoin!;
   }
 
+  static Future<bool> needPasswordScreen() async {
+    var box = await Hive.openBox(HiveBoxes.client);
+    var walletType = box.get(HiveNames.walletType);
+
+    if (walletType == AccountCubit.ledgerWalletType) {
+      return false;
+    }
+    return true;
+  }
+
+  static Future<bool> isLedger() async {
+    var box = await Hive.openBox(HiveBoxes.client);
+    var walletType = box.get(HiveNames.walletType);
+
+    if (walletType == AccountCubit.ledgerWalletType) {
+      return true;
+    }
+    return false;
+  }
 
   Future<void> initSetting() async {
     settings = SettingsModel();
