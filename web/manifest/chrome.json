@@ -1,0 +1,13 @@
+{
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": "/icons/128.png"
+  },
+  "background": {
+    "service_worker": "background-wrapper.js"
+  },
+  "manifest_version": 3
+}
