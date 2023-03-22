@@ -52,10 +52,12 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
         var accounts = state.accounts;
         if (accounts!.length == 1) {
-          accountsSelectorHeight = 193;
+          accountsSelectorHeight = 195;
         }
-        if (accounts.length > 1) {
-          accountsSelectorHeight = 236;
+        else if (accounts.length == 2) {
+          accountsSelectorHeight = 237;
+        } else {
+          accountsSelectorHeight = 260;
         }
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
@@ -160,56 +162,8 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                               ScrollConfiguration.of(context)
                                                   .copyWith(scrollbars: false),
                                           child: ListView.builder(
-                                            itemCount: accounts.length + 1,
+                                            itemCount: accounts.length,
                                             itemBuilder: (context, index) {
-                                              if (index == accounts.length ||
-                                                  accounts.isEmpty) {
-                                                return Column(
-                                                  children: [
-                                                    Divider(
-                                                      height: 1,
-                                                      endIndent: 12,
-                                                      indent: 12,
-                                                      color: Theme.of(context)
-                                                          .dividerColor
-                                                          .withOpacity(0.05),
-                                                      thickness: 1,
-                                                    ),
-                                                    AccountMenuButton(
-                                                      callback: (index) {
-                                                        showDialog(
-                                                          barrierColor:
-                                                              Color(0x0f180245),
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return CreateEditAccountDialog(
-                                                              callback:
-                                                                  (s) async {
-                                                                await accountCubit
-                                                                    .addAccount();
-                                                                accountCubit.editAccount(
-                                                                    s,
-                                                                    index: accounts
-                                                                            .length -
-                                                                        1);
-                                                              },
-                                                            );
-                                                          },
-                                                        );
-                                                      },
-                                                      isHoverBackgroundEffect:
-                                                          false,
-                                                      iconPath:
-                                                          'assets/icons/add.svg',
-                                                      title:
-                                                          'Create new account',
-                                                    ),
-                                                  ],
-                                                );
-                                              } else {
                                                 return Column(
                                                   children: [
                                                     Divider(
@@ -249,11 +203,55 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                     ),
                                                   ],
                                                 );
-                                              }
                                             },
                                           ),
                                         ),
                                       ),
+                                      Column(
+                                        children: [
+                                          Divider(
+                                            height: 1,
+                                            endIndent: 12,
+                                            indent: 12,
+                                            color: Theme.of(context)
+                                                .dividerColor
+                                                .withOpacity(0.05),
+                                            thickness: 1,
+                                          ),
+                                          AccountMenuButton(
+                                            callback: (index) {
+                                              showDialog(
+                                                barrierColor:
+                                                Color(0x0f180245),
+                                                barrierDismissible:
+                                                false,
+                                                context: context,
+                                                builder: (BuildContext
+                                                context) {
+                                                  return CreateEditAccountDialog(
+                                                    callback:
+                                                        (s) async {
+                                                      await accountCubit
+                                                          .addAccount();
+                                                      accountCubit.editAccount(
+                                                          s,
+                                                          index: accounts
+                                                              .length -
+                                                              1);
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            isHoverBackgroundEffect:
+                                            false,
+                                            iconPath:
+                                            'assets/icons/add.svg',
+                                            title:
+                                            'Create new account',
+                                          ),
+                                        ],
+                                      )
                                     ],
                                   ),
                                 ),

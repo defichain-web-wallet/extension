@@ -104,11 +104,15 @@ class _SelectedAccountState extends State<SelectedAccount> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '${widget.accountName}',
-                style: Theme.of(context).textTheme.headline4!.copyWith(
-                      fontSize: 16,
-                    ),
+              Container(
+                constraints: BoxConstraints(maxWidth: 190),
+                child: Text(
+                  '${widget.accountName}',
+                  style: Theme.of(context).textTheme.headline4!.copyWith(
+                        fontSize: 16,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               SizedBox(
                 width: 8,

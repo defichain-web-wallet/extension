@@ -189,6 +189,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                                           .color!,
                                   fontSize: widget.isLockType ? 13 : 14,
                                 ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (widget.afterTitleWidget != null)
