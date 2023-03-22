@@ -392,10 +392,14 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                               child: Container(
                                 child: Row(
                                   children: [
-                                    Text(
-                                      accountFrom.name!,
-                                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                                        fontSize: 13,
+                                    Container(
+                                      constraints: BoxConstraints(maxWidth: 150),
+                                      child: Text(
+                                        accountFrom.name!,
+                                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                                          fontSize: 13,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     SizedBox(
@@ -520,11 +524,16 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                 );
                               },
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    accountTo.name!,
-                                    style: Theme.of(context).textTheme.headline5!.copyWith(
-                                      fontSize: 13,
+                                  Container(
+                                    constraints: BoxConstraints(maxWidth: 150),
+                                    child: Text(
+                                      accountTo.name!,
+                                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                                        fontSize: 13,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   SizedBox(
