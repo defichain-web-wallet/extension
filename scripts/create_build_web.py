@@ -1,5 +1,6 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+import sys
 import os
 import json
 import argparse
@@ -10,6 +11,23 @@ import pathlib
 
 DIR = pathlib.Path(__file__).parent.resolve()
 EXT = "tar"
+
+
+def generate_manifest(browser_name):
+    index_manifest = open('../web/manifest/index.json', 'r+')
+    specific_manifest_part = open(f'../web/manifest/{browser_name}.json')
+
+    target_data = json.load(specific_manifest_part)
+    manifest_data = json.load(index_manifest)
+
+    manifest_data.update(target_data)
+
+    index_manifest.close()
+    specific_manifest_part.close()
+
+    manifest = open("../web/manifest.json", "w")
+    json.dump(manifest_data, manifest)
+    manifest.close()
 
 
 def get_version():
@@ -126,5 +144,7 @@ if __name__ == "__main__":
     version = get_version()
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", help="new version", default=version)
+    parser.add_argument("--browser", help="browser name", default=sys.argv[1])
     args = parser.parse_args()
+    generate_manifest(args.browser)
     run(args.version)
