@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -106,12 +107,13 @@ class _SelectedAccountState extends State<SelectedAccount> {
             children: [
               Container(
                 constraints: BoxConstraints(maxWidth: 190),
-                child: Text(
-                  '${widget.accountName}',
-                  style: Theme.of(context).textTheme.headline4!.copyWith(
-                        fontSize: 16,
-                      ),
-                  overflow: TextOverflow.ellipsis,
+                child: TickerText(
+                  child: Text(
+                    '${widget.accountName}',
+                    style: Theme.of(context).textTheme.headline4!.copyWith(
+                          fontSize: 16,
+                        ),
+                  ),
                 ),
               ),
               SizedBox(

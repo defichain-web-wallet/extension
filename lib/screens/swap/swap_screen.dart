@@ -37,6 +37,7 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/swap/swap_account_selector_dialog.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
@@ -389,34 +390,34 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                   },
                                 );
                               },
-                              child: Container(
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      constraints: BoxConstraints(maxWidth: 150),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    constraints: BoxConstraints(maxWidth: 150),
+                                    child: TickerText(
                                       child: Text(
                                         accountFrom.name!,
                                         style: Theme.of(context).textTheme.headline5!.copyWith(
                                           fontSize: 13,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-                                    RotationTransition(
-                                      turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
-                                      child: SizedBox(
-                                        width: 10,
-                                        height: 10,
-                                        child: SvgPicture.asset(
-                                          'assets/icons/arrow_down.svg',
-                                        ),
+                                  ),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  RotationTransition(
+                                    turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
+                                    child: SizedBox(
+                                      width: 10,
+                                      height: 10,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/arrow_down.svg',
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             )
                           ],
@@ -528,12 +529,13 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                 children: [
                                   Container(
                                     constraints: BoxConstraints(maxWidth: 150),
-                                    child: Text(
-                                      accountTo.name!,
-                                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                                        fontSize: 13,
+                                    child: TickerText(
+                                      child: Text(
+                                        accountTo.name!,
+                                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                                          fontSize: 13,
+                                        ),
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   SizedBox(
