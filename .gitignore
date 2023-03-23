@@ -34,7 +34,7 @@
 
 # Web related
 
-web/manifest.json
+/web/manifest.json
 
 # Symbolication related
 app.*.symbols
