@@ -108,6 +108,7 @@ class _SelectedAccountState extends State<SelectedAccount> {
               Container(
                 constraints: BoxConstraints(maxWidth: 190),
                 child: TickerText(
+                  isSpecialDuration: true,
                   child: Text(
                     '${widget.accountName}',
                     style: Theme.of(context).textTheme.headline4!.copyWith(

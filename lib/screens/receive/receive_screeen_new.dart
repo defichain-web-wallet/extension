@@ -134,6 +134,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                   Container(
                                     constraints: BoxConstraints(maxWidth: 200),
                                     child: TickerText(
+                                      isSpecialDuration: true,
                                       child: Text(
                                         '${state.activeAccount!.name}',
                                         style: headline5.copyWith(

@@ -396,6 +396,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                   Container(
                                     constraints: BoxConstraints(maxWidth: 150),
                                     child: TickerText(
+                                      isSpecialDuration: true,
                                       child: Text(
                                         accountFrom.name!,
                                         style: Theme.of(context).textTheme.headline5!.copyWith(
@@ -530,6 +531,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                   Container(
                                     constraints: BoxConstraints(maxWidth: 150),
                                     child: TickerText(
+                                      isSpecialDuration: true,
                                       child: Text(
                                         accountTo.name!,
                                         style: Theme.of(context).textTheme.headline5!.copyWith(

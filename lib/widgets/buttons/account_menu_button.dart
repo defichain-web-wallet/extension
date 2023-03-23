@@ -171,6 +171,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                       ),
                     Expanded(
                       child: TickerText(
+                        isSpecialDuration: true,
                         child: Text(
                           '${widget.title}',
                           style: widget.callback == null
