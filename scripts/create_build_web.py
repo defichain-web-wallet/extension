@@ -31,14 +31,14 @@ def generate_manifest(browser_name):
 
 
 def get_version():
-    manifest_json_file_path = f"{DIR}/../web/manifest.json"
+    manifest_json_file_path = f"{DIR}/../web/manifest/index.json"
     with open(manifest_json_file_path, "r") as f:
         manifest = json.loads(f.read())
         return manifest["version"]
 
 
 def update_manifest(version):
-    manifest_json_file_path = f"{DIR}/../web/manifest.json"
+    manifest_json_file_path = f"{DIR}/../web/manifest/index.json"
     with open(manifest_json_file_path, "r") as f:
         manifest = json.loads(f.read())
         manifest["version"]: version
