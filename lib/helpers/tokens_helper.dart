@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:defi_wallet/constants/specific_token_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/asset_style_model.dart';
@@ -11,6 +12,7 @@ class TokensHelper {
   static const String DefiAccountSymbol = 'DFI';
   static const String DefiTokenSymbol = '\$DFI';
   final _random = math.Random();
+
 
   double getMaxAPR(List<AssetPairModel> tokenPairs) {
     double maxValue = 0;
@@ -1219,6 +1221,8 @@ class TokensHelper {
         return 'DeFiChain';
       } else if (value == defaultBitcoinTokenName) {
         return 'DeFiChain Bitcoin';
+      } else if(specificTokenNames.containsKey(value)){
+        return specificTokenNames[value]!;
       } else {
         return value;
       }
