@@ -42,7 +42,7 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
         });
       },
       child: Container(
-        width: 100,
+        width: tokenHelper.isPair(widget.selectedAsset.symbol!) ? 130 : 100,
         height: 38,
         child: AssetHeaderSelector(
           assetCode: widget.selectedAsset.symbol!,

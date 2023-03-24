@@ -6,16 +6,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class AssetPair extends StatefulWidget {
   final String pair;
-  final double? size;
+  final double? height;
   final bool isRotate;
   final bool? isTransform;
+  final bool isBorder;
 
   const AssetPair({
     Key? key,
     required this.pair,
-    this.size = 24,
+    this.height = 34,
     this.isRotate = false,
     this.isTransform = true,
+    this.isBorder = true,
   }) : super(key: key);
 
   @override
@@ -23,9 +25,17 @@ class AssetPair extends StatefulWidget {
 }
 
 class _AssetPairState extends State<AssetPair> with ThemeMixin {
-  final double height = 34;
-  final double width = 54;
+  late double height;
+  late double width;
   TokensHelper tokenHelper = TokensHelper();
+
+  @override
+  void initState() {
+    height = widget.height!;
+    width = 54 * height / 34;
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,28 +44,31 @@ class _AssetPairState extends State<AssetPair> with ThemeMixin {
       height: height,
       child: Stack(
         children: [
-          SvgPicture.asset(
-            isDarkTheme()
-                ? 'assets/asset_pair_bg_dark.svg'
-                : 'assets/asset_pair_bg_light.svg',
-            width: width,
-            height: height,
-          ),
+          if (widget.isBorder)
+            SvgPicture.asset(
+              isDarkTheme()
+                  ? 'assets/asset_pair_bg_dark.svg'
+                  : 'assets/asset_pair_bg_light.svg',
+              width: width,
+              height: height,
+            ),
           AssetLogo(
             assetStyle: tokenHelper.getAssetStyleByTokenName(
               tokenHelper.getBaseAssetName(widget.pair),
             ),
             size: height,
             isBorder: false,
+            borderWidth: widget.isBorder ? 5 : 0,
           ),
           Padding(
-            padding: EdgeInsets.only(left: 20),
+            padding: EdgeInsets.only(left: 20 * height / 34),
             child: AssetLogo(
               assetStyle: tokenHelper.getAssetStyleByTokenName(
                 tokenHelper.getQuoteAssetName(widget.pair),
               ),
               size: height,
               isBorder: false,
+              borderWidth: widget.isBorder ? 5 : 0,
             ),
           )
         ],
