@@ -1,4 +1,4 @@
-const Map<String, String> noNamedTokens = {
+const Map<String, String> specificTokenNames = {
   'dAAPL': 'Apple',
   'dAMZN': 'Amazon',
   'dBABA': 'Alibaba',

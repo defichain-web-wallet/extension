@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'package:defi_wallet/constants/tokens_description.dart';
+import 'package:defi_wallet/constants/specific_token_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/asset_style_model.dart';
@@ -1221,8 +1221,8 @@ class TokensHelper {
         return 'DeFiChain';
       } else if (value == defaultBitcoinTokenName) {
         return 'DeFiChain Bitcoin';
-      } else if(noNamedTokens.containsKey(value)){
-        return noNamedTokens[value]!;
+      } else if(specificTokenNames.containsKey(value)){
+        return specificTokenNames[value]!;
       } else {
         return value;
       }
