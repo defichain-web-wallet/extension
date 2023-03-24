@@ -1228,9 +1228,14 @@ class TokensHelper {
   }
 
   String getSpecificDefiPairName(String value) {
+    final String exception = 'Cake-staked ETH-Ether';
+    if (value == exception) {
+      return value;
+    } else {
       String base = value.split('-')[0];
       String quote = value.split('-')[1];
       return getSpecificDefiName(base) + '-' + getSpecificDefiName(quote);
+    }
   }
 
   List<TokensModel> getTokensList(

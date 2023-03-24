@@ -107,6 +107,7 @@ class _SendScreenNewState extends State<SendScreenNew>
             context: context,
             builder: (BuildContext dialogContext) {
               return CreateEditContactDialog(
+                isDisableEditAddress: true,
                 address: addressController.text,
                 isEdit: false,
                 confirmCallback: (name, address, network) {

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 class CreateEditContactDialog extends StatefulWidget {
   final bool isEdit;
+  final bool isDisableEditAddress;
   final Function()? deleteCallback;
   final Function(String name, String address, String network) confirmCallback;
   final String contactName;
@@ -18,6 +19,7 @@ class CreateEditContactDialog extends StatefulWidget {
   const CreateEditContactDialog({
     Key? key,
     this.isEdit = false,
+    this.isDisableEditAddress = false,
     this.deleteCallback,
     required this.confirmCallback,
     this.contactName = '',
@@ -36,6 +38,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   TextEditingController _addressController = TextEditingController();
   FocusNode nameFocusNode = FocusNode();
   FocusNode addressFocusNode = FocusNode();
+  FocusNode submitFocusNode = FocusNode();
   String editTitleText = 'Edit contact';
   String createTitleText = 'New contact';
   String titleContactName = 'Contact`s Name';
@@ -57,6 +60,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
     _addressController.dispose();
     nameFocusNode.dispose();
     addressFocusNode.dispose();
+    submitFocusNode.dispose();
     // TODO: implement dispose
     super.dispose();
   }
@@ -117,6 +121,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                 ),
               ),
               NewPrimaryButton(
+                focusNode: submitFocusNode,
                 width: 104,
                 callback: isEnable
                     ? () async {
@@ -236,6 +241,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                 child: TextFormField(
                                   focusNode: nameFocusNode,
                                   controller: _nameController,
+                                  autofocus: true,
                                   decoration: InputDecoration(
                                     hoverColor: Theme.of(context)
                                         .inputDecorationTheme
@@ -265,6 +271,13 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                         await addressHelper.validateBtcAddress(
                                             _addressController.text);
                                     checkButtonStatus();
+                                  },
+                                  onFieldSubmitted: (val) {
+                                    if(widget.isDisableEditAddress) {
+                                      submitFocusNode.requestFocus();
+                                    } else {
+                                      addressFocusNode.requestFocus();
+                                    }
                                   },
                                 ),
                               ),
@@ -298,6 +311,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                   }
                                 },
                                 child: TextFormField(
+                                  readOnly: widget.isDisableEditAddress,
                                   focusNode: addressFocusNode,
                                   controller: _addressController,
                                   decoration: InputDecoration(
@@ -329,6 +343,9 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                         await addressHelper.validateBtcAddress(
                                             _addressController.text);
                                     checkButtonStatus();
+                                  },
+                                  onFieldSubmitted: (val) {
+                                    submitFocusNode.requestFocus();
                                   },
                                 ),
                               ),
