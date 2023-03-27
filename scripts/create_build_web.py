@@ -27,18 +27,21 @@ def get_browser_type():
 
 
 def generate_manifest(browser_name):
-    with open('../web/manifest/index.json', 'r+') as index_manifest:
-        manifest_data = json.load(index_manifest)
-        index_manifest.close()
+    if browser_name in browser_types:
+        with open('../web/manifest/index.json', 'r+') as index_manifest:
+            manifest_data = json.load(index_manifest)
+            index_manifest.close()
 
-    with open(f'../web/manifest/{browser_name}.json') as specific_manifest_file:
-        target_data = json.load(specific_manifest_file)
-        specific_manifest_file.close()
-        manifest_data.update(target_data)
+        with open(f'../web/manifest/{browser_name}.json') as specific_manifest_file:
+            target_data = json.load(specific_manifest_file)
+            specific_manifest_file.close()
+            manifest_data.update(target_data)
 
-    with open("../web/manifest.json", "w") as manifest:
-        json.dump(manifest_data, manifest)
-        manifest.close()
+        with open("../web/manifest.json", "w") as manifest:
+            json.dump(manifest_data, manifest)
+            manifest.close()
+    else:
+        print('Invalid browser name: must be \'chrome\' or \'firefox\'')
 
 
 def get_version():
@@ -153,9 +156,10 @@ def run(version):
 
 if __name__ == "__main__":
     version = get_version()
+    browser_type = get_browser_type()
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", help="new version", default=version)
-    parser.add_argument("--browser", help="browser name", default=get_browser_type())
+    parser.add_argument("--browser", help="browser name", default=browser_type)
     args = parser.parse_args()
     generate_manifest(args.browser)
     run(args.version)
