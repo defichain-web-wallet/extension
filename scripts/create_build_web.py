@@ -12,22 +12,33 @@ import pathlib
 DIR = pathlib.Path(__file__).parent.resolve()
 EXT = "tar"
 
+browser_types = ['chrome', 'firefox']
+
+
+def get_browser_type():
+    target_args_index = 1
+    browser_types_first_index = 0
+
+    try:
+        if sys.argv[target_args_index] not in browser_types:
+            return sys.argv[target_args_index]
+    except IndexError:
+        return browser_types[browser_types_first_index]
+
 
 def generate_manifest(browser_name):
-    index_manifest = open('../web/manifest/index.json', 'r+')
-    specific_manifest_part = open(f'../web/manifest/{browser_name}.json')
+    with open('../web/manifest/index.json', 'r+') as index_manifest:
+        manifest_data = json.load(index_manifest)
+        index_manifest.close()
 
-    target_data = json.load(specific_manifest_part)
-    manifest_data = json.load(index_manifest)
+    with open(f'../web/manifest/{browser_name}.json') as specific_manifest_file:
+        target_data = json.load(specific_manifest_file)
+        specific_manifest_file.close()
+        manifest_data.update(target_data)
 
-    manifest_data.update(target_data)
-
-    index_manifest.close()
-    specific_manifest_part.close()
-
-    manifest = open("../web/manifest.json", "w")
-    json.dump(manifest_data, manifest)
-    manifest.close()
+    with open("../web/manifest.json", "w") as manifest:
+        json.dump(manifest_data, manifest)
+        manifest.close()
 
 
 def get_version():
@@ -144,7 +155,7 @@ if __name__ == "__main__":
     version = get_version()
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", help="new version", default=version)
-    parser.add_argument("--browser", help="browser name", default=sys.argv[1])
+    parser.add_argument("--browser", help="browser name", default=get_browser_type())
     args = parser.parse_args()
     generate_manifest(args.browser)
     run(args.version)
