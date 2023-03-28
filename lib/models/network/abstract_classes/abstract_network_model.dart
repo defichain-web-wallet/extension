@@ -1,4 +1,5 @@
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'abstract_account_model.dart';
@@ -11,11 +12,11 @@ import 'abstract_staking_provider_model.dart';
 abstract class AbstractNetwork {
   static const int COIN = 100000000;
 
-  final NetworkName networkName;
+  final NetworkTypeModel networkType;
 
-  AbstractNetwork(this.networkName);
+  AbstractNetwork(this.networkType);
 
-  List<TokensModel> getAvailableTokens();
+  Future<List<TokenModel>> getAvailableTokens();
   List<AbstractAccountModel> getAccounts();
 
   // Explorer

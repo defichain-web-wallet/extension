@@ -8,8 +8,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:defichaindart/src/models/networks.dart' as networks;
 
 class DefichainService {
-  final networkHelper = NetworkHelper();
-
   static ECPair getKeypairForPathPrivateKey(
       bip32.BIP32 masterKeypair, String path, NetworkType network) {
     return ECPair.fromPrivateKey(masterKeypair.derivePath(path).privateKey!,
@@ -44,34 +42,16 @@ class DefichainService {
   }
 
   static NetworkType getNetwork(NetworkName networkName) {
-    NetworkType network = networks.defichain;
     switch (networkName) {
       case NetworkName.defichainMainnet:
-        network = networks.defichain;
-        break;
+        return networks.defichain;
       case NetworkName.defichainTestnet:
-        network = networks.defichain_testnet;
-        break;
+        return networks.defichain_testnet;
       default:
         throw 'Invalid network';
     }
-    return network;
   }
 
-  static String networkNameToString({required NetworkName networkName, bool isLoverCase = true}){
-    String? network;
-    switch (networkName) {
-      case NetworkName.defichainMainnet:
-        network = 'MainNet';
-        break;
-      case NetworkName.defichainTestnet:
-        network = 'TestNet';
-        break;
-      default:
-        throw 'Invalid network';
-    }
-    return isLoverCase ? network.toLowerCase() : network;
-  }
 
   static String derivePath(int account) {
     return "1129/0/0/$account";
