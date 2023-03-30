@@ -5,12 +5,12 @@ import 'abstract_account_model.dart';
 
 
 abstract class AbstractLmProviderModel {
-  Future<List<LmPoolModel>> getAvailableLmPools(AbstractNetwork network);
+  Future<List<LmPoolModel>> getAvailableLmPools(AbstractNetworkModel network);
   List<LmPoolModel> getPinnedLmPools(AbstractAccountModel account);
   void pinLmPool(AbstractAccountModel account, LmPoolModel pool);
   void unpinLmPool(AbstractAccountModel account, LmPoolModel pool);
 
-  Future<TxErrorModel> addBalance(AbstractAccountModel account, AbstractNetwork network, String password, LmPoolModel pool, List<double> amounts);
-  Future<TxErrorModel> removeBalance(AbstractAccountModel account, AbstractNetwork network, String password,
+  Future<TxErrorModel> addBalance(AbstractAccountModel account, AbstractNetworkModel network, String password, LmPoolModel pool, List<double> amounts);
+  Future<TxErrorModel> removeBalance(AbstractAccountModel account, AbstractNetworkModel network, String password,
       LmPoolModel pool, double percentage);
 }

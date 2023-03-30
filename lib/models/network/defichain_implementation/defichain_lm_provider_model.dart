@@ -9,7 +9,7 @@ import 'package:defichaindart/defichaindart.dart';
 import '../abstract_classes/abstract_account_model.dart';
 
 abstract class DefichainLmProviderModel extends AbstractLmProviderModel {
-  Future<List<LmPoolModel>> getAvailableLmPools(AbstractNetwork network) {
+  Future<List<LmPoolModel>> getAvailableLmPools(AbstractNetworkModel network) {
     return DFILmRequests.getLmPools(networkType: network.networkType);
   }
 
@@ -21,7 +21,7 @@ abstract class DefichainLmProviderModel extends AbstractLmProviderModel {
 
   Future<TxErrorModel> addBalance(
       AbstractAccountModel account,
-      AbstractNetwork network,
+      AbstractNetworkModel network,
       String password,
       LmPoolModel pool,
       List<double> amounts) async {
@@ -48,7 +48,7 @@ abstract class DefichainLmProviderModel extends AbstractLmProviderModel {
 
   Future<TxErrorModel> removeBalance(
       AbstractAccountModel account,
-      AbstractNetwork network,
+      AbstractNetworkModel network,
       String password,
       LmPoolModel pool,
       double amount) async {

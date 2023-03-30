@@ -8,12 +8,12 @@ import 'abstract_lm_provider_model.dart';
 import 'abstract_on_off_ramp_model.dart';
 import 'abstract_staking_provider_model.dart';
 
-abstract class AbstractNetwork {
+abstract class AbstractNetworkModel {
   static const int COIN = 100000000;
 
   final NetworkTypeModel networkType;
 
-  AbstractNetwork(this.networkType);
+  AbstractNetworkModel(this.networkType);
 
   Future<List<TokenModel>> getAvailableTokens();
   List<AbstractAccountModel> getAccounts();

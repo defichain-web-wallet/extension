@@ -15,11 +15,11 @@ abstract class AbstractAccountModel {
       this.publicKey, this.addresses, this.accountIndex, this.pinnedBalances);
 
   // Tokens
-  List<BalanceModel> getPinnedBalances(AbstractNetwork network) {
+  List<BalanceModel> getPinnedBalances(AbstractNetworkModel network) {
     return pinnedBalances[network.networkType.networkName] ?? [];
   }
 
-  void pinToken(BalanceModel balance, AbstractNetwork network) {
+  void pinToken(BalanceModel balance, AbstractNetworkModel network) {
     try{
       pinnedBalances[network.networkType.networkName]!.add(balance);
     } catch(e) {
@@ -27,7 +27,7 @@ abstract class AbstractAccountModel {
     }
   }
 
-  void unpinToken(BalanceModel balance, AbstractNetwork network){
+  void unpinToken(BalanceModel balance, AbstractNetworkModel network){
     try{
       pinnedBalances[network.networkType.networkName]!.removeWhere((element){
         return element.compare(balance);

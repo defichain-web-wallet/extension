@@ -9,7 +9,7 @@ import 'package:defi_wallet/services/defichain/defichain_service.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
-class DefichainNetwork extends AbstractNetwork {
+class DefichainNetwork extends AbstractNetworkModel {
   DefichainNetwork(NetworkTypeModel networkType) : super(_validationNetworkName(networkType));
 
   static NetworkTypeModel _validationNetworkName(NetworkTypeModel networkType){

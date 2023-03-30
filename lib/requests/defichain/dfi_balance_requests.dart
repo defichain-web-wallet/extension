@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class DFIBalanceRequests {
   static Future<List<BalanceModel>> getBalanceList(
-      {required AbstractNetwork network, required String addressString}) async {
+      {required AbstractNetworkModel network, required String addressString}) async {
     //TODO: add fallback URL
     String urlAddress =
         'https://ocean.defichain.com/v0/${network.networkType.networkStringLowerCase}/address/$addressString/tokens';
@@ -30,7 +30,7 @@ class DFIBalanceRequests {
   }
 
   static Future<BalanceModel> getUTXOBalance(
-      {required AbstractNetwork network, required String addressString}) async {
+      {required AbstractNetworkModel network, required String addressString}) async {
     try {
       var balance = BalanceModel(
         token: TokenModel(
