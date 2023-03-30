@@ -30,16 +30,13 @@ def generate_manifest(browser_name):
     if browser_name in browser_types:
         with open('../web/manifest/index.json', 'r+') as index_manifest:
             manifest_data = json.load(index_manifest)
-            index_manifest.close()
 
         with open(f'../web/manifest/{browser_name}.json') as specific_manifest_file:
             target_data = json.load(specific_manifest_file)
-            specific_manifest_file.close()
             manifest_data.update(target_data)
 
         with open("../web/manifest.json", "w") as manifest:
             json.dump(manifest_data, manifest)
-            manifest.close()
     else:
         print('Invalid browser name: must be \'chrome\' or \'firefox\'')
 
