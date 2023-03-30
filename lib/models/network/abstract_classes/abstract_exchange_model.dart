@@ -1,23 +1,19 @@
-import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/token/exchange_pair_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
+import 'package:defi_wallet/models/tx_error_model.dart';
 
 import 'abstract_account_model.dart';
 
-class ExchangePairsModel {
-  TokensModel token1;
-  TokensModel token2;
-  double ratio;
-  bool isBidirectional = true;
-  ExchangePairsModel(
-      this.token1, this.token2, this.ratio, this.isBidirectional);
-}
-
 abstract class AbstractExchangeModel {
-  List<ExchangePairsModel> getAvailableExchangePairs();
-  String exchange(
+  Future<List<ExchangePairModel>> getAvailableExchangePairs(AbstractNetworkModel network);
+  Future<TxErrorModel> exchange(
       AbstractAccountModel account,
+      AbstractNetworkModel network,
       String password,
-      TokensModel fromToken,
-      double amount,
-      TokensModel toToken,
+      TokenModel fromToken,
+      double amountFrom,
+      double amountTo,
+      TokenModel toToken,
       double slippage);
 }

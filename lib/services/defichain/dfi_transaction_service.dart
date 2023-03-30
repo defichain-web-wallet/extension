@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -22,6 +23,75 @@ class DFITransactionService {
   var balanceRequests = BalanceRequests();
   var balancesHelper = BalancesHelper();
   List<UtxoModel> accountUtxoList = [];
+
+  Future<TxErrorModel> createAndSendSwap(
+      {required String senderAddress,
+        required ECPair keyPair,
+        required String networkString,
+        required TokenModel tokenFrom,
+        required TokenModel tokenTo,
+        required BalanceModel balanceDFIToken,
+        required int amountFrom,
+        required int amountTo,
+        double slippage = 0.03}) async {
+    TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
+
+    var maxPrice = amountFrom / (amountTo) * (1 + slippage);
+    var oneHundredMillions = 100000000;
+    var n = maxPrice * oneHundredMillions;
+    var fraction = (n % oneHundredMillions).round();
+    var integer = ((n - fraction) / oneHundredMillions).round();
+
+    await _getUtxoList(senderAddress, networkString);
+
+    if (tokenFrom.symbol == 'DFI') {
+
+      if (balanceDFIToken.balance < amountFrom) {
+        var responseModel = await _utxoToAccountTransaction(
+          senderAddress: senderAddress,
+            keyPair: keyPair,
+            amount: amountFrom - balanceDFIToken.balance,
+            tokenId: int.parse(tokenFrom.id));
+
+        if (responseModel.isError) {
+          return TxErrorModel(isError: true, error: responseModel.error);
+        }
+
+        txErrorModel = await _prepareTx(responseModel, TxType.convertUtxo, networkString);
+        if (txErrorModel.isError!) {
+          return txErrorModel;
+        }
+      }
+    }
+
+    var responseModel = await _createTransaction(
+      senderAddress: senderAddress,
+        keyPair: keyPair,
+        utxoList: accountUtxoList,
+        destinationAddress: senderAddress,
+        changeAddress: senderAddress,
+        amount: 0,
+        additional: (txb, nw, newUtxo) {
+          txb.addSwapOutput(
+              tokenFrom.id,
+              senderAddress,
+              amountFrom,
+              tokenTo.id,
+              senderAddress,
+              integer,
+              fraction);
+        },
+        useAllUtxo: true);
+
+    if (txErrorModel.txLoaderList!.length > 0) {
+      txErrorModel.txLoaderList!
+          .add(TxLoaderModel(txHex: responseModel.hex, type: TxType.swap));
+    } else {
+      txErrorModel = await _prepareTx(responseModel, TxType.swap, networkString);
+    }
+
+    return txErrorModel;
+  }
 
   Future<TxErrorModel> removeLiqudity(
       {required String senderAddress,
