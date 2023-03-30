@@ -16,6 +16,45 @@ class BalanceModel {
     throw 'Empty token or LMPool';
   }
 
+  static List<BalanceModel> fromJSONList(List<dynamic> jsonList, NetworkName? networkName) {
+    List<BalanceModel> balances = [];
+
+    jsonList.forEach((json) {
+      BalanceModel token = BalanceModel.fromJSON(json, networkName);
+      balances.add(token);
+    });
+
+    return balances;
+  }
+
+  Map<String, dynamic> toJSON() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['balance'] = this.balance;
+    if (this.token != null) {
+      data['token'] = this.token!.toJSON();
+    }
+    if (this.lmPool != null) {
+      data['lmPool'] = this.lmPool!.toJSON();
+    }
+    return data;
+  }
+
+  factory BalanceModel.fromJSON(Map<String, dynamic> json, NetworkName? networkName) {
+    TokenModel? token;
+    LmPoolModel? lmPool;
+    if (json.containsKey('token')) {
+      token = TokenModel.fromJSON(json['token'], networkName);
+    }
+    if (json.containsKey('lmPool')) {
+      lmPool = LmPoolModel.fromJSON(json['lmPool'], networkName);
+    }
+    return BalanceModel(
+      balance: json['balance'],
+      token: token,
+      lmPool: lmPool,
+    );
+  }
+
   bool compare(BalanceModel otherBalance) {
     if(this.lmPool != null && otherBalance.lmPool != null){
       return this.lmPool!.id == otherBalance.lmPool!.id;

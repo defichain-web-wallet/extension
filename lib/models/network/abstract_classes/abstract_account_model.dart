@@ -3,7 +3,6 @@ import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
-import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 
 abstract class AbstractAccountModel {
@@ -16,7 +15,7 @@ abstract class AbstractAccountModel {
       this.publicKey, this.addresses, this.accountIndex, this.pinnedBalances);
 
   // Tokens
-  List<BalanceModel> getPinnedTokens(AbstractNetwork network) {
+  List<BalanceModel> getPinnedBalances(AbstractNetwork network) {
     return pinnedBalances[network.networkType.networkName] ?? [];
   }
 

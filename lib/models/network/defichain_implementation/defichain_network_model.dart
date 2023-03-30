@@ -39,14 +39,17 @@ class DefichainNetwork extends AbstractNetwork {
   }
 
   Future<TxErrorModel> send(AbstractAccountModel account, String address,
-      String password, TokensModel token, double amount) async {
+      String password, TokenModel token, double amount) async {
     ECPair keypair = await DefichainService.getKeypairFromStorage(
         password, account.accountIndex, this.networkType.networkName);
+
+    var balances = account.getPinnedBalances(this);
 
     return DFITransactionService().createSendTransaction(
         senderAddress: account.getAddress(this.networkType.networkName)!,
         keyPair: keypair,
-        token: token,
+        balanceUTXO: balances.firstWhere((element) => element.token!.isUTXO),
+        balance: balances.firstWhere((element) => element.token!.compare(token)),
         destinationAddress: address,
         networkString: this.networkType.networkStringLowerCase,
         amount: toSatoshi(amount));

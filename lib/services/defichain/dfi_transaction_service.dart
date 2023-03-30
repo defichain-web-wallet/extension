@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider_model.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/models/tx_response_model.dart';
@@ -27,7 +27,7 @@ class DFITransactionService {
       {required String senderAddress,
         required ECPair keyPair,
         required String networkString,
-        required LmPoolModel token,
+        required LmPoolModel pool,
         required int amount}) async {
     await _getUtxoList(senderAddress, networkString);
 
@@ -40,7 +40,7 @@ class DFITransactionService {
         amount: 0,
         additional: (txb, nw, newUtxo) {
           txb.addRemoveLiquidityOutput(
-              int.parse(token.id), amount, senderAddress);
+              int.parse(pool.id), amount, senderAddress);
         });
 
     return await _prepareTx(responseModel, TxType.removeLiq, networkString);
@@ -51,41 +51,34 @@ class DFITransactionService {
       {required String senderAddress,
         required ECPair keyPair,
         required String networkString,
-        required LmPoolModel token,
+        required BalanceModel balanceUTXO,
+        required BalanceModel balanceDFIToken,
+        required LmPoolModel pool,
         required List<int> amountList}) async {
     await _getUtxoList(senderAddress, networkString);
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
     int? indexDFI;
 
-    if (token.tokens[0].symbol == 'DFI') {
+    if (pool.tokens[0].symbol == 'DFI') {
       indexDFI = 0;
-    } else if (token.tokens[1].symbol == 'DFI') {
+    } else if (pool.tokens[1].symbol == 'DFI') {
       indexDFI = 1;
     }
-//TODO: need to give balance from parent function
-    var addressBalanceList = await balanceRequests
-        .getAddressBalanceListByAddressList(account.addressList!);
 
     if (indexDFI != null) {
-      var tokenDFIbalanceAll =
-      balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
-
-      var coinDFIbalanceAll =
-      balancesHelper.getBalanceByTokenName(addressBalanceList, '\$DFI');
-
-      if (tokenDFIbalanceAll + coinDFIbalanceAll < amountList[indexDFI]) {
+      if (balanceDFIToken.balance + balanceUTXO.balance < amountList[indexDFI]) {
         return TxErrorModel(
             isError: true,
             error: 'Not enough balance. Wait for approval the previous tx');
       }
 
-      if (tokenDFIbalanceAll < amountList[indexDFI]) {
+      if (balanceDFIToken.balance < amountList[indexDFI]) {
         var responseModel = await _utxoToAccountTransaction(
             senderAddress:senderAddress,
             keyPair: keyPair,
-            amount: amountList[indexDFI] - tokenDFIbalanceAll,
-            tokenId: int.parse(token.tokens[indexDFI].id));
+            amount: amountList[indexDFI] - balanceDFIToken.balance,
+            tokenId: int.parse(pool.tokens[indexDFI].id));
 
         txErrorModel = await _prepareTx(responseModel, TxType.convertUtxo, networkString);
         if (txErrorModel.isError!) {
@@ -104,9 +97,9 @@ class DFITransactionService {
         additional: (txb, nw, newUtxo) {
           txb.addAddLiquidityOutputSingleAddress(
               senderAddress,
-              int.parse(token.tokens[0].id),
+              int.parse(pool.tokens[0].id),
               amountList[0],
-              int.parse(token.tokens[1].id),
+              int.parse(pool.tokens[1].id),
               amountList[1],
               senderAddress);
         },
@@ -144,14 +137,15 @@ class DFITransactionService {
   Future<TxErrorModel> createSendTransaction(
       {required String senderAddress,
       required ECPair keyPair,
-      required TokensModel token,
+      required BalanceModel balanceUTXO,
+      required BalanceModel balance,
       required String destinationAddress,
       required String networkString,
       required int amount}) async {
-    if (token.name == 'DFI') {
+    if (balance.token!.name == 'DFI') {
       return _createSendUTXOTransaction(
           keyPair: keyPair,
-          token: token,
+          balance: balance,
           destinationAddress: destinationAddress,
           amount: amount,
           senderAddress: senderAddress,
@@ -159,7 +153,7 @@ class DFITransactionService {
     } else {
       return _createAndSendToken(
           keyPair: keyPair,
-          token: token,
+          token: balance.token!,
           destinationAddress: destinationAddress,
           amount: amount,
           senderAddress: senderAddress,
@@ -173,19 +167,14 @@ class DFITransactionService {
       required String destinationAddress,
       required String networkString,
       required int amount,
-      required TokensModel token}) async {
+      required BalanceModel balance}) async {
     TxResponseModel? responseModel;
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
     await _getUtxoList(senderAddress, networkString);
-//TODO: need to give balance from parent function
-    var addressBalanceList =
-        await balanceRequests.getAddressBalanceListByAddressList([senderAddress]);
-    var tokenDFIbalance =
-        balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
 
     //Swap DFI tokens to UTXO if needed
-    if (tokenDFIbalance >= DUST) {
+    if (balance.balance >= DUST) {
       responseModel = await _createTransaction(
           keyPair: keyPair,
           utxoList: accountUtxoList,
@@ -197,11 +186,11 @@ class DFITransactionService {
             final mintingStartsAt = txb.tx!.outs.length + 1;
             newUtxo.add(UtxoModel(
                 address: senderAddress,
-                value: tokenDFIbalance,
+                value: balance.balance,
                 mintIndex: newUtxo.length + 1));
-            txb.addOutput(senderAddress, tokenDFIbalance);
+            txb.addOutput(senderAddress, balance.balance);
             txb.addAccountToUtxoOutput(
-                token.id, senderAddress, tokenDFIbalance, mintingStartsAt);
+                balance.token!.id, senderAddress, balance.balance, mintingStartsAt);
           });
       if (responseModel.isError) {
         return TxErrorModel(isError: true, error: responseModel.error);
@@ -238,7 +227,7 @@ class DFITransactionService {
   Future<TxErrorModel> _createAndSendToken(
       {required String senderAddress,
       required ECPair keyPair,
-      required TokensModel token,
+      required TokenModel token,
       required String networkString,
       required String destinationAddress,
       required int amount}) async {

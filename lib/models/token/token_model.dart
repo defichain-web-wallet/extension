@@ -10,6 +10,7 @@ class TokenModel {
   String name;
   String displaySymbol;
   NetworkName networkName;
+  bool isUTXO;
   late bool isPair;
   late Color color;
   late String imagePath;
@@ -20,14 +21,21 @@ class TokenModel {
     required this.name,
     required this.displaySymbol,
     required this.networkName,
+    this.isUTXO = false,
   }) {
     this.isPair = this.symbol.contains('-');
     this.color = getColorByTokenName(symbol: this.symbol);
     this.imagePath = getImagePath(symbol: this.symbol);
   }
 
+  bool compare(TokenModel otherToken) {
+    return this.id == otherToken.id &&
+        this.networkName == otherToken.networkName &&
+        this.name == otherToken.name;
+  }
 
-  factory TokenModel.fromJSON(Map<String, dynamic> json, NetworkName? networkName) {
+  factory TokenModel.fromJSON(
+      Map<String, dynamic> json, NetworkName? networkName) {
     return TokenModel(
       id: json['id'],
       symbol: json['symbol'],
@@ -37,7 +45,8 @@ class TokenModel {
     );
   }
 
-  static List<TokenModel> fromJSONList(List<dynamic> jsonList, NetworkName? networkName) {
+  static List<TokenModel> fromJSONList(
+      List<dynamic> jsonList, NetworkName? networkName) {
     List<TokenModel> tokens = [];
 
     jsonList.forEach((json) {
@@ -366,5 +375,4 @@ class TokenModel {
         }
     }
   }
-
 }

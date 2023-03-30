@@ -1,6 +1,5 @@
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'abstract_account_model.dart';
 import 'abstract_bridge_model.dart';
@@ -62,7 +61,7 @@ abstract class AbstractNetwork {
   // Sending
   bool checkAddress(String address);
   Future<TxErrorModel> send(AbstractAccountModel account, String address,
-      String password, TokensModel token, double amount);
+      String password, TokenModel token, double amount);
   Future<String> signMessage(
       AbstractAccountModel account, String message, String password);
 }

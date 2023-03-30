@@ -10,6 +10,7 @@ class LmPoolModel {
   List<double>? percentages;
   double? apr;
   double? apy;
+  NetworkName? networkName;
 
   LmPoolModel({
     required this.tokens,
@@ -20,7 +21,27 @@ class LmPoolModel {
     required this.displaySymbol,
     required this.name,
     required this.id,
+    required this.networkName,
   });
+
+  Map<String, dynamic> toJSON() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['symbol'] = this.symbol;
+    data['displaySymbol'] = this.displaySymbol;
+    data['name'] = this.name;
+    data['tokens'] = this.tokens.map((token) => token.toJSON()).toList();
+    if (this.percentages != null) {
+      data['percentages'] = this.percentages;
+    }
+    if (this.apr != null) {
+      data['apr'] = this.apr;
+    }
+    if (this.apy != null) {
+      data['apy'] = this.apy;
+    }
+    return data;
+  }
 
   factory LmPoolModel.fromJSON(
       Map<String, dynamic> json, NetworkName? networkName) {
@@ -29,6 +50,7 @@ class LmPoolModel {
       symbol: json['symbol'],
       name: json['name'],
       displaySymbol: json['displaySymbol'],
+      networkName: networkName,
       tokens: TokenModel.fromJSONList([json['tokenA'], json['tokenB']], networkName)
 //TODO: add percentages
     );
