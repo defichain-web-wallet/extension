@@ -36,4 +36,5 @@ class HiveNames {
   //TODO: remove in future (end)
   static const String addressBook = 'address_book';
   static const String lastSent = 'last_sent';
+  static const String easterEgg = 'easter_egg';
 }
