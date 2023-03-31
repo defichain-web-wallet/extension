@@ -43,4 +43,5 @@ class HiveNames {
 
   // address book
   static const String addressBook = 'address_book';
+  static const String easterEgg = 'easter_egg';
 }

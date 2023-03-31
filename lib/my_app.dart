@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/available_amount/available_amount_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
+import 'package:defi_wallet/bloc/easter_egg/easter_egg_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
@@ -23,6 +24,7 @@ class App extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(create: (context) => AuthBloc()),
+        BlocProvider<EasterEggCubit>(create: (context) => EasterEggCubit()),
         BlocProvider<AddressBookCubit>(create: (context) => AddressBookCubit()),
         BlocProvider<AccountCubit>(create: (context) => AccountCubit()),
         BlocProvider<AvailableAmountCubit>(create: (context) => AvailableAmountCubit()),

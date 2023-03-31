@@ -1,11 +1,13 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/easter_egg/easter_egg_cubit.dart';
 import 'package:defi_wallet/bloc/network/network_cubit.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/easter_eggs/egg_dialog.dart';
 import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
@@ -118,6 +120,16 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
       });
       onChangeLocalSettings(item['value']);
     }
+  }
+
+  @override
+  void initState() {
+    EasterEggCubit easterEggCubit = BlocProvider.of<EasterEggCubit>(context);
+    Future.delayed(Duration.zero, () async {
+      await easterEggCubit.getStatuses();
+    });
+    // TODO: implement initState
+    super.initState();
   }
 
   @override
