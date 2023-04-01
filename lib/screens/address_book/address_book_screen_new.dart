@@ -127,8 +127,6 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                     cursor: SystemMouseCursors.click,
                                     child: GestureDetector(
                                       onTap: () {
-                                        print(addressBookState
-                                            .addressBookList!.length);
                                         showDialog(
                                           barrierColor: Color(0x0f180245),
                                           barrierDismissible: false,

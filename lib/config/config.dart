@@ -1,3 +1,7 @@
+class App {
+  static const String AppName = 'Jellywallet';
+}
+
 class Hosts {
   static const String oceanDefichain = 'https://ocean.defichain.com/v0';
   static const String myDefichain = 'http://ocean.mydefichain.com:3000/v0';
