@@ -6,6 +6,7 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/easter_eggs/single_easter_egg.dart';
 import 'package:flutter/material.dart';
 
 class CreateEditContactDialog extends StatefulWidget {
@@ -106,31 +107,41 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
           horizontal: 14,
         ),
         actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Stack(
             children: [
-              Container(
-                width: 104,
-                child: AccentButton(
-                  callback: () {
-                    Navigator.pop(context);
-                  },
-                  label: 'Cancel',
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Container(
+                  width: 104,
+                  child: AccentButton(
+                    callback: () {
+                      Navigator.pop(context);
+                    },
+                    label: 'Cancel',
+                  ),
                 ),
               ),
-              NewPrimaryButton(
-                width: 104,
-                callback: isEnable
-                    ? () async {
-                  network = await addressNetwork(_addressController.text);
-                        widget.confirmCallback!(
-                          _nameController.text,
-                          _addressController.text,
-                          network,
-                        );
-                      }
-                    : null,
-                title: 'Confirm',
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: NewPrimaryButton(
+                  width: 104,
+                  callback: isEnable
+                      ? () async {
+                          network = await addressNetwork(_addressController.text);
+                          widget.confirmCallback!(
+                            _nameController.text,
+                            _addressController.text,
+                            network,
+                          );
+                        }
+                      : null,
+                  title: 'Confirm',
+                ),
+              ),
+              Positioned(
+                child: SingleEasterEgg(index: 3, width: 20, height: 27,),
+                top: 14,
+                right: 90,
               ),
             ],
           ),
