@@ -19,14 +19,16 @@ class EggDialog extends StatefulWidget {
   final String firstMessageText;
   final String gifPath;
   final int eggNumber;
+  final bool isVisibleBg;
 
-  const EggDialog(
-      {Key? key,
-      required this.prase,
-      required this.firstMessageText,
-      required this.gifPath,
-      required this.eggNumber})
-      : super(key: key);
+  const EggDialog({
+    Key? key,
+    required this.prase,
+    required this.firstMessageText,
+    required this.gifPath,
+    required this.eggNumber,
+    required this.isVisibleBg,
+  }) : super(key: key);
 
   @override
   State<EggDialog> createState() => _EggDialogState();
@@ -42,7 +44,8 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
   bool isShowThirdMessage = false;
   bool isTypingDottedVisible = false;
   bool isShowCancel = false;
-  int globalDuration = 500;
+  bool isCopied = false;
+  int globalDuration = 100;
   Color bgPhrase = AppColors.white;
 
   @override
@@ -55,29 +58,29 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
           isTypingDottedVisible = true;
         });
       }
-      if (iterator == 8) {
+      if (iterator == 15) {
         setState(() {
           isShowFirstMessage = true;
           isTypingDottedVisible = false;
         });
       }
-      if (iterator == 9) {
+      if (iterator == 16) {
         setState(() {
           isTypingDottedVisible = true;
         });
       }
-      if (iterator == 12) {
+      if (iterator == 31) {
         setState(() {
           isShowSecondMessage = true;
           isTypingDottedVisible = false;
         });
       }
-      if (iterator == 13) {
+      if (iterator == 32) {
         setState(() {
           isTypingDottedVisible = true;
         });
       }
-      if (iterator == 14) {
+      if (iterator == 47) {
         setState(() {
           isTypingDottedVisible = false;
           isShowThirdMessage = true;
@@ -101,12 +104,11 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
         child: AlertDialog(
           insetPadding: EdgeInsets.all(0),
           contentPadding: EdgeInsets.zero,
-          backgroundColor: Colors.transparent,
+          backgroundColor: widget.isVisibleBg ? Color(0xff352D92).withOpacity(0.53) : Colors.transparent,
           shape: RoundedRectangleBorder(
             side: isDarkTheme()
                 ? BorderSide(color: DarkColors.drawerBorderColor)
                 : BorderSide.none,
-            borderRadius: BorderRadius.circular(20),
           ),
           content: Container(
             width: 360,
@@ -126,33 +128,35 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                       ScaleAnimation(
                         width: 140,
                         height: 132,
-                        duration: Duration(seconds: 1),
-                        child: Stack(
-                          alignment: Alignment.topCenter,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 87.0),
-                              child: Image.asset(
-                                'assets/easter_eggs/ellipse_white.png',
-                                width: 140,
-                                height: 31,
+                        duration: Duration(milliseconds: 200),
+                        child: Container(
+                          child: Stack(
+                            alignment: Alignment.topCenter,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 87.0),
+                                child: Image.asset(
+                                  'assets/easter_eggs/ellipse_white.png',
+                                  width: 140,
+                                  height: 31,
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 92.0, left: 53),
-                              child: Image.asset(
-                                'assets/easter_eggs/ellipse_pink.png',
-                                width: 87,
-                                height: 19,
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 92.0, left: 53),
+                                child: Image.asset(
+                                  'assets/easter_eggs/ellipse_pink.png',
+                                  width: 87,
+                                  height: 19,
+                                ),
                               ),
-                            ),
-                            Image.asset(
-                              widget.gifPath,
-                              width: 131,
-                              height: 173,
-                            ),
-                          ],
+                              Image.asset(
+                                widget.gifPath,
+                                width: 131,
+                                height: 173,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -177,7 +181,7 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                         ScaleAnimation(
                           width: 213,
                           height: 51,
-                          duration: Duration(milliseconds: 200),
+                          duration: Duration(milliseconds: 100),
                           child: Container(
                             constraints: BoxConstraints(maxWidth: 213),
                             padding: EdgeInsets.symmetric(
@@ -201,7 +205,7 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                           child: ScaleAnimation(
                             width: 313,
                             height: 75,
-                            duration: Duration(milliseconds: 200),
+                            duration: Duration(milliseconds: 100),
                             child: Container(
                               constraints: BoxConstraints(maxWidth: 203),
                               padding: EdgeInsets.symmetric(
@@ -263,7 +267,7 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                           child: ScaleAnimation(
                             width: 144,
                             height: 61,
-                            duration: Duration(milliseconds: 200),
+                            duration: Duration(milliseconds: 100),
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 backgroundColor: AppColors.white,
@@ -275,6 +279,9 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                                 await Clipboard.setData(
                                   ClipboardData(text: widget.prase),
                                 );
+                                setState(() {
+                                  isCopied = true;
+                                });
                               },
                               child: Center(
                                 child: Text(
@@ -296,6 +303,33 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                         Padding(
                           padding: const EdgeInsets.only(top: 20.0, left: 10),
                           child: TypingDotted(dotSize: 10.0, spacing: 20.0),
+                        ),
+                      if (isCopied)
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Container(
+                            width: 117,
+                            height: 27,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Color(0xffEFEDF8),
+                                width: 1,
+                                strokeAlign: BorderSide.strokeAlignInside,
+                              ),
+                              color: AppColors.white.withOpacity(0.65),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Copied to clipboard!',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xff0C0321).withOpacity(0.5),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                     ],
                   ),

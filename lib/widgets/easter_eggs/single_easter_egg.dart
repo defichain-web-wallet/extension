@@ -8,6 +8,7 @@ class SingleEasterEgg extends StatefulWidget {
   final double width;
   final double height;
   final double rotateAngel;
+  final bool isVisibleBg;
 
   const SingleEasterEgg({
     Key? key,
@@ -15,6 +16,7 @@ class SingleEasterEgg extends StatefulWidget {
     this.width = 18,
     this.height = 23,
     this.rotateAngel = 24,
+    this.isVisibleBg = true,
   }) : super(key: key);
 
   @override
@@ -41,11 +43,14 @@ class _SingleEasterEggState extends State<SingleEasterEgg> {
     },
   ];
 
+  late bool isVisible;
+
   @override
   void initState() {
     EasterEggCubit easterEggCubit = BlocProvider.of<EasterEggCubit>(context);
     Future.delayed(Duration.zero, () async {
       await easterEggCubit.getStatuses();
+
     });
     // TODO: implement initState
     super.initState();
@@ -54,6 +59,8 @@ class _SingleEasterEggState extends State<SingleEasterEgg> {
   @override
   Widget build(BuildContext context) {
     bool isAvailableEgg = false;
+    EasterEggCubit easterEggCubit = BlocProvider.of<EasterEggCubit>(context);
+    isVisible = easterEggCubit.isWithinTimeFrame();
     return BlocBuilder<EasterEggCubit, EasterEggState>(
         builder: (BuildContext easterEggContext, easterEggState) {
       if (easterEggState.eggsStatus != null) {
@@ -77,7 +84,7 @@ class _SingleEasterEggState extends State<SingleEasterEgg> {
             isAvailableEgg = false;
         }
       }
-      if (easterEggState.eggsStatus != null && !isAvailableEgg) {
+      if (easterEggState.eggsStatus != null && !isAvailableEgg ) {
         return Transform.rotate(
           angle: widget.rotateAngel * 3.1415926535 / 180,
           child: GestureDetector(
@@ -86,6 +93,7 @@ class _SingleEasterEggState extends State<SingleEasterEgg> {
                   context: context,
                   builder: (BuildContext eggContext) {
                     return EggDialog(
+                      isVisibleBg: widget.isVisibleBg,
                       eggNumber: widget.index,
                       prase: phrases[widget.index - 1]['name'],
                       gifPath:

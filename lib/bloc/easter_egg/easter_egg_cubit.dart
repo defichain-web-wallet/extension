@@ -9,19 +9,25 @@ part 'easter_egg_state.dart';
 class EasterEggCubit extends Cubit<EasterEggState> {
   EasterEggCubit() : super(EasterEggState());
 
+  bool isWithinTimeFrame() {
+    int startTimestamp = DateTime.parse("2023-04-03 12:00:00").millisecondsSinceEpoch;
+    int endTimestamp = DateTime.parse("2023-04-10 12:00:00").millisecondsSinceEpoch;
+    int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
+
+    return currentTimestamp >= startTimestamp && currentTimestamp <= endTimestamp;
+  }
+
   getStatuses() async {
     emit(state.copyWith(
       status: EasterEggStatusList.loading,
       eggsStatus: state.eggsStatus,
     ));
-
     EasterEggModel currentStatuses;
-
-    var box = await Hive.openBox(HiveBoxes.client);
-    var easterEggJson;
-    easterEggJson = await box.get(HiveNames.easterEgg);
-    box.close();
     try {
+      var box = await Hive.openBox(HiveBoxes.client);
+      var easterEggJson;
+      easterEggJson = await box.get(HiveNames.easterEgg);
+      box.close();
       if (easterEggJson == null) {
         currentStatuses = EasterEggModel();
       } else {
@@ -30,11 +36,10 @@ class EasterEggCubit extends Cubit<EasterEggState> {
     } catch (err) {
       currentStatuses = EasterEggModel();
     }
-
-    emit(state.copyWith(
-      status: EasterEggStatusList.success,
-      eggsStatus: currentStatuses,
-    ));
+      emit(state.copyWith(
+        status: EasterEggStatusList.success,
+        eggsStatus: currentStatuses,
+      ));
   }
 
   saveStatuses(EasterEggModel newStatuses) async {
