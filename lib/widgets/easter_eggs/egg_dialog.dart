@@ -305,27 +305,32 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                           child: TypingDotted(dotSize: 10.0, spacing: 20.0),
                         ),
                       if (isCopied)
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Container(
-                            width: 117,
-                            height: 27,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Color(0xffEFEDF8),
-                                width: 1,
-                                strokeAlign: BorderSide.strokeAlignInside,
-                              ),
-                              color: AppColors.white.withOpacity(0.65),
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Copied to clipboard!',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xff0C0321).withOpacity(0.5),
+                        Container(
+                          width: 144,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Container(
+                                width: 117,
+                                height: 27,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Color(0xffEFEDF8),
+                                    width: 1,
+                                    strokeAlign: BorderSide.strokeAlignInside,
+                                  ),
+                                  color: AppColors.white.withOpacity(0.65),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Copied to clipboard!',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff0C0321).withOpacity(0.5),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
