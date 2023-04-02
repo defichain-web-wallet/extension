@@ -8,6 +8,7 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/easter_eggs/egg_dialog.dart';
+import 'package:defi_wallet/widgets/easter_eggs/single_easter_egg.dart';
 import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
@@ -337,6 +338,17 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                                   .textTheme
                                                   .headline5,
                                             ),
+                                            if (item['name'] == 'Bitcoin Mainnet')
+                                              ...[
+                                                SizedBox(
+                                                  width: 12,
+                                                ),
+                                                SingleEasterEgg(
+                                                  index: 2,
+                                                  width: 9,
+                                                  height: 12,
+                                                ),
+                                              ]
                                           ],
                                         ),
                                       ),
