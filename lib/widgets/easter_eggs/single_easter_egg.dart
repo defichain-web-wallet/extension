@@ -7,12 +7,14 @@ class SingleEasterEgg extends StatefulWidget {
   final index;
   final double width;
   final double height;
+  final double rotateAngel;
 
   const SingleEasterEgg({
     Key? key,
     required this.index,
     this.width = 18,
     this.height = 23,
+    this.rotateAngel = 24,
   }) : super(key: key);
 
   @override
@@ -77,7 +79,7 @@ class _SingleEasterEggState extends State<SingleEasterEgg> {
       }
       if (easterEggState.eggsStatus != null && !isAvailableEgg) {
         return Transform.rotate(
-          angle: 24.64 * 3.1415926535 / 180,
+          angle: widget.rotateAngel * 3.1415926535 / 180,
           child: GestureDetector(
             onTap: () {
               showDialog(

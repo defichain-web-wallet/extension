@@ -1,4 +1,5 @@
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/easter_eggs/single_easter_egg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:skeletons/skeletons.dart';
@@ -66,7 +67,22 @@ class _EarnCardState extends State<EarnCard> {
                     children: [
                       Container(
                         height: 40,
-                        child: Image.asset(widget.imagePath!),
+                        child: Stack(
+                          children: [
+                            Image.asset(widget.imagePath!),
+                            if (widget.isStaking)
+                              Positioned(
+                                left: 6,
+                                bottom: 4,
+                                child: SingleEasterEgg(
+                                  index: 4,
+                                  width: 28,
+                                  height: 38,
+                                  rotateAngel: 0,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                       SizedBox(
                         width: 12,
