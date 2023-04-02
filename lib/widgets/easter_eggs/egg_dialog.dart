@@ -100,11 +100,11 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
     return BlocBuilder<EasterEggCubit, EasterEggState>(
         builder: (BuildContext easterEggContext, easterEggState) {
       return BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
+        filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
         child: AlertDialog(
           insetPadding: EdgeInsets.all(0),
           contentPadding: EdgeInsets.zero,
-          backgroundColor: widget.isVisibleBg ? Color(0xff352D92).withOpacity(0.53) : Colors.transparent,
+          backgroundColor: widget.isVisibleBg ? Color(0xff352D92).withOpacity(0.33) : Colors.transparent,
           shape: RoundedRectangleBorder(
             side: isDarkTheme()
                 ? BorderSide(color: DarkColors.drawerBorderColor)
