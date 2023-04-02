@@ -84,7 +84,7 @@ class _SingleEasterEggState extends State<SingleEasterEgg> {
             isAvailableEgg = false;
         }
       }
-      if (easterEggState.eggsStatus != null && !isAvailableEgg ) {
+      if (easterEggState.eggsStatus != null && !isAvailableEgg && isVisible) {
         return Transform.rotate(
           angle: widget.rotateAngel * 3.1415926535 / 180,
           child: GestureDetector(
