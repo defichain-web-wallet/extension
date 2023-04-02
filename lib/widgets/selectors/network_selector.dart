@@ -345,8 +345,8 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                                 ),
                                                 SingleEasterEgg(
                                                   index: 2,
-                                                  width: 9,
-                                                  height: 12,
+                                                  width: 12,
+                                                  height: 15,
                                                 ),
                                               ]
                                           ],
