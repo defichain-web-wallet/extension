@@ -97,6 +97,7 @@ class _ExtensionWelcomeBgState extends State<ExtensionWelcomeBg> {
               left: 87,
               top: 285,
               child: SingleEasterEgg(
+                isVisibleBg: false,
                 index: 1,
                 width: 20,
                 height: 27,
