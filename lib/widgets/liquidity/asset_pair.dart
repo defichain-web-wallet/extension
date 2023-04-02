@@ -1,6 +1,7 @@
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
+import 'package:defi_wallet/widgets/easter_eggs/single_easter_egg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -41,23 +42,46 @@ class _AssetPairState extends State<AssetPair> with ThemeMixin {
             width: width,
             height: height,
           ),
-          AssetLogo(
-            assetStyle: tokenHelper.getAssetStyleByTokenName(
-              tokenHelper.getBaseAssetName(widget.pair),
+          if (widget.pair == 'JLY-ESTR') ...[
+            Positioned(
+              right: 5,
+              top: 5,
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: Image.asset(
+                  'assets/easter_eggs/empty_token.png',
+                ),
+              ),
             ),
-            size: height,
-            isBorder: false,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 20),
-            child: AssetLogo(
+            Positioned(
+              left: 6,
+              top: 2,
+              child: SingleEasterEgg(
+                index: 5,
+                width: 22,
+                height: 30,
+              ),
+            ),
+          ] else ...[
+            AssetLogo(
               assetStyle: tokenHelper.getAssetStyleByTokenName(
-                tokenHelper.getQuoteAssetName(widget.pair),
+                tokenHelper.getBaseAssetName(widget.pair),
               ),
               size: height,
               isBorder: false,
             ),
-          )
+            Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: AssetLogo(
+                assetStyle: tokenHelper.getAssetStyleByTokenName(
+                  tokenHelper.getQuoteAssetName(widget.pair),
+                ),
+                size: height,
+                isBorder: false,
+              ),
+            )
+          ]
         ],
       ),
     );

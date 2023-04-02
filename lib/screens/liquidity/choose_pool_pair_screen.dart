@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/easter_egg/easter_egg_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -30,6 +31,8 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
 
   @override
   Widget build(BuildContext context) {
+    EasterEggCubit easterEggCubit = BlocProvider.of<EasterEggCubit>(context);
+
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
@@ -58,6 +61,30 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                   });
                 } catch (e) {
                   print(e);
+                }
+
+                if (easterEggCubit.state.eggsStatus != null &&
+                    !easterEggCubit.state.eggsStatus!.isCollectFifthEgg!) {
+                  availableTokens.add(
+                    AssetPairModel(
+                      apr: 0.12,
+                      fee: 0,
+                      id: -1,
+                      idA: -1,
+                      idB: -1,
+                      symbol: 'JLY-ESTR',
+                      reserveA: 1,
+                      reserveADivReserveB: 1,
+                      reserveB: 1,
+                      reserveBDivReserveA: 1,
+                      status: true,
+                      tokenA: 'JLY',
+                      tokenB: 'ESTR',
+                      totalLiquidity: 384566.6780,
+                      totalLiquidityRaw: 3845666780,
+                      totalLiquidityUsd: 23692225.1127702,
+                    ),
+                  );
                 }
 
                 return Scaffold(
