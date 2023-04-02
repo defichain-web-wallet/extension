@@ -13,8 +13,7 @@ class EasterEggModel {
     this.isCollectFifthEgg = false,
 });
 
-  EasterEggModel.fromJson(Map<String, dynamic> json){
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+  EasterEggModel.fromJson(Map<dynamic, dynamic> data){
     this.isCollectFirstEgg = data["isCollectFirstEgg"];
     this.isCollectSecondEgg = data["isCollectSecondEgg"];
     this.isCollectThirdEgg = data["isCollectThirdEgg"];

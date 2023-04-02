@@ -21,10 +21,14 @@ class EasterEggCubit extends Cubit<EasterEggState> {
     var easterEggJson;
     easterEggJson = await box.get(HiveNames.easterEgg);
     box.close();
-    if (easterEggJson == null) {
+    try {
+      if (easterEggJson == null) {
+        currentStatuses = EasterEggModel();
+      } else {
+        currentStatuses = EasterEggModel.fromJson(easterEggJson);
+      }
+    } catch (err) {
       currentStatuses = EasterEggModel();
-    } else {
-      currentStatuses = EasterEggModel.fromJson(easterEggJson);
     }
 
     emit(state.copyWith(
