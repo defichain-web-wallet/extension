@@ -11,7 +11,7 @@ class EasterEggCubit extends Cubit<EasterEggState> {
 
   bool isWithinTimeFrame() {
     int startTimestamp = DateTime.parse("2023-04-04 00:00:00").millisecondsSinceEpoch;
-    int endTimestamp = DateTime.parse("2023-04-11 00:00:00").millisecondsSinceEpoch;
+    int endTimestamp = DateTime.parse("2023-04-11 23:59:59").millisecondsSinceEpoch;
     int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
     return currentTimestamp >= startTimestamp && currentTimestamp <= endTimestamp;
