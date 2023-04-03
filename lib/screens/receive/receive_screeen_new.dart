@@ -69,7 +69,6 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                     left: 29,
                     right: 29,
                   ),
-                  // width: double.infinity,
                   height: double.infinity,
                   decoration: BoxDecoration(
                     color: isDarkTheme()

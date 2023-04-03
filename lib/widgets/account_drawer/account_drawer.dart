@@ -222,7 +222,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                             callback: (index) {
                                               showDialog(
                                                 barrierColor:
-                                                Color(0x0f180245),
+                                                AppColors.tolopea,
                                                 barrierDismissible:
                                                 false,
                                                 context: context,
