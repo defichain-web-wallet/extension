@@ -200,9 +200,6 @@ class FiatCubit extends Cubit<FiatState> {
       iban = null;
     }
 
-    print('all IBAN first el: ${ibanList[0]}');
-    print('active IBAN: $iban');
-
     emit(state.copyWith(
       status: FiatStatusList.success,
       currentIban: '',
