@@ -33,7 +33,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
   String btcHintText = 'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
 
   cutAddress(String s) {
-    return s.substring(0, 14) + '...' + s.substring(28, 42);
+    return s.substring(0, 5) + '...' + s.substring(s.length - 4, s.length);
   }
 
   @override
@@ -69,7 +69,6 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                     left: 29,
                     right: 29,
                   ),
-                  width: double.infinity,
                   height: double.infinity,
                   decoration: BoxDecoration(
                     color: isDarkTheme()
@@ -131,10 +130,16 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                   SizedBox(
                                     width: 6.4,
                                   ),
-                                  Text(
-                                    '${state.activeAccount!.name}',
-                                    style: headline5.copyWith(
-                                      fontWeight: FontWeight.w700,
+                                  Container(
+                                    constraints: BoxConstraints(maxWidth: 200),
+                                    child: TickerText(
+                                      isSpecialDuration: true,
+                                      child: Text(
+                                        '${state.activeAccount!.name}',
+                                        style: headline5.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -151,6 +156,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     });
                                   },
                                   child: Container(
+                                    width: 140,
                                     height: 43,
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -165,13 +171,9 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Expanded(
-                                          child: TickerText(
-                                            child: Text(
-                                              address,
-                                              style: headline5,
-                                            ),
-                                          ),
+                                        Text(
+                                          cutAddress(address),
+                                          style: headline5,
                                         ),
                                         SizedBox(
                                           width: 10,

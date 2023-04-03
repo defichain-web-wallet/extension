@@ -26,6 +26,7 @@ abstract class AppColors {
   static const ebony = Color(0xFF120C23);
   static const mirage = Color(0xFF1B162C);
   static const gulfBlue = Color(0xFF020C51);
+  static const tolopea = Color(0xff180245);
 
   static const textPrimaryColor = blackRock;
 
