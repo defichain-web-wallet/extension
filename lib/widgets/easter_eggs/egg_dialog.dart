@@ -196,7 +196,10 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                               style: Theme.of(context)
                                   .textTheme
                                   .headline6!
-                                  .copyWith(fontSize: 15),
+                                  .copyWith(
+                                    fontSize: 15,
+                                    color: AppColors.textPrimaryColor,
+                                  ),
                             ),
                           ),
                         ),
@@ -227,6 +230,7 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                                           .headline6!
                                           .copyWith(
                                             fontSize: 15,
+                                            color: AppColors.textPrimaryColor,
                                           ),
                                     ),
                                     TextSpan(
@@ -239,7 +243,8 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                                               decoration:
                                                   TextDecoration.underline,
                                               color: AppColors.pinkColor,
-                                              fontSize: 15),
+                                              fontSize: 15,
+                                      ),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () {
                                           launch(
@@ -253,6 +258,7 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                                           .headline6!
                                           .copyWith(
                                             fontSize: 15,
+                                            color: AppColors.textPrimaryColor,
                                           ),
                                     ),
                                   ],
@@ -291,7 +297,9 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                                       .headline6!
                                       .copyWith(
                                           fontSize: 15,
-                                          fontWeight: FontWeight.w700),
+                                          fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimaryColor,
+                                  ),
                                   softWrap: true,
                                   textAlign: TextAlign.center,
                                 ),
