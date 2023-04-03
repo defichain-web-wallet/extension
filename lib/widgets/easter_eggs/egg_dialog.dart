@@ -241,7 +241,6 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                                               fontSize: 15),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () {
-                                          // Открыть ссылку
                                           launch(
                                               'https://gleam.io/UypGT/jellywallet-easter-egg-hunt');
                                         },
@@ -285,7 +284,7 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                               },
                               child: Center(
                                 child: Text(
-                                  widget.prase,
+                                  '${widget.eggNumber}. ${widget.prase}',
                                   style: Theme.of(context)
                                       .textTheme
                                       .headline6!
@@ -302,7 +301,7 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                       if (isTypingDottedVisible)
                         Padding(
                           padding: const EdgeInsets.only(top: 20.0, left: 10),
-                          child: TypingDotted(dotSize: 10.0, spacing: 20.0),
+                          child: TypingDotted(dotSize: 10.0, spacing: 10.0),
                         ),
                       if (isCopied)
                         Container(
@@ -357,7 +356,7 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                             },
                             child: Icon(
                               Icons.close,
-                              size: 20,
+                              size: 28,
                               color: AppColors.white,
                             ),
                           ),

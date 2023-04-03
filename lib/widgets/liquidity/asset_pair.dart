@@ -1,8 +1,10 @@
+import 'package:defi_wallet/bloc/easter_egg/easter_egg_cubit.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/easter_eggs/single_easter_egg.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AssetPair extends StatefulWidget {
@@ -43,16 +45,23 @@ class _AssetPairState extends State<AssetPair> with ThemeMixin {
             height: height,
           ),
           if (widget.pair == 'JLY-ESTR') ...[
-            Positioned(
-              right: 5,
-              top: 5,
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: Image.asset(
-                  'assets/easter_eggs/empty_token.png',
-                ),
-              ),
+            BlocBuilder<EasterEggCubit, EasterEggState>(
+              builder: (context, state) {
+                bool isAvailableEgg = state.eggsStatus != null &&
+                    state.eggsStatus!.isCollectFifthEgg!;
+                return Positioned(
+                  right: 5,
+                  top: 5,
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: Image.asset(
+                      'assets/easter_eggs/empty_token.png',
+                      color: !isAvailableEgg ? null : Color(0xFF696A6D),
+                    ),
+                  ),
+                );
+              },
             ),
             Positioned(
               left: 6,

@@ -52,7 +52,6 @@ class _SingleEasterEggState extends State<SingleEasterEgg> {
       await easterEggCubit.getStatuses();
 
     });
-    // TODO: implement initState
     super.initState();
   }
 
@@ -84,7 +83,7 @@ class _SingleEasterEggState extends State<SingleEasterEgg> {
             isAvailableEgg = false;
         }
       }
-      if (easterEggState.eggsStatus != null && !isAvailableEgg && isVisible) {
+      if (easterEggState.eggsStatus != null && isVisible) {
         return Transform.rotate(
           angle: widget.rotateAngel * 3.1415926535 / 180,
           child: GestureDetector(
@@ -103,11 +102,20 @@ class _SingleEasterEggState extends State<SingleEasterEgg> {
                     );
                   });
             },
-            child: Image.asset(
-              'assets/easter_eggs/easter_egg_${widget.index}.png',
-              width: widget.width,
-              height: widget.height,
-            ),
+            child: !isAvailableEgg
+                ? Image.asset(
+                    'assets/easter_eggs/easter_egg_${widget.index}.png',
+                    width: widget.width,
+                    height: widget.height,
+                  )
+                : Opacity(
+                  opacity: widget.index != 4 ? 0.5 : 1,
+                  child: Image.asset(
+                      'assets/easter_eggs/founded_egg.png',
+                      width: widget.width,
+                      height: widget.height,
+                    ),
+                ),
           ),
         );
       } else {
