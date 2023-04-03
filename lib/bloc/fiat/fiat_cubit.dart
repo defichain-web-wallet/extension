@@ -178,7 +178,7 @@ class FiatCubit extends Cubit<FiatState> {
     List<IbanModel> activeIbanList = ibanList
         .where((el) =>
             el.active! &&
-            el.type == 'Wallet' &&
+            el.type == null &&
             asset!.name == el.asset!.name)
         .toList();
     IbanModel? iban;
@@ -199,6 +199,9 @@ class FiatCubit extends Cubit<FiatState> {
     } catch (_) {
       iban = null;
     }
+
+    print('all IBAN first el: ${ibanList[0]}');
+    print('active IBAN: $iban');
 
     emit(state.copyWith(
       status: FiatStatusList.success,
