@@ -12,6 +12,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EggDialog extends StatefulWidget {
@@ -340,7 +341,7 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                 ),
                 if (isShowCancel)
                   Padding(
-                    padding: EdgeInsets.only(top: 8, right: 8),
+                    padding: EdgeInsets.only(top: 20, right: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -354,9 +355,10 @@ class _EggDialogState extends State<EggDialog> with ThemeMixin {
                               ));
                               Navigator.pop(context);
                             },
-                            child: Icon(
-                              Icons.close,
-                              size: 28,
+                            child: SvgPicture.asset(
+                              'assets/icons/cancel_icon.svg',
+                              width: 18,
+                              height: 18,
                               color: AppColors.white,
                             ),
                           ),
