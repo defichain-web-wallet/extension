@@ -285,23 +285,26 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                               hoverColor: Colors.transparent,
                                               splashColor: Colors.transparent,
                                               onTap: () async {
-                                                Navigator.push(
-                                                  context,
-                                                  PageRouteBuilder(
-                                                    pageBuilder: (context,
-                                                            animation1,
-                                                            animation2) =>
-                                                        LiquiditySelectPool(
-                                                      assetPair:
-                                                          availableTokens[
-                                                              index],
+                                                if (availableTokens[
+                                                index].symbol != 'JLY-ESTR') {
+                                                  Navigator.push(
+                                                    context,
+                                                    PageRouteBuilder(
+                                                      pageBuilder: (context,
+                                                          animation1,
+                                                          animation2) =>
+                                                          LiquiditySelectPool(
+                                                            assetPair:
+                                                            availableTokens[
+                                                            index],
+                                                          ),
+                                                      transitionDuration:
+                                                      Duration.zero,
+                                                      reverseTransitionDuration:
+                                                      Duration.zero,
                                                     ),
-                                                    transitionDuration:
-                                                        Duration.zero,
-                                                    reverseTransitionDuration:
-                                                        Duration.zero,
-                                                  ),
-                                                );
+                                                  );
+                                                }
                                               },
                                               child: PoolAssetPair(
                                                 assetPair:
