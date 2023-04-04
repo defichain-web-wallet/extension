@@ -38,8 +38,6 @@ abstract class AbstractAccountModel {
     }
   }
 
-  BigInt getBalance(TokensModel token);
-
   // Lists
   Map<NetworkName, List<HistoryModel>> getHistory(
       String networkName, String txid);
