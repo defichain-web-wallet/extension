@@ -1,3 +1,4 @@
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -40,6 +41,12 @@ abstract class AbstractNetworkModel {
       {required AbstractAccountModel account,
         required TokenModel token,
         required TxType type});
+
+  Future<BalanceModel> getBalanceUTXO(
+      List<BalanceModel> balances, String addressString);
+
+  Future<BalanceModel> getBalanceToken(List<BalanceModel> balances, TokenModel token,
+      String addressString);
 
   // Earn
   List<AbstractStakingProvider> getStakingProviders();

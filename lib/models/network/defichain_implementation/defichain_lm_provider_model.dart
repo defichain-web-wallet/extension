@@ -1,6 +1,7 @@
 import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_lm_requests.dart';
 import 'package:defi_wallet/services/defichain/defichain_service.dart';
@@ -29,15 +30,25 @@ abstract class DefichainLmProviderModel extends AbstractLmProviderModel {
         password, account.accountIndex, network.networkType.networkName);
 
     var balances = account.getPinnedBalances(network);
+    var balanceUTXO = await network.getBalanceUTXO(
+        balances, account.getAddress(network.networkType.networkName)!);
+    // TODO: I think we don't need to find token balance in blockchain
+    //  if we don't have this in our balances array. We should have different module for fetch balances
+    var balanceToken = await network.getBalanceToken(
+        balances,
+        TokenModel(
+            id: '0',
+            symbol: 'DFI',
+            name: 'Default Defi token',
+            displaySymbol: 'DFI',
+            networkName: network.networkType.networkName),
+        account.getAddress(network.networkType.networkName)!);
 
     return DFITransactionService().createAndSendLiqudity(
         senderAddress: account.getAddress(network.networkType.networkName)!,
         keyPair: keypair,
-        //TODO: add null validation
-        balanceUTXO: balances.firstWhere((element) => element.token!.isUTXO),
-        //TODO: add null validation
-        balanceDFIToken: balances.firstWhere((element) =>
-            element.token!.name == 'DFI' && element.token!.isUTXO == false),
+        balanceUTXO: balanceUTXO,
+        balanceDFIToken: balanceToken,
         pool: pool,
         networkString: network.networkType.networkStringLowerCase,
         amountList: [

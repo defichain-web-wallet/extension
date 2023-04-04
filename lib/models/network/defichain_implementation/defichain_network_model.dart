@@ -46,20 +46,19 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       {required AbstractAccountModel account,
       required TokenModel token}) async {
     var balances = account.getPinnedBalances(this);
-    double balance = 0;
+    late BalanceModel balance;
 
     if (token.symbol == 'DFI') {
-      var balanceUTXO = await _getBalanceUTXO(
+      var balanceUTXO = await getBalanceUTXO(
           balances, account.getAddress(this.networkType.networkName)!);
-      var balanceToken = await _getBalanceToken(
+      var balanceToken = await getBalanceToken(
           balances, token, account.getAddress(this.networkType.networkName)!);
-      balance = balanceUTXO + balanceToken;
+      return fromSatoshi(balanceUTXO.balance + balanceToken.balance);
     } else {
-      balance = await _getBalanceToken(
+      balance = await getBalanceToken(
           balances, token, account.getAddress(this.networkType.networkName)!);
+      return fromSatoshi(balance.balance);
     }
-
-    return balance;
   }
 
   Future<double> getAvailableBalance(
@@ -69,36 +68,37 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     var balances = account.getPinnedBalances(this);
 
     if (token.symbol == 'DFI') {
-      var tokenDFIbalance = await _getBalanceUTXO(
+      var tokenDFIbalance = await getBalanceUTXO(
           balances, account.getAddress(this.networkType.networkName)!);
-      var coinDFIbalance = await _getBalanceToken(
+      var coinDFIbalance = await getBalanceToken(
           balances, token, account.getAddress(this.networkType.networkName)!);
 
       switch (type) {
         case TxType.send:
-          if (tokenDFIbalance > FEE) {
-            return coinDFIbalance + tokenDFIbalance - (FEE * 2);
+          if (tokenDFIbalance.balance > FEE) {
+            return coinDFIbalance.balance + tokenDFIbalance.balance - (FEE * 2);
           } else {
-            return coinDFIbalance - (FEE);
+            return fromSatoshi(coinDFIbalance.balance - (FEE));
           }
         case TxType.swap:
-          if (coinDFIbalance > (FEE * 2) + DUST) {
-            return coinDFIbalance + tokenDFIbalance - (FEE * 2);
+          if (coinDFIbalance.balance > (FEE * 2) + DUST) {
+            return coinDFIbalance.balance + tokenDFIbalance.balance - (FEE * 2);
           } else {
-            return tokenDFIbalance;
+            return fromSatoshi(tokenDFIbalance.balance);
           }
         case TxType.addLiq:
-          if (coinDFIbalance > (FEE * 2) + DUST) {
-            return coinDFIbalance + tokenDFIbalance - (FEE * 2);
+          if (coinDFIbalance.balance > (FEE * 2) + DUST) {
+            return coinDFIbalance.balance + tokenDFIbalance.balance - (FEE * 2);
           } else {
-            return tokenDFIbalance;
+            return fromSatoshi(tokenDFIbalance.balance);
           }
         default:
           return 0;
       }
     } else {
-      return await _getBalanceToken(
+      var balance = await getBalanceToken(
           balances, token, account.getAddress(this.networkType.networkName)!);
+      return fromSatoshi(balance.balance);
     }
   }
 
@@ -113,13 +113,15 @@ class DefichainNetworkModel extends AbstractNetworkModel {
         password, account.accountIndex, this.networkType.networkName);
 
     var balances = account.getPinnedBalances(this);
+    var balanceUTXO = await getBalanceUTXO(balances, account.getAddress(this.networkType.networkName)!);
+    var balanceToken = await getBalanceToken(balances, token, account.getAddress(this.networkType.networkName)!);
 
     return DFITransactionService().createSendTransaction(
         senderAddress: account.getAddress(this.networkType.networkName)!,
         keyPair: keypair,
-        balanceUTXO: balances.firstWhere((element) => element.token!.isUTXO),
+        balanceUTXO: balanceUTXO,
         balance:
-            balances.firstWhere((element) => element.token!.compare(token)),
+        balanceToken,
         destinationAddress: address,
         networkString: this.networkType.networkStringLowerCase,
         amount: toSatoshi(amount));
@@ -134,39 +136,36 @@ class DefichainNetworkModel extends AbstractNetworkModel {
         message, DefichainService.getNetwork(this.networkType.networkName));
   }
 
-  Future<double> _getBalanceUTXO(
+  Future<BalanceModel> getBalanceUTXO(
       List<BalanceModel> balances, String addressString) async {
-    double? balance;
+    late BalanceModel? balance;
     try {
-      balance = this.fromSatoshi(
-          balances.firstWhere((element) => element.token!.isUTXO).balance);
+      balance = 
+          balances.firstWhere((element) => element.token!.isUTXO);
     } catch (_) {
       //not realistic case
-      var balanceModel = await DFIBalanceRequests.getUTXOBalance(
+      balance = await DFIBalanceRequests.getUTXOBalance(
           network: this, addressString: addressString);
-      balance = this.fromSatoshi(balanceModel.balance);
     }
     return balance;
   }
 
-  Future<double> _getBalanceToken(List<BalanceModel> balances, TokenModel token,
+  Future<BalanceModel> getBalanceToken(List<BalanceModel> balances, TokenModel token,
       String addressString) async {
-    double? balance;
+    late BalanceModel? balance;
     try {
-      balance = this.fromSatoshi(balances
-          .firstWhere((element) => element.token!.compare(token))
-          .balance);
+      balance = balances
+          .firstWhere((element) => element.token!.compare(token));
     } catch (_) {
       //if not exist in balances we check blockchain
       var balanceList = await DFIBalanceRequests.getBalanceList(
           network: this, addressString: addressString);
       try {
-        balance = this.fromSatoshi(balanceList
-            .firstWhere((element) => element.token!.compare(token))
-            .balance);
+        balance = balanceList
+            .firstWhere((element) => element.token!.compare(token));
       } catch (_) {
         //if in blockchain balance doesn't exist - we return 0
-        balance = 0;
+        balance = BalanceModel(balance: 0, token: token);
       }
     }
     return balance;

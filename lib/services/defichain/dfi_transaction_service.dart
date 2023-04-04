@@ -231,7 +231,7 @@ class DFITransactionService {
     }
   }
 
-  Future<TxErrorModel> _createSendUTXOTransaction(
+  Future<TxErrorModel>  _createSendUTXOTransaction(
       {required String senderAddress,
       required ECPair keyPair,
       required String destinationAddress,
