@@ -101,13 +101,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                     confirm.text.isNotEmpty) {
                                   setState(() {
                                     passwordStatus = PasswordStatusList.success;
+                                    confirmStatus = PasswordStatusList.success;
                                     _enableBtn = true;
                                   });
                                 } else if (value != confirm.text &&
                                     confirm.text.isNotEmpty) {
                                   setState(() {
-                                    passwordStatus = PasswordStatusList.error;
-                                    passwordErrorMessage = matchErrorMessage;
+                                    confirmStatus = PasswordStatusList.error;
+                                    confirmErrorMessage = matchErrorMessage;
                                     _enableBtn = false;
                                   });
                                 } else {
