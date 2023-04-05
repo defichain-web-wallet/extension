@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
 import 'package:defi_wallet/screens/staking/yield_machine/yield_machine_action_screen.dart';
@@ -33,7 +34,7 @@ class StakingScreen extends StatefulWidget {
   _StakingScreenState createState() => _StakingScreenState();
 }
 
-class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
+class _StakingScreenState extends State<StakingScreen> with ThemeMixin, SnackBarMixin {
   final String titleText = 'Staking';
   bool isEdit = false;
   bool isFirstBuild = true;
@@ -586,21 +587,37 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                         child: AccentButton(
                                           label: 'Deposit',
                                           callback: () {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    YieldMachineActionScreen(
-                                                  isDeposit: true,
+                                            if (lockState
+                                                .lockStakingDetails!
+                                                .balances![0]
+                                                .balance! >
+                                                0) {
+                                              Navigator.push(
+                                                context,
+                                                PageRouteBuilder(
+                                                  pageBuilder: (context,
+                                                      animation1,
+                                                      animation2) =>
+                                                      YieldMachineActionScreen(
+                                                        isDeposit: true,
+                                                      ),
+                                                  transitionDuration:
+                                                  Duration.zero,
+                                                  reverseTransitionDuration:
+                                                  Duration.zero,
                                                 ),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
+                                              );
+                                            } else {
+                                              showSnackBar(
+                                                context,
+                                                title: 'Insufficient funds',
+                                                color: AppColors.txStatusError.withOpacity(0.1),
+                                                prefix: Icon(
+                                                  Icons.close,
+                                                  color: AppColors.txStatusError,
+                                                ),
+                                              );
+                                            }
                                           },
                                         ),
                                       ),
