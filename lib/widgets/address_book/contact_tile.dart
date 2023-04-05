@@ -1,6 +1,8 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
@@ -90,10 +92,15 @@ class _ContactTileState extends State<ContactTile> with ThemeMixin {
               children: [
                 Row(
                   children: [
-                    Text(
-                      widget.contactName,
-                      style: headline4.copyWith(
-                        fontSize: 16,
+                    Container(
+                      constraints: BoxConstraints(maxWidth: widget.isDialog ? 116 : 150),
+                      child: TickerText(
+                        child: Text(
+                          widget.contactName,
+                          style: headline4.copyWith(
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(
