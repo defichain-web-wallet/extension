@@ -10,6 +10,11 @@ class DfxApi {
   static const String url = 'https://api.dfi.tax/p01/hst/';
 }
 
+class LockApi {
+  static const String home = 'api.lock.space';
+  static const String url = 'https://$home';
+}
+
 class JellyLinks {
   static const String termsAndConditions = 'https://jellywallet.io/terms-and-conditions/';
   static const String telegramGroup = 'https://t.me/jellywallet_eng';

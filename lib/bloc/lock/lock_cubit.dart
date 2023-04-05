@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/lock_analytics_model.dart';
+import 'package:defi_wallet/models/lock_balance_model.dart';
 import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
 import 'package:defi_wallet/requests/lock_requests.dart';
@@ -22,6 +23,13 @@ class LockCubit extends Cubit<LockState> {
     emit(state.copyWith(
       status: LockStatusList.loading,
     ));
+  }
+
+  updateLockStrategy(LockStrategyList lockStrategy, AccountModel account) {
+    emit(state.copyWith(
+      lockStrategy: lockStrategy,
+    ));
+    loadStakingDetails(account, needKycDetails: true);
   }
 
   bool checkVerifiedUser({bool isCheckOnlyKycStatus = false}) {
@@ -134,16 +142,20 @@ class LockCubit extends Cubit<LockState> {
     try {
       LockUserModel? userData;
       LockAnalyticsModel? analyticsData;
-      LockStakingModel? stakingData =
-      await lockRequests.getStaking(account.lockAccessToken!);
+      LockStakingModel? stakingData = await lockRequests.getStaking(
+        account.lockAccessToken!,
+        state.lockStrategy.toString(),
+      );
 
       if (needUserDetails) {
         userData =
-        await lockRequests.getUser(account.lockAccessToken!);
+          await lockRequests.getUser(account.lockAccessToken!);
       }
       if (needKycDetails) {
-        analyticsData =
-        await lockRequests.getAnalytics(account.lockAccessToken!);
+        analyticsData = await lockRequests.getAnalytics(
+          account.lockAccessToken!,
+          state.lockStrategy.toString(),
+        );
       }
       emit(state.copyWith(
         status: LockStatusList.success,
@@ -170,8 +182,10 @@ class LockCubit extends Cubit<LockState> {
     ));
 
     try {
-      LockAnalyticsModel? data =
-          await lockRequests.getAnalytics(account.lockAccessToken!);
+      LockAnalyticsModel? data = await lockRequests.getAnalytics(
+        account.lockAccessToken!,
+        state.lockStrategy.toString(),
+      );
       emit(state.copyWith(
         status: LockStatusList.success,
         lockAnalyticsDetails: data,
