@@ -185,7 +185,11 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                         height: 8,
                                       ),
                                       AmountField(
-                                        onAssetSelect: (asset) {},
+                                        onAssetSelect: (asset) {
+                                          setState(() {
+                                            currentAsset = asset;
+                                          });
+                                        },
                                         onChanged: (asset) {
                                           setState(() {
                                             usdAmount = getUsdBalance(
