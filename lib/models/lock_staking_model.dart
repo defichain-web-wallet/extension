@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/lock_balance_model.dart';
 import 'package:defi_wallet/models/lock_reward_routes_model.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defichaindart/defichaindart.dart';
@@ -18,13 +19,26 @@ class LockStakingModel {
   double? pendingDeposits;
   double? pendingWithdrawals;
   double? rewardsAmount;
+  List<LockBalanceModel>? balances;
   List<LockRewardRoutesModel>? rewardRoutes;
 
 
-
-  LockStakingModel(
-      {this.id,
-      this.status, this.asset, this.depositAddress, this.strategy, this.minimalStake, this.minimalDeposit, this.fee, this.balance, this.pendingDeposits, this.pendingWithdrawals, this.rewardsAmount, this.rewardRoutes});
+  LockStakingModel({
+    this.id,
+    this.status,
+    this.asset,
+    this.depositAddress,
+    this.strategy,
+    this.minimalStake,
+    this.minimalDeposit,
+    this.fee,
+    this.balance,
+    this.pendingDeposits,
+    this.pendingWithdrawals,
+    this.rewardsAmount,
+    this.balances,
+    this.rewardRoutes,
+  });
 
   LockStakingModel.fromJson(Map<String, dynamic> json)  {
     this.id = json["id"];
@@ -41,10 +55,15 @@ class LockStakingModel {
     this.rewardsAmount = json["rewardsAmount"];
 
     List<LockRewardRoutesModel> rewardRoutes = [];
-    // json["rewardRoutes"]
-    //     .map((data) => rewardRoutes.add(LockRewardRoutesModel.fromJson(data)))
-    //     .toList();
-    this.rewardRoutes = [LockRewardRoutesModel(rewardPercent: 1, targetAsset: 'DFI', label: 'Reinvest')];
+    this.balances = List.generate(json["balances"].length,
+        (index) => LockBalanceModel.fromJson(json["balances"][index]));
+    this.rewardRoutes = [
+      LockRewardRoutesModel(
+        rewardPercent: 1,
+        targetAsset: 'DFI',
+        label: 'Reinvest',
+      )
+    ];
   }
 
   Map<String, dynamic> toJson() {
@@ -61,6 +80,7 @@ class LockStakingModel {
     data["pendingDeposits"] = this.pendingDeposits;
     data["pendingWithdrawals"] = this.pendingWithdrawals;
     data["rewardsAmount"] = this.rewardsAmount;
+    data["balances"] = this.balances!.map((e) => e.toJson()).toList();
     data["rewardRoutes"] = this.rewardRoutes!.map((e) => e.toJson()).toList();
     return data;
   }

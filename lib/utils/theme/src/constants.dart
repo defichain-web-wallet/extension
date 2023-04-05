@@ -9,7 +9,7 @@ const double buttonFullWidth = double.infinity;
 const double boxSmallWidth = 312;
 const double boxFullWidth = double.infinity;
 const double buttonBorderRadius = 12.0;
-const double accentButtonBorderRadius = 16.0;
+const double accentButtonBorderRadius = 12.0;
 const double inputBorderRadius = 12.0;
 
 
