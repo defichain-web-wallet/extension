@@ -178,7 +178,14 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                                   ),
                                                   Text(
                                                     'Stake DFI and earn up to '
-                                                    '${lockState.lockAnalyticsDetails!.apy! * 100}% APY',
+                                                    '${BalancesHelper().numberStyling(
+                                                      (lockState
+                                                              .lockAnalyticsDetails!
+                                                              .apy! *
+                                                          100),
+                                                      fixed: true,
+                                                      fixedCount: 2,
+                                                    )}% APY',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .subtitle1!
