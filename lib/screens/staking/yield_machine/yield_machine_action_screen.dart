@@ -106,7 +106,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                     List<TokensModel> assets = getTokensList(
                       tokensState,
                       lockState.lockStakingDetails!.balances,
-                      accountState: widget.isDeposit ? null : accountState,
+                      accountState: widget.isDeposit ? accountState : null,
                     );
                     currentAsset = currentAsset ?? assets.first;
 
@@ -116,15 +116,15 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                       currentAsset!.symbol!,
                     );
                     if (widget.isDeposit) {
-                      available = lockState.lockStakingDetails!.balances!
-                          .firstWhere(
-                              (element) => element.asset == currentAsset!.symbol)
-                          .balance!;
-                    } else {
                       available = convertFromSatoshi(accountState.balances!
                           .firstWhere((element) =>
                       element.token! == currentAsset!.symbol!)
                           .balance!);
+                    } else {
+                      available = lockState.lockStakingDetails!.balances!
+                          .firstWhere(
+                              (element) => element.asset == currentAsset!.symbol)
+                          .balance!;
                     }
                     return Scaffold(
                       drawerScrimColor: Color(0x0f180245),
@@ -205,145 +205,6 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                         suffix: usdAmount,
                                         available: available,
                                       ),
-                                      SizedBox(
-                                        height: 16,
-                                      ),
-                                      if (!widget.isDeposit && widget.isShowDepositAddress) ...[
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'DFI Deposit address ',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline4!
-                                                  .copyWith(
-                                                    fontSize: 16,
-                                                  ),
-                                            ),
-                                            Text(
-                                              '(optional)',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .subtitle1!
-                                                  .copyWith(
-                                                    fontSize: 16,
-                                                    color: Theme.of(context)
-                                                        .textTheme
-                                                        .headline4!
-                                                        .color!
-                                                        .withOpacity(0.6),
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 8,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () async {
-                                            await Clipboard.setData(
-                                              ClipboardData(
-                                                  text: lockState
-                                                      .lockStakingDetails!
-                                                      .depositAddress!),
-                                            );
-                                          },
-                                          child: MouseRegion(
-                                            cursor: SystemMouseCursors.click,
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding: EdgeInsets.all(16),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.viridian
-                                                    .withOpacity(0.07),
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                              ),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Column(
-                                                    children: [
-                                                      Container(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                right: 10),
-                                                        child: SvgPicture.asset(
-                                                          'assets/icons/copy.svg',
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Text(
-                                                          cutAddress(
-                                                            lockState
-                                                                .lockStakingDetails!
-                                                                .depositAddress!,
-                                                          ),
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .headline5!
-                                                                  .copyWith(
-                                                                    fontSize:
-                                                                        12,
-                                                                  ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 16,
-                                        ),
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Column(
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.only(
-                                                      right: 10),
-                                                  child: SvgPicture.asset(
-                                                      'assets/icons/important_icon.svg'),
-                                                ),
-                                              ],
-                                            ),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    warningText,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline5!
-                                                        .copyWith(
-                                                          fontSize: 12,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                      SizedBox(
-                                        height: 88,
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -367,21 +228,25 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                               if (widget.isDeposit) {
                                                 showDialog(
                                                   barrierColor:
-                                                      Color(0x0f180245),
+                                                  Color(0x0f180245),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
-                                                      dialogContext) {
+                                                  dialogContext) {
                                                     return PassConfirmDialog(
                                                       onCancel: () {
                                                         parent
                                                             .emitPending(false);
                                                       },
                                                       onSubmit: (password) {
-                                                        unstakeCallback(
+                                                        depositCallback(
                                                           password,
                                                           accountState
                                                               .accounts!.first,
+                                                          lockState
+                                                              .lockStakingDetails!
+                                                              .depositAddress!,
+                                                          tokensState.tokens!,
                                                           accountState
                                                               .accounts!
                                                               .first
@@ -397,25 +262,21 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                               } else {
                                                 showDialog(
                                                   barrierColor:
-                                                      Color(0x0f180245),
+                                                  Color(0x0f180245),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
-                                                      dialogContext) {
+                                                  dialogContext) {
                                                     return PassConfirmDialog(
                                                       onCancel: () {
                                                         parent
                                                             .emitPending(false);
                                                       },
                                                       onSubmit: (password) {
-                                                        stakeCallback(
+                                                        withdrawalCallback(
                                                           password,
                                                           accountState
                                                               .accounts!.first,
-                                                          lockState
-                                                              .lockStakingDetails!
-                                                              .depositAddress!,
-                                                          tokensState.tokens!,
                                                           accountState
                                                               .accounts!
                                                               .first
@@ -482,7 +343,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
     return s.substring(0, 14) + '...' + s.substring(28, 42);
   }
 
-  stakeCallback(
+  depositCallback(
     String password,
     AccountModel account,
     String address,
@@ -537,7 +398,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
           },
           callbackTryAgain: () async {
             print('TryAgain');
-            await stakeCallback(
+            await depositCallback(
               password,
               account,
               address,
@@ -559,7 +420,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
     );
   }
 
-  unstakeCallback(
+  withdrawalCallback(
     String password,
     AccountModel account,
     String lockAccessToken,
@@ -584,12 +445,6 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
-            if (!txResponse.isError! && !widget.isDeposit) {
-              TransactionCubit transactionCubit =
-                  BlocProvider.of<TransactionCubit>(context);
-
-              transactionCubit.setOngoingTransaction(txResponse);
-            }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
@@ -603,7 +458,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
           },
           callbackTryAgain: () async {
             print('TryAgain');
-            await unstakeCallback(
+            await withdrawalCallback(
               password,
               account,
               lockAccessToken,

@@ -981,12 +981,6 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
-            if (!txResponse.isError! && !widget.isUnstake) {
-              TransactionCubit transactionCubit =
-                  BlocProvider.of<TransactionCubit>(context);
-
-              transactionCubit.setOngoingTransaction(txResponse);
-            }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
