@@ -574,7 +574,7 @@ class _StakingScreenState extends State<StakingScreen>
                                     ],
                                   ),
                                 ),
-                                if (lockState.isYieldMachine) ...[
+                                if (lockState.isYieldMachine  && !isEdit) ...[
                                   SizedBox(
                                     height: 16,
                                   ),

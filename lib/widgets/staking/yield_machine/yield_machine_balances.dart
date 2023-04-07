@@ -45,7 +45,7 @@ class YieldMachineBalance extends StatelessWidget {
                 Text(
                   balancesHelper.numberStyling(
                     totalBalance,
-                    fixedCount: 6,
+                    fixedCount: 2,
                     fixed: true,
                   ),
                   style: Theme.of(context).textTheme.headline4!.copyWith(

@@ -221,9 +221,10 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                           if (txState
                                               is! TransactionLoadingState) {
                                             if (double.parse(controller.text
-                                                    .replaceAll(',', '')) >=
-                                                lockState.lockStakingDetails!
-                                                    .minimalDeposit!) {
+                                                    .replaceAll(',', '')) >= 0.0001
+                                                // lockState.lockStakingDetails!
+                                                //     .minimalDeposit!
+                                            ) {
                                               parent.emitPending(true);
                                               if (widget.isDeposit) {
                                                 showDialog(
@@ -254,6 +255,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                           lockState
                                                               .lockStakingDetails!
                                                               .id!,
+                                                          currentAsset!.symbol!,
                                                         );
                                                       },
                                                     );
@@ -284,6 +286,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                           lockState
                                                               .lockStakingDetails!
                                                               .id!,
+                                                          currentAsset!.symbol!,
                                                         );
                                                       },
                                                     );
@@ -350,6 +353,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
     List<TokensModel> tokens,
     String lockAccessToken,
     int stakingId,
+    String token,
   ) async {
     ECPair keyPair = await HDWalletService().getKeypairFromStorage(
       password,
@@ -362,6 +366,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
       destinationAddress: address,
       amount: balancesHelper.toSatoshi(controller.text),
       tokens: tokens,
+      token: token,
     );
     if (!txResponse.isError!) {
       lockCubit.stake(
@@ -405,6 +410,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
               tokens,
               lockAccessToken,
               stakingId,
+              token,
             );
           },
         );
@@ -425,6 +431,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
     AccountModel account,
     String lockAccessToken,
     int stakingId,
+    String token,
   ) async {
     ECPair keyPair = await HDWalletService().getKeypairFromStorage(
       password,
@@ -435,6 +442,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
       lockAccessToken,
       stakingId,
       double.parse(controller.text.replaceAll(',', '')),
+      token: token,
     );
     TxErrorModel txResponse = TxErrorModel(isError: !isDepositSuccess);
     showDialog(
@@ -463,6 +471,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
               account,
               lockAccessToken,
               stakingId,
+              token,
             );
           },
         );

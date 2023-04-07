@@ -199,8 +199,9 @@ class TransactionService {
       required ECPair? keyPair,
       required String destinationAddress,
       required int amount,
-      required List<TokensModel> tokens}) async {
-    var tokenId = await tokensRequests.getTokenID('DFI', tokens);
+      required List<TokensModel> tokens,
+      String token = 'DFI'}) async {
+    var tokenId = await tokensRequests.getTokenID(token, tokens);
     TxResponseModel? responseModel;
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
@@ -209,7 +210,7 @@ class TransactionService {
     var addressBalanceList = await balanceRequests
         .getAddressBalanceListByAddressList(account.addressList!);
     var tokenDFIbalance =
-        balancesHelper.getBalanceByTokenName(addressBalanceList, 'DFI');
+        balancesHelper.getBalanceByTokenName(addressBalanceList, token);
 
     //Swap DFI tokens to UTXO if needed
     if (tokenDFIbalance >= DUST) {
