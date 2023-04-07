@@ -218,12 +218,16 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                         'Continue',
                                         pendingText: 'Pending...',
                                         callback: (parent) {
+                                          double currentMinimumLimit = 1;
+                                          lockState.lockStakingDetails!.minimalDeposits!.forEach((element) {
+                                            if(element.asset == currentAsset!.symbol){
+                                              currentMinimumLimit = element.amount!;
+                                            }
+                                          });
                                           if (txState
                                               is! TransactionLoadingState) {
                                             if (double.parse(controller.text
-                                                    .replaceAll(',', '')) >= 0.0001
-                                                // lockState.lockStakingDetails!
-                                                //     .minimalDeposit!
+                                                    .replaceAll(',', '')) >= currentMinimumLimit
                                             ) {
                                               parent.emitPending(true);
                                               if (widget.isDeposit) {
@@ -296,8 +300,8 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                             } else {
                                               showSnackBar(
                                                 context,
-                                                title: 'Minimal amount: '
-                                                    '${lockState.lockStakingDetails!.minimalDeposit}',
+                                                title: 'Minimal amount for ${currentAsset!.symbol}: '
+                                                    '$currentMinimumLimit ',
                                                 color: AppColors.txStatusError
                                                     .withOpacity(0.1),
                                                 prefix: Icon(
