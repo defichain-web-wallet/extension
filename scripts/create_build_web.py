@@ -156,7 +156,8 @@ if __name__ == "__main__":
     browser_type = get_browser_type()
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", help="new version", default=version)
-    parser.add_argument("--browser", help="browser name", default=browser_type)
+    parser.add_argument("--browser", help="browser name",
+                        choices=browser_types)
     args = parser.parse_args()
     generate_manifest(args.browser)
     run(args.version)
