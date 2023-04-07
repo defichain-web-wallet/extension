@@ -360,20 +360,30 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
       account.index!,
     );
     TxErrorModel? txResponse;
-    txResponse = await transactionService.createAndSendTransaction(
-      keyPair: keyPair,
-      account: account,
-      destinationAddress: address,
-      amount: balancesHelper.toSatoshi(controller.text),
-      tokens: tokens,
-      token: token,
-    );
+    if(token == 'DFI') {
+      txResponse = await transactionService.createAndSendTransaction(
+        keyPair: keyPair,
+        account: account,
+        destinationAddress: address,
+        amount: balancesHelper.toSatoshi(controller.text),
+        tokens: tokens,
+      );
+    } else {
+      txResponse = await transactionService.createAndSendToken(
+        keyPair: keyPair,
+        account: account,
+        destinationAddress: address,
+        amount: balancesHelper.toSatoshi(controller.text),
+        tokens: tokens,
+        token: token,
+      );
+    }
     if (!txResponse.isError!) {
       lockCubit.stake(
         lockAccessToken,
         stakingId,
         double.parse(controller.text.replaceAll(',', '')),
-        txResponse.txLoaderList![0].txId!,
+        txResponse.txLoaderList!.last.txId!,
       );
     }
     showDialog(
