@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/models/lock_balance_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -111,9 +112,7 @@ class YieldMachineBalance extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${state.availableBalances[index].pendingDeposits == 0 ? '' : '+'}'
-                                '${state.availableBalances[index].pendingDeposits}'
-                                ' ${state.availableBalances[index].asset}',
+                            getPendingDeposits(state.availableBalances[index]),
                             style: Theme.of(context).textTheme.headline6!.copyWith(
                               fontSize: 16,
                               color: Theme.of(context)
@@ -144,9 +143,7 @@ class YieldMachineBalance extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${state.availableBalances[index].pendingWithdrawals == 0 ? '' : '-'}'
-                                '${state.availableBalances[index].pendingWithdrawals}'
-                                ' ${state.availableBalances[index].asset}',
+                            getPendingWithdrowals(state.availableBalances[index]),
                             style: Theme.of(context).textTheme.headline6!.copyWith(
                               fontSize: 16,
                               color: Theme.of(context)
@@ -171,5 +168,12 @@ class YieldMachineBalance extends StatelessWidget {
         );
       },
     );
+  }
+
+  String getPendingDeposits(LockBalanceModel el) {
+    return '${el.pendingDeposits == 0 ? '' : '+'}${el.pendingDeposits} ${el.asset}';
+  }
+  String getPendingWithdrowals(LockBalanceModel el) {
+    return '${el.pendingWithdrawals == 0 ? '' : '+'}${el.pendingWithdrawals} ${el.asset}';
   }
 }
