@@ -590,9 +590,7 @@ class _StakingScreenState extends State<StakingScreen>
                                         child: AccentButton(
                                           label: 'Withdrawal',
                                           callback: () {
-                                            if (lockState.lockStakingDetails!
-                                                .balances![0].balance! >
-                                                0) {
+                                            if (lockState.availableBalances.length != 0) {
                                               Navigator.push(
                                                 context,
                                                 PageRouteBuilder(

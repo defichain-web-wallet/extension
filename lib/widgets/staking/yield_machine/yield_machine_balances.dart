@@ -93,7 +93,7 @@ class YieldMachineBalance extends StatelessWidget {
                     ),
                     if (state.availableBalances[index].pendingDeposits != 0) ...[
                       SizedBox(
-                        height: 16,
+                        height: 8,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
