@@ -30,6 +30,8 @@ class ContactTile extends StatefulWidget {
 
 class _ContactTileState extends State<ContactTile> with ThemeMixin {
   bool isHoverEdit = false;
+  double dialogWidth = 116;
+  double screenWidth = 150;
   late int index;
 
   cutAddress(String s) {
@@ -93,7 +95,9 @@ class _ContactTileState extends State<ContactTile> with ThemeMixin {
                 Row(
                   children: [
                     Container(
-                      constraints: BoxConstraints(maxWidth: widget.isDialog ? 116 : 150),
+                      constraints: BoxConstraints(
+                        maxWidth: widget.isDialog ? dialogWidth : screenWidth,
+                      ),
                       child: TickerText(
                         child: Text(
                           widget.contactName,
