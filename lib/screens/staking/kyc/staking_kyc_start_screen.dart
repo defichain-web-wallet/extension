@@ -109,20 +109,7 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                           height: 4,
                                         ),
                                         Text(
-                                          '${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apy! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% '
-                                          'APY / ${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apr! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% APR',
+                                          '${getStakingApy(lockState)} / ${getStakingApr(lockState)}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -177,15 +164,7 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                                     width: 6.4,
                                                   ),
                                                   Text(
-                                                    'Stake DFI and earn up to '
-                                                    '${BalancesHelper().numberStyling(
-                                                      (lockState
-                                                              .lockAnalyticsDetails!
-                                                              .apy! *
-                                                          100),
-                                                      fixed: true,
-                                                      fixedCount: 2,
-                                                    )}% APY',
+                                                    'Stake DFI and earn up to ${getStakingApy(lockState)}',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .subtitle1!
@@ -371,5 +350,24 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
         );
       },
     );
+  }
+  String getStakingApy(lockState){
+    return '${BalancesHelper().numberStyling(
+      (lockState
+          .lockAnalyticsDetails!
+          .apy! *
+          100),
+      fixed: true,
+      fixedCount: 2,
+    )}% APY';
+  }
+  String getStakingApr(lockState){
+    return '${BalancesHelper().numberStyling(
+      (lockState.lockAnalyticsDetails!
+          .apr! *
+          100),
+      fixed: true,
+      fixedCount: 2,
+    )}% APR';
   }
 }
