@@ -97,7 +97,7 @@ class _ContactTileState extends State<ContactTile> with ThemeMixin {
                       child: TickerText(
                         child: Text(
                           widget.contactName,
-                          style: headline4.copyWith(
+                          style: Theme.of(context).textTheme.headline4!.copyWith(
                             fontSize: 16,
                           ),
                         ),
