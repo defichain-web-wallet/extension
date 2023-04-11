@@ -75,11 +75,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
-    tabController!.dispose();
     if (timer != null) {
       timer!.cancel();
     }
-
     super.dispose();
   }
 

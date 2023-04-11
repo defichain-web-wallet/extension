@@ -45,7 +45,7 @@ class YieldMachineBalance extends StatelessWidget {
                 Text(
                   balancesHelper.numberStyling(
                     totalBalance,
-                    fixedCount: 6,
+                    fixedCount: 2,
                     fixed: true,
                   ),
                   style: Theme.of(context).textTheme.headline4!.copyWith(
@@ -113,6 +113,39 @@ class YieldMachineBalance extends StatelessWidget {
                           Text(
                             '${state.availableBalances[index].pendingDeposits == 0 ? '' : '+'}'
                                 '${state.availableBalances[index].pendingDeposits}'
+                                ' ${state.availableBalances[index].asset}',
+                            style: Theme.of(context).textTheme.headline6!.copyWith(
+                              fontSize: 16,
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!
+                                  .withOpacity(0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    if(state.availableBalances[index].pendingWithdrawals != 0) ...[
+                      SizedBox(height: 8,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Pending Withdrowal',
+                            style: Theme.of(context).textTheme.headline6!.copyWith(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!
+                                  .withOpacity(0.6),
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            '${state.availableBalances[index].pendingWithdrawals == 0 ? '' : '-'}'
+                                '${state.availableBalances[index].pendingWithdrawals}'
                                 ' ${state.availableBalances[index].asset}',
                             style: Theme.of(context).textTheme.headline6!.copyWith(
                               fontSize: 16,
