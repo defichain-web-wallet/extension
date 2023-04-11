@@ -106,7 +106,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                     List<TokensModel> assets = getTokensList(
                       tokensState,
                       lockState.lockStakingDetails!.balances,
-                      accountState: widget.isDeposit ? null : accountState,
+                      accountState: widget.isDeposit ? accountState : null,
                     );
                     currentAsset = currentAsset ?? assets.first;
 
@@ -116,15 +116,15 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                       currentAsset!.symbol!,
                     );
                     if (widget.isDeposit) {
-                      available = lockState.lockStakingDetails!.balances!
-                          .firstWhere(
-                              (element) => element.asset == currentAsset!.symbol)
-                          .balance!;
-                    } else {
                       available = convertFromSatoshi(accountState.balances!
                           .firstWhere((element) =>
                       element.token! == currentAsset!.symbol!)
                           .balance!);
+                    } else {
+                      available = lockState.lockStakingDetails!.balances!
+                          .firstWhere(
+                              (element) => element.asset == currentAsset!.symbol)
+                          .balance!;
                     }
                     return Scaffold(
                       drawerScrimColor: Color(0x0f180245),
@@ -208,7 +208,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                       SizedBox(
                                         height: 16,
                                       ),
-                                      if (!widget.isDeposit && widget.isShowDepositAddress) ...[
+                                      if (widget.isDeposit) ...[
                                         Row(
                                           children: [
                                             Text(
@@ -217,8 +217,8 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                   .textTheme
                                                   .headline4!
                                                   .copyWith(
-                                                    fontSize: 16,
-                                                  ),
+                                                fontSize: 16,
+                                              ),
                                             ),
                                             Text(
                                               '(optional)',
@@ -226,13 +226,13 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                   .textTheme
                                                   .subtitle1!
                                                   .copyWith(
-                                                    fontSize: 16,
-                                                    color: Theme.of(context)
-                                                        .textTheme
-                                                        .headline4!
-                                                        .color!
-                                                        .withOpacity(0.6),
-                                                  ),
+                                                fontSize: 16,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline4!
+                                                    .color!
+                                                    .withOpacity(0.6),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -257,18 +257,18 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                 color: AppColors.viridian
                                                     .withOpacity(0.07),
                                                 borderRadius:
-                                                    BorderRadius.circular(16),
+                                                BorderRadius.circular(16),
                                               ),
                                               child: Row(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                                 children: [
                                                   Column(
                                                     children: [
                                                       Container(
                                                         padding:
-                                                            EdgeInsets.only(
-                                                                right: 10),
+                                                        EdgeInsets.only(
+                                                            right: 10),
                                                         child: SvgPicture.asset(
                                                           'assets/icons/copy.svg',
                                                         ),
@@ -278,8 +278,8 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                   Expanded(
                                                     child: Column(
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
+                                                      CrossAxisAlignment
+                                                          .center,
                                                       children: [
                                                         Text(
                                                           cutAddress(
@@ -288,13 +288,13 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                                 .depositAddress!,
                                                           ),
                                                           style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .headline5!
-                                                                  .copyWith(
-                                                                    fontSize:
-                                                                        12,
-                                                                  ),
+                                                          Theme.of(context)
+                                                              .textTheme
+                                                              .headline5!
+                                                              .copyWith(
+                                                            fontSize:
+                                                            12,
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -309,7 +309,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                         ),
                                         Row(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Column(
                                               children: [
@@ -324,7 +324,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     warningText,
@@ -332,8 +332,8 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                         .textTheme
                                                         .headline5!
                                                         .copyWith(
-                                                          fontSize: 12,
-                                                        ),
+                                                      fontSize: 12,
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -341,9 +341,6 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                           ],
                                         ),
                                       ],
-                                      SizedBox(
-                                        height: 88,
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -357,58 +354,33 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                         'Continue',
                                         pendingText: 'Pending...',
                                         callback: (parent) {
+                                          double currentMinimumLimit = 1;
+                                          lockState.lockStakingDetails!.minimalDeposits!.forEach((element) {
+                                            if(element.asset == currentAsset!.symbol){
+                                              currentMinimumLimit = element.amount!;
+                                            }
+                                          });
                                           if (txState
                                               is! TransactionLoadingState) {
                                             if (double.parse(controller.text
-                                                    .replaceAll(',', '')) >=
-                                                lockState.lockStakingDetails!
-                                                    .minimalDeposit!) {
+                                                    .replaceAll(',', '')) >= currentMinimumLimit
+                                            ) {
                                               parent.emitPending(true);
                                               if (widget.isDeposit) {
                                                 showDialog(
                                                   barrierColor:
-                                                      Color(0x0f180245),
+                                                  Color(0x0f180245),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
-                                                      dialogContext) {
+                                                  dialogContext) {
                                                     return PassConfirmDialog(
                                                       onCancel: () {
                                                         parent
                                                             .emitPending(false);
                                                       },
                                                       onSubmit: (password) {
-                                                        unstakeCallback(
-                                                          password,
-                                                          accountState
-                                                              .accounts!.first,
-                                                          accountState
-                                                              .accounts!
-                                                              .first
-                                                              .lockAccessToken!,
-                                                          lockState
-                                                              .lockStakingDetails!
-                                                              .id!,
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                );
-                                              } else {
-                                                showDialog(
-                                                  barrierColor:
-                                                      Color(0x0f180245),
-                                                  barrierDismissible: false,
-                                                  context: context,
-                                                  builder: (BuildContext
-                                                      dialogContext) {
-                                                    return PassConfirmDialog(
-                                                      onCancel: () {
-                                                        parent
-                                                            .emitPending(false);
-                                                      },
-                                                      onSubmit: (password) {
-                                                        stakeCallback(
+                                                        depositCallback(
                                                           password,
                                                           accountState
                                                               .accounts!.first,
@@ -423,6 +395,38 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                           lockState
                                                               .lockStakingDetails!
                                                               .id!,
+                                                          currentAsset!.symbol!,
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                showDialog(
+                                                  barrierColor:
+                                                  Color(0x0f180245),
+                                                  barrierDismissible: false,
+                                                  context: context,
+                                                  builder: (BuildContext
+                                                  dialogContext) {
+                                                    return PassConfirmDialog(
+                                                      onCancel: () {
+                                                        parent
+                                                            .emitPending(false);
+                                                      },
+                                                      onSubmit: (password) {
+                                                        withdrawalCallback(
+                                                          password,
+                                                          accountState
+                                                              .accounts!.first,
+                                                          accountState
+                                                              .accounts!
+                                                              .first
+                                                              .lockAccessToken!,
+                                                          lockState
+                                                              .lockStakingDetails!
+                                                              .id!,
+                                                          currentAsset!.symbol!,
                                                         );
                                                       },
                                                     );
@@ -432,8 +436,8 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                             } else {
                                               showSnackBar(
                                                 context,
-                                                title: 'Minimal amount: '
-                                                    '${lockState.lockStakingDetails!.minimalDeposit}',
+                                                title: 'Minimal amount for ${currentAsset!.symbol}: '
+                                                    '$currentMinimumLimit ',
                                                 color: AppColors.txStatusError
                                                     .withOpacity(0.1),
                                                 prefix: Icon(
@@ -482,32 +486,44 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
     return s.substring(0, 14) + '...' + s.substring(28, 42);
   }
 
-  stakeCallback(
+  depositCallback(
     String password,
     AccountModel account,
     String address,
     List<TokensModel> tokens,
     String lockAccessToken,
     int stakingId,
+    String token,
   ) async {
     ECPair keyPair = await HDWalletService().getKeypairFromStorage(
       password,
       account.index!,
     );
     TxErrorModel? txResponse;
-    txResponse = await transactionService.createAndSendTransaction(
-      keyPair: keyPair,
-      account: account,
-      destinationAddress: address,
-      amount: balancesHelper.toSatoshi(controller.text),
-      tokens: tokens,
-    );
+    if(token == 'DFI') {
+      txResponse = await transactionService.createAndSendTransaction(
+        keyPair: keyPair,
+        account: account,
+        destinationAddress: address,
+        amount: balancesHelper.toSatoshi(controller.text),
+        tokens: tokens,
+      );
+    } else {
+      txResponse = await transactionService.createAndSendToken(
+        keyPair: keyPair,
+        account: account,
+        destinationAddress: address,
+        amount: balancesHelper.toSatoshi(controller.text),
+        tokens: tokens,
+        token: token,
+      );
+    }
     if (!txResponse.isError!) {
       lockCubit.stake(
         lockAccessToken,
         stakingId,
         double.parse(controller.text.replaceAll(',', '')),
-        txResponse.txLoaderList![0].txId!,
+        txResponse.txLoaderList!.last.txId!,
       );
     }
     showDialog(
@@ -537,13 +553,14 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
           },
           callbackTryAgain: () async {
             print('TryAgain');
-            await stakeCallback(
+            await depositCallback(
               password,
               account,
               address,
               tokens,
               lockAccessToken,
               stakingId,
+              token,
             );
           },
         );
@@ -559,11 +576,12 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
     );
   }
 
-  unstakeCallback(
+  withdrawalCallback(
     String password,
     AccountModel account,
     String lockAccessToken,
     int stakingId,
+    String token,
   ) async {
     ECPair keyPair = await HDWalletService().getKeypairFromStorage(
       password,
@@ -574,6 +592,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
       lockAccessToken,
       stakingId,
       double.parse(controller.text.replaceAll(',', '')),
+      token: token,
     );
     TxErrorModel txResponse = TxErrorModel(isError: !isDepositSuccess);
     showDialog(
@@ -584,12 +603,6 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
-            if (!txResponse.isError! && !widget.isDeposit) {
-              TransactionCubit transactionCubit =
-                  BlocProvider.of<TransactionCubit>(context);
-
-              transactionCubit.setOngoingTransaction(txResponse);
-            }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
@@ -603,11 +616,12 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
           },
           callbackTryAgain: () async {
             print('TryAgain');
-            await unstakeCallback(
+            await withdrawalCallback(
               password,
               account,
               lockAccessToken,
               stakingId,
+              token,
             );
           },
         );

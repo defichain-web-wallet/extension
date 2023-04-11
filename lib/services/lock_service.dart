@@ -19,12 +19,14 @@ class LockService {
     };
   }
 
-  Future<bool> makeWithdraw(ECPair keyPair, String accessToken, int stakingId, double amount) async {
+  Future<bool> makeWithdraw(
+      ECPair keyPair, String accessToken, int stakingId, double amount,
+      {String token = 'DFI'}) async {
     LockWithdrawModel? withdrawModel;
 
     var existWithdraws = await LockRequests().getWithdraws(accessToken, stakingId);
     if(existWithdraws!.isEmpty){
-      withdrawModel = await LockRequests().requestWithdraw(accessToken, stakingId, amount);
+      withdrawModel = await LockRequests().requestWithdraw(accessToken, stakingId, amount, token: token);
     } else {
       withdrawModel = await LockRequests().changeAmountWithdraw(accessToken, stakingId, existWithdraws[0].id!, amount);
     }
