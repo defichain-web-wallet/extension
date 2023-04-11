@@ -204,9 +204,8 @@ class YieldMachineBalance extends StatelessWidget {
   }
 
   String getFormatPendingDetails(LockBalanceModel el, bool isDeposit) {
-    if (isDeposit)
-      return '${el.pendingDeposits == 0 ? '' : '+'}${el.pendingDeposits} ${el.asset}';
-    else
-      return '${el.pendingWithdrawals == 0 ? '' : '-'}${el.pendingWithdrawals} ${el.asset}';
+    String prefix = isDeposit ? '+' : '-';
+    double amount = isDeposit ? el.pendingDeposits! : el.pendingWithdrawals!;
+      return '$prefix$amount ${el.asset}';
   }
 }
