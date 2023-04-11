@@ -138,20 +138,8 @@ class _StakingScreenState extends State<StakingScreen>
                                           height: 4,
                                         ),
                                         Text(
-                                          '${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apy! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% APY / '
-                                          '${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apr! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% APR',
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')} / '
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apr!, 'APR')}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -599,11 +587,7 @@ class _StakingScreenState extends State<StakingScreen>
                                                       animation2) =>
                                                       YieldMachineActionScreen(
                                                         isDeposit: false,
-                                                        isShowDepositAddress: lockState
-                                                            .lockStakingDetails!
-                                                            .balances![0]
-                                                            .balance! >
-                                                            0,
+                                                        isShowDepositAddress: lockState.availableBalances.length != 0,
                                                       ),
                                                   transitionDuration:
                                                   Duration.zero,
@@ -679,5 +663,13 @@ class _StakingScreenState extends State<StakingScreen>
         );
       },
     );
+  }
+  String getAprOrApyFormat(double amount, String amountType){
+    return '${BalancesHelper().numberStyling(
+      (amount *
+        100),
+    fixed: true,
+    fixedCount: 2,
+    )}% $amountType';
   }
 }

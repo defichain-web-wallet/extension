@@ -112,7 +112,7 @@ class YieldMachineBalance extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            getPendingDeposits(state.availableBalances[index]),
+                            getFormatPendingDetails(state.availableBalances[index], true),
                             style: Theme.of(context).textTheme.headline6!.copyWith(
                               fontSize: 16,
                               color: Theme.of(context)
@@ -143,7 +143,7 @@ class YieldMachineBalance extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            getPendingWithdrowals(state.availableBalances[index]),
+                            getFormatPendingDetails(state.availableBalances[index], false),
                             style: Theme.of(context).textTheme.headline6!.copyWith(
                               fontSize: 16,
                               color: Theme.of(context)
@@ -203,10 +203,10 @@ class YieldMachineBalance extends StatelessWidget {
     );
   }
 
-  String getPendingDeposits(LockBalanceModel el) {
-    return '${el.pendingDeposits == 0 ? '' : '+'}${el.pendingDeposits} ${el.asset}';
-  }
-  String getPendingWithdrowals(LockBalanceModel el) {
-    return '${el.pendingWithdrawals == 0 ? '' : '+'}${el.pendingWithdrawals} ${el.asset}';
+  String getFormatPendingDetails(LockBalanceModel el, bool isDeposit) {
+    if (isDeposit)
+      return '${el.pendingDeposits == 0 ? '' : '+'}${el.pendingDeposits} ${el.asset}';
+    else
+      return '${el.pendingWithdrawals == 0 ? '' : '-'}${el.pendingWithdrawals} ${el.asset}';
   }
 }
