@@ -34,7 +34,8 @@ class StakingScreen extends StatefulWidget {
   _StakingScreenState createState() => _StakingScreenState();
 }
 
-class _StakingScreenState extends State<StakingScreen> with ThemeMixin, SnackBarMixin {
+class _StakingScreenState extends State<StakingScreen>
+    with ThemeMixin, SnackBarMixin {
   final String titleText = 'Staking';
   bool isEdit = false;
   bool isFirstBuild = true;
@@ -573,7 +574,7 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin, SnackBar
                                     ],
                                   ),
                                 ),
-                                if (lockState.isYieldMachine) ...[
+                                if (lockState.isYieldMachine  && !isEdit) ...[
                                   SizedBox(
                                     height: 16,
                                   ),
@@ -587,37 +588,21 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin, SnackBar
                                         child: AccentButton(
                                           label: 'Deposit',
                                           callback: () {
-                                            if (lockState
-                                                .lockStakingDetails!
-                                                .balances![0]
-                                                .balance! >
-                                                0) {
-                                              Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                      animation1,
-                                                      animation2) =>
-                                                      YieldMachineActionScreen(
-                                                        isDeposit: true,
-                                                      ),
-                                                  transitionDuration:
-                                                  Duration.zero,
-                                                  reverseTransitionDuration:
-                                                  Duration.zero,
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context,
+                                                        animation1,
+                                                        animation2) =>
+                                                    YieldMachineActionScreen(
+                                                  isDeposit: true,
                                                 ),
-                                              );
-                                            } else {
-                                              showSnackBar(
-                                                context,
-                                                title: 'Insufficient funds',
-                                                color: AppColors.txStatusError.withOpacity(0.1),
-                                                prefix: Icon(
-                                                  Icons.close,
-                                                  color: AppColors.txStatusError,
-                                                ),
-                                              );
-                                            }
+                                                transitionDuration:
+                                                    Duration.zero,
+                                                reverseTransitionDuration:
+                                                    Duration.zero,
+                                              ),
+                                            );
                                           },
                                         ),
                                       ),
@@ -627,26 +612,42 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin, SnackBar
                                         child: NewPrimaryButton(
                                           title: 'Withdrawal',
                                           callback: () {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    YieldMachineActionScreen(
-                                                  isDeposit: false,
-                                                  isShowDepositAddress: lockState
-                                                          .lockStakingDetails!
-                                                          .balances![0]
-                                                          .balance! >
-                                                      0,
+                                            if (lockState.lockStakingDetails!
+                                                    .balances![0].balance! >
+                                                0) {
+                                              Navigator.push(
+                                                context,
+                                                PageRouteBuilder(
+                                                  pageBuilder: (context,
+                                                          animation1,
+                                                          animation2) =>
+                                                      YieldMachineActionScreen(
+                                                    isDeposit: false,
+                                                    isShowDepositAddress: lockState
+                                                            .lockStakingDetails!
+                                                            .balances![0]
+                                                            .balance! >
+                                                        0,
+                                                  ),
+                                                  transitionDuration:
+                                                      Duration.zero,
+                                                  reverseTransitionDuration:
+                                                      Duration.zero,
                                                 ),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
+                                              );
+                                            } else {
+                                              showSnackBar(
+                                                context,
+                                                title: 'Insufficient funds',
+                                                color: AppColors.txStatusError
+                                                    .withOpacity(0.1),
+                                                prefix: Icon(
+                                                  Icons.close,
+                                                  color:
+                                                      AppColors.txStatusError,
+                                                ),
+                                              );
+                                            }
                                           },
                                         ),
                                       )
