@@ -109,7 +109,8 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                           height: 4,
                                         ),
                                         Text(
-                                          '${getStakingApy(lockState)} / ${getStakingApr(lockState)}',
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')} / '
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apr!, 'APR')}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -164,7 +165,8 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                                     width: 6.4,
                                                   ),
                                                   Text(
-                                                    'Stake DFI and earn up to ${getStakingApy(lockState)}',
+                                                    'Stake DFI and earn up to '
+                                                    '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')}',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .subtitle1!
@@ -351,23 +353,12 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
       },
     );
   }
-  String getStakingApy(lockState){
+  String getAprOrApyFormat(double amount, String amountType){
     return '${BalancesHelper().numberStyling(
-      (lockState
-          .lockAnalyticsDetails!
-          .apy! *
+      (amount *
           100),
       fixed: true,
       fixedCount: 2,
-    )}% APY';
-  }
-  String getStakingApr(lockState){
-    return '${BalancesHelper().numberStyling(
-      (lockState.lockAnalyticsDetails!
-          .apr! *
-          100),
-      fixed: true,
-      fixedCount: 2,
-    )}% APR';
+    )}% $amountType';
   }
 }
