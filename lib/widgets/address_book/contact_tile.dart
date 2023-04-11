@@ -2,7 +2,6 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
@@ -46,7 +45,6 @@ class _ContactTileState extends State<ContactTile> with ThemeMixin {
   @override
   void initState() {
     index = widget.index < 10 ? widget.index : getLastCharToInt(index);
-    // TODO: implement initState
     super.initState();
   }
 
