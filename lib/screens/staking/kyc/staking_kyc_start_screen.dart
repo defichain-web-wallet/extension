@@ -109,20 +109,8 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                           height: 4,
                                         ),
                                         Text(
-                                          '${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apy! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% '
-                                          'APY / ${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apr! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% APR',
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')} / '
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apr!, 'APR')}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -178,7 +166,7 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                                   ),
                                                   Text(
                                                     'Stake DFI and earn up to '
-                                                    '${lockState.lockAnalyticsDetails!.apy! * 100}% APY',
+                                                    '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')}',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .subtitle1!
@@ -364,5 +352,13 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
         );
       },
     );
+  }
+  String getAprOrApyFormat(double amount, String amountType){
+    return '${BalancesHelper().numberStyling(
+      (amount *
+          100),
+      fixed: true,
+      fixedCount: 2,
+    )}% $amountType';
   }
 }
