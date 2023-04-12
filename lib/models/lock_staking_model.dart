@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/lock_balance_model.dart';
 import 'package:defi_wallet/models/lock_reward_routes_model.dart';
+import 'package:defi_wallet/models/lock_minimal_deposits_model.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
@@ -21,6 +22,7 @@ class LockStakingModel {
   double? rewardsAmount;
   List<LockBalanceModel>? balances;
   List<LockRewardRoutesModel>? rewardRoutes;
+  List<LockMinimalDepositsModel>? minimalDeposits;
 
 
   LockStakingModel({
@@ -38,6 +40,7 @@ class LockStakingModel {
     this.rewardsAmount,
     this.balances,
     this.rewardRoutes,
+    this.minimalDeposits,
   });
 
   LockStakingModel.fromJson(Map<String, dynamic> json)  {
@@ -53,7 +56,6 @@ class LockStakingModel {
     this.pendingDeposits = json["pendingDeposits"];
     this.pendingWithdrawals = json["pendingWithdrawals"];
     this.rewardsAmount = json["rewardsAmount"];
-
     List<LockRewardRoutesModel> rewardRoutes = [];
     this.balances = List.generate(json["balances"].length,
         (index) => LockBalanceModel.fromJson(json["balances"][index]));
@@ -64,6 +66,8 @@ class LockStakingModel {
         label: 'Reinvest',
       )
     ];
+    this.minimalDeposits = List.generate(json["minimalDeposits"].length,
+            (index) => LockMinimalDepositsModel.fromJson(json["minimalDeposits"][index]));
   }
 
   Map<String, dynamic> toJson() {
@@ -82,6 +86,7 @@ class LockStakingModel {
     data["rewardsAmount"] = this.rewardsAmount;
     data["balances"] = this.balances!.map((e) => e.toJson()).toList();
     data["rewardRoutes"] = this.rewardRoutes!.map((e) => e.toJson()).toList();
+    data["minimalDeposits"] = this.minimalDeposits!.map((e) => e.toJson()).toList();
     return data;
   }
 }
