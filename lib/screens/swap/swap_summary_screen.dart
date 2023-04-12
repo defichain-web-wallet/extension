@@ -67,7 +67,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
               appBar: NewMainAppBar(
                 isShowLogo: false,
               ),
-              drawerScrimColor: Color(0x0f180245),
+              drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: AccountDrawer(
                 width: buttonSmallWidth,
               ),
@@ -269,7 +269,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                   submitSwap(state, tokensState, "");
                                 } else if (!isLedger) {
                                   showDialog(
-                                    barrierColor: Color(0x0f180245),
+                                    barrierColor: AppColors.tolopea.withOpacity(0.06),
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext context1) {
@@ -287,7 +287,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                   );
                                 } else if (isLedger) {
                                   showDialog(
-                                    barrierColor: Color(0x0f180245),
+                                    barrierColor: AppColors.tolopea.withOpacity(0.06),
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext context1) {
@@ -359,7 +359,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
       }
 
       showDialog(
-        barrierColor: Color(0x0f180245),
+        barrierColor: AppColors.tolopea.withOpacity(0.06),
         barrierDismissible: false,
         context: context,
         builder: (BuildContext dialogContext) {

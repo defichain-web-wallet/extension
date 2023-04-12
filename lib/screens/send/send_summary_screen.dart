@@ -112,7 +112,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
         TransactionState txState,
       ) {
         return Scaffold(
-          drawerScrimColor: Color(0x0f180245),
+          drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
           endDrawer: AccountDrawer(
             width: buttonSmallWidth,
           ),
@@ -431,7 +431,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                 await SettingsHelper.isLedger();
                                             if (isLedger) {
                                               showDialog(
-                                                barrierColor: Color(0x0f180245),
+                                                barrierColor: AppColors.tolopea.withOpacity(0.06),
                                                 barrierDismissible: false,
                                                 context: context,
                                                 builder:
@@ -455,7 +455,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                             } else {
                                               parent.emitPending(true);
                                               showDialog(
-                                                barrierColor: Color(0x0f180245),
+                                                barrierColor: AppColors.tolopea.withOpacity(0.06),
                                                 barrierDismissible: false,
                                                 context: context,
                                                 builder:
@@ -600,7 +600,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
             await bitcoinCubit.sendTransaction(tx.txLoaderList![0].txHex!);
 
         showDialog(
-          barrierColor: Color(0x0f180245),
+          barrierColor: AppColors.tolopea.withOpacity(0.06),
           barrierDismissible: false,
           context: context,
           builder: (BuildContext dialogContext) {
@@ -676,7 +676,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     );
 
     showDialog(
-      barrierColor: Color(0x0f180245),
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
       barrierDismissible: false,
       context: context,
       builder: (BuildContext dialogContext) {

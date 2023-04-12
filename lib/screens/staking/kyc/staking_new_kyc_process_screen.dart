@@ -44,7 +44,7 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
         return BlocBuilder<LockCubit, LockState>(
           builder: (lockContext, lockState) {
             return Scaffold(
-              drawerScrimColor: Color(0x0f180245),
+              drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: AccountDrawer(
                 width: buttonSmallWidth,
               ),
@@ -245,7 +245,7 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                                   );
                                 } else {
                                   showDialog(
-                                    barrierColor: Color(0x0f180245),
+                                    barrierColor: AppColors.tolopea.withOpacity(0.06),
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext dialogContext) {

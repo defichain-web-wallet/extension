@@ -37,7 +37,7 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin {
         return BlocBuilder<AccountCubit, AccountState>(
           builder: (context, state) {
             return Scaffold(
-              drawerScrimColor: Color(0x0f180245),
+              drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: AccountDrawer(
                 width: buttonSmallWidth,
               ),
@@ -95,7 +95,7 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin {
                                   subtitleText: 'Click to show recovery seed',
                                   onTap: () {
                                     showDialog(
-                                      barrierColor: Color(0x0f180245),
+                                      barrierColor: AppColors.tolopea.withOpacity(0.06),
                                       barrierDismissible: false,
                                       context: context,
                                       builder: (BuildContext contextDialog) {

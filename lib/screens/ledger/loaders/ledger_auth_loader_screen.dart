@@ -7,6 +7,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/loader/jumping_dots.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -157,7 +158,7 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
     } on Exception catch (error) {
       print(error);
       await showDialog(
-        barrierColor: Color(0x0f180245),
+        barrierColor: AppColors.tolopea.withOpacity(0.06),
         barrierDismissible: false,
         context: context,
         builder: (BuildContext dialogContext) {
