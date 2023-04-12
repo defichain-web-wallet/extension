@@ -87,7 +87,7 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                 FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
                 List<AssetByFiatModel> availableTokens = fiatCubit.getAssetsWithoutPair(fiatState.foundAssets!);
                 return Scaffold(
-                  drawerScrimColor: Color(0x0f180245),
+                  drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                   endDrawer: AccountDrawer(
                     width: buttonSmallWidth,
                   ),

@@ -37,7 +37,7 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
     String titleText = 'Earn';
 
     return Scaffold(
-      drawerScrimColor: Color(0x0f180245),
+      drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
       endDrawer: AccountDrawer(
         width: accountDrawerWidth,
       ),

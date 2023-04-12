@@ -124,7 +124,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                       lockState.lockStakingDetails!.asset!,
                     )}';
                     return Scaffold(
-                      drawerScrimColor: Color(0x0f180245),
+                      drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                       endDrawer: AccountDrawer(
                         width: buttonSmallWidth,
                       ),
@@ -765,8 +765,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                               parent.emitPending(true);
                                               if (widget.isUnstake) {
                                                 showDialog(
-                                                  barrierColor:
-                                                      Color(0x0f180245),
+                                                  barrierColor: AppColors
+                                                      .tolopea
+                                                      .withOpacity(0.06),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
@@ -794,8 +795,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                 );
                                               } else {
                                                 showDialog(
-                                                  barrierColor:
-                                                      Color(0x0f180245),
+                                                  barrierColor: AppColors
+                                                      .tolopea
+                                                      .withOpacity(0.06),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
@@ -908,7 +910,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       );
     }
     showDialog(
-      barrierColor: Color(0x0f180245),
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
       barrierDismissible: false,
       context: context,
       builder: (BuildContext dialogContext) {
@@ -974,7 +976,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
     );
     TxErrorModel txResponse = TxErrorModel(isError: !isUnstakeSuccess);
     showDialog(
-      barrierColor: Color(0x0f180245),
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
       barrierDismissible: false,
       context: context,
       builder: (BuildContext dialogContext) {

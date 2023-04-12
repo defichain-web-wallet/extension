@@ -225,7 +225,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                       appBar: NewMainAppBar(
                         isShowLogo: false,
                       ),
-                      drawerScrimColor: Color(0x0f180245),
+                      drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                       endDrawer: AccountDrawer(
                         width: buttonSmallWidth,
                       ),
@@ -368,7 +368,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                             GestureDetector(
                               onTap: () {
                                 showDialog(
-                                  barrierColor: Color(0x0f180245),
+                                  barrierColor: AppColors.tolopea.withOpacity(0.06),
                                   barrierDismissible: false,
                                   context: context,
                                   builder: (BuildContext context) {
@@ -507,7 +507,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                             GestureDetector(
                               onTap: () {
                                 showDialog(
-                                  barrierColor: Color(0x0f180245),
+                                  barrierColor: AppColors.tolopea.withOpacity(0.06),
                                   barrierDismissible: false,
                                   context: context,
                                   builder: (BuildContext context) {
@@ -1110,7 +1110,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
     if (isNumeric(amountFromController.text)) {
       if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
         showDialog(
-          barrierColor: Color(0x0f180245),
+          barrierColor: AppColors.tolopea.withOpacity(0.06),
           barrierDismissible: false,
           context: context,
           builder: (BuildContext context1) {

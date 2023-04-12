@@ -142,7 +142,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                             .firstWhere((el) => el.iban == element));
                       });
                       return Scaffold(
-                        drawerScrimColor: Color(0x0f180245),
+                        drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                         endDrawer: AccountDrawer(
                           width: buttonSmallWidth,
                         ),
@@ -397,7 +397,10 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                         if (isEnough) {
                                                           showDialog(
                                                             barrierColor:
-                                                                Color(0x0f180245),
+                                                                AppColors
+                                                                    .tolopea
+                                                                    .withOpacity(
+                                                                        0.06),
                                                             barrierDismissible:
                                                                 false,
                                                             context: context,
@@ -626,7 +629,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
       transactionCubit.setOngoingTransaction(txResponse);
     }
     showDialog(
-      barrierColor: Color(0x0f180245),
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
       barrierDismissible: false,
       context: context,
       builder: (BuildContext dialogContext) {
