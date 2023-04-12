@@ -130,8 +130,8 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
           suffix: InkWell(
             onTap: () async {
               if (txState is TransactionLoadedState) {
-                await accountCubit.updateAccountDetails();
                 await transactionCubit.confirmTransactionStatus();
+                await accountCubit.updateAccountDetails();
               } else {
                 launch(
                   '${Hosts.defiScanLiveTx}/$txId' +
