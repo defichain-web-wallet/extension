@@ -4,6 +4,7 @@ import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
@@ -160,7 +161,7 @@ class _UiKitState extends State<UiKit>
                     title: 'TxStatusDialog',
                     callback: () {
                       showDialog(
-                        barrierColor: Color(0x0f180245),
+                        barrierColor: AppColors.tolopea.withOpacity(0.06),
                         barrierDismissible: false,
                         context: context,
                         builder: (BuildContext dialogContext) {

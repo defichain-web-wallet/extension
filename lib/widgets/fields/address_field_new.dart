@@ -125,7 +125,7 @@ class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin{
                     child: GestureDetector(
                       onTap: () {
                         showDialog(
-                          barrierColor: Color(0x0f180245),
+                          barrierColor: AppColors.tolopea.withOpacity(0.06),
                           barrierDismissible: false,
                           context: context,
                           builder: (BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_final_screen.dart';
 import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
 import 'package:defi_wallet/screens/ledger/loaders/ledger_auth_loader_screen.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/dotted_tab.dart';
@@ -121,7 +122,7 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
 
                                   if (usbSupported > 0) {
                                     await showDialog(
-                                      barrierColor: Color(0x0f180245),
+                                      barrierColor: AppColors.tolopea.withOpacity(0.06),
                                       barrierDismissible: false,
                                       context: context,
                                       builder: (BuildContext dialogContext) {

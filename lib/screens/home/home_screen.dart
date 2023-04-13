@@ -125,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen>
                   appBar: NewMainAppBar(
                     isShowLogo: true,
                   ),
-                  drawerScrimColor: Color(0x0f180245),
+                  drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                   endDrawer: AccountDrawer(
                     width: buttonSmallWidth,
                   ),

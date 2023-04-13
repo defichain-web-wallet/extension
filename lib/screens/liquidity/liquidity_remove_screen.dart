@@ -140,7 +140,7 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
       ) {
         double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
         return Scaffold(
-          drawerScrimColor: Color(0x0f180245),
+          drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
           endDrawer: AccountDrawer(
             width: buttonSmallWidth,
           ),
