@@ -81,7 +81,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
           appBar: NewMainAppBar(
             isShowLogo: false,
           ),
-          drawerScrimColor: Color(0x0f180245),
+          drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
           endDrawer: AccountDrawer(
             width: buttonSmallWidth,
           ),
@@ -506,7 +506,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
 
                               if (!isLedger) {
                                 showDialog(
-                                  barrierColor: Color(0x0f180245),
+                                  barrierColor: AppColors.tolopea.withOpacity(0.06),
                                   barrierDismissible: false,
                                   context: context,
                                   builder: (BuildContext context1) {
@@ -525,7 +525,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                                 );
                               } else if (isLedger) {
                                 showDialog(
-                                  barrierColor: Color(0x0f180245),
+                                  barrierColor: AppColors.tolopea.withOpacity(0.06),
                                   barrierDismissible: false,
                                   context: context,
                                   builder: (BuildContext context1) {
@@ -615,7 +615,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
       }
 
       showDialog(
-        barrierColor: Color(0x0f180245),
+        barrierColor: AppColors.tolopea.withOpacity(0.06),
         barrierDismissible: false,
         context: context,
         builder: (BuildContext dialogContext) {

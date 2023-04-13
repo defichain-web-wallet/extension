@@ -134,7 +134,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                         accountName: state.activeAccount!.name!,
                                         onEdit: () {
                                           showDialog(
-                                            barrierColor: Color(0x0f180245),
+                                            barrierColor: AppColors.tolopea.withOpacity(0.06),
                                             barrierDismissible: false,
                                             context: context,
                                             builder: (BuildContext context) {
@@ -222,7 +222,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                             callback: (index) {
                                               showDialog(
                                                 barrierColor:
-                                                AppColors.tolopea,
+                                                AppColors.tolopea.withOpacity(0.06),
                                                 barrierDismissible:
                                                 false,
                                                 context: context,

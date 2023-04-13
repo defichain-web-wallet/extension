@@ -8,6 +8,7 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/assets/asset_icon.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -103,19 +104,22 @@ class _AssetCardState extends State<AssetCard> {
                       widget.tokenName,
                       style: Theme.of(context).textTheme.headline5,
                     ),
-                    Text(
-                      tokensHelper.isPair(widget.tokens[widget.index].symbol!)
-                          ? tokensHelper.getSpecificDefiPairName(
-                              widget.tokens[widget.index].name!)
-                          : tokensHelper.getSpecificDefiName(
-                              widget.tokens[widget.index].name!),
-                      style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .color!
-                                .withOpacity(0.3),
-                          ),
+                    TickerText(
+                      child: Text(
+                        tokensHelper.isPair(widget.tokens[widget.index].symbol!)
+                            ? tokensHelper.getSpecificDefiPairName(
+                                widget.tokens[widget.index].name!)
+                            : tokensHelper.getSpecificDefiName(
+                                widget.tokens[widget.index].name!),
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!
+                                  .withOpacity(0.3),
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     )
                   ],
                 ),

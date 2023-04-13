@@ -127,7 +127,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                           .balance!;
                     }
                     return Scaffold(
-                      drawerScrimColor: Color(0x0f180245),
+                      drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                       endDrawer: AccountDrawer(
                         width: buttonSmallWidth,
                       ),
@@ -368,8 +368,9 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                               parent.emitPending(true);
                                               if (widget.isDeposit) {
                                                 showDialog(
-                                                  barrierColor:
-                                                  Color(0x0f180245),
+                                                  barrierColor: AppColors
+                                                      .tolopea
+                                                      .withOpacity(0.06),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
@@ -403,8 +404,9 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                 );
                                               } else {
                                                 showDialog(
-                                                  barrierColor:
-                                                  Color(0x0f180245),
+                                                  barrierColor: AppColors
+                                                      .tolopea
+                                                      .withOpacity(0.06),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
@@ -528,7 +530,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
       );
     }
     showDialog(
-      barrierColor: Color(0x0f180245),
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
       barrierDismissible: false,
       context: context,
       builder: (BuildContext dialogContext) {
@@ -597,7 +599,7 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
     );
     TxErrorModel txResponse = TxErrorModel(isError: !isDepositSuccess);
     showDialog(
-      barrierColor: Color(0x0f180245),
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
       barrierDismissible: false,
       context: context,
       builder: (BuildContext dialogContext) {
