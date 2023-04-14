@@ -1,22 +1,31 @@
+const oceanDefichainApi = 'https://ocean.defichain.com/v0';
+
 let openRequest = indexedDB.open("rates", 1);
 
+async function loadTokens(path, next = 0) {
+    var result
+    var nextLoadedTokens = []
+    var nextPage = next != 0 ? `&next=${next}` : ''
+    var response = await fetch(oceanDefichainApi + `${path}?size=200` + nextPage)
+        .then((response) => response.json())
+
+    if (response.hasOwnProperty('page')) {
+        var next = response.page.next
+        nextLoadedTokens = await loadTokens(path, next)
+    }
+    return [...response['data'], ...nextLoadedTokens]
+}
+
+
 async function setupRates() {
-    var tokensMainnetResponse = await fetch('https://ocean.defichain.com/v0/mainnet/tokens?size=200')
-        .then((response) => {
-            return response.json();
-        });
-    var tokensTestnetResponse = await fetch('https://ocean.defichain.com/v0/testnet/tokens?size=200')
-        .then((response) => {
-            return response.json();
-        });
-    var poolpairsMainnetResponse = await fetch('https://ocean.defichain.com/v0/mainnet/poolpairs?size=200')
-        .then((response) => {
-            return response.json();
-        });
-    var poolpairsTestnetResponse = await fetch('https://ocean.defichain.com/v0/testnet/poolpairs?size=200')
-        .then((response) => {
-            return response.json();
-        });
+    var tokensMainnetData = await loadTokens('/mainnet/tokens')
+
+    var tokensTestnetData = await loadTokens('/testnet/tokens')
+
+    var poolpairsMainnetData = await loadTokens('/mainnet/poolpairs')
+
+    var poolpairsTestnetData = await loadTokens('/testnet/poolpairs')
+
     var ratesResponse = await fetch('https://api.exchangerate.host/latest?base=USD')
         .then((response) => {
             return response.json();
@@ -29,19 +38,19 @@ async function setupRates() {
 
     let tokensMainnet = {
         key: 'tokensMainnet',
-        data: JSON.stringify(tokensMainnetResponse["data"])
+        data: JSON.stringify(tokensMainnetData)
     };
     let tokensTestnet = {
         key: 'tokensTestnet',
-        data: JSON.stringify(tokensTestnetResponse["data"])
+        data: JSON.stringify(tokensTestnetData)
     };
     let poolpairsMainnet = {
         key: 'poolpairsMainnet',
-        data: JSON.stringify(poolpairsMainnetResponse["data"])
+        data: JSON.stringify(poolpairsMainnetData)
     };
     let poolpairsTestnet = {
         key: 'poolpairsTestnet',
-        data: JSON.stringify(poolpairsTestnetResponse["data"])
+        data: JSON.stringify(poolpairsTestnetData)
     };
     let ratesTestnet = {
         key: 'rates',
