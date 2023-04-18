@@ -145,8 +145,8 @@ class _WalletCheckerState extends State<WalletChecker> {
               context,
               PageRouteBuilder(
                 pageBuilder: (context, animation1, animation2) =>
-                    // ThemeChecker(WelcomeScreen()),
-                    ThemeChecker(UiKit()),
+                    ThemeChecker(WelcomeScreen()),
+                    // ThemeChecker(UiKit()),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),

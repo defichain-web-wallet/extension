@@ -37,11 +37,13 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
         backgroundColor: isDarkTheme()
-            ? DarkColors.scaffoldContainerBgColor
-            : LightColors.scaffoldContainerBgColor,
+            ? DarkColors.drawerBgColor
+            : LightColors.drawerBgColor,
         insetPadding: EdgeInsets.all(24),
         shape: RoundedRectangleBorder(
-          side: BorderSide.none,
+          side: isDarkTheme()
+              ? BorderSide(color: DarkColors.drawerBorderColor)
+              : BorderSide.none,
           borderRadius: BorderRadius.circular(20),
         ),
         actionsPadding: EdgeInsets.only(
