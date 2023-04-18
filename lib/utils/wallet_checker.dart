@@ -10,6 +10,7 @@ import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/screens/ui_kit.dart';
 import 'package:defi_wallet/services/storage_service.dart';
 import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -144,7 +145,8 @@ class _WalletCheckerState extends State<WalletChecker> {
               context,
               PageRouteBuilder(
                 pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(WelcomeScreen()),
+                    // ThemeChecker(WelcomeScreen()),
+                    ThemeChecker(UiKit()),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),

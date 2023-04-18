@@ -12,6 +12,7 @@ class TokenListTile extends StatefulWidget {
   final bool isConfirm;
   final String tokenName;
   final String availableTokenName;
+  final Widget? customContent;
 
   const TokenListTile({
     Key? key,
@@ -21,6 +22,7 @@ class TokenListTile extends StatefulWidget {
     this.isConfirm = false,
     required this.tokenName,
     required this.availableTokenName,
+    this.customContent,
   }) : super(key: key);
 
   @override
@@ -67,6 +69,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        if(widget.customContent == null)
                         Row(
                           children: [
                             SizedBox(
@@ -108,6 +111,8 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                             ),
                           ],
                         ),
+                        if(widget.customContent != null)
+                          widget.customContent!,
                       ],
                     ),
                   ),
