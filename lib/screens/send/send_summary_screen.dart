@@ -607,6 +607,15 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
             return TxStatusDialog(
               txResponse: txResponse,
               callbackOk: () async {
+                if (callbackOk != null) {
+                  callbackOk();
+                }
+                if (!txResponse.isError!) {
+                  TransactionCubit transactionCubit =
+                  BlocProvider.of<TransactionCubit>(context);
+
+                  transactionCubit.setOngoingTransaction(txResponse);
+                }
                 Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
@@ -685,6 +694,12 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
           callbackOk: () {
             if (callbackOk != null) {
               callbackOk();
+            }
+            if (!txResponse!.isError!) {
+              TransactionCubit transactionCubit =
+              BlocProvider.of<TransactionCubit>(context);
+
+              transactionCubit.setOngoingTransaction(txResponse);
             }
             Navigator.pushReplacement(
               context,
