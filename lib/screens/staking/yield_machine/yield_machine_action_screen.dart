@@ -525,7 +525,8 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
         lockAccessToken,
         stakingId,
         double.parse(controller.text.replaceAll(',', '')),
-        txResponse.txLoaderList!.last.txId!,
+        txResponse.txLoaderList!.first.txId!,  // TODO: use last tx
+        asset: token,
       );
     }
     showDialog(

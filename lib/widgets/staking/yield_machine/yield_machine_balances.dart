@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/models/lock_balance_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -93,7 +94,7 @@ class YieldMachineBalance extends StatelessWidget {
                     ),
                     if (state.availableBalances[index].pendingDeposits != 0) ...[
                       SizedBox(
-                        height: 16,
+                        height: 8,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -111,9 +112,7 @@ class YieldMachineBalance extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${state.availableBalances[index].pendingDeposits == 0 ? '' : '+'}'
-                                '${state.availableBalances[index].pendingDeposits}'
-                                ' ${state.availableBalances[index].asset}',
+                            getFormatPendingDetails(state.availableBalances[index], true),
                             style: Theme.of(context).textTheme.headline6!.copyWith(
                               fontSize: 16,
                               color: Theme.of(context)
@@ -144,9 +143,7 @@ class YieldMachineBalance extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${state.availableBalances[index].pendingWithdrawals == 0 ? '' : '-'}'
-                                '${state.availableBalances[index].pendingWithdrawals}'
-                                ' ${state.availableBalances[index].asset}',
+                            getFormatPendingDetails(state.availableBalances[index], false),
                             style: Theme.of(context).textTheme.headline6!.copyWith(
                               fontSize: 16,
                               color: Theme.of(context)
@@ -171,5 +168,11 @@ class YieldMachineBalance extends StatelessWidget {
         );
       },
     );
+  }
+
+  String getFormatPendingDetails(LockBalanceModel el, bool isDeposit) {
+    String prefix = isDeposit ? '+' : '-';
+    double amount = isDeposit ? el.pendingDeposits! : el.pendingWithdrawals!;
+      return '$prefix$amount ${el.asset}';
   }
 }

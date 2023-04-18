@@ -38,7 +38,10 @@ class LockState extends Equatable {
       this.lockStrategy == LockStrategyList.LiquidityMining;
 
   List<LockBalanceModel> get availableBalances => lockStakingDetails!.balances!
-      .where((element) => element.balance! != 0)
+      .where((element) =>
+          element.balance! != 0 ||
+          element.pendingDeposits != 0 ||
+          element.pendingWithdrawals != 0)
       .toList();
 
   LockState copyWith({
