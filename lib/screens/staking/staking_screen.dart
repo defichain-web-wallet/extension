@@ -37,6 +37,8 @@ class StakingScreen extends StatefulWidget {
 class _StakingScreenState extends State<StakingScreen>
     with ThemeMixin, SnackBarMixin {
   final String titleText = 'Staking';
+  final String headerTextStaking = 'DFI Staking by LOCK';
+  final String headerTextYieldMachine = 'Yield Machine by LOCK';
   bool isEdit = false;
   bool isFirstBuild = true;
   TextEditingController controller = TextEditingController();
@@ -124,7 +126,7 @@ class _StakingScreenState extends State<StakingScreen>
                                           CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          'DFI Staking by LOCK',
+                                          !lockState.isYieldMachine ? headerTextStaking : headerTextYieldMachine,
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -136,20 +138,8 @@ class _StakingScreenState extends State<StakingScreen>
                                           height: 4,
                                         ),
                                         Text(
-                                          '${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apy! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% APY / '
-                                          '${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apr! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% APR',
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')} / '
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apr!, 'APR')}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -586,53 +576,23 @@ class _StakingScreenState extends State<StakingScreen>
                                         width: 156,
                                         height: 43,
                                         child: AccentButton(
-                                          label: 'Deposit',
+                                          label: 'Withdrawal',
                                           callback: () {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    YieldMachineActionScreen(
-                                                  isDeposit: true,
-                                                ),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 156,
-                                        height: 43,
-                                        child: NewPrimaryButton(
-                                          title: 'Withdrawal',
-                                          callback: () {
-                                            if (lockState.lockStakingDetails!
-                                                    .balances![0].balance! >
-                                                0) {
+                                            if (lockState.availableBalances.length != 0) {
                                               Navigator.push(
                                                 context,
                                                 PageRouteBuilder(
                                                   pageBuilder: (context,
-                                                          animation1,
-                                                          animation2) =>
+                                                      animation1,
+                                                      animation2) =>
                                                       YieldMachineActionScreen(
-                                                    isDeposit: false,
-                                                    isShowDepositAddress: lockState
-                                                            .lockStakingDetails!
-                                                            .balances![0]
-                                                            .balance! >
-                                                        0,
-                                                  ),
+                                                        isDeposit: false,
+                                                        isShowDepositAddress: lockState.availableBalances.length != 0,
+                                                      ),
                                                   transitionDuration:
-                                                      Duration.zero,
+                                                  Duration.zero,
                                                   reverseTransitionDuration:
-                                                      Duration.zero,
+                                                  Duration.zero,
                                                 ),
                                               );
                                             } else {
@@ -644,10 +604,34 @@ class _StakingScreenState extends State<StakingScreen>
                                                 prefix: Icon(
                                                   Icons.close,
                                                   color:
-                                                      AppColors.txStatusError,
+                                                  AppColors.txStatusError,
                                                 ),
                                               );
                                             }
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 156,
+                                        height: 43,
+                                        child: NewPrimaryButton(
+                                          title: 'Deposit',
+                                          callback: () {
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context,
+                                                    animation1,
+                                                    animation2) =>
+                                                    YieldMachineActionScreen(
+                                                      isDeposit: true,
+                                                    ),
+                                                transitionDuration:
+                                                Duration.zero,
+                                                reverseTransitionDuration:
+                                                Duration.zero,
+                                              ),
+                                            );
                                           },
                                         ),
                                       )
@@ -679,5 +663,13 @@ class _StakingScreenState extends State<StakingScreen>
         );
       },
     );
+  }
+  String getAprOrApyFormat(double amount, String amountType){
+    return '${BalancesHelper().numberStyling(
+      (amount *
+        100),
+    fixed: true,
+    fixedCount: 2,
+    )}% $amountType';
   }
 }

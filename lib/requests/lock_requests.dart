@@ -136,8 +136,9 @@ class LockRequests {
     String accessToken,
     int stakingId,
     double amount,
-    String txId,
-  ) async {
+    String txId, {
+    String asset = 'DFI',
+  }) async {
     try {
       final Uri url =
           Uri.parse('$lockHost/v1/staking/$stakingId/deposit');
@@ -149,7 +150,7 @@ class LockRequests {
       final body = jsonEncode({
         'amount': amount,
         'txId': txId,
-        'asset': 'DFI', // TODO: remove 'DFI' and implement token selector
+        'asset': asset,
       });
 
       final response = await http.post(url, headers: headers, body: body);
@@ -166,8 +167,11 @@ class LockRequests {
   }
 
   Future<LockWithdrawModel?> requestWithdraw(
-      String accessToken, int stakingId, double amount,
-      {String token = 'DFI'}) async {
+    String accessToken,
+    int stakingId,
+    double amount, {
+    String token = 'DFI',
+  }) async {
     try {
       final Uri url =
           Uri.parse('$lockHost/v1/staking/$stakingId/withdrawal');
@@ -178,7 +182,7 @@ class LockRequests {
       };
       final body = jsonEncode({
         'amount': amount,
-        'asset': token, // TODO: remove 'DFI' and implement token selector
+        'asset': token,
       });
 
       final response = await http.post(url, headers: headers, body: body);
