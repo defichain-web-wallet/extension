@@ -1,9 +1,11 @@
 import 'package:defi_wallet/helpers/balances_helper.dart';
 
-mixin BalanceHelperMixin {
+enum FormatNumberType {fiat, btc}
+
+mixin FormatMixin {
   final BalancesHelper balancesHelper = BalancesHelper();
 
-  String numberStyling(double number, String type) {
+  String formatNumberStyling(double number, FormatNumberType type) {
     return balancesHelper.numberStyling(number, type: type);
   }
 }

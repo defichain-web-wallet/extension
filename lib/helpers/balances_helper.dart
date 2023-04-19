@@ -1,4 +1,5 @@
 import 'package:basic_utils/basic_utils.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_balance_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
@@ -115,7 +116,7 @@ class BalancesHelper {
   }
 
   String numberStyling(double number,
-      {bool fixed = false, int fixedCount = 2, String? type}) {
+      {bool fixed = false, int fixedCount = 2, FormatNumberType? type}) {
     if (type == null) {
       const double minAmountByFixed = 0.0001;
       int _fixedCount = fixedCount;
@@ -142,9 +143,9 @@ class BalancesHelper {
       return stringList.join('.');
     } else
       switch (type) {
-        case 'fiat':
+        case FormatNumberType.fiat:
           return numberStyling(number, fixedCount: 2, fixed: true);
-        case 'btc':
+        case FormatNumberType.btc:
           return numberStyling(number, fixedCount: 6, fixed: true);
         default:
           return numberStyling(number);
