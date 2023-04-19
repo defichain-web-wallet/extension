@@ -145,7 +145,7 @@ class BalancesHelper {
       switch (type) {
         case FormatNumberType.fiat:
           return numberStyling(number, fixedCount: 2, fixed: true);
-        case FormatNumberType.btc:
+        case FormatNumberType.crypto:
           return numberStyling(number, fixedCount: 6, fixed: true);
         default:
           return numberStyling(number);

@@ -35,7 +35,7 @@ class _BalanceTextState extends State<BalanceText> with FormatMixin {
     } else if (widget.assetName == 'EUR') {
       return '€' + roundedPart.split('.')[0] + '.';
     } else {
-      return formatNumberStyling(totalBalance, FormatNumberType.btc) +
+      return formatNumberStyling(totalBalance, type: FormatNumberType.crypto) +
           ' ';
     }
   }
