@@ -5,6 +5,7 @@ import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
+import 'package:flutter/material.dart';
 
 class BalancesHelper {
   static const int COIN = 100000000;
@@ -114,29 +115,40 @@ class BalancesHelper {
   }
 
   String numberStyling(double number,
-      {bool fixed = false, int fixedCount = 2}) {
-    const double minAmountByFixed = 0.0001;
-    int _fixedCount = fixedCount;
-    if (number < minAmountByFixed && number != 0) {
-      _fixedCount = 6;
-    }
+      {bool fixed = false, int fixedCount = 2, String? type}) {
+    if (type == null) {
+      const double minAmountByFixed = 0.0001;
+      int _fixedCount = fixedCount;
+      if (number < minAmountByFixed && number != 0) {
+        _fixedCount = 6;
+      }
 
-    var string = '';
+      var string = '';
 
-    if (number < 0.000001 && !fixed && number != 0) {
-      string = number.toStringAsFixed(8);
-    } else {
-      string = fixed ? number.toStringAsFixed(_fixedCount) : number.toString();
-    }
-    var stringList = string.split('.');
+      if (number < 0.000001 && !fixed && number != 0) {
+        string = number.toStringAsFixed(8);
+      } else {
+        string =
+            fixed ? number.toStringAsFixed(_fixedCount) : number.toString();
+      }
+      var stringList = string.split('.');
 
-    stringList[0] = StringUtils.addCharAtPosition(
-            stringList[0].split('').reversed.join(), ",", 3,
-            repeat: true)
-        .split('')
-        .reversed
-        .join();
-    return stringList.join('.');
+      stringList[0] = StringUtils.addCharAtPosition(
+              stringList[0].split('').reversed.join(), ",", 3,
+              repeat: true)
+          .split('')
+          .reversed
+          .join();
+      return stringList.join('.');
+    } else
+      switch (type) {
+        case 'fiat':
+          return numberStyling(number, fixedCount: 2, fixed: true);
+        case 'btc':
+          return numberStyling(number, fixedCount: 6, fixed: true);
+        default:
+          return numberStyling(number);
+      }
   }
 
   bool isAmountEmpty(String amount) {
