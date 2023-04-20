@@ -29,6 +29,7 @@ class LockState extends Equatable {
   final LockRewardRoutesModel? lockRewardNewRoute;
   final List<LockAssetModel> lockAssets;
   final List<LockAssetModel> assetsByCategories;
+  final int lastEditedRewardIndex;
 
   LockState({
     this.status = LockStatusList.initial,
@@ -40,6 +41,7 @@ class LockState extends Equatable {
     this.lockRewardNewRoute,
     this.lockAssets = const [],
     this.assetsByCategories = const [],
+    this.lastEditedRewardIndex = 0,
   });
 
   @override
@@ -52,6 +54,7 @@ class LockState extends Equatable {
         lockRewardNewRoute,
         lockAssets,
         assetsByCategories,
+        lastEditedRewardIndex,
       ];
 
   bool get isYieldMachine =>
@@ -74,6 +77,7 @@ class LockState extends Equatable {
     LockRewardRoutesModel? lockRewardNewRoute,
     List<LockAssetModel>? lockAssets,
     List<LockAssetModel>? assetsByCategories,
+    int? lastEditedRewardIndex,
   }) {
     return LockState(
       status: status ?? this.status,
@@ -86,6 +90,7 @@ class LockState extends Equatable {
       lockRewardNewRoute: lockRewardNewRoute ?? this.lockRewardNewRoute,
       lockAssets: lockAssets ?? this.lockAssets,
       assetsByCategories: assetsByCategories ?? this.assetsByCategories,
+      lastEditedRewardIndex: lastEditedRewardIndex ?? this.lastEditedRewardIndex,
     );
   }
 }

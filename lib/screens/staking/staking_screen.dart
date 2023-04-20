@@ -43,6 +43,7 @@ class _StakingScreenState extends State<StakingScreen>
   bool isFirstBuild = true;
   TextEditingController controller = TextEditingController();
   late List<TextEditingController> controllers;
+  late List<FocusNode> focusNodes;
   late List<Widget> rewards;
 
   _onSaveRewardRoutes(BuildContext context) {
@@ -82,6 +83,7 @@ class _StakingScreenState extends State<StakingScreen>
                   text: (rewards[index].rewardPercent! * 100).toString()
                 );
               });
+              focusNodes = List.generate(rewards.length, (index) => FocusNode());
               controller.text =
                   '${lockState.lockStakingDetails!.rewardRoutes![0].rewardPercent! * 100}';
               bool isYieldMachine =
@@ -435,6 +437,7 @@ class _StakingScreenState extends State<StakingScreen>
                                             ),
                                             RewardRoutesList(
                                               controllers: controllers,
+                                              focusNodes: focusNodes,
                                               isDisabled: isEdit,
                                             ),
                                           ],

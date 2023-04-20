@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class InvestedField extends StatefulWidget {
   final TextEditingController? controller;
+  final FocusNode focusNode;
   final String? subtitle;
   final String tokenName;
   final String label;
@@ -19,6 +20,7 @@ class InvestedField extends StatefulWidget {
   const InvestedField({
     Key? key,
     required this.tokenName,
+    required this.focusNode,
     required this.label,
     required this.onChange,
     required this.onRemove,
@@ -48,6 +50,7 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
           width: 218,
           padding: const EdgeInsets.only(bottom: 6),
           child: TextFormField(
+            focusNode: widget.focusNode,
             controller: widget.controller,
             readOnly: widget.isDisable,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],

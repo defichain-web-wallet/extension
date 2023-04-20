@@ -6,11 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RewardRoutesList extends StatelessWidget {
   final List<TextEditingController> controllers;
+  final List<FocusNode> focusNodes;
   final bool isDisabled;
 
   const RewardRoutesList({
     Key? key,
     required this.controllers,
+    required this.focusNodes,
     required this.isDisabled,
   }) : super(key: key);
 
@@ -23,6 +25,7 @@ class RewardRoutesList extends StatelessWidget {
         List<LockRewardRoutesModel> rewards =
             lockState.lockStakingDetails!.rewardRoutes!;
 
+        focusNodes[lockState.lastEditedRewardIndex].requestFocus();
         return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,6 +34,7 @@ class RewardRoutesList extends StatelessWidget {
               label: rewards[index].label!,
               tokenName: rewards[index].targetAsset!,
               controller: controllers[index],
+              focusNode: focusNodes[index],
               isDeleteBtn: isDisabled,
               isDisable: !isDisabled,
               isReinvest: rewards[index].label! == 'Reinvest',
@@ -38,11 +42,13 @@ class RewardRoutesList extends StatelessWidget {
                 lockCubit.removeRewardRoute(index);
               },
               onChange: (value) {
-                print(value);
                 if (value.isNotEmpty) {
                   List<double> rewardPercentages =
                   controllers.map((e) => double.parse(e.text) / 100).toList();
-                  lockCubit.updateRewardPercentages(rewardPercentages);
+                  lockCubit.updateRewardPercentages(
+                    rewardPercentages,
+                    index: index,
+                  );
                 }
               },
             );

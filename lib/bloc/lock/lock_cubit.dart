@@ -110,7 +110,7 @@ class LockCubit extends Cubit<LockState> {
     }
   }
 
-  updateRewardPercentages(List<double> values) {
+  updateRewardPercentages(List<double> values, {int index = 0}) {
     double sum = 0;
     LockStakingModel stakingModel = LockStakingModel.fromJson(
       state.lockStakingDetails!.toJson(),
@@ -132,6 +132,7 @@ class LockCubit extends Cubit<LockState> {
 
     emit(state.copyWith(
       lockStakingDetails: stakingModel,
+      lastEditedRewardIndex: index,
     ));
   }
 
