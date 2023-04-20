@@ -12,7 +12,7 @@ import { LedgerTransactionRaw } from "./ledger_tx";
 export class JellyWalletLedger {
 
   async getTransport(): Promise<Transport> {
-    // return await SpeculosTransport.open({ baseURL: "172.21.226.17:5000" });
+    // return await SpeculosTransport.open({ baseURL: "172.30.77.173:5000" });
     return await TransportWebUSB.create();
   }
 

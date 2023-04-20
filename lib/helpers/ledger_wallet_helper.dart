@@ -43,6 +43,8 @@ class LedgerWalletsHelper {
     var path = HDWalletService.derivePath(index);
 
     try {
+      jellyLedgerInit();
+
       var ledgerAddressJson =
           await promiseToFuture<dynamic>(getAddress(path, false));
       var ledgerAddress = jsonDecode(ledgerAddressJson);
