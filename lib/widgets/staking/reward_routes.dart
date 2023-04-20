@@ -25,7 +25,9 @@ class RewardRoutesList extends StatelessWidget {
         List<LockRewardRoutesModel> rewards =
             lockState.lockStakingDetails!.rewardRoutes!;
 
-        focusNodes[lockState.lastEditedRewardIndex].requestFocus();
+        if (lockState.lastEditedRewardIndex > 0) {
+          focusNodes[lockState.lastEditedRewardIndex].requestFocus();
+        }
         return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

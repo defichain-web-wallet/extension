@@ -158,6 +158,7 @@ class LockCubit extends Cubit<LockState> {
 
       emit(state.copyWith(
         status: LockStatusList.success,
+        lastEditedRewardIndex: 0,
       ));
     } catch (_) {
       emit(state.copyWith(
