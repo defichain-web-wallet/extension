@@ -1,17 +1,22 @@
 import 'dart:ui';
 
+import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/input_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class StakingAddAssetDialog extends StatefulWidget {
-  const StakingAddAssetDialog({Key? key}) : super(key: key);
+  final String assetName;
+
+  const StakingAddAssetDialog({
+    Key? key,
+    required this.assetName,
+  }) : super(key: key);
 
   @override
   State<StakingAddAssetDialog> createState() => _StakingAddAssetDialogState();
@@ -29,6 +34,8 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
 
   @override
   Widget build(BuildContext context) {
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
@@ -62,7 +69,14 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
               NewPrimaryButton(
                 width: 104,
                 title: 'Confirm',
-                callback: () {},
+                callback: () {
+                  Navigator.pop(context);
+                  lockCubit.updateLockRewardNewRoute(
+                      address: addressController.text,
+                      label: labelController.text,
+                      isComplete: true
+                  );
+                },
               ),
             ],
           ),
@@ -132,7 +146,7 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
                                 width: 8,
                               ),
                               Text(
-                                'DFI - DeFiChain',
+                                widget.assetName,
                                 style: Theme.of(context)
                                     .textTheme
                                     .headline5!

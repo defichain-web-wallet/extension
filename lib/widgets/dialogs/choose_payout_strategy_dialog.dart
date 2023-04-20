@@ -1,19 +1,27 @@
 import 'dart:ui';
 
+import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/mixins/dialog_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/tokens/widgets/search_field.dart';
+import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/add_token/token_list_tile.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
-import 'package:defi_wallet/widgets/selectors/custom_select_tile.dart';
-import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
+import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ChoosePayoutStrategyDialog extends StatefulWidget {
-  const ChoosePayoutStrategyDialog({Key? key}) : super(key: key);
+  final String assetName;
+
+  const ChoosePayoutStrategyDialog({
+    Key? key,
+    required this.assetName,
+  }) : super(key: key);
 
   @override
   State<ChoosePayoutStrategyDialog> createState() =>
@@ -21,18 +29,16 @@ class ChoosePayoutStrategyDialog extends StatefulWidget {
 }
 
 class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
-    with ThemeMixin {
+    with ThemeMixin, DialogMixin {
   String titleText = 'Choose a payout strategy';
-  String subtitleText = 'Payout asset: dUSD';
-  String currentInvest = 'yield_reinvest';
-  bool isFirstTab = true;
-  bool isSecondTab = false;
-  bool isThirdTab = false;
-  int selectIndex = 0;
-  TextEditingController searchController = TextEditingController();
+  String subtitleText = 'Payout asset: ';
+  String currentAddress = '';
+  String currentLabel = '';
 
   @override
   Widget build(BuildContext dialogContext) {
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(dialogContext);
+
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
@@ -67,7 +73,23 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
               NewPrimaryButton(
                 width: 104,
                 title: 'Confirm',
-                callback: () {},
+                callback: () {
+                  Navigator.pop(dialogContext);
+                  if (currentAddress == 'other_address') {
+                    showAppDialog(
+                      StakingAddAssetDialog(
+                        assetName: widget.assetName,
+                      ),
+                      dialogContext,
+                    );
+                  } else {
+                    lockCubit.updateLockRewardNewRoute(
+                      address: currentAddress,
+                      label: currentLabel,
+                      isComplete: true
+                    );
+                  }
+                },
               ),
             ],
           ),
@@ -98,7 +120,7 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
                     height: 12,
                   ),
                   Text(
-                    subtitleText,
+                    subtitleText + tokenHelper.getTokenFormat(widget.assetName),
                     style: Theme.of(context).textTheme.headline4!.copyWith(
                         fontSize: 16,
                         color: Theme.of(context).textTheme.headline5!.color),
@@ -130,12 +152,13 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
                           ),
                           TokenListTile(
                             isSingleSelect: true,
-                            isSelect: currentInvest == 'yield_reinvest',
+                            isSelect: currentAddress == lockCubit.state.lockStakingDetails!.depositAddress!,
                             tokenName: '',
+                            isDense: true,
                             availableTokenName: '',
                             onTap: () {
                               setState(() {
-                                currentInvest = 'yield_reinvest';
+                                currentAddress = lockCubit.state.lockStakingDetails!.depositAddress!;
                               });
                             },
                             customContent: Row(
@@ -178,94 +201,128 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
                           SizedBox(
                             height: 8,
                           ),
-                          Column(
-                            children: List.generate(
-                              10,
-                              (index) {
-                                if (index < 9)
-                                  return Column(
-                                    children: [
-                                      TokenListTile(
-                                        isSingleSelect: true,
-                                        isSelect:
-                                            currentInvest == 'account_$index',
-                                        tokenName: '',
-                                        availableTokenName: '',
-                                        onTap: () {
-                                          setState(() {
-                                            currentInvest = 'account_$index';
-                                          });
-                                        },
-                                        customContent: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 16,
-                                            ),
-                                            SvgPicture.asset(
-                                                'assets/icons/yield_icon.svg'),
-                                            SizedBox(
-                                              width: 8,
-                                            ),
-                                            Text(
-                                              'Account ${index + 1}',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline5!
-                                                  .copyWith(
+                          BlocBuilder<AccountCubit, AccountState>(
+                            builder: (context, state) {
+                              return Column(
+                                children: List.generate(
+                                  state.accounts!.length + 1,
+                                      (index) {
+                                    if (index < state.accounts!.length)
+                                      return Column(
+                                        children: [
+                                          TokenListTile(
+                                            isSingleSelect: true,
+                                            isSelect:
+                                            currentAddress == state.accounts![index].addressList![0].address,
+                                            tokenName: '',
+                                            availableTokenName: '',
+                                            onTap: () {
+                                              setState(() {
+                                                currentLabel = state.accounts![index].name!;
+                                                currentAddress = state.accounts![index].addressList![0].address!;
+                                              });
+                                            },
+                                            customContent: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 16,
+                                                ),
+                                                Container(
+                                                  width: 25,
+                                                  height: 25,
+                                                  padding: const EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: AppTheme.iconButtonBackground,
+                                                  ),
+                                                  child: SvgPicture.asset(
+                                                    'assets/icons/account_icon.svg',
+                                                    width: 25 / 2,
+                                                    height: 25 / 2,
+                                                    color: isDarkTheme()
+                                                        ? Colors.white
+                                                        : null,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 8,
+                                                ),
+                                                Text(
+                                                  state.accounts![index].name!,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5!
+                                                      .copyWith(
                                                     fontSize: 16,
                                                   ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                    ],
-                                  );
-                                else
-                                  return Column(
-                                    children: [
-                                      TokenListTile(
-                                        isSingleSelect: true,
-                                        isSelect:
-                                            currentInvest == 'other_address',
-                                        tokenName: '',
-                                        availableTokenName: '',
-                                        onTap: () {
-                                          setState(() {
-                                            currentInvest = 'other_address';
-                                          });
-                                        },
-                                        customContent: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 16,
-                                            ),
-                                            SvgPicture.asset(
-                                                'assets/icons/yield_icon.svg'),
-                                            SizedBox(
-                                              width: 8,
-                                            ),
-                                            Text(
-                                              'Other DeFiChain address',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline5!
-                                                  .copyWith(
+                                          ),
+                                          SizedBox(
+                                            height: 8,
+                                          ),
+                                        ],
+                                      );
+                                    else
+                                      return Column(
+                                        children: [
+                                          TokenListTile(
+                                            isSingleSelect: true,
+                                            isSelect: currentAddress == 'other_address',
+                                            tokenName: '',
+                                            availableTokenName: '',
+                                            onTap: () {
+                                              setState(() {
+                                                currentAddress = 'other_address';
+                                              });
+                                            },
+                                            customContent: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 16,
+                                                ),
+                                                Container(
+                                                  width: 25,
+                                                  height: 25,
+                                                  padding: const EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: AppTheme.iconButtonBackground,
+                                                  ),
+                                                  child: SvgPicture.asset(
+                                                    'assets/icons/account_icon.svg',
+                                                    width: 25 / 2,
+                                                    height: 25 / 2,
+                                                    color: isDarkTheme()
+                                                        ? Colors.white
+                                                        : null,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 8,
+                                                ),
+                                                Text(
+                                                  'Other DeFiChain address',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline5!
+                                                      .copyWith(
                                                     fontSize: 16,
                                                   ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                    ],
-                                  );
-                              },
-                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 8,
+                                          ),
+                                        ],
+                                      );
+                                  },
+                                ),
+                              );
+                            }
                           ),
                         ],
                       ),

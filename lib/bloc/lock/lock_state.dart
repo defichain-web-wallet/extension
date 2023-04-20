@@ -10,19 +10,36 @@ enum LockStrategyList {
   String toString() => this.name;
 }
 
+enum LockAssetCryptoCategory {
+  Crypto,
+  PoolPair,
+  Stock;
+
+  @override
+  String toString() => this.name;
+}
+
 class LockState extends Equatable {
   final LockStatusList status;
   final LockStrategyList lockStrategy;
+  final LockAssetCryptoCategory lockActiveAssetCategory;
   final LockUserModel? lockUserDetails;
   final LockStakingModel? lockStakingDetails;
   final LockAnalyticsModel? lockAnalyticsDetails;
+  final LockRewardRoutesModel? lockRewardNewRoute;
+  final List<LockAssetModel> lockAssets;
+  final List<LockAssetModel> assetsByCategories;
 
   LockState({
     this.status = LockStatusList.initial,
     this.lockStrategy = LockStrategyList.Masternode,
+    this.lockActiveAssetCategory = LockAssetCryptoCategory.Stock,
     this.lockUserDetails,
     this.lockStakingDetails,
     this.lockAnalyticsDetails,
+    this.lockRewardNewRoute,
+    this.lockAssets = const [],
+    this.assetsByCategories = const [],
   });
 
   @override
@@ -32,6 +49,9 @@ class LockState extends Equatable {
         lockUserDetails,
         lockStakingDetails,
         lockAnalyticsDetails,
+        lockRewardNewRoute,
+        lockAssets,
+        assetsByCategories,
       ];
 
   bool get isYieldMachine =>
@@ -47,16 +67,25 @@ class LockState extends Equatable {
   LockState copyWith({
     LockStatusList? status,
     LockStrategyList? lockStrategy,
+    LockAssetCryptoCategory? lockActiveAssetCategory,
     LockUserModel? lockUserDetails,
     LockStakingModel? lockStakingDetails,
     LockAnalyticsModel? lockAnalyticsDetails,
+    LockRewardRoutesModel? lockRewardNewRoute,
+    List<LockAssetModel>? lockAssets,
+    List<LockAssetModel>? assetsByCategories,
   }) {
     return LockState(
       status: status ?? this.status,
       lockStrategy: lockStrategy ?? this.lockStrategy,
+      lockActiveAssetCategory:
+          lockActiveAssetCategory ?? this.lockActiveAssetCategory,
       lockUserDetails: lockUserDetails ?? this.lockUserDetails,
       lockStakingDetails: lockStakingDetails ?? this.lockStakingDetails,
       lockAnalyticsDetails: lockAnalyticsDetails ?? this.lockAnalyticsDetails,
+      lockRewardNewRoute: lockRewardNewRoute ?? this.lockRewardNewRoute,
+      lockAssets: lockAssets ?? this.lockAssets,
+      assetsByCategories: assetsByCategories ?? this.assetsByCategories,
     );
   }
 }

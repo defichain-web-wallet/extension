@@ -4,20 +4,20 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/lock_reward_routes_model.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
 import 'package:defi_wallet/screens/staking/yield_machine/yield_machine_action_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/common/app_tooltip.dart';
-import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/invested_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/staking/reward_icon.dart';
+import 'package:defi_wallet/widgets/staking/reward_routes.dart';
 import 'package:defi_wallet/widgets/staking/staking_tabs.dart';
 import 'package:defi_wallet/widgets/staking/yield_machine/yield_machine_balances.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -45,6 +45,20 @@ class _StakingScreenState extends State<StakingScreen>
   late List<TextEditingController> controllers;
   late List<Widget> rewards;
 
+  _onSaveRewardRoutes(BuildContext context) {
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
+    lockCubit.updateRewardRoutes(
+      accountCubit
+          .state.accounts!.first,
+      lockCubit.state.lockStakingDetails!.rewardRoutes!,
+    );
+    setState(() {
+      isEdit = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
@@ -62,6 +76,12 @@ class _StakingScreenState extends State<StakingScreen>
         return BlocBuilder<LockCubit, LockState>(
           builder: (lockContext, lockState) {
             if (lockState.status == LockStatusList.success) {
+              List<LockRewardRoutesModel> rewards = lockState.lockStakingDetails!.rewardRoutes!;
+              controllers = List.generate(rewards.length, (index) {
+                return TextEditingController(
+                  text: (rewards[index].rewardPercent! * 100).toString()
+                );
+              });
               controller.text =
                   '${lockState.lockStakingDetails!.rewardRoutes![0].rewardPercent! * 100}';
               bool isYieldMachine =
@@ -126,7 +146,9 @@ class _StakingScreenState extends State<StakingScreen>
                                           CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          !lockState.isYieldMachine ? headerTextStaking : headerTextYieldMachine,
+                                          !lockState.isYieldMachine
+                                              ? headerTextStaking
+                                              : headerTextYieldMachine,
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -398,84 +420,22 @@ class _StakingScreenState extends State<StakingScreen>
                                                         fontSize: 16,
                                                       ),
                                                 ),
-                                                Container(
-                                                  width: 32,
-                                                  height: 32,
-                                                  child: Center(
-                                                    child: isEdit
-                                                        ? NewActionButton(
-                                                            isStaticColor: true,
-                                                            bgGradient:
-                                                                gradientActionButtonBg,
-                                                            iconPath:
-                                                                'assets/icons/add.svg',
-                                                            onPressed: () {
-                                                              showDialog(
-                                                                barrierColor: Color(
-                                                                    0x0f180245),
-                                                                barrierDismissible:
-                                                                    false,
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return StakingAddAssetDialog();
-                                                                },
-                                                              );
-                                                            },
-                                                          )
-                                                        : AppTooltip(
-                                                            message:
-                                                                'Coming soon',
-                                                            margin: 0,
-                                                            child:
-                                                                GestureDetector(
-                                                              onTap: () {
-                                                                // TODO: need to uncomment later
-                                                                // setState(() {
-                                                                //   isEdit = true;
-                                                                // });
-                                                              },
-                                                              child:
-                                                                  MouseRegion(
-                                                                cursor:
-                                                                    SystemMouseCursors
-                                                                        .click,
-                                                                child:
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                  'assets/icons/edit_gradient.svg',
-                                                                  color:
-                                                                      AppColors
-                                                                          .grey,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                  ),
+                                                RewardIcon(
+                                                  readonly: isEdit,
+                                                  onTap: (value) {
+                                                    setState(() {
+                                                      isEdit = value;
+                                                    });
+                                                  },
                                                 ),
                                               ],
                                             ),
                                             SizedBox(
                                               height: 12,
                                             ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                InvestedField(
-                                                  label:
-                                                      '${lockState.lockStakingDetails!.rewardRoutes![0].label}',
-                                                  tokenName:
-                                                      '${lockState.lockStakingDetails!.rewardRoutes![0].targetAsset}',
-                                                  controller: controller,
-                                                  isDeleteBtn: false,
-                                                  isDisable: !isEdit,
-                                                ),
-                                              ],
+                                            RewardRoutesList(
+                                              controllers: controllers,
+                                              isDisabled: isEdit,
                                             ),
                                           ],
                                         ),
@@ -553,18 +513,15 @@ class _StakingScreenState extends State<StakingScreen>
                                             NewPrimaryButton(
                                               width: 140,
                                               title: 'Save',
-                                              callback: () {
-                                                setState(() {
-                                                  isEdit = false;
-                                                });
-                                              },
+                                              callback: () =>
+                                                  _onSaveRewardRoutes(context),
                                             )
                                           ],
                                         ),
                                     ],
                                   ),
                                 ),
-                                if (lockState.isYieldMachine  && !isEdit) ...[
+                                if (lockState.isYieldMachine && !isEdit) ...[
                                   SizedBox(
                                     height: 16,
                                   ),
@@ -578,21 +535,27 @@ class _StakingScreenState extends State<StakingScreen>
                                         child: AccentButton(
                                           label: 'Withdrawal',
                                           callback: () {
-                                            if (lockState.availableBalances.length != 0) {
+                                            if (lockState
+                                                    .availableBalances.length !=
+                                                0) {
                                               Navigator.push(
                                                 context,
                                                 PageRouteBuilder(
                                                   pageBuilder: (context,
-                                                      animation1,
-                                                      animation2) =>
+                                                          animation1,
+                                                          animation2) =>
                                                       YieldMachineActionScreen(
-                                                        isDeposit: false,
-                                                        isShowDepositAddress: lockState.availableBalances.length != 0,
-                                                      ),
+                                                    isDeposit: false,
+                                                    isShowDepositAddress:
+                                                        lockState
+                                                                .availableBalances
+                                                                .length !=
+                                                            0,
+                                                  ),
                                                   transitionDuration:
-                                                  Duration.zero,
+                                                      Duration.zero,
                                                   reverseTransitionDuration:
-                                                  Duration.zero,
+                                                      Duration.zero,
                                                 ),
                                               );
                                             } else {
@@ -604,7 +567,7 @@ class _StakingScreenState extends State<StakingScreen>
                                                 prefix: Icon(
                                                   Icons.close,
                                                   color:
-                                                  AppColors.txStatusError,
+                                                      AppColors.txStatusError,
                                                 ),
                                               );
                                             }
@@ -621,15 +584,15 @@ class _StakingScreenState extends State<StakingScreen>
                                               context,
                                               PageRouteBuilder(
                                                 pageBuilder: (context,
-                                                    animation1,
-                                                    animation2) =>
+                                                        animation1,
+                                                        animation2) =>
                                                     YieldMachineActionScreen(
-                                                      isDeposit: true,
-                                                    ),
+                                                  isDeposit: true,
+                                                ),
                                                 transitionDuration:
-                                                Duration.zero,
+                                                    Duration.zero,
                                                 reverseTransitionDuration:
-                                                Duration.zero,
+                                                    Duration.zero,
                                               ),
                                             );
                                           },
@@ -664,12 +627,12 @@ class _StakingScreenState extends State<StakingScreen>
       },
     );
   }
-  String getAprOrApyFormat(double amount, String amountType){
+
+  String getAprOrApyFormat(double amount, String amountType) {
     return '${BalancesHelper().numberStyling(
-      (amount *
-        100),
-    fixed: true,
-    fixedCount: 2,
+      (amount * 100),
+      fixed: true,
+      fixedCount: 2,
     )}% $amountType';
   }
 }

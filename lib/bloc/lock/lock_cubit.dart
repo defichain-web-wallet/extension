@@ -2,7 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/lock_analytics_model.dart';
+import 'package:defi_wallet/models/lock_asset_model.dart';
 import 'package:defi_wallet/models/lock_balance_model.dart';
+import 'package:defi_wallet/models/lock_reward_routes_model.dart';
 import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
 import 'package:defi_wallet/requests/lock_requests.dart';
@@ -32,6 +34,166 @@ class LockCubit extends Cubit<LockState> {
     loadStakingDetails(account, needKycDetails: true);
   }
 
+  updateLockAssetCategory(
+    LockAssetCryptoCategory value, {
+    List<LockAssetModel>? list,
+  }) {
+    List<LockAssetModel> sourceAssets = list ?? state.lockAssets;
+
+    late List<LockAssetModel> assets;
+    late String targetCategory;
+
+    switch (value) {
+      case LockAssetCryptoCategory.Crypto:
+        targetCategory = LockAssetCryptoCategory.Crypto.toString();
+        break;
+      case LockAssetCryptoCategory.Stock:
+        targetCategory = LockAssetCryptoCategory.Stock.toString();
+        break;
+      case LockAssetCryptoCategory.PoolPair:
+        targetCategory = LockAssetCryptoCategory.PoolPair.toString();
+        break;
+      default:
+        targetCategory = LockAssetCryptoCategory.PoolPair.toString();
+    }
+
+    if (value == LockAssetCryptoCategory.Crypto) {
+      assets = sourceAssets
+          .where((el) => el.category == targetCategory && el.type != "Coin")
+          .toList();
+      // TODO: move here script for swap items in array to /utils
+      var temp = assets.firstWhere((element) => element.name == 'DFI');
+      int index = assets.indexOf(temp);
+      LockAssetModel element = assets.removeAt(index);
+      assets.insert(0, element);
+    } else {
+      assets =
+          sourceAssets.where((el) => el.category == targetCategory).toList();
+    }
+    emit(state.copyWith(
+      assetsByCategories: assets,
+      lockActiveAssetCategory: value,
+      lockRewardNewRoute: LockRewardRoutesModel(
+        targetAsset: assets[0].name,
+      ),
+    ));
+  }
+
+  updateLockRewardNewRoute({
+    String? asset,
+    String? address,
+    String? label,
+    double? percent,
+    bool isComplete = false,
+  }) {
+    LockRewardRoutesModel reward = state.lockRewardNewRoute!;
+    emit(state.copyWith(
+      lockRewardNewRoute: LockRewardRoutesModel(
+        targetAsset: asset ?? reward.targetAsset,
+        targetAddress: address ?? reward.targetAddress,
+        label: label ?? reward.label,
+        targetBlockchain: 'DeFiChain',
+        rewardPercent: percent ?? reward.rewardPercent,
+        id: 0,
+      ),
+    ));
+
+    if (isComplete) {
+      LockStakingModel stakingModel = state.lockStakingDetails!;
+      stakingModel.rewardRoutes = [
+        ...stakingModel.rewardRoutes!,
+        state.lockRewardNewRoute!
+      ];
+      emit(state.copyWith(
+        lockStakingDetails: stakingModel,
+      ));
+    }
+  }
+
+  updateRewardPercentages(List<double> values) {
+    double sum = 0;
+    LockStakingModel stakingModel = LockStakingModel.fromJson(
+      state.lockStakingDetails!.toJson(),
+      reinvest: false,
+    );
+
+    for (int i = 0; i < values.length; i++) {
+      stakingModel.rewardRoutes![i].rewardPercent = values[i];
+      if (stakingModel.rewardRoutes![i].label != 'Reinvest') {
+        sum += values[i];
+      }
+    }
+    double reinvestPercent = 1 - sum;
+
+    var reinvest = stakingModel.rewardRoutes!
+        .firstWhere((element) => element.label == 'Reinvest');
+
+    reinvest.rewardPercent = reinvestPercent;
+
+    emit(state.copyWith(
+      lockStakingDetails: stakingModel,
+    ));
+  }
+
+  updateRewardRoutes(
+    AccountModel account,
+    List<LockRewardRoutesModel> rewardRoutes,
+  ) async {
+    emit(state.copyWith(
+      status: LockStatusList.loading,
+    ));
+    try {
+      List<LockRewardRoutesModel> routes = List.from(rewardRoutes);
+      var temp = routes.firstWhere((element) => element.label == 'Reinvest');
+      int index = routes.indexOf(temp);
+      routes.removeAt(index);
+      var rewardRoutesString = routes.map((e) => e.toJson()).toList();
+
+      await lockRequests.updateRewards(
+        account.lockAccessToken!,
+        rewardRoutesString,
+        state.lockStakingDetails!.id!,
+      );
+
+      emit(state.copyWith(
+        status: LockStatusList.success,
+      ));
+    } catch (_) {
+      emit(state.copyWith(
+        status: LockStatusList.failure,
+      ));
+    }
+  }
+
+  updateReinvestRewardRoute() {
+    double sumPercent = state.lockStakingDetails!.rewardRoutes!
+        .map((route) => route.rewardPercent!)
+        .reduce((value, element) => value + element);
+    double reinvestPercent = 1 - sumPercent;
+
+    var reinvest = state.lockStakingDetails!.rewardRoutes!
+        .firstWhere((element) => element.label == 'Reinvest');
+
+    reinvest.rewardPercent = reinvestPercent;
+  }
+
+  removeRewardRoute(int index) {
+    LockStakingModel stakingModel = LockStakingModel.fromJson(
+      state.lockStakingDetails!.toJson(),
+      reinvest: false,
+    );
+    List<LockRewardRoutesModel> routes = stakingModel.rewardRoutes!;
+    routes.removeAt(index);
+
+    List<double> rewardPercentages =
+      routes.map((e) => e.rewardPercent!).toList();
+
+    emit(state.copyWith(
+      lockStakingDetails: stakingModel,
+    ));
+    updateRewardPercentages(rewardPercentages);
+  }
+
   bool checkVerifiedUser({bool isCheckOnlyKycStatus = false}) {
     if (isCheckOnlyKycStatus) {
       return state.lockUserDetails!.kycStatus! == 'Full' ||
@@ -44,13 +206,10 @@ class LockCubit extends Cubit<LockState> {
   }
 
   bool checkValidKycLink() {
-    return state.lockUserDetails!.kycLink ==
-        'https://kyc.lock.space?code=null';
+    return state.lockUserDetails!.kycLink == 'https://kyc.lock.space?code=null';
   }
 
-  Future<String?> signIn(
-      AccountModel account,
-      ECPair keyPair) async {
+  Future<String?> signIn(AccountModel account, ECPair keyPair) async {
     try {
       late String accessToken;
       accessToken = await lockRequests.signIn(account, keyPair);
@@ -111,14 +270,14 @@ class LockCubit extends Cubit<LockState> {
       }
     }
   }
+
   loadKycDetails(AccountModel account) async {
     emit(state.copyWith(
       status: LockStatusList.loading,
     ));
 
     try {
-      LockUserModel? data =
-          await lockRequests.getKYC(account.lockAccessToken!);
+      LockUserModel? data = await lockRequests.getKYC(account.lockAccessToken!);
       emit(state.copyWith(
         status: LockStatusList.success,
         lockUserDetails: data,
@@ -142,14 +301,22 @@ class LockCubit extends Cubit<LockState> {
     try {
       LockUserModel? userData;
       LockAnalyticsModel? analyticsData;
+      List<LockAssetModel>? lockAssets;
       LockStakingModel? stakingData = await lockRequests.getStaking(
         account.lockAccessToken!,
         state.lockStrategy.toString(),
       );
 
+      if (state.lockAssets.isEmpty) {
+        lockAssets = await lockRequests.getAssets(account.lockAccessToken!);
+        updateLockAssetCategory(
+          LockAssetCryptoCategory.Crypto,
+          list: lockAssets,
+        );
+      }
+
       if (needUserDetails) {
-        userData =
-          await lockRequests.getUser(account.lockAccessToken!);
+        userData = await lockRequests.getUser(account.lockAccessToken!);
       }
       if (needKycDetails) {
         analyticsData = await lockRequests.getAnalytics(
@@ -162,6 +329,15 @@ class LockCubit extends Cubit<LockState> {
         lockStakingDetails: stakingData,
         lockUserDetails: userData,
         lockAnalyticsDetails: analyticsData,
+        lockAssets: lockAssets,
+        lockRewardNewRoute: LockRewardRoutesModel(
+          targetAsset: 'DFI',
+          targetBlockchain: 'DeFiChain',
+          label: '',
+          rewardPercent: 0,
+          id: 0,
+          targetAddress: '',
+        ),
       ));
     } catch (err) {
       if (err == '401') {

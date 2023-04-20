@@ -82,19 +82,19 @@ class _UiKitState extends State<UiKit>
               NewPrimaryButton(
                 title: 'First dialog',
                 callback: () {
-                  jellyDialog(SelectPayoutAssetDialog(), context);
+                  showAppDialog(SelectPayoutAssetDialog(), context);
                 },
               ),
               NewPrimaryButton(
                 title: 'Second dialog',
                 callback: (){
-                  jellyDialog(ChoosePayoutStrategyDialog(), context);
+                  showAppDialog(ChoosePayoutStrategyDialog(assetName: 'DFI',), context);
                 },
               ),
               NewPrimaryButton(
                 title: 'Third dialog',
                 callback: (){
-                  jellyDialog(StakingAddAssetDialog(), context);
+                  // showAppDialog(StakingAddAssetDialog(), context);
                 },
               ),
             ],

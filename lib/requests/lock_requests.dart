@@ -3,13 +3,13 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/lock_analytics_model.dart';
+import 'package:defi_wallet/models/lock_asset_model.dart';
 import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
 import 'package:defi_wallet/models/lock_withdraw_model.dart';
 import 'package:defi_wallet/services/lock_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:http/http.dart' as http;
-
 
 class LockRequests {
   LockService lockService = LockService();
@@ -140,8 +140,7 @@ class LockRequests {
     String asset = 'DFI',
   }) async {
     try {
-      final Uri url =
-          Uri.parse('$lockHost/v1/staking/$stakingId/deposit');
+      final Uri url = Uri.parse('$lockHost/v1/staking/$stakingId/deposit');
 
       final headers = {
         'Content-type': 'application/json',
@@ -173,8 +172,7 @@ class LockRequests {
     String token = 'DFI',
   }) async {
     try {
-      final Uri url =
-          Uri.parse('$lockHost/v1/staking/$stakingId/withdrawal');
+      final Uri url = Uri.parse('$lockHost/v1/staking/$stakingId/withdrawal');
 
       final headers = {
         'Content-type': 'application/json',
@@ -199,12 +197,12 @@ class LockRequests {
   }
 
   Future<List<LockWithdrawModel>?> getWithdraws(
-      String accessToken,
-      int stakingId
-      ) async {
+    String accessToken,
+    int stakingId,
+  ) async {
     try {
       final Uri url =
-      Uri.parse('$lockHost/v1/staking/$stakingId/withdrawal/drafts');
+          Uri.parse('$lockHost/v1/staking/$stakingId/withdrawal/drafts');
 
       final headers = {
         'Content-type': 'application/json',
@@ -227,12 +225,14 @@ class LockRequests {
   }
 
   Future<LockWithdrawModel?> changeAmountWithdraw(
-      String accessToken,
-      int stakingId, int withdrawId, double amount
-      ) async {
+    String accessToken,
+    int stakingId,
+    int withdrawId,
+    double amount,
+  ) async {
     try {
-      final Uri url =
-      Uri.parse('$lockHost/v1/staking/$stakingId/withdrawal/$withdrawId/amount');
+      final Uri url = Uri.parse(
+          '$lockHost/v1/staking/$stakingId/withdrawal/$withdrawId/amount');
 
       final headers = {
         'Content-type': 'application/json',
@@ -310,6 +310,49 @@ class LockRequests {
     } catch (_) {
       print(_);
       return null;
+    }
+  }
+
+  Future<List<LockAssetModel>> getAssets(
+    String accessToken,
+  ) async {
+    try {
+      final Uri url = Uri.parse('$lockHost/v1/asset');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final response = await http.get(url, headers: headers);
+      dynamic data = jsonDecode(response.body);
+      return List.generate(
+        data.length,
+        (index) => LockAssetModel.fromJson(data[index]),
+      );
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> updateRewards(
+    String accessToken,
+    dynamic rewardRoutes,
+    int stakingId,
+  ) async {
+    try {
+      final Uri url = Uri.parse('$lockHost/v1/staking/$stakingId/reward-routes');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final body = jsonEncode(rewardRoutes);
+
+      await http.put(url, headers: headers, body: body);
+    } catch (_) {
+      print(_);
     }
   }
 }

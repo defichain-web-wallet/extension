@@ -43,7 +43,7 @@ class LockStakingModel {
     this.minimalDeposits,
   });
 
-  LockStakingModel.fromJson(Map<String, dynamic> json)  {
+  LockStakingModel.fromJson(Map<String, dynamic> json, {bool reinvest = true})  {
     this.id = json["id"];
     this.status = json["status"];
     this.asset = json["asset"];
@@ -56,16 +56,30 @@ class LockStakingModel {
     this.pendingDeposits = json["pendingDeposits"];
     this.pendingWithdrawals = json["pendingWithdrawals"];
     this.rewardsAmount = json["rewardsAmount"];
-    List<LockRewardRoutesModel> rewardRoutes = [];
     this.balances = List.generate(json["balances"].length,
         (index) => LockBalanceModel.fromJson(json["balances"][index]));
-    this.rewardRoutes = [
-      LockRewardRoutesModel(
-        rewardPercent: 1,
-        targetAsset: 'DFI',
-        label: 'Reinvest',
-      )
-    ];
+
+    double sumPercent = json['rewardRoutes']
+        .map((route) => route['rewardPercent'])
+        .reduce((value, element) => value + element);
+    double reinvestPercent = 1 - sumPercent;
+
+    var routes = List.generate(json['rewardRoutes'].length,
+        (index) => LockRewardRoutesModel.fromJson(json['rewardRoutes'][index]));
+
+    if (reinvest) {
+      this.rewardRoutes = [
+        LockRewardRoutesModel(
+          rewardPercent: reinvestPercent,
+          targetAsset: 'DFI',
+          label: 'Reinvest',
+        ),
+        ...routes,
+      ];
+    } else {
+      this.rewardRoutes = routes;
+    }
+
     this.minimalDeposits = List.generate(json["minimalDeposits"].length,
             (index) => LockMinimalDepositsModel.fromJson(json["minimalDeposits"][index]));
   }
