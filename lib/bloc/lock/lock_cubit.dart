@@ -207,8 +207,9 @@ class LockCubit extends Cubit<LockState> {
     String accessToken,
     int stakingId,
     double amount,
-    String txId,
-  ) {
+    String txId, {
+    String asset = 'DFI',
+  }) {
     emit(state.copyWith(
       status: LockStatusList.loading,
     ));
@@ -218,6 +219,7 @@ class LockCubit extends Cubit<LockState> {
         stakingId,
         amount,
         txId,
+        asset: asset,
       );
       emit(state.copyWith(
         status: LockStatusList.success,

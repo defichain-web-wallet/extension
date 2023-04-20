@@ -20,8 +20,12 @@ class LockService {
   }
 
   Future<bool> makeWithdraw(
-      ECPair keyPair, String accessToken, int stakingId, double amount,
-      {String token = 'DFI'}) async {
+    ECPair keyPair,
+    String accessToken,
+    int stakingId,
+    double amount, {
+    String token = 'DFI',
+  }) async {
     LockWithdrawModel? withdrawModel;
 
     var existWithdraws = await LockRequests().getWithdraws(accessToken, stakingId);
