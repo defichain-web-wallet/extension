@@ -59,13 +59,17 @@ class LockStakingModel {
     this.balances = List.generate(json["balances"].length,
         (index) => LockBalanceModel.fromJson(json["balances"][index]));
 
-    double sumPercent = json['rewardRoutes']
-        .map((route) => route['rewardPercent'])
-        .reduce((value, element) => value + element);
-    double reinvestPercent = 1 - sumPercent;
+    List<LockRewardRoutesModel> routes = [];
+    double reinvestPercent = 1;
 
-    var routes = List.generate(json['rewardRoutes'].length,
-        (index) => LockRewardRoutesModel.fromJson(json['rewardRoutes'][index]));
+    if (json['rewardRoutes'].length > 0) {
+      double sumPercent = json['rewardRoutes']
+          .map((route) => route['rewardPercent'])
+          .reduce((value, element) => value + element);
+      reinvestPercent = 1 - sumPercent;
+      routes = List.generate(json['rewardRoutes'].length,
+              (index) => LockRewardRoutesModel.fromJson(json['rewardRoutes'][index]));
+    }
 
     if (reinvest) {
       this.rewardRoutes = [
