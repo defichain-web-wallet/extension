@@ -115,73 +115,79 @@ class BalancesHelper {
     return amount / COIN;
   }
 
-  String numberStyling(double number,
-      {bool fixed = false, int fixedCount = 2, FormatNumberType? type}) {
+  String numberStyling(
+    double number, {
+    bool fixed = false,
+    int fixedCount = 2,
+    FormatNumberType? type,
+  }) {
+    double minNumber = 0.000001;
     if (type == null) {
-      int _fixedCount = fixedCount;
 
-      var string = '';
+      var stringNumber = '';
 
-      if (number < 0.000001 && !fixed && number != 0) {
-        string = number.toStringAsFixed(8);
+      if (number < minNumber && !fixed && number != 0) {
+        stringNumber = number.toStringAsFixed(8);
       } else {
-        string =
-            fixed ? number.toStringAsFixed(_fixedCount) : number.toString();
+        stringNumber =
+            fixed ? number.toStringAsFixed(fixedCount) : number.toString();
       }
-      var stringList = string.split('.');
+      var charNumberList = stringNumber.split('.');
 
-      stringList[0] = StringUtils.addCharAtPosition(
-              stringList[0].split('').reversed.join(), ",", 3,
+      charNumberList.first = StringUtils.addCharAtPosition(
+              charNumberList.first.split('').reversed.join(), ",", 3,
               repeat: true)
           .split('')
           .reversed
           .join();
-      return stringList.join('.');
-    } else
-      switch (type) {
-        case FormatNumberType.fiat:
+      return charNumberList.join('.');
+    } else {
+      return numberSpecificFormat(type, number);
+    }
+  }
+
+  String numberSpecificFormat(FormatNumberType? type, double number,){
+    switch (type) {
+      case FormatNumberType.fiat:
+        return trimTrailingZeros(
+            numberStyling(number, fixedCount: 2, fixed: true),
+            type: FormatNumberType.fiat);
+      case FormatNumberType.crypto:
+        if (number == 0) {
           return trimTrailingZeros(
-              numberStyling(number, fixedCount: 2, fixed: true),
-              type: FormatNumberType.fiat);
-        case FormatNumberType.crypto:
-          if (number == 0) {
-            return trimTrailingZeros(
-                numberStyling(number, fixedCount: 6, fixed: true));
-          } else if (number < 1) {
-            return trimTrailingZeros(
-                numberStyling(number, fixedCount: 6, fixed: true));
-          } else if (number < 10 && number >= 1) {
-            return trimTrailingZeros(
-                numberStyling(number, fixedCount: 4, fixed: true));
-          } else {
-            return trimTrailingZeros(
-                numberStyling(number, fixedCount: 2, fixed: true));
-          }
-        case FormatNumberType.btc:
-          if (number == 0) {
-            return trimTrailingZeros(
-                numberStyling(number, fixedCount: 6, fixed: true));
-          } else if (number < 1) {
-            return trimTrailingZeros(
-                numberStyling(number, fixedCount: 6, fixed: true));
-          } else if (number < 10 && number >= 1) {
-            return trimTrailingZeros(
-                numberStyling(number, fixedCount: 5, fixed: true));
-          } else {
-            return trimTrailingZeros(
-                numberStyling(number, fixedCount: 4, fixed: true));
-          }
-        default:
-          return numberStyling(number);
-      }
+              numberStyling(number, fixedCount: 6, fixed: true));
+        } else if (number < 1) {
+          return trimTrailingZeros(
+              numberStyling(number, fixedCount: 6, fixed: true));
+        } else if (number < 10 && number >= 1) {
+          return trimTrailingZeros(
+              numberStyling(number, fixedCount: 4, fixed: true));
+        } else {
+          return trimTrailingZeros(
+              numberStyling(number, fixedCount: 2, fixed: true));
+        }
+      case FormatNumberType.btc:
+        if (number == 0) {
+          return trimTrailingZeros(
+              numberStyling(number, fixedCount: 6, fixed: true));
+        } else if (number < 1) {
+          return trimTrailingZeros(
+              numberStyling(number, fixedCount: 6, fixed: true));
+        } else if (number < 10 && number >= 1) {
+          return trimTrailingZeros(
+              numberStyling(number, fixedCount: 5, fixed: true));
+        } else {
+          return trimTrailingZeros(
+              numberStyling(number, fixedCount: 4, fixed: true));
+        }
+      default:
+        return numberStyling(number);
+    }
   }
 
   String trimTrailingZeros(String str, {FormatNumberType? type}) {
     int index = str.length - 1;
     while (index >= 0 && (str[index] == '0' || str[index] == '.')) {
-      index--;
-    }
-    if (index >= 0 && str[index] == '.') {
       index--;
     }
     if (double.tryParse(str) == 0) {
