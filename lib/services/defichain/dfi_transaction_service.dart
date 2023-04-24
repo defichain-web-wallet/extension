@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
-import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -24,16 +23,17 @@ class DFITransactionService {
   var balancesHelper = BalancesHelper();
   List<UtxoModel> accountUtxoList = [];
 
-  Future<TxErrorModel> createAndSendSwap(
-      {required String senderAddress,
-        required ECPair keyPair,
-        required String networkString,
-        required TokenModel tokenFrom,
-        required TokenModel tokenTo,
-        required BalanceModel balanceDFIToken,
-        required int amountFrom,
-        required int amountTo,
-        double slippage = 0.03}) async {
+  Future<TxErrorModel> createAndSendSwap({
+    required String senderAddress,
+    required ECPair keyPair,
+    required String networkString,
+    required TokenModel tokenFrom,
+    required TokenModel tokenTo,
+    required BalanceModel balanceDFIToken,
+    required int amountFrom,
+    required int amountTo,
+    double slippage = 0.03,
+  }) async {
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
     var maxPrice = amountFrom / (amountTo) * (1 + slippage);
@@ -45,10 +45,9 @@ class DFITransactionService {
     await _getUtxoList(senderAddress, networkString);
 
     if (tokenFrom.symbol == 'DFI') {
-
       if (balanceDFIToken.balance < amountFrom) {
         var responseModel = await _utxoToAccountTransaction(
-          senderAddress: senderAddress,
+            senderAddress: senderAddress,
             keyPair: keyPair,
             amount: amountFrom - balanceDFIToken.balance,
             tokenId: int.parse(tokenFrom.id));
@@ -57,7 +56,8 @@ class DFITransactionService {
           return TxErrorModel(isError: true, error: responseModel.error);
         }
 
-        txErrorModel = await _prepareTx(responseModel, TxType.convertUtxo, networkString);
+        txErrorModel =
+            await _prepareTx(responseModel, TxType.convertUtxo, networkString);
         if (txErrorModel.isError!) {
           return txErrorModel;
         }
@@ -65,21 +65,15 @@ class DFITransactionService {
     }
 
     var responseModel = await _createTransaction(
-      senderAddress: senderAddress,
+        senderAddress: senderAddress,
         keyPair: keyPair,
         utxoList: accountUtxoList,
         destinationAddress: senderAddress,
         changeAddress: senderAddress,
         amount: 0,
         additional: (txb, nw, newUtxo) {
-          txb.addSwapOutput(
-              tokenFrom.id,
-              senderAddress,
-              amountFrom,
-              tokenTo.id,
-              senderAddress,
-              integer,
-              fraction);
+          txb.addSwapOutput(tokenFrom.id, senderAddress, amountFrom, tokenTo.id,
+              senderAddress, integer, fraction);
         },
         useAllUtxo: true);
 
@@ -87,18 +81,20 @@ class DFITransactionService {
       txErrorModel.txLoaderList!
           .add(TxLoaderModel(txHex: responseModel.hex, type: TxType.swap));
     } else {
-      txErrorModel = await _prepareTx(responseModel, TxType.swap, networkString);
+      txErrorModel =
+          await _prepareTx(responseModel, TxType.swap, networkString);
     }
 
     return txErrorModel;
   }
 
-  Future<TxErrorModel> removeLiqudity(
-      {required String senderAddress,
-        required ECPair keyPair,
-        required String networkString,
-        required LmPoolModel pool,
-        required int amount}) async {
+  Future<TxErrorModel> removeLiqudity({
+    required String senderAddress,
+    required ECPair keyPair,
+    required String networkString,
+    required LmPoolModel pool,
+    required int amount,
+  }) async {
     await _getUtxoList(senderAddress, networkString);
 
     var responseModel = await _createTransaction(
@@ -116,15 +112,15 @@ class DFITransactionService {
     return await _prepareTx(responseModel, TxType.removeLiq, networkString);
   }
 
-
-  Future<TxErrorModel> createAndSendLiqudity(
-      {required String senderAddress,
-        required ECPair keyPair,
-        required String networkString,
-        required BalanceModel balanceUTXO,
-        required BalanceModel balanceDFIToken,
-        required LmPoolModel pool,
-        required List<int> amountList}) async {
+  Future<TxErrorModel> createAndSendLiqudity({
+    required String senderAddress,
+    required ECPair keyPair,
+    required String networkString,
+    required BalanceModel balanceUTXO,
+    required BalanceModel balanceDFIToken,
+    required LmPoolModel pool,
+    required List<int> amountList,
+  }) async {
     await _getUtxoList(senderAddress, networkString);
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
@@ -137,7 +133,8 @@ class DFITransactionService {
     }
 
     if (indexDFI != null) {
-      if (balanceDFIToken.balance + balanceUTXO.balance < amountList[indexDFI]) {
+      if (balanceDFIToken.balance + balanceUTXO.balance <
+          amountList[indexDFI]) {
         return TxErrorModel(
             isError: true,
             error: 'Not enough balance. Wait for approval the previous tx');
@@ -145,12 +142,13 @@ class DFITransactionService {
 
       if (balanceDFIToken.balance < amountList[indexDFI]) {
         var responseModel = await _utxoToAccountTransaction(
-            senderAddress:senderAddress,
+            senderAddress: senderAddress,
             keyPair: keyPair,
             amount: amountList[indexDFI] - balanceDFIToken.balance,
             tokenId: int.parse(pool.tokens[indexDFI].id));
 
-        txErrorModel = await _prepareTx(responseModel, TxType.convertUtxo, networkString);
+        txErrorModel =
+            await _prepareTx(responseModel, TxType.convertUtxo, networkString);
         if (txErrorModel.isError!) {
           return txErrorModel;
         }
@@ -179,17 +177,19 @@ class DFITransactionService {
       txErrorModel.txLoaderList!
           .add(TxLoaderModel(txHex: responseModel.hex, type: TxType.addLiq));
     } else {
-      txErrorModel = await _prepareTx(responseModel, TxType.addLiq, networkString);
+      txErrorModel =
+          await _prepareTx(responseModel, TxType.addLiq, networkString);
     }
 
     return txErrorModel;
   }
 
-  Future<TxResponseModel> _utxoToAccountTransaction(
-      {required ECPair keyPair,
-        required int amount,
-          required String senderAddress,
-        required int tokenId}) {
+  Future<TxResponseModel> _utxoToAccountTransaction({
+    required ECPair keyPair,
+    required int amount,
+    required String senderAddress,
+    required int tokenId,
+  }) {
     return _createTransaction(
         keyPair: keyPair,
         utxoList: accountUtxoList,
@@ -199,19 +199,19 @@ class DFITransactionService {
         amount: 0,
         reservedBalance: amount,
         additional: (txb, nw, newUtxo) {
-          txb.addUtxosToAccountOutput(
-              tokenId, senderAddress, amount, nw);
+          txb.addUtxosToAccountOutput(tokenId, senderAddress, amount, nw);
         });
   }
 
-  Future<TxErrorModel> createSendTransaction(
-      {required String senderAddress,
-      required ECPair keyPair,
-      required BalanceModel balanceUTXO,
-      required BalanceModel balance,
-      required String destinationAddress,
-      required String networkString,
-      required int amount}) async {
+  Future<TxErrorModel> createSendTransaction({
+    required String senderAddress,
+    required ECPair keyPair,
+    required BalanceModel balanceUTXO,
+    required BalanceModel balance,
+    required String destinationAddress,
+    required String networkString,
+    required int amount,
+  }) async {
     if (balance.token!.name == 'DFI') {
       return _createSendUTXOTransaction(
           keyPair: keyPair,
@@ -231,13 +231,14 @@ class DFITransactionService {
     }
   }
 
-  Future<TxErrorModel>  _createSendUTXOTransaction(
-      {required String senderAddress,
-      required ECPair keyPair,
-      required String destinationAddress,
-      required String networkString,
-      required int amount,
-      required BalanceModel balance}) async {
+  Future<TxErrorModel> _createSendUTXOTransaction({
+    required String senderAddress,
+    required ECPair keyPair,
+    required String destinationAddress,
+    required String networkString,
+    required int amount,
+    required BalanceModel balance,
+  }) async {
     TxResponseModel? responseModel;
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
@@ -259,14 +260,15 @@ class DFITransactionService {
                 value: balance.balance,
                 mintIndex: newUtxo.length + 1));
             txb.addOutput(senderAddress, balance.balance);
-            txb.addAccountToUtxoOutput(
-                balance.token!.id, senderAddress, balance.balance, mintingStartsAt);
+            txb.addAccountToUtxoOutput(balance.token!.id, senderAddress,
+                balance.balance, mintingStartsAt);
           });
       if (responseModel.isError) {
         return TxErrorModel(isError: true, error: responseModel.error);
       }
 
-      txErrorModel = await _prepareTx(responseModel, TxType.convertUtxo, networkString);
+      txErrorModel =
+          await _prepareTx(responseModel, TxType.convertUtxo, networkString);
 
       if (txErrorModel.isError!) {
         return txErrorModel;
@@ -288,19 +290,21 @@ class DFITransactionService {
       txErrorModel.txLoaderList!
           .add(TxLoaderModel(txHex: responseTxModel.hex, type: TxType.send));
     } else {
-      txErrorModel = await _prepareTx(responseTxModel, TxType.send, networkString);
+      txErrorModel =
+          await _prepareTx(responseTxModel, TxType.send, networkString);
     }
 
     return txErrorModel;
   }
 
-  Future<TxErrorModel> _createAndSendToken(
-      {required String senderAddress,
-      required ECPair keyPair,
-      required TokenModel token,
-      required String networkString,
-      required String destinationAddress,
-      required int amount}) async {
+  Future<TxErrorModel> _createAndSendToken({
+    required String senderAddress,
+    required ECPair keyPair,
+    required TokenModel token,
+    required String networkString,
+    required String destinationAddress,
+    required int amount,
+  }) async {
     await _getUtxoList(senderAddress, networkString);
 
     var responseModel = await _createTransaction(
@@ -322,17 +326,17 @@ class DFITransactionService {
     return await _prepareTx(responseModel, TxType.send, networkString);
   }
 
-  Future<TxResponseModel> _createTransaction(
-      {required ECPair keyPair,
-      required List<UtxoModel> utxoList,
-      required String destinationAddress,
-      required String changeAddress,
-      required int amount,
-      required String senderAddress,
-      bool useAllUtxo = true,
-      int reservedBalance = 0,
-      Function(TransactionBuilder, NetworkType, List<UtxoModel>)?
-          additional}) async {
+  Future<TxResponseModel> _createTransaction({
+    required ECPair keyPair,
+    required List<UtxoModel> utxoList,
+    required String destinationAddress,
+    required String changeAddress,
+    required int amount,
+    required String senderAddress,
+    bool useAllUtxo = true,
+    int reservedBalance = 0,
+    Function(TransactionBuilder, NetworkType, List<UtxoModel>)? additional,
+  }) async {
     var sum = 0;
 
     List<UtxoModel> selectedUTXO = [];
@@ -482,8 +486,12 @@ class DFITransactionService {
   }
 
   Future<TxErrorModel> _prepareTx(
-      TxResponseModel responseModel, TxType type, String networkString) async {
-    TxErrorModel? txid = await DFITransactionRequests.sendTxHex(txHex: responseModel.hex, networkString: networkString);
+    TxResponseModel responseModel,
+    TxType type,
+    String networkString,
+  ) async {
+    TxErrorModel? txid = await DFITransactionRequests.sendTxHex(
+        txHex: responseModel.hex, networkString: networkString);
     if (!txid.isError!) {
       _updateUtxoList(responseModel, txid.txLoaderList![0].txId!);
       txid.txLoaderList![0].type = type;

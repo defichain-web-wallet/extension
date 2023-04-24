@@ -35,7 +35,9 @@ class TokenModel {
   }
 
   factory TokenModel.fromJSON(
-      Map<String, dynamic> json, NetworkName? networkName) {
+    Map<String, dynamic> json,
+    NetworkName? networkName,
+  ) {
     return TokenModel(
       id: json['id'],
       symbol: json['symbol'],
@@ -46,13 +48,13 @@ class TokenModel {
   }
 
   static List<TokenModel> fromJSONList(
-      List<dynamic> jsonList, NetworkName? networkName) {
-    List<TokenModel> tokens = [];
-
-    jsonList.forEach((json) {
-      TokenModel token = TokenModel.fromJSON(json, networkName);
-      tokens.add(token);
-    });
+    List<dynamic> jsonList,
+    NetworkName? networkName,
+  ) {
+    List<TokenModel> tokens = List.generate(
+      jsonList.length,
+      (index) => TokenModel.fromJSON(jsonList[index], networkName),
+    );
 
     return tokens;
   }

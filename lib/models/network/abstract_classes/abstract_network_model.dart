@@ -31,61 +31,65 @@ abstract class AbstractNetworkModel {
 
   List<AbstractExchangeModel> getExchanges();
 
-  bool changeAvailable() {
-    return getBridges().length > 0 || getExchanges().length > 0;
-  }
+  bool changeAvailable() =>
+      getBridges().length > 0 || getExchanges().length > 0;
 
-  Future<double> getBalance({required AbstractAccountModel account, required TokenModel token});
+  Future<double> getBalance({
+    required AbstractAccountModel account,
+    required TokenModel token,
+  });
 
-  Future<double> getAvailableBalance(
-      {required AbstractAccountModel account,
-        required TokenModel token,
-        required TxType type});
+  Future<double> getAvailableBalance({
+    required AbstractAccountModel account,
+    required TokenModel token,
+    required TxType type,
+  });
 
   Future<BalanceModel> getBalanceUTXO(
-      List<BalanceModel> balances, String addressString);
+    List<BalanceModel> balances,
+    String addressString,
+  );
 
-  Future<BalanceModel> getBalanceToken(List<BalanceModel> balances, TokenModel token,
-      String addressString);
+  Future<BalanceModel> getBalanceToken(
+    List<BalanceModel> balances,
+    TokenModel token,
+    String addressString,
+  );
 
   // Earn
   List<AbstractStakingProvider> getStakingProviders();
 
   List<AbstractLmProviderModel> getLmProviders();
 
-  bool stakingAvailable() {
-    return getStakingProviders().length > 0;
-  }
+  bool stakingAvailable() => getStakingProviders().length > 0;
 
-  int toSatoshi(double amount) {
-    return (amount * COIN).round();
-  }
+  int toSatoshi(double amount) => (amount * COIN).round();
 
-  double fromSatoshi(int amount) {
-    return amount / COIN;
-  }
+  double fromSatoshi(int amount) => amount / COIN;
 
-  bool lmAvailable() {
-    return getLmProviders().length > 0;
-  }
+  bool lmAvailable() => getLmProviders().length > 0;
 
-  bool earnAvailable() {
-    return stakingAvailable() || lmAvailable();
-  }
+  bool earnAvailable() => stakingAvailable() || lmAvailable();
 
   // Buy and sell
   List<AbstractOnOffRamp> getRamps();
 
-  bool buySellAvailable() {
-    return getRamps().length > 0;
-  }
+  bool buySellAvailable() => getRamps().length > 0;
 
   // Sending
   bool checkAddress(String address);
 
-  Future<TxErrorModel> send(AbstractAccountModel account, String address,
-      String password, TokenModel token, double amount);
+  Future<TxErrorModel> send(
+    AbstractAccountModel account,
+    String address,
+    String password,
+    TokenModel token,
+    double amount,
+  );
 
   Future<String> signMessage(
-      AbstractAccountModel account, String message, String password);
+    AbstractAccountModel account,
+    String message,
+    String password,
+  );
 }

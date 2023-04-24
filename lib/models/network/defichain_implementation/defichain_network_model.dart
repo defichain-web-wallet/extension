@@ -1,8 +1,8 @@
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
@@ -33,136 +33,193 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }
 
   Uri getTransactionExplorer(String tx) {
-    return Uri.parse(
-        'https://defiscan.live/transactions/$tx?network=${networkType.networkStringLowerCase}');
+    final query = {
+      'network': networkType.networkStringLowerCase,
+    };
+
+    return Uri.https(Hosts.defiScanHome, '/transactions/$tx', query);
   }
 
   Uri getAccountExplorer(String address) {
-    return Uri.parse(
-        'https://defiscan.live/address/$address?network=?network=${networkType.networkStringLowerCase}');
+    final query = {
+      'network': networkType.networkStringLowerCase,
+    };
+
+    return Uri.https(Hosts.defiScanHome, '/address/$address', query);
   }
 
-  Future<double> getBalance(
-      {required AbstractAccountModel account,
-      required TokenModel token}) async {
-    var balances = account.getPinnedBalances(this);
+  Future<double> getBalance({
+    required AbstractAccountModel account,
+    required TokenModel token,
+  }) async {
+    List<BalanceModel> balances = account.getPinnedBalances(this);
     late BalanceModel balance;
 
     if (token.symbol == 'DFI') {
-      var balanceUTXO = await getBalanceUTXO(
-          balances, account.getAddress(this.networkType.networkName)!);
-      var balanceToken = await getBalanceToken(
-          balances, token, account.getAddress(this.networkType.networkName)!);
+      BalanceModel balanceUTXO = await getBalanceUTXO(
+        balances,
+        account.getAddress(this.networkType.networkName)!,
+      );
+      BalanceModel balanceToken = await getBalanceToken(
+        balances,
+        token,
+        account.getAddress(this.networkType.networkName)!,
+      );
       return fromSatoshi(balanceUTXO.balance + balanceToken.balance);
     } else {
       balance = await getBalanceToken(
-          balances, token, account.getAddress(this.networkType.networkName)!);
+        balances,
+        token,
+        account.getAddress(this.networkType.networkName)!,
+      );
       return fromSatoshi(balance.balance);
     }
   }
 
-  Future<double> getAvailableBalance(
-      {required AbstractAccountModel account,
-      required TokenModel token,
-      required TxType type}) async {
-    var balances = account.getPinnedBalances(this);
+  Future<double> getAvailableBalance({
+    required AbstractAccountModel account,
+    required TokenModel token,
+    required TxType type,
+  }) async {
+    List<BalanceModel> balances = account.getPinnedBalances(this);
 
     if (token.symbol == 'DFI') {
-      var tokenDFIbalance = await getBalanceUTXO(
-          balances, account.getAddress(this.networkType.networkName)!);
-      var coinDFIbalance = await getBalanceToken(
-          balances, token, account.getAddress(this.networkType.networkName)!);
+      BalanceModel tokenDFIBalance = await getBalanceUTXO(
+        balances,
+        account.getAddress(this.networkType.networkName)!,
+      );
+      BalanceModel coinDFIBalance = await getBalanceToken(
+        balances,
+        token,
+        account.getAddress(this.networkType.networkName)!,
+      );
 
       switch (type) {
         case TxType.send:
-          if (tokenDFIbalance.balance > FEE) {
-            return coinDFIbalance.balance + tokenDFIbalance.balance - (FEE * 2);
+          if (tokenDFIBalance.balance > FEE) {
+            return coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2);
           } else {
-            return fromSatoshi(coinDFIbalance.balance - (FEE));
+            return fromSatoshi(coinDFIBalance.balance - (FEE));
           }
         case TxType.swap:
-          if (coinDFIbalance.balance > (FEE * 2) + DUST) {
-            return coinDFIbalance.balance + tokenDFIbalance.balance - (FEE * 2);
+          if (coinDFIBalance.balance > (FEE * 2) + DUST) {
+            return coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2);
           } else {
-            return fromSatoshi(tokenDFIbalance.balance);
+            return fromSatoshi(tokenDFIBalance.balance);
           }
         case TxType.addLiq:
-          if (coinDFIbalance.balance > (FEE * 2) + DUST) {
-            return coinDFIbalance.balance + tokenDFIbalance.balance - (FEE * 2);
+          if (coinDFIBalance.balance > (FEE * 2) + DUST) {
+            return coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2);
           } else {
-            return fromSatoshi(tokenDFIbalance.balance);
+            return fromSatoshi(tokenDFIBalance.balance);
           }
         default:
           return 0;
       }
     } else {
-      var balance = await getBalanceToken(
-          balances, token, account.getAddress(this.networkType.networkName)!);
+      BalanceModel balance = await getBalanceToken(
+        balances,
+        token,
+        account.getAddress(this.networkType.networkName)!,
+      );
       return fromSatoshi(balance.balance);
     }
   }
 
   bool checkAddress(String address) {
     return Address.validateAddress(
-        address, DefichainService.getNetwork(this.networkType.networkName));
+      address,
+      DefichainService.getNetwork(this.networkType.networkName),
+    );
   }
 
-  Future<TxErrorModel> send(AbstractAccountModel account, String address,
-      String password, TokenModel token, double amount) async {
+  Future<TxErrorModel> send(
+    AbstractAccountModel account,
+    String address,
+    String password,
+    TokenModel token,
+    double amount,
+  ) async {
     ECPair keypair = await DefichainService.getKeypairFromStorage(
-        password, account.accountIndex, this.networkType.networkName);
+      password,
+      account.accountIndex,
+      this.networkType.networkName,
+    );
 
-    var balances = account.getPinnedBalances(this);
-    var balanceUTXO = await getBalanceUTXO(balances, account.getAddress(this.networkType.networkName)!);
-    var balanceToken = await getBalanceToken(balances, token, account.getAddress(this.networkType.networkName)!);
+    List<BalanceModel> balances = account.getPinnedBalances(this);
+    BalanceModel balanceUTXO = await getBalanceUTXO(
+      balances,
+      account.getAddress(this.networkType.networkName)!,
+    );
+    BalanceModel balanceToken = await getBalanceToken(
+      balances,
+      token,
+      account.getAddress(this.networkType.networkName)!,
+    );
 
     return DFITransactionService().createSendTransaction(
-        senderAddress: account.getAddress(this.networkType.networkName)!,
-        keyPair: keypair,
-        balanceUTXO: balanceUTXO,
-        balance:
-        balanceToken,
-        destinationAddress: address,
-        networkString: this.networkType.networkStringLowerCase,
-        amount: toSatoshi(amount));
+      senderAddress: account.getAddress(this.networkType.networkName)!,
+      keyPair: keypair,
+      balanceUTXO: balanceUTXO,
+      balance: balanceToken,
+      destinationAddress: address,
+      networkString: this.networkType.networkStringLowerCase,
+      amount: toSatoshi(amount),
+    );
   }
 
   Future<String> signMessage(
-      AbstractAccountModel account, String message, String password) async {
+    AbstractAccountModel account,
+    String message,
+    String password,
+  ) async {
     ECPair keypair = await DefichainService.getKeypairFromStorage(
-        password, account.accountIndex, this.networkType.networkName);
+      password,
+      account.accountIndex,
+      this.networkType.networkName,
+    );
 
     return keypair.signMessage(
-        message, DefichainService.getNetwork(this.networkType.networkName));
+      message,
+      DefichainService.getNetwork(this.networkType.networkName),
+    );
   }
 
   Future<BalanceModel> getBalanceUTXO(
-      List<BalanceModel> balances, String addressString) async {
+    List<BalanceModel> balances,
+    String addressString,
+  ) async {
     late BalanceModel? balance;
     try {
-      balance = 
-          balances.firstWhere((element) => element.token!.isUTXO);
+      balance = balances.firstWhere((element) => element.token!.isUTXO);
     } catch (_) {
       //not realistic case
       balance = await DFIBalanceRequests.getUTXOBalance(
-          network: this, addressString: addressString);
+        network: this,
+        addressString: addressString,
+      );
     }
     return balance;
   }
 
-  Future<BalanceModel> getBalanceToken(List<BalanceModel> balances, TokenModel token,
-      String addressString) async {
+  Future<BalanceModel> getBalanceToken(
+    List<BalanceModel> balances,
+    TokenModel token,
+    String addressString,
+  ) async {
     late BalanceModel? balance;
     try {
-      balance = balances
-          .firstWhere((element) => element.token!.compare(token));
+      balance = balances.firstWhere((element) => element.token!.compare(token));
     } catch (_) {
       //if not exist in balances we check blockchain
-      var balanceList = await DFIBalanceRequests.getBalanceList(
-          network: this, addressString: addressString);
+      List<BalanceModel> balanceList = await DFIBalanceRequests.getBalanceList(
+        network: this,
+        addressString: addressString,
+      );
       try {
-        balance = balanceList
-            .firstWhere((element) => element.token!.compare(token));
+        balance = balanceList.firstWhere(
+          (element) => element.token!.compare(token),
+        );
       } catch (_) {
         //if in blockchain balance doesn't exist - we return 0
         balance = BalanceModel(balance: 0, token: token);

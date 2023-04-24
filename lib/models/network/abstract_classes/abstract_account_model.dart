@@ -3,7 +3,6 @@ import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
-import 'package:defi_wallet/models/token_model.dart';
 
 abstract class AbstractAccountModel {
   final String publicKey;
@@ -12,7 +11,11 @@ abstract class AbstractAccountModel {
   final int accountIndex;
 
   AbstractAccountModel(
-      this.publicKey, this.addresses, this.accountIndex, this.pinnedBalances);
+    this.publicKey,
+    this.addresses,
+    this.accountIndex,
+    this.pinnedBalances,
+  );
 
   // Tokens
   List<BalanceModel> getPinnedBalances(AbstractNetworkModel network) {
@@ -32,18 +35,20 @@ abstract class AbstractAccountModel {
       pinnedBalances[network.networkType.networkName]!.removeWhere((element){
         return element.compare(balance);
       });
-    } catch(e) {
-      print(e);
+    } catch(_) {
       throw 'Empty balance list for this network';
     }
   }
 
   // Lists
   Map<NetworkName, List<HistoryModel>> getHistory(
-      String networkName, String txid);
+    String networkName,
+    String txid,
+  );
 
   Map<NetworkName, List<AddressBookModel>> getAddressBook(
-      NetworkName networkName);
+    NetworkName networkName,
+  );
 
   // Receive
   String? getAddress(NetworkName networkName) {

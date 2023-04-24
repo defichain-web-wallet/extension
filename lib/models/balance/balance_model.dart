@@ -16,13 +16,14 @@ class BalanceModel {
     throw 'Empty token or LMPool';
   }
 
-  static List<BalanceModel> fromJSONList(List<dynamic> jsonList, NetworkName? networkName) {
-    List<BalanceModel> balances = [];
-
-    jsonList.forEach((json) {
-      BalanceModel token = BalanceModel.fromJSON(json, networkName);
-      balances.add(token);
-    });
+  static List<BalanceModel> fromJSONList(
+    List<dynamic> jsonList,
+    NetworkName? networkName,
+  ) {
+    List<BalanceModel> balances = List.generate(
+      jsonList.length,
+      (index) => BalanceModel.fromJSON(jsonList[index], networkName),
+    );
 
     return balances;
   }
@@ -39,7 +40,10 @@ class BalanceModel {
     return data;
   }
 
-  factory BalanceModel.fromJSON(Map<String, dynamic> json, NetworkName? networkName) {
+  factory BalanceModel.fromJSON(
+    Map<String, dynamic> json,
+    NetworkName? networkName,
+  ) {
     TokenModel? token;
     LmPoolModel? lmPool;
     if (json.containsKey('token')) {
