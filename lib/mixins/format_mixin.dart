@@ -1,6 +1,6 @@
 import 'package:defi_wallet/helpers/balances_helper.dart';
 
-enum FormatNumberType { fiat, crypto }
+enum FormatNumberType { fiat, crypto, btc }
 
 mixin FormatMixin {
   final BalancesHelper balancesHelper = BalancesHelper();
