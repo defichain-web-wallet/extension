@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/lock_analytics_model.dart';
@@ -13,12 +14,14 @@ import 'package:http/http.dart' as http;
 class LockRequests {
   LockService lockService = LockService();
   EncryptHelper encryptHelper = EncryptHelper();
+  String lockHost = LockApi.url;
+  String lockHomeUrl = LockApi.home;
 
   Future<String> signUp(AccountModel account, ECPair keyPair) async {
     try {
       dynamic data = lockService.getAddressAndSignature(account, keyPair);
 
-      final Uri url = Uri.parse('https://api.lock.space/v1/auth/sign-up');
+      final Uri url = Uri.parse('$lockHost/v1/auth/sign-up');
 
       final headers = {
         'Content-type': 'application/json',
@@ -42,7 +45,7 @@ class LockRequests {
     try {
       dynamic data = lockService.getAddressAndSignature(account, keyPair);
 
-      final Uri url = Uri.parse('https://api.lock.space/v1/auth/sign-in');
+      final Uri url = Uri.parse('$lockHost/v1/auth/sign-in');
 
       final headers = {
         'Content-type': 'application/json',
@@ -55,7 +58,7 @@ class LockRequests {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body)['accessToken'];
       } else {
-        return await signUp(account, keyPair);
+        return '';
       }
     } catch (_) {
       return '';
@@ -64,7 +67,7 @@ class LockRequests {
 
   Future<LockUserModel?> getKYC(String accessToken) async {
     try {
-      final Uri url = Uri.parse('https://api.lock.space/v1/kyc');
+      final Uri url = Uri.parse('$lockHost/v1/kyc');
 
       final headers = {
         'Content-type': 'application/json',
@@ -82,7 +85,7 @@ class LockRequests {
 
   Future<LockUserModel?> getUser(String accessToken) async {
     try {
-      final Uri url = Uri.parse('https://api.lock.space/v1/user');
+      final Uri url = Uri.parse('$lockHost/v1/user');
 
       final headers = {
         'Content-type': 'application/json',
@@ -103,10 +106,18 @@ class LockRequests {
     }
   }
 
-  Future<LockStakingModel?> getStaking(String accessToken) async {
+  Future<LockStakingModel?> getStaking(
+    String accessToken,
+    String strategy,
+  ) async {
     try {
-      final Uri url = Uri.parse(
-          'https://api.lock.space/v1/staking?asset=DFI&blockchain=DeFiChain&strategy=Masternode');
+      final query = {
+        'asset': 'DFI',
+        'blockchain': 'DeFiChain',
+        'strategy': strategy,
+      };
+
+      final Uri url = Uri.https('$lockHomeUrl', '/v1/staking', query);
 
       final headers = {
         'Content-type': 'application/json',
@@ -125,17 +136,22 @@ class LockRequests {
     String accessToken,
     int stakingId,
     double amount,
-    String txId,
-  ) async {
+    String txId, {
+    String asset = 'DFI',
+  }) async {
     try {
       final Uri url =
-          Uri.parse('https://api.lock.space/v1/staking/$stakingId/deposit');
+          Uri.parse('$lockHost/v1/staking/$stakingId/deposit');
 
       final headers = {
         'Content-type': 'application/json',
         'Authorization': 'Bearer $accessToken'
       };
-      final body = jsonEncode({'amount': amount, 'txId': txId});
+      final body = jsonEncode({
+        'amount': amount,
+        'txId': txId,
+        'asset': asset,
+      });
 
       final response = await http.post(url, headers: headers, body: body);
       dynamic data = jsonDecode(response.body);
@@ -153,11 +169,12 @@ class LockRequests {
   Future<LockWithdrawModel?> requestWithdraw(
     String accessToken,
     int stakingId,
-    double amount,
-  ) async {
+    double amount, {
+    String token = 'DFI',
+  }) async {
     try {
       final Uri url =
-          Uri.parse('https://api.lock.space/v1/staking/$stakingId/withdrawal');
+          Uri.parse('$lockHost/v1/staking/$stakingId/withdrawal');
 
       final headers = {
         'Content-type': 'application/json',
@@ -165,6 +182,7 @@ class LockRequests {
       };
       final body = jsonEncode({
         'amount': amount,
+        'asset': token,
       });
 
       final response = await http.post(url, headers: headers, body: body);
@@ -186,7 +204,7 @@ class LockRequests {
       ) async {
     try {
       final Uri url =
-      Uri.parse('https://api.lock.space/v1/staking/$stakingId/withdrawal/drafts');
+      Uri.parse('$lockHost/v1/staking/$stakingId/withdrawal/drafts');
 
       final headers = {
         'Content-type': 'application/json',
@@ -214,7 +232,7 @@ class LockRequests {
       ) async {
     try {
       final Uri url =
-      Uri.parse('https://api.lock.space/v1/staking/$stakingId/withdrawal/$withdrawId/amount');
+      Uri.parse('$lockHost/v1/staking/$stakingId/withdrawal/$withdrawId/amount');
 
       final headers = {
         'Content-type': 'application/json',
@@ -245,7 +263,7 @@ class LockRequests {
   ) async {
     try {
       final Uri url = Uri.parse(
-          'https://api.lock.space/v1/staking/$stakingId/withdrawal/${withdrawModel.id}/sign');
+          '$lockHost/v1/staking/$stakingId/withdrawal/${withdrawModel.id}/sign');
 
       final headers = {
         'Content-type': 'application/json',
@@ -268,9 +286,18 @@ class LockRequests {
     }
   }
 
-  Future<LockAnalyticsModel?> getAnalytics(String accessToken) async {
+  Future<LockAnalyticsModel?> getAnalytics(
+    String accessToken,
+    String strategy,
+  ) async {
     try {
-      final Uri url = Uri.parse('https://api.lock.space/v1/analytics/staking?asset=DFI&blockchain=DeFiChain&strategy=Masternode');
+      final query = {
+        'asset': 'DFI',
+        'blockchain': 'DeFiChain',
+        'strategy': strategy,
+      };
+
+      final Uri url = Uri.https('$lockHomeUrl', '/v1/analytics/staking', query);
 
       final headers = {
         'Content-type': 'application/json',

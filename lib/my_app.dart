@@ -7,7 +7,6 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/network/network_cubit.dart';
-import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
@@ -33,7 +32,6 @@ class App extends StatelessWidget {
         BlocProvider<FiatCubit>(create: (context) => FiatCubit()),
         BlocProvider<LockCubit>(create: (context) => LockCubit()),
         BlocProvider<HomeCubit>(create: (context) => HomeCubit()),
-        BlocProvider<StakingCubit>(create: (context) => StakingCubit()),
         BlocProvider<BitcoinCubit>(create: (context) => BitcoinCubit()),
         BlocProvider<NetworkCubit>(create: (context) => NetworkCubit()),
       ],

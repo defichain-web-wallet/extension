@@ -108,7 +108,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                 availableAmountCubit.getAvailable(
                   lockState.lockStakingDetails!.asset!,
                   TxType.send,
-                  accountState.activeAccount!,
+                  accountState.accounts!.first,
                 );
                 return BlocBuilder<TokensCubit, TokensState>(
                   builder: (tokensContext, tokensState) {
@@ -124,7 +124,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                       lockState.lockStakingDetails!.asset!,
                     )}';
                     return Scaffold(
-                      drawerScrimColor: Color(0x0f180245),
+                      drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                       endDrawer: AccountDrawer(
                         width: buttonSmallWidth,
                       ),
@@ -608,7 +608,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                       SizedBox(
                                         height: 16,
                                       ),
-                                      if (!widget.isUnstake) ...[
+                                      if (!widget.isUnstake && lockState.lockStakingDetails!.balance! != 0) ...[
                                         Row(
                                           children: [
                                             Text(
@@ -765,8 +765,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                               parent.emitPending(true);
                                               if (widget.isUnstake) {
                                                 showDialog(
-                                                  barrierColor:
-                                                      Color(0x0f180245),
+                                                  barrierColor: AppColors
+                                                      .tolopea
+                                                      .withOpacity(0.06),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
@@ -780,9 +781,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                         unstakeCallback(
                                                           password,
                                                           accountState
-                                                              .activeAccount!,
+                                                              .accounts!.first,
                                                           accountState
-                                                              .activeAccount!
+                                                              .accounts!.first
                                                               .lockAccessToken!,
                                                           lockState
                                                               .lockStakingDetails!
@@ -794,8 +795,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                 );
                                               } else {
                                                 showDialog(
-                                                  barrierColor:
-                                                      Color(0x0f180245),
+                                                  barrierColor: AppColors
+                                                      .tolopea
+                                                      .withOpacity(0.06),
                                                   barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
@@ -809,13 +811,13 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                         stakeCallback(
                                                           password,
                                                           accountState
-                                                              .activeAccount!,
+                                                              .accounts!.first,
                                                           lockState
                                                               .lockStakingDetails!
                                                               .depositAddress!,
                                                           tokensState.tokens!,
                                                           accountState
-                                                              .activeAccount!
+                                                              .accounts!.first
                                                               .lockAccessToken!,
                                                           lockState
                                                               .lockStakingDetails!
@@ -908,7 +910,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       );
     }
     showDialog(
-      barrierColor: Color(0x0f180245),
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
       barrierDismissible: false,
       context: context,
       builder: (BuildContext dialogContext) {
@@ -974,19 +976,13 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
     );
     TxErrorModel txResponse = TxErrorModel(isError: !isUnstakeSuccess);
     showDialog(
-      barrierColor: Color(0x0f180245),
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
       barrierDismissible: false,
       context: context,
       builder: (BuildContext dialogContext) {
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
-            if (!txResponse.isError! && !widget.isUnstake) {
-              TransactionCubit transactionCubit =
-                  BlocProvider.of<TransactionCubit>(context);
-
-              transactionCubit.setOngoingTransaction(txResponse);
-            }
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
@@ -1031,7 +1027,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
   }
 
   double getAvailableBalance(accountState, asset) {
-    int balance = accountState.activeAccount!.balanceList!
+    int balance = accountState.accounts!.first.balanceList!
         .firstWhere((el) => el.token! == asset && !el.isHidden!)
         .balance!;
     final int fee = 3000;

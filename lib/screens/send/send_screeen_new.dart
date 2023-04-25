@@ -1,13 +1,12 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/mixins/network_mixin.dart';
+import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -95,19 +94,20 @@ class _SendScreenNewState extends State<SendScreenNew>
       late bool isValidAddress;
       if (SettingsHelper.isBitcoin()) {
         isValidAddress =
-        await AddressesHelper().validateBtcAddress(addressController.text);
+            await AddressesHelper().validateBtcAddress(addressController.text);
       } else {
         isValidAddress =
-        await AddressesHelper().validateAddress(addressController.text);
+            await AddressesHelper().validateAddress(addressController.text);
       }
-      if (isValidAddress)  {
+      if (isValidAddress) {
         if (isAddNewContact) {
           showDialog(
-            barrierColor: Color(0x0f180245),
+            barrierColor: AppColors.tolopea.withOpacity(0.06),
             barrierDismissible: false,
             context: context,
             builder: (BuildContext dialogContext) {
               return CreateEditContactDialog(
+                isDisableEditAddress: true,
                 address: addressController.text,
                 isEdit: false,
                 confirmCallback: (name, address, network) {
@@ -260,7 +260,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                     }
 
                     return Scaffold(
-                      drawerScrimColor: Color(0x0f180245),
+                      drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                       endDrawer: AccountDrawer(
                         width: buttonSmallWidth,
                       ),
@@ -386,7 +386,9 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       height: 6,
                                     ),
                                     AmountField(
-                                      type: SettingsHelper.isBitcoin() ? null : TxType.send,
+                                      type: SettingsHelper.isBitcoin()
+                                          ? null
+                                          : TxType.send,
                                       account: accountState.activeAccount!,
                                       onChanged: (value) {
                                         setState(() {

@@ -49,7 +49,7 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
           builder: (context, accountState) {
             if (accountState.status == AccountStatusList.success) {
               return Scaffold(
-                drawerScrimColor: Color(0x0f180245),
+                drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                 endDrawer: AccountDrawer(
                   width: buttonSmallWidth,
                 ),
@@ -143,13 +143,9 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
                                             print('12');
                                           },
                                           isSelect: false,
-                                          imgPath:
-                                              '${tokenHelper.getImageNameByTokenName(tokenName)}',
                                           tokenName: '$tokenName',
                                           availableTokenName:
                                               '${symbols[index]}',
-                                          tokenColor: tokenHelper
-                                              .getColorByTokenName(tokenName),
                                         ),
                                       ],
                                     );

@@ -69,7 +69,7 @@ class _StakingSelectVerificationScreenState
         return BlocBuilder<AccountCubit, AccountState>(
           builder: (accountContext, accountState) {
             return Scaffold(
-              drawerScrimColor: Color(0x0f180245),
+              drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: AccountDrawer(
                 width: buttonSmallWidth,
               ),
@@ -266,7 +266,7 @@ class _StakingSelectVerificationScreenState
                                         try {
                                           await dfxRequests.transferKYC(
                                               accountState
-                                                  .activeAccount!.accessToken!);
+                                                  .accounts!.first.accessToken!);
                                         } catch (_) {
                                           showSnackBar('User not found');
                                         }

@@ -28,7 +28,8 @@ class AddressBookDialog extends StatefulWidget {
   State<AddressBookDialog> createState() => _AddressBookDialogState();
 }
 
-class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin, NetworkMixin {
+class _AddressBookDialogState extends State<AddressBookDialog>
+    with ThemeMixin, NetworkMixin {
   int iterator = 0;
   TextEditingController controller = TextEditingController();
   List<AddressBookModel>? viewList = [];
@@ -239,7 +240,6 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin, 
                                   : Padding(
                                       padding: const EdgeInsets.only(right: 16),
                                       child: StatusLogoAndTitle(
-                                        title: 'Oops!',
                                         subtitle:
                                             'Jelly can\'t see any contacts in your address book',
                                         isTitlePosBefore: true,
@@ -294,7 +294,6 @@ class _AddressBookDialogState extends State<AddressBookDialog> with ThemeMixin, 
                                   : Padding(
                                       padding: const EdgeInsets.only(right: 16),
                                       child: StatusLogoAndTitle(
-                                        title: 'Oops!',
                                         subtitle:
                                             'You don\'t have addresses yet',
                                         isTitlePosBefore: true,

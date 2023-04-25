@@ -1,5 +1,6 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
@@ -28,6 +29,8 @@ class ContactTile extends StatefulWidget {
 
 class _ContactTileState extends State<ContactTile> with ThemeMixin {
   bool isHoverEdit = false;
+  double dialogWidth = 116;
+  double screenWidth = 150;
   late int index;
 
   cutAddress(String s) {
@@ -42,7 +45,6 @@ class _ContactTileState extends State<ContactTile> with ThemeMixin {
   @override
   void initState() {
     index = widget.index < 10 ? widget.index : getLastCharToInt(index);
-    // TODO: implement initState
     super.initState();
   }
 
@@ -64,16 +66,20 @@ class _ContactTileState extends State<ContactTile> with ThemeMixin {
               ]),
             ),
             child: Center(
-              child: GradientText(
-                widget.contactName[0],
-                style: headline6.copyWith(
-                    fontWeight: FontWeight.w700, fontSize: 16),
-                gradientType: GradientType.linear,
-                gradientDirection: GradientDirection.btt,
-                colors: [
-                  AppColors.accountColors[index],
-                  AppColors.accountColors[index],
-                ],
+              child: Container(
+                width: 25,
+                child: GradientText(
+                  widget.contactName[0],
+                  style: headline6.copyWith(
+                      fontWeight: FontWeight.w700, fontSize: 16),
+                  gradientType: GradientType.linear,
+                  gradientDirection: GradientDirection.btt,
+                  colors: [
+                    AppColors.accountColors[index],
+                    AppColors.accountColors[index],
+                  ],
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -86,10 +92,17 @@ class _ContactTileState extends State<ContactTile> with ThemeMixin {
               children: [
                 Row(
                   children: [
-                    Text(
-                      widget.contactName,
-                      style: headline4.copyWith(
-                        fontSize: 16,
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth: widget.isDialog ? dialogWidth : screenWidth,
+                      ),
+                      child: TickerText(
+                        child: Text(
+                          widget.contactName,
+                          style: Theme.of(context).textTheme.headline4!.copyWith(
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(

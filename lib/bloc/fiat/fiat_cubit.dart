@@ -25,6 +25,12 @@ class FiatCubit extends Cubit<FiatState> {
   LockHelper lockHelper = LockHelper();
   EncryptHelper encryptHelper = EncryptHelper();
 
+  setLoadingState() {
+    emit(state.copyWith(
+      status: FiatStatusList.loading,
+    ));
+  }
+
   addContacts(
     String email,
     String phone,
@@ -33,23 +39,12 @@ class FiatCubit extends Cubit<FiatState> {
       status: FiatStatusList.success,
       phone: phone,
       email: email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
-      isShowTutorial: state.isShowTutorial,
-      personalInfo: state.personalInfo,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
   }
 
   createUser(String email, String phone, String accessToken) async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
-      personalInfo: state.personalInfo,
     ));
     await dfxRequests.createUser(
       email,
@@ -67,20 +62,7 @@ class FiatCubit extends Cubit<FiatState> {
 
     emit(state.copyWith(
       status: FiatStatusList.success,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
       isShowTutorial: status,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
   }
 
@@ -95,42 +77,15 @@ class FiatCubit extends Cubit<FiatState> {
 
     emit(state.copyWith(
       status: FiatStatusList.success,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
       currentIban: iban,
       ibansList: ibanList,
-      activeIban: state.activeIban,
-      ibanList: state.ibanList,
-      assets: state.assets,
-      isShowTutorial: state.isShowTutorial,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
   }
 
   changeCurrentIban(IbanModel iban) => emit(state.copyWith(
         status: FiatStatusList.success,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
         currentIban: iban.iban,
-        ibansList: state.ibansList,
-        assets: state.assets,
         activeIban: iban,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
       ));
 
   loadUserDetails(AccountModel account) async {
@@ -146,21 +101,7 @@ class FiatCubit extends Cubit<FiatState> {
     await box.close();
     emit(state.copyWith(
       status: FiatStatusList.loading,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
       isShowTutorial: isShowTutorial,
-      kycHash: state.kycHash,
-      kycStatus: state.kycStatus,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
 
     try {
@@ -171,15 +112,9 @@ class FiatCubit extends Cubit<FiatState> {
       emit(state.copyWith(
         status: FiatStatusList.success,
         phone: data['phone'],
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
         kycHash: data['kycHash'],
         kycStatus: data['kycStatus'],
-        numberPrefix: state.numberPrefix,
         email: data['mail'],
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        assets: state.assets,
         isShowTutorial: isShowTutorial,
         accessToken: accessToken,
         isKycDataComplete: data['kycDataComplete'],
@@ -194,21 +129,7 @@ class FiatCubit extends Cubit<FiatState> {
       } else {
         emit(state.copyWith(
           status: FiatStatusList.failure,
-          phone: state.phone,
-          countryCode: state.countryCode,
-          phoneWithoutPrefix: state.phoneWithoutPrefix,
-          numberPrefix: state.numberPrefix,
-          kycHash: state.kycHash,
-          kycStatus: state.kycStatus,
-          email: state.email,
-          currentIban: state.currentIban,
-          ibansList: state.ibansList,
-          assets: state.assets,
           isShowTutorial: isShowTutorial,
-          isKycDataComplete: state.isKycDataComplete,
-          limit: state.limit,
-          history: state.history,
-          accessToken: state.accessToken,
         ));
       }
     }
@@ -217,25 +138,6 @@ class FiatCubit extends Cubit<FiatState> {
   loadAvailableAssets() async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
-      foundAssets: state.foundAssets,
-      personalInfo: state.personalInfo,
-      countryList: state.countryList,
-      sellableFiatList: state.sellableFiatList,
-      buyableFiatList: state.buyableFiatList,
-      isShowTutorial: state.isShowTutorial,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
     try {
       List<AssetByFiatModel> buyableAssets =
@@ -245,49 +147,13 @@ class FiatCubit extends Cubit<FiatState> {
           buyableAssets.where((element) => element.buyable!).toList();
       emit(state.copyWith(
         status: FiatStatusList.success,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
         assets: result,
         foundAssets: result,
-        personalInfo: state.personalInfo,
-        countryList: state.countryList,
-        sellableFiatList: state.sellableFiatList,
-        buyableFiatList: state.buyableFiatList,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
       ));
     } catch (err) {
       lockHelper.lockWallet();
       emit(state.copyWith(
         status: FiatStatusList.failure,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        assets: state.assets,
-        foundAssets: state.foundAssets,
-        personalInfo: state.personalInfo,
-        countryList: state.countryList,
-        sellableFiatList: state.sellableFiatList,
-        buyableFiatList: state.buyableFiatList,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
       ));
     }
   }
@@ -300,50 +166,19 @@ class FiatCubit extends Cubit<FiatState> {
     await dfxRequests.saveBuyDetails(iban, asset, accessToken);
     emit(state.copyWith(
       status: FiatStatusList.loading,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
       currentIban: iban,
-      ibansList: state.ibansList,
-      assets: state.assets,
-      foundAssets: state.foundAssets,
-      activeIban: state.activeIban,
-      ibanList: state.ibanList,
-      isShowTutorial: state.isShowTutorial,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
   }
 
   loadIbanList({AssetByFiatModel? asset, bool isNewIban = false}) async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
-      foundAssets: state.foundAssets,
-      activeIban: state.activeIban,
-      ibanList: state.ibanList,
-      isShowTutorial: state.isShowTutorial,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
     List<IbanModel> ibanList = await dfxRequests.getIbanList(state.accessToken!);
     List<IbanModel> activeIbanList = ibanList
         .where((el) =>
             el.active! &&
-            el.type == 'Wallet' &&
+            el.type == null &&
             asset!.name == el.asset!.name)
         .toList();
     IbanModel? iban;
@@ -367,48 +202,16 @@ class FiatCubit extends Cubit<FiatState> {
 
     emit(state.copyWith(
       status: FiatStatusList.success,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
       currentIban: '',
-      ibansList: state.ibansList,
-      assets: state.assets,
-      foundAssets: state.foundAssets,
       activeIban: iban,
       ibanList: activeIbanList,
-      isShowTutorial: state.isShowTutorial,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
   }
 
   search(assets, value) {
     List<AssetByFiatModel> search = [];
-    if (value == '') {
-      emit(state.copyWith(
-        status: FiatStatusList.success,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        assets: state.assets,
-        foundAssets: assets,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
-      ));
-    } else {
+
+    if (value != '') {
       assets.forEach((element) {
         if (element.name.contains(value.toUpperCase())) {
           search.add(element);
@@ -417,25 +220,14 @@ class FiatCubit extends Cubit<FiatState> {
           search.add(element);
         }
       });
-      emit(state.copyWith(
-        status: FiatStatusList.success,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        assets: state.assets,
-        foundAssets: search,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
-      ));
+    } else {
+      search = assets;
     }
+
+    emit(state.copyWith(
+      status: FiatStatusList.success,
+      foundAssets: search,
+    ));
   }
 
   loadCountryList() async {
@@ -447,45 +239,12 @@ class FiatCubit extends Cubit<FiatState> {
       List<dynamic> countryList = await dfxRequests.getCountryList(state.accessToken!);
       emit(state.copyWith(
         status: FiatStatusList.success,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        assets: state.assets,
-        foundAssets: state.foundAssets,
-        personalInfo: state.personalInfo,
         countryList: countryList,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
       ));
     } catch (err) {
       lockHelper.lockWallet();
       emit(state.copyWith(
         status: FiatStatusList.failure,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        assets: state.assets,
-        foundAssets: state.foundAssets,
-        personalInfo: state.personalInfo,
-        countryList: state.countryList,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
       ));
     }
   }
@@ -517,22 +276,7 @@ class FiatCubit extends Cubit<FiatState> {
     );
     emit(state.copyWith(
       status: FiatStatusList.success,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
-      foundAssets: state.foundAssets,
       personalInfo: kyc,
-      isShowTutorial: state.isShowTutorial,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
   }
 
@@ -547,22 +291,7 @@ class FiatCubit extends Cubit<FiatState> {
     );
     emit(state.copyWith(
       status: FiatStatusList.success,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
-      foundAssets: state.foundAssets,
       personalInfo: kyc,
-      isShowTutorial: state.isShowTutorial,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
     ));
   }
 
@@ -622,76 +351,9 @@ class FiatCubit extends Cubit<FiatState> {
     }
   }
 
-  loadFiatList(String accessToken) async {
-    emit(state.copyWith(
-      status: FiatStatusList.loading,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
-      foundAssets: state.foundAssets,
-      personalInfo: state.personalInfo,
-      isShowTutorial: state.isShowTutorial,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      sellableFiatList: state.sellableFiatList,
-      buyableFiatList: state.buyableFiatList,
-      history: state.history,
-      accessToken: state.accessToken,
-    ));
-    List<FiatModel> fiatList = await dfxRequests.getFiatList(accessToken);
-    List<FiatModel> activeFiatList =
-        fiatList.where((el) => el.buyable!).toList();
-    emit(state.copyWith(
-      status: FiatStatusList.success,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
-      foundAssets: state.foundAssets,
-      personalInfo: state.personalInfo,
-      sellableFiatList: state.sellableFiatList,
-      buyableFiatList: state.buyableFiatList,
-      isShowTutorial: state.isShowTutorial,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
-    ));
-  }
-
   loadAllAssets({bool isSell = false}) async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
-      phone: state.phone,
-      countryCode: state.countryCode,
-      phoneWithoutPrefix: state.phoneWithoutPrefix,
-      numberPrefix: state.numberPrefix,
-      email: state.email,
-      currentIban: state.currentIban,
-      ibansList: state.ibansList,
-      assets: state.assets,
-      foundAssets: state.foundAssets,
-      activeIban: state.activeIban,
-      ibanList: state.ibanList,
-      isShowTutorial: state.isShowTutorial,
-      kycHash: state.kycHash,
-      isKycDataComplete: state.isKycDataComplete,
-      limit: state.limit,
-      history: state.history,
-      accessToken: state.accessToken,
-      sellableFiatList: state.sellableFiatList,
-      buyableFiatList: state.buyableFiatList,
     ));
     try {
       List<FiatModel> fiatList = await dfxRequests.getFiatList(state.accessToken!);
@@ -726,53 +388,17 @@ class FiatCubit extends Cubit<FiatState> {
 
       emit(state.copyWith(
         status: FiatStatusList.success,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
         ibanList: activeIbanList,
         activeIban: iban,
         assets: assets,
         foundAssets: assets,
-        personalInfo: state.personalInfo,
-        countryList: state.countryList,
         sellableFiatList: sellableFiatList,
         buyableFiatList: buyableFiatList,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
       ));
     } catch (err) {
       lockHelper.lockWallet();
       emit(state.copyWith(
         status: FiatStatusList.failure,
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        ibanList: state.ibanList,
-        assets: state.assets,
-        activeIban: state.activeIban,
-        foundAssets: state.foundAssets,
-        personalInfo: state.personalInfo,
-        countryList: state.countryList,
-        sellableFiatList: state.sellableFiatList,
-        buyableFiatList: state.buyableFiatList,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
       ));
     }
   }
@@ -780,7 +406,6 @@ class FiatCubit extends Cubit<FiatState> {
   Future<void> loadCryptoRoute(AccountModel account) async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
-      accessToken: state.accessToken,
     ));
     try {
       String accessToken = state.accessToken ?? await getAccessTokenFromStorage(account);
@@ -804,30 +429,32 @@ class FiatCubit extends Cubit<FiatState> {
     } catch (err) {
       emit(state.copyWith(
         status: FiatStatusList.failure,
-        errorMessage: err.toString(),
-        phone: state.phone,
-        countryCode: state.countryCode,
-        phoneWithoutPrefix: state.phoneWithoutPrefix,
-        numberPrefix: state.numberPrefix,
-        email: state.email,
-        currentIban: state.currentIban,
-        ibansList: state.ibansList,
-        ibanList: state.ibanList,
-        assets: state.assets,
-        activeIban: state.activeIban,
-        foundAssets: state.foundAssets,
-        personalInfo: state.personalInfo,
-        countryList: state.countryList,
-        sellableFiatList: state.sellableFiatList,
-        buyableFiatList: state.buyableFiatList,
-        isShowTutorial: state.isShowTutorial,
-        kycHash: state.kycHash,
-        isKycDataComplete: state.isKycDataComplete,
-        limit: state.limit,
-        history: state.history,
-        accessToken: state.accessToken,
-        cryptoRoute: state.cryptoRoute,
       ));
+    }
+  }
+
+  Future<String?> signIn(
+      AccountModel account,
+      ECPair keyPair) async {
+    try {
+      late String accessToken;
+      accessToken = await dfxRequests.signIn(account, keyPair);
+      return accessToken == '' ? null : accessToken;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  Future<String?> signUp(
+    AccountModel account,
+    ECPair keyPair,
+  ) async {
+    try {
+      late String accessToken;
+      accessToken = await dfxRequests.signUp(account, keyPair);
+      return accessToken == '' ? null : accessToken;
+    } catch (err) {
+      return null;
     }
   }
 
@@ -875,5 +502,15 @@ class FiatCubit extends Cubit<FiatState> {
     } finally {
       await box.close();
     }
+  }
+
+  List<AssetByFiatModel> getAssetsWithoutPair(List<AssetByFiatModel> assets) {
+    List<AssetByFiatModel> filteredAssets = [];
+    assets.forEach((element) {
+      if(!element.isPair!) {
+        filteredAssets.add(element);
+      }
+    });
+    return filteredAssets;
   }
 }

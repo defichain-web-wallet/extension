@@ -1,4 +1,4 @@
-import 'package:defi_wallet/screens/liquidity/earn_screen_new.dart';
+import 'package:defi_wallet/screens/earn/earn_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/common/app_tooltip.dart';
@@ -67,7 +67,7 @@ class _HomeSliverAppBarState extends State<HomeSliverAppBar> {
                                       PageRouteBuilder(
                                         pageBuilder:
                                             (context, animation1, animation2) =>
-                                                EarnScreenNew(),
+                                                EarnScreen(),
                                         transitionDuration: Duration.zero,
                                         reverseTransitionDuration:
                                             Duration.zero,

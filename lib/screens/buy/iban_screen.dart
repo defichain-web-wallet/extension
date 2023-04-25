@@ -84,7 +84,7 @@ class _IbanScreenState extends State<IbanScreen>
                     fiatState.ibanList!.firstWhere((el) => el.iban == element));
               });
               return Scaffold(
-                drawerScrimColor: Color(0x0f180245),
+                drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                 endDrawer: AccountDrawer(
                   width: buttonSmallWidth,
                 ),

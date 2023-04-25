@@ -436,7 +436,6 @@ class _TransactionHistoryState extends State<TransactionHistory>
                 child: Container(
                   color: Theme.of(context).cardColor,
                   child: StatusLogoAndTitle(
-                    title: 'Oops!',
                     subtitle: 'Not yet any transaction',
                     isTitlePosBefore: true,
                   ),

@@ -6,7 +6,9 @@ import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/assets/asset_icon.dart';
+import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -35,17 +37,6 @@ class AssetCard extends StatefulWidget {
 class _AssetCardState extends State<AssetCard> {
   TokensHelper tokensHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
-
-  Widget _buildTokenIcon(TokensModel token) {
-    if (token.isPair!) {
-      return AssetPair(pair: token.symbol!, size: 20,);
-    } else {
-      return AssetIcon(
-        url: tokensHelper.getImageNameByTokenName(token.symbol!),
-        color: tokensHelper.getColorByTokenName(token.symbol!),
-      );
-    }
-  }
 
   String getFormatTokenBalance(double tokenBalance) =>
       '${balancesHelper.numberStyling(tokenBalance)}';
@@ -89,11 +80,15 @@ class _AssetCardState extends State<AssetCard> {
       child: Container(
         child: Row(
           children: [
-            SizedBox(
-              height: 42,
-              width: 42,
-              child: _buildTokenIcon(widget.tokens![widget.index]),
-            ),
+            if (widget.tokens[widget.index].isPair!)
+              AssetPair(
+                pair: widget.tokens[widget.index].symbol!
+              ),
+            if (!widget.tokens[widget.index].isPair!)
+              AssetLogo(
+                assetStyle: tokensHelper.getAssetStyleByTokenName(
+                    widget.tokens[widget.index].symbol!),
+              ),
             SizedBox(
               width: 10,
             ),
@@ -109,17 +104,22 @@ class _AssetCardState extends State<AssetCard> {
                       widget.tokenName,
                       style: Theme.of(context).textTheme.headline5,
                     ),
-                    Text(
-                      tokensHelper.getSpecificDefiName(
-                        widget.tokens[widget.index].name!,
+                    TickerText(
+                      child: Text(
+                        tokensHelper.isPair(widget.tokens[widget.index].symbol!)
+                            ? tokensHelper.getSpecificDefiPairName(
+                                widget.tokens[widget.index].name!)
+                            : tokensHelper.getSpecificDefiName(
+                                widget.tokens[widget.index].name!),
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!
+                                  .withOpacity(0.3),
+                            ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .color!
-                                .withOpacity(0.3),
-                          ),
                     )
                   ],
                 ),

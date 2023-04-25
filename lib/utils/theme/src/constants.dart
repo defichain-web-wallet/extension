@@ -4,11 +4,12 @@ const fontFamily = "RedHatDisplay";
 
 const double buttonHeight = 48.0;
 const double buttonSmallWidth = 280.0;
+const double accountDrawerWidth = 280.0;
 const double buttonFullWidth = double.infinity;
 const double boxSmallWidth = 312;
 const double boxFullWidth = double.infinity;
 const double buttonBorderRadius = 12.0;
-const double accentButtonBorderRadius = 16.0;
+const double accentButtonBorderRadius = 12.0;
 const double inputBorderRadius = 12.0;
 
 

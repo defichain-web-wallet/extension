@@ -20,8 +20,7 @@ class HistoryRequests {
   var balancesHelper = BalancesHelper();
   var historyHelper = HistoryHelper();
 
-  Future<List<HistoryNew>> getHistory(AddressModel addressModel, String token,
-      String network) async {
+  Future<List<HistoryNew>> getHistory(AddressModel addressModel, String token, String network) async {
     try {
       String urlAddress = '${DfxApi.url}${addressModel.address}/2023/USD';
 
@@ -30,8 +29,7 @@ class HistoryRequests {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         var body = jsonDecode(response.body);
-        List<HistoryNew> list = List<HistoryNew>.generate(
-            body.length, (index) => HistoryNew.fromJson(body[index]));
+        List<HistoryNew> list = List<HistoryNew>.generate(body.length, (index) => HistoryNew.fromJson(body[index]));
         return list;
       } else {
         return [];
@@ -41,42 +39,32 @@ class HistoryRequests {
     }
   }
 
-  Future<TxListModel> getFullHistoryList(
-      AddressModel addressModel, String token, String network,
-      {String transactionNext = '', String historyNext = ''}) async {
-    List<HistoryModel> transactions;
-    List<HistoryModel> actions;
-    List<HistoryModel> allTransactions;
+  Future<TxListModel> getFullHistoryList(AddressModel addressModel, String token, String network, {String transactionNext = '', String historyNext = ''}) async {
+    List<HistoryModel> transactions = List<HistoryModel>.empty();
+    List<HistoryModel> actions = List<HistoryModel>.empty();
+    List<HistoryModel> allTransactions = List<HistoryModel>.empty();
 
     try {
-      var transactionsData = await getHistoryTxsBySingleAddress(
-          addressModel, token, network,
-          next: transactionNext);
-      var actionsData = await getHistoryActions(addressModel, token, network,
-          next: historyNext);
+      var transactionsData = await getHistoryTxsBySingleAddress(addressModel, token, network, next: transactionNext);
+      var actionsData = await getHistoryActions(addressModel, token, network, next: historyNext);
 
-      transactions = transactionsData[0];
-      actions = actionsData[0];
+      if (transactionsData.isNotEmpty) transactions = transactionsData[0];
+      if (actionsData.isNotEmpty) actions = actionsData[0];
 
       allTransactions = [...transactions, ...actions];
 
-      allTransactions
-          .removeWhere((item) => historyHelper.isAvailableTypes(item.type!));
+      allTransactions.removeWhere((item) => historyHelper.isAvailableTypes(item.type!));
 
       historyHelper.sortHistoryList(allTransactions);
 
       return TxListModel(
-          list: allTransactions,
-          transactionNext: transactionsData[1],
-          historyNext: actionsData[1]);
+          list: allTransactions, transactionNext: transactionsData.length >= 2 ? transactionsData[1] : null, historyNext: actionsData.length >= 2 ? actionsData[1] : null);
     } catch (err) {
       throw err;
     }
   }
 
-  Future<List<dynamic>> getHistoryTxsBySingleAddress(
-      AddressModel addressModel, String token, String network,
-      {String next = '', String fallbackUrl = ''}) async {
+  Future<List<dynamic>> getHistoryTxsBySingleAddress(AddressModel addressModel, String token, String network, {String next = '', String fallbackUrl = ''}) async {
     try {
       List<HistoryModel> txModels = [];
 
@@ -85,9 +73,7 @@ class HistoryRequests {
       }
 
       String hostUrl = SettingsHelper.getHostApiUrl();
-      String urlAddress = fallbackUrl.isEmpty
-          ? '$hostUrl/$network/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}'
-          : fallbackUrl;
+      String urlAddress = fallbackUrl.isEmpty ? '$hostUrl/$network/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}' : fallbackUrl;
 
       final Uri url = Uri.parse(urlAddress);
 
@@ -95,6 +81,12 @@ class HistoryRequests {
 
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["error"] != null) {
+          return txModels;
+        }
+
         final historyList = jsonDecode(response.body)['data'];
         String nextPage = '';
         if (jsonDecode(response.body)['page'] != null) {
@@ -117,22 +109,18 @@ class HistoryRequests {
         return [txModels, 'done'];
       }
     } catch (err) {
-      if (fallbackUrl.isEmpty &&
-          SettingsHelper.settings.apiName == ApiName.auto) {
+      if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = network == 'mainnet'
             ? '${Hosts.myDefichain}/mainnet/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}'
             : '${Hosts.ocean}/testnet/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}';
-        return getHistoryTxsBySingleAddress(addressModel, token, network,
-            next: next, fallbackUrl: fallbackUrlAddress);
+        return getHistoryTxsBySingleAddress(addressModel, token, network, next: next, fallbackUrl: fallbackUrlAddress);
       } else {
         throw err;
       }
     }
   }
 
-  Future<List<dynamic>> getHistoryActions(
-      AddressModel addressModel, String token, String network,
-      {String next = '', String fallbackUrl = ''}) async {
+  Future<List<dynamic>> getHistoryActions(AddressModel addressModel, String token, String network, {String next = '', String fallbackUrl = ''}) async {
     try {
       List<HistoryModel> txModels = [];
 
@@ -141,10 +129,7 @@ class HistoryRequests {
       }
 
       String hostUrl = SettingsHelper.getHostApiUrl();
-      String urlAddress = fallbackUrl.isEmpty
-          ? '$hostUrl/$network/address/${addressModel
-          .address}/history?size=30${next != '' ? '&next=' + next : ''}'
-          : fallbackUrl;
+      String urlAddress = fallbackUrl.isEmpty ? '$hostUrl/$network/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}' : fallbackUrl;
 
       final Uri url = Uri.parse(urlAddress);
 
@@ -152,6 +137,11 @@ class HistoryRequests {
 
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["error"] != null) {
+          return txModels;
+        }
         final historyList = jsonDecode(response.body)['data'];
         String nextPage = '';
         if (jsonDecode(response.body)['page'] != null) {
@@ -174,28 +164,21 @@ class HistoryRequests {
         return [txModels, 'done'];
       }
     } catch (err) {
-      if (fallbackUrl.isEmpty &&
-          SettingsHelper.settings.apiName == ApiName.auto) {
+      if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = network == 'mainnet'
-            ? '${Hosts.myDefichain}/mainnet/address/${addressModel
-            .address}/history?size=30${next != '' ? '&next=' + next : ''}'
-            : '${Hosts.ocean}/testnet/address/${addressModel
-            .address}/history?size=30${next != '' ? '&next=' + next : ''}';
-        return getHistoryActions(addressModel, token, network,
-            next: next, fallbackUrl: fallbackUrlAddress);
+            ? '${Hosts.myDefichain}/mainnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}'
+            : '${Hosts.ocean}/testnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}';
+        return getHistoryActions(addressModel, token, network, next: next, fallbackUrl: fallbackUrlAddress);
       } else {
         throw err;
       }
     }
   }
 
-  Future<bool> getTxPresent(String txId, String network,
-      {String fallbackUrl = ''}) async {
+  Future<bool> getTxPresent(String txId, String network, {String fallbackUrl = ''}) async {
     try {
       String hostUrl = SettingsHelper.getHostApiUrl();
-      String urlAddress = fallbackUrl.isEmpty
-          ? '$hostUrl/$network/transactions/$txId'
-          : fallbackUrl;
+      String urlAddress = fallbackUrl.isEmpty ? '$hostUrl/$network/transactions/$txId' : fallbackUrl;
 
       final Uri url = Uri.parse(urlAddress);
 
@@ -208,11 +191,8 @@ class HistoryRequests {
       }
       return false;
     } catch (err) {
-      if (fallbackUrl.isEmpty &&
-          SettingsHelper.settings.apiName == ApiName.auto) {
-        String fallbackUrlAddress = network == 'mainnet'
-            ? '${Hosts.myDefichain}/mainnet/transactions/$txId'
-            : '${Hosts.ocean}/testnet/transactions/$txId';
+      if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
+        String fallbackUrlAddress = network == 'mainnet' ? '${Hosts.myDefichain}/mainnet/transactions/$txId' : '${Hosts.ocean}/testnet/transactions/$txId';
         return getTxPresent(txId, network, fallbackUrl: fallbackUrlAddress);
       } else {
         throw err;

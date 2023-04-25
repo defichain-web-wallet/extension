@@ -82,7 +82,7 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                   });
 
                   return Scaffold(
-                    drawerScrimColor: Color(0x0f180245),
+                    drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                     endDrawer: AccountDrawer(
                       width: buttonSmallWidth,
                     ),
@@ -224,14 +224,9 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                                     isSelect: symbols.contains(
                                                         availableTokens[index]
                                                             .symbol),
-                                                    imgPath:
-                                                        '${tokenHelper.getImageNameByTokenName(tokenName)}',
                                                     tokenName: '$tokenName',
                                                     availableTokenName:
                                                         '${availableTokens[index].name}',
-                                                    tokenColor:
-                                                        availableTokens[index]
-                                                            .color,
                                                   ),
                                                 ],
                                               );

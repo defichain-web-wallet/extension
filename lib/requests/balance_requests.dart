@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:basic_utils/basic_utils.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -28,21 +29,26 @@ class BalanceRequests {
       if (response.statusCode == 200) {
         List<BalanceModel> balances = [];
         var data = jsonDecode(response.body);
+
+        if (data["error"] != null) {
+          return balances;
+        }
+
         var dfiBalance = await getBalanceDFIcoinByAddress(address, sumDFI, network);
         var presentDFI = false;
-        data['data'].forEach((el){
+        data['data'].forEach((el) {
           int amount = convertToSatoshi(double.parse(el['amount']));
-          if(tokensHelper.isDfiToken(el['symbol'])){
-            if(sumDFI){
+          if (tokensHelper.isDfiToken(el['symbol'])) {
+            if (sumDFI) {
               presentDFI = true;
               amount = amount + dfiBalance.balance!;
             }
           }
           balances.add(BalanceModel(token: el['symbol'], balance: amount));
         });
-        if(dfiBalance.balance! > 0 || balances.length > 0){
-          if(sumDFI){
-            if(!presentDFI){
+        if (dfiBalance.balance! > 0 || balances.length > 0) {
+          if (sumDFI) {
+            if (!presentDFI) {
               dfiBalance.token = 'DFI';
               balances.add(dfiBalance);
             }
@@ -68,6 +74,11 @@ class BalanceRequests {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
+
+        if (data["error"] != null) {
+          return BalanceModel(token: '\$DFI', balance: 0);
+        }
+
         return BalanceModel(token: '\$DFI', balance: convertToSatoshi(double.parse(data['data'])));
       }
       return BalanceModel(token: '\$DFI', balance: 0);
@@ -81,7 +92,6 @@ class BalanceRequests {
       List<BalanceModel> balanceList = [];
       var addressListString = addressesHelper.getAddressStringFromListAddressModel(addressList);
 
-
       for (var address in addressListString) {
         var balances = await getBalanceListByAddress(address, true, network);
         balanceList.addAll(balances);
@@ -89,16 +99,15 @@ class BalanceRequests {
       balanceList = balancesHelper.findAndSumDuplicates(balanceList);
 
       return balanceList;
-
     } catch (_) {
       return [];
     }
   }
+
   Future<List<AddressBalanceModel>> getAddressBalanceListByAddressList(List<AddressModel> addressList) async {
     try {
       List<AddressBalanceModel> balanceList = [];
-      for(var i = 0; i < addressList.length; i++){
-
+      for (var i = 0; i < addressList.length; i++) {
         var balances = await getBalanceListByAddress(addressList[i].address!, false, networkHelper.getNetworkString());
 
         balanceList.add(AddressBalanceModel(address: addressList[i].address!, balanceList: balances, addressModel: addressList[i]));

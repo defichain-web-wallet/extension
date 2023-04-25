@@ -50,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool isShownSnackBar = false;
   double sliverTopHeight = 0.0;
   double targetSliverTopHeight = 76.0;
+  GlobalKey txKey = GlobalKey();
 
   tabListener() {
     HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
@@ -74,7 +75,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
-    tabController!.dispose();
     if (timer != null) {
       timer!.cancel();
     }
@@ -125,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen>
                   appBar: NewMainAppBar(
                     isShowLogo: true,
                   ),
-                  drawerScrimColor: Color(0x0f180245),
+                  drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                   endDrawer: AccountDrawer(
                     width: buttonSmallWidth,
                   ),
@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                 ),
                                 if (txState is! TransactionInitialState)
-                                  TransactionStatusBar(),
+                                  TransactionStatusBar(key: txKey,),
                               ],
                             ),
                           ),

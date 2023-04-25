@@ -5,11 +5,15 @@ class HiveBoxes {
 
 class HiveNames {
   static const String masterKeyPairMainnet = 'master_key_pair_mainnet';
-  static const String masterKeyPairMainnetPrivate = 'master_key_pair_mainnet_private';
-  static const String masterKeyPairMainnetPublic = 'master_key_pair_mainnet_public';
+  static const String masterKeyPairMainnetPrivate =
+      'master_key_pair_mainnet_private';
+  static const String masterKeyPairMainnetPublic =
+      'master_key_pair_mainnet_public';
   static const String masterKeyPairTestnet = 'master_key_pair_testnet';
-  static const String masterKeyPairTestnetPrivate = 'master_key_pair_testnet_private';
-  static const String masterKeyPairTestnetPublic = 'master_key_pair_testnet_public';
+  static const String masterKeyPairTestnetPrivate =
+      'master_key_pair_testnet_private';
+  static const String masterKeyPairTestnetPublic =
+      'master_key_pair_testnet_public';
   static const String accountsTestnet = 'accounts_testnet';
   static const String accountsMainnet = 'accounts_mainnet';
   static const String accessToken = 'access_token';
@@ -24,15 +28,19 @@ class HiveNames {
   static const String swapTutorialStatus = 'swap_tutorial_status';
   static const String kycStatus = 'kyc_status';
   static const String storageVersion = 'storage_version';
+  static const String generatedAccessToken = 'generated_access_token';
 
   static const String accountName = 'account_name';
   static const String accountAvatar = 'account_avatar';
 
+  static const String walletType = 'wallet_type';
+  static const String ledgerWalletSetup = 'ledger_wallet_setup';
+
   // address book
-  //TODO: remove in future (start)
   static const String defiAddressBook = 'defi_address_book';
   static const String btcAddressBook = 'btc_address_book';
-  //TODO: remove in future (end)
-  static const String addressBook = 'address_book';
   static const String lastSent = 'last_sent';
+
+  // address book
+  static const String addressBook = 'address_book';
 }
