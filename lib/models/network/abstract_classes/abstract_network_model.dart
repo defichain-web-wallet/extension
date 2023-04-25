@@ -1,4 +1,5 @@
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -9,6 +10,7 @@ import 'abstract_exchange_model.dart';
 import 'abstract_lm_provider_model.dart';
 import 'abstract_on_off_ramp_model.dart';
 import 'abstract_staking_provider_model.dart';
+import 'package:bip32_defichain/bip32.dart' as bip32;
 
 abstract class AbstractNetworkModel {
   static const int COIN = 100000000;
@@ -25,6 +27,8 @@ abstract class AbstractNetworkModel {
   Uri getTransactionExplorer(String tx);
 
   Uri getAccountExplorer(String address);
+
+  Future<String> createAddress(bip32.BIP32 masterKeyPair, int accountIndex);
 
   // Change
   List<AbstractBridge> getBridges();
@@ -57,7 +61,7 @@ abstract class AbstractNetworkModel {
   );
 
   // Earn
-  List<AbstractStakingProvider> getStakingProviders();
+  List<AbstractStakingProviderModel> getStakingProviders();
 
   List<AbstractLmProviderModel> getLmProviders();
 
@@ -74,7 +78,12 @@ abstract class AbstractNetworkModel {
   // Buy and sell
   List<AbstractOnOffRamp> getRamps();
 
+
   bool buySellAvailable() => getRamps().length > 0;
+
+  List<HistoryModel> getHistory(
+      String networkName, String? txid);
+
 
   // Sending
   bool checkAddress(String address);

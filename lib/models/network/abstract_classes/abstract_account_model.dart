@@ -23,31 +23,33 @@ abstract class AbstractAccountModel {
   }
 
   void pinToken(BalanceModel balance, AbstractNetworkModel network) {
-    try{
+    try {
       pinnedBalances[network.networkType.networkName]!.add(balance);
-    } catch(e) {
+    } catch (e) {
       pinnedBalances[network.networkType.networkName] = [balance];
     }
   }
 
-  void unpinToken(BalanceModel balance, AbstractNetworkModel network){
-    try{
-      pinnedBalances[network.networkType.networkName]!.removeWhere((element){
+  void unpinToken(BalanceModel balance, AbstractNetworkModel network) {
+    try {
+      pinnedBalances[network.networkType.networkName]!.removeWhere((element) {
         return element.compare(balance);
       });
-    } catch(_) {
+    } catch (_) {
       throw 'Empty balance list for this network';
     }
   }
 
   // Lists
-  Map<NetworkName, List<HistoryModel>> getHistory(
-    String networkName,
-    String txid,
-  );
 
   Map<NetworkName, List<AddressBookModel>> getAddressBook(
     NetworkName networkName,
+  );
+
+  void addToAddressBook(
+    NetworkName networkName,
+    String address,
+    String name,
   );
 
   // Receive

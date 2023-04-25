@@ -11,6 +11,8 @@ import 'package:defi_wallet/requests/defichain/dfi_token_requests.dart';
 import 'package:defi_wallet/services/defichain/defichain_service.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
 import 'package:defichaindart/defichaindart.dart';
+import 'package:bip32_defichain/bip32.dart' as bip32;
+import 'package:defichaindart/src/models/networks.dart' as networks;
 
 class DefichainNetworkModel extends AbstractNetworkModel {
   DefichainNetworkModel(NetworkTypeModel networkType)
@@ -226,5 +228,35 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       }
     }
     return balance;
+  }
+
+  Future<String> createAddress(bip32.BIP32 masterKeyPair, int accountIndex) async {
+    final keyPair = _getKeypairForPath(masterKeyPair, _derivePath(accountIndex));
+    return _getAddressFromKeyPair(keyPair);
+  }
+
+  // private
+  NetworkType _getNetworkType(){
+    return this.networkType.isTestnet ? networks.defichain_testnet : networks.defichain;
+  }
+  ECPair _getKeypairForPath(
+      bip32.BIP32 masterKeypair, String path) {
+
+    return ECPair.fromPublicKey(masterKeypair.derivePath(path).publicKey,
+        network: _getNetworkType());
+  }
+
+  String _derivePath(int account) {
+    return "1129/0/0/$account";
+  }
+
+  Future<String> _getAddressFromKeyPair(ECPair keyPair) async {
+    final address = P2WPKH(
+      data: PaymentData(
+        pubkey: keyPair.publicKey,
+      ),
+      network: _getNetworkType(),
+    ).data!.address;
+    return address!;
   }
 }
