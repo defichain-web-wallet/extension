@@ -37,9 +37,8 @@ class DFXRequests {
     }
   }
 
-  static Future<String> signIn(AccountModel account, ECPair keyPair) async {
+  static Future<String> signIn(Map<String, String>  signature) async {
     try {
-      dynamic data = lockService.getAddressAndSignature(account, keyPair);
 
       final Uri url = Uri.parse('https://api.lock.space/v1/auth/sign-in');
 
@@ -47,14 +46,14 @@ class DFXRequests {
         'Content-type': 'application/json',
       };
 
-      final body = jsonEncode(data);
+      final body = jsonEncode(signature);
 
       final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body)['accessToken'];
       } else {
-        return await signUp(account, keyPair);
+        return '';
       }
     } catch (_) {
       return '';
