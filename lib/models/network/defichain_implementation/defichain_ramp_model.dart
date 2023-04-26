@@ -1,0 +1,213 @@
+import 'package:defi_wallet/models/available_asset_model.dart';
+import 'package:defi_wallet/models/crypto_route_model.dart';
+import 'package:defi_wallet/models/fiat_history_model.dart';
+import 'package:defi_wallet/models/fiat_model.dart';
+import 'package:defi_wallet/models/iban_model.dart';
+import 'package:defi_wallet/models/kyc_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
+import 'package:defi_wallet/models/network/ramp/ramp_token_model.dart';
+import 'package:defi_wallet/requests/defichain/ramp/dfx_requests.dart';
+
+class DefichainRampModel extends AbstractOnOffRamp {
+  DefichainRampModel(super.networkModel);
+
+  @override
+  Future<bool> signIn(AbstractAccountModel account, String password) async {
+    var data = await _authorizationData(account, password);
+    String? accessToken = await DFXRequests.signIn(data);
+    if (accessToken != null) {
+      this.accessToken = accessToken;
+      this.accessTokenCreated = DateTime.now().millisecondsSinceEpoch;
+      return true;
+    }
+    return false; //TODO: need to return ErrorModel with details
+  }
+
+  Future<bool> signUp(AbstractAccountModel account, String password) async {
+    var data = await _authorizationData(account, password);
+    String? accessToken = await DFXRequests.signUp(data);
+    if (accessToken != null) {
+      this.accessToken = accessToken;
+      this.accessTokenCreated = DateTime.now().millisecondsSinceEpoch;
+      return true;
+    }
+    return false; //TODO: need to return ErrorModel with details
+  }
+
+  @override
+  Future<List<AssetByFiatModel>> availableTokens() async {
+    try {
+      return await DFXRequests.getAvailableAssets(this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  void buy(
+    String iban,
+    AssetByFiatModel asset,
+    String accessToken,
+  ) async {
+    try {
+      await DFXRequests.buy(iban, asset, this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  void sell(
+    String iban,
+    FiatModel fiat,
+    String accessToken,
+  ) async {
+    try {
+      await DFXRequests.sell(iban, fiat, this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<CryptoRouteModel> createCryptoRoute(String accessToken) async {
+    try {
+      return await DFXRequests.createCryptoRoute(this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<void> createUser(
+    String email,
+    String phone,
+    String accessToken,
+  ) async {
+    try {
+      return await DFXRequests.createUser(email, phone, this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<List> getCountryList(String accessToken) async {
+    try {
+      return await DFXRequests.getCountryList(this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<CryptoRouteModel?> getCryptoRoutes(String accessToken) async {
+    try {
+      return await DFXRequests.getCryptoRoutes(this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<List<FiatModel>> getFiatList(String accessToken) async {
+    try {
+      return await DFXRequests.getFiatList(this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<List<FiatHistoryModel>> getHistory(String accessToken) async {
+    try {
+      return await DFXRequests.getHistory(this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<List<IbanModel>> getIbanList(String accessToken) async {
+    try {
+      return await DFXRequests.getIbanList(this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getUserDetails(String accessToken) async {
+    try {
+      return await DFXRequests.getUserDetails(this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<void> saveKycData(KycModel kyc, String accessToken) async {
+    try {
+      return await DFXRequests.saveKycData(kyc, this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  Future<bool> transferKYC(String accessToken) async {
+    try {
+      return await DFXRequests.transferKYC(this.accessToken!);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @override
+  void deleteSavedPaymentData(
+    AbstractAccountModel account,
+    Map<String, String> paymentData,
+  ) {
+    // TODO: implement deleteSavedPaymentData
+  }
+
+  @override
+  List<String> getRequiredPaymentInfo() {
+    // TODO: implement getRequiredPaymentInfo
+    throw UnimplementedError();
+  }
+
+  @override
+  List<Map<String, String>> getSavedPaymentData(AbstractAccountModel account) {
+    // TODO: implement getSavedPaymentData
+    throw UnimplementedError();
+  }
+
+  @override
+  void savePaymentData(
+    AbstractAccountModel account,
+    Map<String, String> paymentData,
+  ) {
+    // TODO: implement savePaymentData
+  }
+
+  Future<Map<String, String>> _authorizationData(
+    AbstractAccountModel account,
+    String password,
+  ) async {
+    var address = account.getAddress(
+      this.networkModel.networkType.networkName,
+    )!;
+    String signature = await this.networkModel.signMessage(
+        account,
+        'By_signing_this_message,_you_confirm_that_you_are_the_sole_owner_of_the_provided_DeFiChain_address_and_are_in_possession_of_its_private_key._Your_ID:_$address',
+        password);
+    return {
+      'address': address,
+      'blockchain': 'DeFiChain',
+      'walletName': 'Jelly',
+      'signature': signature,
+    };
+  }
+}

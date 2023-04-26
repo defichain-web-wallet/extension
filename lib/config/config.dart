@@ -9,7 +9,9 @@ class Hosts {
 }
 
 class DfxApi {
-  static const String url = 'https://api.dfi.tax/p01/hst/';
+  static const String home = 'api.dfx.swiss';
+  static const String url = 'https://$home';
+  static const String historyUrl = 'https://api.dfi.tax/p01/hst/';
 }
 
 class LockApi {

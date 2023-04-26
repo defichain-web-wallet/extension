@@ -1,33 +1,74 @@
-import 'dart:ffi';
-
-import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/available_asset_model.dart';
+import 'package:defi_wallet/models/crypto_route_model.dart';
+import 'package:defi_wallet/models/fiat_history_model.dart';
+import 'package:defi_wallet/models/fiat_model.dart';
+import 'package:defi_wallet/models/iban_model.dart';
+import 'package:defi_wallet/models/kyc_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 
 import 'abstract_account_model.dart';
 
-class Price {
-  String currencyId;
-  Double? buyPrice;
-  Double? sellPrice;
-
-  Price(this.currencyId, this.buyPrice, this.sellPrice);
-}
-
-class RampTokenModel extends TokensModel {
-  List<Price> prices;
-  RampTokenModel(this.prices);
-}
-
 abstract class AbstractOnOffRamp {
-  List<String> getRequiredPaymentInfo();
-  void savePaymentData(
-      AbstractAccountModel account, Map<String, String> paymentData);
-  List<Map<String, String>> getSavedPaymentData(AbstractAccountModel account);
-  void deleteSavedPaymentData(
-      AbstractAccountModel account, Map<String, String> paymentData);
+  String? accessToken;
+  int? accessTokenCreated;
 
-  List<RampTokenModel> availableTokens();
-  String buy(AbstractAccountModel account, String password, TokensModel token,
-      double amount, Map<String, String> paymentData);
-  String sell(AbstractAccountModel account, String password, TokensModel token,
-      double amount, Map<String, String> paymentData);
+  final AbstractNetworkModel networkModel;
+
+  AbstractOnOffRamp(this.networkModel);
+
+  Future<bool> signUp(AbstractAccountModel account, String password);
+
+  Future<bool> signIn(AbstractAccountModel account, String password);
+
+  Future<void> createUser(
+    String email,
+    String phone,
+    String accessToken,
+  );
+
+  Future<CryptoRouteModel?> getCryptoRoutes(String accessToken);
+
+  Future<CryptoRouteModel> createCryptoRoute(String accessToken);
+
+  Future<bool> transferKYC(String accessToken);
+
+  Future<Map<String, dynamic>> getUserDetails(String accessToken);
+
+  Future<List<FiatHistoryModel>> getHistory(String accessToken);
+
+  Future<List<IbanModel>> getIbanList(String accessToken);
+
+  Future<List<dynamic>> getCountryList(String accessToken);
+
+  Future<void> saveKycData(KycModel kyc, String accessToken);
+
+  Future<List<FiatModel>> getFiatList(String accessToken);
+
+  List<String> getRequiredPaymentInfo();
+
+  void savePaymentData(
+    AbstractAccountModel account,
+    Map<String, String> paymentData,
+  );
+
+  List<Map<String, String>> getSavedPaymentData(AbstractAccountModel account);
+
+  void deleteSavedPaymentData(
+    AbstractAccountModel account,
+    Map<String, String> paymentData,
+  );
+
+  Future<List<AssetByFiatModel>> availableTokens();
+
+  void buy(
+    String iban,
+    AssetByFiatModel asset,
+    String accessToken,
+  );
+
+  void sell(
+    String iban,
+    FiatModel fiat,
+    String accessToken,
+  );
 }
