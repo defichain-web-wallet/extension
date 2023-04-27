@@ -29,7 +29,7 @@ abstract class AbstractNetworkModel {
 
   Uri getAccountExplorer(String address);
 
-  Future<String> createAddress(bip32.BIP32 masterKeyPair, int accountIndex);
+  Future<String> createAddress(AbstractAccountModel account);
 
   // Change
   List<AbstractBridge> getBridges();

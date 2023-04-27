@@ -35,6 +35,13 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return networkType;
   }
 
+  Future<String> createAddress(AbstractAccountModel account) async {
+    var publicKeypair = bip32.BIP32.fromBase58(account.publicKey, _getNetworkTypeBip32());
+    var address = await this._createAddressString(publicKeypair, account.accountIndex);
+
+    return address;
+  }
+
   Future<BalanceModel> getBalanceUTXO(
     List<BalanceModel> balances,
     String addressString,
@@ -195,7 +202,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return keypair.signMessage(message, getNetworkType());
   }
 
-  Future<String> createAddress(
+  Future<String> _createAddressString(
       bip32.BIP32 masterKeyPair, int accountIndex) async {
     final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
     return _getAddressFromKeyPair(keyPair);

@@ -9,6 +9,9 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_lm_provider_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/defichain_ramp_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/yield_machine_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -24,7 +27,22 @@ import 'package:defichaindart/src/models/networks.dart' as networks;
 
 class DefichainNetworkModel extends AbstractNetworkModel {
   DefichainNetworkModel(NetworkTypeModel networkType)
-      : super(_validationNetworkName(networkType));
+      : super(_validationNetworkName(networkType)){
+    stakingList.add(new LockStakingProviderModel(this));
+    stakingList.add(new YieldMachineStakingProviderModel(this));
+
+    lmList.add(new DefichainLmProviderModel());
+
+    rampList.add(new DefichainRampModel(this));
+
+    exchangeList.add(new DefichainExchangeModel());
+  }
+
+  List<AbstractStakingProviderModel> stakingList = [];
+  List<AbstractLmProviderModel> lmList = [];
+  List<AbstractOnOffRamp> rampList = [];
+  List<AbstractExchangeModel> exchangeList = [];
+
 
   static const int DUST = 3000;
   static const int FEE = 3000;
@@ -38,6 +56,13 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return networkType;
   }
 
+  Future<String> createAddress(AbstractAccountModel account) async {
+    var publicKeypair = bip32.BIP32.fromBase58(account.publicKey, _getNetworkTypeBip32());
+    var address = await this._createAddressString(publicKeypair, account.accountIndex);
+
+    return address;
+  }
+
   Future<List<TokenModel>> getAvailableTokens() async {
     return await DFITokenRequests.getTokens(networkType: this.networkType);
   }
@@ -47,7 +72,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }
 
   List<AbstractOnOffRamp> getRamps() {
-    return [];
+    return rampList;
   }
 
   Uri getTransactionExplorer(String tx) {
@@ -71,7 +96,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }
 
   List<AbstractExchangeModel> getExchanges() {
-    return [DefichainExchangeModel()];
+    return exchangeList;
   }
 
   List<AbstractStakingProviderModel> getStakingProviders() {
@@ -79,7 +104,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }
 
   List<AbstractLmProviderModel> getLmProviders() {
-    return [DefichainLmProviderModel()];
+    return lmList;
   }
 
   Future<double> getBalance({
@@ -268,7 +293,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return balance;
   }
 
-  Future<String> createAddress(
+  Future<String> _createAddressString(
       bip32.BIP32 masterKeyPair, int accountIndex) async {
     final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
     return _getAddressFromKeyPair(keyPair);
