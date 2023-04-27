@@ -1,6 +1,14 @@
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/history_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_bridge_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_exchange_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/defichain_lm_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -8,8 +16,8 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_account_mod
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_balance_requests.dart';
 import 'package:defi_wallet/requests/defichain/dfi_token_requests.dart';
-import 'package:defi_wallet/services/defichain/defichain_service.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
+import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
@@ -34,6 +42,14 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return await DFITokenRequests.getTokens(networkType: this.networkType);
   }
 
+  List<HistoryModel> getHistory(String networkName, String? txid) {
+    return [];
+  }
+
+  List<AbstractOnOffRamp> getRamps() {
+    return [];
+  }
+
   Uri getTransactionExplorer(String tx) {
     final query = {
       'network': networkType.networkStringLowerCase,
@@ -48,6 +64,22 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     };
 
     return Uri.https(Hosts.defiScanHome, '/address/$address', query);
+  }
+
+  List<AbstractBridge> getBridges() {
+    throw 'Not works yet';
+  }
+
+  List<AbstractExchangeModel> getExchanges() {
+    return [DefichainExchangeModel()];
+  }
+
+  List<AbstractStakingProviderModel> getStakingProviders() {
+    return [];
+  }
+
+  List<AbstractLmProviderModel> getLmProviders() {
+    return [DefichainLmProviderModel()];
   }
 
   Future<double> getBalance({
@@ -131,21 +163,31 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   bool checkAddress(String address) {
     return Address.validateAddress(
       address,
-      DefichainService.getNetwork(this.networkType.networkName),
+      _getNetworkType(),
+    );
+  }
+
+  Future<ECPair> getKeypair(String password, int accountIndex) async {
+    String masterKey = await HiveService.getMasterKey(
+      password,
+      this.networkType,
+    );
+
+    return _getKeypairForPathPrivateKey(
+      bip32.BIP32.fromBase58(masterKey, _getNetworkTypeBip32()),
+      accountIndex,
     );
   }
 
   Future<TxErrorModel> send(
-    AbstractAccountModel account,
-    String address,
-    String password,
-    TokenModel token,
-    double amount,
-  ) async {
-    ECPair keypair = await DefichainService.getKeypairFromStorage(
+      {required AbstractAccountModel account,
+      required String address,
+      required String password,
+      required TokenModel token,
+      required double amount}) async {
+    ECPair keypair = await getKeypair(
       password,
       account.accountIndex,
-      this.networkType.networkName,
     );
 
     List<BalanceModel> balances = account.getPinnedBalances(this);
@@ -175,16 +217,12 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     String message,
     String password,
   ) async {
-    ECPair keypair = await DefichainService.getKeypairFromStorage(
+    ECPair keypair = await getKeypair(
       password,
       account.accountIndex,
-      this.networkType.networkName,
     );
 
-    return keypair.signMessage(
-      message,
-      DefichainService.getNetwork(this.networkType.networkName),
-    );
+    return keypair.signMessage(message, _getNetworkType());
   }
 
   Future<BalanceModel> getBalanceUTXO(
@@ -230,19 +268,31 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return balance;
   }
 
-  Future<String> createAddress(bip32.BIP32 masterKeyPair, int accountIndex) async {
-    final keyPair = _getKeypairForPath(masterKeyPair, _derivePath(accountIndex));
+  Future<String> createAddress(
+      bip32.BIP32 masterKeyPair, int accountIndex) async {
+    final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
     return _getAddressFromKeyPair(keyPair);
   }
 
   // private
-  NetworkType _getNetworkType(){
-    return this.networkType.isTestnet ? networks.defichain_testnet : networks.defichain;
+  NetworkType _getNetworkType() {
+    return this.networkType.isTestnet
+        ? networks.defichain_testnet
+        : networks.defichain;
   }
-  ECPair _getKeypairForPath(
-      bip32.BIP32 masterKeypair, String path) {
 
-    return ECPair.fromPublicKey(masterKeypair.derivePath(path).publicKey,
+  ECPair _getKeypairForPathPublicKey(bip32.BIP32 masterKeypair, int account) {
+    return ECPair.fromPublicKey(
+        masterKeypair.derivePath(_derivePath(account)).publicKey,
+        network: _getNetworkType());
+  }
+
+  ECPair _getKeypairForPathPrivateKey(
+    bip32.BIP32 masterKeypair,
+    int account,
+  ) {
+    return ECPair.fromPrivateKey(
+        masterKeypair.derivePath(_derivePath(account)).privateKey!,
         network: _getNetworkType());
   }
 
@@ -258,5 +308,16 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       network: _getNetworkType(),
     ).data!.address;
     return address!;
+  }
+
+  bip32.NetworkType _getNetworkTypeBip32() {
+    var network = _getNetworkType();
+    return bip32.NetworkType(
+      bip32: bip32.Bip32Type(
+        private: network.bip32.private,
+        public: network.bip32.public,
+      ),
+      wif: network.wif,
+    );
   }
 }

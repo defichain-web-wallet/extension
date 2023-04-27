@@ -6,20 +6,24 @@ import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_lm_requests.dart';
-import 'package:defi_wallet/services/defichain/defichain_service.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
-abstract class DefichainLmProviderModel extends AbstractLmProviderModel {
+class DefichainLmProviderModel extends AbstractLmProviderModel {
   Future<List<LmPoolModel>> getAvailableLmPools(AbstractNetworkModel network) {
     return DFILmRequests.getLmPools(networkType: network.networkType);
   }
 
-  List<LmPoolModel> getPinnedLmPools(AbstractAccountModel account);
+//TODO: add this
+  List<LmPoolModel> getPinnedLmPools(AbstractAccountModel account) {
+    return [];
+  }
 
-  void pinLmPool(AbstractAccountModel account, LmPoolModel pool);
+//TODO: add this
+  void pinLmPool(AbstractAccountModel account, LmPoolModel pool) {}
 
-  void unpinLmPool(AbstractAccountModel account, LmPoolModel pool);
+//TODO: add this
+  void unpinLmPool(AbstractAccountModel account, LmPoolModel pool) {}
 
   Future<TxErrorModel> addBalance(
     AbstractAccountModel account,
@@ -28,10 +32,9 @@ abstract class DefichainLmProviderModel extends AbstractLmProviderModel {
     LmPoolModel pool,
     List<double> amounts,
   ) async {
-    ECPair keypair = await DefichainService.getKeypairFromStorage(
+    ECPair keypair = await network.getKeypair(
       password,
       account.accountIndex,
-      network.networkType.networkName,
     );
 
     List<BalanceModel> balances = account.getPinnedBalances(network);
@@ -74,10 +77,9 @@ abstract class DefichainLmProviderModel extends AbstractLmProviderModel {
     LmPoolModel pool,
     double amount,
   ) async {
-    ECPair keypair = await DefichainService.getKeypairFromStorage(
+    ECPair keypair = await network.getKeypair(
       password,
       account.accountIndex,
-      network.networkType.networkName,
     );
 
     return DFITransactionService().removeLiqudity(

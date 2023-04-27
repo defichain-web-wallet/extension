@@ -6,8 +6,8 @@ import 'package:defi_wallet/models/token/exchange_pair_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_exchange_requests.dart';
-import 'package:defi_wallet/services/defichain/defichain_service.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
+import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 class DefichainExchangeModel extends AbstractExchangeModel {
@@ -29,11 +29,7 @@ class DefichainExchangeModel extends AbstractExchangeModel {
     TokenModel toToken,
     double slippage,
   ) async {
-    ECPair keypair = await DefichainService.getKeypairFromStorage(
-      password,
-      account.accountIndex,
-      network.networkType.networkName,
-    );
+    ECPair keypair = await network.getKeypair(password, account.accountIndex);
 
     List<BalanceModel> balances = account.getPinnedBalances(network);
 

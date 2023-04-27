@@ -1,11 +1,27 @@
-import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
-import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
-import 'package:defi_wallet/services/defichain/defichain_service.dart';
-import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
-import 'package:defichaindart/defichaindart.dart';
 
 class AccountModel extends AbstractAccountModel {
+  AccountModel(
+    String publicKey,
+    Map<NetworkName, String> addresses,
+    int accountIndex,
+    Map<NetworkName, List<BalanceModel>> pinnedBalances,
+  ) : super(
+          publicKey,
+          addresses,
+          accountIndex,
+          pinnedBalances,
+        );
+
+  Map<NetworkName, List<AddressBookModel>> getAddressBook(
+      NetworkName networkName) {
+    return Map<NetworkName, List<AddressBookModel>>();
+  }
+
+  void addToAddressBook(NetworkName networkName, String address, String name) {}
+
+// private
 }

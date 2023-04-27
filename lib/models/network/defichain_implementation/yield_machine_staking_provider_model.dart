@@ -45,9 +45,8 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
   }
 
   Future<bool> isKycDone(AbstractAccountModel account) async {
-      var user = await LockRequests.getKYC(this.accessToken!);
-      return user.kycStatus == 'Full' ||
-          user.kycStatus == 'Light';
+    var user = await LockRequests.getKYC(this.accessToken!);
+    return user.kycStatus == 'Full' || user.kycStatus == 'Light';
   }
 
   Future<String> getKycLink(AbstractAccountModel account) async {
@@ -55,29 +54,32 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     return user.kycLink!;
   }
 
-  Future<BigInt> getAmountStaked(AbstractAccountModel account, TokenModel token) async {
-    var staking = await LockRequests.getStaking(this.accessToken!,'DeFiChain', 'LiquidityMining');
+  Future<BigInt> getAmountStaked(
+      AbstractAccountModel account, TokenModel token) async {
+    var staking = await LockRequests.getStaking(
+        this.accessToken!, 'DeFiChain', 'LiquidityMining');
     BigInt balance = BigInt.from(0);
-    try{
-      balance = BigInt.from(staking.balances.firstWhere((element) => element.asset == token.symbol).balance);
-    } catch(err){
+    try {
+      balance = BigInt.from(staking.balances
+          .firstWhere((element) => element.asset == token.symbol)
+          .balance);
+    } catch (err) {
       balance = BigInt.from(0);
     }
     return balance;
   }
 
-
   Future<StakingTokenModel> getDefaultStakingToken() async {
     var availableTokens = await this.networkModel.getAvailableTokens();
     var token =
-    availableTokens.firstWhere((element) => element.symbol == 'DFI');
+        availableTokens.firstWhere((element) => element.symbol == 'DFI');
     var analytics = await LockRequests.getAnalytics(
         this.accessToken!, 'DFI', 'DeFiChain', 'LiquidityMining');
     if (analytics == null) {
       throw 'Error getting analytics';
     }
-    return StakingTokenModel(apr: analytics.apr!, apy: analytics.apy!, token: token)
-    ;
+    return StakingTokenModel(
+        apr: analytics.apr!, apy: analytics.apy!, token: token);
   }
 
   Future<List<StakingTokenModel>> getAvailableStakingTokens() async {
@@ -108,7 +110,11 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     double amount,
   ) async {
     var tx = await network.send(
-        account, stakingModel.depositAddress, password, token, amount);
+        account: account,
+        address: stakingModel.depositAddress,
+        password: password,
+        token: token,
+        amount: amount);
     if (tx.isError == false) {
       LockRequests.setDeposit(
         this.accessToken!,
@@ -129,19 +135,23 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     double amount,
   ) async {
     late WithdrawModel? withdrawModel;
-    var existWithdraws = await LockRequests.getWithdraws(accessToken!, stakingModel.id);
-    if(existWithdraws!.isEmpty){
-      withdrawModel = await LockRequests.requestWithdraw(accessToken!, stakingModel.id, amount);
+    var existWithdraws =
+        await LockRequests.getWithdraws(accessToken!, stakingModel.id);
+    if (existWithdraws!.isEmpty) {
+      withdrawModel = await LockRequests.requestWithdraw(
+          accessToken!, stakingModel.id, amount);
     } else {
-      withdrawModel = await LockRequests.changeAmountWithdraw(accessToken!, stakingModel.id, existWithdraws[0].id!, amount);
+      withdrawModel = await LockRequests.changeAmountWithdraw(
+          accessToken!, stakingModel.id, existWithdraws[0].id!, amount);
     }
-    if(withdrawModel == null){
+    if (withdrawModel == null) {
       return false; //TODO: add error model
     }
 
-    withdrawModel.signature = await network
-        .signMessage(account, withdrawModel.signMessage!, password);
-    await LockRequests.signedWithdraw(accessToken!, stakingModel.id, withdrawModel);
+    withdrawModel.signature = await network.signMessage(
+        account, withdrawModel.signMessage!, password);
+    await LockRequests.signedWithdraw(
+        accessToken!, stakingModel.id, withdrawModel);
     return true;
   }
 

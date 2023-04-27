@@ -6,6 +6,8 @@ class Hosts {
 
   static const String defiScanHome = 'defiscan.live';
   static const String defiScanLiveTx = 'https://$defiScanHome/transactions/';
+  static const String blockcypherHome = 'live.blockcypher.com';
+  static const String blockcypherApi = 'api.blockcypher.com/v1';
 }
 
 class DfxApi {

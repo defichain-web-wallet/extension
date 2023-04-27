@@ -21,7 +21,8 @@ abstract class AbstractNetworkModel {
 
   Future<List<TokenModel>> getAvailableTokens();
 
-  List<AbstractAccountModel> getAccounts();
+  //TODO: I'm not a sure that we need it
+  // List<AbstractAccountModel> getAccounts();
 
   // Explorer
   Uri getTransactionExplorer(String tx);
@@ -75,26 +76,24 @@ abstract class AbstractNetworkModel {
 
   bool earnAvailable() => stakingAvailable() || lmAvailable();
 
+  Future<dynamic> getKeypair(String password, int accountIndex);
+
   // Buy and sell
   List<AbstractOnOffRamp> getRamps();
 
-
   bool buySellAvailable() => getRamps().length > 0;
 
-  List<HistoryModel> getHistory(
-      String networkName, String? txid);
-
+  List<HistoryModel> getHistory(String networkName, String? txid);
 
   // Sending
   bool checkAddress(String address);
 
   Future<TxErrorModel> send(
-    AbstractAccountModel account,
-    String address,
-    String password,
-    TokenModel token,
-    double amount,
-  );
+      {required AbstractAccountModel account,
+        required String address,
+        required String password,
+        required TokenModel token,
+        required double amount});
 
   Future<String> signMessage(
     AbstractAccountModel account,

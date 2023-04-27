@@ -3,7 +3,7 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as https;
 
 class DFIBalanceRequests {
   static Future<List<BalanceModel>> getBalanceList({
@@ -16,7 +16,7 @@ class DFIBalanceRequests {
         '/address/$addressString/tokens';
     final Uri url = Uri.parse(urlAddress);
     try {
-      final response = await http.get(url);
+      final response = await https.get(url);
 
       if (response.statusCode == 200) {
         dynamic json = jsonDecode(response.body);
@@ -60,7 +60,7 @@ class DFIBalanceRequests {
           '/address/$addressString/balance';
       final Uri url = Uri.parse(urlAddress);
 
-      final response = await http.get(url);
+      final response = await https.get(url);
 
       if (response.statusCode == 200) {
         dynamic data = jsonDecode(response.body);
