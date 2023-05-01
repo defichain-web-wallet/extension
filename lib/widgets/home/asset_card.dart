@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -34,12 +35,12 @@ class AssetCard extends StatefulWidget {
   State<AssetCard> createState() => _AssetCardState();
 }
 
-class _AssetCardState extends State<AssetCard> {
+class _AssetCardState extends State<AssetCard> with FormatMixin{
   TokensHelper tokensHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 
   String getFormatTokenBalance(double tokenBalance) =>
-      '${balancesHelper.numberStyling(tokenBalance)}';
+      '${formatNumberStyling(tokenBalance, type: FormatNumberType.crypto)}';
 
   String getFormatTokenBalanceByFiat(
       state, String coin, double tokenBalance, String fiat) {
@@ -55,7 +56,7 @@ class _AssetCardState extends State<AssetCard> {
     if (fiat == 'EUR') {
       balanceInUsd *= state.eurRate;
     }
-    return '\$${balancesHelper.numberStyling(balanceInUsd, fixed: true)}';
+    return '\$${formatNumberStyling(balanceInUsd, type: FormatNumberType.fiat)}';
   }
 
   @override
