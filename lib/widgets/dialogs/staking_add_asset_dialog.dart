@@ -1,17 +1,22 @@
 import 'dart:ui';
 
+import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/fields/input_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class StakingAddAssetDialog extends StatefulWidget {
-  const StakingAddAssetDialog({Key? key}) : super(key: key);
+  final String assetName;
+
+  const StakingAddAssetDialog({
+    Key? key,
+    required this.assetName,
+  }) : super(key: key);
 
   @override
   State<StakingAddAssetDialog> createState() => _StakingAddAssetDialogState();
@@ -29,15 +34,19 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
 
   @override
   Widget build(BuildContext context) {
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
         backgroundColor: isDarkTheme()
-            ? DarkColors.scaffoldContainerBgColor
-            : LightColors.scaffoldContainerBgColor,
+            ? DarkColors.drawerBgColor
+            : LightColors.drawerBgColor,
         insetPadding: EdgeInsets.all(24),
         shape: RoundedRectangleBorder(
-          side: BorderSide.none,
+          side: isDarkTheme()
+              ? BorderSide(color: DarkColors.drawerBorderColor)
+              : BorderSide.none,
           borderRadius: BorderRadius.circular(20),
         ),
         actionsPadding: EdgeInsets.symmetric(
@@ -60,7 +69,15 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
               NewPrimaryButton(
                 width: 104,
                 title: 'Confirm',
-                callback: () {},
+                callback: () {
+                  Navigator.pop(context);
+                  lockCubit.updateLockRewardNewRoute(
+                      address: addressController.text,
+                      label: labelController.text,
+                      percent: 0,
+                      isComplete: true
+                  );
+                },
               ),
             ],
           ),
@@ -75,7 +92,7 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
           children: [
             Container(
               width: 312,
-              height: isPayout ? 390 : 282,
+              height: 305,
               child: Stack(
                 children: [
                   Container(
@@ -130,7 +147,7 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
                                 width: 8,
                               ),
                               Text(
-                                'DFI - DeFiChain',
+                                widget.assetName,
                                 style: Theme.of(context)
                                     .textTheme
                                     .headline5!
@@ -153,126 +170,61 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
                           ),
                           child: Column(
                             children: [
-                              DefiCheckbox(
-                                callback: (val) {
-                                  setState(() {
-                                    isPayout = val!;
-                                  });
-                                },
-                                value: isPayout,
-                                focusNode: checkBoxFocusNode,
-                                isShowLabel: false,
-                                textWidget: Text(
-                                  'Optional payout address',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subtitle1!
-                                      .copyWith(
+                              InputField(
+                                controller: labelController,
+                                hintText: 'Label: e.g. Wifes wallet',
+                                suffix: Padding(
+                                  padding: EdgeInsets.only(right: 16),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        labelController.text = '';
+                                      });
+                                    },
+                                    child: MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/delete_text_input.svg',
                                         color: Theme.of(context)
                                             .textTheme
-                                            .subtitle1!
+                                            .headline5!
                                             .color!
-                                            .withOpacity(0.8),
+                                            .withOpacity(0.2),
                                       ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              if (isPayout) ...[
-                                SizedBox(
-                                  height: 13,
-                                ),
-                                InputField(
-                                  controller: labelController,
-                                  hintText: 'Label: e.g. Wifes wallet',
-                                  suffix: Padding(
-                                    padding: EdgeInsets.only(right: 16),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          labelController.text = '';
-                                        });
-                                      },
-                                      child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: SvgPicture.asset(
-                                          'assets/icons/delete_text_input.svg',
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .color!
-                                              .withOpacity(0.2),
-                                        ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              InputField(
+                                controller: addressController,
+                                hintText: 'Address: e.g.: df1qx5hraps.....',
+                                suffix: Padding(
+                                  padding: EdgeInsets.only(right: 16),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        addressController.text = '';
+                                      });
+                                    },
+                                    child: MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/delete_text_input.svg',
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!
+                                            .withOpacity(0.2),
                                       ),
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 8,
-                                ),
-                                InputField(
-                                  controller: addressController,
-                                  hintText: 'Address: e.g.: df1qx5hraps.....',
-                                  suffix: Padding(
-                                    padding: EdgeInsets.only(right: 16),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          addressController.text = '';
-                                        });
-                                      },
-                                      child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: SvgPicture.asset(
-                                          'assets/icons/delete_text_input.svg',
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .color!
-                                              .withOpacity(0.2),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ]
+                              ),
                             ],
                           ),
-                        ),
-                        SizedBox(
-                          height: 16,
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(right: 10),
-                                  child: SvgPicture.asset(
-                                      'assets/icons/important_icon.svg'),
-                                ),
-                              ],
-                            ),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Text(
-                                    warningText,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline6!
-                                        .copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .color!
-                                              .withOpacity(0.6),
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
                         ),
                       ],
                     ),
@@ -302,6 +254,5 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
         ),
       ),
     );
-    ;
   }
 }
