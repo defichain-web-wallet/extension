@@ -77,7 +77,7 @@ class _MainLiquidityPairState extends State<MainLiquidityPair> with ThemeMixin {
                             Container(
                               child: AssetPair(
                                 pair: widget.assetPair!.symbol!,
-                                size: 25,
+                                // size: 25,
                               ),
                             ),
                             SizedBox(

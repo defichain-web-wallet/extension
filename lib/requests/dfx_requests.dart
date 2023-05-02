@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';

@@ -1,11 +1,13 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/dialog_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/settings/setting_language_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_recovery_seed_screen.dart';
 import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -22,7 +24,7 @@ class SettingScreen extends StatefulWidget {
   State<SettingScreen> createState() => _SettingScreenState();
 }
 
-class _SettingScreenState extends State<SettingScreen> with ThemeMixin {
+class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMixin {
   TextEditingController searchController = TextEditingController();
   String titleText = 'Settings';
 
@@ -37,7 +39,7 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin {
         return BlocBuilder<AccountCubit, AccountState>(
           builder: (context, state) {
             return Scaffold(
-              drawerScrimColor: Color(0x0f180245),
+              drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: AccountDrawer(
                 width: buttonSmallWidth,
               ),
@@ -95,7 +97,7 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin {
                                   subtitleText: 'Click to show recovery seed',
                                   onTap: () {
                                     showDialog(
-                                      barrierColor: Color(0x0f180245),
+                                      barrierColor: AppColors.tolopea.withOpacity(0.06),
                                       barrierDismissible: false,
                                       context: context,
                                       builder: (BuildContext contextDialog) {

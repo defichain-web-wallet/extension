@@ -55,6 +55,9 @@ class SelectorTabElement extends StatelessWidget {
                               .withOpacity(0.3),
                         ),
                 ),
+                SizedBox(
+                  height: 4,
+                ),
                 Container(
                   width: indicatorWidth ?? 20,
                   height: 2,

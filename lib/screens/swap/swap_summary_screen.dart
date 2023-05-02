@@ -12,6 +12,7 @@ import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -66,7 +67,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
               appBar: NewMainAppBar(
                 isShowLogo: false,
               ),
-              drawerScrimColor: Color(0x0f180245),
+              drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: AccountDrawer(
                 width: buttonSmallWidth,
               ),
@@ -155,13 +156,13 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: SvgPicture.asset(
-                                      TokensHelper().getImageNameByTokenName(
-                                          widget.assetFrom),
-                                    ),
+                                  AssetLogo(
+                                    size: 24,
+                                    assetStyle:
+                                    TokensHelper().getAssetStyleByTokenName(widget.assetFrom),
+                                    borderWidth: 0,
+                                    isBorder: false,
+
                                   ),
                                   SizedBox(
                                     width: 6,
@@ -195,13 +196,12 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: SvgPicture.asset(
-                                TokensHelper()
-                                    .getImageNameByTokenName(widget.assetTo),
-                              ),
+                            AssetLogo(
+                              size: 24,
+                              assetStyle:
+                              TokensHelper().getAssetStyleByTokenName(widget.assetTo),
+                              borderWidth: 0,
+                              isBorder: false,
                             ),
                             SizedBox(
                               width: 6,
@@ -269,7 +269,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                   submitSwap(state, tokensState, "");
                                 } else if (!isLedger) {
                                   showDialog(
-                                    barrierColor: Color(0x0f180245),
+                                    barrierColor: AppColors.tolopea.withOpacity(0.06),
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext context1) {
@@ -287,7 +287,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                   );
                                 } else if (isLedger) {
                                   showDialog(
-                                    barrierColor: Color(0x0f180245),
+                                    barrierColor: AppColors.tolopea.withOpacity(0.06),
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext context1) {
@@ -359,7 +359,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
       }
 
       showDialog(
-        barrierColor: Color(0x0f180245),
+        barrierColor: AppColors.tolopea.withOpacity(0.06),
         barrierDismissible: false,
         context: context,
         builder: (BuildContext dialogContext) {

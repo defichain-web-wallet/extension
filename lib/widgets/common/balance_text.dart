@@ -1,4 +1,5 @@
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:flutter/material.dart';
 
 class BalanceText extends StatefulWidget {
@@ -17,7 +18,7 @@ class BalanceText extends StatefulWidget {
   State<BalanceText> createState() => _BalanceTextState();
 }
 
-class _BalanceTextState extends State<BalanceText> {
+class _BalanceTextState extends State<BalanceText> with FormatMixin {
   BalancesHelper balancesHelper = BalancesHelper();
   late double totalBalance;
   late String roundedPart;
@@ -34,11 +35,7 @@ class _BalanceTextState extends State<BalanceText> {
     } else if (widget.assetName == 'EUR') {
       return '€' + roundedPart.split('.')[0] + '.';
     } else {
-      return balancesHelper.numberStyling(
-            totalBalance,
-            fixed: true,
-            fixedCount: 6,
-          ) +
+      return formatNumberStyling(totalBalance, type: FormatNumberType.btc) +
           ' ';
     }
   }

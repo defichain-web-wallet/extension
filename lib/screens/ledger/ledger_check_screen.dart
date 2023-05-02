@@ -34,7 +34,7 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
       TransactionState txState,
     ) {
       return Scaffold(
-        drawerScrimColor: Color(0x0f180245),
+        drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
         endDrawer: AccountDrawer(
           width: buttonSmallWidth,
         ),
@@ -123,7 +123,7 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                         } on Exception catch (error) {
                           print(error);
                           showDialog(
-                            barrierColor: Color(0x0f180245),
+                            barrierColor: AppColors.tolopea.withOpacity(0.06),
                             barrierDismissible: false,
                             context: context,
                             builder: (BuildContext dialogContext) {

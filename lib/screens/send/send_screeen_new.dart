@@ -102,11 +102,12 @@ class _SendScreenNewState extends State<SendScreenNew>
       if (isValidAddress) {
         if (isAddNewContact) {
           showDialog(
-            barrierColor: Color(0x0f180245),
+            barrierColor: AppColors.tolopea.withOpacity(0.06),
             barrierDismissible: false,
             context: context,
             builder: (BuildContext dialogContext) {
               return CreateEditContactDialog(
+                isDisableEditAddress: true,
                 address: addressController.text,
                 isEdit: false,
                 confirmCallback: (name, address, network) {
@@ -259,7 +260,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                     }
 
                     return Scaffold(
-                      drawerScrimColor: Color(0x0f180245),
+                      drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                       endDrawer: AccountDrawer(
                         width: buttonSmallWidth,
                       ),

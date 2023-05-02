@@ -2,20 +2,22 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/lock_reward_routes_model.dart';
+import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/common/app_tooltip.dart';
-import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
-import 'package:defi_wallet/widgets/fields/invested_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
+import 'package:defi_wallet/widgets/staking/reward_icon.dart';
+import 'package:defi_wallet/widgets/staking/reward_routes.dart';
+import 'package:defi_wallet/widgets/staking/staking_tabs.dart';
+import 'package:defi_wallet/widgets/staking/yield_machine/yield_machine_balances.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,13 +32,30 @@ class StakingScreen extends StatefulWidget {
   _StakingScreenState createState() => _StakingScreenState();
 }
 
-class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
+class _StakingScreenState extends State<StakingScreen>
+    with ThemeMixin, SnackBarMixin {
   final String titleText = 'Staking';
+  final String headerTextStaking = 'DFI Staking by LOCK';
+  final String headerTextYieldMachine = 'Yield Machine by LOCK';
   bool isEdit = false;
   bool isFirstBuild = true;
   TextEditingController controller = TextEditingController();
   late List<TextEditingController> controllers;
+  late List<FocusNode> focusNodes;
   late List<Widget> rewards;
+
+  _onSaveRewardRoutes(BuildContext context) {
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+
+    lockCubit.updateRewardRoutes(
+      accountCubit.state.accounts!.first,
+      lockCubit.state.lockStakingDetails!.rewardRoutes!,
+    );
+    setState(() {
+      isEdit = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,19 +65,44 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
         bool isFullScreen,
         TransactionState txState,
       ) {
+        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
         if (isFirstBuild) {
-          AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-          LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
           lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
           isFirstBuild = false;
         }
         return BlocBuilder<LockCubit, LockState>(
           builder: (lockContext, lockState) {
             if (lockState.status == LockStatusList.success) {
+              List<LockRewardRoutesModel> rewards =
+                  lockState.lockStakingDetails!.rewardRoutes!;
+              controllers = List.generate(rewards.length, (index) {
+                return TextEditingController(
+                    text: (rewards[index].rewardPercent! * 100).toString());
+              });
+              focusNodes = List.generate(rewards.length, (index) => FocusNode());
               controller.text =
                   '${lockState.lockStakingDetails!.rewardRoutes![0].rewardPercent! * 100}';
+              bool isYieldMachine =
+                  lockState.lockStrategy == LockStrategyList.LiquidityMining;
+
+              if (lockState.errorMessage.isNotEmpty) {
+                Future<Null>.delayed(Duration.zero, () {
+                  showSnackBar(
+                    context,
+                    title: lockState.errorMessage,
+                    color: AppColors.txStatusError.withOpacity(0.1),
+                    prefix: Icon(
+                      Icons.close,
+                      color: AppColors.txStatusError,
+                    ),
+                  );
+                });
+                lockCubit.updateErrorMessage('');
+              }
+
               return Scaffold(
-                drawerScrimColor: Color(0x0f180245),
+                drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                 endDrawer: AccountDrawer(
                   width: buttonSmallWidth,
                 ),
@@ -66,6 +110,12 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                   bgColor: AppColors.viridian.withOpacity(0.16),
                   isShowLogo: false,
                   isShowNetworkSelector: false,
+                  callback: () {
+                    lockCubit.updateLockStrategy(
+                      LockStrategyList.Masternode,
+                      accountCubit.state.accounts!.first,
+                    );
+                  },
                 ),
                 body: Container(
                   decoration: BoxDecoration(
@@ -96,12 +146,14 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                       borderRadius: BorderRadius.circular(20),
                                       color: isDarkTheme()
                                           ? AppColors.white.withOpacity(0.04)
-                                          : LightColors.scaffoldContainerBgColor,
+                                          : LightColors
+                                              .scaffoldContainerBgColor,
                                       border: isDarkTheme()
                                           ? Border.all(
-                                        width: 1.0,
-                                        color: Colors.white.withOpacity(0.05),
-                                      )
+                                              width: 1.0,
+                                              color: Colors.white
+                                                  .withOpacity(0.05),
+                                            )
                                           : null,
                                     ),
                                     child: Column(
@@ -109,7 +161,9 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                           CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          'DFI Staking by LOCK',
+                                          !lockState.isYieldMachine
+                                              ? headerTextStaking
+                                              : headerTextYieldMachine,
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -121,20 +175,8 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                           height: 4,
                                         ),
                                         Text(
-                                          '${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apy! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% APY / '
-                                          '${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apr! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% APR',
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')} / '
+                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apr!, 'APR')}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -228,11 +270,11 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                       titleText,
                                       style:
                                           Theme.of(context).textTheme.headline3,
-                                    )
+                                    ),
                                   ],
                                 ),
                                 SizedBox(
-                                  height: 8,
+                                  height: 16,
                                 ),
                                 Container(
                                   width: double.infinity,
@@ -246,112 +288,115 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                   ),
                                   child: Column(
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            '${lockState.lockStakingDetails!.asset} Staking',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline4!
-                                                .copyWith(
-                                                  fontSize: 16,
-                                                ),
-                                          ),
-                                          Text(
-                                            '${lockState.lockStakingDetails!.balance} ${lockState.lockStakingDetails!.asset}',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline4!
-                                                .copyWith(
-                                                  fontSize: 16,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 16,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Pending Deposits ',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .subtitle1!
-                                                .copyWith(
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .headline5!
-                                                      .color!
-                                                      .withOpacity(0.5),
-                                                ),
-                                          ),
-                                          Text(
-                                            '${lockState.lockStakingDetails!.pendingDeposits == 0 ? '' : '+'}'
-                                            '${lockState.lockStakingDetails!.pendingDeposits}'
-                                            ' ${lockState.lockStakingDetails!.asset}',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .copyWith(
-                                                  fontSize: 16,
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .headline5!
-                                                      .color!
-                                                      .withOpacity(0.8),
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 16,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Pending Withdrawals ',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .subtitle1!
-                                                .copyWith(
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .headline5!
-                                                      .color!
-                                                      .withOpacity(0.5),
-                                                ),
-                                          ),
-                                          Text(
-                                            '${lockState.lockStakingDetails!.pendingWithdrawals == 0 ? '' : '-'}'
-                                            '${lockState.lockStakingDetails!.pendingWithdrawals}'
-                                            ' ${lockState.lockStakingDetails!.asset}',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .copyWith(
-                                                  fontSize: 16,
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .headline5!
-                                                      .color!
-                                                      .withOpacity(0.8),
-                                                ),
-                                          ),
-                                        ],
-                                      ),
+                                      if (!lockState.isYieldMachine) ...[
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '${lockState.lockStakingDetails!.asset} Staking',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline4!
+                                                  .copyWith(
+                                                    fontSize: 16,
+                                                  ),
+                                            ),
+                                            Text(
+                                              '${lockState.lockStakingDetails!.balance} ${lockState.lockStakingDetails!.asset}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline4!
+                                                  .copyWith(
+                                                    fontSize: 16,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 16,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Pending Deposits ',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .subtitle1!
+                                                  .copyWith(
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.5),
+                                                  ),
+                                            ),
+                                            Text(
+                                              '${lockState.lockStakingDetails!.pendingDeposits == 0 ? '' : '+'}'
+                                              '${lockState.lockStakingDetails!.pendingDeposits}'
+                                              ' ${lockState.lockStakingDetails!.asset}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline5!
+                                                  .copyWith(
+                                                    fontSize: 16,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.8),
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 16,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Pending Withdrawals ',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .subtitle1!
+                                                  .copyWith(
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.5),
+                                                  ),
+                                            ),
+                                            Text(
+                                              '${lockState.lockStakingDetails!.pendingWithdrawals == 0 ? '' : '-'}'
+                                              '${lockState.lockStakingDetails!.pendingWithdrawals}'
+                                              ' ${lockState.lockStakingDetails!.asset}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline5!
+                                                  .copyWith(
+                                                    fontSize: 16,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.8),
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ] else
+                                        YieldMachineBalance(),
                                       SizedBox(
                                         height: 16,
                                       ),
@@ -384,78 +429,23 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                                         fontSize: 16,
                                                       ),
                                                 ),
-                                                Container(
-                                                  width: 32,
-                                                  height: 32,
-                                                  child: Center(
-                                                    child: isEdit
-                                                        ? NewActionButton(
-                                                            isStaticColor: true,
-                                                            bgGradient:
-                                                                gradientActionButtonBg,
-                                                            iconPath:
-                                                                'assets/icons/add.svg',
-                                                            onPressed: () {
-                                                              showDialog(
-                                                                barrierColor: Color(
-                                                                    0x0f180245),
-                                                                barrierDismissible:
-                                                                    false,
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return StakingAddAssetDialog();
-                                                                },
-                                                              );
-                                                            },
-                                                          )
-                                                        : AppTooltip(
-                                                          message: 'Coming soon',
-                                                          margin: 0,
-                                                          child: GestureDetector(
-                                                              onTap: () {
-                                                                // TODO: need to uncomment later
-                                                                // setState(() {
-                                                                //   isEdit = true;
-                                                                // });
-                                                              },
-                                                              child: MouseRegion(
-                                                                cursor:
-                                                                    SystemMouseCursors
-                                                                        .click,
-                                                                child: SvgPicture
-                                                                    .asset(
-                                                                  'assets/icons/edit_gradient.svg',
-                                                                  color: AppColors.grey,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                        ),
-                                                  ),
+                                                RewardIcon(
+                                                  readonly: isEdit,
+                                                  onTap: (value) {
+                                                    setState(() {
+                                                      isEdit = value;
+                                                    });
+                                                  },
                                                 ),
                                               ],
                                             ),
                                             SizedBox(
                                               height: 12,
                                             ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                InvestedField(
-                                                  label:
-                                                      '${lockState.lockStakingDetails!.rewardRoutes![0].label}',
-                                                  tokenName:
-                                                      '${lockState.lockStakingDetails!.rewardRoutes![0].targetAsset}',
-                                                  controller: controller,
-                                                  isDeleteBtn: false,
-                                                  isDisable: !isEdit,
-                                                ),
-                                              ],
+                                            RewardRoutesList(
+                                              controllers: controllers,
+                                              focusNodes: focusNodes,
+                                              isDisabled: isEdit,
                                             ),
                                           ],
                                         ),
@@ -533,11 +523,8 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                                             NewPrimaryButton(
                                               width: 140,
                                               title: 'Save',
-                                              callback: () {
-                                                setState(() {
-                                                  isEdit = false;
-                                                });
-                                              },
+                                              callback: () =>
+                                                  _onSaveRewardRoutes(context),
                                             )
                                           ],
                                         ),
@@ -554,14 +541,7 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
                 ),
               );
             } else if (lockState.status == LockStatusList.failure) {
-              return Container(
-                child: Center(
-                  child: ErrorPlaceholder(
-                    description: 'Please check again later',
-                    message: 'API is under maintenance',
-                  ),
-                ),
-              );
+              return ErrorScreen();
             } else {
               return Loader();
             }
@@ -569,5 +549,13 @@ class _StakingScreenState extends State<StakingScreen> with ThemeMixin {
         );
       },
     );
+  }
+
+  String getAprOrApyFormat(double amount, String amountType) {
+    return '${BalancesHelper().numberStyling(
+      (amount * 100),
+      fixed: true,
+      fixedCount: 2,
+    )}% $amountType';
   }
 }
