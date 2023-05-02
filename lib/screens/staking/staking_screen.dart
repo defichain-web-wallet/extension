@@ -276,12 +276,6 @@ class _StakingScreenState extends State<StakingScreen>
                                 SizedBox(
                                   height: 16,
                                 ),
-                                StakingTabs(
-                                  lockStrategy: lockState.lockStrategy,
-                                ),
-                                SizedBox(
-                                  height: 24,
-                                ),
                                 Container(
                                   width: double.infinity,
                                   padding: EdgeInsets.all(16),
