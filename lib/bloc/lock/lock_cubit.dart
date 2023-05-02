@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/models/account_model.dart';
@@ -24,6 +26,12 @@ class LockCubit extends Cubit<LockState> {
   setLoadingState() {
     emit(state.copyWith(
       status: LockStatusList.loading,
+    ));
+  }
+
+  updateErrorMessage(String errorString) {
+    emit(state.copyWith(
+      errorMessage: errorString,
     ));
   }
 
@@ -140,31 +148,39 @@ class LockCubit extends Cubit<LockState> {
     AccountModel account,
     List<LockRewardRoutesModel> rewardRoutes,
   ) async {
+    String errorMessage = '';
+
     emit(state.copyWith(
       status: LockStatusList.loading,
     ));
-    try {
-      List<LockRewardRoutesModel> routes = List.from(rewardRoutes);
-      var temp = routes.firstWhere((element) => element.label == 'Reinvest');
-      int index = routes.indexOf(temp);
-      routes.removeAt(index);
-      var rewardRoutesString = routes.map((e) => e.toJson()).toList();
 
+    List<LockRewardRoutesModel> routes = List.from(rewardRoutes);
+    var temp = routes.firstWhere((element) => element.label == 'Reinvest');
+    int index = routes.indexOf(temp);
+    routes.removeAt(index);
+    var rewardRoutesString = routes.map((e) => e.toJson()).toList();
+
+    try {
       await lockRequests.updateRewards(
         account.lockAccessToken!,
         rewardRoutesString,
         state.lockStakingDetails!.id!,
       );
+    } catch (err) {
+      String errorString = err.toString();
 
-      emit(state.copyWith(
-        status: LockStatusList.success,
-        lastEditedRewardIndex: 0,
-      ));
-    } catch (_) {
-      emit(state.copyWith(
-        status: LockStatusList.failure,
-      ));
+      if (errorString.contains('Provided duplicated route')) {
+        errorMessage = 'Cannot create duplicated route';
+      } else {
+        errorMessage = jsonDecode(errorString)['message'];
+      }
     }
+
+    emit(state.copyWith(
+      status: LockStatusList.success,
+      lastEditedRewardIndex: 0,
+      errorMessage: errorMessage,
+    ));
   }
 
   updateReinvestRewardRoute() {

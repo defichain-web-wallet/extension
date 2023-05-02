@@ -350,9 +350,13 @@ class LockRequests {
 
       final body = jsonEncode(rewardRoutes);
 
-      await http.put(url, headers: headers, body: body);
-    } catch (_) {
-      print(_);
+      final response = await http.put(url, headers: headers, body: body);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Error.safeToString(response.body);
+      }
+    } catch (err) {
+      throw err;
     }
   }
 }

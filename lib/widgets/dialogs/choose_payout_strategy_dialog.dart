@@ -36,6 +36,13 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
   String currentLabel = '';
 
   @override
+  void initState() {
+    super.initState();
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    currentAddress = lockCubit.state.lockStakingDetails!.depositAddress!;
+  }
+
+  @override
   Widget build(BuildContext dialogContext) {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(dialogContext);
 
@@ -84,8 +91,10 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
                     );
                   } else {
                     lockCubit.updateLockRewardNewRoute(
+                      asset: widget.assetName,
                       address: currentAddress,
                       label: currentLabel,
+                      percent: 0,
                       isComplete: true
                     );
                   }
@@ -133,57 +142,6 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
                         children: [
                           SizedBox(
                             height: 41,
-                          ),
-                          Text(
-                            'Reinvest',
-                            style:
-                                Theme.of(context).textTheme.headline5!.copyWith(
-                                      fontSize: 12,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
-                            softWrap: true,
-                          ),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          TokenListTile(
-                            isSingleSelect: true,
-                            isSelect: currentAddress == lockCubit.state.lockStakingDetails!.depositAddress!,
-                            tokenName: '',
-                            isDense: true,
-                            availableTokenName: '',
-                            onTap: () {
-                              setState(() {
-                                currentAddress = lockCubit.state.lockStakingDetails!.depositAddress!;
-                              });
-                            },
-                            customContent: Row(
-                              children: [
-                                SizedBox(
-                                  width: 16,
-                                ),
-                                SvgPicture.asset('assets/icons/yield_icon.svg'),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Text(
-                                  'Yield Machine',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline5!
-                                      .copyWith(
-                                        fontSize: 16,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 8,
                           ),
                           Text(
                             'Payout',

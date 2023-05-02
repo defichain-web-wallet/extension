@@ -74,6 +74,7 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
                   lockCubit.updateLockRewardNewRoute(
                       address: addressController.text,
                       label: labelController.text,
+                      percent: 0,
                       isComplete: true
                   );
                 },

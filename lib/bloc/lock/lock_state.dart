@@ -21,6 +21,7 @@ enum LockAssetCryptoCategory {
 
 class LockState extends Equatable {
   final LockStatusList status;
+  final String errorMessage;
   final LockStrategyList lockStrategy;
   final LockAssetCryptoCategory lockActiveAssetCategory;
   final LockUserModel? lockUserDetails;
@@ -33,6 +34,7 @@ class LockState extends Equatable {
 
   LockState({
     this.status = LockStatusList.initial,
+    this.errorMessage = '',
     this.lockStrategy = LockStrategyList.Masternode,
     this.lockActiveAssetCategory = LockAssetCryptoCategory.Stock,
     this.lockUserDetails,
@@ -47,6 +49,7 @@ class LockState extends Equatable {
   @override
   List<Object?> get props => [
         status,
+        errorMessage,
         lockStrategy,
         lockUserDetails,
         lockStakingDetails,
@@ -69,6 +72,7 @@ class LockState extends Equatable {
 
   LockState copyWith({
     LockStatusList? status,
+    String? errorMessage,
     LockStrategyList? lockStrategy,
     LockAssetCryptoCategory? lockActiveAssetCategory,
     LockUserModel? lockUserDetails,
@@ -81,6 +85,7 @@ class LockState extends Equatable {
   }) {
     return LockState(
       status: status ?? this.status,
+      errorMessage: errorMessage ?? this.errorMessage,
       lockStrategy: lockStrategy ?? this.lockStrategy,
       lockActiveAssetCategory:
           lockActiveAssetCategory ?? this.lockActiveAssetCategory,

@@ -5,14 +5,12 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/lock_reward_routes_model.dart';
+import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
-import 'package:defi_wallet/screens/staking/yield_machine/yield_machine_action_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
-import 'package:defi_wallet/widgets/fields/invested_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -51,8 +49,7 @@ class _StakingScreenState extends State<StakingScreen>
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
     lockCubit.updateRewardRoutes(
-      accountCubit
-          .state.accounts!.first,
+      accountCubit.state.accounts!.first,
       lockCubit.state.lockStakingDetails!.rewardRoutes!,
     );
     setState(() {
@@ -77,17 +74,33 @@ class _StakingScreenState extends State<StakingScreen>
         return BlocBuilder<LockCubit, LockState>(
           builder: (lockContext, lockState) {
             if (lockState.status == LockStatusList.success) {
-              List<LockRewardRoutesModel> rewards = lockState.lockStakingDetails!.rewardRoutes!;
+              List<LockRewardRoutesModel> rewards =
+                  lockState.lockStakingDetails!.rewardRoutes!;
               controllers = List.generate(rewards.length, (index) {
                 return TextEditingController(
-                  text: (rewards[index].rewardPercent! * 100).toString()
-                );
+                    text: (rewards[index].rewardPercent! * 100).toString());
               });
               focusNodes = List.generate(rewards.length, (index) => FocusNode());
               controller.text =
                   '${lockState.lockStakingDetails!.rewardRoutes![0].rewardPercent! * 100}';
               bool isYieldMachine =
                   lockState.lockStrategy == LockStrategyList.LiquidityMining;
+
+              if (lockState.errorMessage.isNotEmpty) {
+                Future<Null>.delayed(Duration.zero, () {
+                  showSnackBar(
+                    context,
+                    title: lockState.errorMessage,
+                    color: AppColors.txStatusError.withOpacity(0.1),
+                    prefix: Icon(
+                      Icons.close,
+                      color: AppColors.txStatusError,
+                    ),
+                  );
+                });
+                lockCubit.updateErrorMessage('');
+              }
+
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                 endDrawer: AccountDrawer(
@@ -446,7 +459,7 @@ class _StakingScreenState extends State<StakingScreen>
                                       SizedBox(
                                         height: 16,
                                       ),
-                                      if (!lockState.isYieldMachine && !isEdit)
+                                      if (!isEdit)
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -497,7 +510,7 @@ class _StakingScreenState extends State<StakingScreen>
                                             )
                                           ],
                                         ),
-                                      if (!lockState.isYieldMachine && isEdit)
+                                      if (isEdit)
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -524,86 +537,6 @@ class _StakingScreenState extends State<StakingScreen>
                                     ],
                                   ),
                                 ),
-                                if (lockState.isYieldMachine && !isEdit) ...[
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: 156,
-                                        height: 43,
-                                        child: AccentButton(
-                                          label: 'Withdrawal',
-                                          callback: () {
-                                            if (lockState
-                                                    .availableBalances.length !=
-                                                0) {
-                                              Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                          animation1,
-                                                          animation2) =>
-                                                      YieldMachineActionScreen(
-                                                    isDeposit: false,
-                                                    isShowDepositAddress:
-                                                        lockState
-                                                                .availableBalances
-                                                                .length !=
-                                                            0,
-                                                  ),
-                                                  transitionDuration:
-                                                      Duration.zero,
-                                                  reverseTransitionDuration:
-                                                      Duration.zero,
-                                                ),
-                                              );
-                                            } else {
-                                              showSnackBar(
-                                                context,
-                                                title: 'Insufficient funds',
-                                                color: AppColors.txStatusError
-                                                    .withOpacity(0.1),
-                                                prefix: Icon(
-                                                  Icons.close,
-                                                  color:
-                                                      AppColors.txStatusError,
-                                                ),
-                                              );
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 156,
-                                        height: 43,
-                                        child: NewPrimaryButton(
-                                          title: 'Deposit',
-                                          callback: () {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    YieldMachineActionScreen(
-                                                  isDeposit: true,
-                                                ),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
                               ],
                             ),
                           ),
@@ -614,14 +547,7 @@ class _StakingScreenState extends State<StakingScreen>
                 ),
               );
             } else if (lockState.status == LockStatusList.failure) {
-              return Container(
-                child: Center(
-                  child: ErrorPlaceholder(
-                    description: 'Please check again later',
-                    message: 'API is under maintenance',
-                  ),
-                ),
-              );
+              return ErrorScreen();
             } else {
               return Loader();
             }
