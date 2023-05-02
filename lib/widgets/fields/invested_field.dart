@@ -7,20 +7,28 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class InvestedField extends StatefulWidget {
   final TextEditingController? controller;
+  final FocusNode focusNode;
   final String? subtitle;
   final String tokenName;
   final String label;
   final bool isDeleteBtn;
   final bool isDisable;
+  final bool isReinvest;
+  final Function(String amount) onChange;
+  final Function() onRemove;
 
   const InvestedField({
     Key? key,
     required this.tokenName,
+    required this.focusNode,
     required this.label,
+    required this.onChange,
+    required this.onRemove,
     this.controller,
     this.subtitle,
     this.isDeleteBtn = true,
     this.isDisable = false,
+    this.isReinvest = false,
   }) : super(key: key);
 
   @override
@@ -28,6 +36,9 @@ class InvestedField extends StatefulWidget {
 }
 
 class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
+  static const int defaultLengthLimit = 2;
+  static const int reinvestLengthLimit = 3;
+
   TokensHelper tokenHelper = TokensHelper();
 
   @override
@@ -37,11 +48,14 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
       children: [
         Container(
           width: 218,
+          padding: const EdgeInsets.only(bottom: 6),
           child: TextFormField(
+            focusNode: widget.focusNode,
             controller: widget.controller,
             readOnly: widget.isDisable,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            maxLength: 3,
+            maxLength:
+                widget.isReinvest ? reinvestLengthLimit : defaultLengthLimit,
             textAlign: TextAlign.end,
             style: Theme.of(context).textTheme.headline4!.copyWith(
                   fontSize: 16,
@@ -155,6 +169,7 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
                 ),
               ),
             ),
+            onChanged: (String value) => widget.onChange(value),
           ),
         ),
         if (widget.isDeleteBtn)
@@ -163,7 +178,9 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
             height: 32,
             child: Center(
               child: NewActionButton(
-                onPressed: () {},
+                onPressed: () {
+                  widget.onRemove();
+                },
                 iconPath: 'assets/icons/cross.svg',
                 width: 28,
                 height: 28,
