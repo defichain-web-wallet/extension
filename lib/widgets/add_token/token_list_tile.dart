@@ -86,8 +86,8 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                                 )
                               else
                                 AssetLogo(
-                                  size: 20,
-                                  borderWidth: 0,
+                                  size: widget.isDense ? 20 : 42,
+                                  borderWidth: widget.isDense ? 0 : 5,
                                   assetStyle:
                                       tokenHelper.getAssetStyleByTokenName(
                                           widget.tokenName),
@@ -96,7 +96,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                                 width: 11,
                               ),
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
