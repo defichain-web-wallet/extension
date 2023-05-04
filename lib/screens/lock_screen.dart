@@ -63,6 +63,7 @@ class _LockScreenState extends State<LockScreen> {
                               child: Column(
                                 children: [
                                   PasswordTextField(
+                                    onlyEngCharacters: false,
                                     isOpasity: true,
                                     height: 71,
                                     controller: _passwordController,
