@@ -54,10 +54,10 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
         return BlocBuilder<FiatCubit, FiatState>(
           builder: (context, fiatState) {
             if (iterator == 0 && widget.isNewIban) {
-              fiatCubit.loadIbanList(
-                asset: widget.asset,
-                isNewIban: widget.isNewIban,
-              );
+              // fiatCubit.loadIbanList(
+              //   asset: widget.asset,
+              //   isNewIban: widget.isNewIban,
+              // );
               iterator++;
             }
 
