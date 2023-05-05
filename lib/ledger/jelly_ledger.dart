@@ -38,18 +38,24 @@ external void openInTab();
 @JS('isUsbSupported')
 external bool isUsbSupported();
 
-@JS('ledger.openLedgerDefichain')
-external int openLedgerDefichain(String appName);
+@JS('ledger.openApp')
+external int openApp(String appName);
 
 @JS('ledger.getAddress')
 external String getAddress(
+    String appName,
     String path,
     bool
         verify); //we return a json string now, and decode. Wrapped objects sucks in dart
 
 @JS('ledger.signMessage')
-external String signMessageLedger(String path, String message);
+external String signMessageLedger(String appName, String path, String message);
 
 @JS('ledger.signTransactionRaw')
-external String signTransactionLedgerRaw(String transactionsJson,
-    List<String> paths, String newTx, String network, String changePath);
+external String signTransactionLedgerRaw(
+    String appName,
+    String transactionsJson,
+    List<String> paths,
+    String newTx,
+    String network,
+    String changePath);

@@ -44,7 +44,7 @@ class LedgerWalletsHelper {
 
     try {
       var ledgerAddressJson =
-          await promiseToFuture<dynamic>(getAddress(path, false));
+          await promiseToFuture<dynamic>(getAddress("dfi", path, false));
       var ledgerAddress = jsonDecode(ledgerAddressJson);
 
       var pubKey = ledgerAddress["publicKey"];

@@ -16,16 +16,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ledgerhq/hw-transport-webhid": "6.24.1",
-    "@ledgerhq/hw-transport-webusb": "6.24.1",
+    "@ledgerhq/devices": "^8.0.1",
+    "@ledgerhq/hw-app-btc": "^10.0.1",
+    "@ledgerhq/hw-transport-webhid": "6.27.13",
+    "@ledgerhq/hw-transport-webusb": "6.27.13",
     "@ledgerhq/logs": "^6.10.0",
     "@types/chrome": "^0.0.218",
     "@types/node": "^16.11.7",
+    "@types/w3c-web-hid": "^1.0.3",
     "@types/w3c-web-usb": "^1.0.6",
     "bip174": "^2.0.1",
     "core-js": "^3.21.1",
     "defichainjs-lib": "^6.0.4",
-    "hw-app-dfi": "^7.0.26",
+    "hw-app-dfi": "^7.1.0",
     "hw-transport-node-speculos-http": "6.27.4"
   },
   "devDependencies": {
@@ -42,9 +45,13 @@
     "stream-browserify": "^3.0.0",
     "ts-node": "^8.3.0",
     "tslint": "^6.1.3",
-    "typescript": "^4.4.4"
+    "typescript": "^4.4.4",
+    "util": "^0.12.5"
   },
   "parcel-namer-custom": {
     ".js?$": "[folder]/[name].[ext]"
+  },
+  "alias": {
+    "@ledgerhq/devices": "@ledgerhq/devices/lib-es"
   }
 }

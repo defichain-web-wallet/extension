@@ -8,6 +8,7 @@ class Hosts {
   static const String defiScanLiveTx = 'https://$defiScanHome/transactions/';
   static const String blockcypherHome = 'live.blockcypher.com';
   static const String blockcypherApi = 'api.blockcypher.com/v1';
+  static const String blockstreamApi = 'blockstream.info';
 }
 
 class DfxApi {
@@ -22,7 +23,8 @@ class LockApi {
 }
 
 class JellyLinks {
-  static const String termsAndConditions = 'https://jellywallet.io/terms-and-conditions/';
+  static const String termsAndConditions =
+      'https://jellywallet.io/terms-and-conditions/';
   static const String telegramGroup = 'https://t.me/jellywallet_eng';
 }
 
