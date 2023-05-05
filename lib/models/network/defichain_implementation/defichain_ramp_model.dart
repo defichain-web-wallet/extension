@@ -5,12 +5,25 @@ import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
-import 'package:defi_wallet/models/network/ramp/ramp_token_model.dart';
+import 'package:defi_wallet/models/network/network_type_model.dart';
+import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 import 'package:defi_wallet/requests/defichain/ramp/dfx_requests.dart';
 
 class DefichainRampModel extends AbstractOnOffRamp {
-  DefichainRampModel(super.networkModel);
+  DefichainRampModel(AbstractNetworkModel networkModel)
+      : super(_validationNetworkModel(networkModel));
+
+  static AbstractNetworkModel _validationNetworkModel(
+    AbstractNetworkModel networkModel,
+  ) {
+    if (networkModel.networkType.networkName.name !=
+        NetworkName.defichainMainnet.name) {
+      throw 'Invalid network';
+    }
+    return networkModel;
+  }
 
   @override
   Future<bool> signIn(AbstractAccountModel account, String password) async {
@@ -138,9 +151,9 @@ class DefichainRampModel extends AbstractOnOffRamp {
   }
 
   @override
-  Future<Map<String, dynamic>> getUserDetails(String accessToken) async {
+  Future<RampUserModel> getUserDetails(String accessToken) async {
     try {
-      return await DFXRequests.getUserDetails(this.accessToken!);
+      return DFXRequests.getUserDetails(this.accessToken!);
     } catch (error) {
       throw error;
     }

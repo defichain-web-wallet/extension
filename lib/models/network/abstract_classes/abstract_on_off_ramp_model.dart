@@ -5,6 +5,7 @@ import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 
 import 'abstract_account_model.dart';
 
@@ -32,7 +33,7 @@ abstract class AbstractOnOffRamp {
 
   Future<bool> transferKYC(String accessToken);
 
-  Future<Map<String, dynamic>> getUserDetails(String accessToken);
+  Future<RampUserModel> getUserDetails(String accessToken);
 
   Future<List<FiatHistoryModel>> getHistory(String accessToken);
 
