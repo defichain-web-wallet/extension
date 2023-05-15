@@ -69,22 +69,20 @@ class WalletCubit extends Cubit<WalletState> {
           publicKeyMainnet: publicKeyMainnet,
           sourceId: source.id,
           isRestore: true);
-      accountList.add(account);
+
       //TODO: check tx history here
       bool presentBalance = false;
       applicationModel.networks.forEach((element) {
         var balanceList = account.getPinnedBalances(element);
-        if(balanceList.length > 1){
+        if(balanceList.length > 1 || balanceList.first.balance != 0){
           presentBalance = true;
-        } else {
-          if(balanceList.first.balance != 0){
-            presentBalance = true;
-          }
         }
       });
       hasHistory = presentBalance;
-
-      accountIndex++;
+      if(presentBalance){
+        accountList.add(account);
+        accountIndex++;
+      }
     }
 
     emit(state.copyWith(

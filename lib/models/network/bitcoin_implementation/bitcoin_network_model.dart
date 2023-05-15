@@ -43,6 +43,17 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return this._createAddressString(publicKeypair, accountIndex);
   }
 
+  TokenModel getDefaultToken(){
+    return TokenModel(
+      isUTXO: true,
+      name: 'Bitcoin',
+      symbol: 'BTC',
+      displaySymbol: 'BTC',
+      id: '-1',
+      networkName: this.networkType.networkName,
+    );
+  }
+
   Future<BalanceModel> getBalanceUTXO(
     List<BalanceModel> balances,
     String addressString,
@@ -53,7 +64,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     );
 
     BalanceModel balanceModel = BalanceModel(
-      token: _getBtcToken(),
+      token: getDefaultToken(),
       balance: balance,
     );
     return balanceModel;
@@ -241,15 +252,6 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
   String _derivePath(int account) {
     return "1129/0/0/$account";
   }
-
-  TokenModel _getBtcToken() => TokenModel(
-        isUTXO: true,
-        name: 'Bitcoin',
-        symbol: 'BTC',
-        displaySymbol: 'BTC',
-        id: '-1',
-        networkName: this.networkType.networkName,
-      );
 
   String _getAddressFromKeyPair(ECPair keyPair) {
     return P2WPKH(

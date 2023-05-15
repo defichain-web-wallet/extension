@@ -34,6 +34,10 @@ class AccountModel extends AbstractAccountModel {
             await network.getAllBalances(
                 addressString:
                     addresses[network.networkType.networkName.name]!);
+      } else {
+        balances[network.networkType.networkName.name] = [
+          BalanceModel(balance: 0, token: network.getDefaultToken())
+        ];
       }
     }
 

@@ -46,14 +46,7 @@ class DFIBalanceRequests {
   }) async {
     try {
       BalanceModel balance = BalanceModel(
-        token: TokenModel(
-          isUTXO: true,
-          name: 'Default Defi token',
-          symbol: 'DFI',
-          displaySymbol: 'DFI',
-          id: '-1',
-          networkName: network.networkType.networkName,
-        ),
+        token: network.getDefaultToken(),
         balance: 0,
       );
 

@@ -144,13 +144,19 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       addressString: addressString,
       tokens: tokens
     );
-   var balanceUtxo = await DFIBalanceRequests.getUTXOBalance(
-      network: this,
-      addressString: addressString,
-    );
-    balanceList.add(balanceUtxo);
 
    return balanceList;
+  }
+
+  TokenModel getDefaultToken(){
+    return TokenModel(
+      isUTXO: true,
+      name: 'Default Defi token',
+      symbol: 'DFI',
+      displaySymbol: 'DFI',
+      id: '-1',
+      networkName: this.networkType.networkName,
+    );
   }
 
   Future<double> getAvailableBalance({
