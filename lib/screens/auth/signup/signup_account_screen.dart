@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -95,9 +96,15 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
 
   _createAccount() async {
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     if (_pickedImage != null) {
       _saveImageToStorage();
     }
+
+    await walletCubit.createWallet(
+      widget.mnemonic,
+      widget.password,
+    );
 
     await accountCubit.createAccount(
       widget.mnemonic,
@@ -105,7 +112,8 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
     );
     LoggerService.invokeInfoLogg('user created new wallet');
 
-    await accountCubit.editAccount(_nameController.text == '' ? 'My Wallet' : _nameController.text);
+    await accountCubit.editAccount(
+        _nameController.text == '' ? 'My Wallet' : _nameController.text);
     LoggerService.invokeInfoLogg('user created new wallet');
 
     Navigator.push(

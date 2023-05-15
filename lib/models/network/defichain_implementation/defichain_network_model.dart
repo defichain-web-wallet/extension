@@ -26,27 +26,27 @@ import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
 
 class DefichainNetworkModel extends AbstractNetworkModel {
-  DefichainNetworkModel(NetworkTypeModel networkType)
-      : super(_validationNetworkName(networkType)){
-    stakingList.add(new LockStakingProviderModel(this));
-    stakingList.add(new YieldMachineStakingProviderModel(this));
-
-    lmList.add(new DefichainLmProviderModel());
-
-    rampList.add(new DefichainRampModel(this));
-
-    exchangeList.add(new DefichainExchangeModel());
-  }
+  static const int DUST = 3000;
+  static const int FEE = 3000;
+  static const int RESERVED_BALANCES = 30000;
 
   List<AbstractStakingProviderModel> stakingList = [];
   List<AbstractLmProviderModel> lmList = [];
   List<AbstractOnOffRamp> rampList = [];
   List<AbstractExchangeModel> exchangeList = [];
 
+  DefichainNetworkModel(NetworkTypeModel networkType)
+      : super(_validationNetworkName(networkType)) {
+    if (!networkType.isTestnet) {
+      this.stakingList.add(new LockStakingProviderModel(this));
+      this.stakingList.add(new YieldMachineStakingProviderModel(this));
+      this.rampList.add(new DefichainRampModel(this));
+    }
 
-  static const int DUST = 3000;
-  static const int FEE = 3000;
-  static const int RESERVED_BALANCES = 30000;
+    this.lmList.add(new DefichainLmProviderModel());
+
+    this.exchangeList.add(new DefichainExchangeModel());
+  }
 
   static NetworkTypeModel _validationNetworkName(NetworkTypeModel networkType) {
     if (networkType.networkName != NetworkName.defichainTestnet &&
@@ -56,11 +56,11 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return networkType;
   }
 
-  Future<String> createAddress(AbstractAccountModel account) async {
-    var publicKeypair = bip32.BIP32.fromBase58(account.publicKey, _getNetworkTypeBip32());
-    var address = await this._createAddressString(publicKeypair, account.accountIndex);
+  String createAddress(String publicKey, int accountIndex) {
+    var publicKeypair =
+        bip32.BIP32.fromBase58(publicKey, _getNetworkTypeBip32());
 
-    return address;
+    return this._createAddressString(publicKeypair, accountIndex);
   }
 
   Future<List<TokenModel>> getAvailableTokens() async {
@@ -293,8 +293,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return balance;
   }
 
-  Future<String> _createAddressString(
-      bip32.BIP32 masterKeyPair, int accountIndex) async {
+  String _createAddressString(bip32.BIP32 masterKeyPair, int accountIndex) {
     final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
     return _getAddressFromKeyPair(keyPair);
   }
@@ -325,14 +324,13 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return "1129/0/0/$account";
   }
 
-  Future<String> _getAddressFromKeyPair(ECPair keyPair) async {
-    final address = P2WPKH(
+  String _getAddressFromKeyPair(ECPair keyPair) {
+    return P2WPKH(
       data: PaymentData(
         pubkey: keyPair.publicKey,
       ),
       network: _getNetworkType(),
-    ).data!.address;
-    return address!;
+    ).data!.address!;
   }
 
   bip32.NetworkType _getNetworkTypeBip32() {

@@ -35,11 +35,12 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return networkType;
   }
 
-  Future<String> createAddress(AbstractAccountModel account) async {
-    var publicKeypair = bip32.BIP32.fromBase58(account.publicKey, _getNetworkTypeBip32());
-    var address = await this._createAddressString(publicKeypair, account.accountIndex);
-
-    return address;
+  String createAddress(String publicKey, int accountIndex) {
+    var test = _getNetworkTypeBip32();
+    print('1');
+    var publicKeypair = bip32.BIP32.fromBase58(publicKey, test);
+    print('2');
+    return this._createAddressString(publicKeypair, accountIndex);
   }
 
   Future<BalanceModel> getBalanceUTXO(
@@ -202,8 +203,8 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return keypair.signMessage(message, getNetworkType());
   }
 
-  Future<String> _createAddressString(
-      bip32.BIP32 masterKeyPair, int accountIndex) async {
+  String _createAddressString(
+      bip32.BIP32 masterKeyPair, int accountIndex) {
     final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
     return _getAddressFromKeyPair(keyPair);
   }
@@ -242,14 +243,13 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
         networkName: this.networkType.networkName,
       );
 
-  Future<String> _getAddressFromKeyPair(ECPair keyPair) async {
-    final address = P2WPKH(
+  String _getAddressFromKeyPair(ECPair keyPair) {
+    return P2WPKH(
       data: PaymentData(
         pubkey: keyPair.publicKey,
       ),
       network: getNetworkType(),
-    ).data!.address;
-    return address!;
+    ).data!.address!;
   }
 
   bip32.NetworkType _getNetworkTypeBip32() {

@@ -42,7 +42,6 @@ class AccountCubit extends Cubit<AccountState> {
 
   WalletsHelper walletsHelper = WalletsHelper();
   LedgerWalletsHelper ledgerWalletsHelper = LedgerWalletsHelper();
-  EncryptHelper encryptHelper = EncryptHelper();
   NetworkHelper networkHelper = NetworkHelper();
   HistoryHelper historyHelper = HistoryHelper();
 
@@ -58,7 +57,7 @@ class AccountCubit extends Cubit<AccountState> {
 
     var box = await Hive.openBox(HiveBoxes.client);
     var encryptMnemonic =
-        encryptHelper.getEncryptedData(mnemonic.join(','), password);
+    EncryptHelper.getEncryptedData(mnemonic.join(','), password);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     var encryptedPassword = Crypt.sha256(password).toString();
     await box.put(HiveNames.password, encryptedPassword);
@@ -76,17 +75,35 @@ class AccountCubit extends Cubit<AccountState> {
         masterKeyPairTestnet.publicKey,
         masterKeyPairTestnet.chainCode,
         networkHelper.getNetworkType(testnet));
-
-    final accountTestnet =
-        await walletsHelper.createNewAccount(masterKeyPairTestnet, testnet);
-
+    final masterKeyPairTestnetB =
+        hdWalletService.getMasterKeypairFormSeed(seed, testnet);
+    final masterKeyPairTestnetPublicKeyB = bip32.BIP32.fromPublicKey(
+        masterKeyPairTestnet.publicKey,
+        masterKeyPairTestnet.chainCode,
+        networkHelper.getNetworkType('bitcoin'));
     final masterKeyPairMainnet =
-        hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
-
+    hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
     final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(
         masterKeyPairMainnet.publicKey,
         masterKeyPairMainnet.chainCode,
         networkHelper.getNetworkType(mainnet));
+    print(masterKeyPairMainnetPublicKey.toBase58());
+    print(masterKeyPairTestnetPublicKey.toBase58());
+
+    print(masterKeyPairTestnetPublicKeyB.toBase58());
+    // print(masterKeyPairTestnetPublicKey.toBase58());
+    print('masterKeyPairTestnetPublicKey');
+
+    final accountTestnet =
+        await walletsHelper.createNewAccount(masterKeyPairTestnet, testnet);
+
+    // final masterKeyPairMainnet =
+    //     hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
+    //
+    // final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(
+    //     masterKeyPairMainnet.publicKey,
+    //     masterKeyPairMainnet.chainCode,
+    //     networkHelper.getNetworkType(mainnet));
 
     final accountMainnet = await walletsHelper.createNewAccount(
         masterKeyPairMainnetPublicKey, mainnet);
@@ -169,7 +186,7 @@ class AccountCubit extends Cubit<AccountState> {
       }
 
       if (password != '') {
-        var encryptedMasterKey = encryptHelper.getEncryptedData(
+        var encryptedMasterKey = EncryptHelper.getEncryptedData(
           masterKeyPairMainnetPrivateKey!.toBase58(),
           password,
         );
@@ -180,7 +197,7 @@ class AccountCubit extends Cubit<AccountState> {
 
         if (mnemonic != null) {
           var encryptMnemonic =
-              encryptHelper.getEncryptedData(mnemonic.join(','), password);
+          EncryptHelper.getEncryptedData(mnemonic.join(','), password);
           await box.put(HiveNames.savedMnemonic, encryptMnemonic);
         }
       }
@@ -206,7 +223,7 @@ class AccountCubit extends Cubit<AccountState> {
       }
 
       if (password != '') {
-        var encryptedMasterKey = encryptHelper.getEncryptedData(
+        var encryptedMasterKey = EncryptHelper.getEncryptedData(
           masterKeyPairTestnetPrivateKey!.toBase58(),
           password,
         );

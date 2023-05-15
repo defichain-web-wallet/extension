@@ -35,12 +35,12 @@ class StorageService {
         var savedMnemonic = await box.get(HiveNames.savedMnemonic);
         if (savedMnemonic.split(',').length == 24) {
           var encryptMnemonic =
-              EncryptHelper().getEncryptedData(savedMnemonic, password);
+              EncryptHelper.getEncryptedData(savedMnemonic, password);
           await box.put(HiveNames.savedMnemonic, encryptMnemonic);
           mnemonic =
-              EncryptHelper().getDecryptedData(encryptMnemonic, password);
+              EncryptHelper.getDecryptedData(encryptMnemonic, password);
         } else {
-          mnemonic = EncryptHelper().getDecryptedData(savedMnemonic, password);
+          mnemonic = EncryptHelper.getDecryptedData(savedMnemonic, password);
         }
       } catch (err) {
         mnemonic = '';
@@ -59,7 +59,7 @@ class StorageService {
 
     var savedAccounts = await box.get(HiveNames.accountsMainnet);
       var decryptedAccounts =
-      EncryptHelper().getDecryptedData(savedAccounts, password);
+      EncryptHelper.getDecryptedData(savedAccounts, password);
 
       final jsonString = decryptedAccounts;
       List<AccountModel> accountsMainnet = [];
@@ -89,7 +89,7 @@ class StorageService {
 
        savedAccounts = await box.get(HiveNames.accountsTestnet);
        decryptedAccounts =
-      EncryptHelper().getDecryptedData(savedAccounts, password);
+      EncryptHelper.getDecryptedData(savedAccounts, password);
 
       final jsonStringTestnet = decryptedAccounts;
       List<AccountModel> accountsTestnet = [];

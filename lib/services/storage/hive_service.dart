@@ -20,6 +20,6 @@ class HiveService {
 
     var box = await Hive.openBox(HiveBoxes.client);
     var encryptedMasterKey = await box.get(boxKey);
-    return EncryptHelper().getDecryptedData(encryptedMasterKey, password);
+    return EncryptHelper.getDecryptedData(encryptedMasterKey, password);
   }
 }

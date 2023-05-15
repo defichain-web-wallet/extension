@@ -29,7 +29,7 @@ abstract class AbstractNetworkModel {
 
   Uri getAccountExplorer(String address);
 
-  Future<String> createAddress(AbstractAccountModel account);
+  String createAddress(String publicKey, int accountIndex);
 
   // Change
   List<AbstractBridge> getBridges();

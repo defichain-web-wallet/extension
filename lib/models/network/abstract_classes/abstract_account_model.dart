@@ -5,34 +5,36 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_network_mod
 import 'package:defi_wallet/models/network/network_name.dart';
 
 abstract class AbstractAccountModel {
-  final String publicKey;
-  final Map<NetworkName, String> addresses;
-  final Map<NetworkName, List<BalanceModel>> pinnedBalances;
+  final String sourceId;
+  final Map<String, String> addresses;
+  final Map<String, List<BalanceModel>> pinnedBalances;
   final int accountIndex;
+  final List<AbstractNetworkModel> networkList;
 
   AbstractAccountModel(
-    this.publicKey,
+    this.sourceId,
     this.addresses,
     this.accountIndex,
     this.pinnedBalances,
+    this.networkList,
   );
 
   // Tokens
   List<BalanceModel> getPinnedBalances(AbstractNetworkModel network) {
-    return pinnedBalances[network.networkType.networkName] ?? [];
+    return pinnedBalances[network.networkType.networkName.name] ?? [];
   }
 
   void pinToken(BalanceModel balance, AbstractNetworkModel network) {
     try {
-      pinnedBalances[network.networkType.networkName]!.add(balance);
+      pinnedBalances[network.networkType.networkName.name]!.add(balance);
     } catch (e) {
-      pinnedBalances[network.networkType.networkName] = [balance];
+      pinnedBalances[network.networkType.networkName.name] = [balance];
     }
   }
 
   void unpinToken(BalanceModel balance, AbstractNetworkModel network) {
     try {
-      pinnedBalances[network.networkType.networkName]!.removeWhere((element) {
+      pinnedBalances[network.networkType.networkName.name]!.removeWhere((element) {
         return element.compare(balance);
       });
     } catch (_) {
@@ -42,7 +44,7 @@ abstract class AbstractAccountModel {
 
   // Lists
 
-  Map<NetworkName, List<AddressBookModel>> getAddressBook(
+  Map<String, List<AddressBookModel>> getAddressBook(
     NetworkName networkName,
   );
 
@@ -53,7 +55,5 @@ abstract class AbstractAccountModel {
   );
 
   // Receive
-  String? getAddress(NetworkName networkName) {
-    return addresses[networkName];
-  }
+  String? getAddress(NetworkName networkName);
 }

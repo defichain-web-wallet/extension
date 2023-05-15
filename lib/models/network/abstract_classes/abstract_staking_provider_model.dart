@@ -1,11 +1,8 @@
-
-import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_token_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 
 import 'abstract_account_model.dart';
