@@ -61,6 +61,10 @@ abstract class AbstractNetworkModel {
     String addressString,
   );
 
+  Future<List<BalanceModel>> getAllBalances({
+    required String addressString,
+  });
+
   // Earn
   List<AbstractStakingProviderModel> getStakingProviders();
 

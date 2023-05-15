@@ -59,6 +59,15 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return balanceModel;
   }
 
+  Future<List<BalanceModel>> getAllBalances({
+    required String addressString,
+  }) async {
+    var balance = await getBalanceUTXO(
+        [], addressString);
+
+    return [balance];
+  }
+
   Future<BalanceModel> getBalanceToken(
     List<BalanceModel> balances,
     TokenModel token,
@@ -203,8 +212,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return keypair.signMessage(message, getNetworkType());
   }
 
-  String _createAddressString(
-      bip32.BIP32 masterKeyPair, int accountIndex) {
+  String _createAddressString(bip32.BIP32 masterKeyPair, int accountIndex) {
     final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
     return _getAddressFromKeyPair(keyPair);
   }

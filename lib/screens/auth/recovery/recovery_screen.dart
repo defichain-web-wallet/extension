@@ -1,5 +1,6 @@
 import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -86,13 +87,16 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
               try {
                 AccountCubit accountCubit =
                     BlocProvider.of<AccountCubit>(context);
+                WalletCubit walletCubit =
+                    BlocProvider.of<WalletCubit>(context);
 
                 var box = await Hive.openBox(HiveBoxes.client);
                 var encryptedPassword = Crypt.sha256(password).toString();
                 await box.put(HiveNames.password, encryptedPassword);
                 await box.close();
 
-                await accountCubit.restoreAccount(_mnemonic, password);
+                await walletCubit.restoreWallet(_mnemonic, password);
+                // await accountCubit.restoreAccount(_mnemonic, password);
                 LoggerService.invokeInfoLogg('user  was recover wallet');
               } catch (err) {
                 ScaffoldMessenger.of(context).showSnackBar(

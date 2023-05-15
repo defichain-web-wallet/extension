@@ -135,6 +135,24 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     }
   }
 
+  Future<List<BalanceModel>> getAllBalances({
+    required String addressString,
+  }) async {
+    var tokens = await this.getAvailableTokens();
+    var balanceList = await DFIBalanceRequests.getBalanceList(
+      network: this,
+      addressString: addressString,
+      tokens: tokens
+    );
+   var balanceUtxo = await DFIBalanceRequests.getUTXOBalance(
+      network: this,
+      addressString: addressString,
+    );
+    balanceList.add(balanceUtxo);
+
+   return balanceList;
+  }
+
   Future<double> getAvailableBalance({
     required AbstractAccountModel account,
     required TokenModel token,
@@ -277,9 +295,11 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       balance = balances.firstWhere((element) => element.token!.compare(token));
     } catch (_) {
       //if not exist in balances we check blockchain
+      var tokens = await this.getAvailableTokens();
       List<BalanceModel> balanceList = await DFIBalanceRequests.getBalanceList(
         network: this,
         addressString: addressString,
+          tokens: tokens
       );
       try {
         balance = balanceList.firstWhere(

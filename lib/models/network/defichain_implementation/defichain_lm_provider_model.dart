@@ -10,8 +10,9 @@ import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 class DefichainLmProviderModel extends AbstractLmProviderModel {
-  Future<List<LmPoolModel>> getAvailableLmPools(AbstractNetworkModel network) {
-    return DFILmRequests.getLmPools(networkType: network.networkType);
+  Future<List<LmPoolModel>> getAvailableLmPools(AbstractNetworkModel network) async {
+    var tokens = await network.getAvailableTokens();
+    return DFILmRequests.getLmPools(networkType: network.networkType, tokens: tokens);
   }
 
 //TODO: add this

@@ -46,15 +46,18 @@ class LmPoolModel {
   factory LmPoolModel.fromJSON(
     Map<String, dynamic> json,
     NetworkName? networkName,
+    List<TokenModel> tokens
   ) {
+    var symbols = json['symbol'].split('-');
+    var tokenA = tokens.firstWhere((element) => element.symbol == symbols[0]);
+    var tokenB = tokens.firstWhere((element) => element.symbol == symbols[1]);
     return LmPoolModel(
         id: json['id'],
         symbol: json['symbol'],
         name: json['name'],
         displaySymbol: json['displaySymbol'],
         networkName: networkName,
-        tokens: TokenModel.fromJSONList(
-            [json['tokenA'], json['tokenB']], networkName)
+        tokens: [tokenA, tokenB],
 //TODO: add percentages
         );
   }
@@ -62,12 +65,13 @@ class LmPoolModel {
   static List<LmPoolModel> fromJSONList(
     List<dynamic> jsonList,
     NetworkName? networkName,
+    List<TokenModel> tokens
   ) {
-    List<LmPoolModel> tokens = List.generate(
+    List<LmPoolModel> lmTokens = List.generate(
       jsonList.length,
-      (index) => LmPoolModel.fromJSON(jsonList[index], networkName),
+      (index) => LmPoolModel.fromJSON(jsonList[index], networkName, tokens),
     );
 
-    return tokens;
+    return lmTokens;
   }
 }

@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:http/http.dart' as http;
 
 class DFILmRequests {
   static Future<List<LmPoolModel>> getLmPools({
     String? next,
     required NetworkTypeModel networkType,
+    required List<TokenModel> tokens
   }) async {
     final query = {
       'size': 200,
@@ -26,17 +28,18 @@ class DFILmRequests {
 
       if (response.statusCode == 200) {
         dynamic json = jsonDecode(response.body);
-        List<LmPoolModel> tokens =
-            LmPoolModel.fromJSONList(json, networkType.networkName);
+        List<LmPoolModel> lmTokens =
+            LmPoolModel.fromJSONList(json, networkType.networkName, tokens);
         if (json['page'] != null) {
           var nextTokenList = await getLmPools(
             next: json['page']['next'],
             networkType: networkType,
+              tokens: tokens
           );
-          tokens.addAll(nextTokenList);
+          lmTokens.addAll(nextTokenList);
         }
 
-        return tokens;
+        return lmTokens;
       } else {
         return [];
       }

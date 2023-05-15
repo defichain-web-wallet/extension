@@ -1,3 +1,4 @@
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -12,17 +13,19 @@ class BalanceModel {
     this.token,
     this.lmPool,
   }) {
-    if (this.token != null) {}
-    throw 'Empty token or LMPool';
+    if (this.token == null && this.lmPool == null) {
+      throw 'Empty token or LMPool';
+    }
   }
 
   static List<BalanceModel> fromJSONList(
     List<dynamic> jsonList,
-    NetworkName? networkName,
+    AbstractNetworkModel network,
+      List<TokenModel> tokens
   ) {
     List<BalanceModel> balances = List.generate(
       jsonList.length,
-      (index) => BalanceModel.fromJSON(jsonList[index], networkName),
+      (index) => BalanceModel.fromJSON(jsonList[index], network, tokens),
     );
 
     return balances;
@@ -42,18 +45,18 @@ class BalanceModel {
 
   factory BalanceModel.fromJSON(
     Map<String, dynamic> json,
-    NetworkName? networkName,
+    AbstractNetworkModel network,
+      List<TokenModel> tokens
   ) {
     TokenModel? token;
     LmPoolModel? lmPool;
-    if (json.containsKey('token')) {
-      token = TokenModel.fromJSON(json['token'], networkName);
-    }
-    if (json.containsKey('lmPool')) {
-      lmPool = LmPoolModel.fromJSON(json['lmPool'], networkName);
+    if (json['isLPS'] == false) {
+      token = TokenModel.fromJSON(json, network.networkType.networkName);
+    } else {
+      lmPool = LmPoolModel.fromJSON(json, network.networkType.networkName, tokens);
     }
     return BalanceModel(
-      balance: json['balance'],
+      balance: network.toSatoshi(double.parse(json['amount'])),
       token: token,
       lmPool: lmPool,
     );

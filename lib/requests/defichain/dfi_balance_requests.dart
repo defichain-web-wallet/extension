@@ -9,6 +9,7 @@ class DFIBalanceRequests {
   static Future<List<BalanceModel>> getBalanceList({
     required AbstractNetworkModel network,
     required String addressString,
+    required List<TokenModel> tokens,
   }) async {
     //TODO: add fallback URL
     String urlAddress =
@@ -19,10 +20,11 @@ class DFIBalanceRequests {
       final response = await https.get(url);
 
       if (response.statusCode == 200) {
-        dynamic json = jsonDecode(response.body);
+        List<dynamic> json = jsonDecode(response.body)['data'];
         List<BalanceModel> balances = BalanceModel.fromJSONList(
           json,
-          network.networkType.networkName,
+          network,
+          tokens
         );
         BalanceModel utxoBalance = await DFIBalanceRequests.getUTXOBalance(
           network: network,
