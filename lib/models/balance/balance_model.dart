@@ -18,14 +18,15 @@ class BalanceModel {
     }
   }
 
-  static List<BalanceModel> fromJSONList(
-    List<dynamic> jsonList,
-    AbstractNetworkModel network,
-      List<TokenModel> tokens
-  ) {
+  static List<BalanceModel> fromJSONList(List<dynamic> jsonList,
+      AbstractNetworkModel network, List<TokenModel> tokens) {
     List<BalanceModel> balances = List.generate(
       jsonList.length,
-      (index) => BalanceModel.fromJSON(jsonList[index], network, tokens),
+      (index) => BalanceModel.fromJSON(
+        jsonList[index],
+        network: network,
+        tokens: tokens,
+      ),
     );
 
     return balances;
@@ -44,28 +45,41 @@ class BalanceModel {
   }
 
   factory BalanceModel.fromJSON(
-    Map<String, dynamic> json,
-    AbstractNetworkModel network,
-      List<TokenModel> tokens
-  ) {
-    TokenModel? token;
-    LmPoolModel? lmPool;
-    if (json['isLPS'] == false) {
-      token = TokenModel.fromJSON(json, network.networkType.networkName);
+    Map<String, dynamic> json, {
+    AbstractNetworkModel? network,
+    List<TokenModel>? tokens,
+  }) {
+    if (network != null) {
+      TokenModel? token;
+      LmPoolModel? lmPool;
+      if (json['isLPS'] == false) {
+        token = TokenModel.fromJSON(json,
+            networkName: network.networkType.networkName);
+      } else {
+        lmPool = LmPoolModel.fromJSON(
+          json,
+          networkName: network.networkType.networkName,
+          tokens: tokens,
+        );
+      }
+      return BalanceModel(
+        balance: network.toSatoshi(double.parse(json['amount'])),
+        token: token,
+        lmPool: lmPool,
+      );
     } else {
-      lmPool = LmPoolModel.fromJSON(json, network.networkType.networkName, tokens);
+      return BalanceModel(
+        balance: json['balance'],
+        token: json['token'] == null ? null : TokenModel.fromJSON(json['token']),
+        lmPool: json['lmPool'] == null ? null : LmPoolModel.fromJSON(json['lmPool']),
+      );
     }
-    return BalanceModel(
-      balance: network.toSatoshi(double.parse(json['amount'])),
-      token: token,
-      lmPool: lmPool,
-    );
   }
 
   bool compare(BalanceModel otherBalance) {
-    if(this.lmPool != null && otherBalance.lmPool != null){
+    if (this.lmPool != null && otherBalance.lmPool != null) {
       return this.lmPool!.id == otherBalance.lmPool!.id;
-    } else if(this.token != null && otherBalance.token != null){
+    } else if (this.token != null && otherBalance.token != null) {
       return this.token!.id == otherBalance.token!.id;
     } else {
       return false;

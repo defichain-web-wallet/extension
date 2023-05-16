@@ -44,14 +44,15 @@ class LmPoolModel {
   }
 
   factory LmPoolModel.fromJSON(
-    Map<String, dynamic> json,
+    Map<String, dynamic> json, {
     NetworkName? networkName,
-    List<TokenModel> tokens
-  ) {
-    var symbols = json['symbol'].split('-');
-    var tokenA = tokens.firstWhere((element) => element.symbol == symbols[0]);
-    var tokenB = tokens.firstWhere((element) => element.symbol == symbols[1]);
-    return LmPoolModel(
+    List<TokenModel>? tokens,
+  }) {
+    if (networkName != null && tokens != null) {
+      var symbols = json['symbol'].split('-');
+      var tokenA = tokens.firstWhere((element) => element.symbol == symbols[0]);
+      var tokenB = tokens.firstWhere((element) => element.symbol == symbols[1]);
+      return LmPoolModel(
         id: json['id'],
         symbol: json['symbol'],
         name: json['name'],
@@ -59,17 +60,30 @@ class LmPoolModel {
         networkName: networkName,
         tokens: [tokenA, tokenB],
 //TODO: add percentages
-        );
+      );
+    } else {
+      return LmPoolModel(
+        id: json['id'],
+        symbol: json['symbol'],
+        name: json['name'],
+        displaySymbol: json['displaySymbol'],
+        networkName: NetworkName.values.firstWhere(
+          (value) => value.toString() == json['networkName'],
+        ),
+        tokens: List.generate(json['tokens'].index, (index) => json['tokens'][index]),
+      );
+    }
   }
 
-  static List<LmPoolModel> fromJSONList(
-    List<dynamic> jsonList,
-    NetworkName? networkName,
-    List<TokenModel> tokens
-  ) {
+  static List<LmPoolModel> fromJSONList(List<dynamic> jsonList,
+      NetworkName? networkName, List<TokenModel> tokens) {
     List<LmPoolModel> lmTokens = List.generate(
       jsonList.length,
-      (index) => LmPoolModel.fromJSON(jsonList[index], networkName, tokens),
+      (index) => LmPoolModel.fromJSON(
+        jsonList[index],
+        networkName: networkName,
+        tokens: tokens,
+      ),
     );
 
     return lmTokens;

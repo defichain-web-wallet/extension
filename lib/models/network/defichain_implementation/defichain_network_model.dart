@@ -48,6 +48,12 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     this.exchangeList.add(new DefichainExchangeModel());
   }
 
+  factory DefichainNetworkModel.fromJson(Map<String, dynamic> jsonModel) {
+    return DefichainNetworkModel(
+      NetworkTypeModel.fromJson(jsonModel),
+    );
+  }
+
   static NetworkTypeModel _validationNetworkName(NetworkTypeModel networkType) {
     if (networkType.networkName != NetworkName.defichainTestnet &&
         networkType.networkName != NetworkName.defichainMainnet) {

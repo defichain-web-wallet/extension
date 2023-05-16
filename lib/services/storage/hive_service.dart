@@ -20,7 +20,6 @@ class HiveService {
   }
 
   static Future<dynamic> getData(
-    NetworkTypeModel network,
     String key, {
     String password = '',
   }) async {
@@ -37,7 +36,6 @@ class HiveService {
   }
 
   static Future<void> update(
-    NetworkTypeModel network,
     String key,
     dynamic data, {
     String password = '',

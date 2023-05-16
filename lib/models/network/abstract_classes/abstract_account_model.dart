@@ -5,6 +5,8 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_network_mod
 import 'package:defi_wallet/models/network/network_name.dart';
 
 abstract class AbstractAccountModel {
+  final String publicKeyTestnet;
+  final String publicKeyMainnet;
   final String sourceId;
   final Map<String, String> addresses;
   final Map<String, List<BalanceModel>> pinnedBalances;
@@ -12,12 +14,28 @@ abstract class AbstractAccountModel {
   final List<AbstractNetworkModel> networkList;
 
   AbstractAccountModel(
+    this.publicKeyTestnet,
+    this.publicKeyMainnet,
     this.sourceId,
     this.addresses,
     this.accountIndex,
     this.pinnedBalances,
     this.networkList,
   );
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data["sourceId"] = this.sourceId;
+    data["addresses"] = this.addresses;
+    data["accountIndex"] = this.accountIndex;
+    data["pinnedBalances"] = this.pinnedBalances.map((key, value) {
+      List balancesJson = value.map((e) => e.toJSON()).toList();
+      return MapEntry(key, balancesJson);
+    });
+    // data["networkList"] = this.networkList.map((e) => e.toJson()).toList();
+
+    return data;
+  }
 
   // Tokens
   List<BalanceModel> getPinnedBalances(AbstractNetworkModel network) {

@@ -18,6 +18,13 @@ abstract class AbstractNetworkModel {
 
   AbstractNetworkModel(this.networkType);
 
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['networkType'] = this.networkType.toJson();
+
+    return data;
+  }
+
   Future<List<TokenModel>> getAvailableTokens();
 
   //TODO: I'm not a sure that we need it

@@ -19,8 +19,8 @@ class ExchangePairModel {
     NetworkName? networkName,
   ) {
     return ExchangePairModel(
-      base: TokenModel.fromJSON(json['tokenA'], networkName),
-      quote: TokenModel.fromJSON(json['tokenB'], networkName),
+      base: TokenModel.fromJSON(json['tokenA'], networkName: networkName),
+      quote: TokenModel.fromJSON(json['tokenB'], networkName: networkName),
       ratio: double.parse(json['tokenA']['reserve']) /
           double.parse(json['tokenB']['reserve']),
     );
