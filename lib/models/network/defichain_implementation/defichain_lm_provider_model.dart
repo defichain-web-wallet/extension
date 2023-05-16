@@ -2,6 +2,7 @@ import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -10,9 +11,11 @@ import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 class DefichainLmProviderModel extends AbstractLmProviderModel {
-  Future<List<LmPoolModel>> getAvailableLmPools(AbstractNetworkModel network) async {
+  Future<List<LmPoolModel>> getAvailableLmPools(
+      AbstractNetworkModel network) async {
     var tokens = await network.getAvailableTokens();
-    return DFILmRequests.getLmPools(networkType: network.networkType, tokens: tokens);
+    return DFILmRequests.getLmPools(
+        networkType: network.networkType, tokens: tokens);
   }
 
 //TODO: add this
@@ -27,16 +30,14 @@ class DefichainLmProviderModel extends AbstractLmProviderModel {
   void unpinLmPool(AbstractAccountModel account, LmPoolModel pool) {}
 
   Future<TxErrorModel> addBalance(
-    AbstractAccountModel account,
-    AbstractNetworkModel network,
-    String password,
-    LmPoolModel pool,
-    List<double> amounts,
-  ) async {
-    ECPair keypair = await network.getKeypair(
-      password,
-      account.accountIndex,
-    );
+      AbstractAccountModel account,
+      AbstractNetworkModel network,
+      String password,
+      LmPoolModel pool,
+      List<double> amounts,
+      ApplicationModel applicationModel) async {
+    ECPair keypair =
+        await network.getKeypair(password, account, applicationModel);
 
     List<BalanceModel> balances = account.getPinnedBalances(network);
     BalanceModel balanceUTXO = await network.getBalanceUTXO(
@@ -72,16 +73,14 @@ class DefichainLmProviderModel extends AbstractLmProviderModel {
   }
 
   Future<TxErrorModel> removeBalance(
-    AbstractAccountModel account,
-    AbstractNetworkModel network,
-    String password,
-    LmPoolModel pool,
-    double amount,
-  ) async {
-    ECPair keypair = await network.getKeypair(
-      password,
-      account.accountIndex,
-    );
+      AbstractAccountModel account,
+      AbstractNetworkModel network,
+      String password,
+      LmPoolModel pool,
+      double amount,
+      ApplicationModel applicationModel) async {
+    ECPair keypair =
+        await network.getKeypair(password, account, applicationModel);
 
     return DFITransactionService().removeLiqudity(
       senderAddress: account.getAddress(network.networkType.networkName)!,

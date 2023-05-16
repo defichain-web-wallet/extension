@@ -1,5 +1,6 @@
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -88,8 +89,7 @@ abstract class AbstractNetworkModel {
 
   bool earnAvailable() => stakingAvailable() || lmAvailable();
 
-  Future<dynamic> getKeypair(String password, int accountIndex);
-
+  Future<dynamic> getKeypair(String password, AbstractAccountModel accountIndex, ApplicationModel applicationModel);
   // Buy and sell
   List<AbstractOnOffRamp> getRamps();
 
@@ -105,11 +105,13 @@ abstract class AbstractNetworkModel {
         required String address,
         required String password,
         required TokenModel token,
-        required double amount});
+        required double amount,
+      required ApplicationModel applicationModel});
 
   Future<String> signMessage(
-    AbstractAccountModel account,
-    String message,
-    String password,
-  );
+      AbstractAccountModel account,
+      String message,
+      String password,
+      ApplicationModel applicationModel
+      );
 }

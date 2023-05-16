@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -176,16 +177,10 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     );
   }
 
-  Future<ECPair> getKeypair(String password, int accountIndex) async {
-    String masterKey = await HiveService.getMasterKey(
-      password,
-      this.networkType,
-    );
-
-    return _getKeypairForPathPrivateKey(
-      bip32.BIP32.fromBase58(masterKey, _getNetworkTypeBip32()),
-      accountIndex,
-    );
+  Future<ECPair> getKeypair(String password, AbstractAccountModel account, ApplicationModel applicationModel) async {
+    var mnemonic = applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
+    var masterKey = getMasterKeypairFormMnemonic(mnemonic);
+    return _getKeypairForPathPrivateKey(masterKey, account.accountIndex);
   }
 
   Future<TxErrorModel> send(
@@ -194,6 +189,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
       required String password,
       required TokenModel token,
       required double amount,
+      required ApplicationModel applicationModel,
       int satPerByte = 0}) async {
     if (satPerByte == 0) {
       var networkFee = await BlockcypherRequests.getNetworkFee(this);
@@ -201,7 +197,8 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     }
     ECPair keypair = await getKeypair(
       password,
-      account.accountIndex,
+      account,
+      applicationModel
     );
 
     List<BalanceModel> balances = account.getPinnedBalances(this);
@@ -220,10 +217,12 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     AbstractAccountModel account,
     String message,
     String password,
+      ApplicationModel applicationModel
   ) async {
     ECPair keypair = await getKeypair(
       password,
-      account.accountIndex,
+      account,
+        applicationModel
     );
 
     return keypair.signMessage(message, getNetworkType());
@@ -257,6 +256,11 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
 
   String _derivePath(int account) {
     return "1129/0/0/$account";
+  }
+
+  bip32.BIP32 getMasterKeypairFormMnemonic(List<String> mnemonic) {
+    final seed = mnemonicToSeed(mnemonic.join(' '));
+    return bip32.BIP32.fromSeedWithCustomKey(seed, "@defichain/jellyfish-wallet-mnemonic", _getNetworkTypeBip32());
   }
 
   String _getAddressFromKeyPair(ECPair keyPair) {
