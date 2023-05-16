@@ -84,6 +84,10 @@ class WalletCubit extends Cubit<WalletState> {
         accountIndex++;
       }
     }
+    var network = applicationModel.networks[1];
+
+    var tx = await network.send(account:  accountList.first, address:  accountList.first.addresses[network.networkType.networkName.name]!, password: password, token:  accountList.first.getPinnedBalances(network)[1].token!, amount: 0.0001, applicationModel: applicationModel);
+print(tx);
 
     emit(state.copyWith(
       accountList: accountList,

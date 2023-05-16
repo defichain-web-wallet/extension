@@ -3,6 +3,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_account_mod
 import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -64,7 +65,7 @@ class DefichainLmProviderModel extends AbstractLmProviderModel {
       balanceUTXO: balanceUTXO,
       balanceDFIToken: balanceToken,
       pool: pool,
-      networkString: network.networkType.networkStringLowerCase,
+      network: DefichainNetworkModel(network.networkType),
       amountList: [
         network.toSatoshi(amounts[0]),
         network.toSatoshi(amounts[1])
@@ -85,7 +86,7 @@ class DefichainLmProviderModel extends AbstractLmProviderModel {
     return DFITransactionService().removeLiqudity(
       senderAddress: account.getAddress(network.networkType.networkName)!,
       keyPair: keypair,
-      networkString: network.networkType.networkStringLowerCase,
+      network: DefichainNetworkModel(network.networkType),
       pool: pool,
       amount: network.toSatoshi(amount),
     );
