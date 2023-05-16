@@ -5,8 +5,8 @@ import 'package:defi_wallet/widgets/selectors/network_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-// import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
-// import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
+import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
+import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 
 class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isShowLogo;
@@ -71,10 +71,27 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 splashColor: Colors.transparent,
                 focusColor: Colors.transparent,
               ),
-        title: isShowNetworkSelector ? NetworkSelector(
-          onSelect: () {},
-        ) : Container(),
+        title: isShowNetworkSelector
+            ? NetworkSelector(
+                onSelect: () {},
+              )
+            : Container(),
         actions: [
+          if (isShowLogo)
+            SizedBox(
+              width: 32,
+              height: 32,
+              child: NewActionButton(
+                iconPath: 'assets/icons/fullscreen_icon.svg',
+                onPressed: () => lockHelper.provideWithLockChecker(
+                    context,
+                        () => js.context
+                        .callMethod('open', [window.location.toString()])),
+              ),
+            ),
+          SizedBox(
+            width: 16,
+          ),
           SizedBox(
             width: 32,
             height: 32,

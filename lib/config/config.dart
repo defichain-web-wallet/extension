@@ -24,6 +24,7 @@ class ScreenSizes {
   static const double xSmall = 328;
   static const double small = 458;
   static const double medium = 890;
+  static const double large = 1440;
 }
 
 class TickerTimes {

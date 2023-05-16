@@ -8,16 +8,11 @@ import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
-import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
-import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/screens/home/widgets/transaction_history.dart';
-import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
-import 'package:defi_wallet/widgets/home/home_sliver_app_bar.dart';
+import 'package:defi_wallet/widgets/home/home_card.dart';
+import 'package:defi_wallet/widgets/home/home_tabs_scroll_view.dart';
 import 'package:defi_wallet/widgets/home/transaction_status_bar.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -44,6 +39,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
   static const int tickerTimerUpdate = 15;
+  static const double extendedBoxWidth = 832;
+  static const double extendedFirstColumnWidth = 328;
+  static const double extendedLastColumnWidth = 488;
+
   Timer? timer;
   TabController? tabController;
   LockHelper lockHelper = LockHelper();
@@ -147,128 +146,49 @@ class _HomeScreenState extends State<HomeScreen>
                       }
                       return Container(
                         color: Theme.of(context).scaffoldBackgroundColor,
-                        child: Center(
+                            child: Center(
                           child: StretchBox(
-                            maxWidth: ScreenSizes.medium,
-                            child: Stack(
-                              children: [
-                                ScrollConfiguration(
-                                  behavior: ScrollConfiguration.of(context)
-                                      .copyWith(scrollbars: false),
-                                  child: CustomScrollView(
-                                    slivers: [
-                                      HomeSliverAppBar(),
-                                      SliverAppBar(
-                                        backgroundColor: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        pinned: true,
-                                        actions: [Container()],
-                                        automaticallyImplyLeading: false,
-                                        expandedHeight: 58.0,
-                                        toolbarHeight: 58,
-                                        flexibleSpace: FlexibleSpaceBar(
-                                          background: Container(
-                                            color: Theme.of(context)
-                                                .scaffoldBackgroundColor,
-                                            child: Container(
-                                              padding: const EdgeInsets.only(
-                                                top: 12,
-                                                right: 16,
-                                                bottom: 2,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    Theme.of(context).cardColor,
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(20),
-                                                  topRight: Radius.circular(20),
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    child: TabBarHeader(
-                                                      tabController:
-                                                          tabController,
-                                                      currentTabIndex:
-                                                          homeState.tabIndex,
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 12,
-                                                  ),
-                                                  if (!SettingsHelper
-                                                      .isBitcoin())
-                                                    SizedBox(
-                                                      width: 32,
-                                                      height: 32,
-                                                      child: NewActionButton(
-                                                        iconPath:
-                                                            'assets/icons/add_black.svg',
-                                                        onPressed: () async {
-                                                          await lockHelper
-                                                              .provideWithLockChecker(
-                                                            context,
-                                                            () =>
-                                                                Navigator.push(
-                                                              context,
-                                                              PageRouteBuilder(
-                                                                pageBuilder: (context,
-                                                                        animation1,
-                                                                        animation2) =>
-                                                                    AddTokenScreen(),
-                                                                transitionDuration:
-                                                                    Duration
-                                                                        .zero,
-                                                                reverseTransitionDuration:
-                                                                    Duration
-                                                                        .zero,
-                                                              ),
-                                                            ),
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                ],
-                                              ),
+                            maxWidth: extendedBoxWidth,
+                            child: Container(
+                              child: Stack(
+                                children: [
+                                  if (isFullScreen)
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          width: extendedFirstColumnWidth,
+                                          child: Column(
+                                            children: [
+                                              HomeCard(),
+                                            ],
+                                          ),
+                                        ),
+                                        Flexible(
+                                          child: Container(
+                                            constraints: BoxConstraints(
+                                              maxWidth: extendedLastColumnWidth,
+                                            ),
+                                            child: HomeTabsScrollView(
+                                              txState: txState,
+                                              tabController: tabController!,
+                                              activeTabIndex: homeState.tabIndex,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      if (tabController!.index == 0) ...[
-                                        AssetList(),
-                                        SliverFillRemaining(
-                                          hasScrollBody: false,
-                                          child: Container(
-                                            height: txState
-                                                    is! TransactionInitialState
-                                                ? 90
-                                                : 0,
-                                            color: Theme.of(context).cardColor,
-                                          ),
-                                        )
-                                      ] else ...[
-                                        TransactionHistory(),
-                                        SliverFillRemaining(
-                                          hasScrollBody: false,
-                                          child: Container(
-                                            height: txState
-                                                    is! TransactionInitialState
-                                                ? 90
-                                                : 0,
-                                            color: Theme.of(context).cardColor,
-                                          ),
-                                        ),
-                                      ]
-                                    ],
-                                  ),
-                                ),
-                                if (txState is! TransactionInitialState)
-                                  TransactionStatusBar(key: txKey,),
-                              ],
+                                      ],
+                                    )
+                                  else
+                                    HomeTabsScrollView(
+                                      txState: txState,
+                                      tabController: tabController!,
+                                      activeTabIndex: homeState.tabIndex,
+                                      isShowHomeCard: true,
+                                    ),
+                                  if (txState is! TransactionInitialState)
+                                    TransactionStatusBar(key: txKey,),
+                                ],
+                              ),
                             ),
                           ),
                         ),
