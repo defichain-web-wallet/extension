@@ -1,6 +1,7 @@
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_token_model.dart';
@@ -23,8 +24,8 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     return networkModel;
   }
 
-  Future<bool> signIn(AbstractAccountModel account, String password) async {
-    var data = await _authorizationData(account, password);
+  Future<bool> signIn(AbstractAccountModel account, String password, ApplicationModel applicationModel) async {
+    var data = await _authorizationData(account, password, applicationModel);
     String? accessToken = await LockRequests.signIn(data);
     if (accessToken != null) {
       accessTokensMap[account.accountIndex] = AccessTokenModel(
@@ -36,8 +37,8 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     return false; //TODO: need to return ErrorModel with details
   }
 
-  Future<bool> signUp(AbstractAccountModel account, String password) async {
-    var data = await _authorizationData(account, password);
+  Future<bool> signUp(AbstractAccountModel account, String password, ApplicationModel applicationModel) async {
+    var data = await _authorizationData(account, password, applicationModel);
     String? accessToken = await LockRequests.signUp(data);
     if (accessToken != null) {
       accessTokensMap[account.accountIndex] = AccessTokenModel(
@@ -113,13 +114,14 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     StakingModel stakingModel,
     AbstractNetworkModel network,
     double amount,
+      ApplicationModel applicationModel
   ) async {
     var tx = await network.send(
         account: account,
         address: stakingModel.depositAddress,
         password: password,
         token: token,
-        amount: amount);
+        amount: amount, applicationModel:  applicationModel);
     if (tx.isError == false) {
       LockRequests.setDeposit(
         this.accessTokensMap[account.accountIndex]!.accessToken,
@@ -138,6 +140,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     StakingModel stakingModel,
     AbstractNetworkModel network,
     double amount,
+      ApplicationModel applicationModel
   ) async {
     late WithdrawModel? withdrawModel;
     var existWithdraws =
@@ -154,7 +157,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     }
 
     withdrawModel.signature = await network.signMessage(
-        account, withdrawModel.signMessage!, password);
+        account, withdrawModel.signMessage!, password, applicationModel);
     await LockRequests.signedWithdraw(
         this.accessTokensMap[account.accountIndex]!.accessToken, stakingModel.id, withdrawModel);
     return true;
@@ -163,13 +166,13 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
   //private methods
 
   Future<Map<String, String>> _authorizationData(
-      AbstractAccountModel account, String password) async {
+      AbstractAccountModel account, String password, ApplicationModel applicationModel) async {
     var address =
         account.getAddress(this.networkModel.networkType.networkName)!;
     String signature = await this.networkModel.signMessage(
         account,
         'By_signing_this_message,_you_confirm_to_LOCK_that_you_are_the_sole_owner_of_the_provided_Blockchain_address._Your_ID:_$address',
-        password);
+        password, applicationModel);
     return {
       'address': address,
       'blockchain': 'DeFiChain',

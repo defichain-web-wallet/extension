@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_type_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 import 'package:defi_wallet/requests/defichain/ramp/dfx_requests.dart';
@@ -26,8 +27,12 @@ class DefichainRampModel extends AbstractOnOffRamp {
   }
 
   @override
-  Future<bool> signIn(AbstractAccountModel account, String password) async {
-    var data = await _authorizationData(account, password);
+  Future<bool> signIn(
+    AbstractAccountModel account,
+    String password,
+    ApplicationModel applicationModel,
+  ) async {
+    var data = await _authorizationData(account, password, applicationModel);
     String? accessToken = await DFXRequests.signIn(data);
     if (accessToken != null) {
       this.accessToken = accessToken;
@@ -37,8 +42,12 @@ class DefichainRampModel extends AbstractOnOffRamp {
     return false; //TODO: need to return ErrorModel with details
   }
 
-  Future<bool> signUp(AbstractAccountModel account, String password) async {
-    var data = await _authorizationData(account, password);
+  Future<bool> signUp(
+    AbstractAccountModel account,
+    String password,
+    ApplicationModel applicationModel,
+  ) async {
+    var data = await _authorizationData(account, password, applicationModel);
     String? accessToken = await DFXRequests.signUp(data);
     if (accessToken != null) {
       this.accessToken = accessToken;
@@ -205,17 +214,16 @@ class DefichainRampModel extends AbstractOnOffRamp {
     // TODO: implement savePaymentData
   }
 
-  Future<Map<String, String>> _authorizationData(
-    AbstractAccountModel account,
-    String password,
-  ) async {
+  Future<Map<String, String>> _authorizationData(AbstractAccountModel account,
+      String password, ApplicationModel applicationModel) async {
     var address = account.getAddress(
       this.networkModel.networkType.networkName,
     )!;
     String signature = await this.networkModel.signMessage(
         account,
         'By_signing_this_message,_you_confirm_that_you_are_the_sole_owner_of_the_provided_DeFiChain_address_and_are_in_possession_of_its_private_key._Your_ID:_$address',
-        password);
+        password,
+        applicationModel);
     return {
       'address': address,
       'blockchain': 'DeFiChain',

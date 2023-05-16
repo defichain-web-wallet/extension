@@ -6,6 +6,7 @@ import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_ramp_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
@@ -23,7 +24,7 @@ class RampCubit extends Cubit<RampState> {
     isTestnet: false,
   );
 
-  void signIn(AccountModel account, String password) async {
+  void signIn(AccountModel account, String password, ApplicationModel applicationModel) async {
     emit(state.copyWith(
       status: RampStatusList.loading,
     ));
@@ -31,7 +32,7 @@ class RampCubit extends Cubit<RampState> {
     DefichainRampModel defichainRampModel = state.defichainRampModel ??
         DefichainRampModel(DefichainNetworkModel(networkTypeModel));
 
-    bool isComplete = await defichainRampModel.signIn(account, password);
+    bool isComplete = await defichainRampModel.signIn(account, password, applicationModel);
 
     print(state.defichainRampModel);
 
@@ -47,7 +48,7 @@ class RampCubit extends Cubit<RampState> {
     }
   }
 
-  void signUp(AccountModel account, String password) async {
+  void signUp(AccountModel account, String password, ApplicationModel applicationModel) async {
     emit(state.copyWith(
       status: RampStatusList.loading,
     ));
@@ -55,7 +56,7 @@ class RampCubit extends Cubit<RampState> {
     DefichainRampModel defichainRampModel = state.defichainRampModel ??
         DefichainRampModel(DefichainNetworkModel(networkTypeModel));
 
-    bool isComplete = await defichainRampModel.signUp(account, password);
+    bool isComplete = await defichainRampModel.signUp(account, password, applicationModel);
 
     if (isComplete) {
       emit(state.copyWith(

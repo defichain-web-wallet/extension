@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_lm_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_ramp_model.dart';
@@ -20,6 +21,7 @@ import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_balance_requests.dart';
 import 'package:defi_wallet/requests/defichain/dfi_token_requests.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
+import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
@@ -216,16 +218,10 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     );
   }
 
-  Future<ECPair> getKeypair(String password, int accountIndex) async {
-    String masterKey = await HiveService.getMasterKey(
-      password,
-      this.networkType,
-    );
-
-    return _getKeypairForPathPrivateKey(
-      bip32.BIP32.fromBase58(masterKey, _getNetworkTypeBip32()),
-      accountIndex,
-    );
+  Future<ECPair> getKeypair(String password, AbstractAccountModel account, ApplicationModel applicationModel) async {
+    var mnemonic = applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
+    var masterKey = getMasterKeypairFormMnemonic(mnemonic);
+    return _getKeypairForPathPrivateKey(masterKey, account.accountIndex);
   }
 
   Future<TxErrorModel> send(
@@ -233,10 +229,12 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       required String address,
       required String password,
       required TokenModel token,
-      required double amount}) async {
+      required double amount,
+        required ApplicationModel applicationModel}) async {
     ECPair keypair = await getKeypair(
       password,
-      account.accountIndex,
+      account,
+      applicationModel
     );
 
     List<BalanceModel> balances = account.getPinnedBalances(this);
@@ -265,10 +263,12 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     AbstractAccountModel account,
     String message,
     String password,
+   ApplicationModel applicationModel
   ) async {
     ECPair keypair = await getKeypair(
       password,
-      account.accountIndex,
+      account,
+      applicationModel
     );
 
     return keypair.signMessage(message, _getNetworkType());
@@ -329,6 +329,11 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return this.networkType.isTestnet
         ? networks.defichain_testnet
         : networks.defichain;
+  }
+
+  bip32.BIP32 getMasterKeypairFormMnemonic(List<String> mnemonic) {
+    final seed = mnemonicToSeed(mnemonic.join(' '));
+    return bip32.BIP32.fromSeedWithCustomKey(seed, "@defichain/jellyfish-wallet-mnemonic", _getNetworkTypeBip32());
   }
 
   ECPair _getKeypairForPathPublicKey(bip32.BIP32 masterKeypair, int account) {

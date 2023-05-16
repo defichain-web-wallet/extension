@@ -22,6 +22,12 @@ class SourceSeedModel {
     this.id = Uuid().v1();
   }
 
+  List<String> getMnemonic(String password){
+    var mnemonic = EncryptHelper.getDecryptedData(this.mnemonic, password);
+    return mnemonic.split(',');
+  }
+
+
   void _validatePassword(String? password){
     if(password == null){
       throw 'Password is required';
