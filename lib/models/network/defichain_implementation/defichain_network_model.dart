@@ -32,10 +32,6 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   static const int FEE = 3000;
   static const int RESERVED_BALANCES = 30000;
 
-  List<AbstractStakingProviderModel> stakingList = [];
-  List<AbstractLmProviderModel> lmList = [];
-  List<AbstractOnOffRamp> rampList = [];
-  List<AbstractExchangeModel> exchangeList = [];
 
   DefichainNetworkModel(NetworkTypeModel networkType)
       : super(_validationNetworkName(networkType)) {
@@ -220,7 +216,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   bool checkAddress(String address) {
     return Address.validateAddress(
       address,
-      _getNetworkType(),
+      getNetworkType(),
     );
   }
 
@@ -260,7 +256,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       balanceUTXO: balanceUTXO,
       balance: balanceToken,
       destinationAddress: address,
-      networkString: this.networkType.networkStringLowerCase,
+      network: this,
       amount: toSatoshi(amount),
     );
   }
@@ -277,7 +273,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       applicationModel
     );
 
-    return keypair.signMessage(message, _getNetworkType());
+    return keypair.signMessage(message, getNetworkType());
   }
 
   Future<BalanceModel> getBalanceUTXO(
@@ -331,7 +327,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }
 
   // private
-  NetworkType _getNetworkType() {
+  NetworkType getNetworkType() {
     return this.networkType.isTestnet
         ? networks.defichain_testnet
         : networks.defichain;
@@ -345,7 +341,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   ECPair _getKeypairForPathPublicKey(bip32.BIP32 masterKeypair, int account) {
     return ECPair.fromPublicKey(
         masterKeypair.derivePath(_derivePath(account)).publicKey,
-        network: _getNetworkType());
+        network: getNetworkType());
   }
 
   ECPair _getKeypairForPathPrivateKey(
@@ -354,7 +350,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   ) {
     return ECPair.fromPrivateKey(
         masterKeypair.derivePath(_derivePath(account)).privateKey!,
-        network: _getNetworkType());
+        network: getNetworkType());
   }
 
   String _derivePath(int account) {
@@ -366,12 +362,12 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       data: PaymentData(
         pubkey: keyPair.publicKey,
       ),
-      network: _getNetworkType(),
+      network: getNetworkType(),
     ).data!.address!;
   }
 
   bip32.NetworkType _getNetworkTypeBip32() {
-    var network = _getNetworkType();
+    var network = getNetworkType();
     return bip32.NetworkType(
       bip32: bip32.Bip32Type(
         private: network.bip32.private,

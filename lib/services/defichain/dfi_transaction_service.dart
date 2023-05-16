@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -18,7 +19,6 @@ class DFITransactionService {
   static const DUST = 3000;
   static const FEE = 3000;
   static const int AuthTxMin = 200000;
-  var networkHelper = NetworkHelper();
   var balanceRequests = BalanceRequests();
   var balancesHelper = BalancesHelper();
   List<UtxoModel> accountUtxoList = [];
@@ -26,7 +26,7 @@ class DFITransactionService {
   Future<TxErrorModel> createAndSendSwap({
     required String senderAddress,
     required ECPair keyPair,
-    required String networkString,
+    required DefichainNetworkModel network,
     required TokenModel tokenFrom,
     required TokenModel tokenTo,
     required BalanceModel balanceDFIToken,
@@ -42,13 +42,14 @@ class DFITransactionService {
     var fraction = (n % oneHundredMillions).round();
     var integer = ((n - fraction) / oneHundredMillions).round();
 
-    await _getUtxoList(senderAddress, networkString);
+    await _getUtxoList(senderAddress, network.networkType.networkStringLowerCase);
 
     if (tokenFrom.symbol == 'DFI') {
       if (balanceDFIToken.balance < amountFrom) {
         var responseModel = await _utxoToAccountTransaction(
             senderAddress: senderAddress,
             keyPair: keyPair,
+            network: network,
             amount: amountFrom - balanceDFIToken.balance,
             tokenId: int.parse(tokenFrom.id));
 
@@ -57,7 +58,7 @@ class DFITransactionService {
         }
 
         txErrorModel =
-            await _prepareTx(responseModel, TxType.convertUtxo, networkString);
+            await _prepareTx(responseModel, TxType.convertUtxo, network.networkType.networkStringLowerCase);
         if (txErrorModel.isError!) {
           return txErrorModel;
         }
@@ -71,8 +72,9 @@ class DFITransactionService {
         destinationAddress: senderAddress,
         changeAddress: senderAddress,
         amount: 0,
+        network: network,
         additional: (txb, nw, newUtxo) {
-          txb.addSwapOutput(tokenFrom.id, senderAddress, amountFrom, tokenTo.id,
+          txb.addSwapOutput(int.parse(tokenFrom.id), senderAddress, amountFrom, int.parse(tokenTo.id),
               senderAddress, integer, fraction);
         },
         useAllUtxo: true);
@@ -82,7 +84,7 @@ class DFITransactionService {
           .add(TxLoaderModel(txHex: responseModel.hex, type: TxType.swap));
     } else {
       txErrorModel =
-          await _prepareTx(responseModel, TxType.swap, networkString);
+          await _prepareTx(responseModel, TxType.swap, network.networkType.networkStringLowerCase);
     }
 
     return txErrorModel;
@@ -91,11 +93,11 @@ class DFITransactionService {
   Future<TxErrorModel> removeLiqudity({
     required String senderAddress,
     required ECPair keyPair,
-    required String networkString,
+    required DefichainNetworkModel network,
     required LmPoolModel pool,
     required int amount,
   }) async {
-    await _getUtxoList(senderAddress, networkString);
+    await _getUtxoList(senderAddress, network.networkType.networkStringLowerCase);
 
     var responseModel = await _createTransaction(
         keyPair: keyPair,
@@ -104,24 +106,25 @@ class DFITransactionService {
         destinationAddress: senderAddress,
         changeAddress: senderAddress,
         amount: 0,
+        network: network,
         additional: (txb, nw, newUtxo) {
           txb.addRemoveLiquidityOutput(
               int.parse(pool.id), amount, senderAddress);
         });
 
-    return await _prepareTx(responseModel, TxType.removeLiq, networkString);
+    return await _prepareTx(responseModel, TxType.removeLiq, network.networkType.networkStringLowerCase);
   }
 
   Future<TxErrorModel> createAndSendLiqudity({
     required String senderAddress,
     required ECPair keyPair,
-    required String networkString,
+    required DefichainNetworkModel network,
     required BalanceModel balanceUTXO,
     required BalanceModel balanceDFIToken,
     required LmPoolModel pool,
     required List<int> amountList,
   }) async {
-    await _getUtxoList(senderAddress, networkString);
+    await _getUtxoList(senderAddress, network.networkType.networkStringLowerCase);
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
     int? indexDFI;
@@ -143,12 +146,13 @@ class DFITransactionService {
       if (balanceDFIToken.balance < amountList[indexDFI]) {
         var responseModel = await _utxoToAccountTransaction(
             senderAddress: senderAddress,
+            network: network,
             keyPair: keyPair,
             amount: amountList[indexDFI] - balanceDFIToken.balance,
             tokenId: int.parse(pool.tokens[indexDFI].id));
 
         txErrorModel =
-            await _prepareTx(responseModel, TxType.convertUtxo, networkString);
+            await _prepareTx(responseModel, TxType.convertUtxo, network.networkType.networkStringLowerCase);
         if (txErrorModel.isError!) {
           return txErrorModel;
         }
@@ -162,6 +166,7 @@ class DFITransactionService {
         senderAddress: senderAddress,
         changeAddress: senderAddress,
         amount: 0,
+        network: network,
         additional: (txb, nw, newUtxo) {
           txb.addAddLiquidityOutputSingleAddress(
               senderAddress,
@@ -178,7 +183,7 @@ class DFITransactionService {
           .add(TxLoaderModel(txHex: responseModel.hex, type: TxType.addLiq));
     } else {
       txErrorModel =
-          await _prepareTx(responseModel, TxType.addLiq, networkString);
+          await _prepareTx(responseModel, TxType.addLiq, network.networkType.networkStringLowerCase);
     }
 
     return txErrorModel;
@@ -189,6 +194,7 @@ class DFITransactionService {
     required int amount,
     required String senderAddress,
     required int tokenId,
+    required DefichainNetworkModel network
   }) {
     return _createTransaction(
         keyPair: keyPair,
@@ -197,6 +203,7 @@ class DFITransactionService {
         senderAddress: senderAddress,
         changeAddress: senderAddress,
         amount: 0,
+        network: network,
         reservedBalance: amount,
         additional: (txb, nw, newUtxo) {
           txb.addUtxosToAccountOutput(tokenId, senderAddress, amount, nw);
@@ -209,17 +216,17 @@ class DFITransactionService {
     required BalanceModel balanceUTXO,
     required BalanceModel balance,
     required String destinationAddress,
-    required String networkString,
+    required DefichainNetworkModel network,
     required int amount,
   }) async {
-    if (balance.token!.name == 'DFI') {
+    if (balance.token!.symbol == 'DFI') {
       return _createSendUTXOTransaction(
           keyPair: keyPair,
           balance: balance,
           destinationAddress: destinationAddress,
           amount: amount,
           senderAddress: senderAddress,
-          networkString: networkString);
+          network: network);
     } else {
       return _createAndSendToken(
           keyPair: keyPair,
@@ -227,7 +234,7 @@ class DFITransactionService {
           destinationAddress: destinationAddress,
           amount: amount,
           senderAddress: senderAddress,
-          networkString: networkString);
+          network: network);
     }
   }
 
@@ -235,14 +242,14 @@ class DFITransactionService {
     required String senderAddress,
     required ECPair keyPair,
     required String destinationAddress,
-    required String networkString,
+    required DefichainNetworkModel network,
     required int amount,
     required BalanceModel balance,
   }) async {
     TxResponseModel? responseModel;
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
-    await _getUtxoList(senderAddress, networkString);
+    await _getUtxoList(senderAddress, network.networkType.networkStringLowerCase);
 
     //Swap DFI tokens to UTXO if needed
     if (balance.balance >= DUST) {
@@ -252,6 +259,7 @@ class DFITransactionService {
           destinationAddress: destinationAddress,
           changeAddress: senderAddress,
           amount: 0,
+          network: network,
           senderAddress: senderAddress,
           additional: (txb, nw, newUtxo) {
             final mintingStartsAt = txb.tx!.outs.length + 1;
@@ -268,7 +276,7 @@ class DFITransactionService {
       }
 
       txErrorModel =
-          await _prepareTx(responseModel, TxType.convertUtxo, networkString);
+          await _prepareTx(responseModel, TxType.convertUtxo, network.networkType.networkStringLowerCase);
 
       if (txErrorModel.isError!) {
         return txErrorModel;
@@ -281,6 +289,7 @@ class DFITransactionService {
         destinationAddress: destinationAddress,
         senderAddress: senderAddress,
         changeAddress: senderAddress,
+        network: network,
         amount: amount);
     if (responseTxModel.isError) {
       return TxErrorModel(isError: true, error: responseTxModel.error);
@@ -291,7 +300,7 @@ class DFITransactionService {
           .add(TxLoaderModel(txHex: responseTxModel.hex, type: TxType.send));
     } else {
       txErrorModel =
-          await _prepareTx(responseTxModel, TxType.send, networkString);
+          await _prepareTx(responseTxModel, TxType.send, network.networkType.networkStringLowerCase);
     }
 
     return txErrorModel;
@@ -301,11 +310,11 @@ class DFITransactionService {
     required String senderAddress,
     required ECPair keyPair,
     required TokenModel token,
-    required String networkString,
+    required DefichainNetworkModel network,
     required String destinationAddress,
     required int amount,
   }) async {
-    await _getUtxoList(senderAddress, networkString);
+    await _getUtxoList(senderAddress, network.networkType.networkStringLowerCase);
 
     var responseModel = await _createTransaction(
         keyPair: keyPair,
@@ -313,17 +322,18 @@ class DFITransactionService {
         destinationAddress: senderAddress,
         senderAddress: senderAddress,
         changeAddress: senderAddress,
+        network: network,
         amount: 0,
         additional: (txb, nw, newUtxo) {
-          txb.addAccountToAccountOutputAt(
-              token.id, senderAddress, destinationAddress, amount, 0);
+            txb.addAccountToAccountOutputAt(
+                int.parse(token.id), senderAddress, destinationAddress, amount, 0);
         },
         useAllUtxo: true);
     if (responseModel.isError) {
       return TxErrorModel(isError: true, error: responseModel.error);
     }
 
-    return await _prepareTx(responseModel, TxType.send, networkString);
+    return await _prepareTx(responseModel, TxType.send, network.networkType.networkStringLowerCase);
   }
 
   Future<TxResponseModel> _createTransaction({
@@ -333,6 +343,7 @@ class DFITransactionService {
     required String changeAddress,
     required int amount,
     required String senderAddress,
+    required DefichainNetworkModel network,
     bool useAllUtxo = true,
     int reservedBalance = 0,
     Function(TransactionBuilder, NetworkType, List<UtxoModel>)? additional,
@@ -358,7 +369,7 @@ class DFITransactionService {
     }
 
     final _txb = TransactionBuilder(
-        network: networkHelper.getNetwork(SettingsHelper.settings.network!));
+        network: network.getNetworkType());
     _txb.setVersion(2);
 
     selectedUTXO.forEach((utxo) {
@@ -368,8 +379,7 @@ class DFITransactionService {
           null,
           P2WPKH(
                   data: PaymentData(pubkey: keyPair.publicKey),
-                  network: networkHelper
-                      .getNetwork(SettingsHelper.settings.network!))
+                  network: network.getNetworkType())
               .data!
               .output);
       sum += utxo.value!;
@@ -402,8 +412,7 @@ class DFITransactionService {
     }
 
     if (additional != null) {
-      await additional(_txb,
-          networkHelper.getNetwork(SettingsHelper.settings.network!), newUTXO);
+      await additional(_txb, network.getNetworkType(), newUTXO);
     }
 
     selectedUTXO.asMap().forEach((index, utxo) {

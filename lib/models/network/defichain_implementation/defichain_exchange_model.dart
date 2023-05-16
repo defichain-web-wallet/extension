@@ -3,6 +3,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_account_mod
 import 'package:defi_wallet/models/network/abstract_classes/abstract_exchange_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/token/exchange_pair_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -37,7 +38,7 @@ class DefichainExchangeModel extends AbstractExchangeModel {
 
     return DFITransactionService().createAndSendSwap(
       senderAddress: account.getAddress(network.networkType.networkName)!,
-      networkString: network.networkType.networkStringLowerCase,
+      network: DefichainNetworkModel(network.networkType),
       tokenFrom: fromToken,
       tokenTo: toToken,
       keyPair: keypair,

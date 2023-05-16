@@ -16,6 +16,10 @@ abstract class AbstractNetworkModel {
   static const int COIN = 100000000;
 
   final NetworkTypeModel networkType;
+  final List<AbstractStakingProviderModel> stakingList = [];
+  final List<AbstractLmProviderModel> lmList = [];
+  final List<AbstractOnOffRamp> rampList = [];
+  final List<AbstractExchangeModel> exchangeList = [];
 
   AbstractNetworkModel(this.networkType);
 
