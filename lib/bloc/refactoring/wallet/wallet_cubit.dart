@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
-import 'package:defi_wallet/services/storage/hive_actions_service.dart';
+import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
@@ -35,6 +35,10 @@ class WalletCubit extends Cubit<WalletState> {
         publicKeyTestnet: publicKeyTestnet,
         publicKeyMainnet: publicKeyMainnet,
         sourceId: source.id);
+
+
+    await StorageService.saveAccounts([account]);
+    await StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
       accountList: [account],
@@ -86,17 +90,18 @@ class WalletCubit extends Cubit<WalletState> {
         accountIndex++;
       }
     }
-//     var network = applicationModel.networks[1];
-//
-//     var tx = await network.send(account:  accountList.first, address:  accountList.first.addresses[network.networkType.networkName.name]!, password: password, token:  accountList.first.getPinnedBalances(network)[1].token!, amount: 0.0001, applicationModel: applicationModel);
-// print(tx);
 
-    await HiveActionService.initWalletDetails();
-    await HiveActionService.saveAccounts(accountList);
-    await HiveActionService.savePublicKeys(
+    // var network = applicationModel.networks[1];
+    //var tx = await network.send(account:  accountList.first, address:  accountList.first.addresses[network.networkType.networkName.name]!, password: password, token:  accountList.first.getPinnedBalances(network)[1].token!, amount: 0.0001, applicationModel: applicationModel);
+//print(tx);
+
+    await StorageService.initWalletDetails();
+    await StorageService.saveAccounts(accountList);
+    await StorageService.savePublicKeys(
       publicKeyMainnet,
       publicKeyTestnet,
     );
+    await StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
       accountList: accountList,
@@ -108,8 +113,7 @@ class WalletCubit extends Cubit<WalletState> {
 
   loadAccounts() async {
     try {
-      List<AbstractAccountModel> accounts =
-          await HiveActionService.loadAccounts();
+      List<AbstractAccountModel> accounts = await StorageService.loadAccounts();
       emit(state.copyWith(
         accountList: accounts,
         activeAccount: accounts.first,

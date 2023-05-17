@@ -10,7 +10,7 @@ import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/services/mnemonic_service.dart';
-import 'package:defi_wallet/services/storage/hive_actions_service.dart';
+import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -88,7 +88,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
               try {
                 WalletCubit walletCubit =
                     BlocProvider.of<WalletCubit>(context);
-                await HiveActionService.savePassword(password);
+                await StorageService.savePassword(password);
                 await walletCubit.restoreWallet(_mnemonic, password);
                 LoggerService.invokeInfoLogg('user  was recover wallet');
 
