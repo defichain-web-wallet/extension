@@ -57,8 +57,8 @@ class AccountModel extends AbstractAccountModel {
       ),
     };
     return AccountModel(
-      '',
-      '',
+      jsonModel['publicKeyTestnet'],
+      jsonModel['publicKeyMainnet'],
       jsonModel['sourceId'],
       Map<String, String>.from(jsonModel['addresses']),
       jsonModel['accountIndex'],
@@ -70,6 +70,8 @@ class AccountModel extends AbstractAccountModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data["sourceId"] = this.sourceId;
+    data["publicKeyTestnet"] = this.publicKeyTestnet;
+    data["publicKeyMainnet"] = this.publicKeyMainnet;
     data["addresses"] = this.addresses;
     data["accountIndex"] = this.accountIndex;
     data["pinnedBalances"] = this.pinnedBalances.map((key, value) {

@@ -12,14 +12,18 @@ class SourceSeedModel {
   final String publicKeyMainnet;
   final SourceName sourceName;
 
-  SourceSeedModel({required this.sourceName, required this.publicKeyMainnet, required this.publicKeyTestnet, String? password, List<String>? mnemonic}){
+  SourceSeedModel({String? id, required this.sourceName, required this.publicKeyMainnet, required this.publicKeyTestnet, String? password, List<String>? mnemonic, String? mnemonicFromStore}){
     if(sourceName.name == SourceName.seed.name){
-      _validatePassword(password);
-      _validateMnemonic(mnemonic);
-      this.mnemonic = EncryptHelper.getEncryptedData(mnemonic!.join(','), password);
-
+      if(mnemonicFromStore != null){
+        this.mnemonic = mnemonicFromStore;
+      } else {
+        _validatePassword(password);
+        _validateMnemonic(mnemonic);
+        this.mnemonic = EncryptHelper.getEncryptedData(mnemonic!.join(','), password);
+      }
     }
-    this.id = Uuid().v1();
+
+    this.id = id ?? Uuid().v1();
   }
 
   List<String> getMnemonic(String password){
@@ -37,6 +41,26 @@ class SourceSeedModel {
     if(mnemonic == null){
       throw 'Mnemonic is required';
     }
+  }
+
+  Map<String, dynamic> toJSON() {
+    return {
+      'id': id,
+      'mnemonic': mnemonic,
+      'publicKeyTestnet': publicKeyTestnet,
+      'publicKeyMainnet': publicKeyMainnet,
+      'sourceName': sourceName.name,
+    };
+  }
+
+  factory SourceSeedModel.fromJSON(Map<String, dynamic> json) {
+    return SourceSeedModel(
+      id: json['id'],
+      mnemonicFromStore: json['mnemonic'],
+      publicKeyTestnet: json['publicKeyTestnet'],
+      publicKeyMainnet: json['publicKeyMainnet'],
+      sourceName: SourceName.values.firstWhere((element) => element.name == json['sourceName']),
+    );
   }
 
 }

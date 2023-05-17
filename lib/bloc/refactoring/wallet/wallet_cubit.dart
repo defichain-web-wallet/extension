@@ -13,7 +13,7 @@ import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
-import 'package:defi_wallet/services/storage/hive_actions_service.dart';
+import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
@@ -45,6 +45,10 @@ class WalletCubit extends Cubit<WalletState> {
         publicKeyTestnet: publicKeyTestnet,
         publicKeyMainnet: publicKeyMainnet,
         sourceId: source.id);
+
+
+    await StorageService.saveAccounts([account]);
+    await StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
       accountList: [account],
@@ -93,15 +97,12 @@ class WalletCubit extends Cubit<WalletState> {
         accountIndex++;
       }
     }
-    var network = applicationModel.networks[1];
+    // var network = applicationModel.networks[1];
+    //var tx = await network.send(account:  accountList.first, address:  accountList.first.addresses[network.networkType.networkName.name]!, password: password, token:  accountList.first.getPinnedBalances(network)[1].token!, amount: 0.0001, applicationModel: applicationModel);
+//print(tx);
 
-    var tx = await network.send(account:  accountList.first, address:  accountList.first.addresses[network.networkType.networkName.name]!, password: password, token:  accountList.first.getPinnedBalances(network)[1].token!, amount: 0.0001, applicationModel: applicationModel);
-print(tx);
-
-    await HiveActionService.saveAccounts(accountList);
-    List<AbstractAccountModel> accounts =
-        await HiveActionService.loadAccounts();
-    print(accounts);
+    await StorageService.saveAccounts(accountList);
+    await StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
       accountList: accountList,

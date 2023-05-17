@@ -46,4 +46,7 @@ class HiveNames {
 
   // account
   static const String accounts = 'accounts';
+
+  //application
+  static const String application = 'application';
 }
