@@ -6,20 +6,22 @@ class HiveService {
     try {
       var box = await Hive.openBox(HiveBoxes.client);
       var data = await box.get(key);
+      await box.close();
       return data;
     } catch (error) {
       throw error;
     }
   }
 
+  // TODO: make 'data' to array
   static Future<void> update(
     String key,
-    String data,
+    dynamic data,
   ) async {
     try {
       var box = await Hive.openBox(HiveBoxes.client);
-
       await box.put(key, data);
+      await box.close();
     } catch (error) {
       throw error;
     }

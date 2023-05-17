@@ -10,6 +10,7 @@ import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/services/mnemonic_service.dart';
+import 'package:defi_wallet/services/storage/hive_actions_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -85,19 +86,22 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
             isShownProgressBar: false,
             onSubmitted: (String password) async {
               try {
-                AccountCubit accountCubit =
-                    BlocProvider.of<AccountCubit>(context);
                 WalletCubit walletCubit =
                     BlocProvider.of<WalletCubit>(context);
-
-                var box = await Hive.openBox(HiveBoxes.client);
-                var encryptedPassword = Crypt.sha256(password).toString();
-                await box.put(HiveNames.password, encryptedPassword);
-                await box.close();
-
+                await HiveActionService.savePassword(password);
                 await walletCubit.restoreWallet(_mnemonic, password);
-                // await accountCubit.restoreAccount(_mnemonic, password);
                 LoggerService.invokeInfoLogg('user  was recover wallet');
+
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => HomeScreen(
+                      isLoadTokens: true,
+                    ),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                );
               } catch (err) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -110,17 +114,6 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                   ),
                 );
               }
-
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) => HomeScreen(
-                    isLoadTokens: true,
-                  ),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ),
-              );
             },
           ),
           transitionDuration: Duration.zero,

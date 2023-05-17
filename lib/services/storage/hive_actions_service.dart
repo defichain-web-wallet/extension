@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -7,6 +8,51 @@ import 'package:defi_wallet/services/storage/hive_service.dart';
 
 class HiveActionService {
   static Codec<String, String> stringToBase64 = utf8.fuse(base64);
+
+  static Future initWalletDetails({
+    bool isExistAccessToken = false,
+  }) async {
+    try {
+      await HiveService.update(HiveNames.kycStatus, 'show');
+      await HiveService.update(HiveNames.tutorialStatus, 'show');
+      if (isExistAccessToken) {
+        await HiveService.update(
+          HiveNames.generatedAccessToken,
+          DateTime.now().millisecondsSinceEpoch,
+        );
+      }
+      await HiveService.update(HiveNames.openedMnemonic, null);
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  static Future savePassword(String password) async {
+    try {
+      var encryptedPassword = Crypt.sha256(password).toString();
+      await HiveService.update(HiveNames.password, encryptedPassword);
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  static Future savePublicKeys(String mainnetKey, String testnetKey) async {
+    try {
+      var encryptedMainnetKey = stringToBase64.encode(mainnetKey);
+      var encryptedTestnetKey = stringToBase64.encode(testnetKey);
+
+      await HiveService.update(
+        HiveNames.masterKeyPairMainnetPublic,
+        encryptedMainnetKey,
+      );
+      await HiveService.update(
+        HiveNames.masterKeyPairTestnetPublic,
+        encryptedTestnetKey,
+      );
+    } catch (err) {
+      print(err);
+    }
+  }
 
   static Future saveAccounts(List<AbstractAccountModel> accounts) async {
     try {
