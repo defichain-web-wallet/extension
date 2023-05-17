@@ -19,28 +19,41 @@ class AccountModel extends AbstractAccountModel {
             accountIndex, pinnedBalances, networkList);
 
   factory AccountModel.fromJson(Map<String, dynamic> jsonModel) {
-    // TODO: refactoring this
-    List<AbstractNetworkModel> networkList = [
-      DefichainNetworkModel.fromJson(
-        jsonModel['networkList'][0],
-      ),
-      DefichainNetworkModel.fromJson(
-        jsonModel['networkList'][1],
-      ),
-      BitcoinNetworkModel.fromJson(
-        jsonModel['networkList'][2],
-      ),
-      BitcoinNetworkModel.fromJson(
-        jsonModel['networkList'][3],
-      ),
-    ];
-    // print(networkList);
-    var balances = jsonModel['pinnedBalances']['defichainTestnet'];
+    var networkListJson = jsonModel['networkList'];
+
+    List<AbstractNetworkModel> networkList =
+        List.generate(networkListJson.length, (index) {
+      if (networkListJson[index]['networkName'].contains('defichain')) {
+        return DefichainNetworkModel.fromJson(
+          networkListJson[index],
+        );
+      } else {
+        return BitcoinNetworkModel.fromJson(
+          networkListJson[index],
+        );
+      }
+    });
+    var defichainMainnet = jsonModel['pinnedBalances']['defichainMainnet'];
+    var defichainTestnet = jsonModel['pinnedBalances']['defichainTestnet'];
+    var bitcoinTestnet = jsonModel['pinnedBalances']['bitcoinTestnet'];
+    var bitcoinMainnet = jsonModel['pinnedBalances']['bitcoinMainnet'];
 
     Map<String, List<BalanceModel>> pinnedBalances = {
+      'defichainMainnet': List<BalanceModel>.generate(
+        defichainMainnet.length,
+        (index) => BalanceModel.fromJSON(defichainMainnet[index]),
+      ),
       'defichainTestnet': List<BalanceModel>.generate(
-        balances.length,
-        (index) => BalanceModel.fromJSON(balances[index]),
+        defichainTestnet.length,
+            (index) => BalanceModel.fromJSON(defichainTestnet[index]),
+      ),
+      'bitcoinTestnet': List<BalanceModel>.generate(
+        defichainTestnet.length,
+            (index) => BalanceModel.fromJSON(bitcoinTestnet[index]),
+      ),
+      'bitcoinMainnet': List<BalanceModel>.generate(
+        defichainTestnet.length,
+            (index) => BalanceModel.fromJSON(bitcoinMainnet[index]),
       ),
     };
     return AccountModel(

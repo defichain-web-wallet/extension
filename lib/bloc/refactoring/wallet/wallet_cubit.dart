@@ -99,8 +99,9 @@ class WalletCubit extends Cubit<WalletState> {
 print(tx);
 
     await HiveActionService.saveAccounts(accountList);
-    var a = HiveActionService.loadAccounts();
-    print(a);
+    List<AbstractAccountModel> accounts =
+        await HiveActionService.loadAccounts();
+    print(accounts);
 
     emit(state.copyWith(
       accountList: accountList,

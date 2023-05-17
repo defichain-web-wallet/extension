@@ -30,6 +30,7 @@ class LmPoolModel {
     data['symbol'] = this.symbol;
     data['displaySymbol'] = this.displaySymbol;
     data['name'] = this.name;
+    data['networkName'] = this.networkName.toString();
     data['tokens'] = this.tokens.map((token) => token.toJSON()).toList();
     if (this.percentages != null) {
       data['percentages'] = this.percentages;
@@ -70,7 +71,12 @@ class LmPoolModel {
         networkName: NetworkName.values.firstWhere(
           (value) => value.toString() == json['networkName'],
         ),
-        tokens: List.generate(json['tokens'].index, (index) => json['tokens'][index]),
+        tokens: List.generate(
+          json['tokens'].length,
+          (index) => TokenModel.fromJSON(
+            json['tokens'][index],
+          ),
+        ),
       );
     }
   }

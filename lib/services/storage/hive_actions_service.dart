@@ -24,7 +24,7 @@ class HiveActionService {
       var savedAccounts = await HiveService.getData(HiveNames.accounts);
       var decryptedAccounts = stringToBase64.decode(savedAccounts);
       List<dynamic> jsonList = json.decode(decryptedAccounts);
-      return List<AbstractAccountModel>.generate(
+        return List<AbstractAccountModel>.generate(
         jsonList.length,
         (index) => AccountModel.fromJson(jsonList[index]),
       );
