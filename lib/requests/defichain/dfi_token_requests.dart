@@ -9,7 +9,7 @@ class DFITokenRequests {
     String? next,
     required NetworkTypeModel networkType,
   }) async {
-    Map<String, dynamic> query = {
+    final query = {
       'size': '200',
     };
 
@@ -43,8 +43,8 @@ class DFITokenRequests {
       } else {
         return [];
       }
-    } catch (err) {
-      throw err;
+    } catch (_) {
+      rethrow;
     }
   }
 }

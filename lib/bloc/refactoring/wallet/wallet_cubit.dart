@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -35,7 +36,6 @@ class WalletCubit extends Cubit<WalletState> {
         publicKeyTestnet: publicKeyTestnet,
         publicKeyMainnet: publicKeyMainnet,
         sourceId: source.id);
-
 
     await StorageService.saveAccounts([account]);
     await StorageService.saveApplication(applicationModel);
@@ -96,8 +96,6 @@ class WalletCubit extends Cubit<WalletState> {
       }
     }
 
-    // var network = applicationModel.networks[1];
-    //var tx = await network.send(account:  accountList.first, address:  accountList.first.addresses[network.networkType.networkName.name]!, password: password, token:  accountList.first.getPinnedBalances(network)[1].token!, amount: 0.0001, applicationModel: applicationModel);
 //print(tx);
 
     await StorageService.initWalletDetails();

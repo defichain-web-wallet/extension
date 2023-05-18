@@ -52,20 +52,20 @@ class _AccountBalanceState extends State<AccountBalance> {
                         return tokensHelper.getAmountByUsd(
                           tokensState.tokensPairs!,
                           convertFromSatoshi(e.balance),
-                          e.token!.displaySymbol,
+                          e.token!.symbol,
                         );
                       } else if (widget.asset == 'EUR') {
                         var a = tokensHelper.getAmountByUsd(
                           tokensState.tokensPairs!,
                           convertFromSatoshi(e.balance),
-                          e.token!.displaySymbol,
+                          e.token!.symbol,
                         );
                         return a * tokensState.eurRate!;
                       } else {
                         return tokensHelper.getAmountByBtc(
                           tokensState.tokensPairs!,
                           convertFromSatoshi(e.balance),
-                          e.token!.displaySymbol,
+                          e.token!.symbol,
                         );
                       }
                     } else {
@@ -75,14 +75,14 @@ class _AccountBalanceState extends State<AccountBalance> {
                         return tokensHelper.getPairsAmountByAsset(
                           tokensState.tokensPairs!,
                           balanceInSatoshi,
-                          e.lmPool!.displaySymbol,
+                          e.lmPool!.symbol,
                           widget.asset,
                         );
                       } else if (widget.asset == 'EUR') {
                         var b = tokensHelper.getPairsAmountByAsset(
                           tokensState.tokensPairs!,
                           balanceInSatoshi,
-                          e.lmPool!.displaySymbol,
+                          e.lmPool!.symbol,
                           widget.asset,
                         );
                         return b * tokensState.eurRate!;
@@ -90,7 +90,7 @@ class _AccountBalanceState extends State<AccountBalance> {
                         return tokensHelper.getPairsAmountByAsset(
                           tokensState.tokensPairs!,
                           balanceInSatoshi,
-                          e.lmPool!.displaySymbol,
+                          e.lmPool!.symbol,
                           widget.asset,
                         );
                       }

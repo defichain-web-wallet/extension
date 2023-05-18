@@ -93,19 +93,25 @@ class AccountModel extends AbstractAccountModel {
     isRestore = false,
   }) async {
     Map<String, String> addresses = {};
-    Map<String, List<BalanceModel>> balances = {};
+    Map<String, List<BalanceModel>> pinnedBalances = {};
 
     for (final network in networkList) {
       addresses[network.networkType.networkName.name] = network.createAddress(
           network.networkType.isTestnet ? publicKeyTestnet : publicKeyMainnet,
           accountIndex);
       if (isRestore) {
-        balances[network.networkType.networkName.name] =
-            await network.getAllBalances(
-                addressString:
-                    addresses[network.networkType.networkName.name]!);
+        try {
+          pinnedBalances[network.networkType.networkName.name] =
+          await network.getAllBalances(
+              addressString:
+              addresses[network.networkType.networkName.name]!);
+        } catch (_) {
+          pinnedBalances[network.networkType.networkName.name] = [
+            BalanceModel(balance: 0, token: network.getDefaultToken())
+          ];
+        }
       } else {
-        balances[network.networkType.networkName.name] = [
+        pinnedBalances[network.networkType.networkName.name] = [
           BalanceModel(balance: 0, token: network.getDefaultToken())
         ];
       }
@@ -117,7 +123,7 @@ class AccountModel extends AbstractAccountModel {
       sourceId,
       addresses,
       accountIndex,
-      balances,
+      pinnedBalances,
       networkList,
     );
   }

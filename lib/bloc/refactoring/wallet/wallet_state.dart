@@ -15,6 +15,13 @@ class WalletState extends Equatable {
     this.applicationModel,
   });
 
+  List<BalanceModel> getBalances({String key = 'defichainMainnet'}) {
+    List<BalanceModel> balances = this.activeAccount!.pinnedBalances[key]!;
+    balances.removeWhere(
+      (element) => element.lmPool != null && element.balance == 0,
+    );
+    return balances;
+  }
 
   @override
   List<Object?> get props => [
@@ -26,7 +33,6 @@ class WalletState extends Equatable {
     List<AbstractAccountModel>? accountList,
     AbstractAccountModel? activeAccount,
     ApplicationModel? applicationModel,
-
   }) {
     return WalletState(
       status: status ?? this.status,

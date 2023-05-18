@@ -24,11 +24,7 @@ class AssetList extends StatelessWidget {
     return BlocBuilder<WalletCubit, WalletState>(
       builder: (context, state) {
         if (state.status == WalletStatusList.success) {
-          late List<BalanceModel> balances;
-          balances = state.activeAccount!.pinnedBalances['defichainMainnet']!;
-          balances.removeWhere(
-            (element) => element.lmPool != null && element.balance == 0,
-          );
+          List<BalanceModel> balances = state.getBalances();
 
           return BlocBuilder<TokensCubit, TokensState>(
             builder: (context, tokensState) {
@@ -47,7 +43,7 @@ class AssetList extends StatelessWidget {
                           ? coin
                           : tokenHelper.getTokenWithPrefix(coin);
                       double tokenBalance = convertFromSatoshi(
-                        balances.first.balance,
+                        balances[index].balance,
                       );
                       return Container(
                         padding: const EdgeInsets.only(
