@@ -109,12 +109,7 @@ class WalletCubit extends Cubit<WalletState> {
     //     applicationModel: applicationModel);
     // print(tx);
 
-    await StorageService.initWalletDetails();
     await StorageService.saveAccounts(accountList);
-    await StorageService.savePublicKeys(
-      publicKeyMainnet,
-      publicKeyTestnet,
-    );
     await StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
