@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:defi_wallet/requests/bitcoin/blockcypher_requests.dart';
 
+//TODO: rewrite this
 class BridgeModel extends AbstractBridge {
   BridgeModel(
     BitcoinNetworkModel networkType, {
@@ -122,7 +123,7 @@ class BridgeModel extends AbstractBridge {
   @override
   Future<TxErrorModel> send(BitcoinNetworkModel network, String txHex) async {
     try {
-      return await BlockcypherRequests().sendTxHex(network, txHex);
+      return await BlockcypherRequests.sendTxHex(network, txHex);
     } catch (error) {
       throw error;
     }
