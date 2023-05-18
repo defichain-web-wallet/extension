@@ -73,7 +73,7 @@ class _WalletCheckerState extends State<WalletChecker> {
         if (password != null || isLedger) {
           lockHelper.provideWithLockChecker(context, () async {
             try {
-              await walletCubit.loadAccounts();
+              await walletCubit.loadWalletDetails();
             } catch (err) {
               print(err);
             }
@@ -91,7 +91,7 @@ class _WalletCheckerState extends State<WalletChecker> {
           });
         } else {
           try {
-            await walletCubit.loadAccounts();
+            await walletCubit.loadWalletDetails();
           } catch (err) {
             print(err);
           }

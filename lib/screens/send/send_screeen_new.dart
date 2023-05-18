@@ -11,6 +11,10 @@ import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
@@ -42,11 +46,12 @@ class SendScreenNew extends StatefulWidget {
 
 class _SendScreenNewState extends State<SendScreenNew>
     with ThemeMixin, NetworkMixin, SnackBarMixin {
-  TextEditingController addressController = TextEditingController();
+  TextEditingController addressController = TextEditingController(text: 'df1q2ml8fdg6p05n9nzlp7x5y7m82kwxtk5vjv3rgv');
   TextEditingController assetController = TextEditingController(text: '0');
   FocusNode addressFocusNode = FocusNode();
   AddressBookModel contact = AddressBookModel();
   TokensModel? currentAsset;
+  double availableBalance = 0;
   String suffixText = '';
   String? balanceInUsd;
   String titleText = 'Send';
@@ -59,16 +64,34 @@ class _SendScreenNewState extends State<SendScreenNew>
     List<BalanceModel> balances,
     TokensModel currentAsset,
   ) {
-    int balance = balances
-        .firstWhere((element) {
-          if (element.token == null) {
-            return element.lmPool!.symbol == currentAsset.symbol!;
-          } else {
-            return element.token!.symbol == currentAsset.symbol!;
-          }
-    })
-        .balance;
+    int balance = balances.firstWhere((element) {
+      if (element.token == null) {
+        return element.lmPool!.symbol == currentAsset.symbol!;
+      } else {
+        return element.token!.symbol == currentAsset.symbol!;
+      }
+    }).balance;
     return convertFromSatoshi(balance);
+  }
+
+  Future<void> setAvailableBalance(
+    List<BalanceModel> balances,
+    TokensModel currentAsset,
+    ApplicationModel applicationModel,
+    AbstractAccountModel accountModel,
+  ) async {
+    double balance = await applicationModel.networks[0].getAvailableBalance(
+      account: accountModel,
+      token: TokenModel(
+        id: currentAsset.id.toString(),
+        symbol: currentAsset.symbol!,
+        name: currentAsset.name!,
+        displaySymbol: currentAsset.symbol!,
+        networkName: applicationModel.networks[0].networkType.networkName,
+      ),
+      type: TxType.send,
+    );
+    availableBalance = balance;
   }
 
   String getUsdBalance(context) {
@@ -230,8 +253,6 @@ class _SendScreenNewState extends State<SendScreenNew>
                 );
                 return BlocBuilder<BitcoinCubit, BitcoinState>(
                     builder: (bitcoinContext, bitcoinState) {
-                  BitcoinCubit bitcoinCubit =
-                      BlocProvider.of<BitcoinCubit>(context);
                   AddressBookCubit addressBookCubit =
                       BlocProvider.of<AddressBookCubit>(context);
 
@@ -247,6 +268,13 @@ class _SendScreenNewState extends State<SendScreenNew>
                     } else {
                       currentAsset = currentAsset ?? tokens.first;
                     }
+                    // setAvailableBalance(
+                    //   state.getBalances(),
+                    //   currentAsset!,
+                    //   state.applicationModel!,
+                    //   state.activeAccount!,
+                    // );
+                    // print(availableBalance);
 
                     return Scaffold(
                       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -392,10 +420,16 @@ class _SendScreenNewState extends State<SendScreenNew>
                                           SettingsHelper.isBitcoin(),
                                       suffix: balanceInUsd ??
                                           getUsdBalance(context),
-                                      onAssetSelect: (t) {
+                                      onAssetSelect: (t) async {
                                         setState(() {
                                           currentAsset = t;
                                         });
+                                        // setAvailableBalance(
+                                        //   state.getBalances(),
+                                        //   currentAsset!,
+                                        //   state.applicationModel!,
+                                        //   state.activeAccount!,
+                                        // );
                                       },
                                       controller: assetController,
                                       selectedAsset: currentAsset!,

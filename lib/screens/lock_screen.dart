@@ -149,7 +149,7 @@ class _LockScreenState extends State<LockScreen> {
       if (widget.callback == null) {
         WalletCubit accountCubit = BlocProvider.of<WalletCubit>(context);
 
-        await accountCubit.loadAccounts();
+        await accountCubit.loadWalletDetails();
         LoggerService.invokeInfoLogg('user was unlock wallet');
         parent.emitPending(false);
 

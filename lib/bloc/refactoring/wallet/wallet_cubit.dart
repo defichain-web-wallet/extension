@@ -98,17 +98,6 @@ class WalletCubit extends Cubit<WalletState> {
       }
     }
 
-    // var network = applicationModel.networks[2];
-    // var tx = await network.send(
-    //     account: accountList.first,
-    //     address:
-    //         accountList.first.addresses[network.networkType.networkName.name]!,
-    //     password: password,
-    //     token: accountList.first.getPinnedBalances(network)[0].token!,
-    //     amount: 0.00001,
-    //     applicationModel: applicationModel);
-    // print(tx);
-
     await StorageService.initWalletDetails();
     await StorageService.saveAccounts(accountList);
     await StorageService.savePublicKeys(
@@ -125,13 +114,15 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
-  loadAccounts() async {
+  loadWalletDetails() async {
     try {
       List<AbstractAccountModel> accounts = await StorageService.loadAccounts();
+      ApplicationModel applicationModel = await StorageService.loadApplication();
+
       emit(state.copyWith(
         accountList: accounts,
         activeAccount: accounts.first,
-        applicationModel: null,
+        applicationModel: applicationModel,
         status: WalletStatusList.success,
       ));
     } catch (error) {
