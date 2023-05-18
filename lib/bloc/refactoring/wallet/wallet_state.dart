@@ -17,9 +17,6 @@ class WalletState extends Equatable {
 
   List<BalanceModel> getBalances({String key = 'defichainMainnet'}) {
     List<BalanceModel> balances = this.activeAccount!.pinnedBalances[key]!;
-    balances.removeWhere(
-      (element) => element.lmPool != null && element.balance == 0,
-    );
     return balances;
   }
 

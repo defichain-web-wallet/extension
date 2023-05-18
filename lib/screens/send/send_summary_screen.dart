@@ -432,57 +432,29 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                           isCheckLock: false,
                                           pendingText: 'Pending',
                                           callback: (parent) async {
-                                            final isLedger =
-                                                await SettingsHelper.isLedger();
-                                            if (isLedger) {
-                                              showDialog(
-                                                barrierColor: AppColors.tolopea
-                                                    .withOpacity(0.06),
-                                                barrierDismissible: false,
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context1) {
-                                                  return LedgerCheckScreen(
-                                                      onStartSign:
-                                                          (p, c) async {
-                                                    parent.emitPending(true);
-                                                    p.emitPending(true);
-                                                    await submitSend(
-                                                        state,
-                                                        tokensState,
-                                                        null, callbackOk: (() {
-                                                      Navigator.pop(c);
-                                                    }));
+                                            parent.emitPending(true);
+                                            showDialog(
+                                              barrierColor: AppColors.tolopea
+                                                  .withOpacity(0.06),
+                                              barrierDismissible: false,
+                                              context: context,
+                                              builder:
+                                                  (BuildContext context1) {
+                                                return PassConfirmDialog(
+                                                  onCancel: () {
                                                     parent.emitPending(false);
-                                                    p.emitPending(false);
-                                                  });
-                                                },
-                                              );
-                                            } else {
-                                              parent.emitPending(true);
-                                              showDialog(
-                                                barrierColor: AppColors.tolopea
-                                                    .withOpacity(0.06),
-                                                barrierDismissible: false,
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context1) {
-                                                  return PassConfirmDialog(
-                                                    onCancel: () {
-                                                      parent.emitPending(false);
-                                                    },
-                                                    onSubmit: (password) async {
-                                                      await submitSend(
-                                                        state,
-                                                        tokensState,
-                                                        password,
-                                                      );
-                                                    },
-                                                    context: context,
-                                                  );
-                                                },
-                                              );
-                                            }
+                                                  },
+                                                  onSubmit: (password) async {
+                                                    await submitSend(
+                                                      state,
+                                                      tokensState,
+                                                      password,
+                                                    );
+                                                  },
+                                                  context: context,
+                                                );
+                                              },
+                                            );
                                           },
                                         ),
                                       ),
@@ -556,13 +528,11 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     password, {
     final Function()? callbackOk,
   }) async {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (widget.amount > 0) {
         await _callback(
           state,
           password,
-          bitcoinCubit,
           tokensState.tokens,
           callbackOk: callbackOk,
         );
@@ -575,7 +545,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   Future _callback(
     WalletState walletState,
     String? password,
-    BitcoinCubit bitcoinCubit,
     List<TokensModel> tokens, {
     final Function()? callbackOk,
   }) async {
@@ -600,7 +569,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     TxErrorModel? txResponse;
     AddressBookCubit addressBookCubit =
         BlocProvider.of<AddressBookCubit>(context);
-    final isLedger = await SettingsHelper.isLedger();
+    // final isLedger = await SettingsHelper.isLedger();
 
 
     // TODO: not working now

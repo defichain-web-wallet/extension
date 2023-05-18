@@ -46,7 +46,7 @@ class SendScreenNew extends StatefulWidget {
 
 class _SendScreenNewState extends State<SendScreenNew>
     with ThemeMixin, NetworkMixin, SnackBarMixin {
-  TextEditingController addressController = TextEditingController(text: 'df1q2ml8fdg6p05n9nzlp7x5y7m82kwxtk5vjv3rgv');
+  TextEditingController addressController = TextEditingController();
   TextEditingController assetController = TextEditingController(text: '0');
   FocusNode addressFocusNode = FocusNode();
   AddressBookModel contact = AddressBookModel();
@@ -270,13 +270,13 @@ class _SendScreenNewState extends State<SendScreenNew>
                     } else {
                       currentAsset = currentAsset ?? tokens.first;
                     }
-                    setAvailableBalance(
-                      state.getBalances(),
-                      currentAsset!,
-                      state.applicationModel!,
-                      state.activeAccount!,
-                    );
-                    print(availableBalance);
+                    // setAvailableBalance(
+                    //   state.getBalances(),
+                    //   currentAsset!,
+                    //   state.applicationModel!,
+                    //   state.activeAccount!,
+                    // );
+                    // print(availableBalance);
 
                     return Scaffold(
                       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -426,12 +426,12 @@ class _SendScreenNewState extends State<SendScreenNew>
                                         setState(() {
                                           currentAsset = t;
                                         });
-                                        setAvailableBalance(
-                                          state.getBalances(),
-                                          currentAsset!,
-                                          state.applicationModel!,
-                                          state.activeAccount!,
-                                        );
+                                        // setAvailableBalance(
+                                        //   state.getBalances(),
+                                        //   currentAsset!,
+                                        //   state.applicationModel!,
+                                        //   state.activeAccount!,
+                                        // );
                                       },
                                       controller: assetController,
                                       selectedAsset: currentAsset!,

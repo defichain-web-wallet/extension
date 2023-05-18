@@ -263,13 +263,20 @@ class DFITransactionService {
           senderAddress: senderAddress,
           additional: (txb, nw, newUtxo) {
             final mintingStartsAt = txb.tx!.outs.length + 1;
-            newUtxo.add(UtxoModel(
+            newUtxo.add(
+              UtxoModel(
                 address: senderAddress,
                 value: balance.balance,
-                mintIndex: newUtxo.length + 1));
+                mintIndex: newUtxo.length + 1,
+              ),
+            );
             txb.addOutput(senderAddress, balance.balance);
-            txb.addAccountToUtxoOutput(balance.token!.id, senderAddress,
-                balance.balance, mintingStartsAt);
+            txb.addAccountToUtxoOutput(
+              int.parse(balance.token!.id),
+              senderAddress,
+              balance.balance,
+              mintingStartsAt,
+            );
           });
       if (responseModel.isError) {
         return TxErrorModel(isError: true, error: responseModel.error);

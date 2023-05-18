@@ -92,23 +92,20 @@ class _WalletCheckerState extends State<WalletChecker> {
         } else {
           try {
             await walletCubit.loadWalletDetails();
+            await Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) =>
+                    ThemeChecker(HomeScreen(
+                      isLoadTokens: true,
+                    )),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
           } catch (err) {
             print(err);
           }
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => ThemeChecker(
-                PasswordScreen(
-                  onSubmitted: (String password) {
-                    // need to recovery
-                  },
-                ),
-              ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
         }
       } else {
         if (isSavedMnemonic) {

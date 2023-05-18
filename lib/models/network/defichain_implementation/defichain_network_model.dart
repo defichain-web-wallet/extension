@@ -148,8 +148,34 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       addressString: addressString,
       tokens: tokens
     );
+    List<BalanceModel> result = [];
+    try {
+      // TODO: maybe need rewrite here logic
+      var dfiBalances = balanceList.where((element) {
+        return element.token != null && element.token!.symbol == 'DFI';
+      }).toList();
 
-   return balanceList;
+      if (dfiBalances.length > 1) {
+        var existingBalance = balanceList.where((element) {
+          return element.token != null && element.token!.symbol != 'DFI';
+        }).toList();
+        result = [
+          BalanceModel(
+            balance: dfiBalances[0].balance + dfiBalances[1].balance,
+            token: dfiBalances[0].token,
+            lmPool: dfiBalances[0].lmPool,
+          ),
+          ...existingBalance,
+        ];
+      } else {
+        result = balanceList;
+      }
+
+    } catch (err) {
+      result = [];
+    }
+
+   return result;
   }
 
   TokenModel getDefaultToken(){
