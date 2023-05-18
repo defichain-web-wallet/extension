@@ -13,8 +13,15 @@ class ApplicationModel {
   late String password;
   late List<AbstractNetworkModel> networks;
 
-  ApplicationModel(this.sourceList, password) {
-    this.password = encryptPassword(password);
+  ApplicationModel({required this.sourceList, String? password,  String? encryptedPassword}) {
+    if(password != null){
+      this.password = encryptPassword(password);
+
+    } else if(encryptedPassword != null){
+      this.password = encryptedPassword;
+    } else {
+      throw 'Password is required';
+    }
 
     this.networks = [
       new DefichainNetworkModel(new NetworkTypeModel(
@@ -66,8 +73,8 @@ class ApplicationModel {
     );
 
     return ApplicationModel(
-      sourceListMapped,
-      password,
+      sourceList: sourceListMapped,
+      encryptedPassword: password
     );
   }
 

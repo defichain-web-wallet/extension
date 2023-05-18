@@ -21,7 +21,7 @@ class WalletCubit extends Cubit<WalletState> {
   createWallet(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: WalletStatusList.loading));
     var seed = mnemonicToSeed(mnemonic.join(' '));
-    var applicationModel = ApplicationModel({}, password);
+    var applicationModel = ApplicationModel(sourceList: {}, password: password);
 
     //TODO: maybe we need move this to different service
     var publicKeyMainnet = _getPublicKey(seed, false);
@@ -51,7 +51,7 @@ class WalletCubit extends Cubit<WalletState> {
   restoreWallet(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: WalletStatusList.loading));
     var seed = mnemonicToSeed(mnemonic.join(' '));
-    var applicationModel = ApplicationModel({}, password);
+    var applicationModel = ApplicationModel(sourceList: {}, encryptedPassword: password);
     List<AbstractAccountModel> accountList = [];
 
     bool hasHistory = true;
