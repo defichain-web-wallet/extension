@@ -10,51 +10,6 @@ import 'package:defi_wallet/services/storage/hive_service.dart';
 class StorageService {
   static Codec<String, String> stringToBase64 = utf8.fuse(base64);
 
-  static Future initWalletDetails({
-    bool isExistAccessToken = false,
-  }) async {
-    try {
-      await HiveService.update(HiveNames.kycStatus, 'show');
-      await HiveService.update(HiveNames.tutorialStatus, 'show');
-      if (isExistAccessToken) {
-        await HiveService.update(
-          HiveNames.generatedAccessToken,
-          DateTime.now().millisecondsSinceEpoch,
-        );
-      }
-      await HiveService.update(HiveNames.openedMnemonic, null);
-    } catch (err) {
-      print(err);
-    }
-  }
-
-  static Future savePassword(String password) async {
-    try {
-      var encryptedPassword = Crypt.sha256(password).toString();
-      await HiveService.update(HiveNames.password, encryptedPassword);
-    } catch (err) {
-      print(err);
-    }
-  }
-
-  static Future savePublicKeys(String mainnetKey, String testnetKey) async {
-    try {
-      var encryptedMainnetKey = stringToBase64.encode(mainnetKey);
-      var encryptedTestnetKey = stringToBase64.encode(testnetKey);
-
-      await HiveService.update(
-        HiveNames.masterKeyPairMainnetPublic,
-        encryptedMainnetKey,
-      );
-      await HiveService.update(
-        HiveNames.masterKeyPairTestnetPublic,
-        encryptedTestnetKey,
-      );
-    } catch (err) {
-      print(err);
-    }
-  }
-
   static Future saveAccounts(List<AbstractAccountModel> accounts) async {
     try {
       var data = accounts.map((e) => e.toJson()).toList();

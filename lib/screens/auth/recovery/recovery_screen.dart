@@ -90,7 +90,6 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                     BlocProvider.of<WalletCubit>(context);
                 AccountCubit accountCubit =
                 BlocProvider.of<AccountCubit>(context);
-                await StorageService.savePassword(password);
                 await walletCubit.restoreWallet(_mnemonic, password);
                 await accountCubit.restoreAccount(_mnemonic, password);
                 LoggerService.invokeInfoLogg('user  was recover wallet');
