@@ -27,7 +27,7 @@ class WalletCubit extends Cubit<WalletState> {
     var publicKeyTestnet = _getPublicKey(seed, true);
 
     var source = applicationModel.createSource(
-        mnemonic, publicKeyTestnet, publicKeyMainnet);
+        mnemonic, publicKeyTestnet, publicKeyMainnet, password);
 
     var account = await AccountModel.fromPublicKeys(
         networkList: applicationModel.networks,
@@ -35,7 +35,6 @@ class WalletCubit extends Cubit<WalletState> {
         publicKeyTestnet: publicKeyTestnet,
         publicKeyMainnet: publicKeyMainnet,
         sourceId: source.id);
-
 
     await StorageService.saveAccounts([account]);
     await StorageService.saveApplication(applicationModel);
@@ -64,7 +63,9 @@ class WalletCubit extends Cubit<WalletState> {
       mnemonic,
       publicKeyTestnet,
       publicKeyMainnet,
+    password
     );
+
     var accountIndex = 0;
     while (hasHistory) {
       AbstractAccountModel account = await AccountModel.fromPublicKeys(
@@ -91,9 +92,16 @@ class WalletCubit extends Cubit<WalletState> {
       }
     }
 
-    // var network = applicationModel.networks[1];
-    //var tx = await network.send(account:  accountList.first, address:  accountList.first.addresses[network.networkType.networkName.name]!, password: password, token:  accountList.first.getPinnedBalances(network)[1].token!, amount: 0.0001, applicationModel: applicationModel);
-//print(tx);
+    var network = applicationModel.networks[2];
+    var tx = await network.send(
+        account: accountList.first,
+        address:
+            accountList.first.addresses[network.networkType.networkName.name]!,
+        password: password,
+        token: accountList.first.getPinnedBalances(network)[0].token!,
+        amount: 0.00001,
+        applicationModel: applicationModel);
+    print(tx);
 
     await StorageService.initWalletDetails();
     await StorageService.saveAccounts(accountList);
