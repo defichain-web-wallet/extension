@@ -51,7 +51,7 @@ class WalletCubit extends Cubit<WalletState> {
   restoreWallet(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: WalletStatusList.loading));
     var seed = mnemonicToSeed(mnemonic.join(' '));
-    var applicationModel = ApplicationModel(sourceList: {}, encryptedPassword: password);
+    var applicationModel = ApplicationModel(sourceList: {}, password: password);
     List<AbstractAccountModel> accountList = [];
 
     bool hasHistory = true;
