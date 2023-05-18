@@ -1,5 +1,5 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -35,84 +35,83 @@ class _AccountBalanceState extends State<AccountBalance> {
       builder: (context, tokensState) {
         return BlocBuilder<BitcoinCubit, BitcoinState>(
           builder: (context, bitcoinState) {
-            return BlocBuilder<AccountCubit, AccountState>(
+            return BlocBuilder<WalletCubit, WalletState>(
                 builder: (context, state) {
-                  if (state.status == AccountStatusList.success &&
-                      tokensState.status == TokensStatusList.success) {
-                    late double totalBalance;
-                    late double unconfirmedBalance;
-                    late double totalBtcBalance;
-                    if (SettingsHelper.isBitcoin()) {
+              if (state.status == WalletStatusList.success &&
+                  tokensState.status == TokensStatusList.success) {
+                late double totalBalance;
+                late double unconfirmedBalance;
+                late double totalBtcBalance;
+
+                try {
+                  var balanceList =
+                    state.activeAccount!.pinnedBalances['defichainMainnet'];
+                  totalBalance = balanceList!.map<double>((e) {
+                    if (e.token != null) {
                       if (widget.asset == 'USD') {
-                        totalBalance = tokensHelper.getAmountByUsd(
+                        return tokensHelper.getAmountByUsd(
                           tokensState.tokensPairs!,
-                          convertFromSatoshi(bitcoinState.totalBalance),
-                          'BTC',
+                          convertFromSatoshi(e.balance),
+                          e.token!.displaySymbol,
                         );
                       } else if (widget.asset == 'EUR') {
                         var a = tokensHelper.getAmountByUsd(
                           tokensState.tokensPairs!,
-                          convertFromSatoshi(bitcoinState.totalBalance),
-                          'BTC',
+                          convertFromSatoshi(e.balance),
+                          e.token!.displaySymbol,
                         );
-                        totalBalance = a * tokensState.eurRate!;
+                        return a * tokensState.eurRate!;
                       } else {
-                        totalBalance = convertFromSatoshi(bitcoinState.totalBalance);
+                        return tokensHelper.getAmountByBtc(
+                          tokensState.tokensPairs!,
+                          convertFromSatoshi(e.balance),
+                          e.token!.displaySymbol,
+                        );
                       }
-                      unconfirmedBalance = convertFromSatoshi(bitcoinState.unconfirmedBalance);
                     } else {
-                      totalBalance = state.activeAccount!.balanceList!
-                          .where((el) => !el.isHidden!)
-                          .map<double>((e) {
-                        if (!e.isPair!) {
-                          if (widget.asset == 'USD') {
-                            return tokensHelper.getAmountByUsd(
-                              tokensState.tokensPairs!,
-                              convertFromSatoshi(e.balance!),
-                              e.token!,
-                            );
-                          } else if (widget.asset == 'EUR') {
-                            var a = tokensHelper.getAmountByUsd(
-                              tokensState.tokensPairs!,
-                              convertFromSatoshi(e.balance!),
-                              e.token!,
-                            );
-                            return a * tokensState.eurRate!;
-                          } else {
-                            return tokensHelper.getAmountByBtc(
-                              tokensState.tokensPairs!,
-                              convertFromSatoshi(e.balance!),
-                              e.token!,
-                            );
-                          }
-                        } else {
-                          double balanceInSatoshi = double.parse(e.balance!.toString());
-                          if (widget.asset == 'USD') {
-                            return tokensHelper.getPairsAmountByAsset(
-                                tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'USD');
-                          } else if (widget.asset == 'EUR') {
-                            var b = tokensHelper.getPairsAmountByAsset(
-                                tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'USD');
-                            return b * tokensState.eurRate!;
-                          } else {
-                            return tokensHelper.getPairsAmountByAsset(
-                                tokensState.tokensPairs!, balanceInSatoshi, e.token!, 'BTC');
-                          }
-                        }
-                      }).reduce((value, element) => value + element);
+                      double balanceInSatoshi =
+                      double.parse(e.balance.toString());
+                      if (widget.asset == 'USD') {
+                        return tokensHelper.getPairsAmountByAsset(
+                          tokensState.tokensPairs!,
+                          balanceInSatoshi,
+                          e.lmPool!.displaySymbol,
+                          widget.asset,
+                        );
+                      } else if (widget.asset == 'EUR') {
+                        var b = tokensHelper.getPairsAmountByAsset(
+                          tokensState.tokensPairs!,
+                          balanceInSatoshi,
+                          e.lmPool!.displaySymbol,
+                          widget.asset,
+                        );
+                        return b * tokensState.eurRate!;
+                      } else {
+                        return tokensHelper.getPairsAmountByAsset(
+                          tokensState.tokensPairs!,
+                          balanceInSatoshi,
+                          e.lmPool!.displaySymbol,
+                          widget.asset,
+                        );
+                      }
                     }
+                  }).reduce((value, element) => value + element);
+                } catch (error) {
+                  print(error);
+                  totalBalance = 0.00;
+                }
 
-                    return Container(
-                      child: BalanceText(
-                        isSmallFont: widget.isSmall,
-                        balance: totalBalance,
-                        assetName: widget.asset,
-                      ),
-                    );
-                  } else {
-                    return Container();
-                  }
-                });
+                return Container(
+                  child: BalanceText(
+                    isSmallFont: widget.isSmall,
+                    balance: totalBalance,
+                    assetName: widget.asset,
+                  ),
+                );
+              } else {
+                return Container();
+              }
+            });
           },
         );
       },

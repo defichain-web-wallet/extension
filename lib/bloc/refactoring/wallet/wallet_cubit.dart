@@ -67,14 +67,19 @@ class WalletCubit extends Cubit<WalletState> {
     );
     var accountIndex = 0;
     while (hasHistory) {
-      AbstractAccountModel account = await AccountModel.fromPublicKeys(
-        networkList: applicationModel.networks,
-        accountIndex: accountIndex,
-        publicKeyTestnet: publicKeyTestnet,
-        publicKeyMainnet: publicKeyMainnet,
-        sourceId: source.id,
-        isRestore: true,
-      );
+      late AbstractAccountModel account;
+      try {
+        account = await AccountModel.fromPublicKeys(
+          networkList: applicationModel.networks,
+          accountIndex: accountIndex,
+          publicKeyTestnet: publicKeyTestnet,
+          publicKeyMainnet: publicKeyMainnet,
+          sourceId: source.id,
+          isRestore: true,
+        );
+      } catch (_) {
+        rethrow;
+      }
 
       //TODO: check tx history here
       bool presentBalance = false;

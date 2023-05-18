@@ -5,6 +5,7 @@ import 'package:defi_wallet/constants/specific_token_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/asset_style_model.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:flutter/material.dart';
 
@@ -1243,15 +1244,18 @@ class TokensHelper {
   }
 
   List<TokensModel> getTokensList(
-    balances,
+    List<BalanceModel> balances,
     tokensState, {
     List<TokensModel>? targetList,
   }) {
     List<TokensModel> resList = [];
     if (targetList == null) {
-      balances!.forEach((element) {
+      balances.forEach((element) {
         tokensState.tokens!.forEach((el) {
-          if (element.token == el.symbol) {
+          String symbol = element.token != null
+              ? element.token!.symbol
+              : element.lmPool!.symbol;
+          if (symbol == el.symbol) {
             resList.add(el);
           }
         });

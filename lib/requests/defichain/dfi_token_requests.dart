@@ -11,10 +11,11 @@ class DFITokenRequests {
   }) async {
     Map<String, dynamic> query = {
       'size': '200',
-      'next': next ?? '',
     };
 
-
+    if (next != null) {
+      query['next'] = next;
+    }
 
     try {
       //TODO: add fallback url
