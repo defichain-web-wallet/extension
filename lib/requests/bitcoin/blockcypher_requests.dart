@@ -138,7 +138,7 @@ class BlockcypherRequests {
     }
   }
 
-  Future<TxErrorModel> sendTxHex(
+  static Future<TxErrorModel> sendTxHex(
     BitcoinNetworkModel network,
     String txHex,
   ) async {
