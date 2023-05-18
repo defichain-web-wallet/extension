@@ -91,7 +91,9 @@ class _SendScreenNewState extends State<SendScreenNew>
       ),
       type: TxType.send,
     );
-    availableBalance = balance;
+    setState(() {
+      availableBalance = balance;
+    });
   }
 
   String getUsdBalance(context) {
@@ -268,13 +270,13 @@ class _SendScreenNewState extends State<SendScreenNew>
                     } else {
                       currentAsset = currentAsset ?? tokens.first;
                     }
-                    // setAvailableBalance(
-                    //   state.getBalances(),
-                    //   currentAsset!,
-                    //   state.applicationModel!,
-                    //   state.activeAccount!,
-                    // );
-                    // print(availableBalance);
+                    setAvailableBalance(
+                      state.getBalances(),
+                      currentAsset!,
+                      state.applicationModel!,
+                      state.activeAccount!,
+                    );
+                    print(availableBalance);
 
                     return Scaffold(
                       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -424,12 +426,12 @@ class _SendScreenNewState extends State<SendScreenNew>
                                         setState(() {
                                           currentAsset = t;
                                         });
-                                        // setAvailableBalance(
-                                        //   state.getBalances(),
-                                        //   currentAsset!,
-                                        //   state.applicationModel!,
-                                        //   state.activeAccount!,
-                                        // );
+                                        setAvailableBalance(
+                                          state.getBalances(),
+                                          currentAsset!,
+                                          state.applicationModel!,
+                                          state.activeAccount!,
+                                        );
                                       },
                                       controller: assetController,
                                       selectedAsset: currentAsset!,
