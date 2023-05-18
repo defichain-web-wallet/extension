@@ -28,7 +28,7 @@ class WalletCubit extends Cubit<WalletState> {
     var publicKeyTestnet = _getPublicKey(seed, true);
 
     var source = applicationModel.createSource(
-        mnemonic, publicKeyTestnet, publicKeyMainnet);
+        mnemonic, publicKeyTestnet, publicKeyMainnet, password);
 
     var account = await AccountModel.fromPublicKeys(
         networkList: applicationModel.networks,
@@ -64,7 +64,9 @@ class WalletCubit extends Cubit<WalletState> {
       mnemonic,
       publicKeyTestnet,
       publicKeyMainnet,
+    password
     );
+
     var accountIndex = 0;
     while (hasHistory) {
       late AbstractAccountModel account;
@@ -96,7 +98,16 @@ class WalletCubit extends Cubit<WalletState> {
       }
     }
 
-//print(tx);
+    // var network = applicationModel.networks[2];
+    // var tx = await network.send(
+    //     account: accountList.first,
+    //     address:
+    //         accountList.first.addresses[network.networkType.networkName.name]!,
+    //     password: password,
+    //     token: accountList.first.getPinnedBalances(network)[0].token!,
+    //     amount: 0.00001,
+    //     applicationModel: applicationModel);
+    // print(tx);
 
     await StorageService.initWalletDetails();
     await StorageService.saveAccounts(accountList);

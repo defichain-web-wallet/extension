@@ -44,7 +44,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
 
   final int _fieldsLength = 24;
   final FocusNode _focusNode = FocusNode();
-  final TextEditingController _wordController = TextEditingController(text: 'flock response fantasy rib end supreme call kiwi mesh alter duck grace kid inch clutch resemble weather reopen job wave ranch speak vanish twelve');
+  final TextEditingController _wordController = TextEditingController();
   final FocusNode _confirmFocusNode = FocusNode();
 
   late List<String> _mnemonic;

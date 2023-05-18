@@ -72,12 +72,12 @@ class ApplicationModel {
   }
 
   SourceSeedModel createSource(
-      List<String> mnemonic, String publicKeyTestnet, String publicKeyMainnet) {
+      List<String> mnemonic, String publicKeyTestnet, String publicKeyMainnet, String password) {
     var source = new SourceSeedModel(
         sourceName: SourceName.seed,
         publicKeyMainnet: publicKeyMainnet,
         publicKeyTestnet: publicKeyTestnet,
-        password: this.password,
+        password: password,
         mnemonic: mnemonic);
     sourceList[source.id] = source;
     return source;
