@@ -20,6 +20,9 @@ class WalletState extends Equatable {
     return balances;
   }
 
+  AbstractNetworkModel get activeNetwork =>
+      this.applicationModel!.activeNetwork!;
+
   @override
   List<Object?> get props => [
         status,

@@ -11,7 +11,7 @@ class NetworkTypeModel {
 
   String get networkStringLowerCase => this.networkString.toLowerCase();
 
-  String get networkFormatName {
+  String get networkNameFormat {
     switch (this.networkName) {
       case NetworkName.defichainMainnet:
         return 'Defichain Mainnet';

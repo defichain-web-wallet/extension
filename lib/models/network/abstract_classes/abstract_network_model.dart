@@ -23,6 +23,8 @@ abstract class AbstractNetworkModel {
 
   AbstractNetworkModel(this.networkType);
 
+  String get networkNameFormat => this.networkType.networkNameFormat;
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['networkType'] = this.networkType.toJson();

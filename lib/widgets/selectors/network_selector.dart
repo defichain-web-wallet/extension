@@ -78,7 +78,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                             Flexible(
                               child: TickerText(
                                 child: Text(
-                                  walletState.applicationModel!.activeNetwork!.networkType.networkFormatName,
+                                  walletState.activeNetwork.networkNameFormat,
                                   style: Theme.of(context)
                                       .textTheme
                                       .subtitle2!
@@ -268,7 +268,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                                     ),
                                                     Text(
                                                       item.networkType
-                                                          .networkFormatName,
+                                                          .networkNameFormat,
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .headline5,
