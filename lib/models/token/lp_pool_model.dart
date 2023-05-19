@@ -1,28 +1,31 @@
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 
-class LmPoolModel {
-  String id;
-  String symbol;
-  String displaySymbol;
-  String name;
+class LmPoolModel extends TokenModel {
   List<TokenModel> tokens;
   List<double>? percentages;
   double? apr;
   double? apy;
-  NetworkName? networkName;
 
   LmPoolModel({
+    required String id,
+    required String symbol,
+    required String name,
+    required String displaySymbol,
+    required NetworkName networkName,
+    bool isUTXO = false,
     required this.tokens,
     this.percentages,
     this.apr,
     this.apy,
-    required this.symbol,
-    required this.displaySymbol,
-    required this.name,
-    required this.id,
-    required this.networkName,
-  });
+  }) : super(
+    id: id,
+    symbol: symbol,
+    name: name,
+    displaySymbol: displaySymbol,
+    networkName: networkName,
+    isUTXO: isUTXO,
+  );
 
   Map<String, dynamic> toJSON() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
