@@ -41,9 +41,10 @@ class WalletCubit extends Cubit<WalletState> {
     await StorageService.saveAccounts([account]);
     await StorageService.saveApplication(applicationModel);
 
+    applicationModel.activeAccount = account;
+
     emit(state.copyWith(
       accountList: [account],
-      activeAccount: account,
       applicationModel: applicationModel,
       status: WalletStatusList.success,
     ));
@@ -99,12 +100,13 @@ class WalletCubit extends Cubit<WalletState> {
       }
     }
 
+    applicationModel.activeAccount = accountList.first;
+
     await StorageService.saveAccounts(accountList);
     await StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
       accountList: accountList,
-      activeAccount: accountList.first,
       applicationModel: applicationModel,
       status: WalletStatusList.success,
     ));
@@ -115,9 +117,10 @@ class WalletCubit extends Cubit<WalletState> {
       List<AbstractAccountModel> accounts = await StorageService.loadAccounts();
       ApplicationModel applicationModel = await StorageService.loadApplication();
 
+      applicationModel.activeAccount = accounts.first;
+
       emit(state.copyWith(
         accountList: accounts,
-        activeAccount: accounts.first,
         applicationModel: applicationModel,
         status: WalletStatusList.success,
       ));
