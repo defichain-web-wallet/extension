@@ -26,25 +26,10 @@ class AssetList extends StatelessWidget {
         if (state.status == WalletStatusList.success) {
           List<BalanceModel> balances = state.getBalances();
 
-          return BlocBuilder<TokensCubit, TokensState>(
-            builder: (context, tokensState) {
-              if (tokensState.status == TokensStatusList.success) {
-                List<TokensModel> tokens = tokenHelper.getTokensList(
-                  balances,
-                  tokensState,
-                );
-
                 return SliverFixedExtentList(
                   itemExtent: 64.0 + 6,
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
-                      String coin = tokens[index].symbol!;
-                      String tokenName = SettingsHelper.isBitcoin()
-                          ? coin
-                          : tokenHelper.getTokenWithPrefix(coin);
-                      double tokenBalance = convertFromSatoshi(
-                        balances[index].balance,
-                      );
                       return Container(
                         padding: const EdgeInsets.only(
                           bottom: 4,
@@ -54,35 +39,22 @@ class AssetList extends StatelessWidget {
                         ),
                         color: Theme.of(context).cardColor,
                         child: AssetCard(
-                          index: index,
-                          tokenBalance: tokenBalance,
-                          tokenName: tokenName,
-                          tokenCode: tokenName,
-                          tokensState: tokensState,
-                          tokens: tokens,
+                          balanceModel: balances[index],
                         ),
                       );
                     },
-                    childCount: tokens.length,
+                    childCount: balances.length,
                   ),
                 );
-              } else {
-                return SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Container(
-                    color: Theme.of(context).cardColor,
-                    child: Center(
-                      child: Text('Not yet any tokens'),
-                    ),
-                  ),
-                );
-              }
-            },
-          );
         } else {
           return SliverFillRemaining(
             hasScrollBody: false,
-            child: Container(),
+            child: Container(
+              color: Theme.of(context).cardColor,
+              child: Center(
+                child: Text('Not yet any tokens'),
+              ),
+            ),
           );
         }
       },

@@ -1,33 +1,19 @@
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/models/balance_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
-import 'package:defi_wallet/widgets/assets/asset_icon.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AssetCard extends StatefulWidget {
-  final int index;
-  final String tokenCode;
-  final String tokenName;
-  final double tokenBalance;
-  final TokensState tokensState;
-  final List<TokensModel> tokens;
+  final BalanceModel balanceModel;
 
   const AssetCard({
     Key? key,
-    required this.index,
-    required this.tokenCode,
-    required this.tokenName,
-    required this.tokenBalance,
-    required this.tokensState,
-    required this.tokens,
+    required this.balanceModel,
   }) : super(key: key);
 
   @override
@@ -61,7 +47,7 @@ class _AssetCardState extends State<AssetCard> {
   @override
   Widget build(BuildContext context) {
     String currency = SettingsHelper.settings.currency!;
-
+var token = widget.balanceModel.lmPool ?? widget.balanceModel.token;
     return Container(
       height: 64,
       padding: const EdgeInsets.only(
@@ -80,14 +66,14 @@ class _AssetCardState extends State<AssetCard> {
       child: Container(
         child: Row(
           children: [
-            if (widget.tokens[widget.index].isPair!)
+            if (token!.isPair)
               AssetPair(
-                pair: widget.tokens[widget.index].symbol!
+                pair: token.symbol
               ),
-            if (!widget.tokens[widget.index].isPair!)
+            if (!token.isPair)
               AssetLogo(
                 assetStyle: tokensHelper.getAssetStyleByTokenName(
-                    widget.tokens[widget.index].symbol!),
+                    token.symbol),
               ),
             SizedBox(
               width: 10,
@@ -101,16 +87,16 @@ class _AssetCardState extends State<AssetCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      widget.tokenName,
+                      token.displaySymbol,
                       style: Theme.of(context).textTheme.headline5,
                     ),
                     TickerText(
                       child: Text(
-                        tokensHelper.isPair(widget.tokens[widget.index].symbol!)
+                        token.isPair
                             ? tokensHelper.getSpecificDefiPairName(
-                                widget.tokens[widget.index].name!)
-                            : tokensHelper.getSpecificDefiName(
-                                widget.tokens[widget.index].name!),
+                            token.name)
+                        //TODO: maybe bug
+                            : token.name,
                         style: Theme.of(context).textTheme.headline6!.copyWith(
                               color: Theme.of(context)
                                   .textTheme
@@ -132,7 +118,7 @@ class _AssetCardState extends State<AssetCard> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    getFormatTokenBalance(widget.tokenBalance),
+                    getFormatTokenBalance(convertFromSatoshi(widget.balanceModel.balance)),
                     style: Theme.of(context).textTheme.headline6!.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
@@ -141,12 +127,14 @@ class _AssetCardState extends State<AssetCard> {
                     height: 2,
                   ),
                   Text(
-                    getFormatTokenBalanceByFiat(
-                      widget.tokensState,
-                      widget.tokenCode,
-                      widget.tokenBalance,
-                      currency,
-                    ),
+                    //TODO: fix works with fiat. Move this to cubit
+                    // getFormatTokenBalanceByFiat(
+                    //   widget.tokensState,
+                    //   widget.tokenCode,
+                    //   widget.tokenBalance,
+                    //   currency,
+                    // ),
+                    '',
                     style: Theme.of(context).textTheme.headline6!.copyWith(
                           color: Theme.of(context)
                               .textTheme
