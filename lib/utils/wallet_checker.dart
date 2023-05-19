@@ -70,43 +70,24 @@ class _WalletCheckerState extends State<WalletChecker> {
       await box.close();
 
       if (masterKeyPair != null || isLedger) {
-        if (password != null || isLedger) {
-          lockHelper.provideWithLockChecker(context, () async {
-            try {
-              await walletCubit.loadWalletDetails();
-            } catch (err) {
-              print(err);
-            }
-            await Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(HomeScreen(
-                      isLoadTokens: true,
-                    )),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
-          });
-        } else {
+        lockHelper.provideWithLockChecker(context, () async {
           try {
             await walletCubit.loadWalletDetails();
-            await Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(HomeScreen(
-                      isLoadTokens: true,
-                    )),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
           } catch (err) {
             print(err);
           }
-        }
+          await Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  ThemeChecker(HomeScreen(
+                    isLoadTokens: true,
+                  )),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        });
       } else {
         if (isSavedMnemonic) {
           Navigator.pushReplacement(
