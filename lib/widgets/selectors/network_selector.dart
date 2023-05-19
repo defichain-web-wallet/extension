@@ -78,7 +78,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                             Flexible(
                               child: TickerText(
                                 child: Text(
-                                  walletState.applicationModel!.activeNetwork!.networkFormatName,
+                                  walletState.applicationModel!.activeNetwork!.networkType.networkFormatName,
                                   style: Theme.of(context)
                                       .textTheme
                                       .subtitle2!
@@ -244,7 +244,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                               behavior:
                                                   HitTestBehavior.translucent,
                                               onTap: () =>
-                                                  walletCubit.changeActiveNetwork(item.networkType),
+                                                  walletCubit.changeActiveNetwork(item),
                                               child: Container(
                                                 height: 44,
                                                 child: Row(
@@ -258,7 +258,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                                                 .circular(8),
                                                         color: getMarkColor(walletState
                                                                 .applicationModel!
-                                                                .activeNetwork!.networkName ==
+                                                                .activeNetwork!.networkType.networkName ==
                                                             item.networkType
                                                                 .networkName),
                                                       ),

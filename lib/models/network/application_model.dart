@@ -1,24 +1,21 @@
 import 'package:crypt/crypt.dart';
-import 'package:defi_wallet/models/address_book_model.dart';
-import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
-import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
 
 class ApplicationModel {
   final Map<String, SourceSeedModel> sourceList;
   late String password;
   late List<AbstractNetworkModel> networks;
-  late NetworkTypeModel? activeNetwork;
+  late AbstractNetworkModel? activeNetwork;
 
   ApplicationModel({
     required this.sourceList,
     String? password,
     String? encryptedPassword,
-    NetworkTypeModel? activeNetwork,
+    AbstractNetworkModel? activeNetwork,
   }) {
     if(password != null){
       this.password = encryptPassword(password);
@@ -48,7 +45,7 @@ class ApplicationModel {
           isTestnet: false))
     ];
     if (activeNetwork == null) {
-      this.activeNetwork = networks[1].networkType;
+      this.activeNetwork = networks[1];
     } else {
       this.activeNetwork = activeNetwork;
     }
@@ -105,7 +102,7 @@ class ApplicationModel {
     Map<String, SourceSeedModel>? sourceList,
     String? password,
     String? encryptedPassword,
-    NetworkTypeModel? activeNetwork,
+    AbstractNetworkModel? activeNetwork,
   }) {
     return ApplicationModel(
       sourceList: sourceList!,
