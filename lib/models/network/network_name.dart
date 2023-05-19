@@ -11,6 +11,21 @@ class NetworkTypeModel {
 
   String get networkStringLowerCase => this.networkString.toLowerCase();
 
+  String get networkFormatName {
+    switch (this.networkName) {
+      case NetworkName.defichainMainnet:
+        return 'Defichain Mainnet';
+      case NetworkName.defichainTestnet:
+        return 'Defichain Testnet';
+      case NetworkName.bitcoinMainnet:
+        return 'Bitcoin Mainnet';
+      case NetworkName.bitcoinTestnet:
+        return 'Bitcoin Testnet';
+      default:
+        return 'Unknown name';
+    }
+  }
+
   factory NetworkTypeModel.fromJson(Map<String, dynamic> jsonModel) {
     return NetworkTypeModel(
       networkName: NetworkName.values.firstWhere(

@@ -23,6 +23,7 @@ class WalletState extends Equatable {
   @override
   List<Object?> get props => [
         status,
+        applicationModel,
       ];
 
   WalletState copyWith({

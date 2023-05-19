@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -125,6 +126,17 @@ class WalletCubit extends Cubit<WalletState> {
         status: WalletStatusList.failure,
       ));
     }
+  }
+
+  changeActiveNetwork(NetworkTypeModel network) async {
+    ApplicationModel applicationModel = state.applicationModel!.copyWith(
+      sourceList: state.applicationModel!.sourceList,
+      password: state.applicationModel!.password,
+      activeNetwork: network,
+    );
+    emit(state.copyWith(
+      applicationModel: applicationModel,
+    ));
   }
 
   String _getPublicKey(Uint8List seed, bool isTestnet) {

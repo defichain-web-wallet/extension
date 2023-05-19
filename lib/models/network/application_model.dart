@@ -12,8 +12,14 @@ class ApplicationModel {
   final Map<String, SourceSeedModel> sourceList;
   late String password;
   late List<AbstractNetworkModel> networks;
+  late NetworkTypeModel? activeNetwork;
 
-  ApplicationModel({required this.sourceList, String? password,  String? encryptedPassword}) {
+  ApplicationModel({
+    required this.sourceList,
+    String? password,
+    String? encryptedPassword,
+    NetworkTypeModel? activeNetwork,
+  }) {
     if(password != null){
       this.password = encryptPassword(password);
 
@@ -41,6 +47,11 @@ class ApplicationModel {
           networkString: 'testnet',
           isTestnet: false))
     ];
+    if (activeNetwork == null) {
+      this.activeNetwork = networks[1].networkType;
+    } else {
+      this.activeNetwork = activeNetwork;
+    }
   }
 
   String encryptPassword(String password){
@@ -88,5 +99,19 @@ class ApplicationModel {
         mnemonic: mnemonic);
     sourceList[source.id] = source;
     return source;
+  }
+
+  ApplicationModel copyWith({
+    Map<String, SourceSeedModel>? sourceList,
+    String? password,
+    String? encryptedPassword,
+    NetworkTypeModel? activeNetwork,
+  }) {
+    return ApplicationModel(
+      sourceList: sourceList!,
+      password: password,
+      encryptedPassword: encryptedPassword,
+      activeNetwork: activeNetwork,
+    );
   }
 }
