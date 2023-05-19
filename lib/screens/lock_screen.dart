@@ -6,6 +6,7 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
@@ -137,10 +138,9 @@ class _LockScreenState extends State<LockScreen> {
       isFailed = false;
       isEnable = false;
     });
-    var box = await Hive.openBox(HiveBoxes.client);
-    var encodedPassword = box.get(HiveNames.password);
+    var applicationModel = await StorageService.loadApplication();
 
-    if (Crypt(encodedPassword).match(_passwordController.text)) {
+    if (Crypt(applicationModel.password).match(_passwordController.text)) {
       setState(() {
         isValid = true;
         _formKey.currentState!.validate();
