@@ -13,8 +13,9 @@ class WalletState extends Equatable {
     this.applicationModel,
   });
 
-  List<BalanceModel> getBalances({String key = 'defichainMainnet'}) {
-    List<BalanceModel> balances = this.activeAccount!.pinnedBalances[key]!;
+  List<BalanceModel> getBalances() {
+    //TODO: add active network
+    List<BalanceModel> balances = this.activeAccount!.getPinnedBalances(applicationModel!.networks.first);
     return balances;
   }
 

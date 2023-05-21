@@ -39,7 +39,34 @@ abstract class AbstractAccountModel {
 
   // Tokens
   List<BalanceModel> getPinnedBalances(AbstractNetworkModel network) {
-    return pinnedBalances[network.networkType.networkName.name] ?? [];
+    var balanceList = pinnedBalances[network.networkType.networkName.name] ?? [];
+    List<BalanceModel> result = [];
+    try {
+      // TODO: maybe need rewrite here logic
+      var dfiBalances = balanceList.where((element) {
+        return element.token != null && element.token!.symbol == 'DFI';
+      }).toList();
+
+      if (dfiBalances.length > 1) {
+        var existingBalance = balanceList.where((element) {
+          return element.token != null && element.token!.symbol != 'DFI';
+        }).toList();
+        result = [
+          BalanceModel(
+            balance: dfiBalances[0].balance + dfiBalances[1].balance,
+            token: dfiBalances[0].token,
+            lmPool: dfiBalances[0].lmPool,
+          ),
+          ...existingBalance,
+        ];
+      } else {
+        result = balanceList;
+      }
+
+    } catch (err) {
+      result = [];
+    }
+    return result;
   }
 
   void pinToken(BalanceModel balance, AbstractNetworkModel network) {
