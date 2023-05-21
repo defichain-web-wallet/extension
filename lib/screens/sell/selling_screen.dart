@@ -556,7 +556,6 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
       try {
         foundedIban = fiatState.ibanList!.firstWhere((el) =>
         el.active! &&
-            el.type == "Sell" &&
             el.iban == fiatState.activeIban!.iban &&
             el.fiat!.name == selectedFiat.name);
       } catch (_) {
