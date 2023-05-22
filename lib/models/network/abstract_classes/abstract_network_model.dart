@@ -2,6 +2,7 @@ import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
@@ -102,6 +103,8 @@ abstract class AbstractNetworkModel {
   bool buySellAvailable() => getRamps().length > 0;
 
   List<HistoryModel> getHistory(String networkName, String? txid);
+
+  Future<NetworkFeeModel> getNetworkFee();
 
   // Sending
   bool checkAddress(String address);

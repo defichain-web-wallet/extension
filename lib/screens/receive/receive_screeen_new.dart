@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -27,7 +28,6 @@ class ReceiveScreenNew extends StatefulWidget {
 
 class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
   bool isCopied = false;
-  late String address;
   String hintText =
       'This is your personal wallet address.\nYou can use it to receive DFI and DST tokens like dBTC, dETH, dTSLA & more.';
   String btcHintText = 'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
@@ -44,15 +44,9 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(
+        return BlocBuilder<WalletCubit, WalletState>(
           builder: (BuildContext context, state) {
-            if (state.status == AccountStatusList.success) {
-              if (SettingsHelper.isBitcoin()) {
-                address = state.activeAccount!.bitcoinAddress!.address!;
-              } else {
-                address =
-                    state.activeAccount!.getActiveAddress(isChange: false);
-              }
+            if (state.status == WalletStatusList.success) {
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                 endDrawer: AccountDrawer(
@@ -110,7 +104,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                       : null,
                                 ),
                                 child: QrImage(
-                                  data: address,
+                                  data: state.activeAddress,
                                   padding: EdgeInsets.all(17.7),
                                 ),
                               ),
@@ -135,7 +129,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     child: TickerText(
                                       isSpecialDuration: true,
                                       child: Text(
-                                        '${state.activeAccount!.name}',
+                                        state.activeAccount.name, //TODO: add account name
                                         style: headline5.copyWith(
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -150,7 +144,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                 child: GestureDetector(
                                   onTap: () async {
                                     await Clipboard.setData(
-                                        ClipboardData(text: address));
+                                        ClipboardData(text: state.activeAddress));
                                     setState(() {
                                       isCopied = !isCopied;
                                     });
@@ -172,7 +166,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          cutAddress(address),
+                                          cutAddress(state.activeAddress),
                                           style: headline5,
                                         ),
                                         SizedBox(

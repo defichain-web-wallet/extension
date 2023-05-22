@@ -128,16 +128,12 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
               builder: (context, walletState) {
                 return BlocBuilder<NetworkCubit, NetworkState>(
                   builder: (context, networkState) {
-                    var targetNetworkName =
-                        networkState.currentNetworkSelectorTab ==
-                                NetworkTabs.all
-                            ? 'mainnet'
-                            : 'testnet';
+                    //TODO: refactor this
                     var currentNetworksList = walletState
                         .applicationModel!.networks
                         .where((element) =>
-                            element.networkType.networkString ==
-                            targetNetworkName)
+                            element.networkType.isTestnet == (networkState.currentNetworkSelectorTab !=
+                    NetworkTabs.all))
                         .toList();
                     return Container(
                       color: isDarkTheme()

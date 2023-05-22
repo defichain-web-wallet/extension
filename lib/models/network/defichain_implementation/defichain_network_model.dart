@@ -14,6 +14,7 @@ import 'package:defi_wallet/models/network/defichain_implementation/defichain_ra
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/yield_machine_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
@@ -44,6 +45,10 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     this.lmList.add(new DefichainLmProviderModel());
 
     this.exchangeList.add(new DefichainExchangeModel());
+  }
+
+  Future<NetworkFeeModel> getNetworkFee() async {
+    throw 'Not available for this network';
   }
 
   factory DefichainNetworkModel.fromJson(Map<String, dynamic> jsonModel) {
@@ -184,19 +189,19 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       switch (type) {
         case TxType.send:
           if (tokenDFIBalance.balance > FEE) {
-            return coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2);
+            return fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
           } else {
             return fromSatoshi(coinDFIBalance.balance - (FEE));
           }
         case TxType.swap:
           if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            return coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2);
+            return fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
           } else {
             return fromSatoshi(tokenDFIBalance.balance);
           }
         case TxType.addLiq:
           if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            return coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2);
+            return fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
           } else {
             return fromSatoshi(tokenDFIBalance.balance);
           }

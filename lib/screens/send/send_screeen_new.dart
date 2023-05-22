@@ -13,6 +13,7 @@ import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
@@ -36,6 +37,7 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/fees_selector.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -91,16 +93,10 @@ class _SendScreenNewState extends State<SendScreenNew>
   //   }
   // }
 
-  sendSubmit(addressBookCubit, TxState state) async {
+  sendSubmit(addressBookCubit, TxState state, AbstractNetworkModel activeNetwork) async {
     if (addressController.text != '') {
-      late bool isValidAddress;
-      if (SettingsHelper.isBitcoin()) {
-        isValidAddress =
-            await AddressesHelper().validateBtcAddress(addressController.text);
-      } else {
-        isValidAddress =
-            await AddressesHelper().validateAddress(addressController.text);
-      }
+      late bool isValidAddress = activeNetwork.checkAddress(addressController.text);
+
       if (isValidAddress) {
         if (isAddNewContact) {
           showDialog(
@@ -211,6 +207,8 @@ class _SendScreenNewState extends State<SendScreenNew>
         });
       }
     });
+    TxCubit txCubit = BlocProvider.of<TxCubit>(context);
+    txCubit.setInitial();
     super.initState();
   }
 
@@ -231,6 +229,10 @@ class _SendScreenNewState extends State<SendScreenNew>
       ) {
         return BlocBuilder<TxCubit, TxState>(
           builder: (context, state) {
+            final walletCubit = BlocProvider.of<WalletCubit>(context);
+            AbstractNetworkModel activeNetwork = walletCubit.getCurrentNetwork();
+            bool isBitcoin = activeNetwork.networkType.networkName == NetworkName.bitcoinTestnet ||
+                activeNetwork.networkType.networkName == NetworkName.bitcoinMainnet;
             TxCubit txCubit = BlocProvider.of<TxCubit>(context);
                   AddressBookCubit addressBookCubit =
                       BlocProvider.of<AddressBookCubit>(context);
@@ -384,9 +386,8 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       },
                                       available: state.availableBalance,
                                       // available: true,
-                                      isDisabledSelector:
-                                          SettingsHelper.isBitcoin(), //TODO:
-                                      suffix: balanceInUsd,
+                                      isDisabledSelector: isBitcoin,
+                                      suffix: balanceInUsd ?? '0.00',
                                     // ?? getUsdBalance(context), //TODO: fix it
                                       onAssetSelect: (asset) async {
                                         txCubit.changeActiveBalance(context, asset, TxType.send);
@@ -397,39 +398,33 @@ class _SendScreenNewState extends State<SendScreenNew>
                                     SizedBox(
                                       height: 16,
                                     ),
-                                    // if (state.applicationModel!.networks[0].networkType.networkName == NetworkName.bitcoinTestnet ||
-                                    //         state.applicationModel!.networks[0].networkType.networkName == NetworkName.bitcoinMainnet)
-                                    //   ...[
-                                      //TODO: add fee selector
-                                              // Row(
-                                      //   children: [
-                                      //     Text(
-                                      //       'Fees',
-                                      //       style: Theme.of(context)
-                                      //           .textTheme
-                                      //           .headline5,
-                                      //     ),
-                                      //   ],
-                                      // ),
-                                      // SizedBox(
-                                      //   height: 6,
-                                      // ),
-                                      // FeesSelector(
-                                      //   onSelect: (int fee) {
-                                      //     // bitcoinCubit.changeActiveFee(
-                                      //     //   state
-                                      //     //       .activeAccount!.bitcoinAddress!,
-                                      //     //   fee,
-                                      //     // );
-                                      //   },
-                                      //   activeFee: bitcoinState.activeFee,
-                                      //   fees: [
-                                      //     bitcoinState.networkFee!.low!,
-                                      //     bitcoinState.networkFee!.medium!,
-                                      //     bitcoinState.networkFee!.high!,
-                                      //   ],
-                                      // ),
-                                    // ]
+                                    if (isBitcoin)
+                                      ...[
+                                              Row(
+                                        children: [
+                                          Text(
+                                            'Fees',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline5,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 6,
+                                      ),
+                                      FeesSelector(
+                                        onSelect: (int fee) {
+                                          txCubit.changeActiveFee(fee);
+                                        },
+                                        activeFee: state.activeFee,
+                                        fees: [
+                                          state.networkFee!.low!,
+                                          state.networkFee!.medium!,
+                                          state.networkFee!.high!,
+                                        ],
+                                      ),
+                                    ]
                                   ],
                                 ),
                                 Column(
@@ -484,7 +479,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                               if (txState
                                                   is! TransactionLoadingState) {
                                                 sendSubmit(addressBookCubit,
-                                                    state);
+                                                    state, activeNetwork);
                                               } else {
                                                 showSnackBar(
                                                   context,

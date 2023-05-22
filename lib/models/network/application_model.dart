@@ -1,6 +1,7 @@
 import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
@@ -10,6 +11,7 @@ class ApplicationModel {
   final Map<String, SourceSeedModel> sourceList;
   late String password;
   late List<AbstractNetworkModel> networks;
+  late List<AbstractAccountModel> accounts;
   late AbstractNetworkModel? activeNetwork;
   late AbstractAccountModel? activeAccount;
 
@@ -17,6 +19,7 @@ class ApplicationModel {
     required this.sourceList,
     String? password,
     String? encryptedPassword,
+    List<AbstractAccountModel>? accounts,
     AbstractNetworkModel? activeNetwork,
     AbstractAccountModel? activeAccount,
   }) {
@@ -28,27 +31,10 @@ class ApplicationModel {
     } else {
       throw 'Password is required';
     }
+    this.networks = ApplicationModel.initNetworks();
 
-    this.networks = [
-      new DefichainNetworkModel(new NetworkTypeModel(
-          networkName: NetworkName.defichainTestnet,
-          networkString: 'testnet',
-          isTestnet: true)),
-      new DefichainNetworkModel(new NetworkTypeModel(
-          networkName: NetworkName.defichainMainnet,
-          networkString: 'mainnet',
-          isTestnet: false)),
-      new BitcoinNetworkModel(new NetworkTypeModel(
-          networkName: NetworkName.bitcoinMainnet,
-          networkString: 'mainnet',
-          isTestnet: false)),
-      new BitcoinNetworkModel(new NetworkTypeModel(
-          networkName: NetworkName.bitcoinTestnet,
-          networkString: 'testnet',
-          isTestnet: false))
-    ];
     if (activeNetwork == null) {
-      this.activeNetwork = networks[1];
+      this.activeNetwork = this.networks[2];
     } else {
       this.activeNetwork = activeNetwork;
     }
@@ -69,16 +55,43 @@ class ApplicationModel {
         .toList();
   }
 
+  static List<AbstractNetworkModel> initNetworks(){
+    return [
+      new DefichainNetworkModel(new NetworkTypeModel(
+          networkName: NetworkName.defichainMainnet,
+          networkString: 'mainnet',
+          isTestnet: false)),
+      new DefichainNetworkModel(new NetworkTypeModel(
+          networkName: NetworkName.defichainTestnet,
+          networkString: 'testnet',
+          isTestnet: true)),
+      new BitcoinNetworkModel(new NetworkTypeModel(
+          networkName: NetworkName.bitcoinMainnet,
+          networkString: 'mainnet',
+          isTestnet: false)),
+      new BitcoinNetworkModel(new NetworkTypeModel(
+          networkName: NetworkName.bitcoinTestnet,
+          networkString: 'testnet',
+          isTestnet: true))
+    ];
+  }
+
   Map<String, dynamic> toJSON() {
     return {
       'sourceList': sourceList.map((key, value) => MapEntry(key, value.toJSON())),
-      'password': password
+      'password': password,
+      'activeAccount': activeAccount!.toJson(),
+      'accounts': accounts.map((e) => e.toJson()).toList(),
     };
   }
 
   factory ApplicationModel.fromJSON(Map<String, dynamic> json) {
+    var networks = ApplicationModel.initNetworks();
     final sourceList = json['sourceList'] as Map<String, dynamic>;
     final password = json['password'] as String;
+    final activeAccount = AccountModel.fromJson(json['activeAccount'], networks);
+    final accounts = (json['accounts'] as List).map((data) => AccountModel.fromJson(data, networks))
+        .toList();
 
     final sourceListMapped = sourceList.map(
           (key, value) => MapEntry(key, SourceSeedModel.fromJSON(value)),
@@ -86,7 +99,9 @@ class ApplicationModel {
 
     return ApplicationModel(
       sourceList: sourceListMapped,
-      encryptedPassword: password
+      encryptedPassword: password,
+      accounts: accounts,
+      activeAccount: activeAccount
     );
   }
 

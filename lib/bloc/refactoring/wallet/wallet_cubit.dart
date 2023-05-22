@@ -38,13 +38,12 @@ class WalletCubit extends Cubit<WalletState> {
         publicKeyMainnet: publicKeyMainnet,
         sourceId: source.id);
 
-    await StorageService.saveAccounts([account]);
+    applicationModel.activeAccount = account;
+    applicationModel.accounts = [account];
+
     await StorageService.saveApplication(applicationModel);
 
-    applicationModel.activeAccount = account;
-
     emit(state.copyWith(
-      accountList: [account],
       applicationModel: applicationModel,
       status: WalletStatusList.success,
     ));
@@ -82,6 +81,7 @@ class WalletCubit extends Cubit<WalletState> {
           isRestore: true,
         );
       } catch (_) {
+        print(_);
         rethrow;
       }
 
@@ -100,13 +100,13 @@ class WalletCubit extends Cubit<WalletState> {
       }
     }
 
+    applicationModel.accounts = accountList;
     applicationModel.activeAccount = accountList.first;
 
-    await StorageService.saveAccounts(accountList);
+    // await StorageService.saveAccounts(accountList);
     await StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
-      accountList: accountList,
       applicationModel: applicationModel,
       status: WalletStatusList.success,
     ));
@@ -114,13 +114,12 @@ class WalletCubit extends Cubit<WalletState> {
 
   loadWalletDetails() async {
     try {
-      List<AbstractAccountModel> accounts = await StorageService.loadAccounts();
+      // List<AbstractAccountModel> accounts = await StorageService.loadAccounts();
       ApplicationModel applicationModel = await StorageService.loadApplication();
 
-      applicationModel.activeAccount = accounts.first;
+      // applicationModel.activeAccount = applicationModel.accounts.first;
 
       emit(state.copyWith(
-        accountList: accounts,
         applicationModel: applicationModel,
         status: WalletStatusList.success,
       ));
@@ -132,6 +131,7 @@ class WalletCubit extends Cubit<WalletState> {
   }
 
   changeActiveNetwork(AbstractNetworkModel network) async {
+    // state.applicationModel!.activeNetwork = network;
     ApplicationModel applicationModel = state.applicationModel!.copyWith(
       sourceList: state.applicationModel!.sourceList,
       password: state.applicationModel!.password,
@@ -140,6 +140,10 @@ class WalletCubit extends Cubit<WalletState> {
     emit(state.copyWith(
       applicationModel: applicationModel,
     ));
+  }
+
+  getCurrentNetwork(){
+    return state.applicationModel!.activeNetwork;
   }
 
   String _getPublicKey(Uint8List seed, bool isTestnet) {

@@ -9,6 +9,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
@@ -166,7 +167,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
       addressString: account.getAddress(this.networkType.networkName)!,
     );
     var fee =
-        BTCTransactionService.calculateBTCFee(utxoList.length, 1, satPerByte);
+        fromSatoshi(BTCTransactionService.calculateBTCFee(utxoList.length, 1, satPerByte));
     return balance - fee;
   }
 
@@ -181,6 +182,10 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     var mnemonic = applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
     var masterKey = getMasterKeypairFormMnemonic(mnemonic);
     return _getKeypairForPathPrivateKey(masterKey, account.accountIndex);
+  }
+
+  Future<NetworkFeeModel> getNetworkFee() async {
+    return await BlockcypherRequests.getNetworkFee(this);
   }
 
   Future<TxErrorModel> send(

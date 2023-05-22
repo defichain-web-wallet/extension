@@ -7,6 +7,8 @@ class TxState extends Equatable {
   final List<BalanceModel>? balances;
   final double? availableBalance;
   final BalanceModel? activeBalance;
+  final NetworkFeeModel? networkFee;
+  final int activeFee;
   // final List<BalanceModel>? balances;
 
   TxState({
@@ -14,6 +16,8 @@ class TxState extends Equatable {
     this.balances,
     this.availableBalance,
     this.activeBalance,
+    this.networkFee,
+    this.activeFee = 0
   });
 
   TokenModel? get currentAsset => activeBalance!.lmPool ?? activeBalance!.token;
@@ -24,6 +28,8 @@ class TxState extends Equatable {
         balances,
     availableBalance,
     activeBalance,
+    networkFee,
+    activeFee,
       ];
 
   TxState copyWith({
@@ -31,12 +37,16 @@ class TxState extends Equatable {
     List<BalanceModel>? balances,
     double? availableBalance,
     BalanceModel? activeBalance,
+     NetworkFeeModel? networkFee,
+     int? activeFee,
   }) {
     return TxState(
       status: status ?? this.status,
       balances: balances ?? this.balances,
       availableBalance: availableBalance ?? this.availableBalance,
       activeBalance: activeBalance ?? this.activeBalance,
+      networkFee: networkFee ?? this.networkFee,
+      activeFee: activeFee ?? this.activeFee,
     );
   }
 }
