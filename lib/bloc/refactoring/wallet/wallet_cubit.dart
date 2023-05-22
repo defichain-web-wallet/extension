@@ -131,15 +131,20 @@ class WalletCubit extends Cubit<WalletState> {
   }
 
   changeActiveNetwork(AbstractNetworkModel network) async {
-    // state.applicationModel!.activeNetwork = network;
-    ApplicationModel applicationModel = state.applicationModel!.copyWith(
+    ApplicationModel applicationModel = ApplicationModel(
       sourceList: state.applicationModel!.sourceList,
       password: state.applicationModel!.password,
+      activeAccount: state.applicationModel!.activeAccount,
+      accounts: state.applicationModel!.accounts,
       activeNetwork: network,
     );
+
+    await StorageService.saveApplication(applicationModel);
+
     emit(state.copyWith(
       applicationModel: applicationModel,
     ));
+
   }
 
   getCurrentNetwork(){

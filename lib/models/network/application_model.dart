@@ -32,6 +32,7 @@ class ApplicationModel {
       throw 'Password is required';
     }
     this.networks = ApplicationModel.initNetworks();
+    this.accounts = accounts ?? [];
 
     if (activeNetwork == null) {
       this.activeNetwork = this.networks[2];
@@ -82,14 +83,21 @@ class ApplicationModel {
       'password': password,
       'activeAccount': activeAccount!.toJson(),
       'accounts': accounts.map((e) => e.toJson()).toList(),
+      'activeNetwork': activeNetwork!.toJson(),
     };
   }
 
   factory ApplicationModel.fromJSON(Map<String, dynamic> json) {
+    var savedNetwork = NetworkTypeModel.fromJson(
+      json['activeNetwork']['networkType'],
+    );
     var networks = ApplicationModel.initNetworks();
     final sourceList = json['sourceList'] as Map<String, dynamic>;
     final password = json['password'] as String;
     final activeAccount = AccountModel.fromJson(json['activeAccount'], networks);
+    final activeNetwork = networks.firstWhere(
+      (element) => element.networkType.networkName == savedNetwork.networkName,
+    );
     final accounts = (json['accounts'] as List).map((data) => AccountModel.fromJson(data, networks))
         .toList();
 
@@ -101,7 +109,8 @@ class ApplicationModel {
       sourceList: sourceListMapped,
       encryptedPassword: password,
       accounts: accounts,
-      activeAccount: activeAccount
+      activeAccount: activeAccount,
+      activeNetwork: activeNetwork,
     );
   }
 
