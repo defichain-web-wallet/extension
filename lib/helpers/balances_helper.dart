@@ -115,6 +115,7 @@ class BalancesHelper {
   String numberStyling(
     double number, {
     bool fixed = false,
+    bool isFormatRounded = false,
     int fixedCount = 2,
     FormatNumberType? type,
   }) {
@@ -136,6 +137,14 @@ class BalancesHelper {
           .split('')
           .reversed
           .join();
+      if (isFormatRounded) {
+        String formattedNumber;
+        if (number >= 1000000) {
+          double roundedNumber = (number / 1000000).roundToDouble();
+          formattedNumber = '$roundedNumber М';
+          return formattedNumber;
+        }
+      }
       return charNumberList.join('.');
     } else {
       return numberSpecificFormat(type, number);

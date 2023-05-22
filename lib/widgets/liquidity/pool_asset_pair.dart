@@ -246,8 +246,12 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
   String getTotalAmountByUsd(double amount) {
     BalancesHelper balancesHelper = BalancesHelper();
 
-    String amountFormat =
-        balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
+    String amountFormat = balancesHelper.numberStyling(
+      amount,
+      fixedCount: 2,
+      fixed: true,
+      isFormatRounded: true,
+    );
     return '\$$amountFormat';
   }
 }
