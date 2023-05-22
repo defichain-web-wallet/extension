@@ -237,7 +237,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       required String password,
       required TokenModel token,
       required double amount,
-        required ApplicationModel applicationModel}) async {
+        required ApplicationModel applicationModel,
+        int satPerByte = 0}) async {
     ECPair keypair = await getKeypair(
       password,
       account,

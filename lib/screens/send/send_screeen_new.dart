@@ -32,6 +32,7 @@ import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/address_field_new.dart';
+import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -125,7 +126,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                         isAfterAddContact: true,
                         amount: double.parse(assetController.text),
                         token: state.currentAsset!,
-                        fee: 0,
+                        fee: state.activeFee,
                         // fee: state.activeFee,
                       ),
                       transitionDuration: Duration.zero,
@@ -146,7 +147,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                 address: addressController.text,
                 amount: double.parse(assetController.text),
                 token: state.currentAsset!,
-                fee: 0,
+                fee: state.activeFee,
                 // fee: state.activeFee,
               ),
               transitionDuration: Duration.zero,
@@ -173,7 +174,7 @@ class _SendScreenNewState extends State<SendScreenNew>
             amount: double.parse(assetController.text),
             token: state.currentAsset!,
             contact: contact,
-            fee: 0,
+            fee: state.activeFee,
             // fee: state.activeFee,
           ),
           transitionDuration: Duration.zero,
@@ -507,7 +508,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                       ),
                     );
                   } else {
-                    return Container();
+                    return Loader();
                   }
           },
         );

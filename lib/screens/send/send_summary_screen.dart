@@ -571,7 +571,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     //     walletState.activeAccount!.accountIndex,
     //   );
     // }
-    var network = walletState.applicationModel!.networks[1];
+    var network = walletState.applicationModel!.activeNetwork!;
     var token = walletState.getBalances().lastWhere((element) {
       if (element.token == null) {
         return element.lmPool!.symbol == widget.token.symbol;
@@ -587,6 +587,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       token: token,
       amount: widget.amount,
       applicationModel: walletState.applicationModel!,
+      satPerByte: widget.fee ?? 0,
     );
 
     addressBookCubit.addAddressToLastSent(

@@ -96,7 +96,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
                         width: 10,
                       ),
                       Text(
-                        'Slow',
+                        _feesList.firstWhere((element) => element['value'].toString() == widget.activeFee.toString())['name'],
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                               fontSize: 16,
                             ),

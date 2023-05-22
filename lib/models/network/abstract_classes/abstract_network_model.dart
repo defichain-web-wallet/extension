@@ -115,7 +115,8 @@ abstract class AbstractNetworkModel {
         required String password,
         required TokenModel token,
         required double amount,
-      required ApplicationModel applicationModel});
+      required ApplicationModel applicationModel,
+      int satPerByte = 0});
 
   Future<String> signMessage(
       AbstractAccountModel account,
