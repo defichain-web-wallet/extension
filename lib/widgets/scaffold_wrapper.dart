@@ -34,11 +34,9 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
               return BlocBuilder<TransactionCubit, TransactionState>(
                 buildWhen: (prev, current) => widget.isUpdate,
                 builder: (context, txState) {
-                  print(constraints.maxWidth);
-                  bool isFullScreenMode =
-                      constraints.maxWidth > ScreenSizes.medium;
+                  double width = MediaQuery.of(context).size.width;
+                  bool isFullScreenMode = width > ScreenSizes.medium;
                   return Container(
-                    padding: EdgeInsets.only(top: isFullScreenMode ? 20 : 0),
                     child: widget.builder(
                       context,
                       isFullScreenMode,

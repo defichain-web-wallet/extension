@@ -13,15 +13,14 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
-import 'package:defi_wallet/screens/settings/settings.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/buttons/back_icon_button.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/address_field_new.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -261,10 +260,10 @@ class _SendScreenNewState extends State<SendScreenNew>
 
                     return Scaffold(
                       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                      endDrawer: AccountDrawer(
+                      endDrawer: isFullScreen ? null : AccountDrawer(
                         width: buttonSmallWidth,
                       ),
-                      appBar: NewMainAppBar(
+                      appBar: isFullScreen ? null : NewMainAppBar(
                         isShowLogo: false,
                       ),
                       body: Container(
@@ -300,9 +299,15 @@ class _SendScreenNewState extends State<SendScreenNew>
                                   children: [
                                     Row(
                                       children: [
+                                        BackIconButton(
+                                          leftPadding: 2,
+                                          width: 14,
+                                          height: 14,
+                                          isFullScreen: isFullScreen,
+                                        ),
                                         Text(
                                           titleText,
-                                          style: headline2.copyWith(
+                                          style: headline3.copyWith(
                                               fontWeight: FontWeight.w700),
                                         )
                                       ],

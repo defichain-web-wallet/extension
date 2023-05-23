@@ -114,13 +114,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
 
   List<String> slippageList = ['Custom', '0.5', '1', '3'];
 
-  @override
-  void initState() {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    tokensCubit.loadTokens();
-    super.initState();
-  }
-
   stateInit(accountState, dexState, tokensState) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     assets = [];

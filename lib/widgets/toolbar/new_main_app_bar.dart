@@ -1,5 +1,6 @@
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/logo_helper.dart';
+import 'package:defi_wallet/widgets/buttons/back_icon_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/selectors/network_selector.dart';
 import 'package:flutter/material.dart';
@@ -51,25 +52,10 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 margin: const EdgeInsets.only(left: logoLeftPadding),
                 child: LogoHelper().getLogo(),
               )
-            : IconButton(
-                padding: const EdgeInsets.only(left: logoLeftPadding - 2),
-                icon: Container(
-                  width: iconSize,
-                  height: iconSize,
-                  child: Image.asset(
-                    'assets/icons/arrow.png',
-                  ),
-                ),
-                onPressed: () {
-                  if (callback != null) {
-                    callback!();
-                  }
-                  Navigator.of(context).pop();
-                },
-                hoverColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                splashColor: Colors.transparent,
-                focusColor: Colors.transparent,
+            : BackIconButton(
+                leftPadding: logoLeftPadding - 2,
+                width: iconSize,
+                height: iconSize,
               ),
         title: isShowNetworkSelector
             ? NetworkSelector(
@@ -85,7 +71,7 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 iconPath: 'assets/icons/fullscreen_icon.svg',
                 onPressed: () => lockHelper.provideWithLockChecker(
                     context,
-                        () => js.context
+                    () => js.context
                         .callMethod('open', [window.location.toString()])),
               ),
             ),

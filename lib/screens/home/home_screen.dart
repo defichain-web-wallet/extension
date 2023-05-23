@@ -11,7 +11,7 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
-import 'package:defi_wallet/widgets/home/home_card.dart';
+import 'package:defi_wallet/widgets/home/home_extended_view.dart';
 import 'package:defi_wallet/widgets/home/home_tabs_scroll_view.dart';
 import 'package:defi_wallet/widgets/home/transaction_status_bar.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -146,37 +146,19 @@ class _HomeScreenState extends State<HomeScreen>
                       }
                       return Container(
                         color: Theme.of(context).scaffoldBackgroundColor,
-                            child: Center(
+                        child: Center(
                           child: StretchBox(
                             maxWidth: extendedBoxWidth,
                             child: Container(
                               child: Stack(
                                 children: [
                                   if (isFullScreen)
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          width: extendedFirstColumnWidth,
-                                          child: Column(
-                                            children: [
-                                              HomeCard(),
-                                            ],
-                                          ),
-                                        ),
-                                        Flexible(
-                                          child: Container(
-                                            constraints: BoxConstraints(
-                                              maxWidth: extendedLastColumnWidth,
-                                            ),
-                                            child: HomeTabsScrollView(
-                                              txState: txState,
-                                              tabController: tabController!,
-                                              activeTabIndex: homeState.tabIndex,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                    HomeExtendedView(
+                                      firstColumnWidth:
+                                          extendedFirstColumnWidth,
+                                      lastColumnWidth: extendedLastColumnWidth,
+                                      txState: txState,
+                                      tabController: tabController!,
                                     )
                                   else
                                     HomeTabsScrollView(
@@ -186,7 +168,9 @@ class _HomeScreenState extends State<HomeScreen>
                                       isShowHomeCard: true,
                                     ),
                                   if (txState is! TransactionInitialState)
-                                    TransactionStatusBar(key: txKey,),
+                                    TransactionStatusBar(
+                                      key: txKey,
+                                    ),
                                 ],
                               ),
                             ),
