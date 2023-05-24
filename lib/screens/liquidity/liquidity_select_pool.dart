@@ -361,7 +361,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                                         text: TextSpan(children: [
                                           TextSpan(
                                             text:
-                                                '1 $assetFrom = ${widget.assetPair.reserveBDivReserveA!.toStringAsFixed(8)} $assetTo',
+                                                '1 $assetFrom = ${widget.assetPair.reserveBDivReserveA!.toStringAsFixed(2)} $assetTo',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .headline5!

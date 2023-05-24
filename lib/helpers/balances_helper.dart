@@ -131,20 +131,27 @@ class BalancesHelper {
       }
       var charNumberList = stringNumber.split('.');
 
+      if (isFormatRounded) {
+        int separatedCount = number >= 1000000 ? 2 : 3;
+        var temp = StringUtils.addCharAtPosition(
+            charNumberList.first.split('').reversed.join(), ',', separatedCount,
+            repeat: true)
+            .split('')
+            .reversed
+            .join();
+        var separatedNumbers = temp.split(',');
+        if (number >= 1000000) {
+          return '${separatedNumbers[0]}.${separatedNumbers[1]}M';
+        } else if (number >= 1000) {
+          return '${separatedNumbers[0]}K';
+        }
+      }
       charNumberList.first = StringUtils.addCharAtPosition(
-              charNumberList.first.split('').reversed.join(), ",", 3,
-              repeat: true)
+          charNumberList.first.split('').reversed.join(), ",", 3,
+          repeat: true)
           .split('')
           .reversed
           .join();
-      if (isFormatRounded) {
-        String formattedNumber;
-        if (number >= 1000000) {
-          double roundedNumber = (number / 1000000).roundToDouble();
-          formattedNumber = '$roundedNumber М';
-          return formattedNumber;
-        }
-      }
       return charNumberList.join('.');
     } else {
       return numberSpecificFormat(type, number);
