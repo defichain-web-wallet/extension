@@ -28,6 +28,7 @@ class HomeCubit extends Cubit<HomeState> {
   updateScrollView({Widget? widget}) {
     emit(state.copyWith(
       scrollView: widget,
+      isShownHome: widget == null,
     ));
   }
 }

@@ -36,7 +36,7 @@ class BackIconButton extends StatelessWidget {
           callback!();
         } else {
           if (isFullScreen) {
-            homeCubit.updateScrollView(widget: null);
+            homeCubit.updateScrollView();
           } else {
             Navigator.of(context).pop();
           }

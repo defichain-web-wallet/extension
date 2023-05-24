@@ -22,6 +22,7 @@ class HomeExtendedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
+      buildWhen: (prev, current) => true,
       builder: (context, homeState) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -42,11 +43,13 @@ class HomeExtendedView extends StatelessWidget {
                 constraints: BoxConstraints(
                   maxWidth: lastColumnWidth,
                 ),
-                  child: homeState.scrollView ?? HomeTabsScrollView(
-                  txState: txState,
-                  tabController: tabController,
-                  activeTabIndex: homeState.tabIndex,
-                ),
+                child: (homeState.scrollView == null || homeState.isShownHome)
+                    ? HomeTabsScrollView(
+                        txState: txState,
+                        tabController: tabController,
+                        activeTabIndex: homeState.tabIndex,
+                      )
+                    : homeState.scrollView,
               ),
             ),
           ],
