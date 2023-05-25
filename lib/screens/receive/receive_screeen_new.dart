@@ -8,6 +8,7 @@ import 'package:defi_wallet/my_app.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
@@ -55,19 +56,18 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
               }
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: AccountDrawer(
+                endDrawer: isFullScreen ? null : AccountDrawer(
                   width: buttonSmallWidth,
                 ),
-                appBar: NewMainAppBar(
+                appBar: isFullScreen ? null : NewMainAppBar(
                   isShowLogo: false,
                 ),
                 body: Container(
-                  margin: EdgeInsets.only(top: 5),
                   padding: EdgeInsets.only(
                     top: 22,
-                    bottom: 24,
-                    left: 29,
-                    right: 29,
+                    bottom: 22,
+                    left: 16,
+                    right: 16,
                   ),
                   height: double.infinity,
                   decoration: BoxDecoration(
@@ -89,9 +89,9 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                         children: [
                           Column(
                             children: [
-                              Text(
-                                'Receive',
-                                style: headline3,
+                              PageTitle(
+                                title: 'Receive',
+                                isFullScreen: isFullScreen,
                               ),
                               SizedBox(
                                 height: 24,

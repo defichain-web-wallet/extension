@@ -11,6 +11,7 @@ import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/staking/staking_card.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -19,10 +20,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EarnScreenWrapper extends StatefulWidget {
   final Function() loadEarnData;
+  final bool isFullScreen;
 
   EarnScreenWrapper({
     Key? key,
     required this.loadEarnData,
+    required this.isFullScreen,
   }) : super(key: key);
 
   @override
@@ -38,10 +41,10 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
 
     return Scaffold(
       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-      endDrawer: AccountDrawer(
-        width: accountDrawerWidth,
+      endDrawer: widget.isFullScreen ? null : AccountDrawer(
+        width: buttonSmallWidth,
       ),
-      appBar: NewMainAppBar(
+      appBar: widget.isFullScreen ? null : NewMainAppBar(
         isShowLogo: false,
       ),
       body: Container(
@@ -72,15 +75,9 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
           child: StretchBox(
             child: Column(
               children: [
-                Row(
-                  children: [
-                    Text(
-                      titleText,
-                      style: Theme.of(context).textTheme.headline3!.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                  ],
+                PageTitle(
+                  title: titleText,
+                  isFullScreen: widget.isFullScreen,
                 ),
                 SizedBox(
                   height: 19,

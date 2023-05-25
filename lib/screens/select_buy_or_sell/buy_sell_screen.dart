@@ -15,6 +15,7 @@ import 'package:defi_wallet/screens/sell/selling_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -79,16 +80,16 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
             }
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-              endDrawer: AccountDrawer(
+              endDrawer: isFullScreen ? null : AccountDrawer(
                 width: buttonSmallWidth,
               ),
-              appBar: NewMainAppBar(
+              appBar: isFullScreen ? null : NewMainAppBar(
                 isShowLogo: false,
               ),
               body: Container(
                 padding: EdgeInsets.only(
-                  top: 26,
-                  bottom: 24,
+                  top: 22,
+                  bottom: 22,
                   left: 16,
                   right: 16,
                 ),
@@ -118,15 +119,9 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                         Expanded(
                           child: Column(
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    titleText,
-                                    style: headline2.copyWith(
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ],
+                              PageTitle(
+                                title: titleText,
+                                isFullScreen: isFullScreen,
                               ),
                               SizedBox(
                                 height: 13,

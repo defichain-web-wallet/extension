@@ -8,6 +8,7 @@ import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
 import 'package:defi_wallet/screens/swap/swap_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
 import 'package:defi_wallet/screens/send/send_screeen_new.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/home/account_balance.dart';
 import 'package:defi_wallet/widgets/selectors/app_selector.dart';
@@ -86,18 +87,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                         ? 'assets/icons/earn_disabled.png'
                         : 'assets/icons/earn.png',
                     callback: SettingsHelper.isBitcoin() ? null : () {
-                      if (widget.isFullScreen) {
-                        homeCubit.updateScrollView(widget: EarnScreen());
-                      } else {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => EarnScreen(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
-                      }
+                      NavigatorService.push(context, EarnScreen());
                     },
                   ),
                 ),
@@ -111,18 +101,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                         ? 'assets/icons/wallet_disabled.png'
                         : 'assets/icons/wallet.png',
                     callback: SettingsHelper.isBitcoin() ? null : () {
-                      if (widget.isFullScreen) {
-                        homeCubit.updateScrollView(widget: BuySellScreen());
-                      } else {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => BuySellScreen(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
-                      }
+                      NavigatorService.push(context, BuySellScreen());
                     },
                   ),
                 ),
@@ -139,18 +118,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                     isPrimary: false,
                     iconPath: 'assets/icons/send_icon.svg',
                     callback: () {
-                      if (widget.isFullScreen) {
-                        homeCubit.updateScrollView(widget: SendScreenNew());
-                      } else {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => SendScreenNew(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
-                      }
+                      NavigatorService.push(context, SendScreenNew());
                     },
                   ),
                 ),
@@ -163,18 +131,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                     isPrimary: false,
                     iconPath: 'assets/icons/receive_icon.svg',
                     callback: () {
-                      if (widget.isFullScreen) {
-                        homeCubit.updateScrollView(widget: ReceiveScreenNew());
-                      } else {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => ReceiveScreenNew(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
-                      }
+                      NavigatorService.push(context, ReceiveScreenNew());
                     },
                   ),
                 ),
@@ -208,18 +165,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                           } else {
                             changeWidget = SwapScreen();
                           }
-                          if (widget.isFullScreen) {
-                            homeCubit.updateScrollView(widget: changeWidget);
-                          } else {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) => changeWidget,
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),
-                            );
-                          }
+                          NavigatorService.push(context, changeWidget);
                         },
                       );
                     }

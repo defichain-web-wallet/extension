@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
@@ -13,11 +14,13 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/back_icon_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
@@ -117,41 +120,25 @@ class _SendScreenNewState extends State<SendScreenNew>
                       network: network,
                     ),
                   );
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) =>
-                          SendSummaryScreen(
-                        address: addressController.text,
-                        isAfterAddContact: true,
-                        amount: double.parse(assetController.text),
-                        token: currentAsset!,
-                        fee: bitcoinState.activeFee,
-                      ),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    ),
-                  );
+                  NavigatorService.push(context, SendSummaryScreen(
+                    address: addressController.text,
+                    isAfterAddContact: true,
+                    amount: double.parse(assetController.text),
+                    token: currentAsset!,
+                    fee: bitcoinState.activeFee,
+                  ));
                   Navigator.pop(dialogContext);
                 },
               );
             },
           );
         } else {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SendSummaryScreen(
-                address: addressController.text,
-                amount: double.parse(assetController.text),
-                token: currentAsset!,
-                fee: bitcoinState.activeFee,
-              ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
+          NavigatorService.push(context, SendSummaryScreen(
+            address: addressController.text,
+            amount: double.parse(assetController.text),
+            token: currentAsset!,
+            fee: bitcoinState.activeFee,
+          ));
         }
       } else {
         showSnackBar(
@@ -165,19 +152,12 @@ class _SendScreenNewState extends State<SendScreenNew>
         );
       }
     } else if (contact.name != null) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendSummaryScreen(
-            amount: double.parse(assetController.text),
-            token: currentAsset!,
-            contact: contact,
-            fee: bitcoinState.activeFee,
-          ),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, SendSummaryScreen(
+        amount: double.parse(assetController.text),
+        token: currentAsset!,
+        contact: contact,
+        fee: bitcoinState.activeFee,
+      ));
     } else {
       showSnackBar(
         context,
@@ -297,20 +277,9 @@ class _SendScreenNewState extends State<SendScreenNew>
                               children: [
                                 Column(
                                   children: [
-                                    Row(
-                                      children: [
-                                        BackIconButton(
-                                          leftPadding: 2,
-                                          width: 14,
-                                          height: 14,
-                                          isFullScreen: isFullScreen,
-                                        ),
-                                        Text(
-                                          titleText,
-                                          style: headline3.copyWith(
-                                              fontWeight: FontWeight.w700),
-                                        )
-                                      ],
+                                    PageTitle(
+                                      title: titleText,
+                                      isFullScreen: isFullScreen,
                                     ),
                                     SizedBox(
                                       height: 8,

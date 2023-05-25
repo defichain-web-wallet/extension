@@ -20,7 +20,9 @@ import 'package:defi_wallet/screens/swap/swap_summary_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/buttons/back_icon_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -215,11 +217,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                       targetList: tokensForSwap,
                     );
                     return Scaffold(
-                      appBar: NewMainAppBar(
+                      appBar: isFullScreen ? null : NewMainAppBar(
                         isShowLogo: false,
                       ),
                       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                      endDrawer: AccountDrawer(
+                      endDrawer: isFullScreen ? null : AccountDrawer(
                         width: buttonSmallWidth,
                       ),
                       body: Container(
@@ -315,12 +317,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Change',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .headline3,
+                    PageTitle(
+                      title: 'Change',
+                      isFullScreen: isFullScreen,
                     ),
                     SizedBox(
                       height: 16,
