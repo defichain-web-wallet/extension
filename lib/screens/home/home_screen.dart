@@ -1,6 +1,5 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
@@ -84,16 +83,11 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     if (widget.isLoadTokens) {
       tokensCubit.loadTokensFromStorage();
     }
 
-    return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (SettingsHelper.isBitcoin()) {
-        bitcoinCubit.loadDetails(state.activeAccount!.bitcoinAddress!);
-      }
+    return BlocBuilder<WalletCubit, WalletState>(builder: (context, state) {
       return BlocBuilder<TokensCubit, TokensState>(
         builder: (context, tokensState) {
           return ScaffoldWrapper(
@@ -103,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen>
               bool isFullScreen,
               TransactionState txState,
             ) {
-              if (state.status == AccountStatusList.loading ||
+              if (state.status == WalletStatusList.loading ||
                   tokensState.status == TokensStatusList.loading) {
                 return Container(
                   child: Center(
@@ -131,13 +125,6 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {
-                      if (timer == null && !SettingsHelper.isBitcoin()) {
-                        timer =
-                            Timer.periodic(Duration(seconds: tickerTimerUpdate),
-                                (timer) async {
-                          await accountCubit.loadAccounts();
-                        });
-                      }
                       if (widget.snackBarMessage.isNotEmpty &&
                           !isShownSnackBar) {
                         Future<Null>.delayed(Duration.zero, () {

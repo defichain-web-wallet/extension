@@ -10,24 +10,26 @@ class DFITokenRequests {
     required NetworkTypeModel networkType,
   }) async {
     final query = {
-      'size': 200,
-      'next': next ?? '',
+      'size': '200',
     };
 
-    //TODO: add fallback url
-    final Uri url = Uri.https(
-      Hosts.oceanDefichainHome,
-      '/v0/${networkType.networkStringLowerCase}/tokens',
-      query,
-    );
+    if (next != null) {
+      query['next'] = next;
+    }
 
     try {
+      //TODO: add fallback url
+      final Uri url = Uri.https(
+        Hosts.oceanDefichainHome,
+        '/v0/${networkType.networkStringLowerCase}/tokens',
+        query,
+      );
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         dynamic json = jsonDecode(response.body);
         List<TokenModel> tokens =
-            TokenModel.fromJSONList(json, networkType.networkName);
+            TokenModel.fromJSONList(json['data'], networkType.networkName);
 
         if (json['page'] != null) {
           var nextTokenList = await getTokens(
@@ -41,8 +43,8 @@ class DFITokenRequests {
       } else {
         return [];
       }
-    } catch (err) {
-      throw err;
+    } catch (_) {
+      rethrow;
     }
   }
 }

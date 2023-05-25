@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -44,14 +45,14 @@ class _WalletCheckerState extends State<WalletChecker> {
         );
       }
 
-      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+      WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
       BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
       var box = await Hive.openBox(HiveBoxes.client);
       var masterKeyPairName;
       if (SettingsHelper.settings.network! == 'testnet') {
-        masterKeyPairName = HiveNames.masterKeyPairTestnetPrivate;
+        masterKeyPairName = HiveNames.masterKeyPairTestnetPublic;
       } else {
-        masterKeyPairName = HiveNames.masterKeyPairMainnetPrivate;
+        masterKeyPairName = HiveNames.masterKeyPairMainnetPublic;
       }
       var masterKeyPair = await box.get(masterKeyPairName);
       var password = await box.get(HiveNames.password);
@@ -69,52 +70,24 @@ class _WalletCheckerState extends State<WalletChecker> {
       await box.close();
 
       if (masterKeyPair != null || isLedger) {
-        if (password != null || isLedger) {
-          lockHelper.provideWithLockChecker(context, () async {
-            try {
-              await accountCubit
-                  .restoreAccountFromStorage(SettingsHelper.settings.network!);
-            } catch (err) {
-              print(err);
-            }
-            if (SettingsHelper.isBitcoin()) {
-              await bitcoinCubit
-                  .loadDetails(accountCubit.state.accounts![0].bitcoinAddress!);
-            }
+        lockHelper.provideWithLockChecker(context, () async {
+          try {
+            await walletCubit.loadWalletDetails();
             await Navigator.pushReplacement(
               context,
               PageRouteBuilder(
                 pageBuilder: (context, animation1, animation2) =>
                     ThemeChecker(HomeScreen(
-                  isLoadTokens: true,
-                )),
+                      isLoadTokens: true,
+                    )),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),
             );
-          });
-        } else {
-          try {
-            await accountCubit
-                .restoreAccountFromStorage(SettingsHelper.settings.network!);
           } catch (err) {
             print(err);
           }
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => ThemeChecker(
-                PasswordScreen(
-                  onSubmitted: (String password) {
-                    // need to recovery
-                  },
-                ),
-              ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
-        }
+        });
       } else {
         if (isSavedMnemonic) {
           Navigator.pushReplacement(

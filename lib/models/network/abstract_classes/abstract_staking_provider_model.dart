@@ -1,12 +1,9 @@
-import 'dart:ffi';
-
-import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_token_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 
 import 'abstract_account_model.dart';
@@ -29,29 +26,32 @@ abstract class AbstractStakingProviderModel {
 
   Future<bool> isKycDone(AbstractAccountModel account);
 
-  Future<List<StakingTokenModel>> getAvailableStakingTokens(AbstractAccountModel account);
+  Future<List<StakingTokenModel>> getAvailableStakingTokens(
+      AbstractAccountModel account);
 
-  Future<StakingTokenModel> getDefaultStakingToken(AbstractAccountModel account);
+  Future<StakingTokenModel> getDefaultStakingToken(
+      AbstractAccountModel account);
 
-  Future<BigInt> getAmountStaked(AbstractAccountModel account, TokenModel token);
+  Future<BigInt> getAmountStaked(
+      AbstractAccountModel account, TokenModel token);
 
   Future<StakingModel> getStaking(AbstractAccountModel account);
 
   Future<TxErrorModel> stakeToken(
-    AbstractAccountModel account,
-    String password,
-    StakingTokenModel token,
-    StakingModel stakingModel,
-    AbstractNetworkModel network,
-    double amount,
-  );
+      AbstractAccountModel account,
+      String password,
+      StakingTokenModel token,
+      StakingModel stakingModel,
+      AbstractNetworkModel network,
+      double amount,
+      ApplicationModel applicationModel);
 
   Future<bool> unstakeToken(
-    AbstractAccountModel account,
-    String password,
-    StakingTokenModel token,
-    StakingModel stakingModel,
-    AbstractNetworkModel network,
-    double amount,
-  );
+      AbstractAccountModel account,
+      String password,
+      StakingTokenModel token,
+      StakingModel stakingModel,
+      AbstractNetworkModel network,
+      double amount,
+      ApplicationModel applicationModel);
 }

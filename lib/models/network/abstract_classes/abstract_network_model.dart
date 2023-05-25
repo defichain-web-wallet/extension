@@ -1,5 +1,6 @@
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -10,14 +11,26 @@ import 'abstract_exchange_model.dart';
 import 'abstract_lm_provider_model.dart';
 import 'abstract_on_off_ramp_model.dart';
 import 'abstract_staking_provider_model.dart';
-import 'package:bip32_defichain/bip32.dart' as bip32;
 
 abstract class AbstractNetworkModel {
   static const int COIN = 100000000;
 
   final NetworkTypeModel networkType;
+  final List<AbstractStakingProviderModel> stakingList = [];
+  final List<AbstractLmProviderModel> lmList = [];
+  final List<AbstractOnOffRamp> rampList = [];
+  final List<AbstractExchangeModel> exchangeList = [];
 
   AbstractNetworkModel(this.networkType);
+
+  String get networkNameFormat => this.networkType.networkNameFormat;
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['networkType'] = this.networkType.toJson();
+
+    return data;
+  }
 
   Future<List<TokenModel>> getAvailableTokens();
 
@@ -29,7 +42,7 @@ abstract class AbstractNetworkModel {
 
   Uri getAccountExplorer(String address);
 
-  Future<String> createAddress(AbstractAccountModel account);
+  String createAddress(String publicKey, int accountIndex);
 
   // Change
   List<AbstractBridge> getBridges();
@@ -50,6 +63,8 @@ abstract class AbstractNetworkModel {
     required TxType type,
   });
 
+  TokenModel getDefaultToken();
+
   Future<BalanceModel> getBalanceUTXO(
     List<BalanceModel> balances,
     String addressString,
@@ -60,6 +75,10 @@ abstract class AbstractNetworkModel {
     TokenModel token,
     String addressString,
   );
+
+  Future<List<BalanceModel>> getAllBalances({
+    required String addressString,
+  });
 
   // Earn
   List<AbstractStakingProviderModel> getStakingProviders();
@@ -76,8 +95,7 @@ abstract class AbstractNetworkModel {
 
   bool earnAvailable() => stakingAvailable() || lmAvailable();
 
-  Future<dynamic> getKeypair(String password, int accountIndex);
-
+  Future<dynamic> getKeypair(String password, AbstractAccountModel accountIndex, ApplicationModel applicationModel);
   // Buy and sell
   List<AbstractOnOffRamp> getRamps();
 
@@ -93,11 +111,13 @@ abstract class AbstractNetworkModel {
         required String address,
         required String password,
         required TokenModel token,
-        required double amount});
+        required double amount,
+      required ApplicationModel applicationModel});
 
   Future<String> signMessage(
-    AbstractAccountModel account,
-    String message,
-    String password,
-  );
+      AbstractAccountModel account,
+      String message,
+      String password,
+      ApplicationModel applicationModel
+      );
 }

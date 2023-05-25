@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_lm_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_ramp_model.dart';
@@ -20,33 +21,36 @@ import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_balance_requests.dart';
 import 'package:defi_wallet/requests/defichain/dfi_token_requests.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
+import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
 
 class DefichainNetworkModel extends AbstractNetworkModel {
-  DefichainNetworkModel(NetworkTypeModel networkType)
-      : super(_validationNetworkName(networkType)){
-    stakingList.add(new LockStakingProviderModel(this));
-    stakingList.add(new YieldMachineStakingProviderModel(this));
-
-    lmList.add(new DefichainLmProviderModel());
-
-    rampList.add(new DefichainRampModel(this));
-
-    exchangeList.add(new DefichainExchangeModel());
-  }
-
-  List<AbstractStakingProviderModel> stakingList = [];
-  List<AbstractLmProviderModel> lmList = [];
-  List<AbstractOnOffRamp> rampList = [];
-  List<AbstractExchangeModel> exchangeList = [];
-
-
   static const int DUST = 3000;
   static const int FEE = 3000;
   static const int RESERVED_BALANCES = 30000;
+
+
+  DefichainNetworkModel(NetworkTypeModel networkType)
+      : super(_validationNetworkName(networkType)) {
+    if (!networkType.isTestnet) {
+      this.stakingList.add(new LockStakingProviderModel(this));
+      this.stakingList.add(new YieldMachineStakingProviderModel(this));
+      this.rampList.add(new DefichainRampModel(this));
+    }
+
+    this.lmList.add(new DefichainLmProviderModel());
+
+    this.exchangeList.add(new DefichainExchangeModel());
+  }
+
+  factory DefichainNetworkModel.fromJson(Map<String, dynamic> jsonModel) {
+    return DefichainNetworkModel(
+      NetworkTypeModel.fromJson(jsonModel),
+    );
+  }
 
   static NetworkTypeModel _validationNetworkName(NetworkTypeModel networkType) {
     if (networkType.networkName != NetworkName.defichainTestnet &&
@@ -56,11 +60,11 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return networkType;
   }
 
-  Future<String> createAddress(AbstractAccountModel account) async {
-    var publicKeypair = bip32.BIP32.fromBase58(account.publicKey, _getNetworkTypeBip32());
-    var address = await this._createAddressString(publicKeypair, account.accountIndex);
+  String createAddress(String publicKey, int accountIndex) {
+    var publicKeypair =
+        bip32.BIP32.fromBase58(publicKey, _getNetworkTypeBip32());
 
-    return address;
+    return this._createAddressString(publicKeypair, accountIndex);
   }
 
   Future<List<TokenModel>> getAvailableTokens() async {
@@ -135,6 +139,56 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     }
   }
 
+  Future<List<BalanceModel>> getAllBalances({
+    required String addressString,
+  }) async {
+    var tokens = await this.getAvailableTokens();
+    var balanceList = await DFIBalanceRequests.getBalanceList(
+      network: this,
+      addressString: addressString,
+      tokens: tokens
+    );
+    List<BalanceModel> result = [];
+    try {
+      // TODO: maybe need rewrite here logic
+      var dfiBalances = balanceList.where((element) {
+        return element.token != null && element.token!.symbol == 'DFI';
+      }).toList();
+
+      if (dfiBalances.length > 1) {
+        var existingBalance = balanceList.where((element) {
+          return element.token != null && element.token!.symbol != 'DFI';
+        }).toList();
+        result = [
+          BalanceModel(
+            balance: dfiBalances[0].balance + dfiBalances[1].balance,
+            token: dfiBalances[0].token,
+            lmPool: dfiBalances[0].lmPool,
+          ),
+          ...existingBalance,
+        ];
+      } else {
+        result = balanceList;
+      }
+
+    } catch (err) {
+      result = [];
+    }
+
+   return result;
+  }
+
+  TokenModel getDefaultToken(){
+    return TokenModel(
+      isUTXO: true,
+      name: 'Default Defi token',
+      symbol: 'DFI',
+      displaySymbol: 'DFI',
+      id: '-1',
+      networkName: this.networkType.networkName,
+    );
+  }
+
   Future<double> getAvailableBalance({
     required AbstractAccountModel account,
     required TokenModel token,
@@ -188,20 +242,14 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   bool checkAddress(String address) {
     return Address.validateAddress(
       address,
-      _getNetworkType(),
+      getNetworkType(),
     );
   }
 
-  Future<ECPair> getKeypair(String password, int accountIndex) async {
-    String masterKey = await HiveService.getMasterKey(
-      password,
-      this.networkType,
-    );
-
-    return _getKeypairForPathPrivateKey(
-      bip32.BIP32.fromBase58(masterKey, _getNetworkTypeBip32()),
-      accountIndex,
-    );
+  Future<ECPair> getKeypair(String password, AbstractAccountModel account, ApplicationModel applicationModel) async {
+    var mnemonic = applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
+    var masterKey = getMasterKeypairFormMnemonic(mnemonic);
+    return _getKeypairForPathPrivateKey(masterKey, account.accountIndex);
   }
 
   Future<TxErrorModel> send(
@@ -209,10 +257,12 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       required String address,
       required String password,
       required TokenModel token,
-      required double amount}) async {
+      required double amount,
+        required ApplicationModel applicationModel}) async {
     ECPair keypair = await getKeypair(
       password,
-      account.accountIndex,
+      account,
+      applicationModel
     );
 
     List<BalanceModel> balances = account.getPinnedBalances(this);
@@ -232,7 +282,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       balanceUTXO: balanceUTXO,
       balance: balanceToken,
       destinationAddress: address,
-      networkString: this.networkType.networkStringLowerCase,
+      network: this,
       amount: toSatoshi(amount),
     );
   }
@@ -241,13 +291,15 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     AbstractAccountModel account,
     String message,
     String password,
+   ApplicationModel applicationModel
   ) async {
     ECPair keypair = await getKeypair(
       password,
-      account.accountIndex,
+      account,
+      applicationModel
     );
 
-    return keypair.signMessage(message, _getNetworkType());
+    return keypair.signMessage(message, getNetworkType());
   }
 
   Future<BalanceModel> getBalanceUTXO(
@@ -277,9 +329,11 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       balance = balances.firstWhere((element) => element.token!.compare(token));
     } catch (_) {
       //if not exist in balances we check blockchain
+      var tokens = await this.getAvailableTokens();
       List<BalanceModel> balanceList = await DFIBalanceRequests.getBalanceList(
         network: this,
         addressString: addressString,
+          tokens: tokens
       );
       try {
         balance = balanceList.firstWhere(
@@ -293,23 +347,27 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     return balance;
   }
 
-  Future<String> _createAddressString(
-      bip32.BIP32 masterKeyPair, int accountIndex) async {
+  String _createAddressString(bip32.BIP32 masterKeyPair, int accountIndex) {
     final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
     return _getAddressFromKeyPair(keyPair);
   }
 
   // private
-  NetworkType _getNetworkType() {
+  NetworkType getNetworkType() {
     return this.networkType.isTestnet
         ? networks.defichain_testnet
         : networks.defichain;
   }
 
+  bip32.BIP32 getMasterKeypairFormMnemonic(List<String> mnemonic) {
+    final seed = mnemonicToSeed(mnemonic.join(' '));
+    return bip32.BIP32.fromSeedWithCustomKey(seed, "@defichain/jellyfish-wallet-mnemonic", _getNetworkTypeBip32());
+  }
+
   ECPair _getKeypairForPathPublicKey(bip32.BIP32 masterKeypair, int account) {
     return ECPair.fromPublicKey(
         masterKeypair.derivePath(_derivePath(account)).publicKey,
-        network: _getNetworkType());
+        network: getNetworkType());
   }
 
   ECPair _getKeypairForPathPrivateKey(
@@ -318,25 +376,24 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   ) {
     return ECPair.fromPrivateKey(
         masterKeypair.derivePath(_derivePath(account)).privateKey!,
-        network: _getNetworkType());
+        network: getNetworkType());
   }
 
   String _derivePath(int account) {
     return "1129/0/0/$account";
   }
 
-  Future<String> _getAddressFromKeyPair(ECPair keyPair) async {
-    final address = P2WPKH(
+  String _getAddressFromKeyPair(ECPair keyPair) {
+    return P2WPKH(
       data: PaymentData(
         pubkey: keyPair.publicKey,
       ),
-      network: _getNetworkType(),
-    ).data!.address;
-    return address!;
+      network: getNetworkType(),
+    ).data!.address!;
   }
 
   bip32.NetworkType _getNetworkTypeBip32() {
-    var network = _getNetworkType();
+    var network = getNetworkType();
     return bip32.NetworkType(
       bip32: bip32.Bip32Type(
         private: network.bip32.private,

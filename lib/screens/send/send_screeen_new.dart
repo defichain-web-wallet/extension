@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
@@ -9,6 +10,11 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
@@ -45,6 +51,7 @@ class _SendScreenNewState extends State<SendScreenNew>
   FocusNode addressFocusNode = FocusNode();
   AddressBookModel contact = AddressBookModel();
   TokensModel? currentAsset;
+  double availableBalance = 0;
   String suffixText = '';
   String? balanceInUsd;
   String titleText = 'Send';
@@ -53,26 +60,40 @@ class _SendScreenNewState extends State<SendScreenNew>
   bool isShowCheckbox = false;
   int iterator = 0;
 
-  getTokensList(accountState, tokensState) {
-    List<TokensModel> resList = [];
-    if (!SettingsHelper.isBitcoin()) {
-      accountState.balances!.forEach((element) {
-        tokensState.tokens!.forEach((el) {
-          if (element.token == el.symbol) {
-            resList.add(el);
-          }
-        });
-      });
-    }
-    return resList;
+  double getAvailableBalance(
+    List<BalanceModel> balances,
+    TokensModel currentAsset,
+  ) {
+    int balance = balances.firstWhere((element) {
+      if (element.token == null) {
+        return element.lmPool!.symbol == currentAsset.symbol!;
+      } else {
+        return element.token!.symbol == currentAsset.symbol!;
+      }
+    }).balance;
+    return convertFromSatoshi(balance);
   }
 
-  double getAvailableBalance(accountState, bitcoinState) {
-    if (bitcoinState.totalBalance <= 0) {
-      return 0.0;
-    } else {
-      return convertFromSatoshi(bitcoinState.totalBalance);
-    }
+  Future<void> setAvailableBalance(
+    List<BalanceModel> balances,
+    TokensModel currentAsset,
+    ApplicationModel applicationModel,
+    AbstractAccountModel accountModel,
+  ) async {
+    double balance = await applicationModel.networks[0].getAvailableBalance(
+      account: accountModel,
+      token: TokenModel(
+        id: currentAsset.id.toString(),
+        symbol: currentAsset.symbol!,
+        name: currentAsset.name!,
+        displaySymbol: currentAsset.symbol!,
+        networkName: applicationModel.networks[0].networkType.networkName,
+      ),
+      type: TxType.send,
+    );
+    setState(() {
+      availableBalance = balance;
+    });
   }
 
   String getUsdBalance(context) {
@@ -224,28 +245,20 @@ class _SendScreenNewState extends State<SendScreenNew>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (accountContext, accountState) {
+        return BlocBuilder<WalletCubit, WalletState>(
+          builder: (context, state) {
             return BlocBuilder<TokensCubit, TokensState>(
               builder: (tokenContext, tokensState) {
-                List<TokensModel> tokens = getTokensList(
-                  accountState,
+                List<TokensModel> tokens = tokenHelper.getTokensList(
+                  state.getBalances(),
                   tokensState,
                 );
                 return BlocBuilder<BitcoinCubit, BitcoinState>(
                     builder: (bitcoinContext, bitcoinState) {
-                  BitcoinCubit bitcoinCubit =
-                      BlocProvider.of<BitcoinCubit>(context);
                   AddressBookCubit addressBookCubit =
                       BlocProvider.of<AddressBookCubit>(context);
 
-                  if (iterator == 0 && SettingsHelper.isBitcoin()) {
-                    bitcoinCubit.loadAvailableBalance(
-                        accountState.activeAccount!.bitcoinAddress!);
-                    iterator++;
-                  }
-
-                  if (accountState.status == AccountStatusList.success &&
+                  if (state.status == WalletStatusList.success &&
                       (bitcoinState.status == BitcoinStatusList.success ||
                           !SettingsHelper.isBitcoin())) {
                     if (SettingsHelper.isBitcoin()) {
@@ -255,9 +268,15 @@ class _SendScreenNewState extends State<SendScreenNew>
                         symbol: 'BTC',
                       );
                     } else {
-                      currentAsset = currentAsset ??
-                          getTokensList(accountState, tokensState).first;
+                      currentAsset = currentAsset ?? tokens.first;
                     }
+                    // setAvailableBalance(
+                    //   state.getBalances(),
+                    //   currentAsset!,
+                    //   state.applicationModel!,
+                    //   state.activeAccount!,
+                    // );
+                    // print(availableBalance);
 
                     return Scaffold(
                       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -389,24 +408,30 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       type: SettingsHelper.isBitcoin()
                                           ? null
                                           : TxType.send,
-                                      account: accountState.activeAccount!,
+                                      balance: state.getBalances().first,
                                       onChanged: (value) {
                                         setState(() {
                                           balanceInUsd = getUsdBalance(context);
                                         });
                                       },
                                       available: getAvailableBalance(
-                                        accountState,
-                                        bitcoinState,
+                                        state.getBalances(),
+                                        currentAsset!,
                                       ),
                                       isDisabledSelector:
                                           SettingsHelper.isBitcoin(),
                                       suffix: balanceInUsd ??
                                           getUsdBalance(context),
-                                      onAssetSelect: (t) {
+                                      onAssetSelect: (t) async {
                                         setState(() {
                                           currentAsset = t;
                                         });
+                                        // setAvailableBalance(
+                                        //   state.getBalances(),
+                                        //   currentAsset!,
+                                        //   state.applicationModel!,
+                                        //   state.activeAccount!,
+                                        // );
                                       },
                                       controller: assetController,
                                       selectedAsset: currentAsset!,
@@ -432,11 +457,11 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       ),
                                       FeesSelector(
                                         onSelect: (int fee) {
-                                          bitcoinCubit.changeActiveFee(
-                                            accountState
-                                                .activeAccount!.bitcoinAddress!,
-                                            fee,
-                                          );
+                                          // bitcoinCubit.changeActiveFee(
+                                          //   state
+                                          //       .activeAccount!.bitcoinAddress!,
+                                          //   fee,
+                                          // );
                                         },
                                         activeFee: bitcoinState.activeFee,
                                         fees: [

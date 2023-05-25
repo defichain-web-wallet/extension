@@ -63,10 +63,9 @@ class BTCTransactionService {
     selectedUtxo.asMap().forEach((index, utxo) {
       _txb.sign(vin: index, keyPair: keyPair, witnessValue: utxo.value);
     });
-
-    return TxErrorModel(isError: false, txLoaderList: [
-      TxLoaderModel(txHex: _txb.build().toHex(), type: TxType.send)
-    ]);
+    TxErrorModel tx = await BlockcypherRequests.sendTxHex(network, _txb.build().toHex());
+    tx.txLoaderList![0].type = TxType.send;
+    return tx;
   }
 
   static int calculateBTCFee(int inputCount, int outputCount, int satPerByte) {

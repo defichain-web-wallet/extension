@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -35,11 +36,29 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return networkType;
   }
 
-  Future<String> createAddress(AbstractAccountModel account) async {
-    var publicKeypair = bip32.BIP32.fromBase58(account.publicKey, _getNetworkTypeBip32());
-    var address = await this._createAddressString(publicKeypair, account.accountIndex);
+  factory BitcoinNetworkModel.fromJson(Map<String, dynamic> jsonModel) {
+    return BitcoinNetworkModel(
+      NetworkTypeModel.fromJson(jsonModel),
+    );
+  }
 
-    return address;
+  String createAddress(String publicKey, int accountIndex) {
+    var test = _getNetworkTypeBip32();
+    print('1');
+    var publicKeypair = bip32.BIP32.fromBase58(publicKey, test);
+    print('2');
+    return this._createAddressString(publicKeypair, accountIndex);
+  }
+
+  TokenModel getDefaultToken(){
+    return TokenModel(
+      isUTXO: true,
+      name: 'Bitcoin',
+      symbol: 'BTC',
+      displaySymbol: 'BTC',
+      id: '-1',
+      networkName: this.networkType.networkName,
+    );
   }
 
   Future<BalanceModel> getBalanceUTXO(
@@ -52,10 +71,19 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     );
 
     BalanceModel balanceModel = BalanceModel(
-      token: _getBtcToken(),
+      token: getDefaultToken(),
       balance: balance,
     );
     return balanceModel;
+  }
+
+  Future<List<BalanceModel>> getAllBalances({
+    required String addressString,
+  }) async {
+    var balance = await getBalanceUTXO(
+        [], addressString);
+
+    return [balance];
   }
 
   Future<BalanceModel> getBalanceToken(
@@ -149,16 +177,10 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     );
   }
 
-  Future<ECPair> getKeypair(String password, int accountIndex) async {
-    String masterKey = await HiveService.getMasterKey(
-      password,
-      this.networkType,
-    );
-
-    return _getKeypairForPathPrivateKey(
-      bip32.BIP32.fromBase58(masterKey, _getNetworkTypeBip32()),
-      accountIndex,
-    );
+  Future<ECPair> getKeypair(String password, AbstractAccountModel account, ApplicationModel applicationModel) async {
+    var mnemonic = applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
+    var masterKey = getMasterKeypairFormMnemonic(mnemonic);
+    return _getKeypairForPathPrivateKey(masterKey, account.accountIndex);
   }
 
   Future<TxErrorModel> send(
@@ -167,6 +189,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
       required String password,
       required TokenModel token,
       required double amount,
+      required ApplicationModel applicationModel,
       int satPerByte = 0}) async {
     if (satPerByte == 0) {
       var networkFee = await BlockcypherRequests.getNetworkFee(this);
@@ -174,7 +197,8 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     }
     ECPair keypair = await getKeypair(
       password,
-      account.accountIndex,
+      account,
+      applicationModel
     );
 
     List<BalanceModel> balances = account.getPinnedBalances(this);
@@ -193,17 +217,18 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     AbstractAccountModel account,
     String message,
     String password,
+      ApplicationModel applicationModel
   ) async {
     ECPair keypair = await getKeypair(
       password,
-      account.accountIndex,
+      account,
+        applicationModel
     );
 
     return keypair.signMessage(message, getNetworkType());
   }
 
-  Future<String> _createAddressString(
-      bip32.BIP32 masterKeyPair, int accountIndex) async {
+  String _createAddressString(bip32.BIP32 masterKeyPair, int accountIndex) {
     final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
     return _getAddressFromKeyPair(keyPair);
   }
@@ -233,23 +258,18 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return "1129/0/0/$account";
   }
 
-  TokenModel _getBtcToken() => TokenModel(
-        isUTXO: true,
-        name: 'Bitcoin',
-        symbol: 'BTC',
-        displaySymbol: 'BTC',
-        id: '-1',
-        networkName: this.networkType.networkName,
-      );
+  bip32.BIP32 getMasterKeypairFormMnemonic(List<String> mnemonic) {
+    final seed = mnemonicToSeed(mnemonic.join(' '));
+    return bip32.BIP32.fromSeedWithCustomKey(seed, "@defichain/jellyfish-wallet-mnemonic", _getNetworkTypeBip32());
+  }
 
-  Future<String> _getAddressFromKeyPair(ECPair keyPair) async {
-    final address = P2WPKH(
+  String _getAddressFromKeyPair(ECPair keyPair) {
+    return P2WPKH(
       data: PaymentData(
         pubkey: keyPair.publicKey,
       ),
       network: getNetworkType(),
-    ).data!.address;
-    return address!;
+    ).data!.address!;
   }
 
   bip32.NetworkType _getNetworkTypeBip32() {

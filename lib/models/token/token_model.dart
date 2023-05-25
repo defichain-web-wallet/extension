@@ -35,15 +35,17 @@ class TokenModel {
   }
 
   factory TokenModel.fromJSON(
-    Map<String, dynamic> json,
+    Map<String, dynamic> json, {
     NetworkName? networkName,
-  ) {
+  }) {
     return TokenModel(
       id: json['id'],
       symbol: json['symbol'],
       name: json['name'],
       displaySymbol: json['displaySymbol'],
-      networkName: networkName ?? json['networkName'],
+      networkName: networkName ?? NetworkName.values.firstWhere(
+        (value) => value.toString() == json['networkName'],
+      ),
     );
   }
 
@@ -53,7 +55,7 @@ class TokenModel {
   ) {
     List<TokenModel> tokens = List.generate(
       jsonList.length,
-      (index) => TokenModel.fromJSON(jsonList[index], networkName),
+      (index) => TokenModel.fromJSON(jsonList[index], networkName: networkName),
     );
 
     return tokens;
@@ -65,7 +67,7 @@ class TokenModel {
       'symbol': this.symbol,
       'name': this.name,
       'displaySymbol': this.displaySymbol,
-      'networkName': this.networkName,
+      'networkName': this.networkName.toString(),
     };
   }
 

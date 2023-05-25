@@ -4,7 +4,6 @@ import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field.dart';
 import 'package:defi_wallet/widgets/fields/decoration_text_field_swap.dart';
-import 'package:defi_wallet/widgets/network/network_selector.dart';
 import 'package:defi_wallet/widgets/swap/swap_account_selector_dialog.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';

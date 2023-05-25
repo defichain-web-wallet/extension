@@ -1,7 +1,7 @@
 import 'package:encrypt/encrypt.dart';
 
 class EncryptHelper {
-   String getEncryptedData(plainText, password) {
+   static String getEncryptedData(plainText, password) {
      final key = Key.fromUtf8(getFormatKey(password));
      final iv = IV.fromLength(16);
 
@@ -11,7 +11,7 @@ class EncryptHelper {
      return encrypted.base64;
   }
 
-   String getDecryptedData(encryptedText, password) {
+   static String getDecryptedData(encryptedText, password) {
      final key = Key.fromUtf8(getFormatKey(password));
      final iv = IV.fromLength(16);
 
@@ -19,7 +19,7 @@ class EncryptHelper {
      return encrypter.decrypt(Encrypted.fromBase64(encryptedText), iv: iv);
    }
 
-  bool isValidKey(encryptedText, password) {
+  static bool isValidKey(encryptedText, password) {
     final key = Key.fromUtf8(getFormatKey(password));
     final iv = IV.fromLength(16);
 
@@ -32,7 +32,7 @@ class EncryptHelper {
     }
   }
 
-  String getFormatKey(key) {
+  static String getFormatKey(key) {
      if (key.length < 32) {
        String result = '';
        for (int i in Iterable.generate(32)) {

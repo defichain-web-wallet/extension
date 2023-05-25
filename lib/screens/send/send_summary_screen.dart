@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
@@ -13,8 +14,9 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
@@ -119,8 +121,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
           appBar: NewMainAppBar(
             isShowLogo: false,
           ),
-          body: BlocBuilder<AccountCubit, AccountState>(
-              builder: (context, state) {
+          body:
+              BlocBuilder<WalletCubit, WalletState>(builder: (context, state) {
             return BlocBuilder<TokensCubit, TokensState>(
               builder: (context, tokensState) {
                 return Stack(
@@ -279,17 +281,20 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            if (tokenHelper.isPair(widget.token.symbol))
+                                            if (tokenHelper
+                                                .isPair(widget.token.symbol))
                                               AssetPair(
                                                 isBorder: false,
                                                 pair: widget.token.symbol!,
                                                 height: 20,
                                               ),
-                                            if (!tokenHelper.isPair(widget.token.symbol))
+                                            if (!tokenHelper
+                                                .isPair(widget.token.symbol))
                                               AssetLogo(
                                                 size: 20,
-                                                assetStyle:
-                                                tokenHelper.getAssetStyleByTokenName(widget.token.symbol),
+                                                assetStyle: tokenHelper
+                                                    .getAssetStyleByTokenName(
+                                                        widget.token.symbol),
                                                 borderWidth: 0,
                                                 isBorder: false,
                                               ),
@@ -427,55 +432,29 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                           isCheckLock: false,
                                           pendingText: 'Pending',
                                           callback: (parent) async {
-                                            final isLedger =
-                                                await SettingsHelper.isLedger();
-                                            if (isLedger) {
-                                              showDialog(
-                                                barrierColor: AppColors.tolopea.withOpacity(0.06),
-                                                barrierDismissible: false,
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context1) {
-                                                  return LedgerCheckScreen(
-                                                      onStartSign:
-                                                          (p, c) async {
-                                                    parent.emitPending(true);
-                                                    p.emitPending(true);
-                                                    await submitSend(
-                                                        state,
-                                                        tokensState,
-                                                        null, callbackOk: (() {
-                                                      Navigator.pop(c);
-                                                    }));
+                                            parent.emitPending(true);
+                                            showDialog(
+                                              barrierColor: AppColors.tolopea
+                                                  .withOpacity(0.06),
+                                              barrierDismissible: false,
+                                              context: context,
+                                              builder:
+                                                  (BuildContext context1) {
+                                                return PassConfirmDialog(
+                                                  onCancel: () {
                                                     parent.emitPending(false);
-                                                    p.emitPending(false);
-                                                  });
-                                                },
-                                              );
-                                            } else {
-                                              parent.emitPending(true);
-                                              showDialog(
-                                                barrierColor: AppColors.tolopea.withOpacity(0.06),
-                                                barrierDismissible: false,
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context1) {
-                                                  return PassConfirmDialog(
-                                                    onCancel: () {
-                                                      parent.emitPending(false);
-                                                    },
-                                                    onSubmit: (password) async {
-                                                      await submitSend(
-                                                        state,
-                                                        tokensState,
-                                                        password,
-                                                      );
-                                                    },
-                                                    context: context,
-                                                  );
-                                                },
-                                              );
-                                            }
+                                                  },
+                                                  onSubmit: (password) async {
+                                                    await submitSend(
+                                                      state,
+                                                      tokensState,
+                                                      password,
+                                                    );
+                                                  },
+                                                  context: context,
+                                                );
+                                              },
+                                            );
                                           },
                                         ),
                                       ),
@@ -543,138 +522,81 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     );
   }
 
-  Future submitSend(state, tokensState, password,
-      {final Function()? callbackOk}) async {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+  Future submitSend(
+    state,
+    tokensState,
+    password, {
+    final Function()? callbackOk,
+  }) async {
     try {
-      if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
+      if (widget.amount > 0) {
         await _callback(
-            state.activeAccount, password, bitcoinCubit, tokensState.tokens,
-            callbackOk: callbackOk);
+          state,
+          password,
+          tokensState.tokens,
+          callbackOk: callbackOk,
+        );
       }
-    } catch (_err) {
-      print(_err);
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-            errorBTC: _err.toString(),
-            appBarTitle: 'Change',
-            txResponse: null,
-            amount: widget.amount,
-            token: 'BTC',
-            address: address,
-          ),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+    } catch (err) {
+      print(err);
     }
   }
 
-  Future _callback(AccountModel account, String? password,
-      BitcoinCubit bitcoinCubit, List<TokensModel> tokens,
-      {final Function()? callbackOk}) async {
-    if (SettingsHelper.isBitcoin()) {
-      ECPair keyPair = await HDWalletService()
-          .getKeypairFromStorage(password, account.index!);
-      var tx = await transactionService.createBTCTransaction(
-        keyPair: keyPair,
-        account: account,
-        destinationAddress: address,
-        amount: balancesHelper.toSatoshi(widget.amount.toString()),
-        satPerByte: widget.fee!,
-      );
-      if (tx.isError!) {
-        showSnackBar(
-          context,
-          title: tx.error!,
-          color: AppColors.txStatusError.withOpacity(0.1),
-          prefix: Icon(
-            Icons.close,
-            color: AppColors.txStatusError,
-          ),
-        );
-      } else {
-        var txResponse =
-            await bitcoinCubit.sendTransaction(tx.txLoaderList![0].txHex!);
-
-        showDialog(
-          barrierColor: AppColors.tolopea.withOpacity(0.06),
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext dialogContext) {
-            return TxStatusDialog(
-              txResponse: txResponse,
-              callbackOk: () async {
-                if (callbackOk != null) {
-                  callbackOk();
-                }
-                if (!txResponse.isError!) {
-                  TransactionCubit transactionCubit =
-                  BlocProvider.of<TransactionCubit>(context);
-
-                  transactionCubit.setOngoingTransaction(txResponse);
-                }
-                Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) =>
-                        HomeScreen(
-                      isLoadTokens: true,
-                    ),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
-              callbackTryAgain: () async {
-                print('TryAgain');
-                await _sendTransaction(
-                    context, tokens, widget.token.symbol!, account, password,
-                    callbackOk: callbackOk);
-              },
-            );
-          },
-        );
-      }
-    } else {
-      await _sendTransaction(
-          context, tokens, widget.token.symbol!, account, password,
-          callbackOk: callbackOk);
-    }
+  Future _callback(
+    WalletState walletState,
+    String? password,
+    List<TokensModel> tokens, {
+    final Function()? callbackOk,
+  }) async {
+    await _sendTransaction(
+      context,
+      tokens,
+      widget.token.symbol!,
+      walletState,
+      password,
+      callbackOk: callbackOk,
+    );
   }
 
-  Future _sendTransaction(context, List<TokensModel> tokens, String token,
-      AccountModel account, String? password,
-      {final Function()? callbackOk}) async {
+  Future _sendTransaction(
+    context,
+    List<TokensModel> tokens,
+    String token,
+    WalletState walletState,
+    String? password, {
+    final Function()? callbackOk,
+  }) async {
     TxErrorModel? txResponse;
     AddressBookCubit addressBookCubit =
         BlocProvider.of<AddressBookCubit>(context);
-    final isLedger = await SettingsHelper.isLedger();
+    // final isLedger = await SettingsHelper.isLedger();
 
-    ECPair? keyPair;
-    if (!isLedger) {
-      keyPair = await HDWalletService()
-          .getKeypairFromStorage(password, account.index!);
-    }
 
-    if (token == 'DFI') {
-      txResponse = await transactionService.createAndSendTransaction(
-          keyPair: keyPair,
-          account: account,
-          destinationAddress: address,
-          amount: balancesHelper.toSatoshi(widget.amount.toString()),
-          tokens: tokens);
-    } else {
-      txResponse = await transactionService.createAndSendToken(
-          keyPair: keyPair,
-          account: account,
-          token: token,
-          destinationAddress: address,
-          amount: balancesHelper.toSatoshi(widget.amount.toString()),
-          tokens: tokens);
-    }
+    // TODO: not working now
+    // ECPair? keyPair;
+    // if (!isLedger) {
+    //   keyPair = await HDWalletService().getKeypairFromStorage(
+    //     password,
+    //     walletState.activeAccount!.accountIndex,
+    //   );
+    // }
+    var network = walletState.applicationModel!.networks[1];
+    var token = walletState.getBalances().lastWhere((element) {
+      if (element.token == null) {
+        return element.lmPool!.symbol == widget.token.symbol;
+      } else {
+        return element.token!.symbol == widget.token.symbol;
+      }
+    }).token!;
+
+    txResponse = await network.send(
+      account: walletState.activeAccount!,
+      address: address,
+      password: password!,
+      token: token,
+      amount: widget.amount,
+      applicationModel: walletState.applicationModel!,
+    );
 
     addressBookCubit.addAddressToLastSent(
       AddressBookModel(
@@ -697,7 +619,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
             }
             if (!txResponse!.isError!) {
               TransactionCubit transactionCubit =
-              BlocProvider.of<TransactionCubit>(context);
+                  BlocProvider.of<TransactionCubit>(context);
 
               transactionCubit.setOngoingTransaction(txResponse);
             }
@@ -714,7 +636,12 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
           },
           callbackTryAgain: () async {
             await _sendTransaction(
-                context, tokens, widget.token.symbol!, account, password);
+              context,
+              tokens,
+              widget.token.symbol!,
+              walletState,
+              password,
+            );
           },
         );
       },

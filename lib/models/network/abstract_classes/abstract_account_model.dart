@@ -5,34 +5,54 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_network_mod
 import 'package:defi_wallet/models/network/network_name.dart';
 
 abstract class AbstractAccountModel {
-  final String publicKey;
-  final Map<NetworkName, String> addresses;
-  final Map<NetworkName, List<BalanceModel>> pinnedBalances;
+  final String publicKeyTestnet;
+  final String publicKeyMainnet;
+  final String sourceId;
+  final Map<String, String> addresses;
+  final Map<String, List<BalanceModel>> pinnedBalances;
   final int accountIndex;
+  final List<AbstractNetworkModel> networkList;
 
   AbstractAccountModel(
-    this.publicKey,
+    this.publicKeyTestnet,
+    this.publicKeyMainnet,
+    this.sourceId,
     this.addresses,
     this.accountIndex,
     this.pinnedBalances,
+    this.networkList,
   );
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data["sourceId"] = this.sourceId;
+    data["addresses"] = this.addresses;
+    data["accountIndex"] = this.accountIndex;
+    data["pinnedBalances"] = this.pinnedBalances.map((key, value) {
+      List balancesJson = value.map((e) => e.toJSON()).toList();
+      return MapEntry(key, balancesJson);
+    });
+    // data["networkList"] = this.networkList.map((e) => e.toJson()).toList();
+
+    return data;
+  }
 
   // Tokens
   List<BalanceModel> getPinnedBalances(AbstractNetworkModel network) {
-    return pinnedBalances[network.networkType.networkName] ?? [];
+    return pinnedBalances[network.networkType.networkName.name] ?? [];
   }
 
   void pinToken(BalanceModel balance, AbstractNetworkModel network) {
     try {
-      pinnedBalances[network.networkType.networkName]!.add(balance);
+      pinnedBalances[network.networkType.networkName.name]!.add(balance);
     } catch (e) {
-      pinnedBalances[network.networkType.networkName] = [balance];
+      pinnedBalances[network.networkType.networkName.name] = [balance];
     }
   }
 
   void unpinToken(BalanceModel balance, AbstractNetworkModel network) {
     try {
-      pinnedBalances[network.networkType.networkName]!.removeWhere((element) {
+      pinnedBalances[network.networkType.networkName.name]!.removeWhere((element) {
         return element.compare(balance);
       });
     } catch (_) {
@@ -42,7 +62,7 @@ abstract class AbstractAccountModel {
 
   // Lists
 
-  Map<NetworkName, List<AddressBookModel>> getAddressBook(
+  Map<String, List<AddressBookModel>> getAddressBook(
     NetworkName networkName,
   );
 
@@ -53,7 +73,5 @@ abstract class AbstractAccountModel {
   );
 
   // Receive
-  String? getAddress(NetworkName networkName) {
-    return addresses[networkName];
-  }
+  String? getAddress(NetworkName networkName);
 }
