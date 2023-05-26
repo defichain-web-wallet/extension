@@ -1,0 +1,15 @@
+{
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "browser_action": {
+    "browser_style": true,
+    "default_icon": "/icons/128.png",
+    "default_title": "Jellywallet",
+    "default_popup": "/index.html"
+  },
+  "background": {
+    "scripts": [
+      "background-wrapper.js"
+    ]
+  },
+  "manifest_version": 2
+}
