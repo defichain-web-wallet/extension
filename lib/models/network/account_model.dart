@@ -14,48 +14,21 @@ class AccountModel extends AbstractAccountModel {
     Map<String, String> addresses,
     int accountIndex,
     Map<String, List<BalanceModel>> pinnedBalances,
-    List<AbstractNetworkModel> networkList,
+    String? name
   ) : super(publicKeyTestnet, publicKeyMainnet, sourceId, addresses,
-            accountIndex, pinnedBalances, networkList);
+            accountIndex, pinnedBalances, name ?? 'Account${accountIndex + 1}');
 
-  factory AccountModel.fromJson(Map<String, dynamic> jsonModel) {
-    var networkListJson = jsonModel['networkList'];
+  factory AccountModel.fromJson(Map<String, dynamic> jsonModel, List<AbstractNetworkModel> networkList) {
+    Map<String, List<BalanceModel>> pinnedBalances = {};
 
-    List<AbstractNetworkModel> networkList =
-        List.generate(networkListJson.length, (index) {
-      if (networkListJson[index]['networkName'].contains('defichain')) {
-        return DefichainNetworkModel.fromJson(
-          networkListJson[index],
-        );
-      } else {
-        return BitcoinNetworkModel.fromJson(
-          networkListJson[index],
-        );
-      }
-    });
-    var defichainMainnet = jsonModel['pinnedBalances']['defichainMainnet'];
-    var defichainTestnet = jsonModel['pinnedBalances']['defichainTestnet'];
-    var bitcoinTestnet = jsonModel['pinnedBalances']['bitcoinTestnet'];
-    var bitcoinMainnet = jsonModel['pinnedBalances']['bitcoinMainnet'];
+    for(var network in networkList){
+      var balanceList = jsonModel['pinnedBalances'][network.networkType.networkName.name] as List;
+      pinnedBalances[network.networkType.networkName.name] = List<BalanceModel>.generate(
+        balanceList.length,
+            (index) => BalanceModel.fromJSON(balanceList[index]),
+      );
+    }
 
-    Map<String, List<BalanceModel>> pinnedBalances = {
-      'defichainMainnet': List<BalanceModel>.generate(
-        defichainMainnet.length,
-        (index) => BalanceModel.fromJSON(defichainMainnet[index]),
-      ),
-      'defichainTestnet': List<BalanceModel>.generate(
-        defichainTestnet.length,
-            (index) => BalanceModel.fromJSON(defichainTestnet[index]),
-      ),
-      'bitcoinTestnet': List<BalanceModel>.generate(
-        defichainTestnet.length,
-            (index) => BalanceModel.fromJSON(bitcoinTestnet[index]),
-      ),
-      'bitcoinMainnet': List<BalanceModel>.generate(
-        defichainTestnet.length,
-            (index) => BalanceModel.fromJSON(bitcoinMainnet[index]),
-      ),
-    };
     return AccountModel(
       jsonModel['publicKeyTestnet'],
       jsonModel['publicKeyMainnet'],
@@ -63,7 +36,7 @@ class AccountModel extends AbstractAccountModel {
       Map<String, String>.from(jsonModel['addresses']),
       jsonModel['accountIndex'],
       pinnedBalances,
-      networkList,
+      jsonModel["name"]
     );
   }
 
@@ -74,12 +47,11 @@ class AccountModel extends AbstractAccountModel {
     data["publicKeyMainnet"] = this.publicKeyMainnet;
     data["addresses"] = this.addresses;
     data["accountIndex"] = this.accountIndex;
+    data["name"] = this.name;
     data["pinnedBalances"] = this.pinnedBalances.map((key, value) {
       List balancesJson = value.map((e) => e.toJSON()).toList();
       return MapEntry(key, balancesJson);
     });
-    data["networkList"] =
-        this.networkList.map((e) => e.networkType.toJson()).toList();
 
     return data;
   }
@@ -124,7 +96,7 @@ class AccountModel extends AbstractAccountModel {
       addresses,
       accountIndex,
       pinnedBalances,
-      networkList,
+      null
     );
   }
 

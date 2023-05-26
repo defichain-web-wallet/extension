@@ -31,7 +31,7 @@ class NetworkTypeModel {
       networkName: NetworkName.values.firstWhere(
         (value) => value.toString() == jsonModel['networkName'],
       ),
-      networkString: jsonModel['networkName'],
+      networkString: jsonModel['networkString'],
       isTestnet: jsonModel['isTestnet'],
     );
   }

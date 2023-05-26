@@ -128,16 +128,13 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
               builder: (context, walletState) {
                 return BlocBuilder<NetworkCubit, NetworkState>(
                   builder: (context, networkState) {
-                    var targetNetworkName =
-                        networkState.currentNetworkSelectorTab ==
-                                NetworkTabs.all
-                            ? 'mainnet'
-                            : 'testnet';
+                    //TODO: refactor this
                     var currentNetworksList = walletState
                         .applicationModel!.networks
                         .where((element) =>
-                            element.networkType.networkString ==
-                            targetNetworkName)
+                            element.networkType.isTestnet ==
+                            (networkState.currentNetworkSelectorTab !=
+                                NetworkTabs.all))
                         .toList();
                     return Container(
                       color: isDarkTheme()
@@ -243,8 +240,11 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                             child: GestureDetector(
                                               behavior:
                                                   HitTestBehavior.translucent,
-                                              onTap: () =>
-                                                  walletCubit.changeActiveNetwork(item),
+                                              onTap: () {
+                                                controller.hideMenu();
+                                                walletCubit
+                                                    .changeActiveNetwork(item);
+                                              },
                                               child: Container(
                                                 height: 44,
                                                 child: Row(
@@ -258,7 +258,9 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                                                                 .circular(8),
                                                         color: getMarkColor(walletState
                                                                 .applicationModel!
-                                                                .activeNetwork!.networkType.networkName ==
+                                                                .activeNetwork!
+                                                                .networkType
+                                                                .networkName ==
                                                             item.networkType
                                                                 .networkName),
                                                       ),

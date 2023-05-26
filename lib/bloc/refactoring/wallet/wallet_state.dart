@@ -4,19 +4,19 @@ enum WalletStatusList { initial, loading, success, restore, failure }
 
 class WalletState extends Equatable {
   final WalletStatusList status;
-  final List<AbstractAccountModel>? accountList;
   final ApplicationModel? applicationModel;
 
   WalletState({
     this.status = WalletStatusList.initial,
-    this.accountList,
     this.applicationModel,
   });
 
-  List<BalanceModel> getBalances({String key = 'defichainMainnet'}) {
-    List<BalanceModel> balances = this.activeAccount!.pinnedBalances[key]!;
+  List<BalanceModel> getBalances() {
+    List<BalanceModel> balances = this.applicationModel!.activeAccount!.getPinnedBalances(applicationModel!.activeNetwork!);
     return balances;
   }
+
+  String get activeAddress => this.applicationModel!.activeAccount!.getAddress(this.applicationModel!.activeNetwork!.networkType.networkName)!;
 
   AbstractNetworkModel get activeNetwork =>
       this.applicationModel!.activeNetwork!;
@@ -31,12 +31,10 @@ class WalletState extends Equatable {
 
   WalletState copyWith({
     WalletStatusList? status,
-    List<AbstractAccountModel>? accountList,
     ApplicationModel? applicationModel,
   }) {
     return WalletState(
       status: status ?? this.status,
-      accountList: accountList ?? this.accountList,
       applicationModel: applicationModel ?? this.applicationModel,
     );
   }

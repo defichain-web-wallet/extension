@@ -11,7 +11,7 @@ abstract class AbstractAccountModel {
   final Map<String, String> addresses;
   final Map<String, List<BalanceModel>> pinnedBalances;
   final int accountIndex;
-  final List<AbstractNetworkModel> networkList;
+  final String name;
 
   AbstractAccountModel(
     this.publicKeyTestnet,
@@ -20,26 +20,42 @@ abstract class AbstractAccountModel {
     this.addresses,
     this.accountIndex,
     this.pinnedBalances,
-    this.networkList,
+    this.name
   );
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data["sourceId"] = this.sourceId;
-    data["addresses"] = this.addresses;
-    data["accountIndex"] = this.accountIndex;
-    data["pinnedBalances"] = this.pinnedBalances.map((key, value) {
-      List balancesJson = value.map((e) => e.toJSON()).toList();
-      return MapEntry(key, balancesJson);
-    });
-    // data["networkList"] = this.networkList.map((e) => e.toJson()).toList();
-
-    return data;
-  }
+  Map<String, dynamic> toJson();
 
   // Tokens
-  List<BalanceModel> getPinnedBalances(AbstractNetworkModel network) {
-    return pinnedBalances[network.networkType.networkName.name] ?? [];
+  List<BalanceModel> getPinnedBalances(AbstractNetworkModel network, {bool mergeCoin = true }) {
+    var balanceList = pinnedBalances[network.networkType.networkName.name] ?? [];
+    List<BalanceModel> result = [];
+    //TODO: maybe need to move this to network models
+    try {
+      // TODO: maybe need rewrite here logic
+      var dfiBalances = balanceList.where((element) {
+        return element.token != null && element.token!.symbol == 'DFI';
+      }).toList();
+
+      if (dfiBalances.length > 1 && mergeCoin) {
+        var existingBalance = balanceList.where((element) {
+          return element.token != null && element.token!.symbol != 'DFI';
+        }).toList();
+        result = [
+          BalanceModel(
+            balance: dfiBalances[0].balance + dfiBalances[1].balance,
+            token: dfiBalances[0].token,
+            lmPool: dfiBalances[0].lmPool,
+          ),
+          ...existingBalance,
+        ];
+      } else {
+        result = balanceList;
+      }
+
+    } catch (err) {
+      result = [];
+    }
+    return result;
   }
 
   void pinToken(BalanceModel balance, AbstractNetworkModel network) {

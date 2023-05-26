@@ -14,6 +14,7 @@ import 'package:defi_wallet/models/network/defichain_implementation/defichain_ra
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/yield_machine_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
@@ -44,6 +45,10 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     this.lmList.add(new DefichainLmProviderModel());
 
     this.exchangeList.add(new DefichainExchangeModel());
+  }
+
+  Future<NetworkFeeModel> getNetworkFee() async {
+    throw 'Not available for this network';
   }
 
   factory DefichainNetworkModel.fromJson(Map<String, dynamic> jsonModel) {
@@ -148,34 +153,15 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       addressString: addressString,
       tokens: tokens
     );
-    List<BalanceModel> result = [];
-    try {
-      // TODO: maybe need rewrite here logic
-      var dfiBalances = balanceList.where((element) {
-        return element.token != null && element.token!.symbol == 'DFI';
-      }).toList();
 
-      if (dfiBalances.length > 1) {
-        var existingBalance = balanceList.where((element) {
-          return element.token != null && element.token!.symbol != 'DFI';
-        }).toList();
-        result = [
-          BalanceModel(
-            balance: dfiBalances[0].balance + dfiBalances[1].balance,
-            token: dfiBalances[0].token,
-            lmPool: dfiBalances[0].lmPool,
-          ),
-          ...existingBalance,
-        ];
-      } else {
-        result = balanceList;
-      }
+    var balanceUtxo = await DFIBalanceRequests.getUTXOBalance(
+        network: this,
+        addressString: addressString,
+    );
+    balanceList.add(balanceUtxo);
 
-    } catch (err) {
-      result = [];
-    }
 
-   return result;
+    return balanceList;
   }
 
   TokenModel getDefaultToken(){
@@ -189,19 +175,24 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     );
   }
 
+  bool isTokensPresent(){
+    return true;
+  }
+
   Future<double> getAvailableBalance({
     required AbstractAccountModel account,
     required TokenModel token,
     required TxType type,
   }) async {
-    List<BalanceModel> balances = account.getPinnedBalances(this);
+    List<BalanceModel> balances = account.getPinnedBalances(this, mergeCoin: false);
 
     if (token.symbol == 'DFI') {
-      BalanceModel tokenDFIBalance = await getBalanceUTXO(
+      //TODO: change names
+      BalanceModel coinDFIBalance = await getBalanceUTXO(
         balances,
         account.getAddress(this.networkType.networkName)!,
       );
-      BalanceModel coinDFIBalance = await getBalanceToken(
+      BalanceModel tokenDFIBalance = await getBalanceToken(
         balances,
         token,
         account.getAddress(this.networkType.networkName)!,
@@ -210,19 +201,19 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       switch (type) {
         case TxType.send:
           if (tokenDFIBalance.balance > FEE) {
-            return coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2);
+            return fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
           } else {
             return fromSatoshi(coinDFIBalance.balance - (FEE));
           }
         case TxType.swap:
           if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            return coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2);
+            return fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
           } else {
             return fromSatoshi(tokenDFIBalance.balance);
           }
         case TxType.addLiq:
           if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            return coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2);
+            return fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
           } else {
             return fromSatoshi(tokenDFIBalance.balance);
           }
@@ -258,7 +249,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       required String password,
       required TokenModel token,
       required double amount,
-        required ApplicationModel applicationModel}) async {
+        required ApplicationModel applicationModel,
+        int satPerByte = 0}) async {
     ECPair keypair = await getKeypair(
       password,
       account,
@@ -326,7 +318,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   ) async {
     late BalanceModel? balance;
     try {
-      balance = balances.firstWhere((element) => element.token!.compare(token));
+      balance = balances.firstWhere((element) => element.token!.compare(token) && !element.token!.isUTXO);
     } catch (_) {
       //if not exist in balances we check blockchain
       var tokens = await this.getAvailableTokens();
@@ -337,7 +329,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       );
       try {
         balance = balanceList.firstWhere(
-          (element) => element.token!.compare(token),
+          (element) => element.token!.compare(token) && !element.token!.isUTXO,
         );
       } catch (_) {
         //if in blockchain balance doesn't exist - we return 0

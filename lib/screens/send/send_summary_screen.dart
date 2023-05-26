@@ -17,6 +17,7 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
@@ -44,7 +45,7 @@ class SendSummaryScreen extends StatefulWidget {
   final Function()? callback;
   final AddressBookModel? contact;
   final String? address;
-  final TokensModel token;
+  final TokenModel token;
   final double amount;
   final bool isAfterAddContact;
   final int? fee;
@@ -123,8 +124,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
           ),
           body:
               BlocBuilder<WalletCubit, WalletState>(builder: (context, state) {
-            return BlocBuilder<TokensCubit, TokensState>(
-              builder: (context, tokensState) {
                 return Stack(
                   children: [
                     Container(
@@ -447,7 +446,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                   onSubmit: (password) async {
                                                     await submitSend(
                                                       state,
-                                                      tokensState,
                                                       password,
                                                     );
                                                   },
@@ -514,8 +512,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                       ),
                   ],
                 );
-              },
-            );
           }),
         );
       },
@@ -524,7 +520,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
 
   Future submitSend(
     state,
-    tokensState,
     password, {
     final Function()? callbackOk,
   }) async {
@@ -533,7 +528,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
         await _callback(
           state,
           password,
-          tokensState.tokens,
           callbackOk: callbackOk,
         );
       }
@@ -544,14 +538,12 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
 
   Future _callback(
     WalletState walletState,
-    String? password,
-    List<TokensModel> tokens, {
+    String? password, {
     final Function()? callbackOk,
   }) async {
     await _sendTransaction(
       context,
-      tokens,
-      widget.token.symbol!,
+      widget.token,
       walletState,
       password,
       callbackOk: callbackOk,
@@ -560,8 +552,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
 
   Future _sendTransaction(
     context,
-    List<TokensModel> tokens,
-    String token,
+    TokenModel token,
     WalletState walletState,
     String? password, {
     final Function()? callbackOk,
@@ -580,14 +571,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     //     walletState.activeAccount!.accountIndex,
     //   );
     // }
-    var network = walletState.applicationModel!.networks[1];
-    var token = walletState.getBalances().lastWhere((element) {
-      if (element.token == null) {
-        return element.lmPool!.symbol == widget.token.symbol;
-      } else {
-        return element.token!.symbol == widget.token.symbol;
-      }
-    }).token!;
+    var network = walletState.applicationModel!.activeNetwork!;
 
     txResponse = await network.send(
       account: walletState.activeAccount!,
@@ -596,6 +580,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       token: token,
       amount: widget.amount,
       applicationModel: walletState.applicationModel!,
+      satPerByte: widget.fee ?? 0,
     );
 
     addressBookCubit.addAddressToLastSent(
@@ -637,8 +622,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
           callbackTryAgain: () async {
             await _sendTransaction(
               context,
-              tokens,
-              widget.token.symbol!,
+              widget.token,
               walletState,
               password,
             );

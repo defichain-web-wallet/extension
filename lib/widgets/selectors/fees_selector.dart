@@ -77,10 +77,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
             color: AppColors.lavenderPurple.withOpacity(0.32),
           ),
         ),
-        child: BlocBuilder<BitcoinCubit, BitcoinState>(
-          builder: (context, bitcoinState) {
-            double arrowRotateDeg = _isShowDropdown ? 180 : 0;
-            return Row(
+        child: Row(
               children: [
                 Flexible(
                   child: Row(
@@ -99,7 +96,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
                         width: 10,
                       ),
                       Text(
-                        'Slow',
+                        _feesList.firstWhere((element) => element['value'].toString() == widget.activeFee.toString())['name'],
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                               fontSize: 16,
                             ),
@@ -108,7 +105,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
                         width: 8,
                       ),
                       Text(
-                        '${bitcoinState.activeFee} sat per byte',
+                        '${widget.activeFee} sat per byte',
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                             fontSize: 16,
                             color: Theme.of(context)
@@ -121,7 +118,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
                   ),
                 ),
                 RotationTransition(
-                  turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
+                  turns: AlwaysStoppedAnimation(_isShowDropdown ? 180 : 0 / 360),
                   child: SizedBox(
                     width: 10,
                     height: 10,
@@ -129,9 +126,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
                   ),
                 )
               ],
-            );
-          },
-        ),
+            )
       ),
       menuBuilder: () => CustomPaint(
         isComplex: true,
@@ -139,9 +134,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
         painter: ArrowPainter(),
         child: ClipPath(
           clipper: ArrowClipper(),
-          child: BlocBuilder<BitcoinCubit, BitcoinState>(
-            builder: (context, bitcoinState) {
-              return Container(
+          child: Container(
                 color: isDarkTheme()
                     ? DarkColors.feesDropdownBgColor
                     : LightColors.feesDropdownBgColor,
@@ -162,6 +155,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
                                 controller.hideMenu();
+
                                 widget.onSelect(int.parse(item['value']));
                               },
                               child: Container(
@@ -218,9 +212,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
                         .toList(),
                   ),
                 ),
-              );
-            },
-          ),
+              )
         ),
       ),
       showArrow: false,
