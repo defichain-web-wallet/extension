@@ -168,40 +168,18 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                       return FlatButton(
                         title: 'Change',
                         isPrimary: false,
-                        iconPath: 'assets/icons/change_icon.svg',
-                        callback: () {
-                          if (SettingsHelper.isBitcoin() &&
-                              SettingsHelper.settings.network == 'testnet') {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Not allowed for testnet bitcoin',
-                                  style: Theme.of(context).textTheme.headline5,
-                                ),
-                                backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-                              ),
-                            );
-                            return;
-                          }
-                          if (accountState.swapTutorialStatus == 'show' && SettingsHelper.isBitcoin()) {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) =>
-                                    SwapGuideScreen(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),
-                            );
-                          } else {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) => SwapScreen(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),);
-                          }
+                        iconPath: SettingsHelper.isBitcoin()
+                            ? 'assets/icons/change_icon_disabled.svg'
+                            : 'assets/icons/change_icon.svg',
+                        callback: SettingsHelper.isBitcoin() ? null : () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) => SwapScreen(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          );
                         },
                       );
                     }
