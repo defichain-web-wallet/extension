@@ -30,6 +30,16 @@ class NavigatorService {
     }
   }
 
+  static void pop(BuildContext context) {
+    HomeCubit homeCubit = _getHomeCubit(context);
+
+    if (_isFullScreen(context)) {
+      homeCubit.updateScrollView(widget: null);
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
   static PageRouteBuilder _pageRouteBuilder(Widget widget) => PageRouteBuilder(
     pageBuilder: (context, animation1, animation2) => widget,
     transitionDuration: Duration.zero,

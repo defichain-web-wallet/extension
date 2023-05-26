@@ -2,10 +2,12 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/buy/buy_kyc_contact_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -44,16 +46,16 @@ class _BuyTutorialFourthScreenState extends State<BuyTutorialFourthScreen>
       ) {
         return Scaffold(
           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-          endDrawer: AccountDrawer(
+          endDrawer: isFullScreen ? null : AccountDrawer(
             width: buttonSmallWidth,
           ),
-          appBar: NewMainAppBar(
+          appBar: isFullScreen ? null : NewMainAppBar(
             isShowLogo: false,
           ),
           body: Container(
             padding: EdgeInsets.only(
               top: 22,
-              bottom: 24,
+              bottom: 22,
               left: 16,
               right: 16,
             ),
@@ -83,15 +85,9 @@ class _BuyTutorialFourthScreenState extends State<BuyTutorialFourthScreen>
                     Expanded(
                       child: Column(
                         children: [
-                          Container(
-                            height: 68,
-                            child: Text(
-                              titleText,
-                              style: headline2.copyWith(
-                                  fontWeight: FontWeight.w700),
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                            ),
+                          PageTitle(
+                            title: titleText,
+                            isFullScreen: isFullScreen,
                           ),
                           Container(
                             width: 328,
@@ -212,7 +208,7 @@ class _BuyTutorialFourthScreenState extends State<BuyTutorialFourthScreen>
                               width: 104,
                               child: AccentButton(
                                 callback: () {
-                                  Navigator.pop(context);
+                                  NavigatorService.pop(context);
                                 },
                                 label: 'Back',
                               ),
@@ -224,15 +220,9 @@ class _BuyTutorialFourthScreenState extends State<BuyTutorialFourthScreen>
                                     BlocProvider.of<FiatCubit>(context);
                                 await fiatCubit
                                     .changeStatusTutorial(!widget.isConfirm);
-                                Navigator.push(
+                                NavigatorService.push(
                                   context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            BuyKycContactScreen(),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
+                                  BuyKycContactScreen(),
                                 );
                               },
                               title: 'Next',

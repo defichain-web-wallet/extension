@@ -4,20 +4,16 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/access_token_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/buy/buy_select_currency_screen.dart';
 import 'package:defi_wallet/screens/buy/tutorials/buy_tutorial_first_screen.dart';
-import 'package:defi_wallet/screens/error_screen.dart';
-import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_first_screen.dart';
 import 'package:defi_wallet/screens/sell/selling_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
-import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -25,7 +21,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
-import 'package:skeletons/skeletons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BuySellScreen extends StatefulWidget {
@@ -320,25 +315,9 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
 
   buyCallback(context, state) {
     if (state.isShowTutorial) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              BuyTutorialFirstScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, BuyTutorialFirstScreen());
     } else {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              BuySelectCurrencyScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, BuySelectCurrencyScreen());
     }
   }
 
@@ -347,14 +326,6 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
     var kycStatus = await box.get(HiveNames.kycStatus);
     bool isSkipKyc = kycStatus == 'skip' || state.kycStatus == 'Completed';
     await box.close();
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) =>
-            isSkipKyc ? Selling() : AccountTypeSell(),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ),
-    );
+    NavigatorService.push(context, isSkipKyc ? Selling() : AccountTypeSell());
   }
 }

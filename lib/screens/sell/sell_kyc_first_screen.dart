@@ -1,23 +1,18 @@
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
-import 'package:defi_wallet/screens/sell/country_sell.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_second_screen.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/buttons/primary_button.dart';
-import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,16 +75,16 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
             } else {
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: AccountDrawer(
+                endDrawer: isFullScreen ? null : AccountDrawer(
                   width: buttonSmallWidth,
                 ),
-                appBar: NewMainAppBar(
+                appBar: isFullScreen ? null : NewMainAppBar(
                   isShowLogo: false,
                 ),
                 body: Container(
                   padding: EdgeInsets.only(
                     top: 22,
-                    bottom: 24,
+                    bottom: 22,
                     left: 16,
                     right: 16,
                   ),
@@ -121,16 +116,9 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                               key: _formKey,
                               child: Column(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        titleText,
-                                        style: headline2.copyWith(
-                                            fontWeight: FontWeight.w700),
-                                        textAlign: TextAlign.start,
-                                        softWrap: true,
-                                      ),
-                                    ],
+                                  PageTitle(
+                                    title: titleText,
+                                    isFullScreen: isFullScreen,
                                   ),
                                   SizedBox(
                                     height: 8,
@@ -262,7 +250,7 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                                 width: 104,
                                 child: AccentButton(
                                   callback: () {
-                                    Navigator.pop(context);
+                                    NavigatorService.pop(context);
                                   },
                                   label: 'Back',
                                 ),
@@ -278,16 +266,10 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                                       fiatCubit.setUserName(
                                           _nameController.text,
                                           _surnameController.text);
-                                      Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                    animation2) =>
-                                                SellKycSecondScreen(),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
-                                          ));
+                                      NavigatorService.push(
+                                        context,
+                                        SellKycSecondScreen(),
+                                      );
                                     });
                                   }
                                 },

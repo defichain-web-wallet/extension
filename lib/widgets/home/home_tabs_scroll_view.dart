@@ -5,6 +5,7 @@ import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/transaction_history.dart';
 import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/home/home_sliver_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -79,19 +80,10 @@ class _HomeTabsScrollViewState extends State<HomeTabsScrollView> {
                           height: 32,
                           child: NewActionButton(
                             iconPath: 'assets/icons/add_black.svg',
-                            onPressed: () async {
-                              await lockHelper.provideWithLockChecker(
+                            onPressed: () {
+                              NavigatorService.push(
                                 context,
-                                () => Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            AddTokenScreen(),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                ),
+                                AddTokenScreen(),
                               );
                             },
                           ),

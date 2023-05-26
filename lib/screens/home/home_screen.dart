@@ -123,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen>
                 return Scaffold(
                   appBar: NewMainAppBar(
                     isShowLogo: true,
+                    isSmallScreen: !isFullScreen,
                   ),
                   drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                   endDrawer: AccountDrawer(

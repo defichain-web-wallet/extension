@@ -11,6 +11,7 @@ import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 
 class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isShowLogo;
+  final bool isSmallScreen;
   final bool isShowNetworkSelector;
   final Color? bgColor;
   final void Function()? callback;
@@ -18,6 +19,7 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const NewMainAppBar({
     Key? key,
     this.isShowLogo = true,
+    this.isSmallScreen = false,
     this.isShowNetworkSelector = true,
     this.bgColor,
     this.callback,
@@ -63,7 +65,7 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
               )
             : Container(),
         actions: [
-          if (isShowLogo)
+          if (isSmallScreen)
             SizedBox(
               width: 32,
               height: 32,

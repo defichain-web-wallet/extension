@@ -18,9 +18,9 @@ import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
 import 'package:defi_wallet/screens/swap/swap_summary_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/buttons/back_icon_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
@@ -1133,21 +1133,14 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         ),
                       );
                     } else {
-                      Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                SwapSummaryScreen(
-                                  assetFrom.symbol!,
-                                  assetTo!.symbol!.replaceAll('d', ''),
-                                  double.parse(amountFromController.text),
-                                  double.parse(amountToController.text),
-                                  slippage,
-                                  btcTx: tx.txLoaderList![0].txHex!,
-                                ),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ));
+                      NavigatorService.push(context, SwapSummaryScreen(
+                        assetFrom.symbol!,
+                        assetTo!.symbol!.replaceAll('d', ''),
+                        double.parse(amountFromController.text),
+                        double.parse(amountToController.text),
+                        slippage,
+                        btcTx: tx.txLoaderList![0].txHex!,
+                      ));
                     }
                   } catch (err) {
                     showSnackBar(
@@ -1166,20 +1159,13 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
           },
         );
       } else {
-        Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SwapSummaryScreen(
-                    assetFrom.symbol!,
-                    assetTo!.symbol!,
-                    double.parse(amountFromController.text),
-                    double.parse(amountToController.text),
-                    assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ? slippage + 0.3 : slippage,
-                  ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ));
+        NavigatorService.push(context, SwapSummaryScreen(
+          assetFrom.symbol!,
+          assetTo!.symbol!,
+          double.parse(amountFromController.text),
+          double.parse(amountToController.text),
+          assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ? slippage + 0.3 : slippage,
+        ));
       }
     }
   }

@@ -8,11 +8,13 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/buy/iban_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/add_token/token_list_tile.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -88,16 +90,16 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                 List<AssetByFiatModel> availableTokens = fiatCubit.getAssetsWithoutPair(fiatState.foundAssets!);
                 return Scaffold(
                   drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                  endDrawer: AccountDrawer(
+                  endDrawer: isFullScreen ? null : AccountDrawer(
                     width: buttonSmallWidth,
                   ),
-                  appBar: NewMainAppBar(
+                  appBar: isFullScreen ? null : NewMainAppBar(
                     isShowLogo: false,
                   ),
                   body: Container(
                     padding: EdgeInsets.only(
                       top: 22,
-                      bottom: 24,
+                      bottom: 22,
                       left: 16,
                       right: 16,
                     ),
@@ -125,14 +127,9 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      titleText,
-                                      style: headline2.copyWith(
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  ],
+                                PageTitle(
+                                  title: titleText,
+                                  isFullScreen: isFullScreen,
                                 ),
                                 SizedBox(
                                   height: 8,
@@ -315,7 +312,9 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                                   width: 104,
                                   child: AccentButton(
                                     label: 'Cancel',
-                                    callback: () => Navigator.of(context).pop(),
+                                    callback: () {
+                                      NavigatorService.pop(context);
+                                    },
                                   ),
                                 ),
                                 NewPrimaryButton(
@@ -336,20 +335,9 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                                         ),
                                       );
                                     } else {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder:
-                                              (context, animation1, animation2) {
-                                            return IbanScreen(
-                                              asset: selectedAsset!,
-                                            );
-                                          },
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                          Duration.zero,
-                                        ),
-                                      );
+                                      NavigatorService.push(context, IbanScreen(
+                                        asset: selectedAsset!,
+                                      ));
                                     }
                                   },
                                   title: 'Next',
