@@ -139,7 +139,7 @@ class WalletCubit extends Cubit<WalletState> {
       activeNetwork: network,
     );
 
-    await StorageService.saveApplication(applicationModel);
+    StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
       applicationModel: applicationModel,

@@ -95,6 +95,10 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     throw 'Bitcoin network does not support tokens';
   }
 
+  bool isTokensPresent(){
+    return false;
+  }
+
   List<HistoryModel> getHistory(String networkName, String? txid) {
     return [];
   }

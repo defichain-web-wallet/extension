@@ -4,7 +4,6 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
@@ -15,10 +14,8 @@ import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/home/home_sliver_app_bar.dart';
 import 'package:defi_wallet/widgets/home/transaction_status_bar.dart';
-import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -42,7 +39,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
-  static const int tickerTimerUpdate = 15;
   Timer? timer;
   TabController? tabController;
   LockHelper lockHelper = LockHelper();
@@ -88,8 +84,6 @@ class _HomeScreenState extends State<HomeScreen>
     }
 
     return BlocBuilder<WalletCubit, WalletState>(builder: (context, state) {
-      return BlocBuilder<TokensCubit, TokensState>(
-        builder: (context, tokensState) {
           return ScaffoldWrapper(
             isUpdate: true,
             builder: (
@@ -97,24 +91,6 @@ class _HomeScreenState extends State<HomeScreen>
               bool isFullScreen,
               TransactionState txState,
             ) {
-              if (state.status == WalletStatusList.loading ||
-                  tokensState.status == TokensStatusList.loading) {
-                return Container(
-                  child: Center(
-                    child: Loader(),
-                  ),
-                );
-              } else if (tokensState.status == TokensStatusList.failure) {
-                return Container(
-                  child: Center(
-                    child: ErrorPlaceholder(
-                      message: 'API error',
-                      description:
-                          'Please change the API on settings and try again',
-                    ),
-                  ),
-                );
-              } else {
                 return Scaffold(
                   appBar: NewMainAppBar(
                     isShowLogo: true,
@@ -187,8 +163,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                   SizedBox(
                                                     width: 12,
                                                   ),
-                                                  if (!SettingsHelper
-                                                      .isBitcoin())
+                                                  if (state.activeNetwork.isTokensPresent())
                                                     SizedBox(
                                                       width: 32,
                                                       height: 32,
@@ -263,11 +238,9 @@ class _HomeScreenState extends State<HomeScreen>
                     },
                   ),
                 );
-              }
+
             },
           );
-        },
-      );
     });
   }
 }

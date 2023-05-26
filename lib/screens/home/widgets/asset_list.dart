@@ -1,11 +1,7 @@
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/home/asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +14,7 @@ class AssetList extends StatelessWidget {
 
   TokensHelper tokenHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
+
 
   @override
   Widget build(BuildContext context) {

@@ -26,16 +26,17 @@ abstract class AbstractAccountModel {
   Map<String, dynamic> toJson();
 
   // Tokens
-  List<BalanceModel> getPinnedBalances(AbstractNetworkModel network) {
+  List<BalanceModel> getPinnedBalances(AbstractNetworkModel network, {bool mergeCoin = true }) {
     var balanceList = pinnedBalances[network.networkType.networkName.name] ?? [];
     List<BalanceModel> result = [];
+    //TODO: maybe need to move this to network models
     try {
       // TODO: maybe need rewrite here logic
       var dfiBalances = balanceList.where((element) {
         return element.token != null && element.token!.symbol == 'DFI';
       }).toList();
 
-      if (dfiBalances.length > 1) {
+      if (dfiBalances.length > 1 && mergeCoin) {
         var existingBalance = balanceList.where((element) {
           return element.token != null && element.token!.symbol != 'DFI';
         }).toList();

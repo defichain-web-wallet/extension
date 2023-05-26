@@ -543,7 +543,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   }) async {
     await _sendTransaction(
       context,
-      widget.token.symbol!,
+      widget.token,
       walletState,
       password,
       callbackOk: callbackOk,
@@ -552,7 +552,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
 
   Future _sendTransaction(
     context,
-    String token,
+    TokenModel token,
     WalletState walletState,
     String? password, {
     final Function()? callbackOk,
@@ -572,13 +572,6 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     //   );
     // }
     var network = walletState.applicationModel!.activeNetwork!;
-    var token = walletState.getBalances().lastWhere((element) {
-      if (element.token == null) {
-        return element.lmPool!.symbol == widget.token.symbol;
-      } else {
-        return element.token!.symbol == widget.token.symbol;
-      }
-    }).token!;
 
     txResponse = await network.send(
       account: walletState.activeAccount!,
@@ -629,7 +622,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
           callbackTryAgain: () async {
             await _sendTransaction(
               context,
-              widget.token.symbol!,
+              widget.token,
               walletState,
               password,
             );

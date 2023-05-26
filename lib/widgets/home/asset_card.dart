@@ -1,3 +1,4 @@
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
@@ -7,6 +8,7 @@ import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AssetCard extends StatefulWidget {
   final BalanceModel balanceModel;
@@ -24,8 +26,12 @@ class _AssetCardState extends State<AssetCard> {
   TokensHelper tokensHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 
-  String getFormatTokenBalance(double tokenBalance) =>
-      '${balancesHelper.numberStyling(tokenBalance)}';
+  String getFormatTokenBalance(int tokenBalance) {
+    WalletCubit homeCubit = BlocProvider.of<WalletCubit>(context);
+    var balance = homeCubit.state.activeNetwork.fromSatoshi(tokenBalance);
+    return '${balancesHelper.numberStyling(balance)}';
+  }
+
 
   String getFormatTokenBalanceByFiat(
       state, String coin, double tokenBalance, String fiat) {
@@ -46,7 +52,6 @@ class _AssetCardState extends State<AssetCard> {
 
   @override
   Widget build(BuildContext context) {
-    String currency = SettingsHelper.settings.currency!;
 var token = widget.balanceModel.lmPool ?? widget.balanceModel.token;
     return Container(
       height: 64,
@@ -118,7 +123,7 @@ var token = widget.balanceModel.lmPool ?? widget.balanceModel.token;
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    getFormatTokenBalance(convertFromSatoshi(widget.balanceModel.balance)),
+                    getFormatTokenBalance(widget.balanceModel.balance),
                     style: Theme.of(context).textTheme.headline6!.copyWith(
                           fontWeight: FontWeight.w700,
                         ),

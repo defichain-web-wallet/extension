@@ -232,8 +232,7 @@ class _SendScreenNewState extends State<SendScreenNew>
           builder: (context, state) {
             final walletCubit = BlocProvider.of<WalletCubit>(context);
             AbstractNetworkModel activeNetwork = walletCubit.getCurrentNetwork();
-            bool isBitcoin = activeNetwork.networkType.networkName == NetworkName.bitcoinTestnet ||
-                activeNetwork.networkType.networkName == NetworkName.bitcoinMainnet;
+
             TxCubit txCubit = BlocProvider.of<TxCubit>(context);
                   AddressBookCubit addressBookCubit =
                       BlocProvider.of<AddressBookCubit>(context);
@@ -387,7 +386,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       },
                                       available: state.availableBalance,
                                       // available: true,
-                                      isDisabledSelector: isBitcoin,
+                                      isDisabledSelector: !activeNetwork.isTokensPresent(),
                                       suffix: balanceInUsd ?? '0.00',
                                     // ?? getUsdBalance(context), //TODO: fix it
                                       onAssetSelect: (asset) async {
@@ -399,7 +398,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                     SizedBox(
                                       height: 16,
                                     ),
-                                    if (isBitcoin)
+                                    if (!activeNetwork.isTokensPresent())
                                       ...[
                                               Row(
                                         children: [

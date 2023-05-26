@@ -77,6 +77,8 @@ abstract class AbstractNetworkModel {
     String addressString,
   );
 
+  bool isTokensPresent();
+
   Future<List<BalanceModel>> getAllBalances({
     required String addressString,
   });

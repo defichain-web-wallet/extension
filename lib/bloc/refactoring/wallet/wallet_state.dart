@@ -12,8 +12,7 @@ class WalletState extends Equatable {
   });
 
   List<BalanceModel> getBalances() {
-    //TODO: add active network
-    List<BalanceModel> balances = this.applicationModel!.activeAccount!.getPinnedBalances(applicationModel!.networks.first);
+    List<BalanceModel> balances = this.applicationModel!.activeAccount!.getPinnedBalances(applicationModel!.activeNetwork!);
     return balances;
   }
 

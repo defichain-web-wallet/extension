@@ -154,7 +154,14 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       tokens: tokens
     );
 
-   return balanceList;
+    var balanceUtxo = await DFIBalanceRequests.getUTXOBalance(
+        network: this,
+        addressString: addressString,
+    );
+    balanceList.add(balanceUtxo);
+
+
+    return balanceList;
   }
 
   TokenModel getDefaultToken(){
@@ -168,19 +175,24 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     );
   }
 
+  bool isTokensPresent(){
+    return true;
+  }
+
   Future<double> getAvailableBalance({
     required AbstractAccountModel account,
     required TokenModel token,
     required TxType type,
   }) async {
-    List<BalanceModel> balances = account.getPinnedBalances(this);
+    List<BalanceModel> balances = account.getPinnedBalances(this, mergeCoin: false);
 
     if (token.symbol == 'DFI') {
-      BalanceModel tokenDFIBalance = await getBalanceUTXO(
+      //TODO: change names
+      BalanceModel coinDFIBalance = await getBalanceUTXO(
         balances,
         account.getAddress(this.networkType.networkName)!,
       );
-      BalanceModel coinDFIBalance = await getBalanceToken(
+      BalanceModel tokenDFIBalance = await getBalanceToken(
         balances,
         token,
         account.getAddress(this.networkType.networkName)!,
@@ -306,7 +318,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   ) async {
     late BalanceModel? balance;
     try {
-      balance = balances.firstWhere((element) => element.token!.compare(token));
+      balance = balances.firstWhere((element) => element.token!.compare(token) && !element.token!.isUTXO);
     } catch (_) {
       //if not exist in balances we check blockchain
       var tokens = await this.getAvailableTokens();
@@ -317,7 +329,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       );
       try {
         balance = balanceList.firstWhere(
-          (element) => element.token!.compare(token),
+          (element) => element.token!.compare(token) && !element.token!.isUTXO,
         );
       } catch (_) {
         //if in blockchain balance doesn't exist - we return 0
