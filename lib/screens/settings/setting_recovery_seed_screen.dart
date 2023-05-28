@@ -6,6 +6,7 @@ import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/common/jelly_link_text.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -48,10 +49,10 @@ class _SettingRecoverySeedScreenState extends State<SettingRecoverySeedScreen>
       ) {
         return Scaffold(
           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-          endDrawer: AccountDrawer(
+          endDrawer: isFullScreen ? null : AccountDrawer(
             width: buttonSmallWidth,
           ),
-          appBar: NewMainAppBar(
+          appBar: isFullScreen ? null : NewMainAppBar(
             isShowLogo: false,
           ),
           body: Container(
@@ -86,15 +87,9 @@ class _SettingRecoverySeedScreenState extends State<SettingRecoverySeedScreen>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              titleText,
-                              style: headline2.copyWith(
-                                  fontWeight: FontWeight.w700),
-                            )
-                          ],
+                        PageTitle(
+                          title: titleText,
+                          isFullScreen: isFullScreen,
                         ),
                         SizedBox(
                           height: 32,

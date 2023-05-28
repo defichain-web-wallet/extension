@@ -10,6 +10,7 @@ import 'package:defi_wallet/screens/address_book/delete_contact_dialog.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/address_book/contact_tile.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/address_book/last_sent_tile.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -75,10 +76,10 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
             }
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-              endDrawer: AccountDrawer(
+              endDrawer: isFullScreen ? null : AccountDrawer(
                 width: buttonSmallWidth,
               ),
-              appBar: NewMainAppBar(
+              appBar: isFullScreen ? null : NewMainAppBar(
                 isShowLogo: false,
               ),
               body: Container(
@@ -119,9 +120,9 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'Address Book',
-                                    style: headline3,
+                                  PageTitle(
+                                    title: 'Address Book',
+                                    isFullScreen: isFullScreen,
                                   ),
                                   MouseRegion(
                                     cursor: SystemMouseCursors.click,
