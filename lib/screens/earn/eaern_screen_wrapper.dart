@@ -9,6 +9,7 @@ import 'package:defi_wallet/screens/earn/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
@@ -132,14 +133,7 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
   stakingCallback() async {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     if (lockCubit.checkVerifiedUser(isCheckOnlyKycStatus: true)) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => StakingScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, StakingScreen());
     } else {
       if (lockCubit.checkValidKycLink()) {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
@@ -147,27 +141,15 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
         await lockCubit.loadKycDetails(accountCubit.state.accounts!.first);
         await lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
       }
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              StakingKycStartScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, StakingKycStartScreen());
     }
   }
 
   liquidityCallback(String avaragePairsAPR) {
-    Widget redirectTo = LiquidityScreenNew(averageARP: avaragePairsAPR);
-
-    Navigator.push(
+    NavigatorService.push(
       context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) => redirectTo,
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
+      LiquidityScreenNew(
+        averageARP: avaragePairsAPR,
       ),
     );
   }

@@ -16,11 +16,13 @@ import 'package:defi_wallet/screens/liquidity/liquidity_remove_screen.dart';
 import 'package:defi_wallet/screens/swap/swap_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/lock_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -125,7 +127,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                     )}';
                     return Scaffold(
                       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                      endDrawer: AccountDrawer(
+                      endDrawer: isFullScreen ? null : AccountDrawer(
                         width: buttonSmallWidth,
                       ),
                       appBar: NewMainAppBar(
@@ -169,14 +171,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            titleText,
-                                            style: headline2.copyWith(
-                                                fontWeight: FontWeight.w700),
-                                          )
-                                        ],
+                                      PageTitle(
+                                        title: titleText,
+                                        isFullScreen: isFullScreen,
                                       ),
                                       SizedBox(
                                         height: 8,
@@ -923,16 +920,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
 
               transactionCubit.setOngoingTransaction(txResponse);
             }
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) => HomeScreen(
-                  isLoadTokens: true,
-                ),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
+            NavigatorService.pushReplacement(context, null);
           },
           callbackTryAgain: () async {
             print('TryAgain');
@@ -983,16 +971,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) => HomeScreen(
-                  isLoadTokens: true,
-                ),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
+            NavigatorService.pushReplacement(context, null);
           },
           callbackTryAgain: () async {
             print('TryAgain');

@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_kyc_mobile_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -45,13 +46,13 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
           builder: (lockContext, lockState) {
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-              endDrawer: AccountDrawer(
+              endDrawer: isFullScreen ? null : AccountDrawer(
                 width: buttonSmallWidth,
               ),
-              appBar: NewMainAppBar(
+              appBar: isFullScreen ? null : NewMainAppBar(
                 bgColor: AppColors.viridian.withOpacity(0.16),
-                isShowLogo: false,
                 isShowNetworkSelector: false,
+                isShowLogo: false,
               ),
               body: Container(
                 decoration:
@@ -230,17 +231,11 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                             NewPrimaryButton(
                               callback: () {
                                 if (isMobile) {
-                                  Navigator.push(
+                                  NavigatorService.push(
                                     context,
-                                    PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                              StakingKycMobileScreen(
-                                        kycLink:
-                                            lockState.lockUserDetails!.kycLink!,
-                                      ),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
+                                    StakingKycMobileScreen(
+                                      kycLink:
+                                          lockState.lockUserDetails!.kycLink!,
                                     ),
                                   );
                                 } else {

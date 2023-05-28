@@ -1,19 +1,17 @@
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NavigatorService {
-  static void push(BuildContext context, Widget widget) {
+  static void push(BuildContext context, Widget? widget) {
     HomeCubit homeCubit = _getHomeCubit(context);
 
     if (_isFullScreen(context)) {
       homeCubit.updateScrollView(widget: widget);
     } else {
-      Navigator.push(
-        context,
-        _pageRouteBuilder(widget),
-      );
+      _provideDefaultNavigator(context, widget);
     }
   }
 
@@ -23,10 +21,7 @@ class NavigatorService {
     if (_isFullScreen(context)) {
       homeCubit.updateScrollView(widget: widget);
     } else {
-      Navigator.pushReplacement(
-        context,
-        _pageRouteBuilder(widget!),
-      );
+      _provideDefaultNavigator(context, widget);
     }
   }
 
@@ -37,6 +32,25 @@ class NavigatorService {
       homeCubit.updateScrollView(widget: null);
     } else {
       Navigator.of(context).pop();
+    }
+  }
+
+  static Widget _getHomeWidget() => HomeScreen(
+    isLoadTokens: true,
+  );
+
+  static void _provideDefaultNavigator(BuildContext context, Widget? widget) {
+    if (widget != null) {
+      Navigator.push(
+        context,
+        _pageRouteBuilder(widget),
+      );
+    } else {
+      Widget homeWidget = _getHomeWidget();
+      Navigator.push(
+        context,
+        _pageRouteBuilder(homeWidget),
+      );
     }
   }
 
