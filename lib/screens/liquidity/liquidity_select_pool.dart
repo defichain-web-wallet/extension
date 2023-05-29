@@ -8,12 +8,14 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -129,12 +131,12 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
       TransactionState transactionState,
     ) {
       return Scaffold(
-        appBar: NewMainAppBar(
-          isShowLogo: false,
-        ),
         drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-        endDrawer: AccountDrawer(
+        endDrawer: isFullScreen ? null : AccountDrawer(
           width: buttonSmallWidth,
+        ),
+        appBar: isFullScreen ? null : NewMainAppBar(
+          isShowLogo: false,
         ),
         body: Container(
           padding: EdgeInsets.only(
@@ -158,13 +160,13 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
               topLeft: Radius.circular(20),
             ),
           ),
-          child: _buildBody(context, transactionState),
+          child: _buildBody(context, transactionState, isFullScreen),
         ),
       );
     });
   }
 
-  Widget _buildBody(context, transactionState, {isFullSize = false}) {
+  Widget _buildBody(context, transactionState, isFullScreen) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
     return BlocBuilder<TokensCubit, TokensState>(
@@ -208,9 +210,9 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Set the amount',
-                            style: Theme.of(context).textTheme.headline3,
+                          PageTitle(
+                            title: 'Set the amount',
+                            isFullScreen: isFullScreen,
                           ),
                           SizedBox(
                             height: 16,
@@ -468,7 +470,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                               title: 'Cancel',
                               isPrimary: false,
                               callback: () {
-                                Navigator.of(context).pop();
+                                NavigatorService.pop(context);
                               },
                             ),
                           ),
@@ -496,38 +498,26 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                                       : () {
                                           if (transactionState
                                               is! TransactionLoadingState) {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    LiquidityConfirmation(
-                                                        assetPair:
-                                                            widget.assetPair,
-                                                        baseAmount: double.parse(
-                                                            _amountBaseController
-                                                                .text
-                                                                .replaceAll(
-                                                                    ',', '.')),
-                                                        quoteAmount: double.parse(
-                                                            _amountQuoteController
-                                                                .text
-                                                                .replaceAll(
-                                                                    ',', '.')),
-                                                        shareOfPool:
-                                                            shareOfPool,
-                                                        amountUSD: amountUSD,
-                                                        balanceUSD: balanceUSD,
-                                                        balanceA: balanceA,
-                                                        balanceB: balanceB,
-                                                        amount: amount),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
+                                            NavigatorService.push(context, LiquidityConfirmation(
+                                                assetPair:
+                                                widget.assetPair,
+                                                baseAmount: double.parse(
+                                                    _amountBaseController
+                                                        .text
+                                                        .replaceAll(
+                                                        ',', '.')),
+                                                quoteAmount: double.parse(
+                                                    _amountQuoteController
+                                                        .text
+                                                        .replaceAll(
+                                                        ',', '.')),
+                                                shareOfPool:
+                                                shareOfPool,
+                                                amountUSD: amountUSD,
+                                                balanceUSD: balanceUSD,
+                                                balanceA: balanceA,
+                                                balanceB: balanceB,
+                                                amount: amount));
                                           } else {
                                             showSnackBar(
                                               context,

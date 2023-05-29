@@ -8,12 +8,14 @@ import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair_details.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -78,12 +80,12 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
         TransactionState transactionState,
       ) {
         return Scaffold(
-          appBar: NewMainAppBar(
-            isShowLogo: false,
-          ),
           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-          endDrawer: AccountDrawer(
+          endDrawer: isFullScreen ? null : AccountDrawer(
             width: buttonSmallWidth,
+          ),
+          appBar: isFullScreen ? null : NewMainAppBar(
+            isShowLogo: false,
           ),
           body: Container(
             padding: EdgeInsets.only(
@@ -107,14 +109,14 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                 topLeft: Radius.circular(20),
               ),
             ),
-            child: _buildBody(context, transactionState),
+            child: _buildBody(context, transactionState, isFullScreen),
           ),
         );
       },
     );
   }
 
-  Widget _buildBody(context, transactionState) {
+  Widget _buildBody(context, transactionState, isFullScreen) {
     double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
     return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
       return BlocBuilder<TokensCubit, TokensState>(
@@ -130,9 +132,9 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Summary',
-                          style: Theme.of(context).textTheme.headline3,
+                        PageTitle(
+                          title: 'Summary',
+                          isFullScreen: isFullScreen,
                         ),
                         SizedBox(
                           height: 16,
@@ -492,7 +494,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                             title: 'Cancel',
                             isPrimary: false,
                             callback: () {
-                              Navigator.of(context).pop();
+                              NavigatorService.pop(context);
                             },
                           ),
                         ),
@@ -625,16 +627,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
               if (callbackOk != null) {
                 callbackOk();
               }
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) => HomeScreen(
-                    isLoadTokens: true,
-                  ),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ),
-              );
+              NavigatorService.pushReplacement(context, null);
             },
             callbackTryAgain: () async {
               await submitLiquidityAction(

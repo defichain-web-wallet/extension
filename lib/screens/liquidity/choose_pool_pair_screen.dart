@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_select_pool.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/liquidity/pool_asset_pair.dart';
@@ -62,10 +63,10 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
 
                 return Scaffold(
                   drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                  endDrawer: AccountDrawer(
+                  endDrawer: isFullScreen ? null : AccountDrawer(
                     width: buttonSmallWidth,
                   ),
-                  appBar: NewMainAppBar(
+                  appBar: isFullScreen ? null : NewMainAppBar(
                     isShowLogo: false,
                     callback: ()=>tokensCubit.search(tokensState.tokens, ''),
                   ),
@@ -258,21 +259,11 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                               hoverColor: Colors.transparent,
                                               splashColor: Colors.transparent,
                                               onTap: () async {
-                                                Navigator.push(
+                                                NavigatorService.push(
                                                   context,
-                                                  PageRouteBuilder(
-                                                    pageBuilder: (context,
-                                                            animation1,
-                                                            animation2) =>
-                                                        LiquiditySelectPool(
-                                                      assetPair:
-                                                          availableTokens[
-                                                              index],
-                                                    ),
-                                                    transitionDuration:
-                                                        Duration.zero,
-                                                    reverseTransitionDuration:
-                                                        Duration.zero,
+                                                  LiquiditySelectPool(
+                                                    assetPair:
+                                                        availableTokens[index],
                                                   ),
                                                 );
                                               },
@@ -300,21 +291,19 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                                   splashColor:
                                                       Colors.transparent,
                                                   onTap: () async {
-                                                    Navigator.push(
-                                                      context,
-                                                      PageRouteBuilder(
-                                                        pageBuilder: (context,
-                                                                animation1,
-                                                                animation2) =>
-                                                            LiquiditySelectPool(
+                                                    NavigatorService.push(context,
+                                                        LiquiditySelectPool(
                                                           assetPair:
-                                                              availableTokens[
-                                                                  index],
-                                                        ),
-                                                        transitionDuration:
-                                                            Duration.zero,
-                                                        reverseTransitionDuration:
-                                                            Duration.zero,
+                                                          availableTokens[
+                                                          index],
+                                                        )
+                                                    );
+                                                    NavigatorService.push(
+                                                      context,
+                                                      LiquiditySelectPool(
+                                                        assetPair:
+                                                            availableTokens[
+                                                                index],
                                                       ),
                                                     );
                                                   },
