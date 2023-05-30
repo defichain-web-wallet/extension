@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
@@ -79,8 +80,11 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+    RatesCubit ratesCubit = BlocProvider.of<RatesCubit>(context);
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     if (widget.isLoadTokens) {
       tokensCubit.loadTokensFromStorage();
+      ratesCubit.loadTokensFromStorage(walletCubit.state.activeNetwork);
     }
 
     return BlocBuilder<WalletCubit, WalletState>(builder: (context, state) {

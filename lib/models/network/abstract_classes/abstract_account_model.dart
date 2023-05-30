@@ -1,6 +1,5 @@
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
-import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 
@@ -40,6 +39,9 @@ abstract class AbstractAccountModel {
         var existingBalance = balanceList.where((element) {
           return element.token != null && element.token!.symbol != 'DFI';
         }).toList();
+        var existingPairs = balanceList.where((element) {
+          return element.lmPool != null;
+        }).toList();
         result = [
           BalanceModel(
             balance: dfiBalances[0].balance + dfiBalances[1].balance,
@@ -47,6 +49,7 @@ abstract class AbstractAccountModel {
             lmPool: dfiBalances[0].lmPool,
           ),
           ...existingBalance,
+          ...existingPairs,
         ];
       } else {
         result = balanceList;
