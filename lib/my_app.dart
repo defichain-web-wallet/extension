@@ -8,6 +8,7 @@ import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/network/network_cubit.dart';
 import 'package:defi_wallet/bloc/ramp/ramp_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/transaction/tx_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/theme/theme_cubit.dart';
@@ -40,6 +41,7 @@ class App extends StatelessWidget {
         BlocProvider<RampCubit>(create: (context) => RampCubit()),
         BlocProvider<WalletCubit>(create: (context) => WalletCubit()),
         BlocProvider<TxCubit>(create: (context) => TxCubit()),
+        BlocProvider<ExchangeCubit>(create: (context) => ExchangeCubit()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

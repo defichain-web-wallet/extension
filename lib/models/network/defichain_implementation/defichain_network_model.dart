@@ -154,13 +154,6 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       tokens: tokens
     );
 
-    var balanceUtxo = await DFIBalanceRequests.getUTXOBalance(
-        network: this,
-        addressString: addressString,
-    );
-    balanceList.add(balanceUtxo);
-
-
     return balanceList;
   }
 
@@ -318,7 +311,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   ) async {
     late BalanceModel? balance;
     try {
-      balance = balances.firstWhere((element) => element.token!.compare(token) && !element.token!.isUTXO);
+      //TODO: add filter by token or pair
+      balance = balances.where((element) => element.token != null).firstWhere((element) => element.token!.compare(token) && !element.token!.isUTXO);
     } catch (_) {
       //if not exist in balances we check blockchain
       var tokens = await this.getAvailableTokens();
@@ -328,7 +322,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
           tokens: tokens
       );
       try {
-        balance = balanceList.firstWhere(
+        //TODO: add filter by token or pair
+        balance = balanceList.where((element) => element.token != null).firstWhere(
           (element) => element.token!.compare(token) && !element.token!.isUTXO,
         );
       } catch (_) {

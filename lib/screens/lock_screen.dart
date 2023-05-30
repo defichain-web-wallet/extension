@@ -140,7 +140,7 @@ class _LockScreenState extends State<LockScreen> {
     });
     var applicationModel = await StorageService.loadApplication();
 
-    if (Crypt(applicationModel.password).match(_passwordController.text)) {
+    if (applicationModel.validatePassword(_passwordController.text)) {
       setState(() {
         isValid = true;
         _formKey.currentState!.validate();
