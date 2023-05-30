@@ -34,17 +34,17 @@ class DefichainExchangeModel extends AbstractExchangeModel {
     ECPair keypair =
         await network.getKeypair(password, account, applicationModel);
 
-    List<BalanceModel> balances = account.getPinnedBalances(network);
-
+    List<BalanceModel> balances = account.getPinnedBalances(network, mergeCoin: false);
+    var utxoBalance = balances.firstWhere(
+          (element) => element.token!.symbol == 'DFI' && !element.token!.isUTXO,
+    );
     return DFITransactionService().createAndSendSwap(
       senderAddress: account.getAddress(network.networkType.networkName)!,
       network: DefichainNetworkModel(network.networkType),
       tokenFrom: fromToken,
       tokenTo: toToken,
       keyPair: keypair,
-      balanceDFIToken: balances.firstWhere(
-        (element) => element.token!.name == 'DFI' && !element.token!.isUTXO,
-      ),
+      balanceDFIToken: utxoBalance,
       amountFrom: network.toSatoshi(amountFrom),
       amountTo: network.toSatoshi(amountTo),
     );

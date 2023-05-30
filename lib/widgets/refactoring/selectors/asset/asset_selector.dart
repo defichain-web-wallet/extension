@@ -49,7 +49,7 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
         width: selectedAsset!.isPair ? 130 : 100,
         height: 38,
         child: AssetHeaderSelector(
-          assetCode: selectedAsset.displaySymbol,
+          assetCode: selectedAsset.symbol,
           isShown: _isShowDropdown && !widget.isDisabled,
         ),
       ),

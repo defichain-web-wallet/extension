@@ -5,12 +5,14 @@ class ExchangePairModel {
   TokenModel base;
   TokenModel quote;
   double ratio;
+  double ratioReverse;
   bool isBidirectional;
 
   ExchangePairModel({
     required this.base,
     required this.quote,
     required this.ratio,
+    required this.ratioReverse,
     this.isBidirectional = true,
   });
 
@@ -23,6 +25,8 @@ class ExchangePairModel {
       quote: TokenModel.fromJSON(json['tokenB'], networkName: networkName),
       ratio: double.parse(json['tokenA']['reserve']) /
           double.parse(json['tokenB']['reserve']),
+      ratioReverse: double.parse(json['tokenB']['reserve']) /
+          double.parse(json['tokenA']['reserve']),
     );
   }
 

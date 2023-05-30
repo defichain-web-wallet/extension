@@ -10,9 +10,13 @@ class DFIExchangeRequests {
     required NetworkTypeModel networkType,
   }) async {
     final query = {
-      'size': 200,
-      'next': next ?? '',
+      'size': '200',
+      // 'next': next ?? '',
     };
+
+    if (next != null) {
+      query['next'] = next;
+    }
 
     //TODO: add fallback url
     final Uri url = Uri.https(
@@ -27,7 +31,7 @@ class DFIExchangeRequests {
       if (response.statusCode == 200) {
         dynamic json = jsonDecode(response.body);
         List<ExchangePairModel> pairs =
-            ExchangePairModel.fromJSONList(json, networkType.networkName);
+            ExchangePairModel.fromJSONList(json['data'], networkType.networkName);
         if (json['page'] != null) {
           var nextTokenList = await getExchangePairs(
             next: json['page']['next'],

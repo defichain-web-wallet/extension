@@ -29,7 +29,7 @@ class TokenModel {
   }
 
   bool compare(TokenModel otherToken) {
-    return this.id == otherToken.id &&
+    return
         this.networkName == otherToken.networkName &&
         this.name == otherToken.name;
   }
@@ -42,6 +42,7 @@ class TokenModel {
       id: json['id'],
       symbol: json['symbol'],
       name: json['name'],
+      isUTXO: json['isUTXO'] ?? false,
       displaySymbol: json['displaySymbol'],
       networkName: networkName ?? NetworkName.values.firstWhere(
         (value) => value.toString() == json['networkName'],
@@ -68,6 +69,7 @@ class TokenModel {
       'name': this.name,
       'displaySymbol': this.displaySymbol,
       'networkName': this.networkName.toString(),
+      'isUTXO': this.isUTXO
     };
   }
 

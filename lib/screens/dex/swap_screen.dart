@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -117,77 +118,95 @@ class _SwapScreenState extends State<SwapScreen> {
       BlocBuilder<DexCubit, DexState>(builder: (dexContext, dexState) {
         DexCubit dexCubit = BlocProvider.of<DexCubit>(dexContext);
         BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-        return BlocBuilder<AccountCubit, AccountState>(
-            builder: (accountContext, accountState) {
-          if (accountState.activeToken!.contains('-')) {
-            assetFrom = TokensHelper.DefiAccountSymbol;
-          }
-          return BlocBuilder<TokensCubit, TokensState>(
-              builder: (tokensContext, tokensState) {
-            if (tokensState.status == TokensStatusList.success) {
-              if (accountState.status == AccountStatusList.success) {
-                stateInit(accountState, dexState, tokensState);
-                if (dexState is DexLoadedState) {
-                  dexInit(dexState);
+        return BlocBuilder<ExchangeCubit, ExchangeState>(
+            builder: (exchangeContext, accountState)
+        {
+          return BlocBuilder<AccountCubit, AccountState>(
+              builder: (accountContext, accountState) {
+                if (accountState.activeToken!.contains('-')) {
+                  assetFrom = TokensHelper.DefiAccountSymbol;
                 }
-                if (iteratorUpdate == 0) {
-                  iteratorUpdate++;
-                  accountFrom = accountState.accounts![0];
-                  accountTo = accountState.accounts![0];
-                  bitcoinCubit
-                      .loadAvailableBalance(accountFrom.bitcoinAddress!);
-                  dexCubit.updateDex(assetFrom, assetTo, 0, 0, address,
-                      accountState.activeAccount!.addressList!, tokensState);
-                }
-              }
-            }
-            return BlocBuilder<TransactionCubit, TransactionState>(
-              builder: (context, transactionState) => ScaffoldConstrainedBox(
-                child: GestureDetector(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    if (constraints.maxWidth < ScreenSizes.medium) {
-                      return Scaffold(
-                        appBar: MainAppBar(
-                          title: 'Swap',
-                          hideOverlay: () => hideOverlay(),
-                          isShowBottom:
-                              !(transactionState is TransactionInitialState),
-                          height: !(transactionState is TransactionInitialState)
-                              ? toolbarHeightWithBottom
-                              : toolbarHeight,
-                          action: Container(),
-                        ),
-                        body: _buildBody(context, dexState, dexCubit,
-                            accountState, tokensState, transactionState),
+                return BlocBuilder<TokensCubit, TokensState>(
+                    builder: (tokensContext, tokensState) {
+                      if (tokensState.status == TokensStatusList.success) {
+                        if (accountState.status == AccountStatusList.success) {
+                          stateInit(accountState, dexState, tokensState);
+                          if (dexState is DexLoadedState) {
+                            dexInit(dexState);
+                          }
+                          if (iteratorUpdate == 0) {
+                            iteratorUpdate++;
+                            accountFrom = accountState.accounts![0];
+                            accountTo = accountState.accounts![0];
+                            bitcoinCubit
+                                .loadAvailableBalance(
+                                accountFrom.bitcoinAddress!);
+                            dexCubit.updateDex(
+                                assetFrom,
+                                assetTo,
+                                0,
+                                0,
+                                address,
+                                accountState.activeAccount!.addressList!,
+                                tokensState);
+                          }
+                        }
+                      }
+                      return BlocBuilder<TransactionCubit, TransactionState>(
+                        builder: (context, transactionState) =>
+                            ScaffoldConstrainedBox(
+                              child: GestureDetector(
+                                child: LayoutBuilder(builder: (context,
+                                    constraints) {
+                                  if (constraints.maxWidth <
+                                      ScreenSizes.medium) {
+                                    return Scaffold(
+                                      appBar: MainAppBar(
+                                        title: 'Swap',
+                                        hideOverlay: () => hideOverlay(),
+                                        isShowBottom:
+                                        !(transactionState is TransactionInitialState),
+                                        height: !(transactionState is TransactionInitialState)
+                                            ? toolbarHeightWithBottom
+                                            : toolbarHeight,
+                                        action: Container(),
+                                      ),
+                                      body: _buildBody(
+                                          context, dexState, dexCubit,
+                                          accountState, tokensState,
+                                          transactionState),
+                                    );
+                                  } else {
+                                    return Container(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: Scaffold(
+                                        body: _buildBody(
+                                            context, dexState, dexCubit,
+                                            accountState, tokensState,
+                                            transactionState,
+                                            isCustomBgColor: true),
+                                        appBar: MainAppBar(
+                                          title: 'Swap',
+                                          hideOverlay: () => hideOverlay(),
+                                          isShowBottom:
+                                          !(transactionState is TransactionInitialState),
+                                          height:
+                                          !(transactionState is TransactionInitialState)
+                                              ? toolbarHeightWithBottom
+                                              : toolbarHeight,
+                                          isSmall: true,
+                                          action: Container(),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }),
+                                onTap: () => hideOverlay(),
+                              ),
+                            ),
                       );
-                    } else {
-                      return Container(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Scaffold(
-                          body: _buildBody(context, dexState, dexCubit,
-                              accountState, tokensState, transactionState,
-                              isCustomBgColor: true),
-                          appBar: MainAppBar(
-                            title: 'Swap',
-                            hideOverlay: () => hideOverlay(),
-                            isShowBottom:
-                                !(transactionState is TransactionInitialState),
-                            height:
-                                !(transactionState is TransactionInitialState)
-                                    ? toolbarHeightWithBottom
-                                    : toolbarHeight,
-                            isSmall: true,
-                            action: Container(),
-                          ),
-                        ),
-                      );
-                    }
-                  }),
-                  onTap: () => hideOverlay(),
-                ),
-              ),
-            );
-          });
+                    });
+              });
         });
       });
 

@@ -19,6 +19,13 @@ class WalletCubit extends Cubit<WalletState> {
 
   WalletState get walletState => state;
 
+  int toSatoshi(double value){
+    return state.activeNetwork.toSatoshi(value);
+  }
+  double fromSatoshi(int value){
+    return state.activeNetwork.fromSatoshi(value);
+  }
+
   createWallet(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: WalletStatusList.loading));
     var seed = mnemonicToSeed(mnemonic.join(' '));
@@ -130,10 +137,14 @@ class WalletCubit extends Cubit<WalletState> {
     }
   }
 
+  bool validatePassword(String password) {
+    return state.applicationModel!.validatePassword(password);
+  }
+
   changeActiveNetwork(AbstractNetworkModel network) async {
     ApplicationModel applicationModel = ApplicationModel(
       sourceList: state.applicationModel!.sourceList,
-      password: state.applicationModel!.password,
+      encryptedPassword: state.applicationModel!.password,
       activeAccount: state.applicationModel!.activeAccount,
       accounts: state.applicationModel!.accounts,
       activeNetwork: network,
