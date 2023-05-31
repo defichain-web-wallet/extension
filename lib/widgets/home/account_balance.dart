@@ -33,7 +33,9 @@ class _AccountBalanceState extends State<AccountBalance> {
               try {
                 List<BalanceModel> balances = state.getBalances();
                 totalBalance = ratesState.getTotalAmount(
+                  state.activeNetwork,
                   balances,
+                  convertToken: state.activeToken.symbol,
                 );
               } catch (_) {
                 totalBalance = 0.00;

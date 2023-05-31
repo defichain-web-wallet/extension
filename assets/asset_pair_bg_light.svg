@@ -1,6 +1,6 @@
 <svg width="54" height="34" viewBox="0 0 54 34" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
-        <filter id="filter0_b_2421_23355" x="-4" y="-4" width="62" height="42"
+        <filter id="asset_pair_bg_light" x="-4" y="-4" width="62" height="42"
             filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
             <feFlood flood-opacity="0" result="BackgroundImageFix" />
             <feGaussianBlur in="BackgroundImageFix" stdDeviation="2" />
@@ -10,7 +10,7 @@
                 result="shape" />
         </filter>
     </defs>
-    <g filter="url(#filter0_b_2421_23355)">
+    <g filter="url(#asset_pair_bg_light)">
         <path
             d="M29.4998 32.2558C27.9414 31.4859 26.0741 31.4858 24.5151 32.2547C22.2491 33.3723 19.6972 34 17 34C7.61133 34 0 26.3906 0 17C0 7.60938 7.61133 0 17 0C19.6972 0 22.2491 0.627674 24.5151 1.74533C26.0741 2.51421 27.9414 2.51407 29.4998 1.74419C31.7608 0.627246 34.3038 0 37 0C46.3887 0 54 7.60938 54 17C54 26.3906 46.3887 34 37 34C34.3038 34 31.7608 33.3728 29.4998 32.2558Z"
             fill="#A1C7FF" fill-opacity="0.57" />

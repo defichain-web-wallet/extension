@@ -20,14 +20,28 @@ class RatesState extends Equatable {
         poolPairs,
       ];
 
+  double convertAmountBalance(
+    AbstractNetworkModel networkModel,
+    BalanceModel balanceModel, {
+    String convertToken = 'USDT',
+  }) {
+    double amount = networkModel.fromSatoshi(balanceModel.balance);
+    if (balanceModel.token != null) {
+      return getAmountByToken(amount, balanceModel.token!);
+    } else {
+      return getPoolPairsByToken(balanceModel.balance, balanceModel.lmPool!);
+    }
+  }
+
   double getTotalAmount(
+    AbstractNetworkModel networkModel,
     List<BalanceModel> balances, {
     String convertToken = 'USDT',
   }) {
     return balances.map<double>((e) {
       if (e.token != null) {
         return getAmountByToken(
-          convertFromSatoshi(e.balance),
+          networkModel.fromSatoshi(e.balance),
           e.token!,
           convertToken: convertToken,
         );
@@ -55,6 +69,8 @@ class RatesState extends Equatable {
       if (token.symbol == 'DFI') {
         return assetPair.reserveADivReserveB! * amount;
       }
+
+      // TODO: convert to DUSD doesn't work correctly. Need to check later
       AssetPairModel targetPair = this.poolPairs!.firstWhere((item) {
         return item.tokenA == token.symbol &&
             (item.tokenB == 'DFI' || item.tokenB == 'DUSD');

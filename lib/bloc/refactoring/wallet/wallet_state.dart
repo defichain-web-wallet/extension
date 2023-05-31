@@ -18,6 +18,8 @@ class WalletState extends Equatable {
 
   String get activeAddress => this.applicationModel!.activeAccount!.getAddress(this.applicationModel!.activeNetwork!.networkType.networkName)!;
 
+  TokenModel get activeToken => this.applicationModel!.activeToken!;
+
   AbstractNetworkModel get activeNetwork =>
       this.applicationModel!.activeNetwork!;
 
