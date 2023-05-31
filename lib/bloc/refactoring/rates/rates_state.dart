@@ -81,7 +81,7 @@ class RatesState extends Equatable {
 
       double result;
       if (targetPair.tokenB == 'DUSD') {
-        result = (dfiByToken * amount);
+        result = (dfiByConvertToken * amount);
         return result;
       } else {
         double result = (dfiByToken * amount) * dfiByConvertToken;
