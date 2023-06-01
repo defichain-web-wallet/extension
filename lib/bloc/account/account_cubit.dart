@@ -57,7 +57,7 @@ class AccountCubit extends Cubit<AccountState> {
 
     var box = await Hive.openBox(HiveBoxes.client);
     var encryptMnemonic =
-    EncryptHelper.getEncryptedData(mnemonic.join(','), password);
+        EncryptHelper.getEncryptedData(mnemonic.join(','), password);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     var encryptedPassword = Crypt.sha256(password).toString();
     await box.put(HiveNames.password, encryptedPassword);
@@ -82,7 +82,7 @@ class AccountCubit extends Cubit<AccountState> {
         masterKeyPairTestnet.chainCode,
         networkHelper.getNetworkType('bitcoin'));
     final masterKeyPairMainnet =
-    hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
+        hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
     final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(
         masterKeyPairMainnet.publicKey,
         masterKeyPairMainnet.chainCode,
@@ -197,7 +197,7 @@ class AccountCubit extends Cubit<AccountState> {
 
         if (mnemonic != null) {
           var encryptMnemonic =
-          EncryptHelper.getEncryptedData(mnemonic.join(','), password);
+              EncryptHelper.getEncryptedData(mnemonic.join(','), password);
           await box.put(HiveNames.savedMnemonic, encryptMnemonic);
         }
       }
@@ -828,6 +828,7 @@ class AccountCubit extends Cubit<AccountState> {
     await box.put(HiveNames.kycStatus, 'show');
     await box.put(HiveNames.tutorialStatus, 'show');
     await box.close();
+
     SettingsHelper settingsHelper = SettingsHelper();
 
     settingsHelper.initSetting();

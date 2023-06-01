@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
@@ -148,13 +149,13 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
   Future restoreWallet() async {
     await init();
     try {
-      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-      await accountCubit.restoreLedgerAccount(SettingsHelper.settings.network,
+      WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+      await walletCubit.restoreLedgerAccount(SettingsHelper.settings.network!,
           (need, restored) {
         getStatusText(widget.currentStatus, need, restored);
       });
 
-      widget.callback!();
+      widget.callback();
     } on Exception catch (error) {
       print(error);
       await showDialog(
@@ -186,7 +187,7 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
       });
     }
     if (currentStatus == 'third-step' && need == restored) {
-      widget.callback!();
+      widget.callback();
     }
   }
 }

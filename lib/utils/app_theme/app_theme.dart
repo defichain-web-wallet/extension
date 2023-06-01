@@ -55,10 +55,7 @@ class AppTheme {
       cardColor: Colors.white,
       backgroundColor: Colors.white,
       secondaryHeaderColor: lightGreyColor,
-      colorScheme: ColorScheme.light(
-        primary: pinkColor,
-        primaryVariant: pinkColor,
-      ),
+      colorScheme: ColorScheme.light(primary: pinkColor),
       iconTheme: IconThemeData(
         color: Colors.black,
       ),
@@ -170,10 +167,7 @@ class AppTheme {
       selectedRowColor: Color(0xFF1C1D1F),
       shadowColor: Colors.transparent,
       cardColor: Color(0xff333436),
-      colorScheme: ColorScheme.dark(
-        primary: pinkColor,
-        primaryVariant: pinkColor,
-      ),
+      colorScheme: ColorScheme.dark(primary: pinkColor),
       iconTheme: IconThemeData(
         color: Colors.white,
       ),

@@ -103,7 +103,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
     TokensState tokensState = BlocProvider.of<TokensCubit>(context).state;
     _focusBase.addListener(onFocusBaseField);
     _focusQuote.addListener(onFocusQuoteField);
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _setShareOfPool();
       _setAmount(tokensState);
     });
@@ -671,7 +671,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
       double reserve,
       state,
       tokensState) {
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         int balance = state.activeAccount!.balanceList!
             .firstWhere((el) => el.token! == asset)

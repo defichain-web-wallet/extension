@@ -14,10 +14,7 @@ ThemeData createLightTheme() {
     cardColor: Colors.white,
     backgroundColor: LightColors.cardColor,
     secondaryHeaderColor: AppColors.lightGreyColor,
-    colorScheme: ColorScheme.light(
-      primary: AppColors.pinkColor,
-      primaryVariant: AppColors.pinkColor,
-    ),
+    colorScheme: ColorScheme.light(primary: AppColors.pinkColor),
     iconTheme: IconThemeData(
       color: Colors.black,
     ),

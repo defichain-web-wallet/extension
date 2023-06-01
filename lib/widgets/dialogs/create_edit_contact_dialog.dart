@@ -126,7 +126,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                 callback: isEnable
                     ? () async {
                         network = await addressNetwork(_addressController.text);
-                        widget.confirmCallback!(
+                        widget.confirmCallback(
                           _nameController.text,
                           _addressController.text,
                           network,
@@ -273,7 +273,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                     checkButtonStatus();
                                   },
                                   onFieldSubmitted: (val) {
-                                    if(widget.isDisableEditAddress) {
+                                    if (widget.isDisableEditAddress) {
                                       submitFocusNode.requestFocus();
                                     } else {
                                       addressFocusNode.requestFocus();

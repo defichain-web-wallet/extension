@@ -29,7 +29,7 @@ class _TickerTextState extends State<TickerText> {
   @override
   void initState() {
     scrollController = ScrollController(initialScrollOffset: 0.0);
-    WidgetsBinding.instance!.addPostFrameCallback(scroll);
+    WidgetsBinding.instance.addPostFrameCallback(scroll);
     super.initState();
   }
 
@@ -50,19 +50,24 @@ class _TickerTextState extends State<TickerText> {
 
   void scroll(_) async {
     while (scrollController.hasClients) {
-      await Future.delayed(widget.isSpecialDuration ? pauseDuration : widget.pauseDuration);
+      await Future.delayed(
+          widget.isSpecialDuration ? pauseDuration : widget.pauseDuration);
       if (scrollController.hasClients) {
         await scrollController.animateTo(
           scrollController.position.maxScrollExtent,
-          duration: widget.isSpecialDuration ? animationDuration : widget.animationDuration,
+          duration: widget.isSpecialDuration
+              ? animationDuration
+              : widget.animationDuration,
           curve: Curves.ease,
         );
       }
-      await Future.delayed(widget.isSpecialDuration ? pauseDuration : widget.pauseDuration);
+      await Future.delayed(
+          widget.isSpecialDuration ? pauseDuration : widget.pauseDuration);
       if (scrollController.hasClients) {
         await scrollController.animateTo(
           0.0,
-          duration: widget.isSpecialDuration ? backDuration : widget.backDuration,
+          duration:
+              widget.isSpecialDuration ? backDuration : widget.backDuration,
           curve: Curves.easeOut,
         );
       }

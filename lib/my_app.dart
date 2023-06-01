@@ -28,7 +28,8 @@ class App extends StatelessWidget {
         BlocProvider<AuthBloc>(create: (context) => AuthBloc()),
         BlocProvider<AddressBookCubit>(create: (context) => AddressBookCubit()),
         BlocProvider<AccountCubit>(create: (context) => AccountCubit()),
-        BlocProvider<AvailableAmountCubit>(create: (context) => AvailableAmountCubit()),
+        BlocProvider<AvailableAmountCubit>(
+            create: (context) => AvailableAmountCubit()),
         BlocProvider<TokensCubit>(create: (context) => TokensCubit()),
         BlocProvider<DexCubit>(create: (context) => DexCubit()),
         BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
@@ -46,9 +47,9 @@ class App extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         builder: (context, widget) {
-          ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
-            return ErrorScreen(errorDetails: errorDetails);
-          };
+          // ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+          //   return ErrorScreen(errorDetails: errorDetails);
+          // };
           return widget!;
         },
         home: WalletChecker(),

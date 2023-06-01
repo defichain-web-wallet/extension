@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
+class OngoingTransaction extends StatelessWidget
+    implements PreferredSizeWidget {
   static const double height = 55;
 
   const OngoingTransaction({Key? key}) : super(key: key);
@@ -58,7 +59,10 @@ class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
                       state is TransactionLoadingState
                           ? 'Waiting for transaction'
                           : 'Transaction done',
-                      style: Theme.of(context).textTheme.headline4!.apply(fontWeightDelta: 2),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline4!
+                          .apply(fontWeightDelta: 2),
                     ),
                     Padding(padding: const EdgeInsets.symmetric(vertical: 2)),
                     // SingleChildScrollView(

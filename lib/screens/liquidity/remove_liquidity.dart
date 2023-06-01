@@ -46,7 +46,7 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
   void initState() {
     super.initState();
     TokensState tokensState = BlocProvider.of<TokensCubit>(context).state;
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _setShareOfPool();
       _setAmountA();
       _setAmountB();

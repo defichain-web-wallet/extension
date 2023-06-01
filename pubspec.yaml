@@ -72,7 +72,7 @@ dependencies:
 
   encrypt: ^5.0.1
 
-  sentry_flutter: ^6.17.0
+  sentry_flutter: ^7.6.3
 
   percent_indicator: ^4.0.0
 
@@ -81,7 +81,7 @@ dependencies:
   intl_phone_field: ^3.1.0
   iban_form_field: ^0.2.2
   country_list_pick: ^1.0.1+6
-  reorderables: ^0.5.1
+  reorderables: ^0.6.0
   image_picker: ^0.8.6
   image_picker_for_web: ^2.1.10
   gradient_borders: ^0.2.0

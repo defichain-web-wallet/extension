@@ -85,9 +85,9 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                         : LightColors.scaffoldContainerBgColor,
                     border: isDarkTheme()
                         ? Border.all(
-                      width: 1.0,
-                      color: Colors.white.withOpacity(0.05),
-                    )
+                            width: 1.0,
+                            color: Colors.white.withOpacity(0.05),
+                          )
                         : null,
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
@@ -118,11 +118,11 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                     padding: EdgeInsets.only(right: 16),
                                     child: Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'Exchange Service',
@@ -130,18 +130,18 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                   .textTheme
                                                   .headline5!
                                                   .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                                    fontSize: 12,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.3),
+                                                  ),
                                             ),
                                             Expanded(
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Text(
                                                     'DFX Swiss AG',
@@ -149,8 +149,8 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                         .textTheme
                                                         .headline5!
                                                         .copyWith(
-                                                      fontSize: 12,
-                                                    ),
+                                                          fontSize: 12,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -165,7 +165,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'Your IBAN',
@@ -173,18 +173,18 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                   .textTheme
                                                   .headline5!
                                                   .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                                    fontSize: 12,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.3),
+                                                  ),
                                             ),
                                             Expanded(
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Text(
                                                     fiatHelper.getIbanFormat(
@@ -194,8 +194,8 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                         .textTheme
                                                         .headline5!
                                                         .copyWith(
-                                                      fontSize: 12,
-                                                    ),
+                                                          fontSize: 12,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -210,7 +210,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'Deposit limit',
@@ -218,18 +218,18 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                   .textTheme
                                                   .headline5!
                                                   .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                                    fontSize: 12,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.3),
+                                                  ),
                                             ),
                                             Expanded(
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Text(
                                                     '${fiatState.limit!.value!} € per ${fiatState.limit!.period!.toLowerCase()}',
@@ -237,8 +237,8 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                         .textTheme
                                                         .headline5!
                                                         .copyWith(
-                                                      fontSize: 12,
-                                                    ),
+                                                          fontSize: 12,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -253,7 +253,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'Service fees',
@@ -261,18 +261,18 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                   .textTheme
                                                   .headline5!
                                                   .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                                    fontSize: 12,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.3),
+                                                  ),
                                             ),
                                             Expanded(
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Text(
                                                     '${fiatState.activeIban!.fee}%',
@@ -280,8 +280,8 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                         .textTheme
                                                         .headline5!
                                                         .copyWith(
-                                                      fontSize: 12,
-                                                    ),
+                                                          fontSize: 12,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -296,7 +296,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'Your asset',
@@ -304,18 +304,18 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                   .textTheme
                                                   .headline5!
                                                   .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                                    fontSize: 12,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.3),
+                                                  ),
                                             ),
                                             Expanded(
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Text(
                                                     widget.asset.name!,
@@ -323,8 +323,8 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                         .textTheme
                                                         .headline5!
                                                         .copyWith(
-                                                      fontSize: 12,
-                                                    ),
+                                                          fontSize: 12,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -336,7 +336,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'Recipient',
@@ -344,18 +344,18 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                   .textTheme
                                                   .headline5!
                                                   .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                                    fontSize: 12,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.3),
+                                                  ),
                                             ),
                                             Expanded(
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Container(
                                                     width: 200,
@@ -365,8 +365,8 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                           .textTheme
                                                           .headline4!
                                                           .copyWith(
-                                                        fontSize: 12,
-                                                      ),
+                                                            fontSize: 12,
+                                                          ),
                                                       softWrap: true,
                                                       textAlign: TextAlign.end,
                                                     ),
@@ -379,7 +379,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                       await Clipboard.setData(
                                                         ClipboardData(
                                                             text:
-                                                            'DFX AG, Bahnhofstrasse 7, 6300 Zug, Schweiz'),
+                                                                'DFX AG, Bahnhofstrasse 7, 6300 Zug, Schweiz'),
                                                       );
                                                     },
                                                     child: MouseRegion(
@@ -402,7 +402,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'IBAN',
@@ -410,18 +410,18 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                   .textTheme
                                                   .headline5!
                                                   .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                                    fontSize: 12,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.3),
+                                                  ),
                                             ),
                                             Expanded(
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Container(
                                                     child: Text(
@@ -430,8 +430,8 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                           .textTheme
                                                           .headline4!
                                                           .copyWith(
-                                                        fontSize: 12,
-                                                      ),
+                                                            fontSize: 12,
+                                                          ),
                                                       softWrap: true,
                                                       textAlign: TextAlign.end,
                                                     ),
@@ -444,7 +444,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                       await Clipboard.setData(
                                                         ClipboardData(
                                                             text:
-                                                            'CH68 0857 3177 9752 0181 4'),
+                                                                'CH68 0857 3177 9752 0181 4'),
                                                       );
                                                     },
                                                     child: MouseRegion(
@@ -467,7 +467,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'Purpose of payment',
@@ -475,18 +475,18 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                   .textTheme
                                                   .headline5!
                                                   .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
+                                                    fontSize: 12,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.3),
+                                                  ),
                                             ),
                                             Expanded(
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Container(
                                                     child: Text(
@@ -496,8 +496,8 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                           .textTheme
                                                           .headline4!
                                                           .copyWith(
-                                                        fontSize: 12,
-                                                      ),
+                                                            fontSize: 12,
+                                                          ),
                                                       softWrap: true,
                                                       textAlign: TextAlign.end,
                                                     ),
@@ -511,7 +511,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                         ClipboardData(
                                                             text: fiatState
                                                                 .activeIban!
-                                                                .bankUsage),
+                                                                .bankUsage!),
                                                       );
                                                     },
                                                     child: MouseRegion(
@@ -538,13 +538,13 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                               .textTheme
                                               .headline5!
                                               .copyWith(
-                                            fontSize: 12,
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .color!
-                                                .withOpacity(0.3),
-                                          ),
+                                                fontSize: 12,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color!
+                                                    .withOpacity(0.3),
+                                              ),
                                           softWrap: true,
                                         ),
                                         SizedBox(
@@ -552,23 +552,23 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                              MainAxisAlignment.center,
                                           children: [
                                             Text(
                                               'Send us any amount in fiat '
-                                                  'and we send you crypto back.',
+                                              'and we send you crypto back.',
                                               textAlign: TextAlign.center,
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline4!
                                                   .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.6),
-                                              ),
+                                                    fontSize: 12,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .color!
+                                                        .withOpacity(0.6),
+                                                  ),
                                             ),
                                           ],
                                         ),
@@ -589,7 +589,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                 padding: EdgeInsets.only(right: 16),
                                 child: Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
                                       width: 104,
@@ -606,11 +606,11 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                           context,
                                           PageRouteBuilder(
                                             pageBuilder: (context, animation1,
-                                                animation2) =>
+                                                    animation2) =>
                                                 HomeScreen(),
                                             transitionDuration: Duration.zero,
                                             reverseTransitionDuration:
-                                            Duration.zero,
+                                                Duration.zero,
                                           ),
                                         );
                                       },

@@ -78,15 +78,15 @@ class LedgerWalletsHelper {
       var balances = await _balanceRequests.getBalanceListByAddressList(
           addressList, network);
 
-      if (network == 'mainnet') {
-        List<HistoryNew> txListModel =
-            await _historyRequests.getHistory(addressList[0], 'DFI', network);
-        historyList.addAll(txListModel);
-      } else {
-        TxListModel testnetTxListModel = await _historyRequests
-            .getFullHistoryList(addressList[0], 'DFI', network);
-        testnetHistoryList.addAll(testnetTxListModel.list!);
-      }
+      // if (network == 'mainnet') {
+      //   List<HistoryNew> txListModel =
+      //       await _historyRequests.getHistory(addressList[0], 'DFI', network);
+      //   historyList.addAll(txListModel);
+      // } else {
+      //   TxListModel testnetTxListModel = await _historyRequests
+      //       .getFullHistoryList(addressList[0], 'DFI', network);
+      //   testnetHistoryList.addAll(testnetTxListModel.list!);
+      // }
       if (balances.length == 0) {
         balances.add(BalanceModel(token: 'DFI', balance: 0));
       } else {

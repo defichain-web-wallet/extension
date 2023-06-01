@@ -14,10 +14,7 @@ ThemeData createDarkTheme() {
     dialogBackgroundColor: Color(0xFF1C1D1F),
     shadowColor: Colors.transparent,
     cardColor: Colors.white.withOpacity(0.04),
-    colorScheme: ColorScheme.dark(
-      primary: AppColors.pinkColor,
-      primaryVariant: AppColors.pinkColor,
-    ),
+    colorScheme: ColorScheme.dark(primary: AppColors.pinkColor),
     iconTheme: IconThemeData(
       color: Colors.white,
     ),

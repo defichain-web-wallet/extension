@@ -1,8 +1,12 @@
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
+import 'package:defi_wallet/helpers/ledger_wallet_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -19,10 +23,11 @@ class WalletCubit extends Cubit<WalletState> {
 
   WalletState get walletState => state;
 
-  int toSatoshi(double value){
+  int toSatoshi(double value) {
     return state.activeNetwork.toSatoshi(value);
   }
-  double fromSatoshi(int value){
+
+  double fromSatoshi(int value) {
     return state.activeNetwork.fromSatoshi(value);
   }
 
@@ -69,11 +74,7 @@ class WalletCubit extends Cubit<WalletState> {
     var publicKeyTestnet = _getPublicKey(seed, true);
 
     var source = applicationModel.createSource(
-      mnemonic,
-      publicKeyTestnet,
-      publicKeyMainnet,
-    password
-    );
+        mnemonic, publicKeyTestnet, publicKeyMainnet, password);
 
     var accountIndex = 0;
     while (hasHistory) {
@@ -119,10 +120,60 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
+  restoreLedgerAccount(String network, Function(int, int) statusBar) async {
+    var ledgerWalletsHelper = LedgerWalletsHelper();
+    emit(state.copyWith(status: WalletStatusList.loading));
+
+    var applicationModel = ApplicationModel(sourceList: {}, password: "asdf");
+    List<AbstractAccountModel> accountList = [];
+
+    var source = LedgerSourceModel();
+    try {
+      var accounts =
+          await ledgerWalletsHelper.restoreWallet(network, (need, restored) {
+        emit(state.copyWith(status: WalletStatusList.restore));
+        statusBar(need, restored);
+      });
+
+      for (var acc in accounts) {
+        var accountModel = await AccountModel.fromPublicKeys(
+          networkList: [
+            new DefichainNetworkModel(new NetworkTypeModel(
+                networkName: NetworkName.defichainMainnet,
+                networkString: 'mainnet',
+                isTestnet: false))
+          ],
+          accountIndex: 0,
+          publicKeyTestnet:
+              network == "testnet" ? acc.bitcoinAddress!.address! : "",
+          publicKeyMainnet:
+              network == "mainnet" ? acc.bitcoinAddress!.address! : "",
+          sourceId: source.id,
+          isRestore: true,
+        );
+
+        accountList.add(accountModel);
+      }
+
+      applicationModel.accounts = accountList;
+      applicationModel.activeAccount = accountList.first;
+
+      await StorageService.saveApplication(applicationModel);
+
+      emit(state.copyWith(
+        applicationModel: applicationModel,
+        status: WalletStatusList.success,
+      ));
+    } catch (error) {
+      throw error;
+    }
+  }
+
   loadWalletDetails() async {
     try {
       // List<AbstractAccountModel> accounts = await StorageService.loadAccounts();
-      ApplicationModel applicationModel = await StorageService.loadApplication();
+      ApplicationModel applicationModel =
+          await StorageService.loadApplication();
 
       // applicationModel.activeAccount = applicationModel.accounts.first;
 
@@ -155,10 +206,9 @@ class WalletCubit extends Cubit<WalletState> {
     emit(state.copyWith(
       applicationModel: applicationModel,
     ));
-
   }
 
-  getCurrentNetwork(){
+  getCurrentNetwork() {
     return state.applicationModel!.activeNetwork;
   }
 

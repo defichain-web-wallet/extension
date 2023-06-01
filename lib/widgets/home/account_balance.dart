@@ -45,7 +45,7 @@ class _AccountBalanceState extends State<AccountBalance> {
 
                 try {
                   var balanceList =
-                    state.activeAccount!.pinnedBalances['defichainMainnet'];
+                      state.activeAccount.pinnedBalances['defichainMainnet'];
                   totalBalance = balanceList!.map<double>((e) {
                     if (e.token != null) {
                       if (widget.asset == 'USD') {
@@ -70,7 +70,7 @@ class _AccountBalanceState extends State<AccountBalance> {
                       }
                     } else {
                       double balanceInSatoshi =
-                      double.parse(e.balance.toString());
+                          double.parse(e.balance.toString());
                       if (widget.asset == 'USD') {
                         return tokensHelper.getPairsAmountByAsset(
                           tokensState.tokensPairs!,
