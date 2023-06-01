@@ -2,6 +2,7 @@ import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
@@ -76,6 +77,8 @@ abstract class AbstractNetworkModel {
     String addressString,
   );
 
+  bool isTokensPresent();
+
   Future<List<BalanceModel>> getAllBalances({
     required String addressString,
   });
@@ -103,6 +106,8 @@ abstract class AbstractNetworkModel {
 
   List<HistoryModel> getHistory(String networkName, String? txid);
 
+  Future<NetworkFeeModel> getNetworkFee();
+
   // Sending
   bool checkAddress(String address);
 
@@ -112,7 +117,8 @@ abstract class AbstractNetworkModel {
         required String password,
         required TokenModel token,
         required double amount,
-      required ApplicationModel applicationModel});
+      required ApplicationModel applicationModel,
+      int satPerByte = 0});
 
   Future<String> signMessage(
       AbstractAccountModel account,
