@@ -32,7 +32,6 @@ class PassConfirmDialog extends StatefulWidget {
 }
 
 class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, SnackBarMixin {
-  SettingsHelper settingsHelper = SettingsHelper();
   final _formKey = GlobalKey<FormState>();
   bool isPasswordObscure = true;
   bool isEnable = true;
@@ -40,8 +39,6 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
   bool isVisiblePasswordField = true;
   String password = '';
   bool isFailed = false;
-  convert.Codec<String, String> stringToBase64 =
-      convert.utf8.fuse(convert.base64);
   GlobalKey globalKey = GlobalKey();
   TextEditingController _passwordController = TextEditingController();
   FocusNode confirmFocusNode = FocusNode();
@@ -98,7 +95,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
                       width: 104,
                       title: 'Confirm',
                       callback: () {
-                        _restoreWallet(state.applicationModel!.password);
+                        _restoreWallet(context);
                       },
                     ),
                   ],
@@ -251,14 +248,15 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
     );
   }
 
-  void _restoreWallet(String savedPassword) async {
+  void _restoreWallet(context) async {
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     setState(() {
       isValid = true;
       _formKey.currentState!.validate();
       isFailed = false;
       isEnable = false;
     });
-    if (Crypt(savedPassword).match(password)) {
+    if (walletCubit.validatePassword(password)) {
       setState(() {
         isValid = true;
         _formKey.currentState!.validate();

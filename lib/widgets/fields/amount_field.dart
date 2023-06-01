@@ -88,9 +88,6 @@ class _AmountFieldState extends State<AmountField> {
       }
       if (widget.type == TxType.swap || widget.type == TxType.addLiq) {
         if (widget.isAvailableTo) {
-          String assetSymbol = SettingsHelper.isBitcoin()
-              ? widget.selectedAsset.symbol!.replaceAll('d', '')
-              : widget.selectedAsset.symbol!;
           // await availableAmountCubit.getAvailableTo(
           //   assetSymbol,
           //   widget.type!,
