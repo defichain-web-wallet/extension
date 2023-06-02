@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/main.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,7 +40,7 @@ class OngoingTransaction extends StatelessWidget with PreferredSizeWidget {
                 child: Container(
                   height: 20,
                   width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: isDarkMode ? CircularProgressIndicator(strokeWidth: 2, color: Colors.white,) : CircularProgressIndicator(strokeWidth: 2, color: Colors.black,),
                 ),
               ),
             if (state is TransactionLoadedState)
