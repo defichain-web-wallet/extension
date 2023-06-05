@@ -351,7 +351,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       verticalMargin: isFullScreen ? 2 : -5,
-      horizontalMargin: isFullScreen ? 16 : horizontalMargin,
+      horizontalMargin: isFullScreen ? -34 : horizontalMargin,
       controller: controller,
       enablePassEvent: false,
     );
