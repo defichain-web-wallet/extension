@@ -41,7 +41,9 @@ class RewardRoutesList extends StatelessWidget {
               isDisable: !isDisabled,
               isReinvest: rewards[index].label! == 'Reinvest',
               onRemove: () {
-                lockCubit.removeRewardRoute(index);
+                if (rewards.length > 1) {
+                  lockCubit.removeRewardRoute(index);
+                }
               },
               onChange: (value) {
                 if (value.isNotEmpty) {
