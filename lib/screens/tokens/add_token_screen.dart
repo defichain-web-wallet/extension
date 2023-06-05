@@ -162,7 +162,13 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                     textAlign: TextAlign.start,
                                   ),
                                   Container(
-                                    height: availableTokens.length != 0 ? 288 : 297,
+                                    height: availableTokens.length != 0
+                                        ? isFullScreen
+                                            ? 520
+                                            : 288
+                                        : isFullScreen
+                                            ? 497
+                                            : 297,
                                     child: availableTokens.length != 0
                                         ? ListView.builder(
                                             itemCount: availableTokens.length,

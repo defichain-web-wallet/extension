@@ -42,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen>
   static const double extendedBoxWidth = 832;
   static const double extendedFirstColumnWidth = 328;
   static const double extendedLastColumnWidth = 488;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Timer? timer;
   TabController? tabController;
@@ -49,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool isShownSnackBar = false;
   double sliverTopHeight = 0.0;
   double targetSliverTopHeight = 76.0;
+  int transactionIterator = 0;
   GlobalKey txKey = GlobalKey();
 
   tabListener() {
@@ -121,16 +123,26 @@ class _HomeScreenState extends State<HomeScreen>
                 );
               } else {
                 return Scaffold(
+                  key: _scaffoldKey,
                   appBar: NewMainAppBar(
                     isShowLogo: true,
                     isSmallScreen: !isFullScreen,
                   ),
-                  drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
+                  drawerScrimColor: isFullScreen
+                      ? Colors.transparent
+                      : AppColors.tolopea.withOpacity(0.06),
                   endDrawer: AccountDrawer(
-                    width: buttonSmallWidth,
+                    width: isFullScreen ? 298 : buttonSmallWidth,
+                    isFullScreen: isFullScreen,
                   ),
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {
+                      if (homeState.isShownHome && transactionIterator == 0) {
+                        TransactionCubit transactionCubit =
+                        BlocProvider.of<TransactionCubit>(context);
+                          transactionCubit.checkOngoingTransaction();
+                        transactionIterator++;
+                      }
                       if (timer == null && !SettingsHelper.isBitcoin()) {
                         timer =
                             Timer.periodic(Duration(seconds: tickerTimerUpdate),

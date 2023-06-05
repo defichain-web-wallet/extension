@@ -40,6 +40,7 @@ class AssetList extends StatelessWidget {
                 .toList();
             balances.removeWhere(
                 (element) => element.isPair! && element.balance == 0);
+            balances.sort((a, b) => b.balance!.compareTo(a.balance!));
           }
           String currency = SettingsHelper.settings.currency!;
 

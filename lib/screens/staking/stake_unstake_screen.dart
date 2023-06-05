@@ -819,6 +819,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                           lockState
                                                               .lockStakingDetails!
                                                               .id!,
+                                                          isFullScreen,
                                                         );
                                                       },
                                                     );
@@ -885,6 +886,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
     List<TokensModel> tokens,
     String lockAccessToken,
     int stakingId,
+    bool isFullScreen,
   ) async {
     ECPair keyPair = await HDWalletService().getKeypairFromStorage(
       password,
@@ -913,13 +915,23 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       builder: (BuildContext dialogContext) {
         return TxStatusDialog(
           txResponse: txResponse,
-          callbackOk: () {
+          callbackOk: () async {
             if (!txResponse!.isError!) {
               TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse);
+              await transactionCubit.setOngoingTransaction(txResponse);
             }
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) => HomeScreen(
+                  isLoadTokens: true,
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
             NavigatorService.pushReplacement(context, null);
           },
           callbackTryAgain: () async {
@@ -931,6 +943,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
               tokens,
               lockAccessToken,
               stakingId,
+              isFullScreen,
             );
           },
         );

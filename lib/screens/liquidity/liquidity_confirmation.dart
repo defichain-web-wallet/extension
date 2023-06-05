@@ -520,6 +520,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                                         tokensState,
                                         transactionState,
                                         password,
+                                        isFullScreen,
                                       );
                                       parent.emitPending(false);
                                     });
@@ -539,7 +540,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                                           state,
                                           tokensState,
                                           transactionState,
-                                          null, callbackOk: () {
+                                          null, isFullScreen, callbackOk: () {
                                         Navigator.pop(c);
                                       }, callbackFail: () {
                                         parent.emitPending(true);
@@ -568,7 +569,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
     });
   }
 
-  submitLiquidityAction(state, tokensState, transactionState, password,
+  submitLiquidityAction(state, tokensState, transactionState, password, isFullScreen,
       {final Function()? callbackOk, final Function()? callbackFail}) async {
     if (transactionState is TransactionLoadingState) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -613,7 +614,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
         TransactionCubit transactionCubit =
             BlocProvider.of<TransactionCubit>(context);
 
-        transactionCubit.setOngoingTransaction(txError);
+        await transactionCubit.setOngoingTransaction(txError);
       }
 
       showDialog(
@@ -627,11 +628,21 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
               if (callbackOk != null) {
                 callbackOk();
               }
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) => HomeScreen(
+                    isLoadTokens: true,
+                  ),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
               NavigatorService.pushReplacement(context, null);
             },
             callbackTryAgain: () async {
               await submitLiquidityAction(
-                  state, tokensState, transactionState, password,
+                  state, tokensState, transactionState, password, isFullScreen,
                   callbackFail: callbackFail, callbackOk: callbackOk);
             },
           );

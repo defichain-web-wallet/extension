@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/network/network_cubit.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -115,8 +116,8 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
 
       setState(() {
         currentNetworkItem = item['name'];
+        onChangeLocalSettings(item['value']);
       });
-      onChangeLocalSettings(item['value']);
     }
   }
 
@@ -124,6 +125,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
   Widget build(BuildContext context) {
     double horizontalMargin = menuHelper.getHorizontalMargin(context);
     NetworkCubit networkCubit = BlocProvider.of<NetworkCubit>(context);
+    bool isFullScreen = MediaQuery.of(context).size.width > ScreenSizes.medium;
 
     return CustomPopupMenu(
       menuOnChange: (b) => widget.onSelect(),
@@ -207,7 +209,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
                       ? DarkColors.networkDropdownBgColor
                       : LightColors.networkDropdownBgColor,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  width: 240,
+                  width: isFullScreen ? 272 : 240,
                   child: Container(
                     padding: const EdgeInsets.only(
                       top: 16,
@@ -348,8 +350,8 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
       showArrow: false,
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
-      verticalMargin: -5,
-      horizontalMargin: horizontalMargin,
+      verticalMargin: isFullScreen ? 2 : -5,
+      horizontalMargin: isFullScreen ? 16 : horizontalMargin,
       controller: controller,
       enablePassEvent: false,
     );

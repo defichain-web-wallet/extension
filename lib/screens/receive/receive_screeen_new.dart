@@ -33,8 +33,13 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
       'This is your personal wallet address.\nYou can use it to receive DFI and DST tokens like dBTC, dETH, dTSLA & more.';
   String btcHintText = 'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
 
-  cutAddress(String s) {
-    return s.substring(0, 5) + '...' + s.substring(s.length - 4, s.length);
+  cutAddress(String s, {int range = 5}) {
+    return s.substring(0, range) +
+        '...' +
+        s.substring(
+          s.length - (range - 1),
+          s.length,
+        );
   }
 
   @override
@@ -156,7 +161,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     });
                                   },
                                   child: Container(
-                                    width: 140,
+                                    width: isFullScreen ? 302 : 140,
                                     height: 43,
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -172,7 +177,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          cutAddress(address),
+                                          isFullScreen ? cutAddress(address, range: 16): cutAddress(address),
                                           style: headline5,
                                         ),
                                         SizedBox(

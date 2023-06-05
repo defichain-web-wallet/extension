@@ -19,10 +19,12 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 
 class AccountDrawer extends StatefulWidget {
   final double? width;
+  final bool isFullScreen;
 
   const AccountDrawer({
     Key? key,
     this.width = 280,
+    this.isFullScreen = false,
   }) : super(key: key);
 
   @override
@@ -61,13 +63,19 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
           accountsSelectorHeight = 260;
         }
         return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
+          filter: widget.isFullScreen
+              ? ImageFilter.blur(sigmaX: 0.0, sigmaY: 0.0)
+              : ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
           child: Drawer(
             width: widget.width!,
             backgroundColor: Colors.transparent,
-            elevation: 3,
+            elevation: widget.isFullScreen ? 0 : 3,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.only(
+                  top: widget.isFullScreen ? 52 : 8,
+                  bottom: 8,
+                  right: 8,
+                  left: 8),
               child: Container(
                 decoration: BoxDecoration(
                   color: isDarkTheme()

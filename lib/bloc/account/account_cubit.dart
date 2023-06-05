@@ -766,6 +766,10 @@ class AccountCubit extends Cubit<AccountState> {
       activeToken: state.activeToken,
       historyFilterBy: state.historyFilterBy,
     ));
+    if (network == 'testnet') {
+      await restoreAccountFromStorage(network);
+    }
+
     emit(state.copyWith(
       status: AccountStatusList.success,
       accounts: state.accounts,

@@ -17,6 +17,7 @@ import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/screens/send/send_status_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
@@ -440,7 +441,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                     await submitSend(
                                                         state,
                                                         tokensState,
-                                                        null, callbackOk: (() {
+                                                        null, isFullScreen, callbackOk: (() {
                                                       Navigator.pop(c);
                                                     }));
                                                     parent.emitPending(false);
@@ -465,6 +466,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                         state,
                                                         tokensState,
                                                         password,
+                                                        isFullScreen,
                                                       );
                                                     },
                                                     context: context,
@@ -539,13 +541,13 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     );
   }
 
-  Future submitSend(state, tokensState, password,
+  Future submitSend(state, tokensState, password, isFullScreen,
       {final Function()? callbackOk}) async {
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
         await _callback(
-            state.activeAccount, password, bitcoinCubit, tokensState.tokens,
+            state.activeAccount, password, bitcoinCubit, tokensState.tokens, isFullScreen,
             callbackOk: callbackOk);
       }
     } catch (_err) {
@@ -562,7 +564,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   }
 
   Future _callback(AccountModel account, String? password,
-      BitcoinCubit bitcoinCubit, List<TokensModel> tokens,
+      BitcoinCubit bitcoinCubit, List<TokensModel> tokens, bool isFullScreen,
       {final Function()? callbackOk}) async {
     if (SettingsHelper.isBitcoin()) {
       ECPair keyPair = await HDWalletService()
@@ -603,15 +605,24 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                   TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
-                  transactionCubit.setOngoingTransaction(txResponse);
-
+                  await transactionCubit.setOngoingTransaction(txResponse);
                 }
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => HomeScreen(
+                      isLoadTokens: true,
+                    ),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                );
                 NavigatorService.pushReplacement(context, null);
               },
               callbackTryAgain: () async {
                 print('TryAgain');
                 await _sendTransaction(
-                    context, tokens, widget.token.symbol!, account, password,
+                    context, tokens, widget.token.symbol!, account, password, isFullScreen,
                     callbackOk: callbackOk);
               },
             );
@@ -620,13 +631,13 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       }
     } else {
       await _sendTransaction(
-          context, tokens, widget.token.symbol!, account, password,
+          context, tokens, widget.token.symbol!, account, password, isFullScreen,
           callbackOk: callbackOk);
     }
   }
 
   Future _sendTransaction(context, List<TokensModel> tokens, String token,
-      AccountModel account, String? password,
+      AccountModel account, String? password, bool isFullScreen,
       {final Function()? callbackOk}) async {
     TxErrorModel? txResponse;
     AddressBookCubit addressBookCubit =
@@ -671,7 +682,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       builder: (BuildContext dialogContext) {
         return TxStatusDialog(
           txResponse: txResponse,
-          callbackOk: () {
+          callbackOk: () async {
             if (callbackOk != null) {
               callbackOk();
             }
@@ -679,13 +690,25 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
               TransactionCubit transactionCubit =
               BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse);
+              await transactionCubit.setOngoingTransaction(txResponse);
             }
-            NavigatorService.pushReplacement(context, null);
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) => HomeScreen(
+                  isLoadTokens: true,
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+            if (isFullScreen) {
+              NavigatorService.pushReplacement(context, null);
+            }
           },
           callbackTryAgain: () async {
             await _sendTransaction(
-                context, tokens, widget.token.symbol!, account, password);
+                context, tokens, widget.token.symbol!, account, password, isFullScreen);
           },
         );
       },
