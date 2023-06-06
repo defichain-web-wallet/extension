@@ -50,7 +50,6 @@ class _HomeScreenState extends State<HomeScreen>
   bool isShownSnackBar = false;
   double sliverTopHeight = 0.0;
   double targetSliverTopHeight = 76.0;
-  int transactionIterator = 0;
   GlobalKey txKey = GlobalKey();
 
   tabListener() {
@@ -137,12 +136,6 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {
-                      if (homeState.isShownHome && transactionIterator == 0) {
-                        TransactionCubit transactionCubit =
-                        BlocProvider.of<TransactionCubit>(context);
-                          transactionCubit.checkOngoingTransaction();
-                        transactionIterator++;
-                      }
                       if (timer == null && !SettingsHelper.isBitcoin()) {
                         timer =
                             Timer.periodic(Duration(seconds: tickerTimerUpdate),
