@@ -94,7 +94,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                                   ),
                                   shadowColor: Colors.transparent,
                                   color: Colors.white,
-                                  child: QrImage(
+                                  child: QrImageView(
                                     data: destinationAddress,
                                     size: 170,
                                   ),
