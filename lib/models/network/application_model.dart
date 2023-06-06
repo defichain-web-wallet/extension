@@ -35,7 +35,7 @@ class ApplicationModel {
     this.accounts = accounts ?? [];
 
     if (activeNetwork == null) {
-      this.activeNetwork = this.networks[2];
+      this.activeNetwork = this.networks[0];
     } else {
       this.activeNetwork = activeNetwork;
     }

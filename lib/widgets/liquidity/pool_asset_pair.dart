@@ -2,6 +2,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -11,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class PoolAssetPair extends StatefulWidget {
-  final AssetPairModel assetPair;
+  final LmPoolModel assetPair;
   final bool isGrid;
 
   const PoolAssetPair({Key? key, required this.assetPair, this.isGrid = true})
@@ -133,7 +134,8 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
                         ),
                         TickerText(
                           child: Text(
-                            '${getTotalAmountByUsd(widget.assetPair.totalLiquidityUsd!)}',
+                            '0',
+                            // '${getTotalAmountByUsd(widget.assetPair.totalLiquidityUsd!)}',
                             style:
                                 Theme.of(context).textTheme.headline5!.copyWith(
                                       fontSize: 11,
@@ -184,7 +186,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
                               : LightColors.assetItemSelectorBorderColor
                                   .withOpacity(0.07)),
                       child: Text(
-                        tokensHelper.getTokenWithPrefix(widget.assetPair.tokenA!),
+                        widget.assetPair.tokens[0].displaySymbol,
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                               fontSize: 11,
                             ),
@@ -207,7 +209,7 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
                               : LightColors.assetItemSelectorBorderColor
                                   .withOpacity(0.07)),
                       child: Text(
-                        tokensHelper.getTokenWithPrefix(widget.assetPair.tokenB!),
+                        widget.assetPair.tokens[1].displaySymbol,
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                               fontSize: 11,
                             ),
@@ -230,7 +232,8 @@ class _PoolAssetPairState extends State<PoolAssetPair> with ThemeMixin {
               width: 75,
               child: TickerText(
                 child: Text(
-                  getTotalAmountByUsd(widget.assetPair.totalLiquidityUsd!),
+                  '0',
+                  // getTotalAmountByUsd(widget.assetPair.totalLiquidityUsd!),
                   style: Theme.of(context).textTheme.headline5!.copyWith(
                         fontSize: 12,
                       ),

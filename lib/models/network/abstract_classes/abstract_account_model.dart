@@ -3,6 +3,7 @@ import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/token/lp_pool_model.dart';
 
 abstract class AbstractAccountModel {
   final String publicKeyTestnet;
@@ -26,35 +27,42 @@ abstract class AbstractAccountModel {
   Map<String, dynamic> toJson();
 
   // Tokens
-  List<BalanceModel> getPinnedBalances(AbstractNetworkModel network, {bool mergeCoin = true }) {
+  List<BalanceModel> getPinnedBalances(AbstractNetworkModel network, {bool mergeCoin = true, bool onlyPairs = false}) {
     var balanceList = pinnedBalances[network.networkType.networkName.name] ?? [];
     List<BalanceModel> result = [];
     //TODO: maybe need to move this to network models
-    try {
-      // TODO: maybe need rewrite here logic
-      var dfiBalances = balanceList.where((element) {
-        return element.token != null && element.token!.symbol == 'DFI';
+    if(onlyPairs){
+      result = balanceList.where((element) {
+        return element.lmPool != null;
       }).toList();
-
-      if (dfiBalances.length > 1 && mergeCoin) {
-        var existingBalance = balanceList.where((element) {
-          return element.token != null && element.token!.symbol != 'DFI';
+    } else {
+      try {
+        // TODO: maybe need rewrite here logic
+        var dfiBalances = balanceList.where((element) {
+          return element.token != null && element.token!.symbol == 'DFI';
         }).toList();
-        result = [
-          BalanceModel(
-            balance: dfiBalances[0].balance + dfiBalances[1].balance,
-            token: dfiBalances[0].token,
-            lmPool: dfiBalances[0].lmPool,
-          ),
-          ...existingBalance,
-        ];
-      } else {
-        result = balanceList;
-      }
 
-    } catch (err) {
-      result = [];
+        if (dfiBalances.length > 1 && mergeCoin) {
+          var existingBalance = balanceList.where((element) {
+            return element.token != null && element.token!.symbol != 'DFI';
+          }).toList();
+          result = [
+            BalanceModel(
+              balance: dfiBalances[0].balance + dfiBalances[1].balance,
+              token: dfiBalances[0].token,
+              lmPool: dfiBalances[0].lmPool,
+            ),
+            ...existingBalance,
+          ];
+        } else {
+          result = balanceList;
+        }
+
+      } catch (err) {
+        result = [];
+      }
     }
+
     return result;
   }
 

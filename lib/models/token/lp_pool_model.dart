@@ -39,7 +39,7 @@ class LmPoolModel extends TokenModel {
       data['percentages'] = this.percentages;
     }
     if (this.apr != null) {
-      data['apr'] = this.apr;
+      data['apr']['total'] = this.apr;
     }
     if (this.apy != null) {
       data['apy'] = this.apy;
@@ -52,18 +52,32 @@ class LmPoolModel extends TokenModel {
     NetworkName? networkName,
     List<TokenModel>? tokens,
   }) {
+    List<double>? percentages;
     if (networkName != null && tokens != null) {
       var symbols = json['symbol'].split('-');
+      print('symbol: ${json['symbol']}');
       var tokenA = tokens.firstWhere((element) => element.symbol == symbols[0]);
+      print('symbol1: ${tokenA.symbol}');
       var tokenB = tokens.firstWhere((element) => element.symbol == symbols[1]);
+      print('symbol2: ${tokenB.symbol}');
+      if(json['tokenA'] != null && json['tokenA'] != null && json['totalLiquidity'] != null){
+        //TODO: maybe need in other place
+        percentages = [double.parse(json["tokenA"]['reserve']), double.parse(json["tokenB"]['reserve']), double.parse(json["totalLiquidity"]['token'])];
+      }
+
+      double? apr;
+      if(json["apr"]!= null){
+        apr = json["apr"]['total'];
+      }
       return LmPoolModel(
         id: json['id'],
+        apr: apr,
         symbol: json['symbol'],
         name: json['name'],
         displaySymbol: json['displaySymbol'],
         networkName: networkName,
         tokens: [tokenA, tokenB],
-//TODO: add percentages
+        percentages: percentages
       );
     } else {
       return LmPoolModel(

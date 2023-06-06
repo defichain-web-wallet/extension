@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
@@ -27,25 +28,22 @@ class _LiquidityPoolListState extends State<LiquidityPoolList> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TransactionCubit, TransactionState>(
-        builder: (context, state) => BlocBuilder<TokensCubit, TokensState>(
-              builder: (context, tokensState) => ScaffoldConstrainedBox(
+        builder: (context, state) => ScaffoldConstrainedBox(
                 child: LayoutBuilder(builder: (context, constraints) {
-                  TokensCubit tokensCubit =
-                      BlocProvider.of<TokensCubit>(context);
-                  if (tokensState.status == TokensStatusList.success) {
+                  LmCubit lmCubit =
+                      BlocProvider.of<LmCubit>(context);
                     if (constraints.maxWidth < ScreenSizes.medium) {
                       return Scaffold(
                         appBar: MainAppBar(
                           customTitle: SearchPoolPairField(
                             controller: searchController,
-                            tokensState: tokensState,
                           ),
                           isShowBottom: !(state is TransactionInitialState),
                           height: !(state is TransactionInitialState)
                               ? toolbarHeightWithBottom
                               : toolbarHeight,
                           action: CancelButton(callback: () {
-                            tokensCubit.search(tokensState.tokens, '');
+                            lmCubit.search( '');
                             Navigator.pushReplacement(
                               context,
                               PageRouteBuilder(
@@ -58,7 +56,7 @@ class _LiquidityPoolListState extends State<LiquidityPoolList> {
                             );
                           }),
                         ),
-                        body: _buildBody(context, tokensState),
+                        body: _buildBody(context),
                       );
                     } else {
                       return Container(
@@ -67,10 +65,9 @@ class _LiquidityPoolListState extends State<LiquidityPoolList> {
                           appBar: MainAppBar(
                             customTitle: SearchPoolPairField(
                               controller: searchController,
-                              tokensState: tokensState,
                             ),
                             action: CancelButton(callback: () {
-                              tokensCubit.search(tokensState.tokens, '');
+                              lmCubit.search('');
                               Navigator.pushReplacement(
                                 context,
                                 PageRouteBuilder(
@@ -88,38 +85,19 @@ class _LiquidityPoolListState extends State<LiquidityPoolList> {
                                 : toolbarHeight,
                             isSmall: true,
                           ),
-                          body: _buildBody(context, tokensState,
+                          body: _buildBody(context,
                               isFullSize: true),
                         ),
                       );
                     }
-                  } else {
-                    return Container();
-                  }
-                }),
-              ),
-            ));
+                  }),
+                ));
   }
 
-  Widget _buildBody(context, tokensState, {isFullSize = false}) {
-    return BlocBuilder<AccountCubit, AccountState>(
-      builder: (accountContext, accountState) {
-        if (accountState.status == AccountStatusList.success) {
-          List<AssetPairModel> availableTokens = [];
-
-          try {
-            tokensState.tokensPairs.forEach((el) {
-              var foundTokenPair = tokensState.foundTokens
-                  .where((item) => item.isPair && el.symbol == item.symbol);
-              var fountTokenPairList = List.from(foundTokenPair);
-              if (fountTokenPairList.length == 1) {
-                availableTokens.add(List.from(tokensState.tokensPairs.where(
-                    (item) => item.symbol == fountTokenPairList[0].symbol))[0]);
-              }
-            });
-          } catch (e) {
-            print(e);
-          }
+  Widget _buildBody(context, {isFullSize = false}) {
+    return BlocBuilder<LmCubit, LmState>(
+      builder: (lmContext, lmState) {
+        if (lmState.status == LmStatusList.success) {
 
           return Container(
             color: Theme.of(context).dialogBackgroundColor,
@@ -128,14 +106,14 @@ class _LiquidityPoolListState extends State<LiquidityPoolList> {
               child: isFullSize
                   ? StretchBox(
                       child: PoolGridList(
-                        tokensPairs: availableTokens,
+                        tokensPairs: lmState.foundedPools,
                         isFullSize: isFullSize,
                       ),
                       maxWidth: 700,
                     )
                   : StretchBox(
                       child: PoolGridList(
-                        tokensPairs: availableTokens,
+                        tokensPairs: lmState.foundedPools,
                         isFullSize: isFullSize,
                       ),
                     ),
