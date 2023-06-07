@@ -3,6 +3,7 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
+import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:flutter/material.dart';
 
 class TokenListTile extends StatefulWidget {
@@ -10,17 +11,21 @@ class TokenListTile extends StatefulWidget {
   final bool isSelect;
   final bool isSingleSelect;
   final bool isConfirm;
+  final bool isDense;
   final String tokenName;
-  final String availableTokenName;
+  final String? availableTokenName;
+  final Widget? customContent;
 
   const TokenListTile({
     Key? key,
     this.onTap,
     required this.isSelect,
+    this.availableTokenName,
     this.isSingleSelect = false,
     this.isConfirm = false,
+    this.isDense = false,
     required this.tokenName,
-    required this.availableTokenName,
+    this.customContent,
   }) : super(key: key);
 
   @override
@@ -36,7 +41,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
         cursor: widget.isConfirm ? MouseCursor.defer : SystemMouseCursors.click,
         child: Container(
           padding: EdgeInsets.all(1),
-          height: 64,
+          height: widget.isDense ? 58 : 64,
           width: double.infinity,
           decoration: BoxDecoration(
             color:
@@ -67,47 +72,63 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 11,
-                            ),
-                            AssetLogo(
-                              assetStyle: tokenHelper
-                                  .getAssetStyleByTokenName(widget.tokenName),
-                            ),
-                            SizedBox(
-                              width: 11,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '${tokenHelper.getTokenWithPrefix(widget.tokenName)}',
-                                  style: Theme.of(context).textTheme.headline5,
+                        if (widget.customContent == null)
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 11,
+                              ),
+                              if (tokenHelper.isPair(widget.tokenName))
+                                AssetPair(
+                                  isBorder: false,
+                                  pair: widget.tokenName,
+                                  height: 16,
+                                )
+                              else
+                                AssetLogo(
+                                  size: widget.isDense ? 20 : 42,
+                                  borderWidth: widget.isDense ? 0 : 5,
+                                  assetStyle:
+                                      tokenHelper.getAssetStyleByTokenName(
+                                          widget.tokenName),
                                 ),
-                                SizedBox(
-                                  height: 2,
-                                ),
-                                Text(
-                                  '${tokenHelper.getSpecificDefiName(widget.availableTokenName)}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline5!
-                                      .copyWith(
-                                        color: Theme.of(context)
+                              SizedBox(
+                                width: 11,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '${tokenHelper.getTokenWithPrefix(widget.tokenName)}',
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
+                                  ),
+                                  if (widget.availableTokenName != null)
+                                    ...[
+                                      SizedBox(
+                                        height: 2,
+                                      ),
+                                      Text(
+                                        '${tokenHelper.getSpecificDefiName(widget.availableTokenName!)}',
+                                        style: Theme.of(context)
                                             .textTheme
                                             .headline5!
-                                            .color!
-                                            .withOpacity(0.3),
-                                        fontSize: 12,
+                                            .copyWith(
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .color!
+                                              .withOpacity(0.3),
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                    ]
+                                ],
+                              ),
+                            ],
+                          ),
+                        if (widget.customContent != null) widget.customContent!,
                       ],
                     ),
                   ),
@@ -119,11 +140,12 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                           : CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (widget.isConfirm)
+                        if (widget.isConfirm &&
+                            widget.availableTokenName != null)
                           Padding(
                             padding: EdgeInsets.only(right: 16),
                             child: Text(
-                              '0 ${tokenHelper.getTokenWithPrefix(widget.availableTokenName)}',
+                              '0 ${tokenHelper.getTokenWithPrefix(widget.availableTokenName!)}',
                               style: Theme.of(context).textTheme.headline5,
                             ),
                           ),

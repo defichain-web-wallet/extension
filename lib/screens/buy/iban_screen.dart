@@ -227,7 +227,6 @@ class _IbanScreenState extends State<IbanScreen>
       String iban = (widget.isNewIban || fiatState.activeIban == null)
           ? _ibanController.text
           : fiatState.activeIban.iban;
-      bool isNewIban = widget.isNewIban || iban.isNotEmpty;
       try {
         if (widget.isNewIban || fiatState.activeIban == null) {
           await fiatCubit.saveBuyDetails(
@@ -243,7 +242,7 @@ class _IbanScreenState extends State<IbanScreen>
               pageBuilder: (context, animation1, animation2) =>
                   BuySummaryScreen(
                 asset: widget.asset,
-                isNewIban: isNewIban,
+                isNewIban: widget.isNewIban,
               ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,

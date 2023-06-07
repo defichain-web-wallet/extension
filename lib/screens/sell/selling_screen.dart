@@ -42,8 +42,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class Selling extends StatefulWidget {
   final bool isNewIban;
+  final String fiatName;
 
-  const Selling({Key? key, this.isNewIban = false}) : super(key: key);
+  const Selling({
+    Key? key,
+    this.isNewIban = false,
+    this.fiatName = '',
+  }) : super(key: key);
 
   @override
   _SellingState createState() => _SellingState();
@@ -111,8 +116,11 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                     } else {
                       IbanModel? currentIban;
                       if (iterator == 0) {
+                        String targetFiat = widget.fiatName.isEmpty
+                            ? defaultCurrency
+                            : widget.fiatName;
                         selectedFiat = fiatState.sellableFiatList!
-                            .firstWhere((element) => element.name == defaultCurrency);
+                            .firstWhere((element) => element.name == targetFiat);
                         accountState.activeAccount!.balanceList!.forEach((el) {
                           try {
                             var assetList = fiatState.assets!.where((element) =>
@@ -127,10 +135,14 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                 .first;
                         iterator++;
                       }
+                      List<IbanModel> ibans = fiatState.ibanList!
+                          .where((element) =>
+                              element.fiat!.name! == selectedFiat.name!)
+                          .toList();
                       List<String> stringIbans = [];
                       List<IbanModel> uniqueIbans = [];
 
-                      fiatState.ibanList!.forEach((element) {
+                      ibans.forEach((element) {
                         stringIbans.add(element.iban!);
                       });
 
@@ -265,6 +277,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                       )
                                                     : IbanSelector(
                                                         isBorder: false,
+                                                        fiatName: selectedFiat.name!,
                                                         key: selectKeyIban,
                                                         onAnotherSelect:
                                                             hideOverlay,

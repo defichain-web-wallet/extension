@@ -44,7 +44,6 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
@@ -53,14 +52,6 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
       ) {
         return BlocBuilder<FiatCubit, FiatState>(
           builder: (context, fiatState) {
-            if (iterator == 0 && widget.isNewIban) {
-              fiatCubit.loadIbanList(
-                asset: widget.asset,
-                isNewIban: widget.isNewIban,
-              );
-              iterator++;
-            }
-
             if (fiatState.status == FiatStatusList.success) {
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -511,7 +502,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                         ClipboardData(
                                                             text: fiatState
                                                                 .activeIban!
-                                                                .bankUsage),
+                                                                .bankUsage!),
                                                       );
                                                     },
                                                     child: MouseRegion(

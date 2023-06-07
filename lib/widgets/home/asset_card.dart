@@ -4,6 +4,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
@@ -23,7 +24,7 @@ class AssetCard extends StatefulWidget {
   State<AssetCard> createState() => _AssetCardState();
 }
 
-class _AssetCardState extends State<AssetCard> {
+class _AssetCardState extends State<AssetCard> with FormatMixin{
   TokensHelper tokensHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 

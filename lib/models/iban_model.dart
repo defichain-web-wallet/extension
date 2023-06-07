@@ -13,6 +13,7 @@ class IbanModel {
   double? fee;
   double? refBonus;
   bool? active;
+  bool? isSellable;
   AssetByFiatModel? asset;
   FiatModel? fiat;
   dynamic deposit;
@@ -31,6 +32,7 @@ class IbanModel {
     this.fee,
     this.refBonus,
     this.active,
+    this.isSellable,
     this.asset,
     this.fiat,
     this.deposit,
@@ -63,6 +65,7 @@ class IbanModel {
     } else {
       this.fiat = null;
     }
+    this.isSellable = json["asset"] == null;
     this.deposit = json["deposit"];
     this.minDeposit = json["minDeposit"];
   }
@@ -80,6 +83,7 @@ class IbanModel {
     data["fee"] = this.fee;
     data["refBonus"] = this.refBonus;
     data["active"] = this.active;
+    data["isSellable"] = this.isSellable;
     data["asset"] = this.asset == null ? {} : this.asset!.toJson();
     data["fiat"] = this.fiat == null ? {} : this.fiat!.toJson();
     data["deposit"] = this.deposit;
