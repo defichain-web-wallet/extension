@@ -29,20 +29,20 @@ class RatesModel {
 
     if (tokensMainnet != null && poolpairsMainnet != null) {
       if (network.networkType.isTestnet) {
-        updateRates(
+        await updateRates(
           network,
           jsonTokens: tokensTestnet["data"],
           jsonPoolPairs: poolpairsTestnet["data"],
         );
       } else {
-        updateRates(
+        await updateRates(
           network,
           jsonTokens: tokensMainnet["data"],
           jsonPoolPairs: poolpairsMainnet["data"],
         );
       }
     } else {
-      updateRates(network);
+      await updateRates(network);
     }
   }
 
