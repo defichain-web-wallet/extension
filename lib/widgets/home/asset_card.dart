@@ -41,7 +41,7 @@ class _AssetCardState extends State<AssetCard> {
     return BlocBuilder<RatesCubit, RatesState>(
       buildWhen: (prev, current) => current.status == RatesStatusList.success,
       builder: (context, ratesState) {
-        final convertedBalance = ratesState.convertAmountBalance(
+        final convertedBalance = ratesState.ratesModel!.convertAmountBalance(
           walletCubit.state.activeNetwork,
           widget.balanceModel,
         );

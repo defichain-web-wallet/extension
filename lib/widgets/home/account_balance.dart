@@ -32,7 +32,7 @@ class _AccountBalanceState extends State<AccountBalance> {
 
               try {
                 List<BalanceModel> balances = state.getBalances();
-                totalBalance = ratesState.getTotalAmount(
+                totalBalance = ratesState.ratesModel!.getTotalAmount(
                   state.activeNetwork,
                   balances,
                   convertToken: state.activeToken.symbol,

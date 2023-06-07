@@ -4,11 +4,13 @@ enum RatesStatusList { initial, loading, success, failure }
 
 class RatesState extends Equatable {
   final RatesStatusList status;
+  final RatesModel? ratesModel;
   final List<TokenModel>? tokens;
   final List<AssetPairModel>? poolPairs;
 
   RatesState({
     this.status = RatesStatusList.initial,
+    this.ratesModel,
     this.tokens,
     this.poolPairs,
   });
@@ -16,6 +18,7 @@ class RatesState extends Equatable {
   @override
   List<Object?> get props => [
         status,
+        ratesModel,
         tokens,
         poolPairs,
       ];
@@ -130,11 +133,13 @@ class RatesState extends Equatable {
 
   RatesState copyWith({
     RatesStatusList? status,
+    RatesModel? ratesModel,
     List<TokenModel>? tokens,
     List<AssetPairModel>? poolPairs,
   }) {
     return RatesState(
       status: status ?? this.status,
+      ratesModel: ratesModel ?? this.ratesModel,
       tokens: tokens ?? this.tokens,
       poolPairs: poolPairs ?? this.poolPairs,
     );
