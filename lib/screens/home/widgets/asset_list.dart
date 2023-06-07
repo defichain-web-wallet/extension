@@ -22,7 +22,8 @@ class AssetList extends StatelessWidget {
       builder: (context, ratesState) {
         return BlocBuilder<WalletCubit, WalletState>(
           builder: (context, state) {
-            if (state.status == WalletStatusList.success &&
+            if ((state.status == WalletStatusList.success ||
+                    state.status == WalletStatusList.update) &&
                 ratesState.status == RatesStatusList.success) {
               List<BalanceModel> balances = state.getBalances();
 

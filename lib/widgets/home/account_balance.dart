@@ -26,7 +26,8 @@ class _AccountBalanceState extends State<AccountBalance> {
       builder: (context, ratesState) {
         return BlocBuilder<WalletCubit, WalletState>(
           builder: (context, state) {
-            if (state.status == WalletStatusList.success &&
+            if ((state.status == WalletStatusList.success ||
+                state.status == WalletStatusList.update) &&
                 ratesState.status == RatesStatusList.success) {
               late double totalBalance;
 

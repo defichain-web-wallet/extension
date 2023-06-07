@@ -1,6 +1,6 @@
 part of 'wallet_cubit.dart';
 
-enum WalletStatusList { initial, loading, success, restore, failure }
+enum WalletStatusList { initial, loading, success, restore, failure, update }
 
 class WalletState extends Equatable {
   final WalletStatusList status;

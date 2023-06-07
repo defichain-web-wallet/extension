@@ -39,6 +39,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
+  static const int timerDuration = 30;
+
   Timer? timer;
   TabController? tabController;
   LockHelper lockHelper = LockHelper();
@@ -102,6 +104,12 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {
+                      if (timer == null) {
+                        timer = Timer.periodic(
+                          Duration(seconds: timerDuration),
+                          (timer) async => walletCubit.updateAccountBalances(),
+                        );
+                      }
                       if (widget.snackBarMessage.isNotEmpty &&
                           !isShownSnackBar) {
                         Future<Null>.delayed(Duration.zero, () {

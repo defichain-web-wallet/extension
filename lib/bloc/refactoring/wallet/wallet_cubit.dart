@@ -156,7 +156,29 @@ class WalletCubit extends Cubit<WalletState> {
     emit(state.copyWith(
       applicationModel: applicationModel,
     ));
+  }
 
+  updateAccountBalances() async {
+    emit(state.copyWith(
+      status: WalletStatusList.update,
+      applicationModel: state.applicationModel,
+    ));
+    final networkName =
+        state.applicationModel!.activeNetwork!.networkType.networkName.name;
+    final balances =
+        await state.applicationModel!.activeNetwork!.getAllBalances(
+      addressString: state.activeAccount.addresses[networkName]!,
+    );
+    state.applicationModel!.activeAccount!.pinnedBalances[networkName] =
+        balances;
+
+    // TODO: maybe need to save applicationModel during another action
+    StorageService.saveApplication(state.applicationModel!);
+
+    emit(state.copyWith(
+      status: WalletStatusList.success,
+      applicationModel: state.applicationModel,
+    ));
   }
 
   getCurrentNetwork(){
