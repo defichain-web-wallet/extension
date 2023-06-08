@@ -6,7 +6,6 @@ import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/balance_requests.dart';
-import 'package:flutter/material.dart';
 
 class BalancesHelper {
   static const int COIN = 100000000;
@@ -118,28 +117,30 @@ class BalancesHelper {
     int fixedCount = 2,
     FormatNumberType? type,
   }) {
-    double minNumber = 0.000001;
-    if (type == null) {
-      var stringNumber = '';
+    final defaultPrecision = 8;
+    final minNumber = 0.01;
 
-      if (number < minNumber && !fixed && number != 0) {
-        stringNumber = number.toStringAsFixed(8);
-      } else {
-        stringNumber =
-            fixed ? number.toStringAsFixed(fixedCount) : number.toString();
-      }
-      var charNumberList = stringNumber.split('.');
-
-      charNumberList.first = StringUtils.addCharAtPosition(
-              charNumberList.first.split('').reversed.join(), ",", 3,
-              repeat: true)
-          .split('')
-          .reversed
-          .join();
-      return charNumberList.join('.');
-    } else {
+    if (type != null) {
       return numberSpecificFormat(type, number);
     }
+
+    String stringNumber;
+    if (number < minNumber && !fixed) {
+      stringNumber = number.toStringAsFixed(defaultPrecision);
+    } else {
+      stringNumber = number.toStringAsFixed(fixedCount);
+    }
+
+    final charNumberList = stringNumber.split('.');
+
+    charNumberList.first = StringUtils.addCharAtPosition(
+      charNumberList.first.split('').reversed.join(),
+      ',',
+      3,
+      repeat: true,
+    ).split('').reversed.join();
+
+    return charNumberList.join('.');
   }
 
   String numberSpecificFormat(

@@ -1,11 +1,9 @@
 import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/mixins/format_mixin.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
@@ -30,8 +28,12 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
 
   String getFormatTokenBalance(int tokenBalance) {
     WalletCubit homeCubit = BlocProvider.of<WalletCubit>(context);
-    var balance = homeCubit.state.activeNetwork.fromSatoshi(tokenBalance);
-    return '${balancesHelper.numberStyling(balance)}';
+    final balance = homeCubit.state.activeNetwork.fromSatoshi(tokenBalance);
+    return balancesHelper.numberStyling(
+      balance,
+      fixedCount: 8,
+      fixed: true,
+    );
   }
 
   @override
@@ -49,8 +51,7 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
 
         final roundedBalance = BalancesHelper().numberStyling(
           convertedBalance,
-          fixed: true,
-          fixedCount: 6,
+          fixedCount: 2,
         );
 
         return Container(
@@ -130,7 +131,7 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
                         height: 2,
                       ),
                       Text(
-                        roundedBalance,
+                        '\$$roundedBalance',
                         style: Theme.of(context).textTheme.headline6!.copyWith(
                               color: Theme.of(context)
                                   .textTheme
