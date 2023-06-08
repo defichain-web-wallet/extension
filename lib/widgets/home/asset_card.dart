@@ -47,6 +47,12 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
           widget.balanceModel,
         );
 
+        final roundedBalance = BalancesHelper().numberStyling(
+          convertedBalance,
+          fixed: true,
+          fixedCount: 6,
+        );
+
         return Container(
           height: 64,
           padding: const EdgeInsets.only(
@@ -124,7 +130,7 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
                         height: 2,
                       ),
                       Text(
-                        convertedBalance.toString(),
+                        roundedBalance,
                         style: Theme.of(context).textTheme.headline6!.copyWith(
                               color: Theme.of(context)
                                   .textTheme
