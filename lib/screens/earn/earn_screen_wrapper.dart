@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/earn/earn_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/access_token_helper.dart';
@@ -36,8 +37,8 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
 
   @override
   void initState() {
-    LmCubit lmCubit = BlocProvider.of<LmCubit>(context);
-    lmCubit.setInitial();
+    EarnCubit earnCubit = BlocProvider.of<EarnCubit>(context);
+    earnCubit.setInitial(context);
     super.initState();
   }
 
@@ -79,12 +80,12 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
         ),
         child: Center(
           child: StretchBox(
-            child: BlocBuilder<LmCubit, LmState>(
-              builder: (lmContext, lmState) {
-                LmCubit lmCubit = BlocProvider.of<LmCubit>(context);
-                if(lmState.status == LmStatusList.loading || lmState.status == LmStatusList.initial){
-                  if(lmState.status == LmStatusList.initial){
-                    lmCubit.init(context);
+            child: BlocBuilder<EarnCubit, EarnState>(
+              builder: (earnContext, earnState) {
+                EarnCubit earnCubit = BlocProvider.of<EarnCubit>(context);
+                if(earnState.status == EarnStatusList.loading || earnState.status == EarnStatusList.initial){
+                  if(earnState.status == EarnStatusList.initial){
+                    earnCubit.init(context);
                   }
                   return Loader();
                 }
@@ -105,20 +106,16 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
                           ),
                         ],
                       ),
-                      //TODO: staking
-                      // SizedBox(
-                      //   height: 19,
-                      // ),
-                      // StakingCard(
-                      //   loadEarnData: widget.loadEarnData,
-                      //   callback: stakingCallback,
-                      // ),
+                      SizedBox(
+                        height: 19,
+                      ),
+                      StakingCard(
+                      ),
                       SizedBox(
                         height: 18,
                       ),
                       liquidityMiningCard(
-                        lmState,
-                        lmState.status == TokensStatusList.loading,
+                        earnState.status == EarnStatusList.loading,
                       ),
                     ],
                   );
@@ -131,9 +128,9 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
   }
 
   Widget liquidityMiningCard(
-    LmState lmState,
     bool isLoading,
   ) {
+    LmState lmState = BlocProvider.of<LmCubit>(context).state;
     return EarnCard(
       isLoading: isLoading,
       title: 'Liquidity mining',
@@ -154,35 +151,6 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
     );
   }
 
-  stakingCallback() async {
-    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-    if (lockCubit.checkVerifiedUser(isCheckOnlyKycStatus: true)) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => StakingScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
-    } else {
-      if (lockCubit.checkValidKycLink()) {
-        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-        await lockCubit.loadKycDetails(accountCubit.state.accounts!.first);
-        await lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
-      }
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              StakingKycStartScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
-    }
-  }
 
   liquidityCallback() {
     Widget redirectTo = LiquidityScreenNew();

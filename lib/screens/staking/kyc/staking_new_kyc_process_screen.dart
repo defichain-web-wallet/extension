@@ -15,7 +15,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class StakingNewKycProcessScreen extends StatefulWidget {
-  const StakingNewKycProcessScreen({Key? key}) : super(key: key);
+  const StakingNewKycProcessScreen({Key? key, required this.kycLink}) : super(key: key);
+  final String kycLink;
 
   @override
   State<StakingNewKycProcessScreen> createState() =>
@@ -41,8 +42,6 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<LockCubit, LockState>(
-          builder: (lockContext, lockState) {
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: AccountDrawer(
@@ -237,7 +236,7 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                                           (context, animation1, animation2) =>
                                               StakingKycMobileScreen(
                                         kycLink:
-                                            lockState.lockUserDetails!.kycLink!,
+                                            widget.kycLink,
                                       ),
                                       transitionDuration: Duration.zero,
                                       reverseTransitionDuration: Duration.zero,
@@ -250,8 +249,7 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                                     context: context,
                                     builder: (BuildContext dialogContext) {
                                       return RedirectToLockDialog(
-                                        kycLink:
-                                            lockState.lockUserDetails!.kycLink!,
+                                        kycLink: widget.kycLink,
                                       );
                                     },
                                   );
@@ -290,8 +288,6 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                 ),
               ),
             );
-          },
-        );
       },
     );
   }

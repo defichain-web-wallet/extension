@@ -255,7 +255,7 @@ class _StakingSelectVerificationScreenState
                                           PageRouteBuilder(
                                             pageBuilder: (context, animation1,
                                                     animation2) =>
-                                                StakingNewKycProcessScreen(),
+                                                StakingNewKycProcessScreen(kycLink: '',), //TODO: fix it
                                             transitionDuration: Duration.zero,
                                             reverseTransitionDuration:
                                                 Duration.zero,

@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -87,6 +89,12 @@ class WalletCubit extends Cubit<WalletState> {
           sourceId: source.id,
           isRestore: true,
         );
+        for(var network in applicationModel.networks){
+          if(network.networkType.networkName.name == NetworkName.defichainMainnet.name){
+            await (network.stakingList[0] as LockStakingProviderModel).signIn(account, password, applicationModel);
+          }
+        }
+
       } catch (_) {
         print(_);
         rethrow;

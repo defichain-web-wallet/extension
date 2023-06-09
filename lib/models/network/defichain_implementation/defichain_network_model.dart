@@ -109,7 +109,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }
 
   List<AbstractStakingProviderModel> getStakingProviders() {
-    return [];
+    return stakingList;
   }
 
   List<AbstractLmProviderModel> getLmProviders() {
@@ -250,7 +250,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       applicationModel
     );
 
-    List<BalanceModel> balances = account.getPinnedBalances(this);
+    List<BalanceModel> balances = account.getPinnedBalances(this, mergeCoin: false);
     BalanceModel balanceUTXO = await getBalanceUTXO(
       balances,
       account.getAddress(this.networkType.networkName)!,
