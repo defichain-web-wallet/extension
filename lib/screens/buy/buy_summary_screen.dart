@@ -498,7 +498,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                         ClipboardData(
                                                             text: fiatState
                                                                 .activeIban!
-                                                                .bankUsage),
+                                                                .bankUsage!),
                                                       );
                                                     },
                                                     child: MouseRegion(
