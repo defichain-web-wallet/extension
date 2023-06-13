@@ -1072,12 +1072,30 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
     CryptoRouteModel? cryptoRoute,
   }) async {
     hideOverlay();
+    // TODO: remove SettingsHelper.isBitcoin after refactoring
     if (SettingsHelper.isBitcoin()) {
-      double minDeposit = convertFromSatoshi(cryptoRoute!.minDeposit!);
-      if (minDeposit >= double.parse(amountFromController.text)) {
+      TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+
+      double amountInUsd = tokensHelper.getAmountByUsd(
+        tokensCubit.state.tokensPairs!,
+        double.parse(amountFromController.text),
+        'BTC',
+      );
+
+      double minDeposit = tokensHelper.getAmountByUsd(
+        tokensCubit.state.tokensPairs!,
+        convertFromSatoshi(cryptoRoute!.minDeposit!),
+        'EUROC',
+      );
+      String minDepositFormat = balancesHelper.numberStyling(
+        minDeposit,
+        fixed: true,
+        fixedCount: 2,
+      );
+      if (minDeposit >= amountInUsd) {
         showSnackBar(
           context,
-          title: 'Min amount must be more than $minDeposit BTC',
+          title: 'Min amount must be more than $minDepositFormat USD',
           color: AppColors.txStatusError
               .withOpacity(0.1),
           prefix: Icon(

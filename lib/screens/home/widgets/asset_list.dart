@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -12,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // ignore: must_be_immutable
-class AssetList extends StatelessWidget {
+class AssetList extends StatelessWidget with ThemeMixin {
   AssetList({
     Key? key,
   }) : super(key: key);
@@ -70,6 +71,9 @@ class AssetList extends StatelessWidget {
                         right: 16,
                         top: 2,
                       ),
+                      color: isFullScreen(context)
+                          ? null
+                          : Theme.of(context).cardColor,
                       child: AssetCard(
                         index: index,
                         tokenBalance: tokenBalance,

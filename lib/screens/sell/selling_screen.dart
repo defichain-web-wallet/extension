@@ -55,6 +55,8 @@ class Selling extends StatefulWidget {
 }
 
 class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
+  static const completeKycType = 'Completed';
+
   final TextEditingController amountController =
   TextEditingController(text: '0');
   final TextEditingController _ibanController = TextEditingController();
@@ -299,48 +301,45 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                       ),
                                                     ],
                                                   ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      children: [
-                                                        RichText(
-                                                          text: TextSpan(
-                                                            children: [
-                                                              TextSpan(
+                                                  if (fiatState.kycStatus !=
+                                                      completeKycType)
+                                                    Expanded(
+                                                      child: Column(
+                                                        children: [
+                                                          RichText(
+                                                            text: TextSpan(
+                                                              children: [
+                                                                TextSpan(
+                                                                    text:
+                                                                        'Your account needs to get verified once your daily transaction volume exceeds 900 €. If you want to increase the daily trading limit, please complete the ',
+                                                                    style: Theme.of(context).textTheme.headline6!.copyWith(
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w600,
+                                                                        color: Theme.of(context)
+                                                                            .textTheme
+                                                                            .headline6!
+                                                                            .color!
+                                                                            .withOpacity(0.6))),
+                                                                TextSpan(
                                                                   text:
-                                                                  'Your account needs to get verified once your daily transaction volume exceeds 900 €. If you want to increase the daily trading limit, please complete the ',
+                                                                      'KYC (Know-Your-Customer) process.',
                                                                   style: Theme.of(
-                                                                      context)
+                                                                          context)
                                                                       .textTheme
                                                                       .headline6!
                                                                       .copyWith(
-                                                                      fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                      color: Theme.of(context)
-                                                                          .textTheme
-                                                                          .headline6!
-                                                                          .color!
-                                                                          .withOpacity(0.6))),
-                                                              TextSpan(
-                                                                text:
-                                                                'KYC (Know-Your-Customer) process.',
-                                                                style: Theme.of(
-                                                                    context)
-                                                                    .textTheme
-                                                                    .headline6!
-                                                                    .copyWith(
-                                                                    fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                    color: AppTheme
-                                                                        .pinkColor),
-                                                              ),
-                                                            ],
+                                                                          fontWeight: FontWeight
+                                                                              .w600,
+                                                                          color:
+                                                                              AppTheme.pinkColor),
+                                                                ),
+                                                              ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  )
+                                                        ],
+                                                      ),
+                                                    )
                                                 ],
                                               ),
                                             )
@@ -551,7 +550,6 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
       try {
         foundedIban = fiatState.ibanList!.firstWhere((el) =>
         el.active! &&
-            el.type == "Sell" &&
             el.iban == fiatState.activeIban!.iban &&
             el.fiat!.name == selectedFiat.name);
       } catch (_) {

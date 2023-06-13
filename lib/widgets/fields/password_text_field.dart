@@ -59,6 +59,7 @@ class PasswordTextField extends StatefulWidget {
 }
 
 class _PasswordTextFieldState extends State<PasswordTextField> {
+  final regExp = RegExp("[0-9a-zA-Z-_+=?!@#\$%:;^&*(){}<>\"',.\/|]");
   static const String obscureSymbolCharacter = '●';
   static const int maxLines = 1;
 
@@ -112,8 +113,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                 child: TextFormField(
                   inputFormatters: widget.onlyEngCharacters
                       ? <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(
-                              RegExp("[0-9a-zA-Z]")),
+                          FilteringTextInputFormatter.allow(regExp),
                         ]
                       : [],
                   autofocus: widget.autofocus,

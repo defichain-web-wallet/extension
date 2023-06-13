@@ -144,8 +144,10 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                       return FlatButton(
                         title: 'Change',
                         isPrimary: false,
-                        iconPath: 'assets/icons/change_icon.svg',
-                        callback: () {
+                      iconPath: SettingsHelper.isBitcoin()
+                          ? 'assets/icons/change_icon_disabled.svg'
+                          : 'assets/icons/change_icon.svg',
+                      callback: SettingsHelper.isBitcoin() ? null : () {
                           late Widget changeWidget;
                           if (SettingsHelper.isBitcoin() &&
                               SettingsHelper.settings.network == 'testnet') {

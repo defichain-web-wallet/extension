@@ -365,7 +365,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                                         text: TextSpan(children: [
                                           TextSpan(
                                             text:
-                                                '1 $assetFrom = ${widget.assetPair.reserveBDivReserveA!.toStringAsFixed(4)} $assetTo',
+                                                '1 $assetFrom = ${widget.assetPair.reserveBDivReserveA!.toStringAsFixed(2)} $assetTo',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .headline5!
@@ -395,7 +395,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                                         text: TextSpan(children: [
                                           TextSpan(
                                             text:
-                                                '1 $assetTo = ${widget.assetPair.reserveADivReserveB!.toStringAsFixed(4)} $assetFrom',
+                                                '1 $assetTo = ${widget.assetPair.reserveADivReserveB!.toStringAsFixed(8)} $assetFrom',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .headline5!
@@ -590,8 +590,8 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
         );
 
     setState(() {
-      rateBalanceFromUsd = rateFrom.toStringAsFixed(4);
-      rateBalanceToUsd = rateTo.toStringAsFixed(4);
+      rateBalanceFromUsd = rateFrom.toStringAsFixed(2);
+      rateBalanceToUsd = rateTo.toStringAsFixed(2);
       balanceUSD = totalBalanceInUsd;
       amountUSD = totalAmountInUsd;
     });
