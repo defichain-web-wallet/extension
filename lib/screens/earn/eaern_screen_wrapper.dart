@@ -9,8 +9,10 @@ import 'package:defi_wallet/screens/earn/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/staking/staking_card.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -19,10 +21,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EarnScreenWrapper extends StatefulWidget {
   final Function() loadEarnData;
+  final bool isFullScreen;
 
   EarnScreenWrapper({
     Key? key,
     required this.loadEarnData,
+    required this.isFullScreen,
   }) : super(key: key);
 
   @override
@@ -38,10 +42,10 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
 
     return Scaffold(
       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-      endDrawer: AccountDrawer(
-        width: accountDrawerWidth,
+      endDrawer: widget.isFullScreen ? null : AccountDrawer(
+        width: buttonSmallWidth,
       ),
-      appBar: NewMainAppBar(
+      appBar: widget.isFullScreen ? null : NewMainAppBar(
         isShowLogo: false,
       ),
       body: Container(
@@ -66,21 +70,17 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
           borderRadius: BorderRadius.only(
             topRight: Radius.circular(20),
             topLeft: Radius.circular(20),
+            bottomLeft: Radius.circular(isFullScreen(context) ? 20 : 0),
+            bottomRight: Radius.circular(isFullScreen(context) ? 20 : 0),
           ),
         ),
         child: Center(
           child: StretchBox(
             child: Column(
               children: [
-                Row(
-                  children: [
-                    Text(
-                      titleText,
-                      style: Theme.of(context).textTheme.headline3!.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                  ],
+                PageTitle(
+                  title: titleText,
+                  isFullScreen: widget.isFullScreen,
                 ),
                 SizedBox(
                   height: 19,
@@ -135,14 +135,7 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
   stakingCallback() async {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     if (lockCubit.checkVerifiedUser(isCheckOnlyKycStatus: true)) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => StakingScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, StakingScreen());
     } else {
       if (lockCubit.checkValidKycLink()) {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
@@ -150,27 +143,15 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
         await lockCubit.loadKycDetails(accountCubit.state.accounts!.first);
         await lockCubit.loadUserDetails(accountCubit.state.accounts!.first);
       }
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              StakingKycStartScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, StakingKycStartScreen());
     }
   }
 
   liquidityCallback(String avaragePairsAPR) {
-    Widget redirectTo = LiquidityScreenNew(averageARP: avaragePairsAPR);
-
-    Navigator.push(
+    NavigatorService.push(
       context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) => redirectTo,
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
+      LiquidityScreenNew(
+        averageARP: avaragePairsAPR,
       ),
     );
   }

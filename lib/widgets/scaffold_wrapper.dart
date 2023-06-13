@@ -28,16 +28,15 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
       child: Align(
         alignment: Alignment.center,
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: ScreenSizes.medium),
+          constraints: BoxConstraints(maxWidth: ScreenSizes.large),
           child: LayoutBuilder(
             builder: (context, constraints) {
               return BlocBuilder<TransactionCubit, TransactionState>(
                 buildWhen: (prev, current) => widget.isUpdate,
                 builder: (context, txState) {
-                  bool isFullScreenMode =
-                      constraints.maxWidth == ScreenSizes.medium;
+                  double width = MediaQuery.of(context).size.width;
+                  bool isFullScreenMode = width > ScreenSizes.medium;
                   return Container(
-                    padding: EdgeInsets.only(top: isFullScreenMode ? 20 : 0),
                     child: widget.builder(
                       context,
                       isFullScreenMode,

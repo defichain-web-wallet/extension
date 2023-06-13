@@ -142,6 +142,7 @@ class _FeesSelectorState extends State<FeesSelector> with ThemeMixin {
           child: BlocBuilder<BitcoinCubit, BitcoinState>(
             builder: (context, bitcoinState) {
               return Container(
+                width: 456,
                 color: isDarkTheme()
                     ? DarkColors.feesDropdownBgColor
                     : LightColors.feesDropdownBgColor,

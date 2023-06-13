@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'dart:math' as math;
 
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
@@ -8,10 +7,12 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/add_token/token_list_tile.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -54,7 +55,7 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
           builder: (context, accountState) {
             return BlocBuilder<TokensCubit, TokensState>(
               builder: (context, tokenState) {
-                if (iterator == 0) {
+                if (iterator == 0 && !isFullScreen) {
                   TokensCubit token = BlocProvider.of<TokensCubit>(context);
 
                   token.loadTokensFromStorage();
@@ -83,16 +84,16 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
 
                   return Scaffold(
                     drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                    endDrawer: AccountDrawer(
+                    endDrawer: isFullScreen ? null : AccountDrawer(
                       width: buttonSmallWidth,
                     ),
-                    appBar: NewMainAppBar(
+                    appBar: isFullScreen ? null : NewMainAppBar(
                       isShowLogo: false,
                     ),
                     body: Container(
                       padding: EdgeInsets.only(
                         top: 22,
-                        bottom: 24,
+                        bottom: 22,
                         left: 16,
                         right: 16,
                       ),
@@ -111,6 +112,8 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
                           topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                          bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                         ),
                       ),
                       child: Center(
@@ -121,17 +124,12 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        titleText,
-                                        style: headline2.copyWith(
-                                            fontWeight: FontWeight.w700),
-                                      )
-                                    ],
+                                  PageTitle(
+                                    title: titleText,
+                                    isFullScreen: isFullScreen,
                                   ),
                                   SizedBox(
-                                    height: 8,
+                                    height: 16,
                                   ),
                                   CustomTextFormField(
                                     prefix: Icon(Icons.search),
@@ -166,7 +164,13 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                     textAlign: TextAlign.start,
                                   ),
                                   Container(
-                                    height: availableTokens.length != 0 ? 288 : 297,
+                                    height: availableTokens.length != 0
+                                        ? isFullScreen
+                                            ? 420
+                                            : 288
+                                        : isFullScreen
+                                            ? 397
+                                            : 297,
                                     child: availableTokens.length != 0
                                         ? ListView.builder(
                                             itemCount: availableTokens.length,
@@ -260,19 +264,9 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                       ),
                                     );
                                   } else {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder:
-                                            (context, animation1, animation2) =>
-                                                AddTokenConfirmScreen(
-                                          arguments: symbols,
-                                        ),
-                                        transitionDuration: Duration.zero,
-                                        reverseTransitionDuration:
-                                            Duration.zero,
-                                      ),
-                                    );
+                                    NavigatorService.push(context, AddTokenConfirmScreen(
+                                      arguments: symbols,
+                                    ));
                                   }
                                 },
                                 title: 'Continue',

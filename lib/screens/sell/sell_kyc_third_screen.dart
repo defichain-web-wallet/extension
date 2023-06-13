@@ -4,10 +4,12 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/sell/selling_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -78,16 +80,16 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
             } else {
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: AccountDrawer(
+                endDrawer: isFullScreen ? null : AccountDrawer(
                   width: buttonSmallWidth,
                 ),
-                appBar: NewMainAppBar(
+                appBar: isFullScreen ? null : NewMainAppBar(
                   isShowLogo: false,
                 ),
                 body: Container(
                   padding: EdgeInsets.only(
                     top: 22,
-                    bottom: 24,
+                    bottom: 22,
                     left: 16,
                     right: 16,
                   ),
@@ -106,6 +108,8 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
                       topLeft: Radius.circular(20),
+                      bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                      bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                     ),
                   ),
                   child: Center(
@@ -120,12 +124,9 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    titleText,
-                                    style: headline2.copyWith(
-                                        fontWeight: FontWeight.w700),
-                                    textAlign: TextAlign.start,
-                                    softWrap: true,
+                                  PageTitle(
+                                    title: titleText,
+                                    isFullScreen: isFullScreen,
                                   ),
                                   SizedBox(
                                     height: 8,
@@ -273,7 +274,7 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                                 width: 104,
                                 child: AccentButton(
                                   callback: () {
-                                    Navigator.pop(context);
+                                    NavigatorService.pop(context);
                                   },
                                   label: 'Back',
                                 ),
@@ -312,14 +313,7 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
       String kycStatus = 'skip';
       await box.put(HiveNames.kycStatus, kycStatus);
       await box.close();
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => Selling(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, Selling());
     }
   }
 }

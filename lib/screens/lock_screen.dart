@@ -42,91 +42,103 @@ class _LockScreenState extends State<LockScreen> {
   PasswordStatusList passwordStatus = PasswordStatusList.initial;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: Stack(
-          children: [
-            ExtensionWelcomeBg(),
-            Container(
-              padding: const EdgeInsets.only(bottom: 42),
-              child: Center(
-                child: StretchBox(
-                     child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Container(
-                            padding: authPaddingContainer.copyWith(
-                              top: 0,
-                              bottom: 0,
+  Widget build(BuildContext context) {
+    bool isFullScreen = MediaQuery.of(context).size.width > ScreenSizes.medium;
+    return Scaffold(
+      body: Stack(
+        children: [
+          if (!isFullScreen)
+            ExtensionWelcomeBg()
+          else
+            Center(
+              child: Image.asset(
+                'assets/images/jelly_protect.png',
+                width: 191,
+                height: 306,
+              ),
+            ),
+          Container(
+            padding: const EdgeInsets.only(bottom: 42),
+            child: Center(
+              child: StretchBox(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: authPaddingContainer.copyWith(
+                        top: 0,
+                        bottom: 0,
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            PasswordTextField(
+                              onlyEngCharacters: false,
+                              isOpasity: !isFullScreen,
+                              height: 71,
+                              controller: _passwordController,
+                              status: passwordStatus,
+                              hint: 'Your password',
+                              label: 'Password',
+                              isShowObscureIcon: true,
+                              isCaptionShown: false,
+                              onEditComplete: () =>
+                                  (globalKey.currentWidget! as ElevatedButton)
+                                      .onPressed!(),
+                              isObscure: isPasswordObscure,
+                              onChanged: (val) {},
+                              onPressObscure: () {
+                                setState(
+                                        () => isPasswordObscure = !isPasswordObscure);
+                              },
+                              validator: (val){
+                                return isValid ? null : "Incorrect password";
+                              },
                             ),
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                children: [
-                                  PasswordTextField(
-                                    onlyEngCharacters: false,
-                                    isOpasity: true,
-                                    height: 71,
-                                    controller: _passwordController,
-                                    status: passwordStatus,
-                                    hint: 'Your password',
-                                    label: 'Password',
-                                    isShowObscureIcon: true,
-                                    isCaptionShown: false,
-                                    onEditComplete: () =>
-                                        (globalKey.currentWidget! as ElevatedButton)
-                                            .onPressed!(),
-                                    isObscure: isPasswordObscure,
-                                    onChanged: (val) {},
-                                    onPressObscure: () {
-                                      setState(
-                                              () => isPasswordObscure = !isPasswordObscure);
-                                    },
-                                    validator: (val){
-                                      return isValid ? null : "Incorrect password";
-                                    },
-                                  ),
-                                  StretchBox(
-                                    maxWidth: ScreenSizes.xSmall,
-                                    child: PendingButton(
-                                      widget.callback == null ? 'Unlock' : 'Continue',
-                                      pendingText: 'Pending...',
-                                      isCheckLock: false,
-                                      globalKey: globalKey,
-                                      callback: (parent) => _restoreWallet(parent),
-                                    ),
-                                  ),
-                                  SizedBox(height: 20),
-                                  if (widget.callback == null)
-                                    InkWell(
-                                      child: Text(
-                                        'Forgot password?',
-                                        style: AppTheme.defiUnderlineText,
-                                      ),
-                                      onTap: isEnable
-                                          ? () => Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder:
-                                              (context, animation1, animation2) =>
-                                              RecoveryScreen(),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration: Duration.zero,
-                                        ),
-                                      )
-                                          : null,
-                                    ),
-                                ],
+                            StretchBox(
+                              maxWidth: ScreenSizes.xSmall,
+                              child: PendingButton(
+                                widget.callback == null ? 'Unlock' : 'Continue',
+                                pendingText: 'Pending...',
+                                isCheckLock: false,
+                                globalKey: globalKey,
+                                callback: (parent) => _restoreWallet(parent),
                               ),
                             ),
-                          )
-                        ],
+                            SizedBox(height: 20),
+                            if (widget.callback == null)
+                              InkWell(
+                                child: Text(
+                                  'Forgot password?',
+                                  style: AppTheme.defiUnderlineText,
+                                ),
+                                onTap: isEnable
+                                    ? () => Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                        RecoveryScreen(),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ),
+                                )
+                                    : null,
+                              ),
+                          ],
+                        ),
                       ),
+                    )
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
+  }
 
   void _restoreWallet(parent) async {
     setState(() {

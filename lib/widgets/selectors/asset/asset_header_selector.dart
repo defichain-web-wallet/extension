@@ -83,16 +83,17 @@ class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
               ),
             ),
           ),
-          RotationTransition(
-            turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
-            child: SizedBox(
-              width: 10,
-              height: 10,
-              child: SvgPicture.asset(
-                'assets/icons/arrow_down.svg',
+          if (!SettingsHelper.isBitcoin())
+            RotationTransition(
+              turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
+              child: SizedBox(
+                width: 10,
+                height: 10,
+                child: SvgPicture.asset(
+                  'assets/icons/arrow_down.svg',
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

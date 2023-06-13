@@ -7,10 +7,12 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/lock_reward_routes_model.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -103,10 +105,10 @@ class _StakingScreenState extends State<StakingScreen>
 
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: AccountDrawer(
+                endDrawer: isFullScreen ? null : AccountDrawer(
                   width: buttonSmallWidth,
                 ),
-                appBar: NewMainAppBar(
+                appBar: isFullScreen ? null : NewMainAppBar(
                   bgColor: AppColors.viridian.withOpacity(0.16),
                   isShowLogo: false,
                   isShowNetworkSelector: false,
@@ -264,14 +266,9 @@ class _StakingScreenState extends State<StakingScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      titleText,
-                                      style:
-                                          Theme.of(context).textTheme.headline3,
-                                    ),
-                                  ],
+                                PageTitle(
+                                  title: titleText,
+                                  isFullScreen: isFullScreen,
                                 ),
                                 SizedBox(
                                   height: 16,
@@ -463,21 +460,9 @@ class _StakingScreenState extends State<StakingScreen>
                                               child: AccentButton(
                                                 label: 'Unstake',
                                                 callback: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    PageRouteBuilder(
-                                                      pageBuilder: (context,
-                                                              animation1,
-                                                              animation2) =>
-                                                          StakeUnstakeScreen(
-                                                        isUnstake: true,
-                                                      ),
-                                                      transitionDuration:
-                                                          Duration.zero,
-                                                      reverseTransitionDuration:
-                                                          Duration.zero,
-                                                    ),
-                                                  );
+                                                  NavigatorService.push(context, StakeUnstakeScreen(
+                                                    isUnstake: true,
+                                                  ));
                                                 },
                                               ),
                                             ),
@@ -485,21 +470,9 @@ class _StakingScreenState extends State<StakingScreen>
                                               width: 140,
                                               title: 'Stake',
                                               callback: () {
-                                                Navigator.push(
-                                                  context,
-                                                  PageRouteBuilder(
-                                                    pageBuilder: (context,
-                                                            animation1,
-                                                            animation2) =>
-                                                        StakeUnstakeScreen(
-                                                      isUnstake: false,
-                                                    ),
-                                                    transitionDuration:
-                                                        Duration.zero,
-                                                    reverseTransitionDuration:
-                                                        Duration.zero,
-                                                  ),
-                                                );
+                                                NavigatorService.push(context, StakeUnstakeScreen(
+                                                  isUnstake: false,
+                                                ));
                                               },
                                             )
                                           ],

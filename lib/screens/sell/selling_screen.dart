@@ -5,7 +5,6 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
@@ -18,13 +17,14 @@ import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -157,19 +157,18 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                       });
                       return Scaffold(
                         drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                        endDrawer: AccountDrawer(
+                        endDrawer: isFullScreen ? null : AccountDrawer(
                           width: buttonSmallWidth,
                         ),
-                        appBar: NewMainAppBar(
+                        appBar: isFullScreen ? null : NewMainAppBar(
                           isShowLogo: false,
-                          callback: hideOverlay,
                         ),
                         body: GestureDetector(
                           onTap: hideOverlay,
                           child: Container(
                             padding: EdgeInsets.only(
                               top: 22,
-                              bottom: 24,
+                              bottom: 22,
                               left: 16,
                               right: 16,
                             ),
@@ -188,6 +187,8 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                               borderRadius: BorderRadius.only(
                                 topRight: Radius.circular(20),
                                 topLeft: Radius.circular(20),
+                                bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                                bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                               ),
                             ),
                             child: Center(
@@ -204,17 +205,9 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                           crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                           children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  titleText,
-                                                  style: headline2.copyWith(
-                                                      fontWeight:
-                                                      FontWeight.w700),
-                                                  textAlign: TextAlign.start,
-                                                  softWrap: true,
-                                                ),
-                                              ],
+                                            PageTitle(
+                                              title: titleText,
+                                              isFullScreen: isFullScreen,
                                             ),
                                             SizedBox(
                                               height: 16,
@@ -430,6 +423,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                                   tokensState,
                                                                   fiatState,
                                                                   password,
+                                                                  isFullScreen,
                                                                 );
                                                                 parent
                                                                     .emitPending(
@@ -547,6 +541,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
       TokensState tokensState,
       FiatState fiatState,
       String password,
+      bool isFullScreen,
       ) async {
     try {
       String address;
@@ -571,7 +566,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
         address = foundedIban.deposit["address"];
       }
       await _sendTransaction(context, tokensState, currentAsset!.symbol!,
-          accountState.activeAccount!, address, amount, password);
+          accountState.activeAccount!, isFullScreen, address, amount, password);
     } catch (err) {
       showSnackBar(
         context,
@@ -608,7 +603,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
         double.parse(amountController.text.replaceAll(',', '.')) > 0;
   }
 
-  _sendTransaction(context, tokensState, String token, AccountModel account,
+  _sendTransaction(context, tokensState, String token, AccountModel account, bool isFullScreen,
       String address, double amount, String password) async {
     TxErrorModel? txResponse;
     try {
@@ -637,7 +632,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
       TransactionCubit transactionCubit =
       BlocProvider.of<TransactionCubit>(context);
 
-      transactionCubit.setOngoingTransaction(txResponse);
+      await transactionCubit.setOngoingTransaction(txResponse);
     }
     showDialog(
       barrierColor: AppColors.tolopea.withOpacity(0.06),
@@ -653,14 +648,14 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder:
-                    (context, animation1, animation2) =>
-                    HomeScreen(isLoadTokens: true,),
+                pageBuilder: (context, animation1, animation2) => HomeScreen(
+                  isLoadTokens: true,
+                ),
                 transitionDuration: Duration.zero,
-                reverseTransitionDuration:
-                Duration.zero,
+                reverseTransitionDuration: Duration.zero,
               ),
             );
+            NavigatorService.pushReplacement(context, null);
           },
           callbackTryAgain: () async {
             print('TryAgain');
@@ -669,6 +664,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
               tokensState,
               currentAsset!.symbol!,
               account,
+              isFullScreen,
               address,
               amount,
               password,

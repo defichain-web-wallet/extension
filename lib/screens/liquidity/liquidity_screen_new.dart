@@ -9,10 +9,12 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/screens/liquidity/choose_pool_pair_screen.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_pool_list.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/liquidity/main_liquidity_pair.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -170,10 +172,10 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
 
                   return Scaffold(
                     drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                    endDrawer: AccountDrawer(
+                    endDrawer: isFullScreen ? null : AccountDrawer(
                       width: buttonSmallWidth,
                     ),
-                    appBar: NewMainAppBar(
+                    appBar: isFullScreen ? null : NewMainAppBar(
                       isShowLogo: false,
                     ),
                     body: Container(
@@ -198,6 +200,8 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
                           topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                          bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                         ),
                       ),
                       child: Center(
@@ -209,10 +213,9 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    titleText,
-                                    style: headline2.copyWith(
-                                        fontWeight: FontWeight.w700),
+                                  PageTitle(
+                                    title: titleText,
+                                    isFullScreen: isFullScreen,
                                   ),
                                   Tooltip(
                                     margin: EdgeInsets.only(right: 9, top: 8),
@@ -249,16 +252,9 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                       bgGradient: gradientActionButtonBg,
                                       iconPath: 'assets/images/add_gradient.png',
                                       onPressed: () {
-                                        Navigator.push(
+                                        NavigatorService.push(
                                           context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                    animation2) =>
-                                                ChoosePoolPairScreen(),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
-                                          ),
+                                          ChoosePoolPairScreen(),
                                         );
                                       },
                                     ),

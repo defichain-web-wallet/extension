@@ -70,6 +70,7 @@ class _EarnScreenState extends State<EarnScreen> {
       ) {
         return EarnScreenWrapper(
           loadEarnData: loadEarnData,
+          isFullScreen: isFullScreen,
         );
       },
     );

@@ -8,6 +8,7 @@ import 'package:defi_wallet/my_app.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
@@ -32,8 +33,13 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
       'This is your personal wallet address.\nYou can use it to receive DFI and DST tokens like dBTC, dETH, dTSLA & more.';
   String btcHintText = 'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
 
-  cutAddress(String s) {
-    return s.substring(0, 5) + '...' + s.substring(s.length - 4, s.length);
+  cutAddress(String s, {int range = 5}) {
+    return s.substring(0, range) +
+        '...' +
+        s.substring(
+          s.length - (range - 1),
+          s.length,
+        );
   }
 
   @override
@@ -55,19 +61,18 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
               }
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: AccountDrawer(
+                endDrawer: isFullScreen ? null : AccountDrawer(
                   width: buttonSmallWidth,
                 ),
-                appBar: NewMainAppBar(
+                appBar: isFullScreen ? null : NewMainAppBar(
                   isShowLogo: false,
                 ),
                 body: Container(
-                  margin: EdgeInsets.only(top: 5),
                   padding: EdgeInsets.only(
                     top: 22,
-                    bottom: 24,
-                    left: 29,
-                    right: 29,
+                    bottom: 22,
+                    left: 16,
+                    right: 16,
                   ),
                   height: double.infinity,
                   decoration: BoxDecoration(
@@ -80,6 +85,8 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
                       topLeft: Radius.circular(20),
+                      bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                      bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                     ),
                   ),
                   child: Center(
@@ -89,9 +96,9 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                         children: [
                           Column(
                             children: [
-                              Text(
-                                'Receive',
-                                style: headline3,
+                              PageTitle(
+                                title: 'Receive',
+                                isFullScreen: isFullScreen,
                               ),
                               SizedBox(
                                 height: 24,
@@ -156,7 +163,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     });
                                   },
                                   child: Container(
-                                    width: 140,
+                                    width: isFullScreen ? 302 : 140,
                                     height: 43,
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -172,7 +179,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          cutAddress(address),
+                                          isFullScreen ? cutAddress(address, range: 16): cutAddress(address),
                                           style: headline5,
                                         ),
                                         SizedBox(

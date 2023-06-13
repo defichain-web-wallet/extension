@@ -5,10 +5,12 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/screens/buy/buy_summary_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -85,17 +87,16 @@ class _IbanScreenState extends State<IbanScreen>
               });
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: AccountDrawer(
+                endDrawer: isFullScreen ? null : AccountDrawer(
                   width: buttonSmallWidth,
                 ),
-                appBar: NewMainAppBar(
+                appBar: isFullScreen ? null : NewMainAppBar(
                   isShowLogo: false,
-                  callback: hideOverlay,
                 ),
                 body: Container(
                   padding: EdgeInsets.only(
                     top: 22,
-                    bottom: 24,
+                    bottom: 22,
                     left: 16,
                     right: 16,
                   ),
@@ -114,6 +115,8 @@ class _IbanScreenState extends State<IbanScreen>
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
                       topLeft: Radius.circular(20),
+                      bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                      bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                     ),
                   ),
                   child: Center(
@@ -124,14 +127,9 @@ class _IbanScreenState extends State<IbanScreen>
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    titleText,
-                                    style: headline2.copyWith(
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ],
+                              PageTitle(
+                                title: titleText,
+                                isFullScreen: isFullScreen,
                               ),
                               SizedBox(
                                 height: 8,
@@ -185,7 +183,9 @@ class _IbanScreenState extends State<IbanScreen>
                                 width: 104,
                                 child: AccentButton(
                                   label: 'Cancel',
-                                  callback: () => Navigator.of(context).pop(),
+                                  callback: () {
+                                    NavigatorService.pop(context);
+                                  },
                                 ),
                               ),
                               SizedBox(
@@ -236,17 +236,10 @@ class _IbanScreenState extends State<IbanScreen>
           );
         }
 
-        Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  BuySummaryScreen(
-                asset: widget.asset,
-                isNewIban: widget.isNewIban,
-              ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ));
+        NavigatorService.push(context, BuySummaryScreen(
+          asset: widget.asset,
+          isNewIban: widget.isNewIban,
+        ));
       } catch (err) {
         showSnackBar(
           context,

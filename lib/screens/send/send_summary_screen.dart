@@ -21,12 +21,14 @@ import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/screens/send/send_status_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -113,10 +115,10 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       ) {
         return Scaffold(
           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-          endDrawer: AccountDrawer(
+          endDrawer: isFullScreen ? null : AccountDrawer(
             width: buttonSmallWidth,
           ),
-          appBar: NewMainAppBar(
+          appBar: isFullScreen ? null : NewMainAppBar(
             isShowLogo: false,
           ),
           body: BlocBuilder<AccountCubit, AccountState>(
@@ -128,7 +130,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                     Container(
                       padding: EdgeInsets.only(
                         top: 22,
-                        bottom: 24,
+                        bottom: 22,
                         left: 16,
                         right: 16,
                       ),
@@ -147,6 +149,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
                           topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                          bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                         ),
                       ),
                       child: Center(
@@ -156,14 +160,9 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                             children: [
                               Column(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        titleText,
-                                        style: headline2.copyWith(
-                                            fontWeight: FontWeight.w700),
-                                      )
-                                    ],
+                                  PageTitle(
+                                    title: titleText,
+                                    isFullScreen: isFullScreen,
                                   ),
                                   if (widget.isLedger)
                                     SizedBox(
@@ -444,7 +443,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                     await submitSend(
                                                         state,
                                                         tokensState,
-                                                        null, callbackOk: (() {
+                                                        null, isFullScreen, callbackOk: (() {
                                                       Navigator.pop(c);
                                                     }));
                                                     parent.emitPending(false);
@@ -469,6 +468,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                         state,
                                                         tokensState,
                                                         password,
+                                                        isFullScreen,
                                                       );
                                                     },
                                                     context: context,
@@ -543,37 +543,30 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     );
   }
 
-  Future submitSend(state, tokensState, password,
+  Future submitSend(state, tokensState, password, isFullScreen,
       {final Function()? callbackOk}) async {
     BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
     try {
       if (balancesHelper.toSatoshi(widget.amount.toString()) > 0) {
         await _callback(
-            state.activeAccount, password, bitcoinCubit, tokensState.tokens,
+            state.activeAccount, password, bitcoinCubit, tokensState.tokens, isFullScreen,
             callbackOk: callbackOk);
       }
     } catch (_err) {
       print(_err);
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendStatusScreen(
-            errorBTC: _err.toString(),
-            appBarTitle: 'Change',
-            txResponse: null,
-            amount: widget.amount,
-            token: 'BTC',
-            address: address,
-          ),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.pushReplacement(context, SendStatusScreen(
+        errorBTC: _err.toString(),
+        appBarTitle: 'Change',
+        txResponse: null,
+        amount: widget.amount,
+        token: 'BTC',
+        address: address,
+      ));
     }
   }
 
   Future _callback(AccountModel account, String? password,
-      BitcoinCubit bitcoinCubit, List<TokensModel> tokens,
+      BitcoinCubit bitcoinCubit, List<TokensModel> tokens, bool isFullScreen,
       {final Function()? callbackOk}) async {
     if (SettingsHelper.isBitcoin()) {
       ECPair keyPair = await HDWalletService()
@@ -614,24 +607,24 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                   TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
-                  transactionCubit.setOngoingTransaction(txResponse);
+                  await transactionCubit.setOngoingTransaction(txResponse);
                 }
                 Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) =>
-                        HomeScreen(
+                    pageBuilder: (context, animation1, animation2) => HomeScreen(
                       isLoadTokens: true,
                     ),
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),
                 );
+                NavigatorService.pushReplacement(context, null);
               },
               callbackTryAgain: () async {
                 print('TryAgain');
                 await _sendTransaction(
-                    context, tokens, widget.token.symbol!, account, password,
+                    context, tokens, widget.token.symbol!, account, password, isFullScreen,
                     callbackOk: callbackOk);
               },
             );
@@ -640,13 +633,13 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       }
     } else {
       await _sendTransaction(
-          context, tokens, widget.token.symbol!, account, password,
+          context, tokens, widget.token.symbol!, account, password, isFullScreen,
           callbackOk: callbackOk);
     }
   }
 
   Future _sendTransaction(context, List<TokensModel> tokens, String token,
-      AccountModel account, String? password,
+      AccountModel account, String? password, bool isFullScreen,
       {final Function()? callbackOk}) async {
     TxErrorModel? txResponse;
     AddressBookCubit addressBookCubit =
@@ -691,7 +684,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       builder: (BuildContext dialogContext) {
         return TxStatusDialog(
           txResponse: txResponse,
-          callbackOk: () {
+          callbackOk: () async {
             if (callbackOk != null) {
               callbackOk();
             }
@@ -699,7 +692,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
               TransactionCubit transactionCubit =
               BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse);
+              await transactionCubit.setOngoingTransaction(txResponse);
             }
             Navigator.pushReplacement(
               context,
@@ -711,10 +704,13 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                 reverseTransitionDuration: Duration.zero,
               ),
             );
+            if (isFullScreen) {
+              NavigatorService.pushReplacement(context, null);
+            }
           },
           callbackTryAgain: () async {
             await _sendTransaction(
-                context, tokens, widget.token.symbol!, account, password);
+                context, tokens, widget.token.symbol!, account, password, isFullScreen);
           },
         );
       },

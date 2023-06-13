@@ -18,9 +18,11 @@ import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
 import 'package:defi_wallet/screens/swap/swap_summary_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -113,13 +115,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
   TestPoolSwapModel? dexRate;
 
   List<String> slippageList = ['Custom', '0.5', '1', '3'];
-
-  @override
-  void initState() {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    tokensCubit.loadTokens();
-    super.initState();
-  }
 
   stateInit(accountState, dexState, tokensState) {
     TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
@@ -222,11 +217,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                       targetList: tokensForSwap,
                     );
                     return Scaffold(
-                      appBar: NewMainAppBar(
+                      appBar: isFullScreen ? null : NewMainAppBar(
                         isShowLogo: false,
                       ),
                       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                      endDrawer: AccountDrawer(
+                      endDrawer: isFullScreen ? null : AccountDrawer(
                         width: buttonSmallWidth,
                       ),
                       body: Container(
@@ -249,6 +244,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                           borderRadius: BorderRadius.only(
                             topRight: Radius.circular(20),
                             topLeft: Radius.circular(20),
+                            bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                            bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                           ),
                         ),
                         child: BlocBuilder<BitcoinCubit, BitcoinState>(
@@ -322,12 +319,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Change',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .headline3,
+                    PageTitle(
+                      title: 'Change',
+                      isFullScreen: isFullScreen,
                     ),
                     SizedBox(
                       height: 16,
@@ -1159,21 +1153,14 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         ),
                       );
                     } else {
-                      Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                SwapSummaryScreen(
-                                  assetFrom.symbol!,
-                                  assetTo!.symbol!.replaceAll('d', ''),
-                                  double.parse(amountFromController.text),
-                                  double.parse(amountToController.text),
-                                  slippage,
-                                  btcTx: tx.txLoaderList![0].txHex!,
-                                ),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ));
+                      NavigatorService.push(context, SwapSummaryScreen(
+                        assetFrom.symbol!,
+                        assetTo!.symbol!.replaceAll('d', ''),
+                        double.parse(amountFromController.text),
+                        double.parse(amountToController.text),
+                        slippage,
+                        btcTx: tx.txLoaderList![0].txHex!,
+                      ));
                     }
                   } catch (err) {
                     showSnackBar(
@@ -1192,20 +1179,13 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
           },
         );
       } else {
-        Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SwapSummaryScreen(
-                    assetFrom.symbol!,
-                    assetTo!.symbol!,
-                    double.parse(amountFromController.text),
-                    double.parse(amountToController.text),
-                    assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ? slippage + 0.3 : slippage,
-                  ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ));
+        NavigatorService.push(context, SwapSummaryScreen(
+          assetFrom.symbol!,
+          assetTo!.symbol!,
+          double.parse(amountFromController.text),
+          double.parse(amountToController.text),
+          assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ? slippage + 0.3 : slippage,
+        ));
       }
     }
   }
