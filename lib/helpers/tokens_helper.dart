@@ -1220,7 +1220,7 @@ class TokensHelper {
       if (value == defaultDefiTokenName) {
         return 'DeFiChain';
       } else if (value == defaultBitcoinTokenName) {
-        return 'DeFiChain Bitcoin';
+        return 'Bitcoin';
       } else if(specificTokenNames.containsKey(value)){
         return specificTokenNames[value]!;
       } else {

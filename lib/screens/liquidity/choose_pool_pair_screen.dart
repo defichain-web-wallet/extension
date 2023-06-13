@@ -48,7 +48,11 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                 try {
                   tokensState.tokensPairs!.forEach((el) {
                     var foundTokenPair = tokensState.foundTokens!.where(
-                        (item) => item.isPair && el.symbol == item.symbol);
+                      (item) =>
+                          item.isPair &&
+                          el.symbol == item.symbol &&
+                          !el.symbol!.contains('v1'),
+                    );
                     var fountTokenPairList = List.from(foundTokenPair);
                     if (fountTokenPairList.length == 1) {
                       availableTokens.add(List.from(tokensState.tokensPairs!

@@ -184,7 +184,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                               text: TextSpan(children: [
                                 TextSpan(
                                   text:
-                                      'I understand that DEFI cannot recover this password for me.',
+                                      'I understand that nobody can recover this password for me.',
                                   style: Theme.of(context).textTheme.subtitle1,
                                 ),
                               ]),
