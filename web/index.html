@@ -22,9 +22,19 @@
       top:0px;
       left:0px;
     }
-    html {
-      height: 600px;
-      width: 360px;
+
+    @media screen and (-webkit-min-device-pixel-ratio:0) {
+      html {
+        height: 600px;
+        width: 360px;
+      }
+    }
+
+    @-moz-document url-prefix() {
+      body {
+        height: 600px;
+        width: 360px;
+      }
     }
   </style>
 </head>
