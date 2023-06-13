@@ -71,11 +71,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
             backgroundColor: Colors.transparent,
             elevation: widget.isFullScreen ? 0 : 3,
             child: Padding(
-              padding: EdgeInsets.only(
-                  top: widget.isFullScreen ? 52 : 8,
-                  bottom: 8,
-                  right: 8,
-                  left: 8),
+              padding: EdgeInsets.all(widget.isFullScreen ? 0 : 8),
               child: Container(
                 decoration: BoxDecoration(
                   color: isDarkTheme()

@@ -70,6 +70,8 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
           borderRadius: BorderRadius.only(
             topRight: Radius.circular(20),
             topLeft: Radius.circular(20),
+            bottomLeft: Radius.circular(isFullScreen(context) ? 20 : 0),
+            bottomRight: Radius.circular(isFullScreen(context) ? 20 : 0),
           ),
         ),
         child: Center(

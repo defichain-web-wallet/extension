@@ -39,7 +39,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
   static const int tickerTimerUpdate = 15;
-  static const double extendedBoxWidth = 832;
+  static const double extendedBoxWidth = 1440 - 32;
   static const double extendedFirstColumnWidth = 328;
   static const double extendedLastColumnWidth = 488;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -156,6 +156,7 @@ class _HomeScreenState extends State<HomeScreen>
                           child: StretchBox(
                             maxWidth: extendedBoxWidth,
                             child: Container(
+                              padding: EdgeInsets.only(bottom: isFullScreen ? 36 : 0),
                               child: Stack(
                                 children: [
                                   if (isFullScreen)

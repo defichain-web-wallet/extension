@@ -112,6 +112,8 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
                           topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                          bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                         ),
                       ),
                       child: Center(
@@ -164,10 +166,10 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                   Container(
                                     height: availableTokens.length != 0
                                         ? isFullScreen
-                                            ? 520
+                                            ? 420
                                             : 288
                                         : isFullScreen
-                                            ? 497
+                                            ? 397
                                             : 297,
                                     child: availableTokens.length != 0
                                         ? ListView.builder(

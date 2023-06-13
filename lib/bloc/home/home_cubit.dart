@@ -31,4 +31,16 @@ class HomeCubit extends Cubit<HomeState> {
       isShownHome: widget == null,
     ));
   }
+
+  updateExtendedSelector(bool value) {
+    emit(state.copyWith(
+      isShowExtendedNetworkSelector: value
+    ));
+  }
+
+  updateExtendedDrawer(bool value) {
+    emit(state.copyWith(
+      isShowExtendedAccountDrawer: value
+    ));
+  }
 }

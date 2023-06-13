@@ -1,13 +1,12 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
-import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -19,7 +18,6 @@ import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/buttons/back_icon_button.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -268,6 +266,8 @@ class _SendScreenNewState extends State<SendScreenNew>
                           borderRadius: BorderRadius.only(
                             topRight: Radius.circular(20),
                             topLeft: Radius.circular(20),
+                            bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                            bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                           ),
                         ),
                         child: Center(

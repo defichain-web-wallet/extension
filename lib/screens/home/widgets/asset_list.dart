@@ -70,7 +70,6 @@ class AssetList extends StatelessWidget {
                         right: 16,
                         top: 2,
                       ),
-                      color: Theme.of(context).cardColor,
                       child: AssetCard(
                         index: index,
                         tokenBalance: tokenBalance,

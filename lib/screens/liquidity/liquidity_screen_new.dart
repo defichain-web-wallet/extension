@@ -200,6 +200,8 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
                           topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                          bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                         ),
                       ),
                       child: Center(

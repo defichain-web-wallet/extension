@@ -70,6 +70,8 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20),
                     topLeft: Radius.circular(20),
+                    bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                    bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                   ),
                 ),
                 child: Center(
