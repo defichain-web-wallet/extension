@@ -7,6 +7,8 @@ import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/refactoring/fields/available_amount_text.dart';
+import 'package:defi_wallet/widgets/refactoring/fields/converted_amount_text.dart';
 import 'package:defi_wallet/widgets/refactoring/selectors/asset/asset_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,39 +70,6 @@ class _AmountFieldState extends State<AmountField> {
     }
   }
 
-  _loadAvailableBalance(BuildContext context) {
-    AvailableAmountCubit availableAmountCubit =
-    BlocProvider.of<AvailableAmountCubit>(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (widget.type == TxType.send) {
-        // await availableAmountCubit.getAvailable(
-        //   widget.selectedAsset.symbol!,
-        //   widget.type!,
-        //   widget.account!,
-        // );
-      } else if (widget.type == null) {
-        await availableAmountCubit.btcAvailableBalance(
-          widget.available!,
-        );
-      }
-      if (widget.type == TxType.swap || widget.type == TxType.addLiq) {
-        if (widget.isAvailableTo) {
-          // await availableAmountCubit.getAvailableTo(
-          //   assetSymbol,
-          //   widget.type!,
-          //   widget.account!,
-          // );
-        } else {
-          // await availableAmountCubit.getAvailableFrom(
-          //   widget.selectedAsset.symbol!,
-          //   widget.type!,
-          //   widget.account!,
-          // );
-        }
-      }
-    });
-  }
-
   @override
   void initState() {
     _focusNode.addListener(_onFocusChange);
@@ -109,8 +78,6 @@ class _AmountFieldState extends State<AmountField> {
 
   @override
   Widget build(BuildContext context) {
-    // var available = widget.balance!.balance.toString();
-
     return GestureDetector(
       onTap: () => _focusNode.requestFocus(),
       onDoubleTap: () => _onSelectInputText(),
@@ -179,17 +146,7 @@ class _AmountFieldState extends State<AmountField> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '\$${widget.suffix!}',
-                  style: Theme.of(context).textTheme.headline6!.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context)
-                        .textTheme
-                        .headline6!
-                        .color!
-                        .withOpacity(0.3),
-                  ),
-                ),
+                ConvertedAmountText(amount: double.tryParse(widget.controller.text), token: widget.balance!.token!),
                 GestureDetector(
                   onTap: () {
                     if (widget.controller.text != widget.available.toString()) {
@@ -200,18 +157,7 @@ class _AmountFieldState extends State<AmountField> {
                   },
                   child: MouseRegion(
                     cursor: SystemMouseCursors.click,
-                    child: Text(
-                      'Available: ${widget.available}',
-                      style:
-                      Theme.of(context).textTheme.headline6!.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context)
-                            .textTheme
-                            .headline6!
-                            .color!
-                            .withOpacity(0.3),
-                      ),
-                    ),
+                    child: AvailableAmountText(amount: widget.available!,),
                   ),
                 ),
               ],

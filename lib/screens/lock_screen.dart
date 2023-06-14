@@ -1,5 +1,4 @@
 import 'dart:convert' as Convert;
-import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
@@ -65,6 +64,7 @@ class _LockScreenState extends State<LockScreen> {
                         child: Column(
                           children: [
                             PasswordTextField(
+                              onlyEngCharacters: false,
                               isOpasity: true,
                               height: 71,
                               controller: _passwordController,

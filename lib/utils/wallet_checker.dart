@@ -1,22 +1,19 @@
-import 'dart:convert';
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/screens/ui_kit.dart';
 import 'package:defi_wallet/services/storage_service.dart';
 import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class WalletChecker extends StatefulWidget {
   @override
@@ -26,7 +23,6 @@ class WalletChecker extends StatefulWidget {
 class _WalletCheckerState extends State<WalletChecker> {
   SettingsHelper settingsHelper = SettingsHelper();
   LockHelper lockHelper = LockHelper();
-  Codec<String, String> stringToBase64 = utf8.fuse(base64);
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +42,6 @@ class _WalletCheckerState extends State<WalletChecker> {
       }
 
       WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
-      BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
       var box = await Hive.openBox(HiveBoxes.client);
       var masterKeyPairName;
       if (SettingsHelper.settings.network! == 'testnet') {
@@ -55,7 +50,6 @@ class _WalletCheckerState extends State<WalletChecker> {
         masterKeyPairName = HiveNames.masterKeyPairMainnetPublic;
       }
       var masterKeyPair = await box.get(masterKeyPairName);
-      var password = await box.get(HiveNames.password);
       bool isSavedMnemonic = await box.get(HiveNames.openedMnemonic) != null;
       String? savedMnemonic = await box.get(HiveNames.openedMnemonic);
 
@@ -118,6 +112,7 @@ class _WalletCheckerState extends State<WalletChecker> {
               PageRouteBuilder(
                 pageBuilder: (context, animation1, animation2) =>
                     ThemeChecker(WelcomeScreen()),
+                    // ThemeChecker(UiKit()),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),

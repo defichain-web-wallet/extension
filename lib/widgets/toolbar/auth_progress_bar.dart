@@ -1,7 +1,7 @@
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-class AuthProgressBar extends StatelessWidget with PreferredSizeWidget {
+class AuthProgressBar extends StatelessWidget implements PreferredSizeWidget {
   final double fill;
   const AuthProgressBar({Key? key, this.fill = 1.0}) : super(key: key);
 

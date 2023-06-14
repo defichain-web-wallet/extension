@@ -35,8 +35,11 @@ class DFILmRequests {
             elements.add(element);
           }
         });
-        List<LmPoolModel> lmTokens =
-            LmPoolModel.fromJSONList(elements, networkType.networkName, tokens);
+        List<LmPoolModel> lmTokens = LmPoolModel.fromJSONList(
+          elements,
+          networkType.networkName,
+          tokens,
+        );
         if (json['page'] != null) {
           var nextTokenList = await getLmPools(
             next: json['page']['next'],

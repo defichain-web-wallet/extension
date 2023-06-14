@@ -1,6 +1,5 @@
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
-import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
@@ -42,6 +41,10 @@ abstract class AbstractAccountModel {
           return element.token != null && element.token!.symbol == 'DFI';
         }).toList();
 
+        var existingPairs = balanceList.where((element) {
+          return element.lmPool != null;
+        }).toList();
+
         if (dfiBalances.length > 1 && mergeCoin) {
           var existingBalance = balanceList.where((element) {
             return element.token != null && element.token!.symbol != 'DFI';
@@ -53,6 +56,7 @@ abstract class AbstractAccountModel {
               lmPool: dfiBalances[0].lmPool,
             ),
             ...existingBalance,
+            ...existingPairs,
           ];
         } else {
           result = balanceList;

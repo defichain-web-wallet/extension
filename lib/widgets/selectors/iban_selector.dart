@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class IbanSelector extends StatefulWidget {
+  final String fiatName;
   final List<IbanModel> ibanList;
   final AssetByFiatModel? asset;
   final IbanModel selectedIban;
@@ -23,6 +24,7 @@ class IbanSelector extends StatefulWidget {
   IbanSelector({
     Key? key,
     required this.ibanList,
+    this.fiatName = '',
     this.asset,
     required this.selectedIban,
     this.onAnotherSelect,
@@ -243,6 +245,7 @@ class IbanSelectorState extends State<IbanSelector> with ThemeMixin{
                                     (context, animation1, animation2) =>
                                         Selling(
                                   isNewIban: true,
+                                  fiatName: widget.fiatName,
                                 ),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
@@ -327,7 +330,7 @@ class IbanSelectorState extends State<IbanSelector> with ThemeMixin{
                       onPressed: () async {
                         FiatCubit fiatCubit =
                             BlocProvider.of<FiatCubit>(context);
-                        fiatCubit.changeCurrentIban(widget.selectedIban);
+                        fiatCubit.changeCurrentIban(widget.ibanList[index]);
                         hideOverlay();
                       },
                     );
