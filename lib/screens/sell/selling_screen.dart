@@ -280,29 +280,30 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                         selectedIban:
                                                             fiatState.activeIban!,
                                                       )),
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(
-                                                  vertical: 6),
-                                              child: Divider(
-                                                  color: AppTheme.lightGreyColor),
-                                            ),
-                                            Container(
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                                children: [
-                                                  Column(
-                                                    children: [
-                                                      Container(
-                                                        padding: EdgeInsets.only(
-                                                            right: 10),
-                                                        child: SvgPicture.asset(
-                                                            'assets/icons/important_icon.svg'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  if (fiatState.kycStatus !=
-                                                      completeKycType)
+                                            if (fiatState.kycStatus !=
+                                                completeKycType)
+                                            ...[
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(
+                                                    vertical: 6),
+                                                child: Divider(
+                                                    color: AppTheme.lightGreyColor),
+                                              ),
+                                              Container(
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                                  children: [
+                                                    Column(
+                                                      children: [
+                                                        Container(
+                                                          padding: EdgeInsets.only(
+                                                              right: 10),
+                                                          child: SvgPicture.asset(
+                                                              'assets/icons/important_icon.svg'),
+                                                        ),
+                                                      ],
+                                                    ),
                                                     Expanded(
                                                       child: Column(
                                                         children: [
@@ -311,11 +312,11 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                               children: [
                                                                 TextSpan(
                                                                     text:
-                                                                        'Your account needs to get verified once your daily transaction volume exceeds 900 €. If you want to increase the daily trading limit, please complete the ',
+                                                                    'Your account needs to get verified once your daily transaction volume exceeds 900 €. If you want to increase the daily trading limit, please complete the ',
                                                                     style: Theme.of(context).textTheme.headline6!.copyWith(
                                                                         fontWeight:
-                                                                            FontWeight
-                                                                                .w600,
+                                                                        FontWeight
+                                                                            .w600,
                                                                         color: Theme.of(context)
                                                                             .textTheme
                                                                             .headline6!
@@ -323,16 +324,16 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                                             .withOpacity(0.6))),
                                                                 TextSpan(
                                                                   text:
-                                                                      'KYC (Know-Your-Customer) process.',
+                                                                  'KYC (Know-Your-Customer) process.',
                                                                   style: Theme.of(
-                                                                          context)
+                                                                      context)
                                                                       .textTheme
                                                                       .headline6!
                                                                       .copyWith(
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          color:
-                                                                              AppTheme.pinkColor),
+                                                                      fontWeight: FontWeight
+                                                                          .w600,
+                                                                      color:
+                                                                      AppTheme.pinkColor),
                                                                 ),
                                                               ],
                                                             ),
@@ -340,9 +341,10 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                         ],
                                                       ),
                                                     )
-                                                ],
-                                              ),
-                                            )
+                                                  ],
+                                                ),
+                                              )
+                                            ]
                                           ],
                                         ),
                                       ),

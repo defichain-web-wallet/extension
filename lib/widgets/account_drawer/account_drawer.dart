@@ -110,23 +110,24 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      Container(
-                                        width: 16,
-                                        height: 16,
-                                        child: IconButton(
-                                          splashRadius: 12,
-                                          padding: const EdgeInsets.all(0),
-                                          onPressed: () => Scaffold.of(context)
-                                              .closeEndDrawer(),
-                                          icon: Icon(
-                                            Icons.close,
-                                            size: 16,
-                                            color: Theme.of(context)
-                                                .dividerColor
-                                                .withOpacity(0.5),
+                                      if (!widget.isFullScreen)
+                                        Container(
+                                          width: 16,
+                                          height: 16,
+                                          child: IconButton(
+                                            splashRadius: 12,
+                                            padding: const EdgeInsets.all(0),
+                                            onPressed: () => Scaffold.of(context)
+                                                .closeEndDrawer(),
+                                            icon: Icon(
+                                              Icons.close,
+                                              size: 16,
+                                              color: Theme.of(context)
+                                                  .dividerColor
+                                                  .withOpacity(0.5),
+                                            ),
                                           ),
-                                        ),
-                                      )
+                                        )
                                     ],
                                   ),
                                 ),
