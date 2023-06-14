@@ -65,7 +65,7 @@ class LmPoolModel extends TokenModel {
       data['totalLiquidityRaw'] = this.totalLiquidityRaw;
     }
     if (this.apr != null) {
-      data['apr'] = this.apr;
+      data['apr']['total'] = this.apr;
     }
     if (this.apy != null) {
       data['apy'] = this.apy;
@@ -78,6 +78,7 @@ class LmPoolModel extends TokenModel {
     NetworkName? networkName,
     List<TokenModel>? tokens,
   }) {
+    List<double>? percentages;
     if (networkName != null && tokens != null) {
       List<String> symbols = json['symbol'].split('-');
 
@@ -109,8 +110,24 @@ class LmPoolModel extends TokenModel {
         tokenB = tokens[1];
       }
 
+      if (json['tokenA'] != null &&
+          json['tokenA'] != null &&
+          json['totalLiquidity'] != null) {
+        //TODO: maybe need in other place
+        percentages = [
+          double.parse(json["tokenA"]['reserve']),
+          double.parse(json["tokenB"]['reserve']),
+          double.parse(json["totalLiquidity"]['token'])
+        ];
+      }
+
+      double? apr;
+      if(json["apr"]!= null){
+        apr = json["apr"]['total'];
+      }
       return LmPoolModel(
         id: json['id'],
+        apr: apr,
         symbol: json['symbol'],
         name: json['name'],
         displaySymbol: json['displaySymbol'],
@@ -121,6 +138,7 @@ class LmPoolModel extends TokenModel {
           reserveB,
         ],
         totalLiquidityRaw: totalLiquidity,
+        percentages: percentages
       );
     } else {
       return LmPoolModel(

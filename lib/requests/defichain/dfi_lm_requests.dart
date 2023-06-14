@@ -28,8 +28,15 @@ class DFILmRequests {
 
       if (response.statusCode == 200) {
         dynamic json = jsonDecode(response.body);
+        List<dynamic> data = json['data'];
+        List<dynamic> elements = [];
+        data.forEach((element) {
+          if(element['tradeEnabled'] && element['symbol'].indexOf('BURN') < 0){
+            elements.add(element);
+          }
+        });
         List<LmPoolModel> lmTokens = LmPoolModel.fromJSONList(
-          json['data'],
+          elements,
           networkType.networkName,
           tokens,
         );

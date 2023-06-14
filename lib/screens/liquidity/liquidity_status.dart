@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
@@ -17,7 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 
 class LiquidityStatus extends StatefulWidget {
-  final AssetPairModel assetPair;
+  final LmPoolModel assetPair;
   final bool isRemove;
   final double amountA;
   final double amountB;

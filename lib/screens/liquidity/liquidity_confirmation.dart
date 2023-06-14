@@ -1,10 +1,12 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
@@ -27,7 +29,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 
 class LiquidityConfirmation extends StatefulWidget {
-  final AssetPairModel assetPair;
+  final LmPoolModel assetPair;
   final double baseAmount;
   final double quoteAmount;
   final double amountUSD;
@@ -116,177 +118,64 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
 
   Widget _buildBody(context, transactionState) {
     double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
-    return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      return BlocBuilder<TokensCubit, TokensState>(
-        builder: (context, tokensState) {
-          if (state.status == AccountStatusList.success &&
-              tokensState.status == TokensStatusList.success) {
-            submitLabel = widget.removeLT == 0 ? 'Add' : 'Remove';
-            return StretchBox(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Summary',
-                          style: Theme.of(context).textTheme.headline3,
-                        ),
-                        SizedBox(
-                          height: 16,
-                        ),
-                        Container(
-                          width: double.infinity,
-                          height: widget.removeLT == 0 ? 148 : 88,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 18),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1.0,
-                              color: AppColors.lavenderPurple.withOpacity(0.35),
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(12),
-                            ),
-                          ),
-                          child: Row(
+    submitLabel = widget.removeLT == 0 ? 'Add' : 'Remove';
+    return StretchBox(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Summary',
+                  style: Theme.of(context).textTheme.headline3,
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                Container(
+                  width: double.infinity,
+                  height: widget.removeLT == 0 ? 148 : 88,
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1.0,
+                      color: AppColors.lavenderPurple.withOpacity(0.35),
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      if (widget.removeLT != 0) ...[
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (widget.removeLT != 0) ...[
-                                Flexible(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'You will receive',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .copyWith(
-                                              fontWeight: FontWeight.w400,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .headline6!
-                                                  .color!
-                                                  .withOpacity(0.5),
-                                            ),
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Flexible(
-                                            child: Container(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  SizedBox(
-                                                    width: 24,
-                                                    height: 24,
-                                                    child: SvgPicture.asset(
-                                                      TokensHelper()
-                                                          .getImageNameByTokenName(
-                                                              widget.assetPair
-                                                                  .tokenA),
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 6,
-                                                  ),
-                                                  Text(
-                                                    balancesHelper
-                                                        .numberStyling(
-                                                            widget.baseAmount,
-                                                            fixed: true),
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline3!
-                                                        .copyWith(
-                                                          fontSize: 20,
-                                                        ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 6,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 16,
-                                          ),
-                                          Flexible(
-                                            child: Container(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  SizedBox(
-                                                    width: 24,
-                                                    height: 24,
-                                                    child: SvgPicture.asset(
-                                                      TokensHelper()
-                                                          .getImageNameByTokenName(
-                                                              widget.assetPair
-                                                                  .tokenB),
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 6,
-                                                  ),
-                                                  Text(
-                                                    balancesHelper
-                                                        .numberStyling(
-                                                            widget.quoteAmount,
-                                                            fixed: true),
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline3!
-                                                        .copyWith(
-                                                          fontSize: 20,
-                                                        ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 6,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                              if (widget.removeLT == 0) ...[
-                                Flexible(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'You will receive',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .copyWith(
-                                              fontWeight: FontWeight.w400,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .headline6!
-                                                  .color!
-                                                  .withOpacity(0.5),
-                                            ),
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      Row(
+                              Text(
+                                'You will receive',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .copyWith(
+                                      fontWeight: FontWeight.w400,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.5),
+                                    ),
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Container(
+                                      child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
@@ -294,9 +183,8 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                                             width: 24,
                                             height: 24,
                                             child: SvgPicture.asset(
-                                              TokensHelper()
-                                                  .getImageNameByTokenName(
-                                                      widget.assetPair.tokenA),
+                                              widget.assetPair.tokens[0]
+                                                  .imagePath,
                                             ),
                                           ),
                                           SizedBox(
@@ -312,13 +200,20 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                                                 .copyWith(
                                                   fontSize: 20,
                                                 ),
-                                          )
+                                          ),
+                                          SizedBox(
+                                            width: 6,
+                                          ),
                                         ],
                                       ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 16,
+                                  ),
+                                  Flexible(
+                                    child: Container(
+                                      child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
@@ -326,9 +221,8 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                                             width: 24,
                                             height: 24,
                                             child: SvgPicture.asset(
-                                              TokensHelper()
-                                                  .getImageNameByTokenName(
-                                                      widget.assetPair.tokenB),
+                                              widget.assetPair.tokens[1]
+                                                  .imagePath,
                                             ),
                                           ),
                                           SizedBox(
@@ -344,229 +238,303 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                                                 .copyWith(
                                                   fontSize: 20,
                                                 ),
-                                          )
+                                          ),
+                                          SizedBox(
+                                            width: 6,
+                                          ),
                                         ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 16,
-                                ),
-                                Flexible(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Yield',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .copyWith(
-                                              fontWeight: FontWeight.w400,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .headline6!
-                                                  .color!
-                                                  .withOpacity(0.5),
-                                            ),
                                       ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      Text(
-                                        TokensHelper().getAprFormat(
-                                            widget.assetPair.apr!, true),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline3!
-                                            .copyWith(
-                                              fontSize: 20,
-                                            ),
-                                      )
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ]
+                                ],
+                              ),
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: 26,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isShowDetails = !isShowDetails;
-                            });
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                      ],
+                      if (widget.removeLT == 0) ...[
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Show less',
+                                'You will receive',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .headline5!
+                                    .headline6!
                                     .copyWith(
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w400,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.5),
                                     ),
                               ),
                               SizedBox(
-                                width: 8,
+                                height: 8,
                               ),
-                              RotationTransition(
-                                turns: AlwaysStoppedAnimation(
-                                    arrowRotateDeg / 360),
-                                child: SizedBox(
-                                  width: 8,
-                                  height: 8,
-                                  child: SvgPicture.asset(
-                                    'assets/icons/arrow_down.svg',
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: SvgPicture.asset(
+                                      widget.assetPair.tokens[0].imagePath,
+                                    ),
                                   ),
-                                ),
+                                  SizedBox(
+                                    width: 6,
+                                  ),
+                                  Text(
+                                    balancesHelper.numberStyling(
+                                        widget.baseAmount,
+                                        fixed: true),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline3!
+                                        .copyWith(
+                                          fontSize: 20,
+                                        ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: SvgPicture.asset(
+                                      widget.assetPair.tokens[1].imagePath,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 6,
+                                  ),
+                                  Text(
+                                    balancesHelper.numberStyling(
+                                        widget.quoteAmount,
+                                        fixed: true),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline3!
+                                        .copyWith(
+                                          fontSize: 20,
+                                        ),
+                                  )
+                                ],
                               )
                             ],
                           ),
                         ),
-                        if (isShowDetails) ...[
-                          AssetPairDetails(
-                            assetPair: widget.assetPair,
-                            isRemove: widget.removeLT != 0,
-                            amountA: widget.baseAmount,
-                            amountB: widget.quoteAmount,
-                            balanceA: widget.balanceA,
-                            balanceB: widget.balanceB,
-                            totalBalanceInUsd: widget.balanceUSD,
-                            totalAmountInUsd: widget.amountUSD,
-                          ),
-                        ],
-                        Container(
-                            padding: const EdgeInsets.only(top: 24),
-                            child: RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: 'Note: ',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline6!
-                                        .copyWith(
-                                          fontWeight: FontWeight.w400,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .color!
-                                              .withOpacity(0.3),
-                                        ),
-                                  ),
-                                  TextSpan(
-                                    text:
-                                        'Liquidity tokens represent a share of the liquidity pool',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline6!
-                                        .copyWith(
-                                          fontWeight: FontWeight.w400,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .color!
-                                              .withOpacity(0.3),
-                                        ),
-                                  ),
-                                ],
+                        SizedBox(
+                          width: 16,
+                        ),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Yield',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .copyWith(
+                                      fontWeight: FontWeight.w400,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.5),
+                                    ),
                               ),
-                            ))
-                      ],
-                    ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Text(
+                                TokensHelper()
+                                    .getAprFormat(widget.assetPair.apr!, true),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline3!
+                                    .copyWith(
+                                      fontSize: 20,
+                                    ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ]
+                    ],
                   ),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: 104,
-                          child: FlatButton(
-                            title: 'Cancel',
-                            isPrimary: false,
-                            callback: () {
-                              Navigator.of(context).pop();
-                            },
+                ),
+                SizedBox(
+                  height: 26,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isShowDetails = !isShowDetails;
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Show less',
+                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      RotationTransition(
+                        turns: AlwaysStoppedAnimation(arrowRotateDeg / 360),
+                        child: SizedBox(
+                          width: 8,
+                          height: 8,
+                          child: SvgPicture.asset(
+                            'assets/icons/arrow_down.svg',
                           ),
                         ),
-                        SizedBox(
-                          width: 104,
-                          child: PendingButton(
-                            widget.removeLT == 0 ? 'Add' : 'Remove',
-                            pendingText: 'Pending',
-                            callback: (parent) async {
-                              final isLedger = await SettingsHelper.isLedger();
-
-                              if (!isLedger) {
-                                showDialog(
-                                  barrierColor: AppColors.tolopea.withOpacity(0.06),
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (BuildContext context1) {
-                                    return PassConfirmDialog(
-                                        onSubmit: (password) async {
-                                      parent.emitPending(true);
-                                      await submitLiquidityAction(
-                                        state,
-                                        tokensState,
-                                        transactionState,
-                                        password,
-                                      );
-                                      parent.emitPending(false);
-                                    });
-                                  },
-                                );
-                              } else if (isLedger) {
-                                showDialog(
-                                  barrierColor: AppColors.tolopea.withOpacity(0.06),
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (BuildContext context1) {
-                                    return LedgerCheckScreen(
-                                        onStartSign: (p, c) async {
-                                      parent.emitPending(true);
-                                      p.emitPending(true);
-                                      await submitLiquidityAction(
-                                          state,
-                                          tokensState,
-                                          transactionState,
-                                          null, callbackOk: () {
-                                        Navigator.pop(c);
-                                      }, callbackFail: () {
-                                        parent.emitPending(true);
-                                        p.emitPending(true);
-                                      });
-                                      parent.emitPending(false);
-                                      p.emitPending(false);
-                                    });
-                                  },
-                                );
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+                      )
+                    ],
+                  ),
+                ),
+                if (isShowDetails) ...[
+                  AssetPairDetails(
+                    assetPair: widget.assetPair,
+                    isRemove: widget.removeLT != 0,
+                    amountA: widget.baseAmount,
+                    amountB: widget.quoteAmount,
+                    balanceA: widget.balanceA,
+                    balanceB: widget.balanceB,
+                    totalBalanceInUsd: widget.balanceUSD,
+                    totalAmountInUsd: widget.amountUSD,
                   ),
                 ],
-              ),
-            );
-          } else {
-            return Container();
-          }
-        },
-      );
-    });
+                Container(
+                    padding: const EdgeInsets.only(top: 24),
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Note: ',
+                            style:
+                                Theme.of(context).textTheme.headline6!.copyWith(
+                                      fontWeight: FontWeight.w400,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
+                          ),
+                          TextSpan(
+                            text:
+                                'Liquidity tokens represent a share of the liquidity pool',
+                            style:
+                                Theme.of(context).textTheme.headline6!.copyWith(
+                                      fontWeight: FontWeight.w400,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
+                          ),
+                        ],
+                      ),
+                    ))
+              ],
+            ),
+          ),
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: 104,
+                  child: FlatButton(
+                    title: 'Cancel',
+                    isPrimary: false,
+                    callback: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: 104,
+                  child: PendingButton(
+                    widget.removeLT == 0 ? 'Add' : 'Remove',
+                    pendingText: 'Pending',
+                    callback: (parent) async {
+                      final isLedger = await SettingsHelper.isLedger();
+
+                      if (!isLedger) {
+                        showDialog(
+                          barrierColor: AppColors.tolopea.withOpacity(0.06),
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (BuildContext context1) {
+                            return PassConfirmDialog(
+                                onSubmit: (password) async {
+                              parent.emitPending(true);
+                              await submitLiquidityAction(
+                                context,
+                                transactionState,
+                                password,
+                              );
+                              parent.emitPending(false);
+                            });
+                          },
+                        );
+                      }
+                      //TODO: ledger
+                      // else if (isLedger) {
+                      //   showDialog(
+                      //     barrierColor: AppColors.tolopea.withOpacity(0.06),
+                      //     barrierDismissible: false,
+                      //     context: context,
+                      //     builder: (BuildContext context1) {
+                      //       return LedgerCheckScreen(
+                      //           onStartSign: (p, c) async {
+                      //         parent.emitPending(true);
+                      //         p.emitPending(true);
+                      //         await submitLiquidityAction(
+                      //             state,
+                      //             tokensState,
+                      //             transactionState,
+                      //             null, callbackOk: () {
+                      //           Navigator.pop(c);
+                      //         }, callbackFail: () {
+                      //           parent.emitPending(true);
+                      //           p.emitPending(true);
+                      //         });
+                      //         parent.emitPending(false);
+                      //         p.emitPending(false);
+                      //       });
+                      //     },
+                      //   );
+                      // }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  submitLiquidityAction(state, tokensState, transactionState, password,
+  submitLiquidityAction(context, transactionState, password,
       {final Function()? callbackOk, final Function()? callbackFail}) async {
     if (transactionState is TransactionLoadingState) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -581,30 +549,22 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
       return;
     }
     try {
-      var txser = TransactionService();
       var txError;
-
+      final lmCubit = BlocProvider.of<LmCubit>(context);
       if (widget.removeLT != 0) {
-        txError = await txser.removeLiqudity(
-            keyPair: password != null
-                ? (await HDWalletService().getKeypairFromStorage(
-                    password, state.activeAccount.index!))
-                : null,
-            account: state.activeAccount,
-            token: widget.assetPair,
-            amount: convertToSatoshi(widget.removeLT));
+        txError = await lmCubit.removeLiqudity(
+          password,
+          widget.assetPair,
+          widget.removeLT,
+          context,
+        );
       } else {
-        txError = await txser.createAndSendLiqudity(
-            keyPair: password != null
-                ? (await HDWalletService().getKeypairFromStorage(
-                    password, state.activeAccount.index!))
-                : null,
-            account: state.activeAccount,
-            tokenA: widget.assetPair.tokenA!,
-            tokenB: widget.assetPair.tokenB!,
-            amountA: convertToSatoshi(widget.baseAmount),
-            amountB: convertToSatoshi(widget.quoteAmount),
-            tokens: tokensState.tokens);
+        txError = await lmCubit.addLiqudity(
+          password,
+          widget.assetPair,
+          [widget.baseAmount, widget.quoteAmount],
+          context,
+        );
       }
 
       if (!txError.isError) {
@@ -637,8 +597,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
               );
             },
             callbackTryAgain: () async {
-              await submitLiquidityAction(
-                  state, tokensState, transactionState, password,
+              await submitLiquidityAction(context, transactionState, password,
                   callbackFail: callbackFail, callbackOk: callbackOk);
             },
           );
@@ -658,14 +617,6 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
           ),
         );
       }
-    }
-  }
-
-  String getLiquidityToken() {
-    if (widget.removeLT != 0) {
-      return widget.removeLT.toStringAsFixed(8);
-    } else {
-      return '${widget.baseAmount.toString()}-${widget.quoteAmount.toString()}';
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -8,10 +9,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SearchPoolPairField extends StatefulWidget {
   final TextEditingController controller;
-  final TokensState tokensState;
 
   const SearchPoolPairField(
-      {Key? key, required this.controller, required this.tokensState})
+      {Key? key, required this.controller})
       : super(key: key);
 
   @override
@@ -22,7 +22,7 @@ class _SearchPoolPairFieldState extends State<SearchPoolPairField>
     with ThemeMixin {
   @override
   Widget build(BuildContext context) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+    LmCubit lmCubit = BlocProvider.of<LmCubit>(context);
     return Container(
       height: 48,
       width: 280,
@@ -56,7 +56,7 @@ class _SearchPoolPairFieldState extends State<SearchPoolPairField>
           contentPadding: const EdgeInsets.only(top: 4, right: 16),
         ),
         onChanged: (value) async {
-          tokensCubit.search(widget.tokensState.tokens, value);
+          lmCubit.search(value);
         },
       ),
     );
