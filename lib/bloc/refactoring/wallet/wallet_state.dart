@@ -1,6 +1,6 @@
 part of 'wallet_cubit.dart';
 
-enum WalletStatusList { initial, loading, success, restore, failure }
+enum WalletStatusList { initial, loading, success, restore, failure, update }
 
 class WalletState extends Equatable {
   final WalletStatusList status;
@@ -17,6 +17,8 @@ class WalletState extends Equatable {
   }
 
   String get activeAddress => this.applicationModel!.activeAccount!.getAddress(this.applicationModel!.activeNetwork!.networkType.networkName)!;
+
+  TokenModel get activeToken => this.applicationModel!.activeToken!;
 
   AbstractNetworkModel get activeNetwork =>
       this.applicationModel!.activeNetwork!;

@@ -27,7 +27,7 @@ abstract class AbstractLmProviderModel {
     AbstractNetworkModel network,
     String password,
     LmPoolModel pool,
-    double percentage,
+    double amount,
     ApplicationModel applicationModel,
   );
 }

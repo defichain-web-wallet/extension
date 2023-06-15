@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
@@ -10,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AssetPairDetails extends StatefulWidget {
-  final AssetPairModel assetPair;
+  final LmPoolModel assetPair;
   final bool isRemove;
   final double amountA;
   final double amountB;
@@ -49,36 +50,30 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
     String fiat = SettingsHelper.settings.currency!;
     TokensHelper tokensHelper = TokensHelper();
 
-    return BlocBuilder<TokensCubit, TokensState>(
-      builder: (context, tokensState) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (context, state) {
-            if (state.status == AccountStatusList.success &&
-                tokensState.status == TokensStatusList.success) {
-              if (iterator == 0) {
-                balanceUsd += tokensHelper.getAmountByUsd(
-                  tokensState.tokensPairs!,
-                  widget.balanceA,
-                  widget.assetPair.tokenA!,
-                );
-                balanceUsd += tokensHelper.getAmountByUsd(
-                  tokensState.tokensPairs!,
-                  widget.balanceB,
-                  widget.assetPair.tokenB!,
-                );
-                targetAmountUsd += tokensHelper.getAmountByUsd(
-                  tokensState.tokensPairs!,
-                  widget.amountA,
-                  widget.assetPair.tokenA!,
-                );
-                targetAmountUsd += tokensHelper.getAmountByUsd(
-                  tokensState.tokensPairs!,
-                  widget.amountB,
-                  widget.assetPair.tokenB!,
-                );
-
-                iterator++;
-              }
+              // if (iterator == 0) {
+              //   balanceUsd += tokensHelper.getAmountByUsd(
+              //     tokensState.tokensPairs!,
+              //     widget.balanceA,
+              //     widget.assetPair.tokens,
+              //   );
+              //   balanceUsd += tokensHelper.getAmountByUsd(
+              //     tokensState.tokensPairs!,
+              //     widget.balanceB,
+              //     widget.assetPair.tokenB!,
+              //   );
+              //   targetAmountUsd += tokensHelper.getAmountByUsd(
+              //     tokensState.tokensPairs!,
+              //     widget.amountA,
+              //     widget.assetPair.tokenA!,
+              //   );
+              //   targetAmountUsd += tokensHelper.getAmountByUsd(
+              //     tokensState.tokensPairs!,
+              //     widget.amountB,
+              //     widget.assetPair.tokenB!,
+              //   );
+              //
+              //   iterator++;
+              // }
               return Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: 12,
@@ -92,7 +87,7 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Pooled ${widget.assetPair.tokenA}',
+                            'Pooled ${widget.assetPair.tokens[0].displaySymbol}',
                             style:
                                 Theme.of(context).textTheme.headline5!.copyWith(
                                       fontSize: 12,
@@ -145,7 +140,7 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Pooled ${widget.assetPair.tokenB}',
+                            'Pooled ${widget.assetPair.tokens[0].displaySymbol}',
                             style:
                                 Theme.of(context).textTheme.headline5!.copyWith(
                                       fontSize: 12,
@@ -212,11 +207,12 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                           RichText(
                             text: TextSpan(children: [
                               TextSpan(
-                                text: getPooledByFiatFormat(
-                                  balanceUsd,
-                                  fiat,
-                                  tokensState.eurRate,
-                                ),
+                                text: '0',
+                                // getPooledByFiatFormat(
+                                //   balanceUsd,
+                                //   fiat,
+                                //   tokensState.eurRate,
+                                // ),
                                 style: Theme.of(context)
                                     .textTheme
                                     .headline5!
@@ -226,10 +222,11 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                               ),
                               if (!widget.isRemove)
                                 TextSpan(
-                                  text: getFormatAmountText(
-                                    getPooledByFiatFormat(targetAmountUsd, fiat,
-                                        tokensState.eurRate),
-                                  ),
+                                  text: '0',
+                                  // getFormatAmountText(
+                                  //   getPooledByFiatFormat(targetAmountUsd, fiat,
+                                  //       tokensState.eurRate),
+                                  // ),
                                   style: Theme.of(context)
                                       .textTheme
                                       .headline5!
@@ -346,14 +343,7 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                   ],
                 ),
               );
-            } else {
-              return Container();
             }
-          },
-        );
-      },
-    );
-  }
 
   String getPooledByFiatFormat(amount, fiat, eurRate) {
     if (fiat == 'EUR') {

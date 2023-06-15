@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/access_token_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
@@ -11,6 +12,7 @@ import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/staking/staking_card.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -18,11 +20,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EarnScreenWrapper extends StatefulWidget {
-  final Function() loadEarnData;
+  // final Function() loadEarnData;
 
   EarnScreenWrapper({
     Key? key,
-    required this.loadEarnData,
+    // required this.loadEarnData,
   }) : super(key: key);
 
   @override
@@ -31,6 +33,13 @@ class EarnScreenWrapper extends StatefulWidget {
 
 class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
   final BalancesHelper balancesHelper = BalancesHelper();
+
+  @override
+  void initState() {
+    LmCubit lmCubit = BlocProvider.of<LmCubit>(context);
+    lmCubit.setInitial();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,37 +79,50 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
         ),
         child: Center(
           child: StretchBox(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      titleText,
-                      style: Theme.of(context).textTheme.headline3!.copyWith(
-                            fontWeight: FontWeight.w700,
+            child: BlocBuilder<LmCubit, LmState>(
+              builder: (lmContext, lmState) {
+                LmCubit lmCubit = BlocProvider.of<LmCubit>(context);
+                if(lmState.status == LmStatusList.loading || lmState.status == LmStatusList.initial){
+                  if(lmState.status == LmStatusList.initial){
+                    lmCubit.init(context);
+                  }
+                  return Loader();
+                }
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            titleText,
+                            style:
+                            Theme
+                                .of(context)
+                                .textTheme
+                                .headline3!
+                                .copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 19,
-                ),
-                StakingCard(
-                  loadEarnData: widget.loadEarnData,
-                  callback: stakingCallback,
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                BlocBuilder<TokensCubit, TokensState>(
-                  builder: (tokensContext, tokensState) {
-                    return liquidityMiningCard(
-                      tokensState,
-                      tokensState.status == TokensStatusList.loading,
-                    );
-                  },
-                ),
-              ],
+                        ],
+                      ),
+                      //TODO: staking
+                      // SizedBox(
+                      //   height: 19,
+                      // ),
+                      // StakingCard(
+                      //   loadEarnData: widget.loadEarnData,
+                      //   callback: stakingCallback,
+                      // ),
+                      SizedBox(
+                        height: 18,
+                      ),
+                      liquidityMiningCard(
+                        lmState,
+                        lmState.status == TokensStatusList.loading,
+                      ),
+                    ],
+                  );
+                }
             ),
           ),
         ),
@@ -109,26 +131,26 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
   }
 
   Widget liquidityMiningCard(
-    TokensState tokensState,
+    LmState lmState,
     bool isLoading,
   ) {
-    String avaragePairsAPR =
-        TokensHelper().getAprFormat(tokensState.averageAccountAPR!, false);
     return EarnCard(
       isLoading: isLoading,
       title: 'Liquidity mining',
       subTitle:
-          'up to ${TokensHelper().getAprFormat(tokensState.maxAPR ?? 0, true)} APR',
+          'up to ${lmState.maxApr} APR',
       imagePath: 'assets/pair_icons/dfi_btc.png',
-      firstColumnNumber: balancesHelper
-          .numberStyling(tokensState.totalPairsBalance ?? 0, fixed: true),
+      //TODO: add fiat value
+      // firstColumnNumber: balancesHelper
+      //     .numberStyling(tokensState.totalPairsBalance ?? 0, fixed: true),
+      firstColumnNumber: "0",
       firstColumnAsset: 'USD',
       firstColumnSubTitle: 'Pooled',
-      secondColumnNumber: avaragePairsAPR,
+      secondColumnNumber: lmState.averageApr,
       secondColumnAsset: '%',
       secondColumnSubTitle: 'Portfolio APR',
       isStaking: false,
-      callback: () => liquidityCallback(avaragePairsAPR),
+      callback: () => liquidityCallback(),
     );
   }
 
@@ -162,8 +184,8 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
     }
   }
 
-  liquidityCallback(String avaragePairsAPR) {
-    Widget redirectTo = LiquidityScreenNew(averageARP: avaragePairsAPR);
+  liquidityCallback() {
+    Widget redirectTo = LiquidityScreenNew();
 
     Navigator.push(
       context,

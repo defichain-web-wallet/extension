@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -17,7 +18,7 @@ import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RemoveLiquidity extends StatefulWidget {
-  final AssetPairModel assetPair;
+  final LmPoolModel assetPair;
   final int balance;
 
   const RemoveLiquidity(
@@ -46,13 +47,13 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
   void initState() {
     super.initState();
     TokensState tokensState = BlocProvider.of<TokensCubit>(context).state;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _setShareOfPool();
-      _setAmountA();
-      _setAmountB();
-      _setBalanceA();
-      _setBalanceB();
-      _setBalanceAndAmountUSD(tokensState);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      // _setShareOfPool();
+      // _setAmountA();
+      // _setAmountB();
+      // _setBalanceA();
+      // _setBalanceB();
+      // _setBalanceAndAmountUSD(tokensState);
     });
   }
 
@@ -179,9 +180,9 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
                                   setState(() {
                                     currentSliderValue = value;
                                   });
-                                  _setShareOfPool();
-                                  _setAmountA();
-                                  _setAmountB();
+                                  // _setShareOfPool();
+                                  // _setAmountA();
+                                  // _setAmountB();
                                 },
                               ),
                             ),
@@ -197,9 +198,9 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
                                     setState(() {
                                       currentSliderValue = 25;
                                     });
-                                    _setShareOfPool();
-                                    _setAmountA();
-                                    _setAmountB();
+                                    // _setShareOfPool();
+                                    // _setAmountA();
+                                    // _setAmountB();
                                   },
                                 ),
                                 SliderButton(
@@ -209,9 +210,9 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
                                     setState(() {
                                       currentSliderValue = 50;
                                     });
-                                    _setShareOfPool();
-                                    _setAmountA();
-                                    _setAmountB();
+                                    // _setShareOfPool();
+                                    // _setAmountA();
+                                    // _setAmountB();
                                   },
                                 ),
                                 SliderButton(
@@ -221,9 +222,9 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
                                     setState(() {
                                       currentSliderValue = 75;
                                     });
-                                    _setShareOfPool();
-                                    _setAmountA();
-                                    _setAmountB();
+                                    // _setShareOfPool();
+                                    // _setAmountA();
+                                    // _setAmountB();
                                   },
                                 ),
                                 SliderButton(
@@ -233,9 +234,9 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
                                     setState(() {
                                       currentSliderValue = 100;
                                     });
-                                    _setShareOfPool();
-                                    _setAmountA();
-                                    _setAmountB();
+                                    // _setShareOfPool();
+                                    // _setAmountA();
+                                    // _setAmountB();
                                   },
                                 ),
                               ],
@@ -263,13 +264,13 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    '${amountA.toStringAsFixed(6)} ${TokensHelper().getTokenFormat(widget.assetPair.tokenA)}',
+                                    '${amountA.toStringAsFixed(6)} ${widget.assetPair.tokens[0].displaySymbol}',
                                     style:
                                         Theme.of(context).textTheme.headline5,
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    '${amountB.toStringAsFixed(6)} ${TokensHelper().getTokenFormat(widget.assetPair.tokenB)}',
+                                    '${amountB.toStringAsFixed(6)} ${widget.assetPair.tokens[1].displaySymbol}',
                                     style:
                                         Theme.of(context).textTheme.headline5,
                                   ),
@@ -360,66 +361,66 @@ class _RemoveLiquidityState extends State<RemoveLiquidity> {
     return (convertFromSatoshi(widget.balance) * currentSliderValue / 100);
   }
 
-  void _setShareOfPool() {
-    setState(() {
-      shareOfPool = (widget.balance *
-          (currentSliderValue / 100) /
-          widget.assetPair.totalLiquidityRaw!);
-    });
-  }
-
-  void _setBalanceAndAmountUSD(tokensState) {
-    var totalBalanceInUsd = tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          balanceA,
-          widget.assetPair.tokenA!,
-        ) +
-        tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          balanceB,
-          widget.assetPair.tokenB!,
-        );
-    var totalAmountInUsd = tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          amountB,
-          widget.assetPair.tokenA!,
-        ) +
-        tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          amountB,
-          widget.assetPair.tokenB!,
-        );
-    setState(() {
-      balanceUSD = totalBalanceInUsd;
-      amountUSD = totalAmountInUsd;
-    });
-  }
-
-  void _setAmountA() {
-    setState(() {
-      amountA = (shareOfPool * widget.assetPair.reserveA!);
-    });
-  }
-
-  void _setAmountB() {
-    setState(() {
-      amountB = (shareOfPool * widget.assetPair.reserveB!);
-    });
-  }
-
-  void _setBalanceA() {
-    setState(() {
-      balanceA = (widget.balance / widget.assetPair.totalLiquidityRaw!) *
-          widget.assetPair.reserveA!;
-    });
-  }
-
-  void _setBalanceB() {
-    setState(() {
-      balanceB = (widget.balance / widget.assetPair.totalLiquidityRaw!) *
-          widget.assetPair.reserveB!;
-    });
-  }
+  // void _setShareOfPool() {
+  //   setState(() {
+  //     shareOfPool = (widget.balance *
+  //         (currentSliderValue / 100) /
+  //         widget.assetPair.totalLiquidityRaw!);
+  //   });
+  // }
+  //
+  // void _setBalanceAndAmountUSD(tokensState) {
+  //   var totalBalanceInUsd = tokensHelper.getAmountByUsd(
+  //         tokensState.tokensPairs,
+  //         balanceA,
+  //         widget.assetPair.tokenA!,
+  //       ) +
+  //       tokensHelper.getAmountByUsd(
+  //         tokensState.tokensPairs,
+  //         balanceB,
+  //         widget.assetPair.tokenB!,
+  //       );
+  //   var totalAmountInUsd = tokensHelper.getAmountByUsd(
+  //         tokensState.tokensPairs,
+  //         amountB,
+  //         widget.assetPair.tokenA!,
+  //       ) +
+  //       tokensHelper.getAmountByUsd(
+  //         tokensState.tokensPairs,
+  //         amountB,
+  //         widget.assetPair.tokenB!,
+  //       );
+  //   setState(() {
+  //     balanceUSD = totalBalanceInUsd;
+  //     amountUSD = totalAmountInUsd;
+  //   });
+  // }
+  //
+  // void _setAmountA() {
+  //   setState(() {
+  //     amountA = (shareOfPool * widget.assetPair.reserveA!);
+  //   });
+  // }
+  //
+  // void _setAmountB() {
+  //   setState(() {
+  //     amountB = (shareOfPool * widget.assetPair.reserveB!);
+  //   });
+  // }
+  //
+  // void _setBalanceA() {
+  //   setState(() {
+  //     balanceA = (widget.balance / widget.assetPair.totalLiquidityRaw!) *
+  //         widget.assetPair.reserveA!;
+  //   });
+  // }
+  //
+  // void _setBalanceB() {
+  //   setState(() {
+  //     balanceB = (widget.balance / widget.assetPair.totalLiquidityRaw!) *
+  //         widget.assetPair.reserveB!;
+  //   });
+  // }
 }
 
 class SliderButton extends StatelessWidget {

@@ -6,6 +6,7 @@ import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_networ
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 
 class ApplicationModel {
   final Map<String, AbstractSourceModel> sourceList;
@@ -14,6 +15,7 @@ class ApplicationModel {
   late List<AbstractAccountModel> accounts;
   late AbstractNetworkModel? activeNetwork;
   late AbstractAccountModel? activeAccount;
+  late TokenModel? activeToken;
 
   ApplicationModel({
     required this.sourceList,
@@ -22,6 +24,7 @@ class ApplicationModel {
     List<AbstractAccountModel>? accounts,
     AbstractNetworkModel? activeNetwork,
     AbstractAccountModel? activeAccount,
+    TokenModel? activeToken,
   }) {
     if (password != null) {
       this.password = encryptPassword(password);
@@ -34,11 +37,19 @@ class ApplicationModel {
     this.accounts = accounts ?? [];
 
     if (activeNetwork == null) {
-      this.activeNetwork = this.networks[2];
+      this.activeNetwork = this.networks[0];
     } else {
       this.activeNetwork = activeNetwork;
     }
     this.activeAccount = activeAccount;
+    // TODO: need to create list with available tokens for converting
+    this.activeToken = TokenModel(
+      id: '0',
+      symbol: 'USDT',
+      name: 'USDT',
+      displaySymbol: 'USDT',
+      networkName: this.activeNetwork!.networkType.networkName,
+    );
   }
 
   String encryptPassword(String password) {

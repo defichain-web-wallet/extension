@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_network_mod
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -205,6 +206,29 @@ class WalletCubit extends Cubit<WalletState> {
 
     emit(state.copyWith(
       applicationModel: applicationModel,
+    ));
+  }
+
+  updateAccountBalances() async {
+    emit(state.copyWith(
+      status: WalletStatusList.update,
+      applicationModel: state.applicationModel,
+    ));
+    final networkName =
+        state.applicationModel!.activeNetwork!.networkType.networkName.name;
+    final balances =
+        await state.applicationModel!.activeNetwork!.getAllBalances(
+      addressString: state.activeAccount.addresses[networkName]!,
+    );
+    state.applicationModel!.activeAccount!.pinnedBalances[networkName] =
+        balances;
+
+    // TODO: maybe need to save applicationModel during another action
+    StorageService.saveApplication(state.applicationModel!);
+
+    emit(state.copyWith(
+      status: WalletStatusList.success,
+      applicationModel: state.applicationModel,
     ));
   }
 

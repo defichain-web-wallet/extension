@@ -129,10 +129,7 @@ class _StakingKycMobileScreenState extends State<StakingKycMobileScreen>
                                       )
                                     : null,
                               ),
-                              child: QrImage(
-                                data: widget.kycLink,
-                                padding: EdgeInsets.all(17.7),
-                              ),
+                              child: QrImageView(data: widget.kycLink, padding: EdgeInsets.all(17.7),),
                             ),
                           ],
                         ),

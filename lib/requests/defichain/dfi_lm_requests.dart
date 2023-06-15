@@ -12,7 +12,7 @@ class DFILmRequests {
     required List<TokenModel> tokens
   }) async {
     final query = {
-      'size': 200,
+      'size': '200',
       'next': next ?? '',
     };
 
@@ -28,8 +28,18 @@ class DFILmRequests {
 
       if (response.statusCode == 200) {
         dynamic json = jsonDecode(response.body);
-        List<LmPoolModel> lmTokens =
-            LmPoolModel.fromJSONList(json, networkType.networkName, tokens);
+        List<dynamic> data = json['data'];
+        List<dynamic> elements = [];
+        data.forEach((element) {
+          if(element['tradeEnabled'] && element['symbol'].indexOf('BURN') < 0){
+            elements.add(element);
+          }
+        });
+        List<LmPoolModel> lmTokens = LmPoolModel.fromJSONList(
+          elements,
+          networkType.networkName,
+          tokens,
+        );
         if (json['page'] != null) {
           var nextTokenList = await getLmPools(
             next: json['page']['next'],

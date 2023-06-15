@@ -4,6 +4,7 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/fields/password/caption_text.dart';
 import 'package:defi_wallet/widgets/fields/suffix_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 enum PasswordStatusList { initial, confirm, success, error }
 
@@ -30,6 +31,7 @@ class PasswordTextField extends StatefulWidget {
   final bool isShowObscureIcon;
   final bool isCaptionShown;
   final bool isOpasity;
+  final bool onlyEngCharacters;
 
   const PasswordTextField({
     Key? key,
@@ -49,6 +51,7 @@ class PasswordTextField extends StatefulWidget {
     this.isShowObscureIcon = false,
     this.isCaptionShown = true,
     this.isOpasity = false,
+    this.onlyEngCharacters = true,
   }) : super(key: key);
 
   @override
@@ -107,6 +110,12 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
               GestureDetector(
                 onDoubleTap: _onSelectInputText,
                 child: TextFormField(
+                  inputFormatters: widget.onlyEngCharacters
+                      ? <TextInputFormatter>[
+                          FilteringTextInputFormatter.allow(
+                              RegExp("[0-9a-zA-Z]")),
+                        ]
+                      : [],
                   autofocus: widget.autofocus,
                   maxLines: maxLines,
                   obscuringCharacter: obscureSymbolCharacter,

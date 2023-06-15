@@ -1,6 +1,6 @@
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
@@ -39,6 +39,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
+  static const int timerDuration = 30;
+
   Timer? timer;
   TabController? tabController;
   LockHelper lockHelper = LockHelper();
@@ -78,9 +80,10 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+    RatesCubit ratesCubit = BlocProvider.of<RatesCubit>(context);
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     if (widget.isLoadTokens) {
-      tokensCubit.loadTokensFromStorage();
+      ratesCubit.loadRates(walletCubit.state.activeNetwork);
     }
 
     return BlocBuilder<WalletCubit, WalletState>(builder: (context, state) {
@@ -101,6 +104,12 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {
+                      if (timer == null) {
+                        timer = Timer.periodic(
+                          Duration(seconds: timerDuration),
+                          (timer) async => walletCubit.updateAccountBalances(),
+                        );
+                      }
                       if (widget.snackBarMessage.isNotEmpty &&
                           !isShownSnackBar) {
                         Future<Null>.delayed(Duration.zero, () {

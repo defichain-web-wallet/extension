@@ -1,5 +1,6 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+import sys
 import os
 import json
 import argparse
@@ -11,16 +12,44 @@ import pathlib
 DIR = pathlib.Path(__file__).parent.resolve()
 EXT = "tar"
 
+browser_types = ['chrome', 'firefox']
+
+
+def get_browser_type():
+    target_args_index = 1
+    browser_types_first_index = 0
+
+    try:
+        if sys.argv[target_args_index] not in browser_types:
+            return sys.argv[target_args_index]
+    except IndexError:
+        return browser_types[browser_types_first_index]
+
+
+def generate_manifest(browser_name):
+    if browser_name in browser_types:
+        with open('../web/manifest/index.json', 'r+') as index_manifest:
+            manifest_data = json.load(index_manifest)
+
+        with open(f'../web/manifest/{browser_name}.json') as specific_manifest_file:
+            target_data = json.load(specific_manifest_file)
+            manifest_data.update(target_data)
+
+        with open("../web/manifest.json", "w") as manifest:
+            json.dump(manifest_data, manifest)
+    else:
+        print('Invalid browser name: must be \'chrome\' or \'firefox\'')
+
 
 def get_version():
-    manifest_json_file_path = f"{DIR}/../web/manifest.json"
+    manifest_json_file_path = f"{DIR}/../web/manifest/index.json"
     with open(manifest_json_file_path, "r") as f:
         manifest = json.loads(f.read())
         return manifest["version"]
 
 
 def update_manifest(version):
-    manifest_json_file_path = f"{DIR}/../web/manifest.json"
+    manifest_json_file_path = f"{DIR}/../web/manifest/index.json"
     with open(manifest_json_file_path, "r") as f:
         manifest = json.loads(f.read())
         manifest["version"]: version
@@ -124,7 +153,11 @@ def run(version):
 
 if __name__ == "__main__":
     version = get_version()
+    browser_type = get_browser_type()
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", help="new version", default=version)
+    parser.add_argument("--browser", help="browser name",
+                        choices=browser_types)
     args = parser.parse_args()
+    generate_manifest(args.browser)
     run(args.version)

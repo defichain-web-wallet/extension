@@ -1,9 +1,11 @@
+import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -20,7 +22,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class LiquidityRemoveScreen extends StatefulWidget {
-  final AssetPairModel assetPair;
+  final LmPoolModel assetPair;
   final int balance;
 
   const LiquidityRemoveScreen({
@@ -48,18 +50,19 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
   double balanceB = 0;
 
   bool isShowDetails = true;
+  LmCubit? lmCubit;
 
   @override
   void initState() {
     super.initState();
-    TokensState tokensState = BlocProvider.of<TokensCubit>(context).state;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    lmCubit = BlocProvider.of<LmCubit>(context);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       _setShareOfPool();
       _setAmountA();
       _setAmountB();
       _setBalanceA();
       _setBalanceB();
-      _setBalanceAndAmountUSD(tokensState);
+      // _setBalanceAndAmountUSD(tokensState);
     });
   }
 
@@ -71,62 +74,65 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
 
   void _setShareOfPool() {
     setState(() {
-      shareOfPool = (widget.balance *
-          (currentSliderValue / 100) /
-          widget.assetPair.totalLiquidityRaw!);
+      shareOfPool = lmCubit!.calculateShareOfPool(
+          widget.balance, currentSliderValue, widget.assetPair);
     });
   }
 
   void _setBalanceAndAmountUSD(tokensState) {
-    var totalBalanceInUsd = tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          balanceA,
-          widget.assetPair.tokenA!,
-        ) +
-        tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          balanceB,
-          widget.assetPair.tokenB!,
-        );
-    var totalAmountInUsd = tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          amountB,
-          widget.assetPair.tokenA!,
-        ) +
-        tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          amountB,
-          widget.assetPair.tokenB!,
-        );
-    setState(() {
-      balanceUSD = totalBalanceInUsd;
-      amountUSD = totalAmountInUsd;
-    });
+    // var totalBalanceInUsd = tokensHelper.getAmountByUsd(
+    //       tokensState.tokensPairs,
+    //       balanceA,
+    //       widget.assetPair.tokenA!,
+    //     ) +
+    //     tokensHelper.getAmountByUsd(
+    //       tokensState.tokensPairs,
+    //       balanceB,
+    //       widget.assetPair.tokenB!,
+    //     );
+    // var totalAmountInUsd = tokensHelper.getAmountByUsd(
+    //       tokensState.tokensPairs,
+    //       amountB,
+    //       widget.assetPair.tokenA!,
+    //     ) +
+    //     tokensHelper.getAmountByUsd(
+    //       tokensState.tokensPairs,
+    //       amountB,
+    //       widget.assetPair.tokenB!,
+    //     );
+    // setState(() {
+    //   balanceUSD = totalBalanceInUsd;
+    //   amountUSD = totalAmountInUsd;
+    // });
   }
 
   void _setAmountA() {
     setState(() {
-      amountA = (shareOfPool * widget.assetPair.reserveA!);
+      amountA = (shareOfPool * widget.assetPair.percentages![0]);
     });
   }
 
   void _setAmountB() {
     setState(() {
-      amountB = (shareOfPool * widget.assetPair.reserveB!);
+      amountB = (shareOfPool * widget.assetPair.percentages![1]);
     });
   }
 
+//TODO: move to cubit
   void _setBalanceA() {
     setState(() {
-      balanceA = (widget.balance / widget.assetPair.totalLiquidityRaw!) *
-          widget.assetPair.reserveA!;
+      balanceA = (widget.balance /
+              convertToSatoshi(widget.assetPair.percentages![2])) *
+          widget.assetPair.percentages![0];
     });
   }
 
+//TODO: move to cubit
   void _setBalanceB() {
     setState(() {
-      balanceB = (widget.balance / widget.assetPair.totalLiquidityRaw!) *
-          widget.assetPair.reserveB!;
+      balanceB = (widget.balance /
+              convertToSatoshi(widget.assetPair.percentages![2])) *
+          widget.assetPair.percentages![1];
     });
   }
 
@@ -411,7 +417,7 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
                                       text: TextSpan(children: [
                                         TextSpan(
                                           text:
-                                              '${amountA.toStringAsFixed(6)} ${TokensHelper().getTokenFormat(widget.assetPair.tokenA)}',
+                                              '${amountA.toStringAsFixed(6)} ${widget.assetPair.tokens[0].displaySymbol}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -428,7 +434,7 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
                                       text: TextSpan(children: [
                                         TextSpan(
                                           text:
-                                              '${amountB.toStringAsFixed(6)} ${TokensHelper().getTokenFormat(widget.assetPair.tokenB)}',
+                                              '${amountB.toStringAsFixed(6)} ${widget.assetPair.tokens[1].displaySymbol}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
