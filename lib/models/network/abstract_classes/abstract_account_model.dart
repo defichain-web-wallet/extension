@@ -11,7 +11,7 @@ abstract class AbstractAccountModel {
   final Map<String, String> addresses;
   final Map<String, List<BalanceModel>> pinnedBalances;
   final int accountIndex;
-  final String name;
+  String name;
 
   AbstractAccountModel(
     this.publicKeyTestnet,
@@ -22,6 +22,10 @@ abstract class AbstractAccountModel {
     this.pinnedBalances,
     this.name
   );
+
+  void changeName(String name){
+    this.name = name;
+  }
 
   Map<String, dynamic> toJson();
 

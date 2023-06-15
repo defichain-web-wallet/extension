@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
+import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -178,6 +179,53 @@ class WalletCubit extends Cubit<WalletState> {
     emit(state.copyWith(
       status: WalletStatusList.success,
       applicationModel: state.applicationModel,
+    ));
+  }
+
+  editAccount(String name, int index) async {
+    ApplicationModel applicationModel = state.applicationModel!;
+    applicationModel.accounts.firstWhere((element) => element.accountIndex == index).changeName(name);
+      if(applicationModel.activeAccount!.accountIndex == index){
+        applicationModel.activeAccount!.changeName(name);
+      }
+
+    StorageService.saveApplication(applicationModel);
+
+    emit(state.copyWith(
+      applicationModel: applicationModel,
+    ));
+  }
+
+  updateActiveAccount(int index) async {
+    emit(state.copyWith(
+      status: WalletStatusList.loading,
+    ));
+    ApplicationModel applicationModel = state.applicationModel!;
+    AbstractAccountModel account = applicationModel.accounts.firstWhere((element) => element.accountIndex == index);
+    applicationModel.activeAccount = account;
+
+    StorageService.saveApplication(applicationModel);
+
+    emit(state.copyWith(
+      status: WalletStatusList.success,
+      applicationModel: applicationModel,
+    ));
+  }
+  addNewAccount(String name) async {
+    emit(state.copyWith(
+      status: WalletStatusList.loading,
+    ));
+    ApplicationModel applicationModel = state.applicationModel!;
+    int maxIndex = 0;
+    applicationModel.accounts.forEach((element) => element.accountIndex > maxIndex ? maxIndex = element.accountIndex : null);
+    SourceSeedModel source = applicationModel.sourceList.values.first;
+    AbstractAccountModel account = await AccountModel.fromPublicKeys(networkList: applicationModel.networks,  accountIndex: maxIndex+1, publicKeyMainnet: source.publicKeyMainnet, publicKeyTestnet: source.publicKeyTestnet, sourceId: source.id);
+    account.changeName(name);
+    applicationModel.accounts.add(account);
+    StorageService.saveApplication(applicationModel);
+    emit(state.copyWith(
+      status: WalletStatusList.success,
+      applicationModel: applicationModel,
     ));
   }
 
