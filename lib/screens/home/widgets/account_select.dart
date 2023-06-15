@@ -180,81 +180,162 @@ class AccountSelectState extends State<AccountSelect> {
                 itemCount: _accountList.length + 1,
                 itemBuilder: (context, index) {
                   if (index == _accountList.length) {
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(0),
-                          shadowColor: Colors.transparent,
-                          primary: Colors.transparent,
-                          shape: RoundedRectangleBorder(
+                    return Row(children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.all(0),
+                            shadowColor: Colors.transparent,
+                            primary: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10.0),
+                                    bottomRight: Radius.circular(10.0))),
+                            side: BorderSide(
+                              color: Colors.transparent,
+                            )),
+                        child: Container(
+                          height: _tileHeight,
+                          decoration: BoxDecoration(
                               borderRadius: BorderRadius.only(
                                   bottomLeft: Radius.circular(10.0),
                                   bottomRight: Radius.circular(10.0))),
-                          side: BorderSide(
-                            color: Colors.transparent,
-                          )),
-                      child: Container(
-                        height: _tileHeight,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10.0),
-                                bottomRight: Radius.circular(10.0))),
-                        child: Center(
-                          child: Text(
-                            '+ Create new account',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline4!
-                                .apply(color: AppTheme.pinkColor),
+                          child: Center(
+                            child: Text(
+                              '+ Create new account',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline4!
+                                  .apply(color: AppTheme.pinkColor),
+                            ),
                           ),
                         ),
+                        onPressed: () async {
+                          hideOverlay();
+                          widget.isFullScreen
+                              ? PasswordBottomSheet
+                                  .provideWithPasswordFullScreen(
+                                      context, _activeAccount,
+                                      (password) async {
+                                  AccountModel account =
+                                      await accountCubit.addAccount();
+                                  if (SettingsHelper.isBitcoin()) {
+                                    await bitcoinCubit
+                                        .loadDetails(account.bitcoinAddress!);
+                                  }
+                                  LoggerService.invokeInfoLogg(
+                                      'user created new account');
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (context, animation1, animation2) =>
+                                              HomeScreen(),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  );
+                                })
+                              : PasswordBottomSheet.provideWithPassword(
+                                  context, _activeAccount, (password) async {
+                                  AccountModel account =
+                                      await accountCubit.addAccount();
+                                  if (SettingsHelper.isBitcoin()) {
+                                    await bitcoinCubit
+                                        .loadDetails(account.bitcoinAddress!);
+                                  }
+                                  LoggerService.invokeInfoLogg(
+                                      'user created new account');
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (context, animation1, animation2) =>
+                                              HomeScreen(),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  );
+                                });
+                        },
                       ),
-                      onPressed: () async {
-                        hideOverlay();
-                        widget.isFullScreen
-                            ? PasswordBottomSheet.provideWithPasswordFullScreen(
-                                context, _activeAccount, (password) async {
-                                AccountModel account =
-                                    await accountCubit.addAccount();
-                                if (SettingsHelper.isBitcoin()) {
-                                  await bitcoinCubit
-                                      .loadDetails(account.bitcoinAddress!);
-                                }
-                                LoggerService.invokeInfoLogg(
-                                    'user created new account');
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            HomeScreen(),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                );
-                              })
-                            : PasswordBottomSheet.provideWithPassword(
-                                context, _activeAccount, (password) async {
-                                AccountModel account =
-                                    await accountCubit.addAccount();
-                                if (SettingsHelper.isBitcoin()) {
-                                  await bitcoinCubit
-                                      .loadDetails(account.bitcoinAddress!);
-                                }
-                                LoggerService.invokeInfoLogg(
-                                    'user created new account');
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (context, animation1, animation2) =>
-                                            HomeScreen(),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
-                                );
-                              });
-                      },
-                    );
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.all(0),
+                            shadowColor: Colors.transparent,
+                            primary: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10.0),
+                                    bottomRight: Radius.circular(10.0))),
+                            side: BorderSide(
+                              color: Colors.transparent,
+                            )),
+                        child: Container(
+                          height: _tileHeight,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(10.0),
+                                  bottomRight: Radius.circular(10.0))),
+                          child: Center(
+                            child: Text(
+                              '+ Create new account',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline4!
+                                  .apply(color: AppTheme.pinkColor),
+                            ),
+                          ),
+                        ),
+                        onPressed: () async {
+                          hideOverlay();
+                          widget.isFullScreen
+                              ? PasswordBottomSheet
+                                  .provideWithPasswordFullScreen(
+                                      context, _activeAccount,
+                                      (password) async {
+                                  AccountModel account =
+                                      await accountCubit.addAccount();
+                                  if (SettingsHelper.isBitcoin()) {
+                                    await bitcoinCubit
+                                        .loadDetails(account.bitcoinAddress!);
+                                  }
+                                  LoggerService.invokeInfoLogg(
+                                      'user created new account');
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (context, animation1, animation2) =>
+                                              HomeScreen(),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  );
+                                })
+                              : PasswordBottomSheet.provideWithPassword(
+                                  context, _activeAccount, (password) async {
+                                  AccountModel account =
+                                      await accountCubit.addAccount();
+                                  if (SettingsHelper.isBitcoin()) {
+                                    await bitcoinCubit
+                                        .loadDetails(account.bitcoinAddress!);
+                                  }
+                                  LoggerService.invokeInfoLogg(
+                                      'user created new account');
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (context, animation1, animation2) =>
+                                              HomeScreen(),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  );
+                                });
+                        },
+                      )
+                    ]);
                   } else {
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(

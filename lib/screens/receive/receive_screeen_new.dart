@@ -30,7 +30,8 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
   bool isCopied = false;
   String hintText =
       'This is your personal wallet address.\nYou can use it to receive DFI and DST tokens like dBTC, dETH, dTSLA & more.';
-  String btcHintText = 'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
+  String btcHintText =
+      'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
 
   cutAddress(String s) {
     return s.substring(0, 5) + '...' + s.substring(s.length - 4, s.length);
@@ -68,9 +69,12 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                     color: isDarkTheme()
                         ? DarkColors.scaffoldContainerBgColor
                         : LightColors.scaffoldContainerBgColor,
-                    border: isDarkTheme() ? Border.all(
-                      width: 1.0, color: Colors.white.withOpacity(0.05),
-                    ) : null,
+                    border: isDarkTheme()
+                        ? Border.all(
+                            width: 1.0,
+                            color: Colors.white.withOpacity(0.05),
+                          )
+                        : null,
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
                       topLeft: Radius.circular(20),
@@ -117,7 +121,10 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                   Text(
                                     'Address',
                                     style: headline5.apply(
-                                      color: Theme.of(context).textTheme.headline5!.color!
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!
                                           .withOpacity(0.3),
                                     ),
                                   ),
@@ -129,7 +136,8 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     child: TickerText(
                                       isSpecialDuration: true,
                                       child: Text(
-                                        state.activeAccount.name, //TODO: add account name
+                                        state.activeAccount
+                                            .name, //TODO: add account name
                                         style: headline5.copyWith(
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -143,8 +151,8 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                 cursor: SystemMouseCursors.click,
                                 child: GestureDetector(
                                   onTap: () async {
-                                    await Clipboard.setData(
-                                        ClipboardData(text: state.activeAddress));
+                                    await Clipboard.setData(ClipboardData(
+                                        text: state.activeAddress));
                                     setState(() {
                                       isCopied = !isCopied;
                                     });
@@ -173,7 +181,10 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                           width: 10,
                                         ),
                                         Image.asset(
-                                            'assets/images/copy_gradient.png', width: 20, height: 20,)
+                                          'assets/images/copy_gradient.png',
+                                          width: 20,
+                                          height: 20,
+                                        )
                                       ],
                                     ),
                                   ),
@@ -189,12 +200,20 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     width: 272,
                                     height: 48,
                                     child: Text(
-                                      SettingsHelper.isBitcoin() ? btcHintText : hintText,
+                                      SettingsHelper.isBitcoin()
+                                          ? btcHintText
+                                          : hintText,
                                       textAlign: TextAlign.center,
-                                      style: Theme.of(context).textTheme.headline6!.apply(
-                                          color: Theme.of(context).textTheme.headline6!.color!
-                                              .withOpacity(0.3),
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .apply(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline6!
+                                                .color!
+                                                .withOpacity(0.3),
+                                          ),
                                     ),
                                   ),
                                   if (isCopied)

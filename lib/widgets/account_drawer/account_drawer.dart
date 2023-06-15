@@ -53,8 +53,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
         var accounts = state.accounts;
         if (accounts!.length == 1) {
           accountsSelectorHeight = 195;
-        }
-        else if (accounts.length == 2) {
+        } else if (accounts.length == 2) {
           accountsSelectorHeight = 237;
         } else {
           accountsSelectorHeight = 260;
@@ -134,7 +133,8 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                         accountName: state.activeAccount!.name!,
                                         onEdit: () {
                                           showDialog(
-                                            barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                            barrierColor: AppColors.tolopea
+                                                .withOpacity(0.06),
                                             barrierDismissible: false,
                                             context: context,
                                             builder: (BuildContext context) {
@@ -164,45 +164,43 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                           child: ListView.builder(
                                             itemCount: accounts.length,
                                             itemBuilder: (context, index) {
-                                                return Column(
-                                                  children: [
-                                                    Divider(
-                                                      height: 1,
-                                                      endIndent: 12,
-                                                      indent: 12,
-                                                      color: Theme.of(context)
-                                                          .dividerColor
-                                                          .withOpacity(0.05),
-                                                      thickness: 1,
-                                                    ),
-                                                    AccountMenuButton(
-                                                      accountSelectMode: true,
-                                                      account: accounts[index],
-                                                      callback: accounts[index]
-                                                                  .index ==
-                                                              state
-                                                                  .activeAccount!
-                                                                  .index
-                                                          ? null
-                                                          : (accountIndex) async {
-                                                              accountCubit
-                                                                  .updateActiveAccount(
-                                                                      accounts[
-                                                                              index]
-                                                                          .index!);
-                                                              Scaffold.of(
-                                                                      context)
-                                                                  .closeEndDrawer();
-                                                            },
-                                                      isHoverBackgroundEffect:
-                                                          false,
-                                                      iconPath:
-                                                          'assets/icons/add.svg',
-                                                      title:
-                                                          accounts[index].name!,
-                                                    ),
-                                                  ],
-                                                );
+                                              return Column(
+                                                children: [
+                                                  Divider(
+                                                    height: 1,
+                                                    endIndent: 12,
+                                                    indent: 12,
+                                                    color: Theme.of(context)
+                                                        .dividerColor
+                                                        .withOpacity(0.05),
+                                                    thickness: 1,
+                                                  ),
+                                                  AccountMenuButton(
+                                                    accountSelectMode: true,
+                                                    account: accounts[index],
+                                                    callback: accounts[index]
+                                                                .index ==
+                                                            state.activeAccount!
+                                                                .index
+                                                        ? null
+                                                        : (accountIndex) async {
+                                                            accountCubit
+                                                                .updateActiveAccount(
+                                                                    accounts[
+                                                                            index]
+                                                                        .index!);
+                                                            Scaffold.of(context)
+                                                                .closeEndDrawer();
+                                                          },
+                                                    isHoverBackgroundEffect:
+                                                        false,
+                                                    iconPath:
+                                                        'assets/icons/add.svg',
+                                                    title:
+                                                        accounts[index].name!,
+                                                  ),
+                                                ],
+                                              );
                                             },
                                           ),
                                         ),
@@ -221,34 +219,29 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                           AccountMenuButton(
                                             callback: (index) {
                                               showDialog(
-                                                barrierColor:
-                                                AppColors.tolopea.withOpacity(0.06),
-                                                barrierDismissible:
-                                                false,
+                                                barrierColor: AppColors.tolopea
+                                                    .withOpacity(0.06),
+                                                barrierDismissible: false,
                                                 context: context,
-                                                builder: (BuildContext
-                                                context) {
+                                                builder:
+                                                    (BuildContext context) {
                                                   return CreateEditAccountDialog(
-                                                    callback:
-                                                        (s) async {
+                                                    callback: (s) async {
                                                       await accountCubit
                                                           .addAccount();
                                                       accountCubit.editAccount(
                                                           s,
-                                                          index: accounts
-                                                              .length -
-                                                              1);
+                                                          index:
+                                                              accounts.length -
+                                                                  1);
                                                     },
                                                   );
                                                 },
                                               );
                                             },
-                                            isHoverBackgroundEffect:
-                                            false,
-                                            iconPath:
-                                            'assets/icons/add.svg',
-                                            title:
-                                            'Create new account',
+                                            isHoverBackgroundEffect: false,
+                                            iconPath: 'assets/icons/add.svg',
+                                            title: 'Create new account',
                                           ),
                                         ],
                                       )

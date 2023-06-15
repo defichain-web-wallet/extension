@@ -45,7 +45,7 @@ dependencies:
   bloc: ^8.0.1
 
   #qr
-  qr_flutter: ^4.0.0
+  qr_flutter: ^4.1.0
 
   path_provider: ^2.0.2
   equatable: ^2.0.3
