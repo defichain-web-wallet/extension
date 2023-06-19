@@ -3,6 +3,7 @@ import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 

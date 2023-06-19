@@ -5,7 +5,7 @@ class StakingTokenModel extends TokenModel {
   double? apy;
 
   StakingTokenModel(
-      {required double apr, required double apy, required TokenModel token})
+      {required  this.apr, required  this.apy, required TokenModel token})
       : super(
       id: token.id,
       symbol: token.symbol,

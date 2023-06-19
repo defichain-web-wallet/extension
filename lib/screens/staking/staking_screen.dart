@@ -1,5 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
@@ -11,6 +11,7 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/fields/invested_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -48,10 +49,10 @@ class _StakingScreenState extends State<StakingScreen>
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
-    lockCubit.updateRewardRoutes(
-      accountCubit.state.accounts!.first,
-      lockCubit.state.lockStakingDetails!.rewardRoutes!,
-    );
+    // lockCubit.updateRewardRoutes(
+    //   accountCubit.state.accounts!.first,
+    //   lockCubit.state.lockStakingDetails!.rewardRoutes!,
+    // );
     setState(() {
       isEdit = false;
     });
@@ -67,39 +68,18 @@ class _StakingScreenState extends State<StakingScreen>
       ) {
         AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
         LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-        if (isFirstBuild) {
-          lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
-          isFirstBuild = false;
-        }
         return BlocBuilder<LockCubit, LockState>(
           builder: (lockContext, lockState) {
             if (lockState.status == LockStatusList.success) {
-              List<LockRewardRoutesModel> rewards =
-                  lockState.lockStakingDetails!.rewardRoutes!;
-              controllers = List.generate(rewards.length, (index) {
-                return TextEditingController(
-                    text: (rewards[index].rewardPercent! * 100).toString());
-              });
+              // List<LockRewardRoutesModel> rewards =
+              //     lockState.lockStakingDetails!.rewardRoutes!;
+              // controllers = List.generate(rewards.length, (index) {
+              //   return TextEditingController(
+              //       text: (rewards[index].rewardPercent! * 100).toString());
+              // });
               focusNodes = List.generate(rewards.length, (index) => FocusNode());
               controller.text =
-                  '${lockState.lockStakingDetails!.rewardRoutes![0].rewardPercent! * 100}';
-              bool isYieldMachine =
-                  lockState.lockStrategy == LockStrategyList.LiquidityMining;
-
-              if (lockState.errorMessage.isNotEmpty) {
-                Future<Null>.delayed(Duration.zero, () {
-                  showSnackBar(
-                    context,
-                    title: lockState.errorMessage,
-                    color: AppColors.txStatusError.withOpacity(0.1),
-                    prefix: Icon(
-                      Icons.close,
-                      color: AppColors.txStatusError,
-                    ),
-                  );
-                });
-                lockCubit.updateErrorMessage('');
-              }
+                  '${1 * 100}';
 
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -111,10 +91,10 @@ class _StakingScreenState extends State<StakingScreen>
                   isShowLogo: false,
                   isShowNetworkSelector: false,
                   callback: () {
-                    lockCubit.updateLockStrategy(
-                      LockStrategyList.Masternode,
-                      accountCubit.state.accounts!.first,
-                    );
+                    // lockCubit.updateLockStrategy(
+                    //   LockStrategyList.Masternode,
+                    //   accountCubit.state.accounts!.first,
+                    // );
                   },
                 ),
                 body: Container(
@@ -161,9 +141,7 @@ class _StakingScreenState extends State<StakingScreen>
                                           CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          !lockState.isYieldMachine
-                                              ? headerTextStaking
-                                              : headerTextYieldMachine,
+                                          headerTextStaking,
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -175,8 +153,8 @@ class _StakingScreenState extends State<StakingScreen>
                                           height: 4,
                                         ),
                                         Text(
-                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')} / '
-                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apr!, 'APR')}',
+                                          '${getAprOrApyFormat(lockState.stakingTokenModel!.apy!, 'APY')} / '
+                                          '${getAprOrApyFormat(lockState.stakingTokenModel!.apr!, 'APR')}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -276,6 +254,12 @@ class _StakingScreenState extends State<StakingScreen>
                                 SizedBox(
                                   height: 16,
                                 ),
+                                // StakingTabs(
+                                //   lockStrategy: lockState.lockStrategy,
+                                // ),
+                                SizedBox(
+                                  height: 24,
+                                ),
                                 Container(
                                   width: double.infinity,
                                   padding: EdgeInsets.all(16),
@@ -288,7 +272,7 @@ class _StakingScreenState extends State<StakingScreen>
                                   ),
                                   child: Column(
                                     children: [
-                                      if (!lockState.isYieldMachine) ...[
+                                      ...[
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -296,7 +280,7 @@ class _StakingScreenState extends State<StakingScreen>
                                               CrossAxisAlignment.center,
                                           children: [
                                             Text(
-                                              '${lockState.lockStakingDetails!.asset} Staking',
+                                              '${lockState.stakingModel!.balances[0].asset} Staking',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline4!
@@ -305,7 +289,7 @@ class _StakingScreenState extends State<StakingScreen>
                                                   ),
                                             ),
                                             Text(
-                                              '${lockState.lockStakingDetails!.balance} ${lockState.lockStakingDetails!.asset}',
+                                              '${lockState.stakingModel!.balances[0].balance} ${lockState.stakingModel!.balances[0].asset}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline4!
@@ -338,9 +322,9 @@ class _StakingScreenState extends State<StakingScreen>
                                                   ),
                                             ),
                                             Text(
-                                              '${lockState.lockStakingDetails!.pendingDeposits == 0 ? '' : '+'}'
-                                              '${lockState.lockStakingDetails!.pendingDeposits}'
-                                              ' ${lockState.lockStakingDetails!.asset}',
+                                              '${lockState.stakingModel!.balances[0].pendingDeposits == 0 ? '' : '+'}'
+                                              '${lockState.stakingModel!.balances[0].pendingDeposits}'
+                                              ' ${lockState.stakingModel!.balances[0].asset}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline5!
@@ -378,9 +362,9 @@ class _StakingScreenState extends State<StakingScreen>
                                                   ),
                                             ),
                                             Text(
-                                              '${lockState.lockStakingDetails!.pendingWithdrawals == 0 ? '' : '-'}'
-                                              '${lockState.lockStakingDetails!.pendingWithdrawals}'
-                                              ' ${lockState.lockStakingDetails!.asset}',
+                                              '${lockState.stakingModel!.balances[0].pendingWithdrawals == 0 ? '' : '-'}'
+                                              '${lockState.stakingModel!.balances[0].pendingWithdrawals}'
+                                              ' ${lockState.stakingModel!.balances[0].asset}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline5!
@@ -395,8 +379,9 @@ class _StakingScreenState extends State<StakingScreen>
                                             ),
                                           ],
                                         ),
-                                      ] else
-                                        YieldMachineBalance(),
+                                      ],
+                                    // else
+                                    //     YieldMachineBalance(),
                                       SizedBox(
                                         height: 16,
                                       ),
@@ -442,18 +427,32 @@ class _StakingScreenState extends State<StakingScreen>
                                             SizedBox(
                                               height: 12,
                                             ),
-                                            RewardRoutesList(
-                                              controllers: controllers,
-                                              focusNodes: focusNodes,
-                                              isDisabled: isEdit,
-                                            ),
+                                            // Column(
+                                            //   mainAxisAlignment:
+                                            //       MainAxisAlignment.start,
+                                            //   crossAxisAlignment:
+                                            //       CrossAxisAlignment.start,
+                                            //   children: [
+                                            //     InvestedField(
+                                            //       label:
+                                            //           // '${lockState.stakingModel!.rewardRoutes[0].label}',
+                                            //           'Reinvest',
+                                            //       tokenName:
+                                            //           'DFI',
+                                            //           // '${lockState.stakingModel!.rewardRoutes[0].targetAsset}',
+                                            //       controller: controller,
+                                            //       isDeleteBtn: false,
+                                            //       isDisable: !isEdit,
+                                            //     ),
+                                            //   ],
+                                            //
+                                            // ),
                                           ],
                                         ),
                                       ),
                                       SizedBox(
                                         height: 16,
                                       ),
-                                      if (!isEdit)
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -504,33 +503,111 @@ class _StakingScreenState extends State<StakingScreen>
                                             )
                                           ],
                                         ),
-                                      if (isEdit)
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              width: 140,
-                                              child: AccentButton(
-                                                label: 'Cancel',
-                                                callback: () {
-                                                  setState(() {
-                                                    isEdit = false;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                            NewPrimaryButton(
-                                              width: 140,
-                                              title: 'Save',
-                                              callback: () =>
-                                                  _onSaveRewardRoutes(context),
-                                            )
-                                          ],
-                                        ),
+
+                                      // if (isEdit)
+                                      //   Row(
+                                      //     mainAxisAlignment:
+                                      //         MainAxisAlignment.spaceBetween,
+                                      //     children: [
+                                      //       Container(
+                                      //         width: 140,
+                                      //         child: AccentButton(
+                                      //           label: 'Cancel',
+                                      //           callback: () {
+                                      //             setState(() {
+                                      //               isEdit = false;
+                                      //             });
+                                      //           },
+                                      //         ),
+                                      //       ),
+                                      //       NewPrimaryButton(
+                                      //         width: 140,
+                                      //         title: 'Save',
+                                      //         callback: () {
+                                      //           setState(() {
+                                      //             isEdit = false;
+                                      //           });
+                                      //         },
+                                      //       )
+                                      //     ],
+                                      //   ),
                                     ],
                                   ),
                                 ),
+                                // if (lockState.isYieldMachine  && !isEdit) ...[
+                                //   SizedBox(
+                                //     height: 16,
+                                //   ),
+                                //   Row(
+                                //     mainAxisAlignment:
+                                //         MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       SizedBox(
+                                //         width: 156,
+                                //         height: 43,
+                                //         child: AccentButton(
+                                //           label: 'Withdrawal',
+                                //           callback: () {
+                                //             if (lockState.availableBalances.length != 0) {
+                                //               Navigator.push(
+                                //                 context,
+                                //                 PageRouteBuilder(
+                                //                   pageBuilder: (context,
+                                //                       animation1,
+                                //                       animation2) =>
+                                //                       YieldMachineActionScreen(
+                                //                         isDeposit: false,
+                                //                         isShowDepositAddress: lockState.availableBalances.length != 0,
+                                //                       ),
+                                //                   transitionDuration:
+                                //                   Duration.zero,
+                                //                   reverseTransitionDuration:
+                                //                   Duration.zero,
+                                //                 ),
+                                //               );
+                                //             } else {
+                                //               showSnackBar(
+                                //                 context,
+                                //                 title: 'Insufficient funds',
+                                //                 color: AppColors.txStatusError
+                                //                     .withOpacity(0.1),
+                                //                 prefix: Icon(
+                                //                   Icons.close,
+                                //                   color:
+                                //                   AppColors.txStatusError,
+                                //                 ),
+                                //               );
+                                //             }
+                                //           },
+                                //         ),
+                                //       ),
+                                //       SizedBox(
+                                //         width: 156,
+                                //         height: 43,
+                                //         child: NewPrimaryButton(
+                                //           title: 'Deposit',
+                                //           callback: () {
+                                //             Navigator.push(
+                                //               context,
+                                //               PageRouteBuilder(
+                                //                 pageBuilder: (context,
+                                //                     animation1,
+                                //                     animation2) =>
+                                //                     YieldMachineActionScreen(
+                                //                       isDeposit: true,
+                                //                     ),
+                                //                 transitionDuration:
+                                //                 Duration.zero,
+                                //                 reverseTransitionDuration:
+                                //                 Duration.zero,
+                                //               ),
+                                //             );
+                                //           },
+                                //         ),
+                                //       )
+                                //     ],
+                                //   ),
+                                // ],
                               ],
                             ),
                           ),

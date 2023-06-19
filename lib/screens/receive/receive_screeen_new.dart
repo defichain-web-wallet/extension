@@ -103,7 +103,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                         )
                                       : null,
                                 ),
-                                child: QrImageView(
+                                child: QrImage(
                                   data: state.activeAddress,
                                   padding: EdgeInsets.all(17.7),
                                 ),

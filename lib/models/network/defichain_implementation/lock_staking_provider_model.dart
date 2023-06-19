@@ -24,6 +24,7 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
     return networkModel;
   }
 
+
   Future<bool> signIn(AbstractAccountModel account, String password, ApplicationModel applicationModel) async {
     var data = await _authorizationData(account, password, applicationModel);
     String? accessToken = await LockRequests.signIn(data);
@@ -128,6 +129,7 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
       StakingModel stakingModel,
       AbstractNetworkModel network,
       double amount,
+      String asset,
       ApplicationModel applicationModel) async {
     var tx = await network.send(
         account: account,
@@ -142,7 +144,8 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
         this.accessTokensMap[account.accountIndex]!.accessToken,
         stakingModel.id,
         amount,
-        tx.txLoaderList![tx.txLoaderList!.length - 1].txId!,
+        asset,
+        tx.txLoaderList![0].txId!,
       );
     }
     return tx;
@@ -155,34 +158,40 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
       StakingModel stakingModel,
       AbstractNetworkModel network,
       double amount,
+      String asset,
       ApplicationModel applicationModel) async {
     late WithdrawModel? withdrawModel;
-    var existWithdraws = await LockRequests.getWithdraws(
-        this.accessTokensMap[account.accountIndex]!.accessToken,
-        stakingModel.id);
-    if (existWithdraws!.isEmpty) {
-      withdrawModel = await LockRequests.requestWithdraw(
+    try{
+      var existWithdraws = await LockRequests.getWithdraws(
           this.accessTokensMap[account.accountIndex]!.accessToken,
-          stakingModel.id,
-          amount);
-    } else {
-      withdrawModel = await LockRequests.changeAmountWithdraw(
-          this.accessTokensMap[account.accountIndex]!.accessToken,
-          stakingModel.id,
-          existWithdraws[0].id!,
-          amount);
-    }
-    if (withdrawModel == null) {
-      return false; //TODO: add error model
-    }
+          stakingModel.id);
+      if (existWithdraws!.isEmpty) {
+        withdrawModel = await LockRequests.requestWithdraw(
+            this.accessTokensMap[account.accountIndex]!.accessToken,
+            stakingModel.id,
+            amount,
+            asset);
+      } else {
+        withdrawModel = await LockRequests.changeAmountWithdraw(
+            this.accessTokensMap[account.accountIndex]!.accessToken,
+            stakingModel.id,
+            existWithdraws[0].id!,
+            amount);
+      }
+      if (withdrawModel == null) {
+        return false; //TODO: add error model
+      }
 
-    withdrawModel.signature = await network.signMessage(
-        account, withdrawModel.signMessage!, password, applicationModel);
-    await LockRequests.signedWithdraw(
-        this.accessTokensMap[account.accountIndex]!.accessToken,
-        stakingModel.id,
-        withdrawModel);
-    return true;
+      withdrawModel.signature = await network.signMessage(
+          account, withdrawModel.signMessage!, password, applicationModel);
+      await LockRequests.signedWithdraw(
+          this.accessTokensMap[account.accountIndex]!.accessToken,
+          stakingModel.id,
+          withdrawModel);
+      return true;
+    } catch(e){
+      return false;
+    }
   }
 
   //private methods

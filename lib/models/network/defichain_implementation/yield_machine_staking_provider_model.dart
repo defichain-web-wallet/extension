@@ -114,6 +114,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     StakingModel stakingModel,
     AbstractNetworkModel network,
     double amount,
+      String asset,
       ApplicationModel applicationModel
   ) async {
     var tx = await network.send(
@@ -127,6 +128,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
         this.accessTokensMap[account.accountIndex]!.accessToken,
         stakingModel.id,
         amount,
+        asset,
         tx.txLoaderList![tx.txLoaderList!.length - 1].txId!,
       );
     }
@@ -140,6 +142,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     StakingModel stakingModel,
     AbstractNetworkModel network,
     double amount,
+      String asset,
       ApplicationModel applicationModel
   ) async {
     late WithdrawModel? withdrawModel;
@@ -147,7 +150,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
         await LockRequests.getWithdraws(this.accessTokensMap[account.accountIndex]!.accessToken, stakingModel.id);
     if (existWithdraws!.isEmpty) {
       withdrawModel = await LockRequests.requestWithdraw(
-          this.accessTokensMap[account.accountIndex]!.accessToken, stakingModel.id, amount);
+          this.accessTokensMap[account.accountIndex]!.accessToken, stakingModel.id, amount, asset,);
     } else {
       withdrawModel = await LockRequests.changeAmountWithdraw(
           this.accessTokensMap[account.accountIndex]!.accessToken, stakingModel.id, existWithdraws[0].id!, amount);

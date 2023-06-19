@@ -26,6 +26,10 @@ abstract class AbstractStakingProviderModel {
 
   Future<bool> isKycDone(AbstractAccountModel account);
 
+  AccessTokenModel? getAccessToken(AbstractAccountModel account){
+    return accessTokensMap[account.accountIndex];
+  }
+
   Future<List<StakingTokenModel>> getAvailableStakingTokens(
       AbstractAccountModel account);
 
@@ -44,6 +48,7 @@ abstract class AbstractStakingProviderModel {
       StakingModel stakingModel,
       AbstractNetworkModel network,
       double amount,
+      String asset,
       ApplicationModel applicationModel);
 
   Future<bool> unstakeToken(
@@ -53,5 +58,6 @@ abstract class AbstractStakingProviderModel {
       StakingModel stakingModel,
       AbstractNetworkModel network,
       double amount,
+      String asset,
       ApplicationModel applicationModel);
 }
