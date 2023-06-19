@@ -5,9 +5,11 @@ import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
+import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/defichain_ramp_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
@@ -24,13 +26,13 @@ class RampCubit extends Cubit<RampState> {
     isTestnet: false,
   );
 
-  Future<void> setAccessToken(String accessToken) async {
-    DefichainRampModel defichainRampModel = state.defichainRampModel ??
-        DefichainRampModel(DefichainNetworkModel(networkTypeModel));
-    defichainRampModel.accessToken = accessToken;
+  Future<void> setAccessToken(AccessTokenModel accessTokenModel) async {
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel ??
+        DFXRampModel(DefichainNetworkModel(networkTypeModel));
 
     emit(state.copyWith(
       status: RampStatusList.initial,
+      accessTokenModel: accessTokenModel,
       defichainRampModel: defichainRampModel,
     ));
   }
@@ -44,8 +46,8 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel ??
-        DefichainRampModel(DefichainNetworkModel(networkTypeModel));
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel ??
+        DFXRampModel(DefichainNetworkModel(networkTypeModel));
 
     try {
       await defichainRampModel.signIn(account, password, applicationModel);
@@ -70,8 +72,8 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel ??
-        DefichainRampModel(DefichainNetworkModel(networkTypeModel));
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel ??
+        DFXRampModel(DefichainNetworkModel(networkTypeModel));
 
     bool isComplete = await defichainRampModel.signUp(account, password, applicationModel);
 
@@ -92,13 +94,13 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
       defichainRampModel.createUser(
         email,
         phone,
-        defichainRampModel.accessToken!,
+        state.accessTokenModel!.accessToken,
       );
 
       emit(state.copyWith(
@@ -112,10 +114,10 @@ class RampCubit extends Cubit<RampState> {
   }
 
   Future<void> buy(String iban, AssetByFiatModel asset) async {
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
-      await defichainRampModel.buy(iban, asset, defichainRampModel.accessToken!);
+      await defichainRampModel.buy(iban, asset, state.accessTokenModel!.accessToken);
 
       emit(state.copyWith(
         status: RampStatusList.success,
@@ -131,10 +133,10 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
-      defichainRampModel.sell(iban, fiat, defichainRampModel.accessToken!);
+      defichainRampModel.sell(iban, fiat, state.accessTokenModel!.accessToken);
 
       emit(state.copyWith(
         status: RampStatusList.success,
@@ -151,12 +153,12 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
       CryptoRouteModel? cryptoRouteModel =
           await defichainRampModel.getCryptoRoutes(
-        defichainRampModel.accessToken!,
+        state.accessTokenModel!.accessToken,
       );
       print(cryptoRouteModel);
 
@@ -175,10 +177,10 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
-      defichainRampModel.createCryptoRoute(defichainRampModel.accessToken!);
+      defichainRampModel.createCryptoRoute(state.accessTokenModel!.accessToken);
 
       emit(state.copyWith(
         status: RampStatusList.success,
@@ -195,11 +197,11 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
       List<dynamic> countries = await defichainRampModel.getCountryList(
-        defichainRampModel.accessToken!,
+        state.accessTokenModel!.accessToken,
       );
       print(countries);
 
@@ -219,11 +221,13 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
       List<AssetByFiatModel> assets =
-          await defichainRampModel.getAvailableTokens();
+          await defichainRampModel.getAvailableTokens(
+        state.accessTokenModel!.accessToken,
+      );
 
       emit(state.copyWith(
         status: RampStatusList.success,
@@ -239,20 +243,24 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
       List<FiatModel> fiatAssets = await defichainRampModel.getFiatList(
-        defichainRampModel.accessToken!,
+        state.accessTokenModel!.accessToken,
       );
 
       List<FiatModel> sellableFiatList =
         fiatAssets.where((el) => el.sellable!).toList();
 
       List<AssetByFiatModel> assets =
-        await defichainRampModel.getAvailableTokens();
+          await defichainRampModel.getAvailableTokens(
+        state.accessTokenModel!.accessToken,
+      );
 
-      List<IbanModel> ibanList = await defichainRampModel.getIbanList();
+      List<IbanModel> ibanList = await defichainRampModel.getIbanList(
+        state.accessTokenModel!.accessToken,
+      );
       List<IbanModel> activeIbanList =
         ibanList.where((el) => el.active! && el.isSellable!).toList();
       IbanModel? iban;
@@ -287,11 +295,11 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
       List<FiatHistoryModel> history = await defichainRampModel.getHistory(
-        defichainRampModel.accessToken!,
+        state.accessTokenModel!.accessToken,
       );
       print(history);
 
@@ -314,10 +322,12 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
-      List<IbanModel> ibans = await defichainRampModel.getIbanList();
+      List<IbanModel> ibans = await defichainRampModel.getIbanList(
+        state.accessTokenModel!.accessToken,
+      );
       List<IbanModel> ibansList = ibans
           .where((el) =>
       el.active! &&
@@ -368,12 +378,12 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
       RampUserModel userModel =
           await defichainRampModel.getUserDetails(
-        defichainRampModel.accessToken!,
+        state.accessTokenModel!.accessToken,
       );
 
       emit(state.copyWith(
@@ -392,11 +402,11 @@ class RampCubit extends Cubit<RampState> {
       status: RampStatusList.loading,
     ));
 
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
       defichainRampModel.transferKYC(
-        defichainRampModel.accessToken!,
+        state.accessTokenModel!.accessToken,
       );
 
       emit(state.copyWith(
@@ -473,10 +483,13 @@ class RampCubit extends Cubit<RampState> {
       location: city,
       zip: zipCode,
     );
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+    AbstractOnOffRamp defichainRampModel = state.defichainRampModel!;
 
     try {
-      await defichainRampModel.saveKycData(kyc);
+      await defichainRampModel.saveKycData(
+        kyc,
+        state.accessTokenModel!.accessToken,
+      );
     } catch (err) {
       rethrow;
     } finally {

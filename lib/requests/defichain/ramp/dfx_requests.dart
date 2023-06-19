@@ -12,7 +12,7 @@ import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:http/http.dart' as http;
 
 class DFXRequests {
-  static Future<String> signUp(Map<String, String> data) async {
+  static Future<String?> signUp(Map<String, String> data) async {
     try {
       final Uri url = Uri.https(DfxApi.home, '/v1/auth/signUp');
 
@@ -27,10 +27,10 @@ class DFXRequests {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body)['accessToken'];
       } else {
-        return '';
+        return null;
       }
     } catch (_) {
-      return '';
+      return null;
     }
   }
 

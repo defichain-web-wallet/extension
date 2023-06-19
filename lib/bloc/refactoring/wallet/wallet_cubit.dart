@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/defichain_ramp_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -97,7 +97,7 @@ class WalletCubit extends Cubit<WalletState> {
         for(var network in applicationModel.networks){
           if(network.networkType.networkName.name == NetworkName.defichainMainnet.name){
             await (network.stakingList[0] as LockStakingProviderModel).signIn(account, password, applicationModel);
-            await (network.rampList[0] as DefichainRampModel).signIn(
+            await (network.rampList[0] as DFXRampModel).signIn(
               account,
               password,
               applicationModel,
@@ -109,6 +109,8 @@ class WalletCubit extends Cubit<WalletState> {
         print(_);
         rethrow;
       }
+
+      print(applicationModel);
 
       //TODO: check tx history here
       bool presentBalance = false;

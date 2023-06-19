@@ -5,6 +5,7 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/access_token_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/screens/buy/buy_select_currency_screen.dart';
 import 'package:defi_wallet/screens/buy/tutorials/buy_tutorial_first_screen.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_first_screen.dart';
@@ -43,12 +44,15 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
   loadDfxData() {
     RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
-    String? accessToken = walletCubit
-        .state.applicationModel!.activeNetwork!.rampList[0].accessToken;
-    // hasAccessToken = accessToken != null;
-    hasAccessToken = rampCubit.state.defichainRampModel != null;
+    AccessTokenModel? accessToken = walletCubit
+        .state
+        .applicationModel!
+        .activeNetwork!
+        .rampList[0]
+        .accessTokensMap[walletCubit.state.activeAccount.accountIndex]!;
+    hasAccessToken = accessToken != null;
     if (hasAccessToken) {
-      // rampCubit.setAccessToken(accessToken!);
+      rampCubit.setAccessToken(accessToken);
       rampCubit.loadUserDetails();
     }
   }

@@ -3,18 +3,18 @@ import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
-import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
+import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_type_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 import 'package:defi_wallet/requests/defichain/ramp/dfx_requests.dart';
 
-class DefichainRampModel extends AbstractOnOffRamp {
-  DefichainRampModel(AbstractNetworkModel networkModel)
+class DFXRampModel extends AbstractOnOffRamp {
+  DFXRampModel(AbstractNetworkModel networkModel)
       : super(_validationNetworkModel(networkModel));
 
   static AbstractNetworkModel _validationNetworkModel(
@@ -36,8 +36,10 @@ class DefichainRampModel extends AbstractOnOffRamp {
     final data = await _authorizationData(account, password, applicationModel);
     String? accessToken = await DFXRequests.signIn(data);
     if (accessToken != null) {
-      this.accessToken = accessToken;
-      this.accessTokenCreated = DateTime.now().millisecondsSinceEpoch;
+      accessTokensMap[account.accountIndex] = AccessTokenModel(
+        accessToken: accessToken,
+        expireHours: 24,
+      );
     }
   }
 
@@ -49,17 +51,21 @@ class DefichainRampModel extends AbstractOnOffRamp {
     var data = await _authorizationData(account, password, applicationModel);
     String? accessToken = await DFXRequests.signUp(data);
     if (accessToken != null) {
-      this.accessToken = accessToken;
-      this.accessTokenCreated = DateTime.now().millisecondsSinceEpoch;
+      accessTokensMap[account.accountIndex] = AccessTokenModel(
+        accessToken: accessToken,
+        expireHours: 24,
+      );
       return true;
     }
     return false; //TODO: need to return ErrorModel with details
   }
 
   @override
-  Future<List<AssetByFiatModel>> getAvailableTokens() async {
+  Future<List<AssetByFiatModel>> getAvailableTokens(
+    String accessToken,
+  ) async {
     try {
-      return await DFXRequests.getAvailableAssets(this.accessToken!);
+      return await DFXRequests.getAvailableAssets(accessToken);
     } catch (error) {
       throw error;
     }
@@ -72,7 +78,7 @@ class DefichainRampModel extends AbstractOnOffRamp {
     String accessToken,
   ) async {
     try {
-      await DFXRequests.buy(iban, asset, this.accessToken!);
+      await DFXRequests.buy(iban, asset, accessToken);
     } catch (error) {
       throw error;
     }
@@ -85,7 +91,7 @@ class DefichainRampModel extends AbstractOnOffRamp {
     String accessToken,
   ) async {
     try {
-      await DFXRequests.sell(iban, fiat, this.accessToken!);
+      await DFXRequests.sell(iban, fiat, accessToken);
     } catch (error) {
       throw error;
     }
@@ -94,7 +100,7 @@ class DefichainRampModel extends AbstractOnOffRamp {
   @override
   Future<CryptoRouteModel> createCryptoRoute(String accessToken) async {
     try {
-      return await DFXRequests.createCryptoRoute(this.accessToken!);
+      return await DFXRequests.createCryptoRoute(accessToken);
     } catch (error) {
       throw error;
     }
@@ -107,7 +113,7 @@ class DefichainRampModel extends AbstractOnOffRamp {
     String accessToken,
   ) async {
     try {
-      await DFXRequests.createUser(email, phone, this.accessToken!);
+      await DFXRequests.createUser(email, phone, accessToken);
     } catch (error) {
       throw error;
     }
@@ -116,7 +122,7 @@ class DefichainRampModel extends AbstractOnOffRamp {
   @override
   Future<List> getCountryList(String accessToken) async {
     try {
-      return await DFXRequests.getCountryList(this.accessToken!);
+      return await DFXRequests.getCountryList(accessToken);
     } catch (error) {
       throw error;
     }
@@ -125,7 +131,7 @@ class DefichainRampModel extends AbstractOnOffRamp {
   @override
   Future<CryptoRouteModel?> getCryptoRoutes(String accessToken) async {
     try {
-      return await DFXRequests.getCryptoRoutes(this.accessToken!);
+      return await DFXRequests.getCryptoRoutes(accessToken);
     } catch (error) {
       throw error;
     }
@@ -134,7 +140,7 @@ class DefichainRampModel extends AbstractOnOffRamp {
   @override
   Future<List<FiatModel>> getFiatList(String accessToken) async {
     try {
-      return await DFXRequests.getFiatList(this.accessToken!);
+      return await DFXRequests.getFiatList(accessToken);
     } catch (error) {
       throw error;
     }
@@ -143,16 +149,16 @@ class DefichainRampModel extends AbstractOnOffRamp {
   @override
   Future<List<FiatHistoryModel>> getHistory(String accessToken) async {
     try {
-      return await DFXRequests.getHistory(this.accessToken!);
+      return await DFXRequests.getHistory(accessToken);
     } catch (error) {
       throw error;
     }
   }
 
   @override
-  Future<List<IbanModel>> getIbanList() async {
+  Future<List<IbanModel>> getIbanList(String accessToken) async {
     try {
-      return await DFXRequests.getIbanList(this.accessToken!);
+      return await DFXRequests.getIbanList(accessToken);
     } catch (error) {
       throw error;
     }
@@ -161,16 +167,16 @@ class DefichainRampModel extends AbstractOnOffRamp {
   @override
   Future<RampUserModel> getUserDetails(String accessToken) async {
     try {
-      return DFXRequests.getUserDetails(this.accessToken!);
+      return DFXRequests.getUserDetails(accessToken);
     } catch (error) {
       throw error;
     }
   }
 
   @override
-  Future<void> saveKycData(RampKycModel kyc) async {
+  Future<void> saveKycData(RampKycModel kyc, String accessToken) async {
     try {
-      return await DFXRequests.saveKycData(kyc, this.accessToken!);
+      return await DFXRequests.saveKycData(kyc, accessToken);
     } catch (error) {
       throw error;
     }
@@ -179,7 +185,7 @@ class DefichainRampModel extends AbstractOnOffRamp {
   @override
   Future<bool> transferKYC(String accessToken) async {
     try {
-      return await DFXRequests.transferKYC(this.accessToken!);
+      return await DFXRequests.transferKYC(accessToken);
     } catch (error) {
       throw error;
     }

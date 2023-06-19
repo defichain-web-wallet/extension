@@ -4,7 +4,8 @@ enum RampStatusList { initial, loading, success, expired, failure }
 
 class RampState extends Equatable {
   final RampStatusList status;
-  final DefichainRampModel? defichainRampModel;
+  final AbstractOnOffRamp? defichainRampModel;
+  final AccessTokenModel? accessTokenModel;
   final RampUserModel? rampUserModel;
   final List<AssetByFiatModel>? assets;
   final List<FiatModel>? fiatAssets;
@@ -17,6 +18,7 @@ class RampState extends Equatable {
   RampState({
     this.status = RampStatusList.initial,
     this.defichainRampModel,
+    this.accessTokenModel,
     this.rampUserModel,
     this.assets,
     this.fiatAssets,
@@ -29,7 +31,7 @@ class RampState extends Equatable {
 
   bool get hasAccessToken =>
       this.defichainRampModel != null &&
-      this.defichainRampModel!.accessToken != null;
+      this.defichainRampModel!.accessTokensMap[0]!.accessToken != null;
 
   List<IbanModel> uniqueIbans(FiatModel fiat) {
     List<IbanModel> ibans = this
@@ -61,6 +63,7 @@ class RampState extends Equatable {
   List<Object?> get props => [
         status,
         defichainRampModel,
+        accessTokenModel,
         rampUserModel,
         assets,
         fiatAssets,
@@ -73,7 +76,8 @@ class RampState extends Equatable {
 
   RampState copyWith({
     RampStatusList? status,
-    DefichainRampModel? defichainRampModel,
+    AbstractOnOffRamp? defichainRampModel,
+    AccessTokenModel? accessTokenModel,
     RampUserModel? rampUserModel,
     List<AssetByFiatModel>? assets,
     List<FiatModel>? fiatAssets,
@@ -86,6 +90,7 @@ class RampState extends Equatable {
     return RampState(
       status: status ?? this.status,
       defichainRampModel: defichainRampModel ?? this.defichainRampModel,
+      accessTokenModel: accessTokenModel ?? this.accessTokenModel,
       rampUserModel: rampUserModel ?? this.rampUserModel,
       assets: assets ?? this.assets,
       fiatAssets: fiatAssets ?? this.fiatAssets,

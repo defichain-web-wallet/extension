@@ -10,7 +10,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_pro
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_lm_provider_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/defichain_ramp_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/yield_machine_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
@@ -39,7 +39,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     if (!networkType.isTestnet) {
       this.stakingList.add(new LockStakingProviderModel(this));
       this.stakingList.add(new YieldMachineStakingProviderModel(this));
-      this.rampList.add(new DefichainRampModel(this));
+      this.rampList.add(new DFXRampModel(this));
     }
 
     this.lmList.add(new DefichainLmProviderModel());
