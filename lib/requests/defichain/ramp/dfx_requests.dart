@@ -6,6 +6,7 @@ import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
 import 'package:defi_wallet/models/kyc_model.dart';
+import 'package:defi_wallet/models/network/ramp/ramp_kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:http/http.dart' as http;
@@ -33,7 +34,7 @@ class DFXRequests {
     }
   }
 
-  static Future<String> signIn(Map<String, String> data) async {
+  static Future<String?> signIn(Map<String, String> data) async {
     try {
       final Uri url = Uri.https(DfxApi.home, '/v1/auth/signIn');
 
@@ -48,10 +49,10 @@ class DFXRequests {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body)['accessToken'];
       } else {
-        return '';
+        return null;
       }
     } catch (_) {
-      return '';
+      return null;
     }
   }
 
@@ -263,7 +264,7 @@ class DFXRequests {
 
   static Future<List<dynamic>> getCountryList(String accessToken) async {
     try {
-      final Uri url = Uri.https(DfxApi.home, '/v1/route');
+      final Uri url = Uri.https(DfxApi.home, '/v1/country');
 
       final headers = {
         'Content-type': 'application/json',
@@ -283,7 +284,7 @@ class DFXRequests {
     }
   }
 
-  static Future<void> saveKycData(KycModel kyc, String accessToken) async {
+  static Future<void> saveKycData(RampKycModel kyc, String accessToken) async {
     try {
       final Uri url = Uri.https(DfxApi.home, '/v1/kyc/data');
 

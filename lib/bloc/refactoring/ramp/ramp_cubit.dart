@@ -4,12 +4,12 @@ import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
-import 'package:defi_wallet/models/kyc_model.dart';
-import 'package:defi_wallet/models/network/account_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_ramp_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network/ramp/ramp_kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -24,7 +24,22 @@ class RampCubit extends Cubit<RampState> {
     isTestnet: false,
   );
 
-  void signIn(AccountModel account, String password, ApplicationModel applicationModel) async {
+  Future<void> setAccessToken(String accessToken) async {
+    DefichainRampModel defichainRampModel = state.defichainRampModel ??
+        DefichainRampModel(DefichainNetworkModel(networkTypeModel));
+    defichainRampModel.accessToken = accessToken;
+
+    emit(state.copyWith(
+      status: RampStatusList.initial,
+      defichainRampModel: defichainRampModel,
+    ));
+  }
+
+  Future<void> signIn(
+    AbstractAccountModel account,
+    String password,
+    ApplicationModel applicationModel,
+  ) async {
     emit(state.copyWith(
       status: RampStatusList.loading,
     ));
@@ -32,23 +47,25 @@ class RampCubit extends Cubit<RampState> {
     DefichainRampModel defichainRampModel = state.defichainRampModel ??
         DefichainRampModel(DefichainNetworkModel(networkTypeModel));
 
-    bool isComplete = await defichainRampModel.signIn(account, password, applicationModel);
+    try {
+      await defichainRampModel.signIn(account, password, applicationModel);
 
-    print(state.defichainRampModel);
-
-    if (isComplete) {
       emit(state.copyWith(
         status: RampStatusList.success,
         defichainRampModel: defichainRampModel,
       ));
-    } else {
+    } catch (_) {
       emit(state.copyWith(
         status: RampStatusList.failure,
       ));
     }
   }
 
-  void signUp(AccountModel account, String password, ApplicationModel applicationModel) async {
+  Future<void> signUp(
+    AbstractAccountModel account,
+    String password,
+    ApplicationModel applicationModel,
+  ) async {
     emit(state.copyWith(
       status: RampStatusList.loading,
     ));
@@ -70,7 +87,7 @@ class RampCubit extends Cubit<RampState> {
     }
   }
 
-  void createUser(String email, String phone) async {
+  Future<void> createUser(String email, String phone) async {
     emit(state.copyWith(
       status: RampStatusList.loading,
     ));
@@ -94,27 +111,22 @@ class RampCubit extends Cubit<RampState> {
     }
   }
 
-  void buy(String iban, AssetByFiatModel asset) async {
-    emit(state.copyWith(
-      status: RampStatusList.loading,
-    ));
-
+  Future<void> buy(String iban, AssetByFiatModel asset) async {
     DefichainRampModel defichainRampModel = state.defichainRampModel!;
 
     try {
-      defichainRampModel.buy(iban, asset, defichainRampModel.accessToken!);
+      await defichainRampModel.buy(iban, asset, defichainRampModel.accessToken!);
 
       emit(state.copyWith(
         status: RampStatusList.success,
       ));
-    } catch (error) {
-      emit(state.copyWith(
-        status: RampStatusList.failure,
-      ));
+    } catch (_) {
+      // TODO: need to handle error inside bloc
+      rethrow;
     }
   }
 
-  void sell(String iban, FiatModel fiat) async {
+  Future<void> sell(String iban, FiatModel fiat) async {
     emit(state.copyWith(
       status: RampStatusList.loading,
     ));
@@ -178,7 +190,7 @@ class RampCubit extends Cubit<RampState> {
     }
   }
 
-  void loadCountryList() async {
+  void loadCountries() async {
     emit(state.copyWith(
       status: RampStatusList.loading,
     ));
@@ -193,11 +205,32 @@ class RampCubit extends Cubit<RampState> {
 
       emit(state.copyWith(
         status: RampStatusList.success,
+        countries: countries,
       ));
     } catch (error) {
       emit(state.copyWith(
         status: RampStatusList.failure,
       ));
+    }
+  }
+
+  Future<void> loadAssets() async {
+    emit(state.copyWith(
+      status: RampStatusList.loading,
+    ));
+
+    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+
+    try {
+      List<AssetByFiatModel> assets =
+          await defichainRampModel.getAvailableTokens();
+
+      emit(state.copyWith(
+        status: RampStatusList.success,
+        assets: assets,
+      ));
+    } catch (error) {
+      print(error);
     }
   }
 
@@ -212,10 +245,35 @@ class RampCubit extends Cubit<RampState> {
       List<FiatModel> fiatAssets = await defichainRampModel.getFiatList(
         defichainRampModel.accessToken!,
       );
-      print(fiatAssets);
+
+      List<FiatModel> sellableFiatList =
+        fiatAssets.where((el) => el.sellable!).toList();
+
+      List<AssetByFiatModel> assets =
+        await defichainRampModel.getAvailableTokens();
+
+      List<IbanModel> ibanList = await defichainRampModel.getIbanList();
+      List<IbanModel> activeIbanList =
+        ibanList.where((el) => el.active! && el.isSellable!).toList();
+      IbanModel? iban;
+
+      try {
+        if (state.newIban != null && state.newIban != '') {
+          iban = activeIbanList
+              .firstWhere((element) => (element.iban == state.newIban!.replaceAll(' ', '')));
+        } else {
+          iban = activeIbanList.firstWhere((element) => element.isSellable!);
+        }
+      } catch (_) {
+        iban = null;
+      }
 
       emit(state.copyWith(
         status: RampStatusList.success,
+        fiatAssets: sellableFiatList,
+        assets: assets,
+        activeIban: iban,
+        ibans: ibanList,
       ));
     } catch (error) {
       emit(state.copyWith(
@@ -247,7 +305,11 @@ class RampCubit extends Cubit<RampState> {
     }
   }
 
-  void loadIbans() async {
+  void loadIbans({
+    AssetByFiatModel? asset,
+    bool isNewIban = false,
+    bool isSellable = false,
+  }) async {
     emit(state.copyWith(
       status: RampStatusList.loading,
     ));
@@ -255,20 +317,51 @@ class RampCubit extends Cubit<RampState> {
     DefichainRampModel defichainRampModel = state.defichainRampModel!;
 
     try {
-      List<IbanModel> ibans = await defichainRampModel.getIbanList(
-        defichainRampModel.accessToken!,
-      );
+      List<IbanModel> ibans = await defichainRampModel.getIbanList();
+      List<IbanModel> ibansList = ibans
+          .where((el) =>
+      el.active! &&
+          el.isSellable == isSellable &&
+          asset!.name == el.asset!.name)
+          .toList();
+      IbanModel? iban;
       print(ibans);
+
+      try {
+        if (asset != null) {
+          iban = ibansList.firstWhere((element) =>
+          element.asset!.name == asset.name);
+        } else if (isNewIban && asset != null) {
+          iban = ibansList.firstWhere(
+                (element) =>
+            element.asset!.name == asset.name &&
+                element.iban == state.newIban!.replaceAll(' ', ''),
+          );
+        } else {
+          iban = ibansList[0];
+        }
+      } catch (_) {
+        iban = null;
+      }
 
       emit(state.copyWith(
         status: RampStatusList.success,
+        ibans: ibansList,
+        activeIban: iban,
       ));
     } catch (error) {
       emit(state.copyWith(
         status: RampStatusList.failure,
       ));
     }
+
   }
+
+  changeCurrentIban(IbanModel iban) => emit(state.copyWith(
+    status: RampStatusList.success,
+    newIban: iban.iban,
+    activeIban: iban,
+  ));
 
   void loadUserDetails() async {
     emit(state.copyWith(
@@ -286,37 +379,6 @@ class RampCubit extends Cubit<RampState> {
       emit(state.copyWith(
         status: RampStatusList.success,
         rampUserModel: userModel,
-      ));
-    } catch (error) {
-      emit(state.copyWith(
-        status: RampStatusList.failure,
-      ));
-    }
-  }
-
-  void updateKyc() async {
-    emit(state.copyWith(
-      status: RampStatusList.loading,
-    ));
-
-    DefichainRampModel defichainRampModel = state.defichainRampModel!;
-
-    try {
-      defichainRampModel.saveKycData(
-        KycModel(
-          firstname: 'firstname',
-          surname: 'surname',
-          street: 'street',
-          location: 'location',
-          accountType: 'accountType',
-          zip: 'zip',
-          country: Map<dynamic, dynamic>(),
-        ),
-        defichainRampModel.accessToken!,
-      );
-
-      emit(state.copyWith(
-        status: RampStatusList.success,
       ));
     } catch (error) {
       emit(state.copyWith(
@@ -343,6 +405,84 @@ class RampCubit extends Cubit<RampState> {
     } catch (error) {
       emit(state.copyWith(
         status: RampStatusList.failure,
+      ));
+    }
+  }
+
+  setUserName(String firstname, String surname) {
+    Map? country;
+    String? street;
+    String? location;
+    String? zip;
+
+    if (state.rampKycModel != null) {
+      country = state.rampKycModel!.country ?? null;
+    }
+    if (state.rampKycModel != null) {
+      street = state.rampKycModel!.street ?? null;
+    }
+    if (state.rampKycModel != null) {
+      location = state.rampKycModel!.location ?? null;
+    }
+    if (state.rampKycModel != null) {
+      zip = state.rampKycModel!.zip ?? null;
+    }
+    RampKycModel rampKycModel = RampKycModel(
+      firstname: firstname,
+      surname: surname,
+      country: country,
+      street: street,
+      location: location,
+      zip: zip,
+    );
+    emit(state.copyWith(
+      status: RampStatusList.success,
+      rampKycModel: rampKycModel,
+    ));
+  }
+
+  setCountry(Map country) {
+    RampKycModel rampKycModel = RampKycModel(
+      firstname: state.rampKycModel!.firstname,
+      surname: state.rampKycModel!.surname,
+      country: country,
+      street: state.rampKycModel!.street ?? null,
+      location: state.rampKycModel!.location ?? null,
+      zip: state.rampKycModel!.zip ?? null,
+    );
+    emit(state.copyWith(
+      status: RampStatusList.success,
+      rampKycModel: rampKycModel,
+    ));
+  }
+
+  Future<void> updateKyc(
+    String street,
+    String city,
+    String zipCode,
+  ) async {
+    emit(state.copyWith(
+      status: RampStatusList.loading,
+    ));
+
+    RampKycModel kyc = RampKycModel(
+      firstname: state.rampKycModel!.firstname,
+      surname: state.rampKycModel!.surname,
+      country: state.rampKycModel!.country,
+      street: street,
+      location: city,
+      zip: zipCode,
+    );
+    DefichainRampModel defichainRampModel = state.defichainRampModel!;
+
+    try {
+      await defichainRampModel.saveKycData(kyc);
+    } catch (err) {
+      rethrow;
+    } finally {
+      emit(state.copyWith(
+        status: RampStatusList.success,
+        rampKycModel: kyc,
       ));
     }
   }

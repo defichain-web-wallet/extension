@@ -3,9 +3,9 @@ import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
-import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
+import 'package:defi_wallet/models/network/ramp/ramp_kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 
 import 'abstract_account_model.dart';
@@ -24,7 +24,7 @@ abstract class AbstractOnOffRamp {
     ApplicationModel applicationModel,
   );
 
-  Future<bool> signIn(
+  Future<void> signIn(
     AbstractAccountModel account,
     String password,
     ApplicationModel applicationModel,
@@ -46,11 +46,11 @@ abstract class AbstractOnOffRamp {
 
   Future<List<FiatHistoryModel>> getHistory(String accessToken);
 
-  Future<List<IbanModel>> getIbanList(String accessToken);
+  Future<List<IbanModel>> getIbanList();
 
   Future<List<dynamic>> getCountryList(String accessToken);
 
-  Future<void> saveKycData(KycModel kyc, String accessToken);
+  Future<void> saveKycData(RampKycModel kyc);
 
   Future<List<FiatModel>> getFiatList(String accessToken);
 
@@ -68,7 +68,7 @@ abstract class AbstractOnOffRamp {
     Map<String, String> paymentData,
   );
 
-  Future<List<AssetByFiatModel>> availableTokens();
+  Future<List<AssetByFiatModel>> getAvailableTokens();
 
   void buy(
     String iban,

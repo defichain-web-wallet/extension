@@ -1,5 +1,5 @@
 import 'package:country_list_pick/country_list_pick.dart';
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -59,16 +59,16 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<FiatCubit, FiatState>(
-          builder: (BuildContext context, fiatState) {
-            if (fiatState.personalInfo!.country != null) {
-              selectedCountry = fiatState.personalInfo!.country!;
+        return BlocBuilder<RampCubit, RampState>(
+          builder: (BuildContext context, rampState) {
+            if (rampState.rampKycModel!.country != null) {
+              selectedCountry = rampState.rampKycModel!.country!;
             } else {
-              selectedCountry = fiatState.countryList![0];
+              selectedCountry = rampState.countries![0];
             }
-            if (fiatState.status == FiatStatusList.loading) {
+            if (rampState.status == RampStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.expired) {
+            } else if (rampState.status == RampStatusList.expired) {
               Future.microtask(() => Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
@@ -241,7 +241,7 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                                 print(code!.code);
                                                 selectedCountry =
                                                     getFormatCountry(code.code!,
-                                                        fiatState.countryList!);
+                                                        rampState.countries!);
                                               }),
                                           SizedBox(
                                             height: 16,
@@ -494,16 +494,15 @@ class _SellKycSecondScreenState extends State<SellKycSecondScreen>
                                 child: NewPrimaryButton(
                                   width: 104,
                                   callback: () async {
-                                    FiatCubit fiatCubit =
-                                        BlocProvider.of<FiatCubit>(context);
-                                    fiatCubit.setCountry(selectedCountry);
+                                    RampCubit rampCubit =
+                                        BlocProvider.of<RampCubit>(context);
+                                    await rampCubit.setCountry(selectedCountry);
                                     if (_formKey.currentState!.validate()) {
                                       try {
-                                        await fiatCubit.setAddress(
+                                        await rampCubit.updateKyc(
                                           _streetAddressController.text,
                                           _cityController.text,
                                           _zipCodeController.text,
-                                          fiatState.accessToken!,
                                         );
                                         Navigator.push(
                                           context,

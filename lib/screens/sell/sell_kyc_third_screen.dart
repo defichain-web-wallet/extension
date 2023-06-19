@@ -1,4 +1,4 @@
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -53,19 +53,17 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        // FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-        // fiatCubit.loadCountryList();
-        return BlocBuilder<FiatCubit, FiatState>(
-          builder: (BuildContext context, fiatState) {
-            if (fiatState.email != null) {
-              _emailController.text = fiatState.email!;
+        return BlocBuilder<RampCubit, RampState>(
+          builder: (BuildContext context, rampState) {
+            if (rampState.rampUserModel != null) {
+              _emailController.text = rampState.rampUserModel!.email!;
             }
-            if (fiatState.phone != null) {
-              _phoneController.text = fiatState.phone!;
+            if (rampState.rampUserModel != null) {
+              _phoneController.text = rampState.rampUserModel!.email!;
             }
-            if (fiatState.status == FiatStatusList.loading) {
+            if (rampState.status == RampStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.expired) {
+            } else if (rampState.status == RampStatusList.expired) {
               Future.microtask(() => Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
@@ -281,7 +279,7 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
                               NewPrimaryButton(
                                 width: 104,
                                 callback: () {
-                                  _authenticateWithEmail(context, fiatState);
+                                  _authenticateWithEmail(context, rampState);
                                 },
                                 title: 'Next',
                               ),
@@ -300,13 +298,12 @@ class _SellKycThirdScreenState extends State<SellKycThirdScreen>
     );
   }
 
-  _authenticateWithEmail(context, fiatState) async {
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+  _authenticateWithEmail(context, rampState) async {
+    RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
     if (_formKey.currentState!.validate()) {
-      await fiatCubit.createUser(
+      await rampCubit.createUser(
         _emailController.text,
         _phoneController.text,
-        fiatState.accessToken,
       );
       var box = await Hive.openBox(HiveBoxes.client);
       String kycStatus = 'skip';
