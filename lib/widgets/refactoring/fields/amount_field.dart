@@ -78,92 +78,88 @@ class _AmountFieldState extends State<AmountField> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _focusNode.requestFocus(),
-      onDoubleTap: () => _onSelectInputText(),
-      child: Container(
-        height: 80,
-        padding: const EdgeInsets.only(
-          top: 8,
-          bottom: 8,
-          left: 12,
-          right: 12,
+    return Container(
+      height: 80,
+      padding: const EdgeInsets.only(
+        top: 8,
+        bottom: 8,
+        left: 12,
+        right: 12,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: _onFocused
+            ? GradientBoxBorder(
+          gradient: gradientWrongMnemonicWord,
+        )
+            : Border.all(
+          color: LightColors.amountFieldBorderColor.withOpacity(0.32),
         ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: _onFocused
-              ? GradientBoxBorder(
-            gradient: gradientWrongMnemonicWord,
-          )
-              : Border.all(
-            color: LightColors.amountFieldBorderColor.withOpacity(0.32),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: SizedBox(
-                      height: 42,
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        inputFormatters: inputFormatters,
-                        controller: widget.controller,
-                        focusNode: _focusNode,
-                        onChanged: (value) => widget.onChanged(value),
-                        style: Theme.of(context).textTheme.headline4!.copyWith(
-                          fontSize: 20,
-                        ),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.all(0.0),
-                        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: SizedBox(
+                    height: 42,
+                    child: TextField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: inputFormatters,
+                      controller: widget.controller,
+                      focusNode: _focusNode,
+                      onChanged: (value) => widget.onChanged(value),
+                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.all(0.0),
                       ),
                     ),
                   ),
-                  AssetSelector(
-                    assets: widget.assets,
-                    selectedAsset: widget.balance!,
-                    onSelect: (token) {
-                      widget.controller.text = '0';
-                      widget.onChanged(widget.controller.text);
-                      widget.onAssetSelect(token);
-                    },
-                    isDisabled: widget.isDisabledSelector,
-                  ),
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ConvertedAmountText(amount: double.tryParse(widget.controller.text), token: widget.balance!.token!),
-                GestureDetector(
-                  onTap: () {
-                    if (widget.controller.text != widget.available.toString()) {
-                      widget.controller.text = widget.available.toString();
-                      widget.onChanged(widget.controller.text);
-                      _focusNode.requestFocus();
-                    }
+                ),
+                AssetSelector(
+                  assets: widget.assets,
+                  selectedAsset: widget.balance!,
+                  onSelect: (token) {
+                    widget.controller.text = '0';
+                    widget.onChanged(widget.controller.text);
+                    widget.onAssetSelect(token);
                   },
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: AvailableAmountText(amount: widget.available!,),
-                  ),
+                  isDisabled: widget.isDisabledSelector,
                 ),
               ],
-            )
-          ],
-        ),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ConvertedAmountText(amount: double.tryParse(widget.controller.text), token: widget.balance!.token!),
+              GestureDetector(
+                onTap: () {
+                  if (widget.controller.text != widget.available.toString()) {
+                    widget.controller.text = widget.available.toString();
+                    widget.onChanged(widget.controller.text);
+                    _focusNode.requestFocus();
+                  }
+                },
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: AvailableAmountText(amount: widget.available!,),
+                ),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }
