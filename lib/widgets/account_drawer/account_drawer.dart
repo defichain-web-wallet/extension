@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
@@ -12,6 +13,7 @@ import 'package:defi_wallet/widgets/buttons/account_menu_button.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_account_dialog.dart';
 import 'package:defi_wallet/widgets/defi_switch.dart';
 import 'package:defi_wallet/widgets/dialogs/wallet_lock_dialog.dart';
+import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -47,11 +49,12 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AccountCubit, AccountState>(
+    return BlocBuilder<WalletCubit, WalletState>(
+      buildWhen: (prev, current) => true,
       builder: (BuildContext context, state) {
-        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+        WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
         var accounts = state.accounts;
-        if (accounts!.length == 1) {
+        if (accounts.length == 1) {
           accountsSelectorHeight = 195;
         }
         else if (accounts.length == 2) {
@@ -131,7 +134,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                         CrossAxisAlignment.center,
                                     children: [
                                       SelectedAccount(
-                                        accountName: state.activeAccount!.name!,
+                                        accountName: state.activeAccount.name,
                                         onEdit: () {
                                           showDialog(
                                             barrierColor: AppColors.tolopea.withOpacity(0.06),
@@ -141,15 +144,13 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                               return CreateEditAccountDialog(
                                                 callback: (s) {
                                                   setState(() {
-                                                    accountCubit.editAccount(s,
-                                                        index: state
-                                                            .activeAccount!
-                                                            .index);
+                                                    walletCubit.editAccount(s,
+                                                         state
+                                                            .activeAccount
+                                                            .accountIndex);
                                                   });
                                                 },
-                                                index:
-                                                    state.activeAccount!.index,
-                                                name: state.activeAccount!.name,
+                                                name: state.activeAccount.name,
                                                 isEdit: true,
                                               );
                                             },
@@ -179,17 +180,17 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                       accountSelectMode: true,
                                                       account: accounts[index],
                                                       callback: accounts[index]
-                                                                  .index ==
+                                                                  .accountIndex ==
                                                               state
-                                                                  .activeAccount!
-                                                                  .index
+                                                                  .activeAccount
+                                                                  .accountIndex
                                                           ? null
                                                           : (accountIndex) async {
-                                                              accountCubit
+                                                        walletCubit
                                                                   .updateActiveAccount(
                                                                       accounts[
                                                                               index]
-                                                                          .index!);
+                                                                          .accountIndex);
                                                               Scaffold.of(
                                                                       context)
                                                                   .closeEndDrawer();
@@ -231,13 +232,8 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                   return CreateEditAccountDialog(
                                                     callback:
                                                         (s) async {
-                                                      await accountCubit
-                                                          .addAccount();
-                                                      accountCubit.editAccount(
-                                                          s,
-                                                          index: accounts
-                                                              .length -
-                                                              1);
+                                                      await walletCubit
+                                                          .addNewAccount(s);
                                                     },
                                                   );
                                                 },

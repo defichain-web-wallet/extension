@@ -1,7 +1,10 @@
+import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defichaindart/defichaindart.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 mixin NetworkMixin {
   String currentNetworkName() {
@@ -14,21 +17,9 @@ mixin NetworkMixin {
     }
   }
 
-  Future<String> addressNetwork(String address) async {
-    if (Address.validateAddress(
-        address, NetworkHelper().getNetwork('mainnet'))) {
-      return 'DefiChain Mainnet';
-    } else if (Address.validateAddress(
-        address, NetworkHelper().getNetwork('testnet'))) {
-      return 'DefiChain Testnet';
-    } else if (Address.validateAddress(
-        address, NetworkHelper().getNetwork('bitcoin'))) {
-      return 'Bitcoin Mainnet';
-    } else if (Address.validateAddress(
-        address, NetworkHelper().getNetwork('bitcoin_testnet'))) {
-      return 'Bitcoin Testnet';
-    } else {
-      return 'Unknown network';
-    }
+  NetworkTypeModel? addressNetwork(context, String address) {
+    final addressCubit = BlocProvider.of<AddressBookCubit>(context);
+    final networkType = addressCubit.getNetworkType(context, address);
+    return networkType;
   }
 }

@@ -17,14 +17,12 @@ import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class CreateEditAccountDialog extends StatefulWidget {
   final bool isEdit;
-  final int? index;
   final String? name;
   final Function(String s)? callback;
 
   const CreateEditAccountDialog({
     Key? key,
     this.isEdit = false,
-    this.index,
     this.name,
     this.callback,
   }) : super(key: key);

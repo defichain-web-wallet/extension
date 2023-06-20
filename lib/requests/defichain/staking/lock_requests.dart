@@ -116,6 +116,7 @@ class LockRequests {
       String accessToken,
       int stakingId,
       double amount,
+      String asset,
       String txId,
       ) async {
     try {
@@ -126,7 +127,7 @@ class LockRequests {
         'Content-type': 'application/json',
         'Authorization': 'Bearer $accessToken'
       };
-      final body = jsonEncode({'amount': amount, 'txId': txId});
+      final body = jsonEncode({'amount': amount, 'txId': txId, 'asset': asset});
 
       final response = await http.post(url, headers: headers, body: body);
       dynamic data = jsonDecode(response.body);
@@ -145,6 +146,7 @@ class LockRequests {
       String accessToken,
       int stakingId,
       double amount,
+      String asset
       ) async {
     try {
       final Uri url =
@@ -156,6 +158,7 @@ class LockRequests {
       };
       final body = jsonEncode({
         'amount': amount,
+        'asset': asset,
       });
 
       final response = await http.post(url, headers: headers, body: body);

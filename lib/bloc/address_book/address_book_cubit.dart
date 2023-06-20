@@ -1,13 +1,17 @@
 import 'dart:convert';
 
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 
 part 'address_book_state.dart';
@@ -15,202 +19,122 @@ part 'address_book_state.dart';
 class AddressBookCubit extends Cubit<AddressBookState> {
   AddressBookCubit() : super(AddressBookState());
 
-  addAddress(AddressBookModel addressBook) async {
-    List<AddressBookModel>? addressBookList;
-    final resultJSON = [];
-    if (state.addressBookList != null) {
-      addressBookList = state.addressBookList!;
-      addressBookList.add(addressBook);
-    } else {
-      addressBookList = [addressBook];
-    }
-
-    for (var element in addressBookList) {
-      resultJSON.add(element.toJson());
-    }
-
-    var jsonString = json.encode(resultJSON);
-
-    var box = await Hive.openBox(HiveBoxes.client);
-      await box.put(HiveNames.addressBook, jsonString);
-    await box.close();
-
-    emit(state.copyWith(
-      addressBookList: addressBookList,
-      lastSentList: state.lastSentList,
-    ));
+  NetworkTypeModel? getNetworkType(context, String address){
+    NetworkTypeModel? networkTypeModel;
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    final networks = walletCubit.state.applicationModel!.networks;
+    networks.forEach((element) {
+      if(element.checkAddress(address)){
+        networkTypeModel = element.networkType;
+      }
+    });
+    return networkTypeModel;
   }
 
-  addAddressToLastSent(AddressBookModel addressModel) async {
-    List<AddressBookModel>? lastSentList;
-    final resultJSON = [];
-    if (state.lastSentList != null) {
-      lastSentList = state.lastSentList!;
-      lastSentList.add(addressModel);
-    } else {
-      lastSentList = [addressModel];
-    }
-
-    for (var element in lastSentList) {
-      resultJSON.add(element.toJson());
-    }
-
-    var jsonString = json.encode(resultJSON);
-
-    var box = await Hive.openBox(HiveBoxes.client);
-    await box.put(HiveNames.lastSent, jsonString);
-
-    await box.close();
-
-    emit(state.copyWith(
-      lastSentList: lastSentList,
-      addressBookList: state.addressBookList,
-    ));
-  }
-
-  removeAddressFromLastSent(int index) async {
+  addAddress(context, AddressBookModel addressBook) async {
     emit(state.copyWith(
       status: AddressBookStatusList.loading,
-      lastSentList: state.lastSentList,
-      addressBookList: state.addressBookList,
     ));
-    List<AddressBookModel> lastSentList = state.lastSentList!;
-    final resultJSON = [];
-    lastSentList.removeAt(index);
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    var account = walletCubit.state.applicationModel!.activeAccount!;
+    var currentNetwork = walletCubit.state.applicationModel!.activeNetwork!;
+    addressBook.network = currentNetwork.networkType;
+    account.addToAddressBook(addressBook);
 
-    for (var element in lastSentList) {
-      resultJSON.add(element.toJson());
-    }
-
-    var jsonString = json.encode(resultJSON);
-
-    var box = await Hive.openBox(HiveBoxes.client);
-    await box.put(HiveNames.lastSent, jsonString);
-
-    await box.close();
+    StorageService.saveApplication(walletCubit.state.applicationModel!);
 
     emit(state.copyWith(
       status: AddressBookStatusList.success,
-      lastSentList: lastSentList,
-      addressBookList: state.addressBookList,
+      addressBookList: account.addressBook,
     ));
   }
 
-  editAddress(AddressBookModel addressBook, int id) async {
-    List<AddressBookModel>? addressBookList = state.addressBookList;
-
-    for (var i = 0; i < addressBookList!.length; i++) {
-      if (addressBookList[i].id == id) {
-        addressBookList[i] = addressBook;
-      }
-    }
-
-    final resultJSON = [];
-
-
-    for (var element in addressBookList) {
-      resultJSON.add(element.toJson());
-    }
-
-    var jsonString = json.encode(resultJSON);
-
-    var box = await Hive.openBox(HiveBoxes.client);
-      await box.put(HiveNames.addressBook, jsonString);
-    await box.close();
-
-    emit(state.copyWith(
-      addressBookList: addressBookList,
-      lastSentList: state.lastSentList,
-    ));
-  }
-
-  loadAddressBook() async {
-    List<AddressBookModel> addressBookList = [];
-    List<AddressBookModel> lastSentList = [];
+  addAddressToLastSent(context, AddressBookModel addressModel) async {
     emit(state.copyWith(
       status: AddressBookStatusList.loading,
-      addressBookList: state.addressBookList,
-      lastSentList: state.lastSentList,
     ));
-    var box = await Hive.openBox(HiveBoxes.client);
-    var addressBookJson;
-    var lastSentJson;
-    lastSentJson = await box.get(HiveNames.lastSent);
-    addressBookJson = await box.get(HiveNames.addressBook);
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    var account = walletCubit.state.applicationModel!.activeAccount!;
+    var currentNetwork = walletCubit.state.applicationModel!.activeNetwork!;
+    addressModel.network = currentNetwork.networkType;
+    account.addToLastSend(addressModel);
 
-    //TODO: remove in future (start)
-      if(addressBookJson == null) {
-      var addressBookBTCJson;
-      var addressBookDFIJson;
-      addressBookBTCJson = await box.get(HiveNames.btcAddressBook);
-      addressBookDFIJson = await box.get(HiveNames.defiAddressBook);
-      if (addressBookBTCJson != null) {
-        List<dynamic> jsonFromString = json.decode(addressBookBTCJson);
-        for (var element in jsonFromString) {
-          addressBookList.add(AddressBookModel.fromJson(element));
-        }
-      }
-      if (addressBookDFIJson != null) {
-        List<dynamic> jsonFromString = json.decode(addressBookDFIJson);
-        for (var element in jsonFromString) {
-          addressBookList.add(AddressBookModel.fromJson(element));
-        }
-      }
-    }
-
-    //TODO: remove in future (end)
-
-    if (addressBookJson != null) {
-      List<dynamic> jsonFromString = json.decode(addressBookJson);
-
-      for (var element in jsonFromString) {
-        addressBookList.add(AddressBookModel.fromJson(element));
-      }
-    }
-
-    if (lastSentJson != null) {
-      List<dynamic> jsonFromString = json.decode(lastSentJson);
-
-      for (var element in jsonFromString) {
-        lastSentList.add(AddressBookModel.fromJson(element));
-      }
-    }
-
-    await box.close();
+    StorageService.saveApplication(walletCubit.state.applicationModel!);
 
     emit(state.copyWith(
       status: AddressBookStatusList.success,
-      addressBookList: addressBookList,
-      lastSentList: lastSentList,
+      lastSentList: account.lastSendList,
     ));
   }
 
-  deleteAddress(AddressBookModel addressBook) async {
-    List<AddressBookModel> addressBookList = state.addressBookList!;
+  removeAddressFromLastSent(context, AddressBookModel addressModel) async {
+    emit(state.copyWith(
+      status: AddressBookStatusList.loading,
+    ));
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    var account = walletCubit.state.applicationModel!.activeAccount!;
+    account.removeFromLastSend(addressModel);
 
-    addressBookList.removeWhere((element) => element.id == addressBook.id);
-
-
-    final resultJSON = [];
-
-
-    for (var element in addressBookList) {
-      resultJSON.add(element.toJson());
-    }
-
-    var jsonString = json.encode(resultJSON);
-
-    var box = await Hive.openBox(HiveBoxes.client);
-      await box.put(HiveNames.addressBook, jsonString);
-    await box.close();
+    StorageService.saveApplication(walletCubit.state.applicationModel!);
 
     emit(state.copyWith(
-      addressBookList: addressBookList,
-      lastSentList: state.lastSentList,
+      status: AddressBookStatusList.success,
+      lastSentList: account.lastSendList,
+    ));
+  }
+  deleteAddress(context, AddressBookModel addressBook) async {
+    emit(state.copyWith(
+      status: AddressBookStatusList.loading,
+    ));
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    var account = walletCubit.state.applicationModel!.activeAccount!;
+    account.removeFromAddressBook(addressBook);
+
+    StorageService.saveApplication(walletCubit.state.applicationModel!);
+
+    emit(state.copyWith(
+      status: AddressBookStatusList.success,
+      addressBookList: account.addressBook,
     ));
   }
 
-  getLastContact(){
-    return state.addressBookList!.last;
+  editAddress(context, AddressBookModel addressBook) async {
+    emit(state.copyWith(
+      status: AddressBookStatusList.loading,
+    ));
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    var account = walletCubit.state.applicationModel!.activeAccount!;
+    account.editAddressBook(addressBook);
+
+    StorageService.saveApplication(walletCubit.state.applicationModel!);
+
+    emit(state.copyWith(
+      status: AddressBookStatusList.success,
+      addressBookList: account.addressBook,
+    ));
+  }
+
+
+  init(context, {bool currentNetowk = false}) async {
+    emit(state.copyWith(
+      status: AddressBookStatusList.loading,
+    ));
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    var account = walletCubit.state.applicationModel!.activeAccount!;
+    var network = walletCubit.state.applicationModel!.activeNetwork!;
+    late List<AddressBookModel> addressBook;
+    late List<AddressBookModel> lastSend;
+    if(currentNetowk){
+      addressBook = account.addressBook.where((element) => element.network!.networkName.name == network.networkType.networkName.name).toList();
+      lastSend = account.lastSendList.where((element) => element.network!.networkName.name == network.networkType.networkName.name).toList();
+    } else {
+      addressBook = account.addressBook;
+      lastSend = account.lastSendList;
+    }
+    emit(state.copyWith(
+      status: AddressBookStatusList.success,
+      addressBookList: account.addressBook,
+      lastSentList: account.lastSendList,
+    ));
   }
 }

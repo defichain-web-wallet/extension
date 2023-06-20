@@ -62,17 +62,6 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   static const String obscureSymbolCharacter = '●';
   static const int maxLines = 1;
 
-  _onSelectInputText() {
-    if (widget.controller.text.isNotEmpty) {
-      widget.controller.selection =
-          TextSelection(
-              baseOffset: 0,
-              extentOffset:
-              widget.controller
-                  .text.length);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -107,78 +96,75 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                     ),
                   ),
                 ),
-              GestureDetector(
-                onDoubleTap: _onSelectInputText,
-                child: TextFormField(
-                  inputFormatters: widget.onlyEngCharacters
-                      ? <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(
-                              RegExp("[0-9a-zA-Z]")),
-                        ]
-                      : [],
-                  autofocus: widget.autofocus,
-                  maxLines: maxLines,
-                  obscuringCharacter: obscureSymbolCharacter,
-                  onFieldSubmitted: widget.onSubmitted,
-                  textAlignVertical: TextAlignVertical.center,
-                  obscureText: widget.isObscure,
-                  onEditingComplete: widget.onEditComplete,
-                  controller: widget.controller,
-                  decoration: InputDecoration(
-                    errorStyle: TextStyle(
+              TextFormField(
+                inputFormatters: widget.onlyEngCharacters
+                    ? <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(
+                      RegExp("[0-9a-zA-Z]")),
+                ]
+                    : [],
+                autofocus: widget.autofocus,
+                maxLines: maxLines,
+                obscuringCharacter: obscureSymbolCharacter,
+                onFieldSubmitted: widget.onSubmitted,
+                textAlignVertical: TextAlignVertical.center,
+                obscureText: widget.isObscure,
+                onEditingComplete: widget.onEditComplete,
+                controller: widget.controller,
+                decoration: InputDecoration(
+                  errorStyle: TextStyle(
                       backgroundColor: Colors.transparent,
                       color: Colors.pink,
                       fontSize: 10
-                    ),
-                    hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-                    filled: true,
-                    fillColor: widget.isOpasity
-                        ? AppColors.inputSplashFillColor.withOpacity(0.33)
-                        : Theme.of(context).inputDecorationTheme.fillColor,
-                    enabledBorder: widget.isOpasity
-                        ? Theme.of(context)
-                            .inputDecorationTheme
-                            .enabledBorder!
-                            .copyWith(
-                                borderSide: BorderSide(
-                              color: AppColors.lavenderPurple.withOpacity(0.33),
-                            ))
-                        : Theme.of(context).inputDecorationTheme.enabledBorder,
-                    focusedBorder:
-                        Theme.of(context).inputDecorationTheme.focusedBorder,
-                    hintText: widget.hint,
-                    hintStyle: widget.isOpasity
-                        ? TextStyle(
-                            fontSize: passwordField.fontSize,
-                            color: Colors.white.withOpacity(0.6),
-                            letterSpacing: 0,
-                          )
-                        : TextStyle(
-                            fontSize: passwordField.fontSize,
-                            letterSpacing: 0,
-                          ),
-                    suffixIconConstraints:
-                        BoxConstraints(minHeight: 24, minWidth: 24),
-                    suffixIcon: Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 16.0),
-                      child: SuffixIcon(
-                        isOpasity: widget.isOpasity,
-                        isObscure: widget.isObscure,
-                        callback: widget.onPressObscure!,
-                      ),
+                  ),
+                  hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                  filled: true,
+                  fillColor: widget.isOpasity
+                      ? AppColors.inputSplashFillColor.withOpacity(0.33)
+                      : Theme.of(context).inputDecorationTheme.fillColor,
+                  enabledBorder: widget.isOpasity
+                      ? Theme.of(context)
+                      .inputDecorationTheme
+                      .enabledBorder!
+                      .copyWith(
+                      borderSide: BorderSide(
+                        color: AppColors.lavenderPurple.withOpacity(0.33),
+                      ))
+                      : Theme.of(context).inputDecorationTheme.enabledBorder,
+                  focusedBorder:
+                  Theme.of(context).inputDecorationTheme.focusedBorder,
+                  hintText: widget.hint,
+                  hintStyle: widget.isOpasity
+                      ? TextStyle(
+                    fontSize: passwordField.fontSize,
+                    color: Colors.white.withOpacity(0.6),
+                    letterSpacing: 0,
+                  )
+                      : TextStyle(
+                    fontSize: passwordField.fontSize,
+                    letterSpacing: 0,
+                  ),
+                  suffixIconConstraints:
+                  BoxConstraints(minHeight: 24, minWidth: 24),
+                  suffixIcon: Padding(
+                    padding: const EdgeInsetsDirectional.only(end: 16.0),
+                    child: SuffixIcon(
+                      isOpasity: widget.isOpasity,
+                      isObscure: widget.isObscure,
+                      callback: widget.onPressObscure!,
                     ),
                   ),
-                  style: passwordField.copyWith(
-                    fontSize: widget.isObscure ? 6 : passwordField.fontSize,
-                    letterSpacing: widget.isObscure ? 4 : 0,
-                    color: widget.isOpasity
-                        ? Colors.white
-                        : Theme.of(context).textTheme.headline1!.color!,
-                  ),
-                  onChanged: widget.onChanged,
-                  validator: widget.validator,
                 ),
-              ),
+                style: passwordField.copyWith(
+                  fontSize: widget.isObscure ? 6 : passwordField.fontSize,
+                  letterSpacing: widget.isObscure ? 4 : 0,
+                  color: widget.isOpasity
+                      ? Colors.white
+                      : Theme.of(context).textTheme.headline1!.color!,
+                ),
+                onChanged: widget.onChanged,
+                validator: widget.validator,
+              )
             ],
           ),
         ),

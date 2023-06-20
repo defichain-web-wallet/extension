@@ -1,12 +1,9 @@
 import 'dart:ui';
-import 'dart:math' as math;
-
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -38,10 +35,17 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
   final double _logoWidth = 210.0;
   final double _logoHeight = 200.0;
   final double _logoRotateDeg = 17.5;
-  List<String> symbols = List.empty(growable: true);
+  List<TokenModel> tokens = List.empty(growable: true);
   TokensHelper tokenHelper = TokensHelper();
   int iterator = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    TokensCubit token = BlocProvider.of<TokensCubit>(context);
+
+    token.init(context);
+  }
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
@@ -50,36 +54,9 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (context, accountState) {
             return BlocBuilder<TokensCubit, TokensState>(
               builder: (context, tokenState) {
-                if (iterator == 0) {
-                  TokensCubit token = BlocProvider.of<TokensCubit>(context);
-
-                  token.loadTokensFromStorage();
-                  iterator++;
-                }
-                if (tokenState.status == TokensStatusList.success &&
-                    accountState.status == AccountStatusList.success) {
-                  List<TokensModel> availableTokens = [];
-
-                  tokenState.foundTokens!.forEach((el) {
-                    if (!el.isLPS) {
-                      try {
-                        accountState.activeAccount!.balanceList!
-                            .firstWhere((token) => token.token == el.symbol);
-                      } catch (err) {
-                        if (!el.symbol.contains('v1')) {
-                          if (SettingsHelper.settings.network == "mainnet") {
-                            availableTokens.add(el);
-                          } else if (el.symbol != "TSLA") {
-                            availableTokens.add(el);
-                          }
-                        }
-                      }
-                    }
-                  });
+                if (tokenState.status == TokensStatusList.success) {
 
                   return Scaffold(
                     drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -166,14 +143,14 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                     textAlign: TextAlign.start,
                                   ),
                                   Container(
-                                    height: availableTokens.length != 0 ? 288 : 297,
-                                    child: availableTokens.length != 0
+                                    height: tokenState.foundTokens!.length != 0 ? 288 : 297,
+                                    child: tokenState.foundTokens!.length != 0
                                         ? ListView.builder(
-                                            itemCount: availableTokens.length,
+                                            itemCount: tokenState.foundTokens!.length,
                                             itemBuilder:
                                                 (BuildContext context, index) {
                                               String tokenName =
-                                                  availableTokens[index]
+                                                  tokenState.foundTokens![index]
                                                       .symbol
                                                       .toString();
                                               return Column(
@@ -185,48 +162,25 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                                     isSingleSelect: false,
                                                     onTap: () {
                                                       setState(() {
-                                                        try {
-                                                          accountState
-                                                              .activeAccount!
-                                                              .balanceList!
-                                                              .firstWhere((el) =>
-                                                                  el.token ==
-                                                                  availableTokens[
-                                                                          index]
-                                                                      .symbol);
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(
-                                                            SnackBar(
-                                                              content: Text(
-                                                                  'This token already exist'),
-                                                            ),
-                                                          );
-                                                        } catch (_) {
-                                                          symbols.contains(
-                                                                  availableTokens[
-                                                                          index]
-                                                                      .symbol)
-                                                              ? symbols.remove(
-                                                                  availableTokens[
-                                                                          index]
-                                                                      .symbol)
-                                                              : symbols.add(
-                                                                  availableTokens[
-                                                                          index]
-                                                                      .symbol!);
-                                                          symbols = symbols
+                                                        tokens.contains(
+                                                                  tokenState.foundTokens![
+                                                                          index])
+                                                              ? tokens.remove(
+                                                                  tokenState.foundTokens![
+                                                                          index])
+                                                              : tokens.add(
+                                                                  tokenState.foundTokens![
+                                                                          index]);
+                                                          tokens = tokens
                                                               .toSet()
                                                               .toList();
-                                                        }
-                                                      });
+                                                        });
                                                     },
-                                                    isSelect: symbols.contains(
-                                                        availableTokens[index]
-                                                            .symbol),
+                                                    isSelect: tokens.contains(
+                                                        tokenState.foundTokens![index]),
                                                     tokenName: '$tokenName',
                                                     availableTokenName:
-                                                        '${availableTokens[index].name}',
+                                                        '${tokenState.foundTokens![index].name}',
                                                   ),
                                                 ],
                                               );
@@ -245,7 +199,7 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                               NewPrimaryButton(
                                 width: buttonSmallWidth,
                                 callback: () {
-                                  if (symbols.isEmpty) {
+                                  if (tokens.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
@@ -266,7 +220,7 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                         pageBuilder:
                                             (context, animation1, animation2) =>
                                                 AddTokenConfirmScreen(
-                                          arguments: symbols,
+                                                  tokens: tokens,
                                         ),
                                         transitionDuration: Duration.zero,
                                         reverseTransitionDuration:
@@ -290,7 +244,5 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
             );
           },
         );
-      },
-    );
   }
 }

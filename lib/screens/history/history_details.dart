@@ -126,26 +126,27 @@ class _HistoryDetailsState extends State<HistoryDetails>
           body: BlocBuilder<TokensCubit, TokensState>(
             builder: (context, tokensState) {
               AssetPairModel? assetPairModel;
-              if (txCategory == 'PoolSwap') {
-                try {
-                  assetPairModel = tokensState.tokensPairs!
-                      .firstWhere((element) =>
-                  element.tokenA == tokenNameFirst &&
-                      element.tokenB == tokenNameSecond);
-                } catch (err) {
-                  print(err);
-                }
-              }
-              totalBalanceByUsd = tokensHelper.getAmountByUsd(
-                tokensState.tokensPairs!,
-                widget.dfxHistoryModel!.value!,
-                tokenNameFirst!,
-              );
-              String totalBalanceByUsdFormat = balancesHelper.numberStyling(
-                totalBalanceByUsd,
-                fixed: true,
-                fixedCount: 6,
-              );
+              // if (txCategory == 'PoolSwap') {
+              //   try {
+              //     assetPairModel = tokensState.tokensPairs!
+              //         .firstWhere((element) =>
+              //     element.tokenA == tokenNameFirst &&
+              //         element.tokenB == tokenNameSecond);
+              //   } catch (err) {
+              //     print(err);
+              //   }
+              // }
+              // totalBalanceByUsd = tokensHelper.getAmountByUsd(
+              //   tokensState.tokensPairs!,
+              //   widget.dfxHistoryModel!.value!,
+              //   tokenNameFirst!,
+              // );
+              // String totalBalanceByUsdFormat = balancesHelper.numberStyling(
+              //   totalBalanceByUsd,
+              //   fixed: true,
+              //   fixedCount: 6,
+              // );
+              String totalBalanceByUsdFormat = '0';
 
               return Stack(
                 children: [

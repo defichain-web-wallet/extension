@@ -222,12 +222,12 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                               account: accountState.activeAccount!,
                                               onChanged: (value) {
                                                 setState(() {
-                                                  balanceInUsd =
-                                                      getUsdBalance(context);
+                                                  // balanceInUsd =
+                                                  //     getUsdBalance(context);
                                                 });
                                               },
-                                              suffix: balanceInUsd ??
-                                                  getUsdBalance(context),
+                                              suffix: balanceInUsd,
+                                                  // ?? getUsdBalance(context),
                                               onAssetSelect: (t) {
                                                 setState(() {
                                                   currentAsset = t;
@@ -529,19 +529,19 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
     return resList;
   }
 
-  String getUsdBalance(context) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    try {
-      var amount = tokenHelper.getAmountByUsd(
-        tokensCubit.state.tokensPairs!,
-        double.parse(amountController.text.replaceAll(',', '.')),
-        currentAsset!.symbol!,
-      );
-      return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
-    } catch (err) {
-      return '0.00';
-    }
-  }
+  // String getUsdBalance(context) {
+  //   TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+  //   try {
+  //     var amount = tokenHelper.getAmountByUsd(
+  //       tokensCubit.state.tokensPairs!,
+  //       double.parse(amountController.text.replaceAll(',', '.')),
+  //       currentAsset!.symbol!,
+  //     );
+  //     return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
+  //   } catch (err) {
+  //     return '0.00';
+  //   }
+  // }
 
   _submitSell(
       AccountState accountState,

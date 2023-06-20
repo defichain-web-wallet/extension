@@ -2,7 +2,6 @@ import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
-import 'package:defi_wallet/models/token/lp_pool_model.dart';
 
 abstract class AbstractAccountModel {
   final String publicKeyTestnet;
@@ -11,7 +10,9 @@ abstract class AbstractAccountModel {
   final Map<String, String> addresses;
   final Map<String, List<BalanceModel>> pinnedBalances;
   final int accountIndex;
-  final String name;
+  String name;
+  final List<AddressBookModel> addressBook;
+  final List<AddressBookModel> lastSendList;
 
   AbstractAccountModel(
     this.publicKeyTestnet,
@@ -20,8 +21,14 @@ abstract class AbstractAccountModel {
     this.addresses,
     this.accountIndex,
     this.pinnedBalances,
-    this.name
+    this.name,
+    this.addressBook,
+    this.lastSendList
   );
+
+  void changeName(String name){
+    this.name = name;
+  }
 
   Map<String, dynamic> toJson();
 
@@ -90,15 +97,45 @@ abstract class AbstractAccountModel {
 
   // Lists
 
-  Map<String, List<AddressBookModel>> getAddressBook(
-    NetworkName networkName,
-  );
-
   void addToAddressBook(
-    NetworkName networkName,
-    String address,
-    String name,
-  );
+      AddressBookModel address,
+  ){
+    addressBook.add(address);
+  }
+
+  void addToLastSend(
+      AddressBookModel address,
+  ){
+    lastSendList.add(address);
+  }
+  void editAddressBook(
+      AddressBookModel address,
+      ){
+    int index = addressBook.indexWhere((element) => element.id == address.id);
+    addressBook[index] = address;
+  }
+
+  List<AddressBookModel> getAddressBook(NetworkName? networkName,){
+    if(networkName == null){
+      return addressBook;
+    } else {
+      return addressBook.where((element) => element.network!.networkName == networkName).toList();
+    }
+  }
+  List<AddressBookModel> getLastSend(NetworkName? networkName,){
+    if(networkName == null){
+      return lastSendList;
+    } else {
+      return lastSendList.where((element) => element.network!.networkName == networkName).toList();
+    }
+  }
+
+  void removeFromAddressBook(AddressBookModel address,){
+    addressBook.removeWhere((element) => element.id == address.id);
+  }
+  void removeFromLastSend(AddressBookModel address,){
+    lastSendList.removeWhere((element) => element.id == address.id);
+  }
 
   // Receive
   String? getAddress(NetworkName networkName);

@@ -24,6 +24,7 @@ class WalletState extends Equatable {
       this.applicationModel!.activeNetwork!;
 
   AbstractAccountModel get activeAccount => this.applicationModel!.activeAccount!;
+  List<AbstractAccountModel> get accounts => this.applicationModel!.accounts;
 
   @override
   List<Object?> get props => [

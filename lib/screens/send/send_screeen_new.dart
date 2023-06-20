@@ -1,36 +1,20 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/transaction/tx_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
-import 'package:defi_wallet/models/balance/balance_model.dart';
-import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
-import 'package:defi_wallet/models/network/account_model.dart';
-import 'package:defi_wallet/models/network/application_model.dart';
-import 'package:defi_wallet/models/network/network_name.dart';
-import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
-import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
-import 'package:defi_wallet/screens/settings/settings.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/address_field_new.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
@@ -38,7 +22,6 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/fees_selector.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -320,44 +303,31 @@ class _SendScreenNewState extends State<SendScreenNew>
                                     SizedBox(
                                       height: 24,
                                     ),
-                                    GestureDetector(
-                                      onDoubleTap: () {
-                                        addressFocusNode.requestFocus();
-                                        if (addressController.text.isNotEmpty) {
-                                          addressController.selection =
-                                              TextSelection(
-                                                  baseOffset: 0,
-                                                  extentOffset:
-                                                      addressController
-                                                          .text.length);
+                                    AddressFieldNew(
+                                      addressFocusNode: addressFocusNode,
+                                      clearPrefix: () {
+                                        setState(() {
+                                          contact = AddressBookModel();
+                                        });
+                                      },
+                                      onChange: (val) {
+                                        if (val == '') {
+                                          setState(() {
+                                            isAddNewContact = false;
+                                          });
                                         }
                                       },
-                                      child: AddressFieldNew(
-                                        addressFocusNode: addressFocusNode,
-                                        clearPrefix: () {
-                                          setState(() {
-                                            contact = AddressBookModel();
-                                          });
-                                        },
-                                        onChange: (val) {
-                                          if (val == '') {
-                                            setState(() {
-                                              isAddNewContact = false;
-                                            });
-                                          }
-                                        },
-                                        controller: addressController,
-                                        getAddress: (val) {
-                                          addressController.text = val;
-                                        },
-                                        getContact: (val) {
-                                          setState(() {
-                                            addressController.text = '';
-                                            contact = val;
-                                          });
-                                        },
-                                        contact: contact,
-                                      ),
+                                      controller: addressController,
+                                      getAddress: (val) {
+                                        addressController.text = val;
+                                      },
+                                      getContact: (val) {
+                                        setState(() {
+                                          addressController.text = '';
+                                          contact = val;
+                                        });
+                                      },
+                                      contact: contact,
                                     ),
                                     SizedBox(
                                       height: 16,
