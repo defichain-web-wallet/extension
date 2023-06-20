@@ -4,34 +4,34 @@ enum RampStatusList { initial, loading, success, expired, failure }
 
 class RampState extends Equatable {
   final RampStatusList status;
-  final AbstractOnOffRamp? defichainRampModel;
+  final AbstractOnOffRamp? dfxRampModel;
   final AccessTokenModel? accessTokenModel;
   final RampUserModel? rampUserModel;
+  final RampKycModel? rampKycModel;
   final List<AssetByFiatModel>? assets;
   final List<FiatModel>? fiatAssets;
   final List<IbanModel>? ibans;
   final IbanModel? activeIban;
   final String? newIban;
   final List<dynamic>? countries;
-  final RampKycModel? rampKycModel;
 
   RampState({
     this.status = RampStatusList.initial,
-    this.defichainRampModel,
+    this.dfxRampModel,
     this.accessTokenModel,
     this.rampUserModel,
+    this.rampKycModel,
     this.assets,
     this.fiatAssets,
     this.ibans,
     this.activeIban,
     this.newIban,
     this.countries,
-    this.rampKycModel,
   });
 
   bool get hasAccessToken =>
-      this.defichainRampModel != null &&
-      this.defichainRampModel!.accessTokensMap[0]!.accessToken != null;
+      this.dfxRampModel != null &&
+      this.dfxRampModel!.accessTokensMap[0]!.accessToken != null;
 
   List<IbanModel> uniqueIbans(FiatModel fiat) {
     List<IbanModel> ibans = this
@@ -62,7 +62,7 @@ class RampState extends Equatable {
   @override
   List<Object?> get props => [
         status,
-        defichainRampModel,
+        dfxRampModel,
         accessTokenModel,
         rampUserModel,
         assets,
@@ -76,29 +76,29 @@ class RampState extends Equatable {
 
   RampState copyWith({
     RampStatusList? status,
-    AbstractOnOffRamp? defichainRampModel,
+    AbstractOnOffRamp? dfxRampModel,
     AccessTokenModel? accessTokenModel,
     RampUserModel? rampUserModel,
+    RampKycModel? rampKycModel,
     List<AssetByFiatModel>? assets,
     List<FiatModel>? fiatAssets,
     List<IbanModel>? ibans,
     IbanModel? activeIban,
     String? newIban,
     List<dynamic>? countries,
-    RampKycModel? rampKycModel,
   }) {
     return RampState(
       status: status ?? this.status,
-      defichainRampModel: defichainRampModel ?? this.defichainRampModel,
+      dfxRampModel: dfxRampModel ?? this.dfxRampModel,
       accessTokenModel: accessTokenModel ?? this.accessTokenModel,
       rampUserModel: rampUserModel ?? this.rampUserModel,
+      rampKycModel: rampKycModel ?? this.rampKycModel,
       assets: assets ?? this.assets,
       fiatAssets: fiatAssets ?? this.fiatAssets,
       ibans: ibans ?? this.ibans,
       activeIban: activeIban ?? this.activeIban,
       newIban: newIban ?? this.newIban,
       countries: countries ?? this.countries,
-      rampKycModel: rampKycModel ?? this.rampKycModel,
     );
   }
 

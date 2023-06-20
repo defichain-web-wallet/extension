@@ -454,7 +454,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
         Map sellDetails = await dfxRequests.sell(
           iban,
           selectedFiat,
-          rampState.defichainRampModel!.accessTokensMap[0]!.accessToken,
+          rampState.dfxRampModel!.accessTokensMap[0]!.accessToken,
         );
         address = sellDetails["deposit"]["address"];
       } else {
