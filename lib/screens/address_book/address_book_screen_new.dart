@@ -38,6 +38,8 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
   bool isSelectedContacts = true;
   bool isSelectedLastSent = false;
   bool isDeleted = false;
+  late AddressBookCubit addressBookCubit;
+
 
   showDeletedTooltip() {
     setState(() {
@@ -51,6 +53,13 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
   }
 
   @override
+  void initState() {
+    addressBookCubit = BlocProvider.of<AddressBookCubit>(context);
+    addressBookCubit.init(context);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       builder: (
@@ -58,20 +67,11 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        AddressBookCubit addressBookCubit =
-            BlocProvider.of<AddressBookCubit>(context);
-        if (iterator == 0) {
-          iterator++;
-
-          addressBookCubit.loadAddressBook();
-        }
         return BlocBuilder<AddressBookCubit, AddressBookState>(
           builder: (context, addressBookState) {
-            if (iterator == 1 &&
-                addressBookState.status == AddressBookStatusList.success) {
+            if (addressBookState.status == AddressBookStatusList.success) {
               viewList = addressBookState.addressBookList;
               lastSent = addressBookState.lastSentList;
-              iterator++;
             }
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -140,6 +140,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                               confirmCallback: (name, address, network) {
                                                 setState(() {
                                                   addressBookCubit.addAddress(
+                                                    context,
                                                     AddressBookModel(
                                                       name: name,
                                                       address: address,
@@ -267,7 +268,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                                 contactAddress:
                                                     viewList![index].address!,
                                                 networkName:
-                                                    viewList![index].network!,
+                                                    viewList![index].network!.networkNameFormat,
                                                 editCallback: () {
                                                   showDialog(
                                                     barrierColor: AppColors
@@ -288,17 +289,12 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                                         confirmCallback:
                                                             (name, address, network) {
                                                           setState(() {
+                                                            var element = viewList![index];
+                                                            element.name = name;
+                                                            element.address = address;
                                                             addressBookCubit.editAddress(
-                                                                AddressBookModel(
-                                                                      name:
-                                                                          name,
-                                                                      address:
-                                                                          address,
-                                                                      network:
-                                                                          network,
-                                                                    ),
-                                                                    viewList![index]
-                                                                    .id);
+                                                                context,
+                                                                element);
                                                             Navigator.pop(
                                                                 context);
                                                           });
@@ -320,7 +316,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                                                     () {
                                                                   setState(() {
                                                                     addressBookCubit
-                                                                        .deleteAddress(
+                                                                        .deleteAddress(context,
                                                                             viewList![index]);
                                                                     Navigator.pop(
                                                                         context);
@@ -375,7 +371,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
                                             children: [
                                               LastSentTile(
                                                 address:
-                                                    lastSent![index].address!,
+                                                    lastSent![index],
                                                 index: index,
                                               ),
                                               Divider(

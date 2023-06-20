@@ -8,7 +8,7 @@ import 'package:defi_wallet/models/tx_error_model.dart';
 
 import 'abstract_account_model.dart';
 
-abstract class AbstractStakingProviderModel {
+abstract class  AbstractStakingProviderModel {
   Map<int, AccessTokenModel> accessTokensMap = {};
 
   final AbstractNetworkModel networkModel;

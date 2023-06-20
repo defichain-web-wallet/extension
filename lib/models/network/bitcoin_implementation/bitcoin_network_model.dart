@@ -172,7 +172,8 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     );
     var fee =
         fromSatoshi(BTCTransactionService.calculateBTCFee(utxoList.length, 1, satPerByte));
-    return balance - fee;
+    var available = balance - fee;
+    return available > 0 ? available : 0;
   }
 
   bool checkAddress(String address) {

@@ -95,6 +95,7 @@ class ApplicationModel {
       'activeAccount': activeAccount!.toJson(),
       'accounts': accounts.map((e) => e.toJson()).toList(),
       'activeNetwork': activeNetwork!.toJson(),
+      'networks': networks.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -123,6 +124,10 @@ class ApplicationModel {
       activeAccount: activeAccount,
       activeNetwork: activeNetwork,
     );
+  }
+
+  List<String> getMnemonic(String password){
+    return this.sourceList[this.activeAccount!.sourceId]!.getMnemonic(password);
   }
 
   SourceSeedModel createSource(

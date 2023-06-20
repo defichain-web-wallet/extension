@@ -1,9 +1,6 @@
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
-import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_network_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 
@@ -15,30 +12,56 @@ class AccountModel extends AbstractAccountModel {
     Map<String, String> addresses,
     int accountIndex,
     Map<String, List<BalanceModel>> pinnedBalances,
-    String? name
-  ) : super(publicKeyTestnet, publicKeyMainnet, sourceId, addresses,
-            accountIndex, pinnedBalances, name ?? 'Account${accountIndex + 1}');
+    String? name,
+    List<AddressBookModel> addressBook,
+    List<AddressBookModel> lastSend,
+  ) : super(
+            publicKeyTestnet,
+            publicKeyMainnet,
+            sourceId,
+            addresses,
+            accountIndex,
+            pinnedBalances,
+            name ?? 'Account${accountIndex + 1}',
+            addressBook,
+            lastSend);
 
-  factory AccountModel.fromJson(Map<String, dynamic> jsonModel, List<AbstractNetworkModel> networkList) {
+  factory AccountModel.fromJson(
+      Map<String, dynamic> jsonModel, List<AbstractNetworkModel> networkList) {
     Map<String, List<BalanceModel>> pinnedBalances = {};
 
-    for(var network in networkList){
-      var balanceList = jsonModel['pinnedBalances'][network.networkType.networkName.name] as List;
-      pinnedBalances[network.networkType.networkName.name] = List<BalanceModel>.generate(
+    for (var network in networkList) {
+      var balanceList = jsonModel['pinnedBalances']
+          [network.networkType.networkName.name] as List;
+      pinnedBalances[network.networkType.networkName.name] =
+          List<BalanceModel>.generate(
         balanceList.length,
-            (index) => BalanceModel.fromJSON(balanceList[index]),
+        (index) => BalanceModel.fromJSON(balanceList[index]),
       );
     }
 
-    return AccountModel(
-      jsonModel['publicKeyTestnet'],
-      jsonModel['publicKeyMainnet'],
-      jsonModel['sourceId'],
-      Map<String, String>.from(jsonModel['addresses']),
-      jsonModel['accountIndex'],
-      pinnedBalances,
-      jsonModel["name"]
+    var addressBookList = jsonModel["addressBook"] as List;
+    final addressBook = List<AddressBookModel>.generate(
+      addressBookList.length,
+      (index) => AddressBookModel.fromJson(addressBookList[index]),
     );
+
+    var lastSendList = jsonModel["lastSendList"] as List;
+    final lastSend = List<AddressBookModel>.generate(
+      lastSendList.length,
+      (index) => AddressBookModel.fromJson(lastSendList[index]),
+    );
+
+    return AccountModel(
+        jsonModel['publicKeyTestnet'],
+        jsonModel['publicKeyMainnet'],
+        jsonModel['sourceId'],
+        Map<String, String>.from(jsonModel['addresses']),
+        jsonModel['accountIndex'],
+        pinnedBalances,
+        jsonModel["name"],
+        addressBook,
+        lastSend);
   }
 
   Map<String, dynamic> toJson() {
@@ -53,6 +76,9 @@ class AccountModel extends AbstractAccountModel {
       List balancesJson = value.map((e) => e.toJSON()).toList();
       return MapEntry(key, balancesJson);
     });
+
+    data["addressBook"] = this.addressBook.map((e) => e.toJson()).toList();
+    data["lastSendList"] = this.lastSendList.map((e) => e.toJson()).toList();
 
     return data;
   }
@@ -75,9 +101,9 @@ class AccountModel extends AbstractAccountModel {
       if (isRestore) {
         try {
           pinnedBalances[network.networkType.networkName.name] =
-          await network.getAllBalances(
-              addressString:
-              addresses[network.networkType.networkName.name]!);
+              await network.getAllBalances(
+                  addressString:
+                      addresses[network.networkType.networkName.name]!);
         } catch (_) {
           pinnedBalances[network.networkType.networkName.name] = [
             BalanceModel(balance: 0, token: network.getDefaultToken())
@@ -90,26 +116,13 @@ class AccountModel extends AbstractAccountModel {
       }
     }
 
-    return AccountModel(
-      publicKeyTestnet,
-      publicKeyMainnet,
-      sourceId,
-      addresses,
-      accountIndex,
-      pinnedBalances,
-      null
-    );
-  }
-
-  Map<String, List<AddressBookModel>> getAddressBook(NetworkName networkName) {
-    return Map<String, List<AddressBookModel>>();
+    return AccountModel(publicKeyTestnet, publicKeyMainnet, sourceId, addresses,
+        accountIndex, pinnedBalances, null, [], []);
   }
 
   String? getAddress(NetworkName networkName) {
     return addresses[networkName.name];
   }
-
-  void addToAddressBook(NetworkName networkName, String address, String name) {}
 
 // private
 }
