@@ -14,17 +14,21 @@ import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 import 'package:defi_wallet/requests/defichain/ramp/dfx_requests.dart';
 
 class DFXRampModel extends AbstractOnOffRamp {
-  DFXRampModel(AbstractNetworkModel networkModel)
-      : super(_validationNetworkModel(networkModel));
+  DFXRampModel() : super();
 
-  static AbstractNetworkModel _validationNetworkModel(
-    AbstractNetworkModel networkModel,
-  ) {
-    if (networkModel.networkType.networkName.name !=
-        NetworkName.defichainMainnet.name) {
-      throw 'Invalid network';
+  factory DFXRampModel.fromJson(Map<String, dynamic> json) {
+    return DFXRampModel();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.accessTokensMap.isNotEmpty) {
+      data["accessTokensMap"] = this.accessTokensMap.map((key, value) {
+        return MapEntry(key.toString(), value.toJson());
+      });
     }
-    return networkModel;
+    return data;
   }
 
   @override
@@ -32,8 +36,14 @@ class DFXRampModel extends AbstractOnOffRamp {
     AbstractAccountModel account,
     String password,
     ApplicationModel applicationModel,
+    AbstractNetworkModel networkModel,
   ) async {
-    final data = await _authorizationData(account, password, applicationModel);
+    final data = await _authorizationData(
+      account,
+      password,
+      applicationModel,
+      networkModel,
+    );
     String? accessToken = await DFXRequests.signIn(data);
     if (accessToken != null) {
       accessTokensMap[account.accountIndex] = AccessTokenModel(
@@ -47,8 +57,14 @@ class DFXRampModel extends AbstractOnOffRamp {
     AbstractAccountModel account,
     String password,
     ApplicationModel applicationModel,
+    AbstractNetworkModel networkModel,
   ) async {
-    var data = await _authorizationData(account, password, applicationModel);
+    var data = await _authorizationData(
+      account,
+      password,
+      applicationModel,
+      networkModel,
+    );
     String? accessToken = await DFXRequests.signUp(data);
     if (accessToken != null) {
       accessTokensMap[account.accountIndex] = AccessTokenModel(
@@ -219,12 +235,16 @@ class DFXRampModel extends AbstractOnOffRamp {
     // TODO: implement savePaymentData
   }
 
-  Future<Map<String, String>> _authorizationData(AbstractAccountModel account,
-      String password, ApplicationModel applicationModel) async {
+  Future<Map<String, String>> _authorizationData(
+    AbstractAccountModel account,
+    String password,
+    ApplicationModel applicationModel,
+    AbstractNetworkModel networkModel,
+  ) async {
     var address = account.getAddress(
-      this.networkModel.networkType.networkName,
+      networkModel.networkType.networkName,
     )!;
-    String signature = await this.networkModel.signMessage(
+    String signature = await networkModel.signMessage(
         account,
         'By_signing_this_message,_you_confirm_that_you_are_the_sole_owner_of_the_provided_DeFiChain_address_and_are_in_possession_of_its_private_key._Your_ID:_$address',
         password,

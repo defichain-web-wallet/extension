@@ -26,12 +26,7 @@ abstract class AbstractNetworkModel {
 
   String get networkNameFormat => this.networkType.networkNameFormat;
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['networkType'] = this.networkType.toJson();
-
-    return data;
-  }
+  Map<String, dynamic> toJson();
 
   Future<List<TokenModel>> getAvailableTokens();
 

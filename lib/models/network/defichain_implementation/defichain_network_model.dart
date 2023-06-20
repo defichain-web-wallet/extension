@@ -22,8 +22,6 @@ import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_balance_requests.dart';
 import 'package:defi_wallet/requests/defichain/dfi_token_requests.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
-import 'package:defi_wallet/services/mnemonic_service.dart';
-import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
@@ -37,9 +35,9 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   DefichainNetworkModel(NetworkTypeModel networkType)
       : super(_validationNetworkName(networkType)) {
     if (!networkType.isTestnet) {
-      this.stakingList.add(new LockStakingProviderModel(this));
-      this.stakingList.add(new YieldMachineStakingProviderModel(this));
-      this.rampList.add(new DFXRampModel(this));
+      this.stakingList.add(new LockStakingProviderModel());
+      this.stakingList.add(new YieldMachineStakingProviderModel());
+      this.rampList.add(new DFXRampModel());
     }
 
     this.lmList.add(new DefichainLmProviderModel());
@@ -51,10 +49,25 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     throw 'Not available for this network';
   }
 
-  factory DefichainNetworkModel.fromJson(Map<String, dynamic> jsonModel) {
+  factory DefichainNetworkModel.fromJson(Map<String, dynamic> json) {
     return DefichainNetworkModel(
-      NetworkTypeModel.fromJson(jsonModel),
+      NetworkTypeModel.fromJson(json['networkType']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['networkType'] = this.networkType.toJson();
+    data['stakingList'] = List.generate(
+      this.stakingList.length,
+      (index) => this.stakingList[index].toJson(),
+    );
+    data['rampList'] = List.generate(
+      this.rampList.length,
+          (index) => this.rampList[index].toJson(),
+    );
+
+    return data;
   }
 
   static NetworkTypeModel _validationNetworkName(NetworkTypeModel networkType) {

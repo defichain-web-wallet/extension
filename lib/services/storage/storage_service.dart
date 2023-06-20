@@ -24,8 +24,9 @@ class StorageService {
 
   static Future saveApplication(ApplicationModel applicationModel) async {
     try {
-      String jsonString = json.encode(applicationModel.toJSON());
-      var encryptedApplication = stringToBase64.encode(jsonString);
+      final applicationModelJson = applicationModel.toJSON();
+      final jsonString = json.encode(applicationModelJson);
+      final encryptedApplication = stringToBase64.encode(jsonString);
       await HiveService.update(HiveNames.application, encryptedApplication);
     } catch (err) {
       print(err);

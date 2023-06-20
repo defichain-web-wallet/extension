@@ -8,8 +8,6 @@ import 'package:defi_wallet/models/network/defichain_implementation/lock_staking
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
-import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -96,11 +94,17 @@ class WalletCubit extends Cubit<WalletState> {
         );
         for(var network in applicationModel.networks){
           if(network.networkType.networkName.name == NetworkName.defichainMainnet.name){
-            await (network.stakingList[0] as LockStakingProviderModel).signIn(account, password, applicationModel);
+            await (network.stakingList[0] as LockStakingProviderModel).signIn(
+              account,
+              password,
+              applicationModel,
+              network,
+            );
             await (network.rampList[0] as DFXRampModel).signIn(
               account,
               password,
               applicationModel,
+              network,
             );
           }
         }
@@ -170,6 +174,8 @@ class WalletCubit extends Cubit<WalletState> {
       activeNetwork: network,
     );
 
+    applicationModel.networks = state.applicationModel!.networks;
+
     StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
@@ -207,6 +213,7 @@ class WalletCubit extends Cubit<WalletState> {
         applicationModel.activeAccount!.changeName(name);
       }
 
+    applicationModel.networks = state.applicationModel!.networks;
     StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
@@ -221,6 +228,8 @@ class WalletCubit extends Cubit<WalletState> {
     ApplicationModel applicationModel = state.applicationModel!;
     AbstractAccountModel account = applicationModel.accounts.firstWhere((element) => element.accountIndex == index);
     applicationModel.activeAccount = account;
+
+    applicationModel.networks = state.applicationModel!.networks;
 
     StorageService.saveApplication(applicationModel);
 
@@ -240,7 +249,10 @@ class WalletCubit extends Cubit<WalletState> {
     AbstractAccountModel account = await AccountModel.fromPublicKeys(networkList: applicationModel.networks,  accountIndex: maxIndex+1, publicKeyMainnet: source.publicKeyMainnet, publicKeyTestnet: source.publicKeyTestnet, sourceId: source.id);
     account.changeName(name);
     applicationModel.accounts.add(account);
+    applicationModel.networks = state.applicationModel!.networks;
+
     StorageService.saveApplication(applicationModel);
+
     emit(state.copyWith(
       status: WalletStatusList.success,
       applicationModel: applicationModel,

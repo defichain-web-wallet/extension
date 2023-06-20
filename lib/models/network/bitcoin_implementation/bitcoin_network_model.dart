@@ -43,6 +43,12 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['networkType'] = this.networkType.toJson();
+    return data;
+  }
+
   String createAddress(String publicKey, int accountIndex) {
     var test = _getNetworkTypeBip32();
     print('1');

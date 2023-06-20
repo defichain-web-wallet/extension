@@ -14,20 +14,20 @@ import 'abstract_account_model.dart';
 abstract class AbstractOnOffRamp {
   Map<int, AccessTokenModel> accessTokensMap = {};
 
-  final AbstractNetworkModel networkModel;
-
-  AbstractOnOffRamp(this.networkModel);
+  AbstractOnOffRamp();
 
   Future<bool> signUp(
     AbstractAccountModel account,
     String password,
     ApplicationModel applicationModel,
+    AbstractNetworkModel networkModel,
   );
 
   Future<void> signIn(
     AbstractAccountModel account,
     String password,
     ApplicationModel applicationModel,
+    AbstractNetworkModel networkModel,
   );
 
   Future<void> createUser(
@@ -81,4 +81,6 @@ abstract class AbstractOnOffRamp {
     FiatModel fiat,
     String accessToken,
   );
+
+  Map<String, dynamic> toJson();
 }

@@ -20,15 +20,9 @@ part 'ramp_state.dart';
 class RampCubit extends Cubit<RampState> {
   RampCubit() : super(RampState());
 
-  NetworkTypeModel networkTypeModel = NetworkTypeModel(
-    networkName: NetworkName.defichainMainnet,
-    networkString: 'defichainMainnet',
-    isTestnet: false,
-  );
-
   Future<void> setAccessToken(AccessTokenModel accessTokenModel) async {
     AbstractOnOffRamp defichainRampModel = state.defichainRampModel ??
-        DFXRampModel(DefichainNetworkModel(networkTypeModel));
+        DFXRampModel();
 
     emit(state.copyWith(
       status: RampStatusList.initial,
@@ -47,10 +41,15 @@ class RampCubit extends Cubit<RampState> {
     ));
 
     AbstractOnOffRamp defichainRampModel = state.defichainRampModel ??
-        DFXRampModel(DefichainNetworkModel(networkTypeModel));
+        DFXRampModel();
 
     try {
-      await defichainRampModel.signIn(account, password, applicationModel);
+      await defichainRampModel.signIn(
+        account,
+        password,
+        applicationModel,
+        applicationModel.activeNetwork!,
+      );
 
       emit(state.copyWith(
         status: RampStatusList.success,
@@ -73,9 +72,14 @@ class RampCubit extends Cubit<RampState> {
     ));
 
     AbstractOnOffRamp defichainRampModel = state.defichainRampModel ??
-        DFXRampModel(DefichainNetworkModel(networkTypeModel));
+        DFXRampModel();
 
-    bool isComplete = await defichainRampModel.signUp(account, password, applicationModel);
+    bool isComplete = await defichainRampModel.signUp(
+      account,
+      password,
+      applicationModel,
+      applicationModel.activeNetwork!,
+    );
 
     if (isComplete) {
       emit(state.copyWith(
