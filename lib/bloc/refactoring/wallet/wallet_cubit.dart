@@ -141,10 +141,11 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
-  loadWalletDetails() async {
+  loadWalletDetails({ApplicationModel? application}) async {
     try {
       // List<AbstractAccountModel> accounts = await StorageService.loadAccounts();
-      ApplicationModel applicationModel = await StorageService.loadApplication();
+      ApplicationModel applicationModel =
+          application ?? await StorageService.loadApplication();
 
       // applicationModel.activeAccount = applicationModel.accounts.first;
 

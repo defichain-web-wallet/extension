@@ -51,7 +51,9 @@ class _WalletCheckerState extends State<WalletChecker> {
       if (applicationModel != null || isLedger) {
         lockHelper.provideWithLockChecker(context, () async {
           try {
-            await walletCubit.loadWalletDetails();
+            await walletCubit.loadWalletDetails(
+              application: applicationModel,
+            );
             await Navigator.pushReplacement(
               context,
               PageRouteBuilder(
