@@ -14,6 +14,7 @@ import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_mod
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/yield_machine_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network/staking_enum.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -50,9 +51,34 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }
 
   factory DefichainNetworkModel.fromJson(Map<String, dynamic> json) {
+    final stakingListJson = json['stakingList'];
+    final rampListJson = json['rampList'];
+
+    final stakingList = List.generate(
+      stakingListJson.length,
+      (index) {
+        if (StakingEnum.staking.isCompare(stakingListJson[index]['type'])) {
+          return LockStakingProviderModel.fromJson(stakingListJson[index]);
+        } else {
+          return YieldMachineStakingProviderModel.fromJson(
+            stakingListJson[index],
+          );
+        }
+      },
+    );
+    final rampList = List.generate(
+      rampListJson.length,
+      (index) => DFXRampModel.fromJson(
+        rampListJson[index],
+      ),
+    );
     return DefichainNetworkModel(
       NetworkTypeModel.fromJson(json['networkType']),
-    );
+    )
+      ..stakingList = stakingList
+      ..rampList = rampList
+      ..lmList = [DefichainLmProviderModel()]
+      ..exchangeList = [DefichainExchangeModel()];
   }
 
   Map<String, dynamic> toJson() {

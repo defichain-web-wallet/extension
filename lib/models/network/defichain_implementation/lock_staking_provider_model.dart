@@ -5,6 +5,7 @@ import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_token_model.dart';
 import 'package:defi_wallet/models/network/staking/withdraw_model.dart';
+import 'package:defi_wallet/models/network/staking_enum.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/defichain/staking/lock_requests.dart';
@@ -208,9 +209,20 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
   }
 
   factory LockStakingProviderModel.fromJson(
-    Map<String, dynamic> jsonModel,
+    Map<String, dynamic> json,
   ) {
-    return LockStakingProviderModel();
+    if (json['accessTokensMap'] == null) {
+      return LockStakingProviderModel();
+    } else {
+      final accessTokensList = json['accessTokensMap'] as Map<String, dynamic>;
+      final accessTokensMap = accessTokensList.map(
+        (key, value) => MapEntry(
+          int.parse(key),
+          AccessTokenModel.fromJson(value),
+        ),
+      );
+      return LockStakingProviderModel()..accessTokensMap = accessTokensMap;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -221,6 +233,7 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
         return MapEntry(key.toString(), value.toJson());
       });
     }
+    data['type'] = StakingEnum.staking.toString();
 
     return data;
   }

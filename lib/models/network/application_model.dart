@@ -105,10 +105,18 @@ class ApplicationModel {
   }
 
   factory ApplicationModel.fromJSON(Map<String, dynamic> json) {
+    final networksListJson = json['networks'];
+    final networks = List.generate(networksListJson.length, (index) {
+      final network = networksListJson[index];
+      if (network['networkType']['networkName'].contains('defichain')) {
+        return DefichainNetworkModel.fromJson(network);
+      } else {
+        return BitcoinNetworkModel.fromJson(network);
+      }
+    });
     final savedNetwork = NetworkTypeModel.fromJson(
       json['activeNetwork']['networkType'],
     );
-    final networks = ApplicationModel.initNetworks();
     final sourceList = json['sourceList'] as Map<String, dynamic>;
     final password = json['password'] as String;
     final activeAccount = AccountModel.fromJson(json['activeAccount'], networks);
@@ -129,7 +137,7 @@ class ApplicationModel {
       accounts: accounts,
       activeAccount: activeAccount,
       activeNetwork: activeNetwork,
-    );
+    )..networks = networks;
   }
 
   SourceSeedModel createSource(

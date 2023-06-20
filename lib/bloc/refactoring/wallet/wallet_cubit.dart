@@ -114,8 +114,6 @@ class WalletCubit extends Cubit<WalletState> {
         rethrow;
       }
 
-      print(applicationModel);
-
       //TODO: check tx history here
       bool presentBalance = false;
       applicationModel.networks.forEach((element) {
@@ -172,9 +170,7 @@ class WalletCubit extends Cubit<WalletState> {
       activeAccount: state.applicationModel!.activeAccount,
       accounts: state.applicationModel!.accounts,
       activeNetwork: network,
-    );
-
-    applicationModel.networks = state.applicationModel!.networks;
+    )..networks = state.applicationModel!.networks;
 
     StorageService.saveApplication(applicationModel);
 
@@ -213,7 +209,6 @@ class WalletCubit extends Cubit<WalletState> {
         applicationModel.activeAccount!.changeName(name);
       }
 
-    applicationModel.networks = state.applicationModel!.networks;
     StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
@@ -228,8 +223,6 @@ class WalletCubit extends Cubit<WalletState> {
     ApplicationModel applicationModel = state.applicationModel!;
     AbstractAccountModel account = applicationModel.accounts.firstWhere((element) => element.accountIndex == index);
     applicationModel.activeAccount = account;
-
-    applicationModel.networks = state.applicationModel!.networks;
 
     StorageService.saveApplication(applicationModel);
 
@@ -249,7 +242,6 @@ class WalletCubit extends Cubit<WalletState> {
     AbstractAccountModel account = await AccountModel.fromPublicKeys(networkList: applicationModel.networks,  accountIndex: maxIndex+1, publicKeyMainnet: source.publicKeyMainnet, publicKeyTestnet: source.publicKeyTestnet, sourceId: source.id);
     account.changeName(name);
     applicationModel.accounts.add(account);
-    applicationModel.networks = state.applicationModel!.networks;
 
     StorageService.saveApplication(applicationModel);
 

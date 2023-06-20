@@ -8,7 +8,6 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_network_mod
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
-import 'package:defi_wallet/models/network/network_type_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 import 'package:defi_wallet/requests/defichain/ramp/dfx_requests.dart';
@@ -17,7 +16,18 @@ class DFXRampModel extends AbstractOnOffRamp {
   DFXRampModel() : super();
 
   factory DFXRampModel.fromJson(Map<String, dynamic> json) {
-    return DFXRampModel();
+    if (json.isEmpty) {
+      return DFXRampModel();
+    } else {
+      final accessTokensList = json['accessTokensMap'] as Map<String, dynamic>;
+      final accessTokensMap = accessTokensList.map(
+        (key, value) => MapEntry(
+          int.parse(key),
+          AccessTokenModel.fromJson(value),
+        ),
+      );
+      return DFXRampModel()..accessTokensMap = accessTokensMap;
+    }
   }
 
   @override
