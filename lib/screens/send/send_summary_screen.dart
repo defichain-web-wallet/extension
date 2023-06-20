@@ -583,12 +583,10 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       satPerByte: widget.fee ?? 0,
     );
 
-    addressBookCubit.addAddressToLastSent(
+    addressBookCubit.addAddressToLastSent(context,
       AddressBookModel(
         address: address,
-        isLastSent: true,
-        network: currentNetworkName(),
-      ),
+      )
     );
 
     showDialog(

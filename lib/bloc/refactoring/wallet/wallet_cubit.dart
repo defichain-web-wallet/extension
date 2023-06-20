@@ -159,6 +159,10 @@ class WalletCubit extends Cubit<WalletState> {
     }
   }
 
+  List<String> getMnemonic(String password){
+    return state.applicationModel!.getMnemonic(password);
+  }
+
   bool validatePassword(String password) {
     return state.applicationModel!.validatePassword(password);
   }

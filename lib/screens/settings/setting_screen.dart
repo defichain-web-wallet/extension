@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/dialog_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -36,8 +37,6 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (context, state) {
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: AccountDrawer(
@@ -102,9 +101,9 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
                                       context: context,
                                       builder: (BuildContext contextDialog) {
                                         return PassConfirmDialog(
-                                          onSubmit: (val) async {
-                                            var mnemonic =
-                                                await getMnemonic(val);
+                                          onSubmit: (password) async {
+                                            final walletCubit = BlocProvider.of<WalletCubit>(context);
+                                            List<String> mnemonic = walletCubit.getMnemonic(password);
                                             Navigator.pushReplacement(
                                               context,
                                               PageRouteBuilder(
@@ -163,7 +162,5 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
             );
           },
         );
-      },
-    );
   }
 }

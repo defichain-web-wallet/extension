@@ -140,6 +140,10 @@ class ApplicationModel {
     )..networks = networks;
   }
 
+  List<String> getMnemonic(String password){
+    return this.sourceList[this.activeAccount!.sourceId]!.getMnemonic(password);
+  }
+
   SourceSeedModel createSource(
       List<String> mnemonic, String publicKeyTestnet, String publicKeyMainnet, String password) {
     var source = new SourceSeedModel(

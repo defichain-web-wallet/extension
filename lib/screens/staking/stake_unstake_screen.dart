@@ -374,12 +374,12 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                       .text = (lockState.stakingModel!.balances[0].balance -
                                                       lockState.stakingModel!.balances[0].pendingWithdrawals)
                                                       .toString();
-                                                  usdAmount =
-                                                  '\$${getUsdBalance(
-                                                    context,
-                                                    controller.text,
-                                                    lockState.stakingModel!.balances[0].asset,
-                                                  )}';
+                                                  // usdAmount =
+                                                  // '\$${getUsdBalance(
+                                                  //   context,
+                                                  //   controller.text,
+                                                  //   lockState.stakingModel!.balances[0].asset,
+                                                  // )}';
                                                 });
                                               },
                                               child: Text(
@@ -906,23 +906,23 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
     );
   }
 
-  String getUsdBalance(
-    context,
-    String balance,
-    String asset,
-  ) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    try {
-      var amount = tokenHelper.getAmountByUsd(
-        tokensCubit.state.tokensPairs!,
-        double.parse(balance),
-        asset,
-      );
-      return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
-    } catch (err) {
-      return '0.00';
-    }
-  }
+  // String getUsdBalance(
+  //   context,
+  //   String balance,
+  //   String asset,
+  // ) {
+  //   TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+  //   try {
+  //     var amount = tokenHelper.getAmountByUsd(
+  //       tokensCubit.state.tokensPairs!,
+  //       double.parse(balance),
+  //       asset,
+  //     );
+  //     return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
+  //   } catch (err) {
+  //     return '0.00';
+  //   }
+  // }
 
   double getAvailableBalance(accountState, asset) {
     int balance = accountState.accounts!.first.balanceList!

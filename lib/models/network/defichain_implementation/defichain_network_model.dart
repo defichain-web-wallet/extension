@@ -1,4 +1,5 @@
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_bridge_model.dart';
@@ -218,6 +219,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }) async {
     List<BalanceModel> balances = account.getPinnedBalances(this, mergeCoin: false);
 
+    double available = 0;
+
     if (token.symbol == 'DFI') {
       //TODO: change names
       BalanceModel coinDFIBalance = await getBalanceUTXO(
@@ -233,24 +236,30 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       switch (type) {
         case TxType.send:
           if (tokenDFIBalance.balance > FEE) {
-            return fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+            break;
           } else {
-            return fromSatoshi(coinDFIBalance.balance - (FEE));
+            available = fromSatoshi(coinDFIBalance.balance - (FEE));
+            break;
           }
         case TxType.swap:
           if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            return fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+            break;
           } else {
-            return fromSatoshi(tokenDFIBalance.balance);
+            available = fromSatoshi(tokenDFIBalance.balance);
+            break;
           }
         case TxType.addLiq:
           if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            return fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+            break;
           } else {
-            return fromSatoshi(tokenDFIBalance.balance);
+            available = fromSatoshi(tokenDFIBalance.balance);
+            break;
           }
         default:
-          return 0;
+          available = 0;
       }
     } else {
       BalanceModel balance = await getBalanceToken(
@@ -258,8 +267,9 @@ class DefichainNetworkModel extends AbstractNetworkModel {
         token,
         account.getAddress(this.networkType.networkName)!,
       );
-      return fromSatoshi(balance.balance);
+      available = fromSatoshi(balance.balance);
     }
+    return available > 0 ? available : 0;
   }
 
   bool checkAddress(String address) {

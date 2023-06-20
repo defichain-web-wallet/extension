@@ -1,7 +1,9 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -18,11 +20,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddTokenConfirmScreen extends StatefulWidget {
-  final List<String> arguments;
+  final List<TokenModel> tokens;
 
   const AddTokenConfirmScreen({
     Key? key,
-    required this.arguments,
+    required this.tokens,
   }) : super(key: key);
 
   @override
@@ -34,20 +36,18 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
   TextEditingController searchController = TextEditingController();
   TokensHelper tokenHelper = TokensHelper();
   String titleText = 'Add token';
-  List<String> symbols = [];
 
   @override
   Widget build(BuildContext context) {
-    symbols = widget.arguments;
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (context, accountState) {
-            if (accountState.status == AccountStatusList.success) {
+        return BlocBuilder<TokensCubit, TokensState>(
+          builder: (context, tokensState) {
+            if (tokensState.status == TokensStatusList.success) {
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                 endDrawer: AccountDrawer(
@@ -129,9 +129,9 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
                               Container(
                                 height: 288,
                                 child: ListView.builder(
-                                  itemCount: symbols.length,
+                                  itemCount: widget.tokens.length,
                                   itemBuilder: (BuildContext context, index) {
-                                    String tokenName = symbols[index];
+                                    TokenModel token = widget.tokens[index];
                                     return Column(
                                       children: [
                                         SizedBox(
@@ -139,13 +139,10 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
                                         ),
                                         TokenListTile(
                                           isConfirm: true,
-                                          onTap: () {
-                                            print('12');
-                                          },
                                           isSelect: false,
-                                          tokenName: '$tokenName',
+                                          tokenName: token.symbol,
                                           availableTokenName:
-                                              '${symbols[index]}',
+                                          token.name,
                                         ),
                                       ],
                                     );
@@ -168,7 +165,7 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
                               ),
                               NewPrimaryButton(
                                 width: 104,
-                                callback: () => submitAddToken(accountState),
+                                callback: () => submitAddToken(),
                                 title: 'Confirm',
                               ),
                             ],
@@ -188,13 +185,11 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
     );
   }
 
-  submitAddToken(state) async {
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+  submitAddToken() async {
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
 
-    for (var tokenName in symbols) {
-      await accountCubit.addToken(tokenName);
-    }
-    LoggerService.invokeInfoLogg('user added new token');
+    await tokensCubit.addTokens(context, widget.tokens);
+
     await Navigator.pushReplacement(
       context,
       PageRouteBuilder(
