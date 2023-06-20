@@ -11,9 +11,7 @@ import 'abstract_account_model.dart';
 abstract class  AbstractStakingProviderModel {
   Map<int, AccessTokenModel> accessTokensMap = {};
 
-  final AbstractNetworkModel networkModel;
-
-  AbstractStakingProviderModel(this.networkModel);
+  AbstractStakingProviderModel();
 
   // List<String> getRequiredKycInfo();
   //
@@ -31,10 +29,14 @@ abstract class  AbstractStakingProviderModel {
   }
 
   Future<List<StakingTokenModel>> getAvailableStakingTokens(
-      AbstractAccountModel account);
+    AbstractAccountModel account,
+    AbstractNetworkModel networkModel,
+  );
 
   Future<StakingTokenModel> getDefaultStakingToken(
-      AbstractAccountModel account);
+    AbstractAccountModel account,
+    AbstractNetworkModel networkModel,
+  );
 
   Future<BigInt> getAmountStaked(
       AbstractAccountModel account, TokenModel token);
@@ -60,4 +62,6 @@ abstract class  AbstractStakingProviderModel {
       double amount,
       String asset,
       ApplicationModel applicationModel);
+
+  Map<String, dynamic> toJson();
 }

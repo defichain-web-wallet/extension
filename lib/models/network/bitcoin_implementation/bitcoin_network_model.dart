@@ -16,7 +16,6 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_account_mod
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/bitcoin/blockcypher_requests.dart';
 import 'package:defi_wallet/services/bitcoin/btc_transaction_service.dart';
-import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
@@ -37,17 +36,21 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return networkType;
   }
 
-  factory BitcoinNetworkModel.fromJson(Map<String, dynamic> jsonModel) {
+  factory BitcoinNetworkModel.fromJson(Map<String, dynamic> json) {
     return BitcoinNetworkModel(
-      NetworkTypeModel.fromJson(jsonModel),
+      NetworkTypeModel.fromJson(json['networkType']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['networkType'] = this.networkType.toJson();
+    return data;
   }
 
   String createAddress(String publicKey, int accountIndex) {
     var test = _getNetworkTypeBip32();
-    print('1');
     var publicKeypair = bip32.BIP32.fromBase58(publicKey, test);
-    print('2');
     return this._createAddressString(publicKeypair, accountIndex);
   }
 

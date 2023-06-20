@@ -17,21 +17,16 @@ abstract class AbstractNetworkModel {
   static const int COIN = 100000000;
 
   final NetworkTypeModel networkType;
-  final List<AbstractStakingProviderModel> stakingList = [];
-  final List<AbstractLmProviderModel> lmList = [];
-  final List<AbstractOnOffRamp> rampList = [];
-  final List<AbstractExchangeModel> exchangeList = [];
+  late List<AbstractStakingProviderModel> stakingList = [];
+  late List<AbstractLmProviderModel> lmList = [];
+  late List<AbstractOnOffRamp> rampList = [];
+  late List<AbstractExchangeModel> exchangeList = [];
 
   AbstractNetworkModel(this.networkType);
 
   String get networkNameFormat => this.networkType.networkNameFormat;
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['networkType'] = this.networkType.toJson();
-
-    return data;
-  }
+  Map<String, dynamic> toJson();
 
   Future<List<TokenModel>> getAvailableTokens();
 

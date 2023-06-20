@@ -11,10 +11,11 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_pro
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_lm_provider_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/defichain_ramp_model.dart';
+import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/yield_machine_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network/staking_enum.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -23,7 +24,6 @@ import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_balance_requests.dart';
 import 'package:defi_wallet/requests/defichain/dfi_token_requests.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
-import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
@@ -37,9 +37,9 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   DefichainNetworkModel(NetworkTypeModel networkType)
       : super(_validationNetworkName(networkType)) {
     if (!networkType.isTestnet) {
-      this.stakingList.add(new LockStakingProviderModel(this));
-      this.stakingList.add(new YieldMachineStakingProviderModel(this));
-      this.rampList.add(new DefichainRampModel(this));
+      this.stakingList.add(new LockStakingProviderModel());
+      this.stakingList.add(new YieldMachineStakingProviderModel());
+      this.rampList.add(new DFXRampModel());
     }
 
     this.lmList.add(new DefichainLmProviderModel());
@@ -51,10 +51,50 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     throw 'Not available for this network';
   }
 
-  factory DefichainNetworkModel.fromJson(Map<String, dynamic> jsonModel) {
-    return DefichainNetworkModel(
-      NetworkTypeModel.fromJson(jsonModel),
+  factory DefichainNetworkModel.fromJson(Map<String, dynamic> json) {
+    final stakingListJson = json['stakingList'];
+    final rampListJson = json['rampList'];
+
+    final stakingList = List.generate(
+      stakingListJson.length,
+      (index) {
+        if (StakingEnum.staking.isCompare(stakingListJson[index]['type'])) {
+          return LockStakingProviderModel.fromJson(stakingListJson[index]);
+        } else {
+          return YieldMachineStakingProviderModel.fromJson(
+            stakingListJson[index],
+          );
+        }
+      },
     );
+    final rampList = List.generate(
+      rampListJson.length,
+      (index) => DFXRampModel.fromJson(
+        rampListJson[index],
+      ),
+    );
+    return DefichainNetworkModel(
+      NetworkTypeModel.fromJson(json['networkType']),
+    )
+      ..stakingList = stakingList
+      ..rampList = rampList
+      ..lmList = [DefichainLmProviderModel()]
+      ..exchangeList = [DefichainExchangeModel()];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['networkType'] = this.networkType.toJson();
+    data['stakingList'] = List.generate(
+      this.stakingList.length,
+      (index) => this.stakingList[index].toJson(),
+    );
+    data['rampList'] = List.generate(
+      this.rampList.length,
+          (index) => this.rampList[index].toJson(),
+    );
+
+    return data;
   }
 
   static NetworkTypeModel _validationNetworkName(NetworkTypeModel networkType) {

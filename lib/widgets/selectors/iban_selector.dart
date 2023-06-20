@@ -1,4 +1,4 @@
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/helpers/fiat_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -328,9 +328,9 @@ class IbanSelectorState extends State<IbanSelector> with ThemeMixin{
                         ),
                       ),
                       onPressed: () async {
-                        FiatCubit fiatCubit =
-                            BlocProvider.of<FiatCubit>(context);
-                        fiatCubit.changeCurrentIban(widget.ibanList[index]);
+                        RampCubit rampCubit =
+                            BlocProvider.of<RampCubit>(context);
+                        rampCubit.changeCurrentIban(widget.ibanList[index]);
                         hideOverlay();
                       },
                     );

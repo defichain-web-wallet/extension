@@ -90,31 +90,45 @@ class ApplicationModel {
 
   Map<String, dynamic> toJSON() {
     return {
-      'sourceList': sourceList.map((key, value) => MapEntry(key, value.toJSON())),
+      'sourceList': sourceList.map(
+        (key, value) => MapEntry(key, value.toJSON()),
+      ),
       'password': password,
       'activeAccount': activeAccount!.toJson(),
       'accounts': accounts.map((e) => e.toJson()).toList(),
       'activeNetwork': activeNetwork!.toJson(),
-      'networks': networks.map((e) => e.toJson()).toList(),
+      'networks': List.generate(
+        networks.length,
+        (index) => networks[index].toJson(),
+      ),
     };
   }
 
   factory ApplicationModel.fromJSON(Map<String, dynamic> json) {
-    var savedNetwork = NetworkTypeModel.fromJson(
+    final networksListJson = json['networks'];
+    final networks = List.generate(networksListJson.length, (index) {
+      final network = networksListJson[index];
+      if (network['networkType']['networkName'].contains('defichain')) {
+        return DefichainNetworkModel.fromJson(network);
+      } else {
+        return BitcoinNetworkModel.fromJson(network);
+      }
+    });
+    final savedNetwork = NetworkTypeModel.fromJson(
       json['activeNetwork']['networkType'],
     );
-    var networks = ApplicationModel.initNetworks();
     final sourceList = json['sourceList'] as Map<String, dynamic>;
     final password = json['password'] as String;
     final activeAccount = AccountModel.fromJson(json['activeAccount'], networks);
     final activeNetwork = networks.firstWhere(
       (element) => element.networkType.networkName == savedNetwork.networkName,
     );
-    final accounts = (json['accounts'] as List).map((data) => AccountModel.fromJson(data, networks))
+    final accounts = (json['accounts'] as List)
+        .map((json) => AccountModel.fromJson(json, networks))
         .toList();
 
     final sourceListMapped = sourceList.map(
-          (key, value) => MapEntry(key, SourceSeedModel.fromJSON(value)),
+      (key, value) => MapEntry(key, SourceSeedModel.fromJSON(value)),
     );
 
     return ApplicationModel(
@@ -123,7 +137,7 @@ class ApplicationModel {
       accounts: accounts,
       activeAccount: activeAccount,
       activeNetwork: activeNetwork,
-    );
+    )..networks = networks;
   }
 
   List<String> getMnemonic(String password){

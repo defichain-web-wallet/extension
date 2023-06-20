@@ -3,31 +3,31 @@ import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
-import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
+import 'package:defi_wallet/models/network/ramp/ramp_kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
 
 import 'abstract_account_model.dart';
 
 abstract class AbstractOnOffRamp {
-  String? accessToken;
-  int? accessTokenCreated;
+  Map<int, AccessTokenModel> accessTokensMap = {};
 
-  final AbstractNetworkModel networkModel;
-
-  AbstractOnOffRamp(this.networkModel);
+  AbstractOnOffRamp();
 
   Future<bool> signUp(
     AbstractAccountModel account,
     String password,
     ApplicationModel applicationModel,
+    AbstractNetworkModel networkModel,
   );
 
-  Future<bool> signIn(
+  Future<void> signIn(
     AbstractAccountModel account,
     String password,
     ApplicationModel applicationModel,
+    AbstractNetworkModel networkModel,
   );
 
   Future<void> createUser(
@@ -50,7 +50,7 @@ abstract class AbstractOnOffRamp {
 
   Future<List<dynamic>> getCountryList(String accessToken);
 
-  Future<void> saveKycData(KycModel kyc, String accessToken);
+  Future<void> saveKycData(RampKycModel kyc, String accessToken);
 
   Future<List<FiatModel>> getFiatList(String accessToken);
 
@@ -68,9 +68,9 @@ abstract class AbstractOnOffRamp {
     Map<String, String> paymentData,
   );
 
-  Future<List<AssetByFiatModel>> availableTokens();
+  Future<List<AssetByFiatModel>> getAvailableTokens(String accessToken);
 
-  void buy(
+  Future<void> buy(
     String iban,
     AssetByFiatModel asset,
     String accessToken,
@@ -81,4 +81,6 @@ abstract class AbstractOnOffRamp {
     FiatModel fiat,
     String accessToken,
   );
+
+  Map<String, dynamic> toJson();
 }

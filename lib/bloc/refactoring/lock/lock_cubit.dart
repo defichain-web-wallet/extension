@@ -30,10 +30,15 @@ class LockCubit extends Cubit<LockState> {
     var stakingProviders = activeNetwork.getStakingProviders();
     var lockStaking = stakingProviders[0];
 
-    await (lockStaking as LockStakingProviderModel).signUp(account, password, walletCubit.state.applicationModel!);
+    await (lockStaking as LockStakingProviderModel).signUp(
+      account,
+      password,
+      walletCubit.state.applicationModel!,
+      walletCubit.state.activeNetwork,
+    );
     await StorageService.saveApplication(walletCubit.state.applicationModel!);
 
-    await _checkAccessKey(lockStaking, account, stakingProviders);
+    await _checkAccessKey(context, lockStaking, account, stakingProviders);
   }
 
   signIn(context, String password) async {
@@ -43,10 +48,15 @@ class LockCubit extends Cubit<LockState> {
     var stakingProviders = activeNetwork.getStakingProviders();
     var lockStaking = stakingProviders[0];
 
-    await (lockStaking as LockStakingProviderModel).signIn(account, password, walletCubit.state.applicationModel!);
+    await (lockStaking as LockStakingProviderModel).signIn(
+      account,
+      password,
+      walletCubit.state.applicationModel!,
+      walletCubit.state.activeNetwork,
+    );
     await StorageService.saveApplication(walletCubit.state.applicationModel!);
 
-    await _checkAccessKey(lockStaking, account, stakingProviders);
+    await _checkAccessKey(context, lockStaking, account, stakingProviders);
   }
 
   getAvailableBalances(context) async {
@@ -84,10 +94,22 @@ class LockCubit extends Cubit<LockState> {
     var stakingProviders = activeNetwork.getStakingProviders();
     var lockStaking = stakingProviders[0];
 
-    await _checkAccessKey(lockStaking as LockStakingProviderModel, activeAccount, stakingProviders);
+    await _checkAccessKey(
+      context,
+      lockStaking as LockStakingProviderModel,
+      activeAccount,
+      stakingProviders,
+    );
   }
 
-  _checkAccessKey(LockStakingProviderModel lockStaking, AbstractAccountModel account, List<AbstractStakingProviderModel> stakingProviders) async {
+  _checkAccessKey(
+    context,
+    LockStakingProviderModel lockStaking,
+    AbstractAccountModel account,
+    List<AbstractStakingProviderModel> stakingProviders,
+  ) async {
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+
     var accessKey = lockStaking.getAccessToken(account);
     if (accessKey != null) {
       if(accessKey.isValid()){
@@ -101,7 +123,10 @@ class LockCubit extends Cubit<LockState> {
         isKycDone = await lockStaking.isKycDone(account);
 
         LockStatusList status;
-        stakingTokenModel = await lockStaking.getDefaultStakingToken(account);
+        stakingTokenModel = await lockStaking.getDefaultStakingToken(
+          account,
+          walletCubit.state.activeNetwork,
+        );
         if (!isKycDone) {
           status = LockStatusList.neededKyc;
           kycLink = await lockStaking.getKycLink(account);

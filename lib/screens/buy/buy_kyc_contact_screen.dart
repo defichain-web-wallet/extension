@@ -1,7 +1,6 @@
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/buy/buy_select_currency_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -31,7 +30,6 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
   final _phoneController = TextEditingController();
   final FocusNode emailFocusNode = FocusNode();
   final FocusNode phoneFocusNode = FocusNode();
-  final DfxRequests dfxRequests = DfxRequests();
   String countryCode = 'US';
   String numberPrefix = '+1';
   bool isEnable = true;
@@ -56,21 +54,19 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
         return BlocBuilder<AccountCubit, AccountState>(
           builder: (BuildContext context, accountState) {
-            // fiatCubit.loadUserDetails(accountState.activeAccount!);
-            return BlocBuilder<FiatCubit, FiatState>(
-              builder: (BuildContext context, fiatState) {
-                if (fiatState.email != null) {
-                  _emailController.text = fiatState.email!;
+            return BlocBuilder<RampCubit, RampState>(
+              builder: (BuildContext context, rampState) {
+                if (rampState.rampUserModel!.email != null) {
+                  _emailController.text = rampState.rampUserModel!.email!;
                 }
-                if (fiatState.phone != null) {
-                  _phoneController.text = fiatState.phone!;
+                if (rampState.rampUserModel!.phone != null) {
+                  _phoneController.text = rampState.rampUserModel!.phone!;
                 }
-                if (fiatState.status == FiatStatusList.loading) {
+                if (rampState.status == RampStatusList.loading) {
                   return Loader();
-                } else if (fiatState.status == FiatStatusList.expired) {
+                } else if (rampState.status == RampStatusList.expired) {
                   Future.microtask(() => Navigator.pushReplacement(
                       context,
                       PageRouteBuilder(
@@ -273,7 +269,7 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
                                     callback: isEnable
                                         ? () async {
                                             await _authenticateWithEmailAndPassword(
-                                                context, fiatState);
+                                                context,);
                                           }
                                         : null,
                                     title: 'Next',
@@ -295,14 +291,13 @@ class _BuyKycContactScreenState extends State<BuyKycContactScreen>
     );
   }
 
-  _authenticateWithEmailAndPassword(context, state) async {
+  _authenticateWithEmailAndPassword(context) async {
     if (_formKey.currentState!.validate()) {
-      FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+      RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
 
-      await fiatCubit.createUser(
+      await rampCubit.createUser(
         _emailController.text,
         _phoneController.text,
-        state.accessToken,
       );
       Navigator.push(
         context,
