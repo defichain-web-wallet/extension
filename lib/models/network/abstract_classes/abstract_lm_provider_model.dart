@@ -4,7 +4,7 @@ import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 
-abstract class AbstractLmProviderModel {
+abstract class  AbstractLmProviderModel {
   Future<List<LmPoolModel>> getAvailableLmPools(AbstractNetworkModel network);
 
   List<LmPoolModel> getPinnedLmPools(AbstractAccountModel account);

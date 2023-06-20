@@ -318,8 +318,8 @@ class _HistoryState extends State<History> {
                                                     .textTheme
                                                     .headline5,
                                               ),
-                                              Text(
-                                                  "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
+                                              // Text(
+                                              //     "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
                                             ],
                                           ),
                                         ),

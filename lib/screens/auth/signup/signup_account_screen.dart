@@ -95,7 +95,6 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
   }
 
   _createAccount() async {
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     if (_pickedImage != null) {
       _saveImageToStorage();
@@ -105,16 +104,6 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
       widget.mnemonic,
       widget.password,
     );
-
-    await accountCubit.createAccount(
-      widget.mnemonic,
-      widget.password,
-    );
-    LoggerService.invokeInfoLogg('user created new wallet');
-
-    await accountCubit.editAccount(
-        _nameController.text == '' ? 'My Wallet' : _nameController.text);
-    LoggerService.invokeInfoLogg('user created new wallet');
 
     Navigator.push(
       context,
@@ -134,8 +123,6 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (BuildContext context, state) {
             return Scaffold(
               appBar: WelcomeAppBar(
                 progress: 1,
@@ -268,8 +255,6 @@ class _SignupAccountScreenState extends State<SignupAccountScreen>
               ),
             );
           },
-        );
-      },
     );
   }
 }
