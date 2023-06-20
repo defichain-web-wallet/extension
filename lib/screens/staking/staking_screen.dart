@@ -43,7 +43,6 @@ class _StakingScreenState extends State<StakingScreen>
   TextEditingController controller = TextEditingController();
   late List<TextEditingController> controllers;
   late List<FocusNode> focusNodes;
-
   _onSaveRewardRoutes(BuildContext context) {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
@@ -502,7 +501,6 @@ class _StakingScreenState extends State<StakingScreen>
                                             )
                                           ],
                                         ),
-
                                       // if (isEdit)
                                       //   Row(
                                       //     mainAxisAlignment:

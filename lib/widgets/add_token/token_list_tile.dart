@@ -145,7 +145,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                           Padding(
                             padding: EdgeInsets.only(right: 16),
                             child: Text(
-                              '0 ${tokenHelper.getTokenWithPrefix(widget.tokenName!)}',
+                              '0 ${tokenHelper.getTokenWithPrefix(widget.availableTokenName!)}',
                               style: Theme.of(context).textTheme.headline5,
                             ),
                           ),
