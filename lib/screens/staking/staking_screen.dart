@@ -43,7 +43,6 @@ class _StakingScreenState extends State<StakingScreen>
   TextEditingController controller = TextEditingController();
   late List<TextEditingController> controllers;
   late List<FocusNode> focusNodes;
-  late List<Widget> rewards;
 
   _onSaveRewardRoutes(BuildContext context) {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
@@ -77,7 +76,7 @@ class _StakingScreenState extends State<StakingScreen>
               //   return TextEditingController(
               //       text: (rewards[index].rewardPercent! * 100).toString());
               // });
-              focusNodes = List.generate(rewards.length, (index) => FocusNode());
+              // focusNodes = List.generate(rewards.length, (index) => FocusNode());
               controller.text =
                   '${1 * 100}';
 
