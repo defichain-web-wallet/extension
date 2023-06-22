@@ -1,17 +1,17 @@
-import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'dart:ui';
+
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/ledger/guide/connect_ledger_second_screen.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/dotted_tab.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class ConnectLedgerFirstScreen extends StatefulWidget {
-  const ConnectLedgerFirstScreen({Key? key}) : super(key: key);
+  final void Function() callback;
+
+  const ConnectLedgerFirstScreen({Key? key, required this.callback})
+      : super(key: key);
 
   @override
   State<ConnectLedgerFirstScreen> createState() =>
@@ -26,107 +26,74 @@ class _ConnectLedgerFirstScreenState extends State<ConnectLedgerFirstScreen>
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldWrapper(
-      builder: (
-        BuildContext context,
-        bool isFullScreen,
-        TransactionState txState,
-      ) {
-        return Scaffold(
-          appBar: WelcomeAppBar(
-            progress: 0.3,
-          ),
-          body: Container(
-            padding: EdgeInsets.only(
-              top: 25,
-              bottom: 24,
-              left: 16,
-              right: 16,
+    return Center(
+      child: StretchBox(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Image.asset(
+              'assets/images/defi_no_seed_phrase.png',
+              width: 262.94,
+              height: 236.44,
             ),
-            child: Center(
-              child: StretchBox(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Image.asset(
-                      'assets/images/defi_no_seed_phrase.png',
-                      width: 262.94,
-                      height: 236.44,
+            Container(
+              child: Column(
+                children: [
+                  DottedTab(
+                    tabLenth: 4,
+                    selectTabIndex: 1,
+                  ),
+                  SizedBox(
+                    height: 19,
+                  ),
+                  Text(
+                    '$titleText Connect Ledger',
+                    style: Theme.of(context).textTheme.headline3,
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Container(
+                    height: 105,
+                    child: Text(
+                      subtitleText,
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                            color: Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .color!
+                                .withOpacity(0.6),
+                          ),
+                      textAlign: TextAlign.center,
                     ),
-                    Container(
-                      child: Column(
-                        children: [
-                          DottedTab(
-                            tabLenth: 4,
-                            selectTabIndex: 1,
-                          ),
-                          SizedBox(
-                            height: 19,
-                          ),
-                          Text(
-                            '$titleText Connect Ledger',
-                            style: Theme.of(context).textTheme.headline3,
-                          ),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Container(
-                            height: 105,
-                            child: Text(
-                              subtitleText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline5!
-                                        .color!
-                                        .withOpacity(0.6),
-                                  ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                width: 104,
-                                child: AccentButton(
-                                  callback: () {
-                                    Navigator.pop(context);
-                                  },
-                                  label: 'Back',
-                                ),
-                              ),
-                              NewPrimaryButton(
-                                width: 104,
-                                callback: () {
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                              ConnectLedgerSecondScreen(),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
-                                    ),
-                                  );
-                                },
-                                title: 'Next',
-                              ),
-                            ],
-                          ),
-                        ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 104,
+                        child: AccentButton(
+                          callback: () {
+                            Navigator.pop(context);
+                          },
+                          label: 'Cancel',
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                      NewPrimaryButton(
+                        width: 104,
+                        callback: () {
+                          this.widget.callback();
+                        },
+                        title: 'Next',
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }

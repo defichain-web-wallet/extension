@@ -4,7 +4,10 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
+import 'package:defi_wallet/screens/ledger/guide/connect_ledger_first_screen.dart';
+import 'package:defi_wallet/screens/ledger/guide/connect_ledger_overlay_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_screen.dart';
 import 'package:defi_wallet/utils/theme/theme_manager.dart';
@@ -55,12 +58,11 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
         WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
         var accounts = state.accounts;
         if (accounts.length == 1) {
-          accountsSelectorHeight = 195;
-        }
-        else if (accounts.length == 2) {
-          accountsSelectorHeight = 237;
+          accountsSelectorHeight = 245;
+        } else if (accounts.length == 2) {
+          accountsSelectorHeight = 280;
         } else {
-          accountsSelectorHeight = 260;
+          accountsSelectorHeight = 320;
         }
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
@@ -137,16 +139,17 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                         accountName: state.activeAccount.name,
                                         onEdit: () {
                                           showDialog(
-                                            barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                            barrierColor: AppColors.tolopea
+                                                .withOpacity(0.06),
                                             barrierDismissible: false,
                                             context: context,
                                             builder: (BuildContext context) {
                                               return CreateEditAccountDialog(
                                                 callback: (s) {
                                                   setState(() {
-                                                    walletCubit.editAccount(s,
-                                                         state
-                                                            .activeAccount
+                                                    walletCubit.editAccount(
+                                                        s,
+                                                        state.activeAccount
                                                             .accountIndex);
                                                   });
                                                 },
@@ -165,45 +168,43 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                           child: ListView.builder(
                                             itemCount: accounts.length,
                                             itemBuilder: (context, index) {
-                                                return Column(
-                                                  children: [
-                                                    Divider(
-                                                      height: 1,
-                                                      endIndent: 12,
-                                                      indent: 12,
-                                                      color: Theme.of(context)
-                                                          .dividerColor
-                                                          .withOpacity(0.05),
-                                                      thickness: 1,
-                                                    ),
-                                                    AccountMenuButton(
-                                                      accountSelectMode: true,
-                                                      account: accounts[index],
-                                                      callback: accounts[index]
-                                                                  .accountIndex ==
-                                                              state
-                                                                  .activeAccount
-                                                                  .accountIndex
-                                                          ? null
-                                                          : (accountIndex) async {
-                                                        walletCubit
-                                                                  .updateActiveAccount(
-                                                                      accounts[
-                                                                              index]
-                                                                          .accountIndex);
-                                                              Scaffold.of(
-                                                                      context)
-                                                                  .closeEndDrawer();
-                                                            },
-                                                      isHoverBackgroundEffect:
-                                                          false,
-                                                      iconPath:
-                                                          'assets/icons/add.svg',
-                                                      title:
-                                                          accounts[index].name!,
-                                                    ),
-                                                  ],
-                                                );
+                                              return Column(
+                                                children: [
+                                                  Divider(
+                                                    height: 1,
+                                                    endIndent: 12,
+                                                    indent: 12,
+                                                    color: Theme.of(context)
+                                                        .dividerColor
+                                                        .withOpacity(0.05),
+                                                    thickness: 1,
+                                                  ),
+                                                  AccountMenuButton(
+                                                    accountSelectMode: true,
+                                                    account: accounts[index],
+                                                    callback: accounts[index]
+                                                                .accountIndex ==
+                                                            state.activeAccount
+                                                                .accountIndex
+                                                        ? null
+                                                        : (accountIndex) async {
+                                                            walletCubit
+                                                                .updateActiveAccount(
+                                                                    accounts[
+                                                                            index]
+                                                                        .accountIndex);
+                                                            Scaffold.of(context)
+                                                                .closeEndDrawer();
+                                                          },
+                                                    isHoverBackgroundEffect:
+                                                        false,
+                                                    iconPath:
+                                                        'assets/icons/add.svg',
+                                                    title:
+                                                        accounts[index].name!,
+                                                  ),
+                                                ],
+                                              );
                                             },
                                           ),
                                         ),
@@ -222,16 +223,14 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                           AccountMenuButton(
                                             callback: (index) {
                                               showDialog(
-                                                barrierColor:
-                                                AppColors.tolopea.withOpacity(0.06),
-                                                barrierDismissible:
-                                                false,
+                                                barrierColor: AppColors.tolopea
+                                                    .withOpacity(0.06),
+                                                barrierDismissible: false,
                                                 context: context,
-                                                builder: (BuildContext
-                                                context) {
+                                                builder:
+                                                    (BuildContext context) {
                                                   return CreateEditAccountDialog(
-                                                    callback:
-                                                        (s) async {
+                                                    callback: (s) async {
                                                       await walletCubit
                                                           .addNewAccount(s);
                                                     },
@@ -239,12 +238,32 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                 },
                                               );
                                             },
-                                            isHoverBackgroundEffect:
-                                            false,
-                                            iconPath:
-                                            'assets/icons/add.svg',
-                                            title:
-                                            'Create new account',
+                                            isHoverBackgroundEffect: false,
+                                            iconPath: 'assets/icons/add.svg',
+                                            title: 'Create new account',
+                                          ),
+                                          AccountMenuButton(
+                                            callback: (index) {
+                                              showDialog(
+                                                barrierColor: AppColors.tolopea
+                                                    .withOpacity(0.06),
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return ConnectLedgerOverlayScreen();
+                                                  // return CreateEditAccountDialog(
+                                                  //   callback: (s) async {
+                                                  //     await walletCubit
+                                                  //         .addNewAccount(s);
+                                                  //   },
+                                                  // );
+                                                },
+                                              );
+                                            },
+                                            isHoverBackgroundEffect: false,
+                                            iconPath: 'assets/icons/add.svg',
+                                            title: 'Add ledger account',
                                           ),
                                         ],
                                       )

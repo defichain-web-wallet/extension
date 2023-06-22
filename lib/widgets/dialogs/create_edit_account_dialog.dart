@@ -32,7 +32,8 @@ class CreateEditAccountDialog extends StatefulWidget {
       _CreateEditAccountDialogState();
 }
 
-class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with ThemeMixin{
+class _CreateEditAccountDialogState extends State<CreateEditAccountDialog>
+    with ThemeMixin {
   TextEditingController _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   FocusNode nameFocusNode = FocusNode();
@@ -148,7 +149,7 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with 
                     width: 104,
                     globalKey: globalKey,
                     callback: () async {
-                     if(_formKey.currentState!.validate()) {
+                      if (_formKey.currentState!.validate()) {
                         if (_nameController.text.length > 3) {
                           if (_pickedImage != null) {
                             await _saveImageToStorage();
@@ -346,15 +347,20 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with 
                                   child: Container(
                                     height: 71,
                                     child: GestureDetector(
-                                      onDoubleTap:() {
+                                      onDoubleTap: () {
                                         nameFocusNode.requestFocus();
-                                        if(_nameController.text.isNotEmpty) {
-                                          _nameController.selection = TextSelection(baseOffset: 0, extentOffset:_nameController.text.length);
+                                        if (_nameController.text.isNotEmpty) {
+                                          _nameController.selection =
+                                              TextSelection(
+                                                  baseOffset: 0,
+                                                  extentOffset: _nameController
+                                                      .text.length);
                                         }
                                       },
                                       child: TextFormField(
                                         onSaved: (val) async {
-                                          if(_formKey.currentState!.validate()) {
+                                          if (_formKey.currentState!
+                                              .validate()) {
                                             if (_nameController.text.length >
                                                 3) {
                                               if (_pickedImage != null) {
@@ -369,26 +375,37 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with 
                                         controller: _nameController,
                                         focusNode: nameFocusNode,
                                         onEditingComplete: () =>
-                                            (globalKey.currentWidget! as ElevatedButton)
+                                            (globalKey.currentWidget!
+                                                    as ElevatedButton)
                                                 .onPressed!(),
                                         decoration: InputDecoration(
                                           errorStyle: TextStyle(
-                                              backgroundColor: Colors.transparent,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               color: Colors.pink,
-                                              fontSize: 10
-                                          ),
-                                          hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                                              fontSize: 10),
+                                          hoverColor: Theme.of(context)
+                                              .inputDecorationTheme
+                                              .hoverColor,
                                           filled: true,
-                                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                          enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                                          focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                                          fillColor: Theme.of(context)
+                                              .inputDecorationTheme
+                                              .fillColor,
+                                          enabledBorder: Theme.of(context)
+                                              .inputDecorationTheme
+                                              .enabledBorder,
+                                          focusedBorder: Theme.of(context)
+                                              .inputDecorationTheme
+                                              .focusedBorder,
                                           hintText: 'Enter your Account`s Name',
                                           hintStyle: passwordField.copyWith(
-                                            color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                                            color: isDarkTheme()
+                                                ? DarkColors.hintTextColor
+                                                : LightColors.hintTextColor,
                                           ),
                                         ),
                                         validator: (value) {
-                                          if(value!.length > 3) {
+                                          if (value!.length > 3) {
                                             return null;
                                           } else {
                                             return 'Must be more than 3 characters';

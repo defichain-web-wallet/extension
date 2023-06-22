@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
@@ -13,11 +12,13 @@ import 'package:js/js_util.dart';
 import 'package:retry/retry.dart';
 
 class LedgerSigningService implements SigningWalletService {
-  var transactionRequests = TransactionRequests();
+  final TransactionRequests transactionRequests;
+
+  LedgerSigningService(this.transactionRequests);
 
   @override
   Future<Uint8List> getPublicKey(
-      AccountModel accountModel, String address, String network,
+      AccountModel accountModel, String address, NetworkType network,
       {ECPair? key}) async {
     var addressModel = accountModel.addressList!
         .firstWhere((element) => element.address == address);
@@ -30,7 +31,7 @@ class LedgerSigningService implements SigningWalletService {
       TransactionBuilder txBuilder,
       AccountModel accountModel,
       List<UtxoModel> utxoModel,
-      String network,
+      NetworkType network,
       String changePath,
       {ECPair? key}) async {
     var prevOuts = List<LedgerTransactionRaw>.empty(growable: true);
@@ -45,10 +46,8 @@ class LedgerSigningService implements SigningWalletService {
       final pubKey =
           await getPublicKey(accountModel, element.address!, network);
 
-      final p2wpkh = P2WPKH(
-              data: PaymentData(pubkey: pubKey),
-              network: NetworkHelper().getNetwork(network))
-          .data!;
+      final p2wpkh =
+          P2WPKH(data: PaymentData(pubkey: pubKey), network: network).data!;
       final redeemScript = p2wpkh.output;
       final redemHex = HEX.encode(redeemScript!);
 
@@ -81,7 +80,7 @@ class LedgerSigningService implements SigningWalletService {
       var jsonString = json.encode(prevOutsJson);
       jellyLedgerInit();
       var txHex = await promiseToFuture(signTransactionLedgerRaw(
-          jsonString, paths, txhex, network, changePath));
+          jsonString, paths, txhex, network.messagePrefix, changePath));
       return txHex;
     } catch (err) {
       print(err);
@@ -90,8 +89,8 @@ class LedgerSigningService implements SigningWalletService {
   }
 
   @override
-  Future<String> signMessage(
-      AccountModel accountModel, String address, String message, String network,
+  Future<String> signMessage(AccountModel accountModel, String address,
+      String message, NetworkType network,
       {ECPair? key}) async {
     var signature = await promiseToFuture(
         signMessageLedger(accountModel.addressList![0].getPath(), message));

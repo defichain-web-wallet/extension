@@ -12,7 +12,7 @@ import 'package:defichaindart/defichaindart.dart';
 class LocalSigningService implements SigningWalletService {
   @override
   Future<Uint8List> getPublicKey(
-      AccountModel accountModel, String address, String network,
+      AccountModel accountModel, String address, NetworkType network,
       {ECPair? key}) async {
     if (key == null) {
       throw new Exception("key cannot be null here!");
@@ -26,7 +26,7 @@ class LocalSigningService implements SigningWalletService {
       TransactionBuilder txBuilder,
       AccountModel accountModel,
       List<UtxoModel> utxoModel,
-      String network,
+      NetworkType network,
       String changePath,
       {ECPair? key}) async {
     if (key == null) {
@@ -44,13 +44,13 @@ class LocalSigningService implements SigningWalletService {
   }
 
   @override
-  Future<String> signMessage(
-      AccountModel accountModel, String address, String message, String network,
+  Future<String> signMessage(AccountModel accountModel, String address,
+      String message, NetworkType network,
       {ECPair? key}) async {
     if (key == null) {
       throw new Exception("key cannot be null here!");
     }
     var privateKey = key;
-    return privateKey.signMessage(message, NetworkHelper().getNetwork(network));
+    return privateKey.signMessage(message, network);
   }
 }

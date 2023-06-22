@@ -11,19 +11,19 @@ import 'package:hive/hive.dart';
 
 abstract class SigningWalletService {
   Future<Uint8List> getPublicKey(
-      AccountModel accountModel, String address, String network,
+      AccountModel accountModel, String address, NetworkType network,
       {ECPair? key});
 
   Future<String> signTransaction(
       TransactionBuilder txBuilder,
       AccountModel accountModel,
       List<UtxoModel> utxoModel,
-      String network,
+      NetworkType network,
       String changePath,
       {ECPair? key});
 
-  Future<String> signMessage(
-      AccountModel accountModel, String address, String message, String network,
+  Future<String> signMessage(AccountModel accountModel, String address,
+      String message, NetworkType network,
       {ECPair? key});
 }
 

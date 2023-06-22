@@ -4,6 +4,7 @@ import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_networ
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/bitcoin/blockcypher_requests.dart';
+import 'package:defi_wallet/services/signing_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 import 'package:defi_wallet/models/utxo_model.dart';
@@ -63,7 +64,8 @@ class BTCTransactionService {
     selectedUtxo.asMap().forEach((index, utxo) {
       _txb.sign(vin: index, keyPair: keyPair, witnessValue: utxo.value);
     });
-    TxErrorModel tx = await BlockcypherRequests.sendTxHex(network, _txb.build().toHex());
+    TxErrorModel tx =
+        await BlockcypherRequests.sendTxHex(network, _txb.build().toHex());
     tx.txLoaderList![0].type = TxType.send;
     return tx;
   }
@@ -79,7 +81,8 @@ class BTCTransactionService {
         satPerByte;
   }
 
-  static List<UtxoModel> _utxoSelector(List<UtxoModel> utxos, int fee, int amount) {
+  static List<UtxoModel> _utxoSelector(
+      List<UtxoModel> utxos, int fee, int amount) {
     utxos = _shuffle(utxos);
     List<UtxoModel> selectedUtxo = [];
     int sum = 0;
