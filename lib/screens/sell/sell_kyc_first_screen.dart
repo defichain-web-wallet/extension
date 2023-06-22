@@ -1,23 +1,16 @@
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
-import 'package:defi_wallet/screens/sell/country_sell.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_second_screen.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/buttons/primary_button.dart';
-import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,8 +24,8 @@ class AccountTypeSell extends StatefulWidget {
 
 class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _surnameController = TextEditingController();
+  final _nameController = TextEditingController(text: 'test');
+  final _surnameController = TextEditingController(text: 'example');
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode surnameFocusNode = FocusNode();
   final String titleText = '1/3. Introduce yourself';
@@ -57,17 +50,17 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
         bool isFullScreen,
         TransactionState txState,
       ) {
-        FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-        fiatCubit.loadCountryList();
-        return BlocBuilder<FiatCubit, FiatState>(
-          builder: (BuildContext context, fiatState) {
-            if (fiatState.personalInfo != null) {
-              _nameController.text = fiatState.personalInfo!.firstname!;
-              _surnameController.text = fiatState.personalInfo!.surname!;
-            }
-            if (fiatState.status == FiatStatusList.loading) {
+        RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
+        rampCubit.loadCountries();
+        return BlocBuilder<RampCubit, RampState>(
+          builder: (BuildContext context, rampState) {
+            // if (rampState.personalInfo != null) {
+            //   _nameController.text = rampState.personalInfo!.firstname!;
+            //   _surnameController.text = rampState.personalInfo!.surname!;
+            // }
+            if (rampState.status == RampStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.expired) {
+            } else if (rampState.status == RampStatusList.expired) {
               Future.microtask(() => Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
@@ -79,7 +72,7 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
               return Container();
             } else {
               return Scaffold(
-                drawerScrimColor: Color(0x0f180245),
+                drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                 endDrawer: AccountDrawer(
                   width: buttonSmallWidth,
                 ),
@@ -273,11 +266,12 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                                   if (_formKey.currentState!.validate()) {
                                     lockHelper.provideWithLockChecker(context,
                                         () {
-                                      FiatCubit fiatCubit =
-                                          BlocProvider.of<FiatCubit>(context);
-                                      fiatCubit.setUserName(
-                                          _nameController.text,
-                                          _surnameController.text);
+                                      RampCubit rampCubit =
+                                          BlocProvider.of<RampCubit>(context);
+                                      rampCubit.setUserName(
+                                        _nameController.text,
+                                        _surnameController.text,
+                                      );
                                       Navigator.push(
                                           context,
                                           PageRouteBuilder(

@@ -1,6 +1,6 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -46,7 +46,7 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
             return BlocBuilder<LockCubit, LockState>(
               builder: (lockContext, lockState) {
                 return Scaffold(
-                  drawerScrimColor: Color(0x0f180245),
+                  drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                   endDrawer: AccountDrawer(
                     width: buttonSmallWidth,
                   ),
@@ -109,20 +109,8 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                           height: 4,
                                         ),
                                         Text(
-                                          '${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apy! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% '
-                                          'APY / ${BalancesHelper().numberStyling(
-                                            (lockState.lockAnalyticsDetails!
-                                                    .apr! *
-                                                100),
-                                            fixed: true,
-                                            fixedCount: 2,
-                                          )}% APR',
+                                          '${getAprOrApyFormat(lockState.stakingTokenModel!.apy!, 'APY')} / '
+                                          '${getAprOrApyFormat(lockState.stakingTokenModel!.apr!, 'APR')}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -178,7 +166,7 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                                   ),
                                                   Text(
                                                     'Stake DFI and earn up to '
-                                                    '${lockState.lockAnalyticsDetails!.apy! * 100}% APY',
+                                                    '${getAprOrApyFormat(lockState.stakingTokenModel!.apy!, 'APY')}',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .subtitle1!
@@ -339,7 +327,7 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                         PageRouteBuilder(
                                           pageBuilder: (context, animation1,
                                                   animation2) =>
-                                              StakingNewKycProcessScreen(),
+                                              StakingNewKycProcessScreen(kycLink: lockState.kycLink!,),
                                           transitionDuration: Duration.zero,
                                           reverseTransitionDuration:
                                               Duration.zero,
@@ -364,5 +352,13 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
         );
       },
     );
+  }
+  String getAprOrApyFormat(double amount, String amountType){
+    return '${BalancesHelper().numberStyling(
+      (amount *
+          100),
+      fixed: true,
+      fixedCount: 2,
+    )}% $amountType';
   }
 }

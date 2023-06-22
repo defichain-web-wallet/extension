@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LastSentTile extends StatefulWidget {
-  final String address;
+  final AddressBookModel address;
   final int index;
 
   const LastSentTile({
@@ -41,7 +41,7 @@ class _LastSentTileState extends State<LastSentTile> with NetworkMixin, ThemeMix
         children: [
           Expanded(
             child: Text(
-              cutAddress(widget.address),
+              cutAddress(widget.address.address!),
               style: headline5.copyWith(
                 fontSize: 13,
               ),
@@ -52,17 +52,17 @@ class _LastSentTileState extends State<LastSentTile> with NetworkMixin, ThemeMix
               GestureDetector(
                 onTap: () {
                   showDialog(
-                    barrierColor: Color(0x0f180245),
+                    barrierColor: AppColors.tolopea.withOpacity(0.06),
                     barrierDismissible: false,
                     context: context,
                     builder:
                         (BuildContext dialogContext) {
                       return CreateEditContactDialog(
-                        address: widget.address,
+                        address: widget.address.address!,
                         isEdit: false,
                         confirmCallback:
                             (name, address, network) {
-                          addressBookCubit.addAddress(
+                          addressBookCubit.addAddress(context,
                             AddressBookModel(
                                 name: name,
                                 address: address,
@@ -87,7 +87,7 @@ class _LastSentTileState extends State<LastSentTile> with NetworkMixin, ThemeMix
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    addressBookCubit.removeAddressFromLastSent(widget.index);
+                    addressBookCubit.removeAddressFromLastSent(context, widget.address);
                   });
                 },
                 child: Icon(

@@ -1,7 +1,7 @@
 class FiatHelper {
   String getIbanFormat(String iban) {
     String ibanFormat = '';
-    int ibanLength = 22;
+    int ibanLength = iban.length;
     int iterationStep = 4;
     int specialSelectedCounter = 20;
 

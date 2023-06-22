@@ -3,6 +3,9 @@ import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 class DFXService {
+  static const int walletId = 4;
+  static const String referralCode = '007-666';
+
   var networkHelper = NetworkHelper();
 
   Map<dynamic, dynamic> getAddressAndSignature(
@@ -24,7 +27,8 @@ class DFXService {
       return {
         'address': address,
         'signature': signature,
-        'walletId': 4,
+        'walletId': walletId,
+        'usedRef': referralCode,
       };
     }
   }

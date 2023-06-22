@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:defi_wallet/constants/specific_token_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/asset_style_model.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +13,7 @@ class TokensHelper {
   static const String DefiAccountSymbol = 'DFI';
   static const String DefiTokenSymbol = '\$DFI';
   final _random = math.Random();
+
 
   double getMaxAPR(List<AssetPairModel> tokenPairs) {
     double maxValue = 0;
@@ -1215,24 +1218,44 @@ class TokensHelper {
     if (!SettingsHelper.isBitcoin()) {
       String defaultDefiTokenName = 'Default Defi token';
       String defaultBitcoinTokenName = 'Bitcoin';
-      return value
-          .replaceAll(defaultDefiTokenName, 'DeFiChain')
-          .replaceAll(defaultBitcoinTokenName, 'DeFiChain Bitcoin');
+      if (value == defaultDefiTokenName) {
+        return 'DeFiChain';
+      } else if (value == defaultBitcoinTokenName) {
+        return 'DeFiChain Bitcoin';
+      } else if(specificTokenNames.containsKey(value)){
+        return specificTokenNames[value]!;
+      } else {
+        return value;
+      }
     } else {
       return value;
     }
   }
 
+  String getSpecificDefiPairName(String value) {
+    final String exception = 'Cake-staked ETH-Ether';
+    if (value == exception) {
+      return value;
+    } else {
+      String base = value.split('-')[0];
+      String quote = value.split('-')[1];
+      return getSpecificDefiName(base) + '-' + getSpecificDefiName(quote);
+    }
+  }
+
   List<TokensModel> getTokensList(
-    balances,
+    List<BalanceModel> balances,
     tokensState, {
     List<TokensModel>? targetList,
   }) {
     List<TokensModel> resList = [];
     if (targetList == null) {
-      balances!.forEach((element) {
+      balances.forEach((element) {
         tokensState.tokens!.forEach((el) {
-          if (element.token == el.symbol) {
+          String symbol = element.token != null
+              ? element.token!.symbol
+              : element.lmPool!.symbol;
+          if (symbol == el.symbol) {
             resList.add(el);
           }
         });
@@ -1282,6 +1305,12 @@ class TokensHelper {
     return (token != 'DFI' && token != 'DUSD' && token != 'csETH')
         ? 'd' + token
         : token;
+  }
+
+  String getPairNameWithPrefix(assetPairName) {
+    return getTokenWithPrefix(getBaseAssetName(assetPairName)) +
+        '-' +
+        getTokenWithPrefix(getQuoteAssetName(assetPairName));
   }
 
   bool isPair(symbol) {

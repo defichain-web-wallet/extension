@@ -2,7 +2,9 @@ import 'dart:math' as math;
 
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -14,7 +16,7 @@ class AccountMenuButton extends StatefulWidget {
   final void Function(int index)? callback;
   final Widget? afterTitleWidget;
   final bool accountSelectMode;
-  final AccountModel? account;
+  final AbstractAccountModel? account;
   final bool isLockType;
   final bool isTheme;
   final bool isFuture;
@@ -49,7 +51,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
     String accountIndex = index.toString();
     if (accountIndex.length == 1) {
       return AppColors
-          .accountColors[widget.account!.index!];
+          .accountColors[widget.account!.accountIndex];
     } else {
       return AppColors
           .accountColors[int.parse(accountIndex[1])];
@@ -79,7 +81,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
             if (widget.account == null) {
               widget.callback!(defaultAccountId);
             } else {
-              widget.callback!(widget.account!.index!);
+              widget.callback!(widget.account!.accountIndex);
             }
           }
         },
@@ -152,7 +154,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                     if (widget.accountSelectMode)
                       CircleAvatar(
                         radius: 12,
-                        backgroundColor: getCircleAvatarColor(widget.account!.index!)
+                        backgroundColor: getCircleAvatarColor(widget.account!.accountIndex)
                             .withOpacity(0.16),
                         child: Text(
                           '${widget.title[0]}',
@@ -161,7 +163,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                               .headline4!
                               .copyWith(
                                   fontSize: 11,
-                                  color: getCircleAvatarColor(widget.account!.index!)),
+                                  color: getCircleAvatarColor(widget.account!.accountIndex)),
                         ),
                       ),
                     if (widget.accountSelectMode)
@@ -169,26 +171,29 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                         width: 6.4,
                       ),
                     Expanded(
-                      child: Text(
-                        '${widget.title}',
-                        style: widget.callback == null
-                            ? Theme.of(context).textTheme.headline5!.copyWith(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .headline5!
-                                      .color!
-                                      .withOpacity(0.5),
-                                  fontSize: widget.isLockType ? 13 : 14,
-                                )
-                            : Theme.of(context).textTheme.headline5!.copyWith(
-                                  color: isHover || widget.isStaticBg
-                                      ? widget.hoverTextColor ?? AppColors.hollywoodCerise
-                                      : Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!,
-                                  fontSize: widget.isLockType ? 13 : 14,
-                                ),
+                      child: TickerText(
+                        isSpecialDuration: true,
+                        child: Text(
+                          '${widget.title}',
+                          style: widget.callback == null
+                              ? Theme.of(context).textTheme.headline5!.copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .color!
+                                        .withOpacity(0.5),
+                                    fontSize: widget.isLockType ? 13 : 14,
+                                  )
+                              : Theme.of(context).textTheme.headline5!.copyWith(
+                                    color: isHover || widget.isStaticBg
+                                        ? widget.hoverTextColor ?? AppColors.hollywoodCerise
+                                        : Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!,
+                                    fontSize: widget.isLockType ? 13 : 14,
+                                  ),
+                        ),
                       ),
                     ),
                     if (widget.afterTitleWidget != null)

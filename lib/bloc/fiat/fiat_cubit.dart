@@ -163,14 +163,32 @@ class FiatCubit extends Cubit<FiatState> {
     AssetByFiatModel asset,
     String accessToken,
   ) async {
-    await dfxRequests.saveBuyDetails(iban, asset, accessToken);
     emit(state.copyWith(
       status: FiatStatusList.loading,
-      currentIban: iban,
     ));
+    try {
+      IbanModel activeIban = await dfxRequests.saveBuyDetails(
+        iban,
+        asset,
+        accessToken,
+      );
+
+      emit(state.copyWith(
+        status: FiatStatusList.success,
+        activeIban: activeIban,
+      ));
+    } catch (err) {
+      emit(state.copyWith(
+        status: FiatStatusList.failure,
+      ));
+    }
   }
 
-  loadIbanList({AssetByFiatModel? asset, bool isNewIban = false}) async {
+  loadIbanList({
+    AssetByFiatModel? asset,
+    bool isNewIban = false,
+    bool isSellable = false,
+  }) async {
     emit(state.copyWith(
       status: FiatStatusList.loading,
     ));
@@ -178,7 +196,7 @@ class FiatCubit extends Cubit<FiatState> {
     List<IbanModel> activeIbanList = ibanList
         .where((el) =>
             el.active! &&
-            el.type == 'Wallet' &&
+            el.isSellable == isSellable &&
             asset!.name == el.asset!.name)
         .toList();
     IbanModel? iban;
@@ -366,9 +384,8 @@ class FiatCubit extends Cubit<FiatState> {
       await dfxRequests.getAvailableAssets(state.accessToken!);
 
       List<IbanModel> ibanList = await dfxRequests.getIbanList(state.accessToken!);
-      String targetType = (isSell) ? 'Sell' : 'Wallet';
       List<IbanModel> activeIbanList =
-      ibanList.where((el) => el.active! && el.type == targetType).toList();
+      ibanList.where((el) => el.active! && el.isSellable == isSell).toList();
       IbanModel? iban;
 
       try {
@@ -377,7 +394,7 @@ class FiatCubit extends Cubit<FiatState> {
               .firstWhere((element) => (element.iban == state.currentIban!.replaceAll(' ', '')));
         } else {
           if (isSell) {
-            iban = activeIbanList.firstWhere((element) => element.type == 'Sell');
+            iban = activeIbanList.firstWhere((element) => element.isSellable!);
           } else {
             iban = activeIbanList[0];
           }

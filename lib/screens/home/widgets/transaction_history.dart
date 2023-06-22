@@ -322,19 +322,19 @@ class _TransactionHistoryState extends State<TransactionHistory>
                                                 .withOpacity(0.3),
                                           ),
                                     ),
-                                    Text(
-                                        "\$${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName).abs(), fixed: true, fixedCount: 2)}",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .copyWith(
-                                              fontWeight: FontWeight.w600,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .headline6!
-                                                  .color!
-                                                  .withOpacity(0.3),
-                                            )),
+                                    // Text(
+                                    //     "\$${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName).abs(), fixed: true, fixedCount: 2)}",
+                                    //     style: Theme.of(context)
+                                    //         .textTheme
+                                    //         .headline6!
+                                    //         .copyWith(
+                                    //           fontWeight: FontWeight.w600,
+                                    //           color: Theme.of(context)
+                                    //               .textTheme
+                                    //               .headline6!
+                                    //               .color!
+                                    //               .withOpacity(0.3),
+                                    //         )),
                                   ],
                                 ),
                               ),
@@ -436,7 +436,6 @@ class _TransactionHistoryState extends State<TransactionHistory>
                 child: Container(
                   color: Theme.of(context).cardColor,
                   child: StatusLogoAndTitle(
-                    title: 'Oops!',
                     subtitle: 'Not yet any transaction',
                     isTitlePosBefore: true,
                   ),

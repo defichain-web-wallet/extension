@@ -1,171 +1,153 @@
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/models/balance_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/utils/convert.dart';
-import 'package:defi_wallet/widgets/assets/asset_icon.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
+import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AssetCard extends StatefulWidget {
-  final int index;
-  final String tokenCode;
-  final String tokenName;
-  final double tokenBalance;
-  final TokensState tokensState;
-  final List<TokensModel> tokens;
+  final BalanceModel balanceModel;
 
   const AssetCard({
     Key? key,
-    required this.index,
-    required this.tokenCode,
-    required this.tokenName,
-    required this.tokenBalance,
-    required this.tokensState,
-    required this.tokens,
+    required this.balanceModel,
   }) : super(key: key);
 
   @override
   State<AssetCard> createState() => _AssetCardState();
 }
 
-class _AssetCardState extends State<AssetCard> {
+class _AssetCardState extends State<AssetCard> with FormatMixin{
   TokensHelper tokensHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 
-  Widget _buildTokenIcon(TokensModel token) {
-    if (token.isPair!) {
-      return AssetPair(pair: token.symbol!, size: 20,);
-    } else {
-      return AssetIcon(
-        url: tokensHelper.getImageNameByTokenName(token.symbol!),
-        color: tokensHelper.getColorByTokenName(token.symbol!),
-      );
-    }
-  }
-
-  String getFormatTokenBalance(double tokenBalance) =>
-      '${balancesHelper.numberStyling(tokenBalance)}';
-
-  String getFormatTokenBalanceByFiat(
-      state, String coin, double tokenBalance, String fiat) {
-    double balanceInUsd;
-    if (tokensHelper.isPair(coin)) {
-      double balanceInSatoshi = convertToSatoshi(tokenBalance) + .0;
-      balanceInUsd = tokensHelper.getPairsAmountByAsset(
-          state.tokensPairs, balanceInSatoshi, coin, 'USD')*2;
-    } else {
-      balanceInUsd = tokensHelper.getAmountByUsd(
-          state.tokensPairs, tokenBalance, coin.replaceAll('d', ''));
-    }
-    if (fiat == 'EUR') {
-      balanceInUsd *= state.eurRate;
-    }
-    return '\$${balancesHelper.numberStyling(balanceInUsd, fixed: true)}';
+  String getFormatTokenBalance(int tokenBalance) {
+    WalletCubit homeCubit = BlocProvider.of<WalletCubit>(context);
+    final balance = homeCubit.state.activeNetwork.fromSatoshi(tokenBalance);
+    return balancesHelper.numberStyling(
+      balance,
+      fixedCount: 8,
+      fixed: true,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    String currency = SettingsHelper.settings.currency!;
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+    final token = widget.balanceModel.lmPool ?? widget.balanceModel.token;
 
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.only(
-        left: 10,
-        top: 10,
-        right: 16,
-        bottom: 10,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).listTileTheme.tileColor!,
-        ),
-        color: Theme.of(context).listTileTheme.selectedColor,
-      ),
-      child: Container(
-        child: Row(
-          children: [
-            if (widget.tokens[widget.index].isPair!)
-              AssetPair(
-                pair: widget.tokens[widget.index].symbol!
-              ),
-            if (!widget.tokens[widget.index].isPair!)
-              AssetLogo(
-                assetStyle: tokensHelper.getAssetStyleByTokenName(
-                    widget.tokens[widget.index].symbol!),
-              ),
-            SizedBox(
-              width: 10,
+    return BlocBuilder<RatesCubit, RatesState>(
+      buildWhen: (prev, current) => current.status == RatesStatusList.success,
+      builder: (context, ratesState) {
+        final convertedBalance = ratesState.ratesModel!.convertAmountBalance(
+          walletCubit.state.activeNetwork,
+          widget.balanceModel,
+        );
+
+        final roundedBalance = BalancesHelper().numberStyling(
+          convertedBalance,
+          fixedCount: 2,
+        );
+
+        return Container(
+          height: 64,
+          padding: const EdgeInsets.only(
+            left: 10,
+            top: 10,
+            right: 16,
+            bottom: 10,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).listTileTheme.tileColor!,
             ),
-            Expanded(
-              child: Container(
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.tokenName,
-                      style: Theme.of(context).textTheme.headline5,
-                    ),
-                    Text(
-                      tokensHelper.getSpecificDefiName(
-                        widget.tokens[widget.index].name!,
-                      ),
-                      style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .color!
-                                .withOpacity(0.3),
-                          ),
-                    )
-                  ],
+            color: Theme.of(context).listTileTheme.selectedColor,
+          ),
+          child: Container(
+            child: Row(
+              children: [
+                if (token!.isPair) AssetPair(pair: token.symbol),
+                if (!token.isPair)
+                  AssetLogo(
+                    assetStyle:
+                        tokensHelper.getAssetStyleByTokenName(token.symbol),
+                  ),
+                SizedBox(
+                  width: 10,
                 ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    getFormatTokenBalance(widget.tokenBalance),
-                    style: Theme.of(context).textTheme.headline6!.copyWith(
-                          fontWeight: FontWeight.w700,
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          token.displaySymbol,
+                          style: Theme.of(context).textTheme.headline5,
                         ),
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    getFormatTokenBalanceByFiat(
-                      widget.tokensState,
-                      widget.tokenCode,
-                      widget.tokenBalance,
-                      currency,
+                        TickerText(
+                          child: Text(
+                            token.isPair
+                                ? tokensHelper
+                                    .getSpecificDefiPairName(token.name)
+                                //TODO: maybe bug
+                                : token.name,
+                            style:
+                                Theme.of(context).textTheme.headline6!.copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.3),
+                                    ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        )
+                      ],
                     ),
-                    style: Theme.of(context).textTheme.headline6!.copyWith(
-                          color: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .color!
-                              .withOpacity(0.3),
-                        ),
                   ),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        getFormatTokenBalance(widget.balanceModel.balance),
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      SizedBox(
+                        height: 2,
+                      ),
+                      Text(
+                        '\$$roundedBalance',
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .color!
+                                  .withOpacity(0.3),
+                            ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

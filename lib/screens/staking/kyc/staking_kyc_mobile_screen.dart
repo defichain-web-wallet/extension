@@ -35,7 +35,7 @@ class _StakingKycMobileScreenState extends State<StakingKycMobileScreen>
         TransactionState txState,
       ) {
         return Scaffold(
-          drawerScrimColor: Color(0x0f180245),
+          drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
           endDrawer: AccountDrawer(
             width: buttonSmallWidth,
           ),
@@ -129,10 +129,7 @@ class _StakingKycMobileScreenState extends State<StakingKycMobileScreen>
                                       )
                                     : null,
                               ),
-                              child: QrImage(
-                                data: widget.kycLink,
-                                padding: EdgeInsets.all(17.7),
-                              ),
+                              child: QrImageView(data: widget.kycLink, padding: EdgeInsets.all(17.7),),
                             ),
                           ],
                         ),

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:defi_wallet/bloc/staking/staking_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
@@ -233,7 +232,7 @@ class DfxRequests {
     }
   }
 
-  Future<void> saveBuyDetails(
+  Future<IbanModel> saveBuyDetails(
       String iban, AssetByFiatModel asset, String accessToken) async {
     try {
       final Uri url = Uri.parse('https://api.dfx.swiss/v1/buy');
@@ -251,11 +250,14 @@ class DfxRequests {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        var errorMessage = jsonDecode(response.body);
-        throw Error.safeToString(errorMessage['message'] is List
-            ? errorMessage['message'][0]
-            : errorMessage['message']);
+      var data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return IbanModel.fromJson(data);
+      } else {
+        throw Error.safeToString(data['message'] is List
+            ? data['message'][0]
+            : data['message']);
       }
     } catch (err) {
       throw err;

@@ -4,6 +4,7 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/fields/password/caption_text.dart';
 import 'package:defi_wallet/widgets/fields/suffix_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 enum PasswordStatusList { initial, confirm, success, error }
 
@@ -30,6 +31,7 @@ class PasswordTextField extends StatefulWidget {
   final bool isShowObscureIcon;
   final bool isCaptionShown;
   final bool isOpasity;
+  final bool onlyEngCharacters;
 
   const PasswordTextField({
     Key? key,
@@ -49,6 +51,7 @@ class PasswordTextField extends StatefulWidget {
     this.isShowObscureIcon = false,
     this.isCaptionShown = true,
     this.isOpasity = false,
+    this.onlyEngCharacters = true,
   }) : super(key: key);
 
   @override
@@ -94,6 +97,12 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                   ),
                 ),
               TextFormField(
+                inputFormatters: widget.onlyEngCharacters
+                    ? <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(
+                      RegExp("[0-9a-zA-Z]")),
+                ]
+                    : [],
                 autofocus: widget.autofocus,
                 maxLines: maxLines,
                 obscuringCharacter: obscureSymbolCharacter,
@@ -104,9 +113,9 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                 controller: widget.controller,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(
-                    backgroundColor: Colors.transparent,
-                    color: Colors.pink,
-                    fontSize: 10
+                      backgroundColor: Colors.transparent,
+                      color: Colors.pink,
+                      fontSize: 10
                   ),
                   hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                   filled: true,
@@ -115,28 +124,28 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                       : Theme.of(context).inputDecorationTheme.fillColor,
                   enabledBorder: widget.isOpasity
                       ? Theme.of(context)
-                          .inputDecorationTheme
-                          .enabledBorder!
-                          .copyWith(
-                              borderSide: BorderSide(
-                            color: AppColors.lavenderPurple.withOpacity(0.33),
-                          ))
+                      .inputDecorationTheme
+                      .enabledBorder!
+                      .copyWith(
+                      borderSide: BorderSide(
+                        color: AppColors.lavenderPurple.withOpacity(0.33),
+                      ))
                       : Theme.of(context).inputDecorationTheme.enabledBorder,
                   focusedBorder:
-                      Theme.of(context).inputDecorationTheme.focusedBorder,
+                  Theme.of(context).inputDecorationTheme.focusedBorder,
                   hintText: widget.hint,
                   hintStyle: widget.isOpasity
                       ? TextStyle(
-                          fontSize: passwordField.fontSize,
-                          color: Colors.white.withOpacity(0.6),
-                          letterSpacing: 0,
-                        )
+                    fontSize: passwordField.fontSize,
+                    color: Colors.white.withOpacity(0.6),
+                    letterSpacing: 0,
+                  )
                       : TextStyle(
-                          fontSize: passwordField.fontSize,
-                          letterSpacing: 0,
-                        ),
+                    fontSize: passwordField.fontSize,
+                    letterSpacing: 0,
+                  ),
                   suffixIconConstraints:
-                      BoxConstraints(minHeight: 24, minWidth: 24),
+                  BoxConstraints(minHeight: 24, minWidth: 24),
                   suffixIcon: Padding(
                     padding: const EdgeInsetsDirectional.only(end: 16.0),
                     child: SuffixIcon(
@@ -155,7 +164,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                 ),
                 onChanged: widget.onChanged,
                 validator: widget.validator,
-              ),
+              )
             ],
           ),
         ),

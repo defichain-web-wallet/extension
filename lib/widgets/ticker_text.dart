@@ -4,6 +4,7 @@ class TickerText extends StatefulWidget {
   final Widget child;
   final Axis direction;
   final Duration animationDuration, backDuration, pauseDuration;
+  final bool isSpecialDuration;
 
   const TickerText({
     Key? key,
@@ -12,6 +13,7 @@ class TickerText extends StatefulWidget {
     this.animationDuration = const Duration(seconds: 10),
     this.backDuration = const Duration(seconds: 10),
     this.pauseDuration = const Duration(seconds: 1),
+    this.isSpecialDuration = false,
   }) : super(key: key);
 
   @override
@@ -20,6 +22,9 @@ class TickerText extends StatefulWidget {
 
 class _TickerTextState extends State<TickerText> {
   late ScrollController scrollController;
+  Duration animationDuration = const Duration(seconds: 20);
+  Duration backDuration = const Duration(seconds: 20);
+  Duration pauseDuration = const Duration(seconds: 1);
 
   @override
   void initState() {
@@ -45,19 +50,19 @@ class _TickerTextState extends State<TickerText> {
 
   void scroll(_) async {
     while (scrollController.hasClients) {
-      await Future.delayed(widget.pauseDuration);
+      await Future.delayed(widget.isSpecialDuration ? pauseDuration : widget.pauseDuration);
       if (scrollController.hasClients) {
         await scrollController.animateTo(
           scrollController.position.maxScrollExtent,
-          duration: widget.animationDuration,
+          duration: widget.isSpecialDuration ? animationDuration : widget.animationDuration,
           curve: Curves.ease,
         );
       }
-      await Future.delayed(widget.pauseDuration);
+      await Future.delayed(widget.isSpecialDuration ? pauseDuration : widget.pauseDuration);
       if (scrollController.hasClients) {
         await scrollController.animateTo(
           0.0,
-          duration: widget.backDuration,
+          duration: widget.isSpecialDuration ? backDuration : widget.backDuration,
           curve: Curves.easeOut,
         );
       }

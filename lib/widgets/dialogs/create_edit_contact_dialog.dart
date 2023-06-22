@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -10,14 +11,16 @@ import 'package:flutter/material.dart';
 
 class CreateEditContactDialog extends StatefulWidget {
   final bool isEdit;
+  final bool isDisableEditAddress;
   final Function()? deleteCallback;
-  final Function(String name, String address, String network) confirmCallback;
+  final Function(String name, String address, NetworkTypeModel network) confirmCallback;
   final String contactName;
   final String address;
 
   const CreateEditContactDialog({
     Key? key,
     this.isEdit = false,
+    this.isDisableEditAddress = false,
     this.deleteCallback,
     required this.confirmCallback,
     this.contactName = '',
@@ -36,6 +39,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   TextEditingController _addressController = TextEditingController();
   FocusNode nameFocusNode = FocusNode();
   FocusNode addressFocusNode = FocusNode();
+  FocusNode submitFocusNode = FocusNode();
   String editTitleText = 'Edit contact';
   String createTitleText = 'New contact';
   String titleContactName = 'Contact`s Name';
@@ -45,11 +49,10 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   String subtitleText = 'Enter name and address';
   String titleDeleteContact = 'Delete contact';
   bool isValidAddress = false;
-  bool isValidBitcoinAddress = false;
   late String titleText;
   late double contentHeight;
   late bool isEnable;
-  late String network;
+  late NetworkTypeModel? network;
 
   @override
   void dispose() {
@@ -57,6 +60,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
     _addressController.dispose();
     nameFocusNode.dispose();
     addressFocusNode.dispose();
+    submitFocusNode.dispose();
     // TODO: implement dispose
     super.dispose();
   }
@@ -75,7 +79,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
     setState(() {
       if (_nameController.text.length > 0 &&
           _addressController.text.isNotEmpty &&
-          (isValidAddress || isValidBitcoinAddress)) {
+          (isValidAddress)) {
         isEnable = true;
       } else {
         isEnable = false;
@@ -117,14 +121,15 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                 ),
               ),
               NewPrimaryButton(
+                focusNode: submitFocusNode,
                 width: 104,
                 callback: isEnable
                     ? () async {
-                        network = await addressNetwork(_addressController.text);
+                        network = addressNetwork(context, _addressController.text);
                         widget.confirmCallback!(
                           _nameController.text,
                           _addressController.text,
-                          network,
+                          network!,
                         );
                       }
                     : null,
@@ -236,6 +241,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                 child: TextFormField(
                                   focusNode: nameFocusNode,
                                   controller: _nameController,
+                                  autofocus: true,
                                   decoration: InputDecoration(
                                     hoverColor: Theme.of(context)
                                         .inputDecorationTheme
@@ -259,12 +265,15 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                   ),
                                   onChanged: (value) async {
                                     isValidAddress =
-                                        await addressHelper.validateAddress(
-                                            _addressController.text);
-                                    isValidBitcoinAddress =
-                                        await addressHelper.validateBtcAddress(
-                                            _addressController.text);
+                                        addressNetwork(context, _addressController.text) != null;
                                     checkButtonStatus();
+                                  },
+                                  onFieldSubmitted: (val) {
+                                    if(widget.isDisableEditAddress) {
+                                      submitFocusNode.requestFocus();
+                                    } else {
+                                      addressFocusNode.requestFocus();
+                                    }
                                   },
                                 ),
                               ),
@@ -298,6 +307,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                   }
                                 },
                                 child: TextFormField(
+                                  readOnly: widget.isDisableEditAddress,
                                   focusNode: addressFocusNode,
                                   controller: _addressController,
                                   decoration: InputDecoration(
@@ -322,13 +332,11 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                     hintText: hintAddress,
                                   ),
                                   onChanged: (value) async {
-                                    isValidAddress =
-                                        await addressHelper.validateAddress(
-                                            _addressController.text);
-                                    isValidBitcoinAddress =
-                                        await addressHelper.validateBtcAddress(
-                                            _addressController.text);
+                                    isValidAddress = addressNetwork(context, _addressController.text) != null;
                                     checkButtonStatus();
+                                  },
+                                  onFieldSubmitted: (val) {
+                                    submitFocusNode.requestFocus();
                                   },
                                 ),
                               ),

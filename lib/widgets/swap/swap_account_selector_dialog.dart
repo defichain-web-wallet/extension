@@ -127,7 +127,7 @@ class _SwapAccountSelectorDialog extends State<SwapAccountSelectorDialog> {
                                         widget.onSelect(index);
                                         Navigator.pop(context);
                                       },
-                                      account: accounts[index],
+                                      // account: accounts[index],
                                       isHoverBackgroundEffect: false,
                                       iconPath: 'assets/icons/add.svg',
                                       title: accounts[index].name!,

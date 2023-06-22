@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/fiat_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -44,26 +45,17 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<FiatCubit, FiatState>(
-          builder: (context, fiatState) {
-            if (iterator == 0 && widget.isNewIban) {
-              fiatCubit.loadIbanList(
-                asset: widget.asset,
-                isNewIban: widget.isNewIban,
-              );
-              iterator++;
-            }
-
-            if (fiatState.status == FiatStatusList.success) {
+        return BlocBuilder<RampCubit, RampState>(
+          builder: (context, rampState) {
+            if (rampState.status == RampStatusList.success) {
               return Scaffold(
-                drawerScrimColor: Color(0x0f180245),
+                drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                 endDrawer: AccountDrawer(
                   width: buttonSmallWidth,
                 ),
@@ -188,7 +180,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                 children: [
                                                   Text(
                                                     fiatHelper.getIbanFormat(
-                                                        fiatState
+                                                        rampState
                                                             .activeIban!.iban!),
                                                     style: Theme.of(context)
                                                         .textTheme
@@ -232,7 +224,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                 MainAxisAlignment.end,
                                                 children: [
                                                   Text(
-                                                    '${fiatState.limit!.value!} € per ${fiatState.limit!.period!.toLowerCase()}',
+                                                    '${rampState.rampUserModel!.limit!.value!} € per ${rampState.rampUserModel!.limit!.period!.toLowerCase()}',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .headline5!
@@ -275,7 +267,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                 MainAxisAlignment.end,
                                                 children: [
                                                   Text(
-                                                    '${fiatState.activeIban!.fee}%',
+                                                    '${rampState.activeIban!.fee}%',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .headline5!
@@ -490,7 +482,7 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                 children: [
                                                   Container(
                                                     child: Text(
-                                                      fiatState.activeIban!
+                                                      rampState.activeIban!
                                                           .bankUsage!,
                                                       style: Theme.of(context)
                                                           .textTheme
@@ -509,9 +501,9 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                                                     onTap: () async {
                                                       await Clipboard.setData(
                                                         ClipboardData(
-                                                            text: fiatState
+                                                            text: rampState
                                                                 .activeIban!
-                                                                .bankUsage),
+                                                                .bankUsage!),
                                                       );
                                                     },
                                                     child: MouseRegion(
@@ -627,9 +619,9 @@ class _BuySummaryScreenState extends State<BuySummaryScreen> with ThemeMixin {
                   ),
                 ),
               );
-            } else if (fiatState.status == FiatStatusList.loading) {
+            } else if (rampState.status == FiatStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.expired) {
+            } else if (rampState.status == FiatStatusList.expired) {
               Future.microtask(() => Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(

@@ -69,7 +69,7 @@ class _StakingSelectVerificationScreenState
         return BlocBuilder<AccountCubit, AccountState>(
           builder: (accountContext, accountState) {
             return Scaffold(
-              drawerScrimColor: Color(0x0f180245),
+              drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: AccountDrawer(
                 width: buttonSmallWidth,
               ),
@@ -255,7 +255,7 @@ class _StakingSelectVerificationScreenState
                                           PageRouteBuilder(
                                             pageBuilder: (context, animation1,
                                                     animation2) =>
-                                                StakingNewKycProcessScreen(),
+                                                StakingNewKycProcessScreen(kycLink: '',), //TODO: fix it
                                             transitionDuration: Duration.zero,
                                             reverseTransitionDuration:
                                                 Duration.zero,

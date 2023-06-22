@@ -1,4 +1,5 @@
 import 'package:basic_utils/basic_utils.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/address_balance_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
@@ -11,37 +12,36 @@ class BalancesHelper {
   static const int DUST = 3000; //TODO: move to constants file
   static const int FEE = 3000; //TODO: move to constants file
 
-  Future<double> getAvailableBalance(String currency, TxType type, AccountModel account) async {
+  Future<double> getAvailableBalance(
+      String currency, TxType type, AccountModel account) async {
     var addressBalanceList = await BalanceRequests()
         .getAddressBalanceListByAddressList(account.addressList!);
-    if(currency == 'DFI'){
-        var tokenDFIbalance =
-        getBalanceByTokenName(addressBalanceList, 'DFI');
+    if (currency == 'DFI') {
+      var tokenDFIbalance = getBalanceByTokenName(addressBalanceList, 'DFI');
 
-        var coinDFIbalance =
-        getBalanceByTokenName(addressBalanceList, '\$DFI');
-        switch (type) {
-          case TxType.send:
-            if(tokenDFIbalance > FEE){
-              return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE*2));
-            } else {
-              return fromSatohi(coinDFIbalance - (FEE));
-            }
-          case TxType.swap:
-            if(coinDFIbalance > (FEE*2)+DUST){
-              return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE*2));
-            } else {
-              return fromSatohi(tokenDFIbalance);
-            }
-          case TxType.addLiq:
-            if(coinDFIbalance > (FEE*2)+DUST){
-              return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE*2));
-            } else {
-              return fromSatohi(tokenDFIbalance);
-            }
-          default:
-            return 0;
-        }
+      var coinDFIbalance = getBalanceByTokenName(addressBalanceList, '\$DFI');
+      switch (type) {
+        case TxType.send:
+          if (tokenDFIbalance > FEE) {
+            return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE * 2));
+          } else {
+            return fromSatohi(coinDFIbalance - (FEE));
+          }
+        case TxType.swap:
+          if (coinDFIbalance > (FEE * 2) + DUST) {
+            return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE * 2));
+          } else {
+            return fromSatohi(tokenDFIbalance);
+          }
+        case TxType.addLiq:
+          if (coinDFIbalance > (FEE * 2) + DUST) {
+            return fromSatohi(coinDFIbalance + tokenDFIbalance - (FEE * 2));
+          } else {
+            return fromSatohi(tokenDFIbalance);
+          }
+        default:
+          return 0;
+      }
     } else {
       return fromSatohi(getBalanceByTokenName(addressBalanceList, currency));
     }
@@ -64,11 +64,9 @@ class BalancesHelper {
     // return balanceMap.map((balance)=>BalanceModel(token: balance));
   }
 
-  List<double> calculateAmountFromLiqudity(int amount, AssetPairModel pair){
-    var amountA = (amount / pair.totalLiquidityRaw!) *
-        pair.reserveA!;
-    var amountB = (amount / pair.totalLiquidityRaw!) *
-        pair.reserveB!;
+  List<double> calculateAmountFromLiqudity(int amount, AssetPairModel pair) {
+    var amountA = (amount / pair.totalLiquidityRaw!) * pair.reserveA!;
+    var amountB = (amount / pair.totalLiquidityRaw!) * pair.reserveB!;
     return [amountA, amountB];
   }
 
@@ -113,30 +111,108 @@ class BalancesHelper {
     return amount / COIN;
   }
 
-  String numberStyling(double number,
-      {bool fixed = false, int fixedCount = 2}) {
-    const double minAmountByFixed = 0.0001;
-    int _fixedCount = fixedCount;
-    if (number < minAmountByFixed && number != 0) {
-      _fixedCount = 6;
+  String numberStyling(
+    double number, {
+    bool fixed = false,
+    int fixedCount = 2,
+    FormatNumberType? type,
+  }) {
+    final defaultPrecision = 8;
+    final minNumber = 0.01;
+
+    if (type != null) {
+      return numberSpecificFormat(type, number);
     }
 
-    var string = '';
-
-    if (number < 0.000001 && !fixed && number != 0) {
-      string = number.toStringAsFixed(8);
+    String stringNumber;
+    if (number < minNumber && !fixed) {
+      stringNumber = number.toStringAsFixed(defaultPrecision);
     } else {
-      string = fixed ? number.toStringAsFixed(_fixedCount) : number.toString();
+      stringNumber = number.toStringAsFixed(fixedCount);
     }
-    var stringList = string.split('.');
 
-    stringList[0] = StringUtils.addCharAtPosition(
-            stringList[0].split('').reversed.join(), ",", 3,
-            repeat: true)
-        .split('')
-        .reversed
-        .join();
-    return stringList.join('.');
+    final charNumberList = stringNumber.split('.');
+
+    charNumberList.first = StringUtils.addCharAtPosition(
+      charNumberList.first.split('').reversed.join(),
+      ',',
+      3,
+      repeat: true,
+    ).split('').reversed.join();
+
+    return charNumberList.join('.');
+  }
+
+  String numberSpecificFormat(
+    FormatNumberType? type,
+    double number,
+  ) {
+    int specificPrecision = type == FormatNumberType.crypto ? 4 : 5;
+    int defaultPrecision = type == FormatNumberType.crypto ? 2 : 4;
+    switch (type) {
+      case FormatNumberType.fiat:
+        return trimTrailingZeros(
+          numberStyling(
+            number,
+            fixedCount: 2,
+            fixed: true,
+          ),
+          type: FormatNumberType.fiat,
+        );
+      case FormatNumberType.btc:
+      case FormatNumberType.crypto:
+        if (number == 0) {
+          return trimTrailingZeros(
+            numberStyling(
+              number,
+              fixedCount: 6,
+              fixed: true,
+            ),
+          );
+        } else if (number < 1) {
+          return trimTrailingZeros(
+            numberStyling(
+              number,
+              fixedCount: 6,
+              fixed: true,
+            ),
+          );
+        } else if (number < 10 && number >= 1) {
+          return trimTrailingZeros(
+            numberStyling(
+              number,
+              fixedCount: specificPrecision,
+              fixed: true,
+            ),
+          );
+        } else {
+          return trimTrailingZeros(
+            numberStyling(
+              number,
+              fixedCount: defaultPrecision,
+              fixed: true,
+            ),
+          );
+        }
+      default:
+        return numberStyling(number);
+    }
+  }
+
+  String trimTrailingZeros(String str, {FormatNumberType? type}) {
+    int index = str.length - 1;
+    while (index >= 0 && (str[index] == '0' || str[index] == '.')) {
+      index--;
+    }
+    if (double.tryParse(str) == 0) {
+      if (type == FormatNumberType.fiat) {
+        return '0.00';
+      } else {
+        return '0';
+      }
+    } else {
+      return str.substring(0, index + 1);
+    }
   }
 
   bool isAmountEmpty(String amount) {

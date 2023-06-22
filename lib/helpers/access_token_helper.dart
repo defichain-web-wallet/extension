@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +19,7 @@ class AccessTokenHelper {
     bool isExistingAccount = false,
   }) async {
     showDialog(
-      barrierColor: Color(0x0f180245),
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context1) {

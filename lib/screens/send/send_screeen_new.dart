@@ -1,29 +1,23 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/transaction/tx_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/netwrok_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
-import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
-import 'package:defi_wallet/screens/settings/settings.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/fields/address_field_new.dart';
-import 'package:defi_wallet/widgets/fields/amount_field.dart';
+import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/fees_selector.dart';
@@ -44,7 +38,6 @@ class _SendScreenNewState extends State<SendScreenNew>
   TextEditingController assetController = TextEditingController(text: '0');
   FocusNode addressFocusNode = FocusNode();
   AddressBookModel contact = AddressBookModel();
-  TokensModel? currentAsset;
   String suffixText = '';
   String? balanceInUsd;
   String titleText = 'Send';
@@ -53,60 +46,50 @@ class _SendScreenNewState extends State<SendScreenNew>
   bool isShowCheckbox = false;
   int iterator = 0;
 
-  getTokensList(accountState, tokensState) {
-    List<TokensModel> resList = [];
-    if (!SettingsHelper.isBitcoin()) {
-      accountState.balances!.forEach((element) {
-        tokensState.tokens!.forEach((el) {
-          if (element.token == el.symbol) {
-            resList.add(el);
-          }
-        });
-      });
-    }
-    return resList;
-  }
 
-  double getAvailableBalance(accountState, bitcoinState) {
-    if (bitcoinState.totalBalance <= 0) {
-      return 0.0;
-    } else {
-      return convertFromSatoshi(bitcoinState.totalBalance);
-    }
-  }
+  // Future<void> setAvailableBalance(
+  //   List<BalanceModel> balances,
+  //   TokenModel currentAsset,
+  //   ApplicationModel applicationModel,
+  //   AbstractAccountModel accountModel,
+  // ) async {
+  //   double balance = await applicationModel.networks[0].getAvailableBalance(
+  //     account: accountModel,
+  //     token: currentAsset,
+  //     type: TxType.send,
+  //   );
+  //   setState(() {
+  //     availableBalance = balance;
+  //   });
+  // }
 
-  String getUsdBalance(context) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    try {
-      var amount = tokenHelper.getAmountByUsd(
-        tokensCubit.state.tokensPairs!,
-        double.parse(assetController.text.replaceAll(',', '.')),
-        currentAsset!.symbol!,
-      );
-      return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
-    } catch (err) {
-      return '0.00';
-    }
-  }
+  // String getUsdBalance(context) {
+  //   TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+  //   try {
+  //     var amount = tokenHelper.getAmountByUsd(
+  //       tokensCubit.state.tokensPairs!,
+  //       double.parse(assetController.text.replaceAll(',', '.')),
+  //       currentAsset!.symbol!,
+  //     );
+  //     return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
+  //   } catch (err) {
+  //     return '0.00';
+  //   }
+  // }
 
-  sendSubmit(addressBookCubit, bitcoinState) async {
+  sendSubmit(addressBookCubit, TxState state, AbstractNetworkModel activeNetwork) async {
     if (addressController.text != '') {
-      late bool isValidAddress;
-      if (SettingsHelper.isBitcoin()) {
-        isValidAddress =
-            await AddressesHelper().validateBtcAddress(addressController.text);
-      } else {
-        isValidAddress =
-            await AddressesHelper().validateAddress(addressController.text);
-      }
+      late bool isValidAddress = activeNetwork.checkAddress(addressController.text);
+
       if (isValidAddress) {
         if (isAddNewContact) {
           showDialog(
-            barrierColor: Color(0x0f180245),
+            barrierColor: AppColors.tolopea.withOpacity(0.06),
             barrierDismissible: false,
             context: context,
             builder: (BuildContext dialogContext) {
               return CreateEditContactDialog(
+                isDisableEditAddress: true,
                 address: addressController.text,
                 isEdit: false,
                 confirmCallback: (name, address, network) {
@@ -125,8 +108,9 @@ class _SendScreenNewState extends State<SendScreenNew>
                         address: addressController.text,
                         isAfterAddContact: true,
                         amount: double.parse(assetController.text),
-                        token: currentAsset!,
-                        fee: bitcoinState.activeFee,
+                        token: state.currentAsset!,
+                        fee: state.activeFee,
+                        // fee: state.activeFee,
                       ),
                       transitionDuration: Duration.zero,
                       reverseTransitionDuration: Duration.zero,
@@ -145,8 +129,9 @@ class _SendScreenNewState extends State<SendScreenNew>
                   SendSummaryScreen(
                 address: addressController.text,
                 amount: double.parse(assetController.text),
-                token: currentAsset!,
-                fee: bitcoinState.activeFee,
+                token: state.currentAsset!,
+                fee: state.activeFee,
+                // fee: state.activeFee,
               ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
@@ -170,9 +155,10 @@ class _SendScreenNewState extends State<SendScreenNew>
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) => SendSummaryScreen(
             amount: double.parse(assetController.text),
-            token: currentAsset!,
+            token: state.currentAsset!,
             contact: contact,
-            fee: bitcoinState.activeFee,
+            fee: state.activeFee,
+            // fee: state.activeFee,
           ),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
@@ -205,6 +191,8 @@ class _SendScreenNewState extends State<SendScreenNew>
         });
       }
     });
+    TxCubit txCubit = BlocProvider.of<TxCubit>(context);
+    txCubit.setInitial();
     super.initState();
   }
 
@@ -223,43 +211,29 @@ class _SendScreenNewState extends State<SendScreenNew>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (accountContext, accountState) {
-            return BlocBuilder<TokensCubit, TokensState>(
-              builder: (tokenContext, tokensState) {
-                List<TokensModel> tokens = getTokensList(
-                  accountState,
-                  tokensState,
-                );
-                return BlocBuilder<BitcoinCubit, BitcoinState>(
-                    builder: (bitcoinContext, bitcoinState) {
-                  BitcoinCubit bitcoinCubit =
-                      BlocProvider.of<BitcoinCubit>(context);
+        return BlocBuilder<TxCubit, TxState>(
+          builder: (context, state) {
+            final walletCubit = BlocProvider.of<WalletCubit>(context);
+            AbstractNetworkModel activeNetwork = walletCubit.getCurrentNetwork();
+
+            TxCubit txCubit = BlocProvider.of<TxCubit>(context);
                   AddressBookCubit addressBookCubit =
                       BlocProvider.of<AddressBookCubit>(context);
-
-                  if (iterator == 0 && SettingsHelper.isBitcoin()) {
-                    bitcoinCubit.loadAvailableBalance(
-                        accountState.activeAccount!.bitcoinAddress!);
-                    iterator++;
+                  if(state.status == TxStatusList.initial){
+                    txCubit.init(context, TxType.send);
                   }
 
-                  if (accountState.status == AccountStatusList.success &&
-                      (bitcoinState.status == BitcoinStatusList.success ||
-                          !SettingsHelper.isBitcoin())) {
-                    if (SettingsHelper.isBitcoin()) {
-                      print(bitcoinState);
-                      currentAsset = TokensModel(
-                        name: 'Bitcoin',
-                        symbol: 'BTC',
-                      );
-                    } else {
-                      currentAsset = currentAsset ??
-                          getTokensList(accountState, tokensState).first;
-                    }
+                  if (state.status == TxStatusList.success){
+                    // setAvailableBalance(
+                    //   state.getBalances(),
+                    //   currentAsset!,
+                    //   state.applicationModel!,
+                    //   state.activeAccount!,
+                    // );
+                    // print(availableBalance);
 
                     return Scaffold(
-                      drawerScrimColor: Color(0x0f180245),
+                      drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                       endDrawer: AccountDrawer(
                         width: buttonSmallWidth,
                       ),
@@ -329,44 +303,31 @@ class _SendScreenNewState extends State<SendScreenNew>
                                     SizedBox(
                                       height: 24,
                                     ),
-                                    GestureDetector(
-                                      onDoubleTap: () {
-                                        addressFocusNode.requestFocus();
-                                        if (addressController.text.isNotEmpty) {
-                                          addressController.selection =
-                                              TextSelection(
-                                                  baseOffset: 0,
-                                                  extentOffset:
-                                                      addressController
-                                                          .text.length);
+                                    AddressFieldNew(
+                                      addressFocusNode: addressFocusNode,
+                                      clearPrefix: () {
+                                        setState(() {
+                                          contact = AddressBookModel();
+                                        });
+                                      },
+                                      onChange: (val) {
+                                        if (val == '') {
+                                          setState(() {
+                                            isAddNewContact = false;
+                                          });
                                         }
                                       },
-                                      child: AddressFieldNew(
-                                        addressFocusNode: addressFocusNode,
-                                        clearPrefix: () {
-                                          setState(() {
-                                            contact = AddressBookModel();
-                                          });
-                                        },
-                                        onChange: (val) {
-                                          if (val == '') {
-                                            setState(() {
-                                              isAddNewContact = false;
-                                            });
-                                          }
-                                        },
-                                        controller: addressController,
-                                        getAddress: (val) {
-                                          addressController.text = val;
-                                        },
-                                        getContact: (val) {
-                                          setState(() {
-                                            addressController.text = '';
-                                            contact = val;
-                                          });
-                                        },
-                                        contact: contact,
-                                      ),
+                                      controller: addressController,
+                                      getAddress: (val) {
+                                        addressController.text = val;
+                                      },
+                                      getContact: (val) {
+                                        setState(() {
+                                          addressController.text = '';
+                                          contact = val;
+                                        });
+                                      },
+                                      contact: contact,
                                     ),
                                     SizedBox(
                                       height: 16,
@@ -385,38 +346,31 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       height: 6,
                                     ),
                                     AmountField(
-                                      type: SettingsHelper.isBitcoin()
-                                          ? null
-                                          : TxType.send,
-                                      account: accountState.activeAccount!,
+                                      type: TxType.send,
+                                      balance: state.activeBalance,
                                       onChanged: (value) {
                                         setState(() {
-                                          balanceInUsd = getUsdBalance(context);
+                                          //TODO: fix USD balance
+                                          // balanceInUsd = getUsdBalance(context);
                                         });
                                       },
-                                      available: getAvailableBalance(
-                                        accountState,
-                                        bitcoinState,
-                                      ),
-                                      isDisabledSelector:
-                                          SettingsHelper.isBitcoin(),
-                                      suffix: balanceInUsd ??
-                                          getUsdBalance(context),
-                                      onAssetSelect: (t) {
-                                        setState(() {
-                                          currentAsset = t;
-                                        });
+                                      available: state.availableBalance,
+                                      // available: true,
+                                      isDisabledSelector: !activeNetwork.isTokensPresent(),
+                                      suffix: balanceInUsd ?? '0.00',
+                                    // ?? getUsdBalance(context), //TODO: fix it
+                                      onAssetSelect: (asset) async {
+                                        txCubit.changeActiveBalance(context, asset, TxType.send);
                                       },
                                       controller: assetController,
-                                      selectedAsset: currentAsset!,
-                                      assets: tokens,
+                                      assets: state.balances!,
                                     ),
                                     SizedBox(
                                       height: 16,
                                     ),
-                                    if (bitcoinState.networkFee != null &&
-                                        SettingsHelper.isBitcoin()) ...[
-                                      Row(
+                                    if (!activeNetwork.isTokensPresent())
+                                      ...[
+                                              Row(
                                         children: [
                                           Text(
                                             'Fees',
@@ -431,17 +385,13 @@ class _SendScreenNewState extends State<SendScreenNew>
                                       ),
                                       FeesSelector(
                                         onSelect: (int fee) {
-                                          bitcoinCubit.changeActiveFee(
-                                            accountState
-                                                .activeAccount!.bitcoinAddress!,
-                                            fee,
-                                          );
+                                          txCubit.changeActiveFee(fee);
                                         },
-                                        activeFee: bitcoinState.activeFee,
+                                        activeFee: state.activeFee,
                                         fees: [
-                                          bitcoinState.networkFee!.low!,
-                                          bitcoinState.networkFee!.medium!,
-                                          bitcoinState.networkFee!.high!,
+                                          state.networkFee!.low!,
+                                          state.networkFee!.medium!,
+                                          state.networkFee!.high!,
                                         ],
                                       ),
                                     ]
@@ -499,7 +449,7 @@ class _SendScreenNewState extends State<SendScreenNew>
                                               if (txState
                                                   is! TransactionLoadingState) {
                                                 sendSubmit(addressBookCubit,
-                                                    bitcoinState);
+                                                    state, activeNetwork);
                                               } else {
                                                 showSnackBar(
                                                   context,
@@ -526,17 +476,9 @@ class _SendScreenNewState extends State<SendScreenNew>
                         ),
                       ),
                     );
-                  } else if (bitcoinState.status == BitcoinStatusList.failure) {
-                    return ErrorScreen(
-                      errorDetails:
-                          FlutterErrorDetails(exception: 'Bitcoin API error'),
-                    );
                   } else {
-                    return Container();
+                    return Loader();
                   }
-                });
-              },
-            );
           },
         );
       },

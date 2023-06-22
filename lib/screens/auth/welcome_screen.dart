@@ -59,11 +59,6 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Expanded(
-                        child: Center(
-                            // child: WelcomePositionedLogo(),
-                            ),
-                      ),
-                      Container(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [

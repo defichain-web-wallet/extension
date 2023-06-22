@@ -1,50 +1,36 @@
-import 'dart:async';
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/transaction/tx_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/dex_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/account_model.dart';
-import 'package:defi_wallet/models/asset_pair_model.dart';
-import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
 import 'package:defi_wallet/screens/swap/swap_summary_screen.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
-import 'package:defi_wallet/widgets/fields/amount_field.dart';
+import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
-import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/bloc/dex/dex_cubit.dart';
-import 'package:defi_wallet/bloc/dex/dex_state.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/models/test_pool_swap_model.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/swap/swap_account_selector_dialog.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SwapScreen extends StatefulWidget {
   const SwapScreen({Key? key}) : super(key: key);
@@ -70,21 +56,13 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
   final GlobalKey<AssetSelectSwapState> selectKeyTo =
   GlobalKey<AssetSelectSwapState>();
 
-  TransactionService transactionService = TransactionService();
-  BalancesHelper balancesHelper = BalancesHelper();
-  LockHelper lockHelper = LockHelper();
-  TokensHelper tokensHelper = TokensHelper();
-  TestPoolSwapModel dexModel = TestPoolSwapModel();
   FocusNode focusFrom = new FocusNode();
   FocusNode focusTo = new FocusNode();
   FocusModel focusAmountFromModel = new FocusModel();
   FocusModel focusAmountToModel = new FocusModel();
-  Timer? debounce;
 
   List<TokensModel> tokensForSwap = [];
   List<TokensModel> assets = [];
-  late AccountModel accountFrom;
-  late AccountModel accountTo;
   TokensModel assetFrom = TokensModel(name: 'DefiChain', symbol: 'DFI');
   TokensModel? assetTo;
   String address = '';
@@ -102,7 +80,6 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
   bool isShowSlippageField = false;
   double toolbarHeight = 55;
   double toolbarHeightWithBottom = 105;
-  double slippage = 0.03; //3%
   String stabilizationFee = '30';
   String amountFromInUsd = '0.0';
   String amountToInUsd = '0.0';
@@ -115,204 +92,107 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
 
   @override
   void initState() {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    tokensCubit.loadTokens();
+    ExchangeCubit txCubit = BlocProvider.of<ExchangeCubit>(context);
+    txCubit.setInitial();
     super.initState();
-  }
-
-  stateInit(accountState, dexState, tokensState) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    assets = [];
-    if (SettingsHelper.isBitcoin()) {
-      assetFrom = TokensModel(symbol: 'BTC', name: 'Bitcoin');
-      assetTo = TokensModel(symbol: 'dBTC', name: 'Bitcoin');
-    } else {
-      accountState.activeAccount.balanceList!.forEach((el) {
-        if (tokensState.tokensForSwap[el.token] != null &&
-            !assets.contains(el.token) &&
-            !el.isHidden) {
-          assets.add(TokensModel(
-            name: el.token!,
-            symbol: el.token!,
-          ));
-        }
-      });
-      List<dynamic> tokens = tokensState.tokensForSwap[assetFrom.symbol];
-      tokensForSwap = List<TokensModel>.generate(
-        tokens.length,
-            (index) =>
-            TokensModel(
-              name: tokens[index],
-              symbol: tokens[index],
-            ),
-      );
-      assetFrom = assetFrom;
-
-      assetTo = assetTo ?? tokensForSwap[0];
-
-      DexHelper dexHelper = DexHelper();
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        dexRate = await dexHelper.calculateDex(
-          assetFrom.symbol!,
-          assetTo!.symbol!,
-          1,
-          0,
-          address,
-          accountState.activeAccount!.addressList!,
-          tokensState,
-        );
-        rateQuoteUsd = tokensHelper.getAmountByUsd(
-          tokensCubit.state.tokensPairs!,
-          dexRate!.priceFrom!,
-          assetTo!.symbol!,
-        );
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldWrapper(
-      builder: (BuildContext context,
-          bool isFullScreen,
-          TransactionState transactionState,) {
-        return BlocBuilder<DexCubit, DexState>(
-          builder: (dexContext, dexState) {
-            DexCubit dexCubit = BlocProvider.of<DexCubit>(dexContext);
-            BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-            return BlocBuilder<AccountCubit, AccountState>(
-              builder: (accountContext, accountState) {
-                return BlocBuilder<TokensCubit, TokensState>(
-                  builder: (tokensContext, tokensState) {
-                    if (tokensState.status == TokensStatusList.success) {
-                      if (accountState.status == AccountStatusList.success) {
-                        stateInit(accountState, dexState, tokensState);
-                        if (dexState is DexLoadedState) {
-                          dexInit(dexState);
-                        }
-                        if (iteratorUpdate == 0) {
-                          iteratorUpdate++;
-                          accountFrom = accountState.accounts![0];
-                          accountTo = accountState.accounts![0];
-                          if (SettingsHelper.isBitcoin()) {
-                            bitcoinCubit.loadAvailableBalance(
-                                accountFrom.bitcoinAddress!);
-                          }
-                          dexCubit.updateDex(
-                            assetFrom.symbol!,
-                            assetTo!.symbol!,
-                            0,
-                            0,
-                            address,
-                            accountState.activeAccount!.addressList!,
-                            tokensState,
-                          );
-                        }
-                      }
-                    }
-                    assets = tokensHelper.getTokensList(
-                      accountState,
-                      tokensState,
-                      targetList: assets,
-                    );
-                    tokensForSwap = tokensHelper.getTokensList(
-                      accountState,
-                      tokensState,
-                      targetList: tokensForSwap,
-                    );
-                    return Scaffold(
-                      appBar: NewMainAppBar(
-                        isShowLogo: false,
+    try {
+      return ScaffoldWrapper(
+          builder: (BuildContext context,
+              bool isFullScreen,
+              TransactionState transactionState,) {
+            return BlocBuilder<ExchangeCubit, ExchangeState>(
+              builder: (exchangeContext, exchangeState) {
+                ExchangeCubit exchangeCubit = BlocProvider.of<ExchangeCubit>(
+                    context);
+                if (exchangeState.status == ExchangeStatusList.initial) {
+                  exchangeCubit.init(context);
+                  return Loader();
+                } else if (exchangeState.status == ExchangeStatusList.success) {
+                  return Scaffold(
+                    appBar: NewMainAppBar(
+                      isShowLogo: false,
+                    ),
+                    drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
+                    endDrawer: AccountDrawer(
+                      width: buttonSmallWidth,
+                    ),
+                    body: Container(
+                      padding: EdgeInsets.only(
+                        top: 22,
+                        bottom: 22,
+                        left: 16,
+                        right: 16,
                       ),
-                      drawerScrimColor: Color(0x0f180245),
-                      endDrawer: AccountDrawer(
-                        width: buttonSmallWidth,
-                      ),
-                      body: Container(
-                        padding: EdgeInsets.only(
-                          top: 22,
-                          bottom: 22,
-                          left: 16,
-                          right: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDarkTheme()
-                              ? DarkColors.networkDropdownBgColor
-                              : LightColors.scaffoldContainerBgColor,
-                          border: isDarkTheme()
-                              ? Border.all(
-                            width: 1.0,
-                            color: Colors.white.withOpacity(0.05),
-                          )
-                              : null,
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            topLeft: Radius.circular(20),
-                          ),
-                        ),
-                        child: BlocBuilder<BitcoinCubit, BitcoinState>(
-                          builder: (context, bitcoinState) {
-                            return _buildBody(
-                              context,
-                              dexState,
-                              dexCubit,
-                              accountState,
-                              tokensState,
-                              transactionState,
-                              isFullScreen,
-                            );
-                          }
+                      decoration: BoxDecoration(
+                        color: isDarkTheme()
+                            ? DarkColors.networkDropdownBgColor
+                            : LightColors.scaffoldContainerBgColor,
+                        border: isDarkTheme()
+                            ? Border.all(
+                          width: 1.0,
+                          color: Colors.white.withOpacity(0.05),
+                        )
+                            : null,
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(20),
+                          topLeft: Radius.circular(20),
                         ),
                       ),
-                    );
-                  },
-                );
+                      child: _buildBody(
+                        context,
+                        exchangeCubit,
+                        exchangeState,
+                        isFullScreen,
+                      ),
+                    ),
+                  );
+                } else {
+                  return Loader();
+                }
+                // assets = tokensHelper.getTokensList(
+                //   accountState,
+                //   tokensState,
+                //   targetList: assets,
+                // );
+                // tokensForSwap = tokensHelper.getTokensList(
+                //   accountState,
+                //   tokensState,
+                //   targetList: tokensForSwap,
+                // );
               },
             );
-          },
-        );
-      },
-    );
+          });
+    } catch(e){
+      print(e);
+      return Container();
+    }
   }
 
-  Widget _buildBody(context, dexState, dexCubit, accountState, tokensState,
-      transactionState, isFullScreen) {
+  Widget _buildBody(context, ExchangeCubit exchangeCubit, ExchangeState exchangeState, isFullScreen) {
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
     double arrowRotateDegAccountFrom = false ? 180 : 0;
     double arrowRotateDegAccountTo = false ? 180 : 0;
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     bool isShowStabilizationFee =
-        assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ||
-            assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'USDT' ||
-            assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'USDC';
-    if (tokensState.status == TokensStatusList.loading) {
-      return Container(
-        child: Center(
-          child: Loader(),
-        ),
-      );
-    } else {
-      if (dexState is DexErrorState) {
-        return Container(
-          child: Center(
-            child: ErrorPlaceholder(
-              message: 'API error',
-              description: 'Please change the API on settings and try again',
-            ),
-          ),
-        );
-      } else {
-        if (isShowStabilizationFee) {
-          try {
-            AssetPairModel targetPair = tokensState.tokensPairs
-                .firstWhere((e) => e.tokenA == 'DUSD' && e.tokenB == 'DFI');
-            // stabilizationFee = balancesHelper.numberStyling(
-            //     ((1 / (1 - targetPair.fee!)) - 1) * 100,
-            //     fixedCount: 2,
-            //     fixed: true);
-          } catch (err) {
-            print(err);
-          }
-        }
+        exchangeState.selectedBalance!.token!.symbol == 'DUSD' && exchangeState.selectedSecondInputBalance!.token!.symbol == 'DFI' ||
+            exchangeState.selectedBalance!.token!.symbol == 'DUSD' && exchangeState.selectedSecondInputBalance!.token!.symbol == 'USDT' ||
+            exchangeState.selectedBalance!.token!.symbol == 'DUSD' && exchangeState.selectedSecondInputBalance!.token!.symbol == 'USDC';
+
+        // if (isShowStabilizationFee) {
+        //   try {
+        //     // var targetPair = exchangeState.availablePairs!
+        //     //     .firstWhere((e) => e.quote.displaySymbol == 'DUSD' && e.base.displaySymbol == 'DFI');
+        //     // stabilizationFee = balancesHelper.numberStyling(
+        //     //     ((1 / (1 - targetPair.fee!)) - 1) * 100,
+        //     //     fixedCount: 2,
+        //     //     fixed: true);
+        //   } catch (err) {
+        //     print(err);
+        //   }
+        // }
         return StretchBox(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -331,265 +211,240 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                     SizedBox(
                       height: 16,
                     ),
-                    if (SettingsHelper.isBitcoin())
-                      ...[
-                        Center(
-                          child: Container(
-                            height: 24,
-                            width: 78,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                color: isDarkTheme()
-                                  ? DarkColors.swapNetworkMarkBgColor
-                                  : LightColors.swapNetworkMarkBgColor,
-                              borderRadius: BorderRadius.circular(36)
-                            ),
-                            child: Text(
-                              'Bitcoin Mainnet',
-                              style: Theme.of(context).textTheme.headline6!.copyWith(
-                                fontSize: 8,
-                                color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3)
-                              ),
-                            ),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                'Swap from',
-                                style: Theme.of(context).textTheme.headline5!.copyWith(
-                                  color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  barrierColor: Color(0x0f180245),
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return SwapAccountSelectorDialog(
-                                      confirmCallback: (name, address) {},
-                                      onSelect: (int index) {
-                                      BitcoinCubit bitcoinCubit =
-                                          BlocProvider.of<BitcoinCubit>(
-                                              context);
-                                      setState(() {
-                                        accountFrom =
-                                            accountState.accounts[index];
-                                        bitcoinCubit.loadAvailableBalance(
-                                          accountFrom.bitcoinAddress!,
-                                        );
-                                      });
-                                    },
-                                  );
-                                  },
-                                );
-                              },
-                              child: Container(
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      accountFrom.name!,
-                                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-                                    RotationTransition(
-                                      turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
-                                      child: SizedBox(
-                                        width: 10,
-                                        height: 10,
-                                        child: SvgPicture.asset(
-                                          'assets/icons/arrow_down.svg',
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 6,
-                        )
-                      ],
+                    //TODO:This is block for bitcoin network. Comment this because bitcoin currently is unavailable
+                      // ...[
+                      //   Center(
+                      //     child: Container(
+                      //       height: 24,
+                      //       width: 78,
+                      //       alignment: Alignment.center,
+                      //       decoration: BoxDecoration(
+                      //           color: isDarkTheme()
+                      //             ? DarkColors.swapNetworkMarkBgColor
+                      //             : LightColors.swapNetworkMarkBgColor,
+                      //         borderRadius: BorderRadius.circular(36)
+                      //       ),
+                      //       child: Text(
+                      //         'Bitcoin Mainnet',
+                      //         style: Theme.of(context).textTheme.headline6!.copyWith(
+                      //           fontSize: 8,
+                      //           color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3)
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      //   Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       Flexible(
+                      //         child: Text(
+                      //           'Swap from',
+                      //           style: Theme.of(context).textTheme.headline5!.copyWith(
+                      //             color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       GestureDetector(
+                      //         onTap: () {
+                      //           showDialog(
+                      //             barrierColor: AppColors.tolopea.withOpacity(0.06),
+                      //             barrierDismissible: false,
+                      //             context: context,
+                      //             builder: (BuildContext context) {
+                      //               return SwapAccountSelectorDialog(
+                      //                 confirmCallback: (name, address) {},
+                      //                 onSelect: (int index) {
+                      //                 BitcoinCubit bitcoinCubit =
+                      //                     BlocProvider.of<BitcoinCubit>(
+                      //                         context);
+                      //                 setState(() {
+                      //                   accountFrom =
+                      //                       accountState.accounts[index];
+                      //                   bitcoinCubit.loadAvailableBalance(
+                      //                     accountFrom.bitcoinAddress!,
+                      //                   );
+                      //                 });
+                      //               },
+                      //             );
+                      //             },
+                      //           );
+                      //         },
+                      //         child: Row(
+                      //           mainAxisAlignment: MainAxisAlignment.end,
+                      //           children: [
+                      //             Container(
+                      //               constraints: BoxConstraints(maxWidth: 150),
+                      //               child: TickerText(
+                      //                 isSpecialDuration: true,
+                      //                 child: Text(
+                      //                   accountFrom.name!,
+                      //                   style: Theme.of(context).textTheme.headline5!.copyWith(
+                      //                     fontSize: 13,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //             SizedBox(
+                      //               width: 8,
+                      //             ),
+                      //             RotationTransition(
+                      //               turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
+                      //               child: SizedBox(
+                      //                 width: 10,
+                      //                 height: 10,
+                      //                 child: SvgPicture.asset(
+                      //                   'assets/icons/arrow_down.svg',
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       )
+                      //     ],
+                      //   ),
+                      //   SizedBox(
+                      //     height: 6,
+                      //   )
+                      // ],
                     AmountField(
                       isAvailableTo: false,
-                      type: SettingsHelper.isBitcoin() ? null : TxType.swap,
-                      account: accountState.activeAccount!,
+                      type: TxType.swap,
                       suffix: amountFromInUsd,
-                      isDisabledSelector: SettingsHelper.isBitcoin(),
-                      available: getAvailableAmount(
-                        accountState,
-                        assetFrom.symbol,
-                        dexState,
-                        isBitcoin: SettingsHelper.isBitcoin()
-                      ),
+                      isDisabledSelector: false,
+                      available: exchangeState.availableFrom,
                       onAssetSelect: (asset) {
-                        onSelectFromAsset(
-                          asset,
-                          tokensState,
-                          accountState,
-                          dexCubit,
-                        );
+                        exchangeCubit.updateBalance(context, asset);
                       },
                       onChanged: (value) {
-                        try {
-                          calculateSecondAmount(value, tokensState);
-                          onChangeFromAsset(
-                            value,
-                            accountState,
-                            dexState,
-                            dexCubit,
-                            tokensState,
-                          );
-                        } catch (err) {
-                          print(err);
-                        }
+                        double amount = double.parse(value);
+                        var amountToInput = exchangeCubit.calculateRate(exchangeState.selectedSecondInputBalance!.token!, exchangeState.selectedBalance!.token!, amount);
+                        exchangeCubit.updateAmountsAndSlipage(amountFrom: amount, amountTo: amountToInput);
+                        setState(() {
+                          amountToController.text = amountToInput.toString();
+                        });
                       },
                       controller: amountFromController,
-                      selectedAsset: assetFrom,
-                      assets: assets,
+                      balance: exchangeState.selectedBalance,
+                      assets: exchangeState.balances!,
                     ),
                     SizedBox(
                       height: 8,
                     ),
-                    if (SettingsHelper.isBitcoin())
-                      ...[
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Center(
-                          child: Container(
-                            height: 24,
-                            width: 90,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                color: isDarkTheme()
-                                    ? DarkColors.swapNetworkMarkBgColor
-                                    : LightColors.swapNetworkMarkBgColor,
-                                borderRadius: BorderRadius.circular(36)
-                            ),
-                            child: Text(
-                              'DeFiChain Mainnet',
-                              style: Theme.of(context).textTheme.headline6!.copyWith(
-                                  fontSize: 8,
-                                  color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3)
-                              ),
-                            ),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                'Swap to',
-                                style: Theme.of(context).textTheme.headline5!.copyWith(
-                                  color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  barrierColor: Color(0x0f180245),
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return SwapAccountSelectorDialog(
-                                      confirmCallback: (name, address) {},
-                                      onSelect: (int index) {
-                                        FiatCubit fiatCubit =
-                                          BlocProvider.of<FiatCubit>(context);
-                                        setState(() {
-                                          accountTo = accountState.accounts[index];
-                                        });
-                                        fiatCubit.loadCryptoRoute(accountTo);
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                              child: Row(
-                                children: [
-                                  Text(
-                                    accountTo.name!,
-                                    style: Theme.of(context).textTheme.headline5!.copyWith(
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  RotationTransition(
-                                    turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
-                                    child: SizedBox(
-                                      width: 10,
-                                      height: 10,
-                                      child: SvgPicture.asset(
-                                        'assets/icons/arrow_down.svg',
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 6,
-                        )
-                      ],
+                    //TODO:This is block for bitcoin network. Comment this because bitcoin currently is unavailable
+                      // ...[
+                      //   SizedBox(
+                      //     height: 8,
+                      //   ),
+                      //   Center(
+                      //     child: Container(
+                      //       height: 24,
+                      //       width: 90,
+                      //       alignment: Alignment.center,
+                      //       decoration: BoxDecoration(
+                      //           color: isDarkTheme()
+                      //               ? DarkColors.swapNetworkMarkBgColor
+                      //               : LightColors.swapNetworkMarkBgColor,
+                      //           borderRadius: BorderRadius.circular(36)
+                      //       ),
+                      //       child: Text(
+                      //         'DeFiChain Mainnet',
+                      //         style: Theme.of(context).textTheme.headline6!.copyWith(
+                      //             fontSize: 8,
+                      //             color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3)
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      //   Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       Flexible(
+                      //         child: Text(
+                      //           'Swap to',
+                      //           style: Theme.of(context).textTheme.headline5!.copyWith(
+                      //             color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       GestureDetector(
+                      //         onTap: () {
+                      //           showDialog(
+                      //             barrierColor: AppColors.tolopea.withOpacity(0.06),
+                      //             barrierDismissible: false,
+                      //             context: context,
+                      //             builder: (BuildContext context) {
+                      //               return SwapAccountSelectorDialog(
+                      //                 confirmCallback: (name, address) {},
+                      //                 onSelect: (int index) {
+                      //                   FiatCubit fiatCubit =
+                      //                     BlocProvider.of<FiatCubit>(context);
+                      //                   setState(() {
+                      //                     accountTo = accountState.accounts[index];
+                      //                   });
+                      //                   fiatCubit.loadCryptoRoute(accountTo);
+                      //                 },
+                      //               );
+                      //             },
+                      //           );
+                      //         },
+                      //         child: Row(
+                      //           mainAxisAlignment: MainAxisAlignment.end,
+                      //           children: [
+                      //             Container(
+                      //               constraints: BoxConstraints(maxWidth: 150),
+                      //               child: TickerText(
+                      //                 isSpecialDuration: true,
+                      //                 child: Text(
+                      //                   accountTo.name!,
+                      //                   style: Theme.of(context).textTheme.headline5!.copyWith(
+                      //                     fontSize: 13,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //             SizedBox(
+                      //               width: 8,
+                      //             ),
+                      //             RotationTransition(
+                      //               turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
+                      //               child: SizedBox(
+                      //                 width: 10,
+                      //                 height: 10,
+                      //                 child: SvgPicture.asset(
+                      //                   'assets/icons/arrow_down.svg',
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       )
+                      //     ],
+                      //   ),
+                      //   SizedBox(
+                      //     height: 6,
+                      //   )
+                      // ],
                     AmountField(
                       type: TxType.swap,
-                      account: accountState.activeAccount!,
                       suffix: amountToInUsd,
-                      isDisabledSelector: SettingsHelper.isBitcoin(),
+                      available: 0,
                       onAssetSelect: (asset) {
-                        onSelectToAsset(
-                          asset,
-                          tokensState,
-                          accountState,
-                          dexCubit,
-                        );
+                        exchangeCubit.updateBalanceTo(context, asset);
                       },
                       onChanged: (value) {
-                        try {
-                          var amount = tokensHelper.getAmountByUsd(
-                            tokensCubit.state.tokensPairs!,
-                            double.parse(value.replaceAll(',', '.')),
-                            assetTo!.symbol!,
-                          );
-                          setState(() {
-                            amountToInUsd = balancesHelper.numberStyling(amount,
-                                fixedCount: 2, fixed: true);
-                            amountFromInUsd = amountToInUsd;
-                          });
-                        } catch (err) {
-                          print(err);
-                        }
-                        onChangeToAsset(
-                          value,
-                          accountState,
-                          dexState,
-                          dexCubit,
-                          tokensState,
-                        );
+                        double amount = double.parse(value);
+
+                        var amountFromInput = exchangeCubit.calculateRate(exchangeState.selectedBalance!.token!, exchangeState.selectedSecondInputBalance!.token!, amount);
+                        exchangeCubit.updateAmountsAndSlipage(amountFrom: amountFromInput, amountTo: amount);
+                        setState(() {
+                          amountFromController.text = amountFromInput.toString();
+                        });
                       },
+                      balance: exchangeState.selectedSecondInputBalance,
                       controller: amountToController,
-                      selectedAsset: assetTo!,
-                      assets: tokensForSwap,
+                      assets: exchangeState.secondInputBalances!,
                     ),
-                    if (!SettingsHelper.isBitcoin())
+                    //TODO:This is block for bitcoin network. Comment this because bitcoin currently is unavailable
                       ...[
                         SizedBox(
                           height: 12,
@@ -649,18 +504,19 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                   ),
                                   onPressed: () =>
                                       setState(() {
-                                        slippage = 0.03;
+                                        exchangeCubit.updateAmountsAndSlipage(slippage: 0.03);
                                         isShowSlippageField = false;
-                                        hideOverlay();
+                                        // hideOverlay();
                                       }),
                                 ),
                               ),
                               onChanged: (String value) {
                                 setState(() {
                                   try {
-                                    slippage = double.parse(value) / 100;
+                                    var slippage = double.parse(value) / 100;
+                                    exchangeCubit.updateAmountsAndSlipage(slippage: slippage);
                                   } catch (err) {
-                                    slippage = 0.03;
+                                    exchangeCubit.updateAmountsAndSlipage(slippage: 0.03);
                                   }
                                 });
                               },
@@ -682,7 +538,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                     '${slippageList[index]} ${slippageList[index] !=
                                         'Custom' ? '%' : ''}',
                                     isActive: slippageList[index] != 'Custom' &&
-                                        slippage ==
+                                        exchangeState.slippage ==
                                             double.parse(slippageList[index]) / 100,
                                     callback: () {
                                       if (slippageList[index] == 'Custom') {
@@ -691,9 +547,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                         });
                                       } else {
                                         setState(() {
-                                          slippage =
-                                              double.parse(slippageList[index]) /
-                                                  100;
+                                          exchangeCubit.updateAmountsAndSlipage(slippage: double.parse(slippageList[index]) /
+                                              100);
                                         });
                                       }
                                     },
@@ -732,7 +587,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                 ),
                               ),
                               Text(
-                                getRateStringFormat(dexState),
+                                exchangeCubit.getRateStringFormat(),
                                 style: Theme
                                     .of(context)
                                     .textTheme
@@ -741,22 +596,22 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                   fontSize: 12,
                                 ),
                               ),
-                              Text(
-                                ' (\$${balancesHelper.numberStyling(rateQuoteUsd, fixedCount: 2, fixed: true)})',
-                                style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .copyWith(
-                                  fontSize: 12,
-                                  color: Theme
-                                      .of(context)
-                                      .textTheme
-                                      .headline5!
-                                      .color!
-                                      .withOpacity(0.3),
-                                ),
-                              )
+                              // Text(
+                              //   ' (\$${balancesHelper.numberStyling(rateQuoteUsd, fixedCount: 2, fixed: true)})',
+                              //   style: Theme
+                              //       .of(context)
+                              //       .textTheme
+                              //       .headline5!
+                              //       .copyWith(
+                              //     fontSize: 12,
+                              //     color: Theme
+                              //         .of(context)
+                              //         .textTheme
+                              //         .headline5!
+                              //         .color!
+                              //         .withOpacity(0.3),
+                              //   ),
+                              // )
                             ],
                           ),
                         ),
@@ -785,7 +640,7 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                                 ),
                               ),
                               Text(
-                                '${balancesHelper.fromSatohi(12000)} DFI',
+                                '${walletCubit.fromSatoshi(12000)} DFI',
                                 style: Theme
                                     .of(context)
                                     .textTheme
@@ -849,95 +704,89 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Column(
                   children: [
-                    BlocBuilder<FiatCubit, FiatState>(builder: (context, fiatState) {
-                      FiatCubit fiatCubit =
-                      BlocProvider.of<FiatCubit>(context);
-                      if (iterator == 0 && SettingsHelper.isBitcoin()) {
-                        fiatCubit.loadCryptoRoute(accountTo);
-                        iterator++;
-                      }
-                      if (SettingsHelper.isBitcoin()) {
-                        return Column(
-                          children: [
-                            if (fiatState.status == FiatStatusList.success && fiatState.kycStatus != completeKycType)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 14.0),
-                                child: InkWell(
-                                  onTap: () {
-                                    String kycHash = fiatState.kycHash!;
-                                    launch(
-                                        'https://payment.dfx.swiss/kyc?code=$kycHash');
-                                  },
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text:
-                                          'Please complete the KYC process to enable this feature',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline5
-                                          ?.apply(color: AppTheme.pinkColor),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            else if (fiatState.errorMessage == "\"Missing bank transaction\"")
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 14.0),
-                                child: Text(
-                                  'Please do buy or sell first',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline5
-                                      ?.apply(color: Theme.of(context)
-                                      .textTheme
-                                      .headline5!.color!.withOpacity(0.6)),
-                                ),
-                              ),
-                            NewPrimaryButton(
-                              titleWidget: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/change_icon.svg',
-                                      color: AppColors.white,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text(
-                                    'Preview Change',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .button!
-                                        .copyWith(
-                                          fontWeight: FontWeight.w800,
-                                          color: AppColors.white,
-                                          fontSize: 14,
-                                        ),
-                                  )
-                                ],
-                              ),
-                              callback: !isDisableSubmit() &&
-                                      (fiatState.kycStatus ==
-                                          completeKycType) &&
-                                      fiatState.errorMessage == null
-                                  ? () => submitReviewSwap(
-                                        accountState,
-                                        transactionState,
-                                        context,
-                                        isFullScreen,
-                                        cryptoRoute: fiatState.cryptoRoute,
-                                      )
-                                  : null,
-                            ),
-                          ],
-                        );
-                      } else {
-                        return NewPrimaryButton(
+                        //TODO:This is block for bitcoin network. Comment this because bitcoin currently is unavailable
+                        //if bitcoin{
+                        // return Column(
+                        //   children: [
+                        //     if (fiatState.status == FiatStatusList.success && fiatState.kycStatus != completeKycType)
+                        //       Padding(
+                        //         padding: const EdgeInsets.only(bottom: 14.0),
+                        //         child: InkWell(
+                        //           onTap: () {
+                        //             String kycHash = fiatState.kycHash!;
+                        //             launch(
+                        //                 'https://payment.dfx.swiss/kyc?code=$kycHash');
+                        //           },
+                        //           child: RichText(
+                        //             text: TextSpan(
+                        //               text:
+                        //                   'Please complete the KYC process to enable this feature',
+                        //               style: Theme.of(context)
+                        //                   .textTheme
+                        //                   .headline5
+                        //                   ?.apply(color: AppTheme.pinkColor),
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       )
+                        //     else if (fiatState.errorMessage == "\"Missing bank transaction\"")
+                        //       Padding(
+                        //         padding: const EdgeInsets.only(bottom: 14.0),
+                        //         child: Text(
+                        //           'Please do buy or sell first',
+                        //           style: Theme.of(context)
+                        //               .textTheme
+                        //               .headline5
+                        //               ?.apply(color: Theme.of(context)
+                        //               .textTheme
+                        //               .headline5!.color!.withOpacity(0.6)),
+                        //         ),
+                        //       ),
+                        //     NewPrimaryButton(
+                        //       titleWidget: Row(
+                        //         mainAxisAlignment: MainAxisAlignment.center,
+                        //         children: [
+                        //           SizedBox(
+                        //             width: 16,
+                        //             height: 16,
+                        //             child: SvgPicture.asset(
+                        //               'assets/icons/change_icon.svg',
+                        //               color: AppColors.white,
+                        //             ),
+                        //           ),
+                        //           SizedBox(
+                        //             width: 8,
+                        //           ),
+                        //           Text(
+                        //             'Preview Change',
+                        //             style: Theme.of(context)
+                        //                 .textTheme
+                        //                 .button!
+                        //                 .copyWith(
+                        //                   fontWeight: FontWeight.w800,
+                        //                   color: AppColors.white,
+                        //                   fontSize: 14,
+                        //                 ),
+                        //           )
+                        //         ],
+                        //       ),
+                        //       callback: !isDisableSubmit() &&
+                        //               (fiatState.kycStatus ==
+                        //                   completeKycType) &&
+                        //               fiatState.errorMessage == null
+                        //           ? () => submitReviewSwap(
+                        //                 accountState,
+                        //                 transactionState,
+                        //                 context,
+                        //                 isFullScreen,
+                        //                 cryptoRoute: fiatState.cryptoRoute,
+                        //               )
+                        //           : null,
+                        //     ),
+                        //   ],
+                        // );
+                        // else
+                         NewPrimaryButton(
                           titleWidget: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -968,10 +817,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                           ),
                           callback: !isDisableSubmit()
                               ? () {
-                            if (transactionState is! TransactionLoadingState) {
+                            TxCubit txCubit = BlocProvider.of<TxCubit>(context);
+                            if (txCubit.transactionState is! TransactionLoadingState) {
                                     submitReviewSwap(
-                                      accountState,
-                                      transactionState,
                                       context,
                                       isFullScreen,
                                     );
@@ -991,451 +839,34 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                             }
                                 }
                               : null,
-                        );
-                      }
-                    }),
+                        ),
                   ],
                 ),
               ),
             ],
           ),
         );
-      }
-    }
-  }
 
-  getRateStringFormat(dexState) {
-    double priceFrom =
-        (dexState is DexInitialState) ? 0.00 : dexState.initModel.priceFrom;
-    return '1 ${assetFrom.symbol} = $priceFrom ${assetTo!.symbol}';
-  }
-
-  calculateSecondAmount(String value, TokensState tokensState) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    try {
-      double dValue = double.parse(value.replaceAll(',', '.'));
-      var amount = tokensHelper.getAmountByUsd(
-        tokensCubit.state.tokensPairs!,
-        dValue,
-        assetFrom.symbol!,
-      );
-      setState(() {
-        amountFromInUsd =
-            balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
-        amountToInUsd = amountFromInUsd;
-      });
-    } catch (err) {
-      print(err);
     }
-  }
-
-  dexInit(dexState) {
-    if (waitingFrom && waitingTo) {
-      if (dexState.dexModel.amountFrom != null) {
-        amountFromController.text = dexState.dexModel.amountFrom.toString();
-        amountFromController.selection = TextSelection.fromPosition(
-            TextPosition(offset: amountFromController.text.length));
-      }
-      if (dexState.dexModel.amountTo != null) {
-        amountToController.text = dexState.dexModel.amountTo.toString();
-        amountToController.selection = TextSelection.fromPosition(
-            TextPosition(offset: amountToController.text.length));
-      }
-    }
-  }
-
-  bool isEnoughBalance(state) {
-    if (SettingsHelper.isBitcoin()) {
-      BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-      var amount = convertFromSatoshi(bitcoinCubit.state.totalBalance);
-      return amount < double.parse(amountFromController.text);
-    }
-    int balance = state.activeAccount.balanceList!
-        .firstWhere((el) => el.token! == assetFrom.symbol && !el.isHidden)
-        .balance!;
-    return convertFromSatoshi(balance) <
-        double.parse(amountFromController.text);
-  }
-
-  submitReviewSwap(
-    state,
-    transactionState,
-    context,
-    bool isFullScreen, {
-    CryptoRouteModel? cryptoRoute,
-  }) async {
-    hideOverlay();
-    if (SettingsHelper.isBitcoin()) {
-      double minDeposit = convertFromSatoshi(cryptoRoute!.minDeposit!);
-      if (minDeposit >= double.parse(amountFromController.text)) {
-        showSnackBar(
-          context,
-          title: 'Min amount must be more than $minDeposit BTC',
-          color: AppColors.txStatusError
-              .withOpacity(0.1),
-          prefix: Icon(
-            Icons.close,
-            color: AppColors.txStatusError,
-          ),
-        );
-        return;
-      }
-    }
-    if (isEnoughBalance(state)) {
-      showSnackBar(
-        context,
-        title: 'Insufficient funds',
-        color: AppColors.txStatusError
-            .withOpacity(0.1),
-        prefix: Icon(
-          Icons.close,
-          color: AppColors.txStatusError,
-        ),
-      );
-      return;
-    }
-    if (isNumeric(amountFromController.text)) {
-      if (SettingsHelper.isBitcoin() && cryptoRoute != null) {
-        showDialog(
-          barrierColor: Color(0x0f180245),
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context1) {
-            return PassConfirmDialog(
-                onSubmit: (password) async {
-                  try {
-                    BitcoinCubit bitcoinCubit =
-                    BlocProvider.of<BitcoinCubit>(context);
-                    ECPair keyPair = await HDWalletService()
-                        .getKeypairFromStorage(
-                        password, state.activeAccount.index!);
-                    var tx = await transactionService.createBTCTransaction(
-                      keyPair: keyPair,
-                      account: state.activeAccount,
-                      destinationAddress: cryptoRoute.address!,
-                      amount: balancesHelper.toSatoshi(amountFromController.text),
-                      satPerByte: bitcoinCubit.state.networkFee!.medium!,
-                    );
-                    if (tx.isError!) {
-                      showSnackBar(
-                        context,
-                        title: tx.error!,
-                        color: AppColors.txStatusError
-                            .withOpacity(0.1),
-                        prefix: Icon(
-                          Icons.close,
-                          color: AppColors.txStatusError,
-                        ),
-                      );
-                    } else {
-                      Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                SwapSummaryScreen(
-                                  assetFrom.symbol!,
-                                  assetTo!.symbol!.replaceAll('d', ''),
-                                  double.parse(amountFromController.text),
-                                  double.parse(amountToController.text),
-                                  slippage,
-                                  btcTx: tx.txLoaderList![0].txHex!,
-                                ),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ));
-                    }
-                  } catch (err) {
-                    showSnackBar(
-                      context,
-                      title: 'Something went wrong',
-                      color: AppColors.txStatusError
-                          .withOpacity(0.1),
-                      prefix: Icon(
-                        Icons.close,
-                        color: AppColors.txStatusError,
-                      ),
-                    );
-                  }
-                }
-            );
-          },
-        );
-      } else {
-        Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SwapSummaryScreen(
-                    assetFrom.symbol!,
-                    assetTo!.symbol!,
-                    double.parse(amountFromController.text),
-                    double.parse(amountToController.text),
-                    assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' ? slippage + 0.3 : slippage,
-                  ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ));
-      }
-    }
-  }
-
-  onSelectFromAsset(asset, tokensState, accountState, dexCubit) {
-    List<dynamic> tokens = tokensState.tokensForSwap[asset.symbol];
-    tokensForSwap = List<TokensModel>.generate(
-      tokens.length,
-          (index) =>
-          TokensModel(
-            name: tokens[index],
-            symbol: tokens[index],
-          ),
-    );
-    setState(() {
-      assetFrom = asset;
-      assetTo = tokensForSwap[0];
-    });
-    if (assetFrom.symbol == assetTo!.symbol) {
-      amountFromController.text = amountToController.text;
-    } else {
-      dexCubit.updateDex(
-        assetFrom.symbol,
-        assetTo!.symbol,
-        null,
-        double.parse(amountToController.text),
-        address,
-        accountState.activeAccount.addressList!,
-        tokensState,
-      );
-    }
-  }
-
-  onSelectToAsset(asset, tokensState, accountState, dexCubit) {
-    setState(() => {assetTo = asset});
-    if (assetFrom.symbol == assetTo!.symbol) {
-      amountFromController.text = amountToController.text;
-    } else {
-      dexCubit.updateDex(
-          assetFrom.symbol,
-          assetTo!.symbol,
-          null,
-          double.parse(amountToController.text),
-          address,
-          accountState.activeAccount.addressList!,
-          tokensState);
-    }
-  }
-
-  onChangeFromAsset(value, accountState, dexState, dexCubit, tokensState) {
-    String valueFormat = value.replaceAll(',', '.');
-    if (isFailed) {
-      setState(() {
-        isFailed = false;
-      });
-    }
-    waitingFrom = false;
-    amountFromController.text = valueFormat;
-    amountFromController.selection = TextSelection.fromPosition(
-        TextPosition(offset: amountFromController.text.length));
-    onFromInputChanged(
-        valueFormat, dexState, dexCubit, accountState, tokensState);
-  }
-
-  onChangeToAsset(value, accountState, dexState, dexCubit, tokensState) {
-    String valueFormat = value.replaceAll(',', '.');
-    if (isFailed) {
-      setState(() {
-        isFailed = false;
-      });
-    }
-    waitingTo = false;
-    amountToController.text = valueFormat;
-    amountToController.selection = TextSelection.fromPosition(
-        TextPosition(offset: amountToController.text.length));
-    onToInputChanged(
-        valueFormat, dexState, dexCubit, accountState, tokensState);
-  }
 
   bool isNumeric(String string) {
     final numericRegex = RegExp(r'^-?(([0-9]*)|(([0-9]*)\.([0-9]*)))$');
     return numericRegex.hasMatch(string);
   }
 
-  String createPriceString(dexState, tokenFrom, tokenTo) {
-    double price = 0;
-    if (dexState is DexLoadedState) {
-      if (dexState.dexModel.tokenFrom == tokenFrom) {
-        price = dexState.dexModel.priceFrom!;
-      } else {
-        price = dexState.dexModel.priceTo!;
-      }
+  submitReviewSwap(
+    context,
+    bool isFullScreen, ) async {
+    if (isNumeric(amountFromController.text)) {
+        Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  SwapSummaryScreen(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ));
     }
-    return '${balancesHelper.numberStyling(
-        price, fixedCount: 8, fixed: true)} ${tokensHelper.getTokenWithPrefix(
-        tokenTo)} per ${tokensHelper.getTokenWithPrefix(tokenFrom)}';
-  }
-
-  String createFeeString(dexState) {
-    var fee = 0;
-    if (dexState is DexLoadedState) {
-      if (dexState.dexModel.fee != null) {
-        fee = dexState.dexModel.fee!;
-      }
-    }
-    return '${balancesHelper.numberStyling(convertFromSatoshi(fee))} DFI';
-  }
-
-  onFromInputChanged(String query, dexState, dexCubit, accountState,
-      tokensState) {
-    double amount = (query == '') ? 0 : double.parse(query);
-
-    if (debounce?.isActive ?? false) debounce?.cancel();
-    debounce = Timer(const Duration(milliseconds: 800), () {
-      waitingFrom = true;
-      if (assetFrom.symbol! == assetTo!.symbol!) {
-        amountToController.text = amountFromController.text;
-      } else {
-        if (SettingsHelper.isBitcoin()) {
-          FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-          double amount = double.parse(amountFromController.text);
-          FiatState f = fiatCubit.state;
-          try {
-            var a = (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
-                .toString();
-            amountToController.text = balancesHelper.numberStyling(
-              double.parse(a),
-              fixedCount: 4,
-              fixed: true,
-            );
-          } catch (err) {
-            amountToController.text = balancesHelper.numberStyling(
-              amount,
-              fixedCount: 4,
-              fixed: true,
-            );
-          }
-
-          dexCubit.updateBtcDex(assetFrom.symbol, assetTo!.symbol, amount,
-              double.parse(amountToController.text));
-        } else {
-          dexCubit.updateDex(
-              assetFrom.symbol,
-              assetTo!.symbol,
-              amount,
-              null,
-              address,
-              accountState.activeAccount.addressList!,
-              tokensState);
-        }
-      }
-      //TODO: add validation
-    });
-  }
-
-  onToInputChanged(String query, dexState, dexCubit, accountState,
-      tokensState) {
-    double amount = (query == '') ? 0 : double.parse(query);
-    if (debounce?.isActive ?? false) debounce?.cancel();
-    debounce = Timer(const Duration(milliseconds: 800), () {
-      waitingTo = true;
-      if (assetFrom.symbol! == assetTo!.symbol!) {
-        if (SettingsHelper.isBitcoin()) {
-          FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-          double amount = double.parse(amountToController.text);
-
-          amountFromController.text =
-              (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
-                  .toString();
-          amountFromController.text = balancesHelper.numberStyling(
-            double.parse(amountToController.text),
-            fixedCount: 4,
-            fixed: true,
-          );
-        } else {
-          amountFromController.text = amountToController.text;
-        }
-      } else {
-        dexCubit.updateDex(
-            assetFrom.symbol,
-            assetTo!.symbol,
-            null,
-            amount,
-            address,
-            accountState.activeAccount.addressList!,
-            tokensState);
-      }
-    });
-  }
-
-  String getUdsAmount(double amount, tokensState) {
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-
-    var targetAmount =
-    (amount - (fiatCubit.state.cryptoRoute!.fee! / 100 * amount))
-        .toString();
-
-    var result = tokensHelper.getAmountByUsd(
-      tokensState.tokensPairs!,
-      double.parse(targetAmount.replaceAll(',', '.')),
-      'BTC',
-    );
-    return balancesHelper.numberStyling(
-      result,
-      fixedCount: 2,
-      fixed: true,
-    );
-  }
-
-  hideOverlay() {
-    try {
-      selectKeyFrom.currentState!.hideOverlay();
-    } catch (_) {}
-    try {
-      selectKeyTo.currentState!.hideOverlay();
-    } catch (_) {}
-  }
-
-  double getAmountByFee(int balance, String token) {
-    int fee = token == 'DFI' ? 12000 : 0;
-    int amount = balance - fee;
-    return (amount > 0) ? convertFromSatoshi(balance - fee) : 0.0;
-  }
-
-  double getAvailableAmount(
-    accountState,
-    assetFrom,
-    dexState, {
-    bool isBitcoin = false,
-  }) {
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-    int amount = 0;
-    int fee = 0;
-
-    if (isBitcoin) {
-      if (bitcoinCubit.state.availableBalance <= 0) {
-        return 0.0;
-      } else {
-        return convertFromSatoshi(bitcoinCubit.state.availableBalance);
-      }
-    }
-
-    if (accountState.status == AccountStatusList.success &&
-        dexState is DexLoadedState) {
-      if (dexState.dexModel.fee != null) {
-        fee = dexState.dexModel.fee!;
-      }
-      accountState.activeAccount.balanceList!.forEach((balance) {
-        if (balance.token == assetFrom && !balance.isHidden) {
-          amount = balance.balance!;
-        }
-        if (assetFrom == 'DFI' && !balance.isHidden) {
-          amount -= fee;
-        }
-      });
-    }
-    if (amount < 0) {
-      amount = 0;
-    }
-
-    return convertFromSatoshi(amount);
   }
 
   bool isDisableSubmit() {

@@ -33,31 +33,24 @@ class _AddressBookDialogState extends State<AddressBookDialog>
   int iterator = 0;
   TextEditingController controller = TextEditingController();
   List<AddressBookModel>? viewList = [];
-  List<AddressBookModel>? allContactsList = [];
-  List<AddressBookModel>? lastSent = [];
   bool isSelectedContacts = true;
   bool isSelectedLastSent = false;
 
   @override
-  Widget build(BuildContext context) {
-    AddressBookCubit addressBookCubit =
-        BlocProvider.of<AddressBookCubit>(context);
-    if (iterator == 0) {
-      iterator++;
+  void initState() {
+    super.initState();
+    AddressBookCubit addressBookCubit = BlocProvider.of<AddressBookCubit>(context);
 
-      addressBookCubit.loadAddressBook();
-    }
+    addressBookCubit.init(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<AddressBookCubit, AddressBookState>(
       builder: (context, addressBookState) {
-        if (iterator == 1 &&
+        if (iterator == 0 &&
             addressBookState.status == AddressBookStatusList.success) {
-          allContactsList = addressBookState.addressBookList;
-          allContactsList!.forEach((element) {
-            if (element.network == currentNetworkName()) {
-              viewList!.add(element);
-            }
-          });
-          lastSent = addressBookState.lastSentList;
+          viewList = addressBookState.addressBookList;
           iterator++;
         }
         return BackdropFilter(
@@ -220,7 +213,7 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                                                             .address!,
                                                     networkName:
                                                         viewList![index]
-                                                            .network!,
+                                                            .network!.networkNameFormat,
                                                   ),
                                                 ),
                                               ),
@@ -240,7 +233,6 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                                   : Padding(
                                       padding: const EdgeInsets.only(right: 16),
                                       child: StatusLogoAndTitle(
-                                        title: 'Oops!',
                                         subtitle:
                                             'Jelly can\'t see any contacts in your address book',
                                         isTitlePosBefore: true,
@@ -252,9 +244,9 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                           Expanded(
                             child: Container(
                               width: double.infinity,
-                              child: (lastSent != null && lastSent!.isNotEmpty)
+                              child: (addressBookState.lastSentList != null && addressBookState.lastSentList!.isNotEmpty)
                                   ? ListView.builder(
-                                      itemCount: lastSent!.length,
+                                      itemCount: addressBookState.lastSentList!.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return Padding(
@@ -267,7 +259,7 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                                                   if (widget.getAddress !=
                                                       null) {
                                                     widget.getAddress!(
-                                                        lastSent![index]
+                                                        addressBookState.lastSentList![index]
                                                             .address!);
                                                     Navigator.pop(context);
                                                   }
@@ -276,8 +268,7 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                                                   cursor:
                                                       SystemMouseCursors.click,
                                                   child: LastSentTile(
-                                                    address: lastSent![index]
-                                                        .address!,
+                                                    address: addressBookState.lastSentList![index],
                                                     index: index,
                                                   ),
                                                 ),
@@ -295,7 +286,6 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                                   : Padding(
                                       padding: const EdgeInsets.only(right: 16),
                                       child: StatusLogoAndTitle(
-                                        title: 'Oops!',
                                         subtitle:
                                             'You don\'t have addresses yet',
                                         isTitlePosBefore: true,

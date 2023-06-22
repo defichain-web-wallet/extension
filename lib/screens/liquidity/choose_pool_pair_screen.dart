@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -36,38 +37,17 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<TokensCubit, TokensState>(
-            builder: (context, tokensState) {
-          return BlocBuilder<AccountCubit, AccountState>(
-            builder: (accountContext, accountState) {
-              TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-              if (accountState.status == AccountStatusList.success &&
-                  tokensState.status == TokensStatusList.success) {
-                List<AssetPairModel> availableTokens = [];
+      LmCubit lmCubit = BlocProvider.of<LmCubit>(context);
 
-                try {
-                  tokensState.tokensPairs!.forEach((el) {
-                    var foundTokenPair = tokensState.foundTokens!.where(
-                        (item) => item.isPair && el.symbol == item.symbol);
-                    var fountTokenPairList = List.from(foundTokenPair);
-                    if (fountTokenPairList.length == 1) {
-                      availableTokens.add(List.from(tokensState.tokensPairs!
-                          .where((item) =>
-                              item.symbol == fountTokenPairList[0].symbol))[0]);
-                    }
-                  });
-                } catch (e) {
-                  print(e);
-                }
 
                 return Scaffold(
-                  drawerScrimColor: Color(0x0f180245),
+                  drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                   endDrawer: AccountDrawer(
                     width: buttonSmallWidth,
                   ),
                   appBar: NewMainAppBar(
                     isShowLogo: false,
-                    callback: ()=>tokensCubit.search(tokensState.tokens, ''),
+                    callback: ()=>lmCubit.search(''),
                   ),
                   body: Container(
                     padding: EdgeInsets.only(
@@ -112,7 +92,6 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                               children: [
                                 SearchPoolPairField(
                                   controller: searchController,
-                                  tokensState: tokensState,
                                 ),
                                 Expanded(
                                   child: Column(
@@ -238,8 +217,10 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                   ),
                                 ],
                               ),
-                            Expanded(
-                              child: availableTokens.length > 0
+                       BlocBuilder<LmCubit, LmState>(
+                  builder: (lmContext, lmState) =>
+                             Expanded(
+                              child: lmState.foundedPools!.length > 0
                                   ? !filter
                                       ? GridView.builder(
                                           gridDelegate:
@@ -249,7 +230,7 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                             crossAxisSpacing: 8,
                                             mainAxisSpacing: 8,
                                           ),
-                                          itemCount: availableTokens.length,
+                                          itemCount: lmState.foundedPools!.length,
                                           itemBuilder:
                                               (BuildContext ctx, index) {
                                             return InkWell(
@@ -266,7 +247,7 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                                             animation2) =>
                                                         LiquiditySelectPool(
                                                       assetPair:
-                                                          availableTokens[
+                                                      lmState.foundedPools![
                                                               index],
                                                     ),
                                                     transitionDuration:
@@ -278,14 +259,14 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                               },
                                               child: PoolAssetPair(
                                                 assetPair:
-                                                    availableTokens[index],
+                                                lmState.foundedPools![index],
                                                 isGrid: true,
                                               ),
                                             );
                                           },
                                         )
                                       : ListView.builder(
-                                          itemCount: availableTokens.length,
+                                          itemCount: lmState.foundedPools!.length,
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 12, vertical: 12),
                                           itemBuilder:
@@ -308,7 +289,7 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                                                 animation2) =>
                                                             LiquiditySelectPool(
                                                           assetPair:
-                                                              availableTokens[
+                                                          lmState.foundedPools![
                                                                   index],
                                                         ),
                                                         transitionDuration:
@@ -320,11 +301,11 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                                   },
                                                   child: PoolAssetPair(
                                                     assetPair:
-                                                        availableTokens[index],
+                                                    lmState.foundedPools![index],
                                                     isGrid: false,
                                                   ),
                                                 ),
-                                                if (!((availableTokens.length -
+                                                if (!((lmState.foundedPools!.length -
                                                         1) ==
                                                     index))
                                                   Divider(
@@ -346,20 +327,14 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                             .apply(color: Colors.grey.shade600),
                                       ),
                                     ),
-                            ),
+                            )),
                           ],
                         ),
                       ),
                     ),
                   ),
                 );
-              } else {
-                return Container();
               }
-            },
-          );
-        });
-      },
     );
   }
 }
