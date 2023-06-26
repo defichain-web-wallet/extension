@@ -1,6 +1,5 @@
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/widgets/buttons/cancel_button.dart';
-import 'package:defi_wallet/widgets/ongoing_transaction.dart';
 import 'package:flutter/material.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -37,7 +36,6 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      bottom: isShowBottom ? OngoingTransaction() : null,
       shadowColor: Colors.transparent,
       shape: !isSmall!
           ? null

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
@@ -15,20 +16,24 @@ class TransactionCubit extends Cubit<TransactionState> {
   HistoryRequests historyRequests = HistoryRequests();
   Timer? timer;
 
-  checkOngoingTransaction() async {
+  checkOngoingTransaction(NetworkTypeModel networkType) async {
     var box = await Hive.openBox(HiveBoxes.client);
     var txId = await box.get(HiveNames.ongoingTransaction);
     await box.close();
     if (txId != null) {
       TxErrorModel txErrorModel = TxErrorModel.fromJson(txId);
-      await onChangeTransactionState(txErrorModel);
+      await onChangeTransactionState(txErrorModel, networkType);
       timer = Timer.periodic(Duration(seconds: 2), (timer) async {
-        await onChangeTransactionState(txErrorModel, timer: timer);
+        await onChangeTransactionState(txErrorModel, networkType, timer: timer);
       });
     }
   }
 
-  onChangeTransactionState(TxErrorModel txErrorModel, {dynamic timer}) async {
+  onChangeTransactionState(
+    TxErrorModel txErrorModel,
+    NetworkTypeModel networkType, {
+    dynamic timer,
+  }) async {
     bool isOngoing;
     TxLoaderModel loadingTx;
     try {
@@ -37,7 +42,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       );
       isOngoing = await historyRequests.getTxPresent(
         loadingTx.txId!,
-        SettingsHelper.settings.network!,
+        networkType.networkString,
       );
       if (isOngoing) {
         if (txErrorModel.txLoaderList!.length > 1 &&

@@ -63,8 +63,11 @@ class _HomeScreenState extends State<HomeScreen>
     tabController!.addListener(tabListener);
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
 
-    transactionCubit.checkOngoingTransaction();
+    transactionCubit.checkOngoingTransaction(
+      walletCubit.state.activeNetwork.networkType,
+    );
 
     lockHelper.updateTimer();
   }
