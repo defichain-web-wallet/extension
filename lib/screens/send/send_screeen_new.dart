@@ -3,15 +3,19 @@ import 'package:defi_wallet/bloc/refactoring/transaction/tx_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/mixins/netwrok_mixin.dart';
+import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
+import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
@@ -100,43 +104,27 @@ class _SendScreenNewState extends State<SendScreenNew>
                       network: network,
                     ),
                   );
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) =>
-                          SendSummaryScreen(
-                        address: addressController.text,
-                        isAfterAddContact: true,
-                        amount: double.parse(assetController.text),
-                        token: state.currentAsset!,
-                        fee: state.activeFee,
-                        // fee: state.activeFee,
-                      ),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    ),
-                  );
+                  NavigatorService.push(context, SendSummaryScreen(
+                  address: addressController.text,
+                  isAfterAddContact: true,
+                  amount: double.parse(assetController.text),
+                  token: state.currentAsset!,
+                  fee: state.activeFee,
+                  // fee: state.activeFee,
+                  ));
                   Navigator.pop(dialogContext);
                 },
               );
             },
           );
         } else {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SendSummaryScreen(
-                address: addressController.text,
-                amount: double.parse(assetController.text),
-                token: state.currentAsset!,
-                fee: state.activeFee,
-                // fee: state.activeFee,
-              ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
+          NavigatorService.push(context, SendSummaryScreen(
+            address: addressController.text,
+            amount: double.parse(assetController.text),
+            token: state.currentAsset!,
+            fee: state.activeFee,
+            // fee: state.activeFee,
+          ));
         }
       } else {
         showSnackBar(
@@ -150,20 +138,13 @@ class _SendScreenNewState extends State<SendScreenNew>
         );
       }
     } else if (contact.name != null) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => SendSummaryScreen(
-            amount: double.parse(assetController.text),
-            token: state.currentAsset!,
-            contact: contact,
-            fee: state.activeFee,
-            // fee: state.activeFee,
-          ),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, SendSummaryScreen(
+        amount: double.parse(assetController.text),
+        token: state.currentAsset!,
+        contact: contact,
+        fee: state.activeFee,
+        // fee: state.activeFee,
+      ));
     } else {
       showSnackBar(
         context,
@@ -234,10 +215,10 @@ class _SendScreenNewState extends State<SendScreenNew>
 
                     return Scaffold(
                       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                      endDrawer: AccountDrawer(
+                      endDrawer: isFullScreen ? null : AccountDrawer(
                         width: buttonSmallWidth,
                       ),
-                      appBar: NewMainAppBar(
+                      appBar: isFullScreen ? null : NewMainAppBar(
                         isShowLogo: false,
                       ),
                       body: Container(
@@ -262,6 +243,8 @@ class _SendScreenNewState extends State<SendScreenNew>
                           borderRadius: BorderRadius.only(
                             topRight: Radius.circular(20),
                             topLeft: Radius.circular(20),
+                            bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                            bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                           ),
                         ),
                         child: Center(
@@ -271,14 +254,9 @@ class _SendScreenNewState extends State<SendScreenNew>
                               children: [
                                 Column(
                                   children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          titleText,
-                                          style: headline2.copyWith(
-                                              fontWeight: FontWeight.w700),
-                                        )
-                                      ],
+                                    PageTitle(
+                                      title: titleText,
+                                      isFullScreen: isFullScreen,
                                     ),
                                     SizedBox(
                                       height: 8,

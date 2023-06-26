@@ -1,7 +1,7 @@
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_kyc_mobile_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -11,7 +11,6 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/custom_select_tile.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class StakingNewKycProcessScreen extends StatefulWidget {
@@ -44,13 +43,13 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
       ) {
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-              endDrawer: AccountDrawer(
+              endDrawer: isFullScreen ? null : AccountDrawer(
                 width: buttonSmallWidth,
               ),
-              appBar: NewMainAppBar(
+              appBar: isFullScreen ? null : NewMainAppBar(
                 bgColor: AppColors.viridian.withOpacity(0.16),
-                isShowLogo: false,
                 isShowNetworkSelector: false,
+                isShowLogo: false,
               ),
               body: Container(
                 decoration:
@@ -80,6 +79,8 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
                           topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                          bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                         ),
                       ),
                       child: StretchBox(
@@ -229,17 +230,10 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                             NewPrimaryButton(
                               callback: () {
                                 if (isMobile) {
-                                  Navigator.push(
+                                  NavigatorService.push(
                                     context,
-                                    PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                              StakingKycMobileScreen(
-                                        kycLink:
-                                            widget.kycLink,
-                                      ),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
+                                    StakingKycMobileScreen(
+                                      kycLink: widget.kycLink,
                                     ),
                                   );
                                 } else {

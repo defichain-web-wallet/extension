@@ -1,22 +1,30 @@
+import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/logo_helper.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/widgets/buttons/back_icon_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/selectors/network_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-// import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
-// import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
+import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
+import 'dart:js' as js;
 
-class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
+import 'package:flutter_bloc/flutter_bloc.dart'; // ignore: avoid_web_libraries_in_flutter
+
+class NewMainAppBar extends StatelessWidget
+    with ThemeMixin
+    implements PreferredSizeWidget {
   final bool isShowLogo;
+  final bool isSmallScreen;
   final bool isShowNetworkSelector;
   final Color? bgColor;
   final void Function()? callback;
 
-  const NewMainAppBar({
+  NewMainAppBar({
     Key? key,
     this.isShowLogo = true,
+    this.isSmallScreen = false,
     this.isShowNetworkSelector = true,
     this.bgColor,
     this.callback,
@@ -34,6 +42,7 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     LockHelper lockHelper = LockHelper();
+    HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
 
     return PreferredSize(
       preferredSize: Size.fromHeight(toolbarHeight),
@@ -51,36 +60,46 @@ class NewMainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 margin: const EdgeInsets.only(left: logoLeftPadding),
                 child: LogoHelper().getLogo(),
               )
-            : IconButton(
-                padding: const EdgeInsets.only(left: logoLeftPadding - 2),
-                icon: Container(
-                  width: iconSize,
-                  height: iconSize,
-                  child: Image.asset(
-                    'assets/icons/arrow.png',
-                  ),
-                ),
-                onPressed: () {
-                  if (callback != null) {
-                    callback!();
-                  }
-                  Navigator.of(context).pop();
-                },
-                hoverColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                splashColor: Colors.transparent,
-                focusColor: Colors.transparent,
+            : BackIconButton(
+                leftPadding: logoLeftPadding - 2,
+                width: iconSize,
+                height: iconSize,
               ),
-        title: isShowNetworkSelector ? NetworkSelector(
-          onSelect: () {},
-        ) : Container(),
+        title: isShowNetworkSelector
+            ? NetworkSelector(
+                onSelect: () {},
+              )
+            : Container(),
         actions: [
+          if (isSmallScreen)
+            SizedBox(
+              width: 32,
+              height: 32,
+              child: NewActionButton(
+                iconPath: 'assets/icons/fullscreen_icon.svg',
+                onPressed: () => lockHelper.provideWithLockChecker(
+                    context,
+                    () => js.context
+                        .callMethod('open', [window.location.toString()])),
+              ),
+            ),
+          SizedBox(
+            width: 16,
+          ),
           SizedBox(
             width: 32,
             height: 32,
             child: NewActionButton(
               iconPath: 'assets/icons/account_icon.svg',
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              onPressed: () {
+                if (!isFullScreen(context)) {
+                  Scaffold.of(context).openEndDrawer();
+                } else {
+                  homeCubit.updateExtendedDrawer(
+                    !homeCubit.state.isShowExtendedAccountDrawer,
+                  );
+                }
+              },
             ),
           ),
           SizedBox(

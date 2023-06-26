@@ -33,7 +33,7 @@ class RewardRoutesList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(rewards.length, (index) {
             return InvestedField(
-              label: rewards[index].label!,
+              label: rewards[index].label ?? '',
               tokenName: rewards[index].targetAsset!,
               controller: controllers[index],
               focusNode: focusNodes[index],

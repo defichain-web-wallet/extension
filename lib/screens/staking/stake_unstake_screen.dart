@@ -1,26 +1,21 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/available_amount/available_amount_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
-import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_remove_screen.dart';
-import 'package:defi_wallet/screens/swap/swap_screen.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/lock_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -104,14 +99,14 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
             {
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: AccountDrawer(
-                  width: buttonSmallWidth,
-                ),
-                appBar: NewMainAppBar(
-                  bgColor: AppColors.viridian.withOpacity(0.16),
-                  isShowLogo: false,
-                  isShowNetworkSelector: false,
-                ),
+    endDrawer: isFullScreen ? null : AccountDrawer(
+    width: buttonSmallWidth,
+    ),
+    appBar: NewMainAppBar(
+    bgColor: AppColors.viridian.withOpacity(0.16),
+    isShowLogo: false,
+    isShowNetworkSelector: false,
+    ),
                 body: Container(
                   decoration: BoxDecoration(
                     color: AppColors.viridian.withOpacity(0.16),
@@ -138,6 +133,8 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20),
                         topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                        bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                       ),
                     ),
                     child: StretchBox(
@@ -148,14 +145,9 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      titleText,
-                                      style: headline2.copyWith(
-                                          fontWeight: FontWeight.w700),
-                                    )
-                                  ],
+                                PageTitle(
+                                  title: titleText,
+                                  isFullScreen: isFullScreen,
                                 ),
                                 SizedBox(
                                   height: 8,
@@ -829,23 +821,20 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
       builder: (BuildContext dialogContext) {
         return TxStatusDialog(
           txResponse: txResponse,
-          callbackOk: () {
+          callbackOk: () async {
             if (!txResponse.isError!) {
               TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse);
+              await transactionCubit.setOngoingTransaction(txResponse);
             }
-            Navigator.pushReplacement(
+            NavigatorService.pushReplacement(
               context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) => HomeScreen(
-                  isLoadTokens: true,
-                ),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
+              HomeScreen(
+                isLoadTokens: true,
               ),
             );
+            NavigatorService.pushReplacement(context, null);
           },
           callbackTryAgain: () async {
             print('TryAgain');
@@ -883,16 +872,7 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
         return TxStatusDialog(
           txResponse: txResponse,
           callbackOk: () {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) => HomeScreen(
-                  isLoadTokens: true,
-                ),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
+            NavigatorService.pushReplacement(context, null);
           },
           callbackTryAgain: () async {
             print('TryAgain');

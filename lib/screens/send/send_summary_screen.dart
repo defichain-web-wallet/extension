@@ -22,24 +22,22 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
-import 'package:defi_wallet/screens/send/send_status_screen.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
 class SendSummaryScreen extends StatefulWidget {
   final Function()? callback;
@@ -116,10 +114,10 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       ) {
         return Scaffold(
           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-          endDrawer: AccountDrawer(
+          endDrawer: isFullScreen ? null : AccountDrawer(
             width: buttonSmallWidth,
           ),
-          appBar: NewMainAppBar(
+          appBar: isFullScreen ? null : NewMainAppBar(
             isShowLogo: false,
           ),
           body:
@@ -129,7 +127,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                     Container(
                       padding: EdgeInsets.only(
                         top: 22,
-                        bottom: 24,
+                        bottom: 22,
                         left: 16,
                         right: 16,
                       ),
@@ -148,6 +146,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
                           topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                          bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                         ),
                       ),
                       child: Center(
@@ -157,14 +157,9 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                             children: [
                               Column(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        titleText,
-                                        style: headline2.copyWith(
-                                            fontWeight: FontWeight.w700),
-                                      )
-                                    ],
+                                  PageTitle(
+                                    title: titleText,
+                                    isFullScreen: isFullScreen,
                                   ),
                                   if (widget.isLedger)
                                     SizedBox(
@@ -419,7 +414,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                         width: 104,
                                         child: AccentButton(
                                           callback: () {
-                                            Navigator.pop(context);
+                                            NavigatorService.pop(context);
                                           },
                                           label: 'Cancel',
                                         ),
@@ -431,28 +426,54 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                           isCheckLock: false,
                                           pendingText: 'Pending',
                                           callback: (parent) async {
-                                            parent.emitPending(true);
-                                            showDialog(
-                                              barrierColor: AppColors.tolopea
-                                                  .withOpacity(0.06),
-                                              barrierDismissible: false,
-                                              context: context,
-                                              builder:
-                                                  (BuildContext context1) {
-                                                return PassConfirmDialog(
-                                                  onCancel: () {
-                                                    parent.emitPending(false);
-                                                  },
-                                                  onSubmit: (password) async {
+                                            final isLedger =
+                                                await SettingsHelper.isLedger();
+                                            if (isLedger) {
+                                              showDialog(
+                                                barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context1) {
+                                                  return LedgerCheckScreen(
+                                                      onStartSign:
+                                                          (p, c) async {
+                                                    parent.emitPending(true);
+                                                    p.emitPending(true);
                                                     await submitSend(
-                                                      state,
-                                                      password,
-                                                    );
-                                                  },
-                                                  context: context,
-                                                );
-                                              },
-                                            );
+                                                        state,
+                                                        null, isFullScreen, callbackOk: (() {
+                                                      NavigatorService.pop(c);
+                                                    }));
+                                                    parent.emitPending(false);
+                                                    p.emitPending(false);
+                                                  });
+                                                },
+                                              );
+                                            } else {
+                                              parent.emitPending(true);
+                                              showDialog(
+                                                barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context1) {
+                                                  return PassConfirmDialog(
+                                                    onCancel: () {
+                                                      parent.emitPending(false);
+                                                    },
+                                                    onSubmit: (password) async {
+                                                      await submitSend(
+                                                        state,
+                                                        password,
+                                                        isFullScreen,
+                                                      );
+                                                    },
+                                                    context: context,
+                                                  );
+                                                },
+                                              );
+                                            }
                                           },
                                         ),
                                       ),
@@ -520,7 +541,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
 
   Future submitSend(
     state,
-    password, {
+    password,
+    isFullScreen, {
     final Function()? callbackOk,
   }) async {
     try {
@@ -528,6 +550,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
         await _callback(
           state,
           password,
+          isFullScreen,
           callbackOk: callbackOk,
         );
       }
@@ -538,7 +561,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
 
   Future _callback(
     WalletState walletState,
-    String? password, {
+    String? password,
+    bool isFullScreen, {
     final Function()? callbackOk,
   }) async {
     await _sendTransaction(
@@ -546,6 +570,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       widget.token,
       walletState,
       password,
+      isFullScreen,
       callbackOk: callbackOk,
     );
   }
@@ -554,7 +579,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     context,
     TokenModel token,
     WalletState walletState,
-    String? password, {
+    String? password,
+    bool isFullScreen, {
     final Function()? callbackOk,
   }) async {
     TxErrorModel? txResponse;
@@ -596,7 +622,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       builder: (BuildContext dialogContext) {
         return TxStatusDialog(
           txResponse: txResponse,
-          callbackOk: () {
+          callbackOk: () async {
             if (callbackOk != null) {
               callbackOk();
             }
@@ -604,18 +630,14 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
               TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
-              transactionCubit.setOngoingTransaction(txResponse);
+              await transactionCubit.setOngoingTransaction(txResponse);
             }
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) => HomeScreen(
-                  isLoadTokens: true,
-                ),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
+            NavigatorService.pushReplacement(context, HomeScreen(
+              isLoadTokens: true,
+            ));
+            if (isFullScreen) {
+              NavigatorService.pushReplacement(context, null);
+            }
           },
           callbackTryAgain: () async {
             await _sendTransaction(
@@ -623,6 +645,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
               widget.token,
               walletState,
               password,
+              isFullScreen,
             );
           },
         );

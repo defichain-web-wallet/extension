@@ -7,6 +7,7 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme_manager.dart';
 import 'package:defi_wallet/widgets/account_drawer/selected_account.dart';
 import 'package:defi_wallet/widgets/buttons/account_menu_button.dart';
@@ -20,10 +21,12 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 
 class AccountDrawer extends StatefulWidget {
   final double? width;
+  final bool isFullScreen;
 
   const AccountDrawer({
     Key? key,
     this.width = 280,
+    this.isFullScreen = false,
   }) : super(key: key);
 
   @override
@@ -63,13 +66,15 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
           accountsSelectorHeight = 260;
         }
         return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
+          filter: widget.isFullScreen
+              ? ImageFilter.blur(sigmaX: 0.0, sigmaY: 0.0)
+              : ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
           child: Drawer(
             width: widget.width!,
             backgroundColor: Colors.transparent,
-            elevation: 3,
+            elevation: widget.isFullScreen ? 0 : 3,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(widget.isFullScreen ? 0 : 8),
               child: Container(
                 decoration: BoxDecoration(
                   color: isDarkTheme()
@@ -108,23 +113,24 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      Container(
-                                        width: 16,
-                                        height: 16,
-                                        child: IconButton(
-                                          splashRadius: 12,
-                                          padding: const EdgeInsets.all(0),
-                                          onPressed: () => Scaffold.of(context)
-                                              .closeEndDrawer(),
-                                          icon: Icon(
-                                            Icons.close,
-                                            size: 16,
-                                            color: Theme.of(context)
-                                                .dividerColor
-                                                .withOpacity(0.5),
+                                      if (!widget.isFullScreen)
+                                        Container(
+                                          width: 16,
+                                          height: 16,
+                                          child: IconButton(
+                                            splashRadius: 12,
+                                            padding: const EdgeInsets.all(0),
+                                            onPressed: () => Scaffold.of(context)
+                                                .closeEndDrawer(),
+                                            icon: Icon(
+                                              Icons.close,
+                                              size: 16,
+                                              color: Theme.of(context)
+                                                  .dividerColor
+                                                  .withOpacity(0.5),
+                                            ),
                                           ),
-                                        ),
-                                      )
+                                        )
                                     ],
                                   ),
                                 ),
@@ -260,15 +266,9 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                           AccountMenuButton(
                             callback: (index) {
                               Scaffold.of(context).closeEndDrawer();
-                              Navigator.push(
+                              NavigatorService.push(
                                 context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          AddressBookScreenNew(),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
+                                AddressBookScreenNew(),
                               );
                             },
                             iconPath: 'assets/icons/address_book.svg',
@@ -280,15 +280,9 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                           AccountMenuButton(
                             callback: (index) {
                               Scaffold.of(context).closeEndDrawer();
-                              Navigator.push(
+                              NavigatorService.push(
                                 context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          SettingScreen(),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
+                                SettingScreen(),
                               );
                             },
                             iconPath: 'assets/icons/setting.svg',

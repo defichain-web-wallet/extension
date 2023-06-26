@@ -29,10 +29,12 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
     );
     String? accessToken = await LockRequests.signIn(data);
     if (accessToken != null) {
-      this.accessTokensMap[account.accountIndex] = AccessTokenModel(
+      final accessTokenModel = AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
       );
+      print(accessTokenModel.toJson());
+      this.accessTokensMap[account.accountIndex] = accessTokenModel;
       return true;
     }
     return false; //TODO: need to return ErrorModel with details

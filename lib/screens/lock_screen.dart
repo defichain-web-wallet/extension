@@ -1,6 +1,5 @@
 import 'dart:convert' as Convert;
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
@@ -14,7 +13,6 @@ import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 
 class LockScreen extends StatefulWidget {
@@ -43,10 +41,20 @@ class _LockScreenState extends State<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isFullScreen = MediaQuery.of(context).size.width > ScreenSizes.medium;
     return Scaffold(
       body: Stack(
         children: [
-          ExtensionWelcomeBg(),
+          if (!isFullScreen)
+            ExtensionWelcomeBg()
+          else
+            Center(
+              child: Image.asset(
+                'assets/images/jelly_protect.png',
+                width: 191,
+                height: 306,
+              ),
+            ),
           Container(
             padding: const EdgeInsets.only(bottom: 42),
             child: Center(
@@ -65,7 +73,7 @@ class _LockScreenState extends State<LockScreen> {
                           children: [
                             PasswordTextField(
                               onlyEngCharacters: false,
-                              isOpasity: true,
+                              isOpasity: !isFullScreen,
                               height: 71,
                               controller: _passwordController,
                               status: passwordStatus,
@@ -79,10 +87,10 @@ class _LockScreenState extends State<LockScreen> {
                               isObscure: isPasswordObscure,
                               onChanged: (val) {},
                               onPressObscure: () {
-                                setState(() =>
-                                    isPasswordObscure = !isPasswordObscure);
+                                setState(
+                                        () => isPasswordObscure = !isPasswordObscure);
                               },
-                              validator: (val) {
+                              validator: (val){
                                 return isValid ? null : "Incorrect password";
                               },
                             ),
@@ -105,16 +113,15 @@ class _LockScreenState extends State<LockScreen> {
                                 ),
                                 onTap: isEnable
                                     ? () => Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                    animation2) =>
-                                                RecoveryScreen(),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
-                                          ),
-                                        )
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                        RecoveryScreen(),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
+                                  ),
+                                )
                                     : null,
                               ),
                           ],

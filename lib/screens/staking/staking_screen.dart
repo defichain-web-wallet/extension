@@ -4,21 +4,19 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/lock_reward_routes_model.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
-import 'package:defi_wallet/widgets/fields/invested_field.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/staking/reward_icon.dart';
 import 'package:defi_wallet/widgets/staking/reward_routes.dart';
-import 'package:defi_wallet/widgets/staking/staking_tabs.dart';
-import 'package:defi_wallet/widgets/staking/yield_machine/yield_machine_balances.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,6 +41,9 @@ class _StakingScreenState extends State<StakingScreen>
   TextEditingController controller = TextEditingController();
   late List<TextEditingController> controllers;
   late List<FocusNode> focusNodes;
+
+  late List<Widget> rewards;
+
   _onSaveRewardRoutes(BuildContext context) {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
@@ -81,10 +82,10 @@ class _StakingScreenState extends State<StakingScreen>
 
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: AccountDrawer(
+                endDrawer: isFullScreen ? null : AccountDrawer(
                   width: buttonSmallWidth,
                 ),
-                appBar: NewMainAppBar(
+                appBar: isFullScreen ? null : NewMainAppBar(
                   bgColor: AppColors.viridian.withOpacity(0.16),
                   isShowLogo: false,
                   isShowNetworkSelector: false,
@@ -240,14 +241,9 @@ class _StakingScreenState extends State<StakingScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      titleText,
-                                      style:
-                                          Theme.of(context).textTheme.headline3,
-                                    ),
-                                  ],
+                                PageTitle(
+                                  title: titleText,
+                                  isFullScreen: isFullScreen,
                                 ),
                                 SizedBox(
                                   height: 16,
@@ -425,32 +421,18 @@ class _StakingScreenState extends State<StakingScreen>
                                             SizedBox(
                                               height: 12,
                                             ),
-                                            // Column(
-                                            //   mainAxisAlignment:
-                                            //       MainAxisAlignment.start,
-                                            //   crossAxisAlignment:
-                                            //       CrossAxisAlignment.start,
-                                            //   children: [
-                                            //     InvestedField(
-                                            //       label:
-                                            //           // '${lockState.stakingModel!.rewardRoutes[0].label}',
-                                            //           'Reinvest',
-                                            //       tokenName:
-                                            //           'DFI',
-                                            //           // '${lockState.stakingModel!.rewardRoutes[0].targetAsset}',
-                                            //       controller: controller,
-                                            //       isDeleteBtn: false,
-                                            //       isDisable: !isEdit,
-                                            //     ),
-                                            //   ],
-                                            //
-                                            // ),
+                                            RewardRoutesList(
+                                              controllers: controllers,
+                                              focusNodes: focusNodes,
+                                              isDisabled: isEdit,
+                                            ),
                                           ],
                                         ),
                                       ),
                                       SizedBox(
                                         height: 16,
                                       ),
+                                      if (!isEdit)
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -460,21 +442,9 @@ class _StakingScreenState extends State<StakingScreen>
                                               child: AccentButton(
                                                 label: 'Unstake',
                                                 callback: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    PageRouteBuilder(
-                                                      pageBuilder: (context,
-                                                              animation1,
-                                                              animation2) =>
-                                                          StakeUnstakeScreen(
-                                                        isUnstake: true,
-                                                      ),
-                                                      transitionDuration:
-                                                          Duration.zero,
-                                                      reverseTransitionDuration:
-                                                          Duration.zero,
-                                                    ),
-                                                  );
+                                                  NavigatorService.push(context, StakeUnstakeScreen(
+                                                    isUnstake: true,
+                                                  ));
                                                 },
                                               ),
                                             ),
@@ -482,129 +452,40 @@ class _StakingScreenState extends State<StakingScreen>
                                               width: 140,
                                               title: 'Stake',
                                               callback: () {
-                                                Navigator.push(
-                                                  context,
-                                                  PageRouteBuilder(
-                                                    pageBuilder: (context,
-                                                            animation1,
-                                                            animation2) =>
-                                                        StakeUnstakeScreen(
-                                                      isUnstake: false,
-                                                    ),
-                                                    transitionDuration:
-                                                        Duration.zero,
-                                                    reverseTransitionDuration:
-                                                        Duration.zero,
-                                                  ),
-                                                );
+                                                NavigatorService.push(context, StakeUnstakeScreen(
+                                                  isUnstake: false,
+                                                ));
                                               },
                                             )
                                           ],
                                         ),
-                                      // if (isEdit)
-                                      //   Row(
-                                      //     mainAxisAlignment:
-                                      //         MainAxisAlignment.spaceBetween,
-                                      //     children: [
-                                      //       Container(
-                                      //         width: 140,
-                                      //         child: AccentButton(
-                                      //           label: 'Cancel',
-                                      //           callback: () {
-                                      //             setState(() {
-                                      //               isEdit = false;
-                                      //             });
-                                      //           },
-                                      //         ),
-                                      //       ),
-                                      //       NewPrimaryButton(
-                                      //         width: 140,
-                                      //         title: 'Save',
-                                      //         callback: () {
-                                      //           setState(() {
-                                      //             isEdit = false;
-                                      //           });
-                                      //         },
-                                      //       )
-                                      //     ],
-                                      //   ),
+                                      if (isEdit)
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              width: 140,
+                                              child: AccentButton(
+                                                label: 'Cancel',
+                                                callback: () {
+                                                  setState(() {
+                                                    isEdit = false;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                            NewPrimaryButton(
+                                              width: 140,
+                                              title: 'Save',
+                                              callback: () =>
+                                                  _onSaveRewardRoutes(context),
+                                            )
+                                          ],
+                                        ),
                                     ],
                                   ),
                                 ),
-                                // if (lockState.isYieldMachine  && !isEdit) ...[
-                                //   SizedBox(
-                                //     height: 16,
-                                //   ),
-                                //   Row(
-                                //     mainAxisAlignment:
-                                //         MainAxisAlignment.spaceBetween,
-                                //     children: [
-                                //       SizedBox(
-                                //         width: 156,
-                                //         height: 43,
-                                //         child: AccentButton(
-                                //           label: 'Withdrawal',
-                                //           callback: () {
-                                //             if (lockState.availableBalances.length != 0) {
-                                //               Navigator.push(
-                                //                 context,
-                                //                 PageRouteBuilder(
-                                //                   pageBuilder: (context,
-                                //                       animation1,
-                                //                       animation2) =>
-                                //                       YieldMachineActionScreen(
-                                //                         isDeposit: false,
-                                //                         isShowDepositAddress: lockState.availableBalances.length != 0,
-                                //                       ),
-                                //                   transitionDuration:
-                                //                   Duration.zero,
-                                //                   reverseTransitionDuration:
-                                //                   Duration.zero,
-                                //                 ),
-                                //               );
-                                //             } else {
-                                //               showSnackBar(
-                                //                 context,
-                                //                 title: 'Insufficient funds',
-                                //                 color: AppColors.txStatusError
-                                //                     .withOpacity(0.1),
-                                //                 prefix: Icon(
-                                //                   Icons.close,
-                                //                   color:
-                                //                   AppColors.txStatusError,
-                                //                 ),
-                                //               );
-                                //             }
-                                //           },
-                                //         ),
-                                //       ),
-                                //       SizedBox(
-                                //         width: 156,
-                                //         height: 43,
-                                //         child: NewPrimaryButton(
-                                //           title: 'Deposit',
-                                //           callback: () {
-                                //             Navigator.push(
-                                //               context,
-                                //               PageRouteBuilder(
-                                //                 pageBuilder: (context,
-                                //                     animation1,
-                                //                     animation2) =>
-                                //                     YieldMachineActionScreen(
-                                //                       isDeposit: true,
-                                //                     ),
-                                //                 transitionDuration:
-                                //                 Duration.zero,
-                                //                 reverseTransitionDuration:
-                                //                 Duration.zero,
-                                //               ),
-                                //             );
-                                //           },
-                                //         ),
-                                //       )
-                                //     ],
-                                //   ),
-                                // ],
                               ],
                             ),
                           ),

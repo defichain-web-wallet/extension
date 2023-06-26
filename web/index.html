@@ -13,7 +13,6 @@
   <meta name="apple-mobile-web-app-title" content="defi_wallet">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-
   <title>defi_wallet</title>
   <link rel="manifest" href="manifest.json">
   <style>
@@ -23,9 +22,19 @@
       top:0px;
       left:0px;
     }
-    html, body {
-      height: 600px;
-      width: 360px;
+
+    @media screen and (-webkit-min-device-pixel-ratio:0) {
+      html {
+        height: 600px;
+        width: 360px;
+      }
+    }
+
+    @-moz-document url-prefix() {
+      body {
+        height: 600px;
+        width: 360px;
+      }
     }
   </style>
 </head>

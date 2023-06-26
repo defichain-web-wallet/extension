@@ -1,7 +1,7 @@
 // import 'dart:html'; // ignore: avoid_web_libraries_in_flutter
 // import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/widgets/buttons/back_button.dart';
+import 'package:defi_wallet/widgets/buttons/back_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive/hive.dart';
@@ -49,7 +49,7 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
         padding: const EdgeInsets.only(left: 8),
         child: Row(
           children: [
-            backButton(context),
+            BackIconButton(leftPadding: 0, width: 24, height: 24,),
           ],
         ),
       ) : null,

@@ -1,20 +1,16 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
-import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
@@ -26,7 +22,6 @@ import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class SwapSummaryScreen extends StatefulWidget {
   // final String assetFrom;
@@ -63,12 +58,12 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
             TransactionState transactionState,
           ) {
             return Scaffold(
-              appBar: NewMainAppBar(
-                isShowLogo: false,
-              ),
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-              endDrawer: AccountDrawer(
+              endDrawer: isFullScreen ? null : AccountDrawer(
                 width: buttonSmallWidth,
+              ),
+              appBar: isFullScreen ? null : NewMainAppBar(
+                isShowLogo: false,
               ),
               body: Container(
                 padding: EdgeInsets.only(
@@ -90,9 +85,11 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20),
                     topLeft: Radius.circular(20),
+                    bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                    bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                   ),
                 ),
-                child: _buildBody(context),
+                child: _buildBody(context, isFullScreen),
               ),
             );
           },
@@ -101,7 +98,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
     );
   }
 
-  Widget _buildBody(context, {isCustomBgColor = false}) => BlocBuilder<ExchangeCubit, ExchangeState>(
+  Widget _buildBody(context, isFullScreen) => BlocBuilder<ExchangeCubit, ExchangeState>(
   builder: (context, state) {
     ExchangeCubit exchangeCubit = BlocProvider.of<ExchangeCubit>(context);
     return StretchBox(
@@ -112,9 +109,9 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Summary',
-                    style: Theme.of(context).textTheme.headline3,
+                  PageTitle(
+                    title: 'Summary',
+                    isFullScreen: isFullScreen,
                   ),
                   SizedBox(
                     height: 16,
@@ -247,7 +244,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               title: 'Cancel',
                               isPrimary: false,
                               callback: () {
-                                Navigator.of(context).pop();
+                                NavigatorService.pop(context);
                               },
                             ),
                           ),
@@ -359,6 +356,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                   reverseTransitionDuration: Duration.zero,
                 ),
               );
+              NavigatorService.pushReplacement(context, null);
             },
             callbackTryAgain: () async {
               print('TryAgain');

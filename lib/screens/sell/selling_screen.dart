@@ -17,11 +17,13 @@ import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
@@ -51,6 +53,8 @@ class Selling extends StatefulWidget {
 }
 
 class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
+  static const completeKycType = 'Completed';
+
   final TextEditingController amountController =
       TextEditingController(text: '0');
   final TextEditingController _ibanController = TextEditingController();
@@ -130,10 +134,10 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                         );
                         return Scaffold(
                           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                          endDrawer: AccountDrawer(
+                          endDrawer: isFullScreen ? null : AccountDrawer(
                             width: buttonSmallWidth,
                           ),
-                          appBar: NewMainAppBar(
+                          appBar: isFullScreen ? null : NewMainAppBar(
                             isShowLogo: false,
                             callback: hideOverlay,
                           ),
@@ -142,7 +146,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                             child: Container(
                               padding: EdgeInsets.only(
                                 top: 22,
-                                bottom: 24,
+                                bottom: 22,
                                 left: 16,
                                 right: 16,
                               ),
@@ -161,6 +165,8 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                 borderRadius: BorderRadius.only(
                                   topRight: Radius.circular(20),
                                   topLeft: Radius.circular(20),
+                                  bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                                  bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                                 ),
                               ),
                               child: Center(
@@ -178,17 +184,9 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    titleText,
-                                                    style: headline2.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.w700),
-                                                    textAlign: TextAlign.start,
-                                                    softWrap: true,
-                                                  ),
-                                                ],
+                                              PageTitle(
+                                                title: titleText,
+                                                isFullScreen: isFullScreen,
                                               ),
                                               SizedBox(
                                                 height: 16,
@@ -516,7 +514,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
       TransactionCubit transactionCubit =
           BlocProvider.of<TransactionCubit>(context);
 
-      transactionCubit.setOngoingTransaction(txResponse);
+      await transactionCubit.setOngoingTransaction(txResponse);
     }
     showDialog(
       barrierColor: AppColors.tolopea.withOpacity(0.06),
@@ -540,6 +538,7 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                 reverseTransitionDuration: Duration.zero,
               ),
             );
+            NavigatorService.pushReplacement(context, null);
           },
           callbackTryAgain: () async {
             await _sendTransaction(

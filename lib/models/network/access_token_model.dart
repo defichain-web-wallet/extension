@@ -16,15 +16,15 @@ class AccessTokenModel {
   factory AccessTokenModel.fromJson(Map<String, dynamic> jsonModel) {
     return AccessTokenModel(
       accessToken: jsonModel['accessToken'],
-      expireHours: int.parse(jsonModel['expireHours']),
+      expireHours: jsonModel['expireHours'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'accessToken': this.accessToken.toString(),
-      'expireHours': this.accessTokenExpireTime.toString(),
-    };
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data["accessToken"] = this.accessToken.toString();
+    data["expireHours"] = this.accessTokenExpireTime;
+    return data;
   }
 }
 

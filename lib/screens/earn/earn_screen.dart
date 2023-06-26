@@ -1,7 +1,4 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/screens/earn/earn_screen_wrapper.dart';
@@ -69,7 +66,7 @@ class _EarnScreenState extends State<EarnScreen> {
         TransactionState txState,
       ) {
         return EarnScreenWrapper(
-          // loadEarnData: loadEarnData,
+          isFullScreen: isFullScreen,
         );
       },
     );

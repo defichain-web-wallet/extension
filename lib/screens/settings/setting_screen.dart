@@ -1,15 +1,13 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/dialog_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/settings/setting_language_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_recovery_seed_screen.dart';
-import 'package:defi_wallet/services/mnemonic_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
-import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -39,10 +37,10 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
       ) {
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-              endDrawer: AccountDrawer(
+              endDrawer: isFullScreen ? null : AccountDrawer(
                 width: buttonSmallWidth,
               ),
-              appBar: NewMainAppBar(
+              appBar: isFullScreen ? null : NewMainAppBar(
                 isShowLogo: false,
               ),
               body: Container(
@@ -67,6 +65,8 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20),
                     topLeft: Radius.circular(20),
+                    bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                    bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                   ),
                 ),
                 child: Center(
@@ -77,14 +77,9 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  titleText,
-                                  style: headline2.copyWith(
-                                      fontWeight: FontWeight.w700),
-                                )
-                              ],
+                            PageTitle(
+                              title: titleText,
+                              isFullScreen: isFullScreen,
                             ),
                             SizedBox(
                               height: 16,
@@ -104,19 +99,10 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
                                           onSubmit: (password) async {
                                             final walletCubit = BlocProvider.of<WalletCubit>(context);
                                             List<String> mnemonic = walletCubit.getMnemonic(password);
-                                            Navigator.pushReplacement(
+                                            NavigatorService.pushReplacement(
                                               context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    SettingRecoverySeedScreen(
-                                                  mnemonic: mnemonic,
-                                                ),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
+                                              SettingRecoverySeedScreen(
+                                                mnemonic: mnemonic,
                                               ),
                                             );
                                           },

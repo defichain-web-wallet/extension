@@ -1,4 +1,3 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
@@ -6,6 +5,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_new_kyc_process_screen.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_select_verification_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -47,13 +47,13 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
               builder: (lockContext, lockState) {
                 return Scaffold(
                   drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                  endDrawer: AccountDrawer(
+                  endDrawer: isFullScreen ? null : AccountDrawer(
                     width: buttonSmallWidth,
                   ),
-                  appBar: NewMainAppBar(
+                  appBar: isFullScreen ? null : NewMainAppBar(
                     bgColor: AppColors.viridian.withOpacity(0.16),
-                    isShowLogo: false,
                     isShowNetworkSelector: false,
+                    isShowLogo: false,
                   ),
                   body: Container(
                     decoration: BoxDecoration(
@@ -275,6 +275,8 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                             borderRadius: BorderRadius.only(
                               topRight: Radius.circular(20),
                               topLeft: Radius.circular(20),
+                              bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                              bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                             ),
                           ),
                           child: StretchBox(
@@ -310,27 +312,15 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                 NewPrimaryButton(
                                   callback: () {
                                     if (fiatState.kycStatus == 'Completed') {
-                                      Navigator.push(
+                                      NavigatorService.push(
                                         context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              StakingSelectVerificationScreen(),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
-                                        ),
+                                        StakingSelectVerificationScreen(),
                                       );
                                     } else {
-                                      Navigator.push(
+                                      NavigatorService.push(
                                         context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              StakingNewKycProcessScreen(kycLink: lockState.kycLink!,),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
+                                        StakingNewKycProcessScreen(
+                                          kycLink: lockState.kycLink!,
                                         ),
                                       );
                                     }
