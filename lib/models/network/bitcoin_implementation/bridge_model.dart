@@ -10,7 +10,7 @@ import 'package:defi_wallet/requests/bitcoin/blockcypher_requests.dart';
 //TODO: rewrite this
 class BridgeModel extends AbstractBridge {
   BridgeModel(
-    BitcoinNetworkModel networkType, {
+    NetworkTypeModel networkType, {
     int activeFee = 0,
     int totalBalance = 0,
     int unconfirmedBalance = 0,
@@ -27,11 +27,11 @@ class BridgeModel extends AbstractBridge {
           history,
         );
 
-  static BitcoinNetworkModel _validationNetworkName(
-    BitcoinNetworkModel networkType,
+  static NetworkTypeModel _validationNetworkName(
+      NetworkTypeModel networkType,
   ) {
-    if (networkType.networkType.networkName != NetworkName.bitcoinTestnet &&
-        networkType.networkType.networkName != NetworkName.bitcoinMainnet) {
+    if (networkType.networkName != NetworkName.defichainMainnet &&
+        networkType.networkName != NetworkName.defichainTestnet) {
       throw 'Invalid network';
     }
     return networkType;

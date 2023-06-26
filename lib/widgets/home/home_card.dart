@@ -40,7 +40,6 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
-    print(walletCubit.state.isSendReceiveOnly);
 
     return Container(
       width: homeCardWidth,

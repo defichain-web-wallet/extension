@@ -6,7 +6,7 @@ import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
 
 abstract class AbstractBridge {
-  final BitcoinNetworkModel networkType;
+  final NetworkTypeModel networkType;
   final int activeFee;
   final int totalBalance;
   final int unconfirmedBalance;

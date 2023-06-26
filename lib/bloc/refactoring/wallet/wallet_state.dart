@@ -17,10 +17,7 @@ class WalletState extends Equatable {
   }
 
   bool get isSendReceiveOnly =>
-      this.applicationModel!.activeNetwork!.networkType.networkName ==
-          NetworkName.bitcoinMainnet ||
-      this.applicationModel!.activeNetwork!.networkType.networkName ==
-          NetworkName.bitcoinTestnet;
+      this.applicationModel!.activeNetwork!.getBridges().isEmpty;
 
   String get activeAddress => this.applicationModel!.activeAccount!.getAddress(this.applicationModel!.activeNetwork!.networkType.networkName)!;
 

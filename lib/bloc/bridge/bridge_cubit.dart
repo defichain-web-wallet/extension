@@ -30,7 +30,7 @@ class BridgeCubit extends Cubit<BridgeState> {
     ));
 
     BridgeModel bridgeModel =
-        state.bridgeModel ?? BridgeModel(bitcoinNetworkModel);
+        state.bridgeModel ?? BridgeModel(bitcoinNetworkModel.networkType);
 
     try {
       balance = await bridgeModel.getBalance(
@@ -44,7 +44,7 @@ class BridgeCubit extends Cubit<BridgeState> {
       );
 
       BridgeModel newBridgeModel = BridgeModel(
-        bitcoinNetworkModel,
+        bitcoinNetworkModel.networkType,
         totalBalance: balance,
         history: history,
       );
@@ -86,7 +86,7 @@ class BridgeCubit extends Cubit<BridgeState> {
       );
 
       BridgeModel newBridgeModel = BridgeModel(
-        bitcoinNetworkModel,
+        bitcoinNetworkModel.networkType,
         networkFeeModel: networkFee,
         history: state.bridgeModel!.history,
         totalBalance: state.bridgeModel!.totalBalance,
