@@ -626,7 +626,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
             if (callbackOk != null) {
               callbackOk();
             }
-            if (!txResponse!.isError!) {
+            if (!txResponse!.isError! && !walletState.isSendReceiveOnly) {
               TransactionCubit transactionCubit =
                   BlocProvider.of<TransactionCubit>(context);
 
