@@ -149,7 +149,7 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                                 CustomTextFormField(
                                   prefix: Icon(Icons.search),
                                   addressController: searchController,
-                                  hintText: 'Search in Settings',
+                                  hintText: 'Search Token',
                                   isBorder: true,
                                   onChanged: (value) {
                                     TokensCubit token =

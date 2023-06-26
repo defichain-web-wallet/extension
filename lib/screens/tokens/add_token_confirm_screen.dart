@@ -97,7 +97,7 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
                         CustomTextFormField(
                           prefix: Icon(Icons.search),
                           addressController: searchController,
-                          hintText: 'Search in Settings',
+                          hintText: 'Search Token',
                           isBorder: true,
                           onChanged: (value) {},
                         ),
