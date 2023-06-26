@@ -16,6 +16,12 @@ class WalletState extends Equatable {
     return balances;
   }
 
+  bool get isSendReceiveOnly =>
+      this.applicationModel!.activeNetwork!.networkType.networkName ==
+          NetworkName.bitcoinMainnet ||
+      this.applicationModel!.activeNetwork!.networkType.networkName ==
+          NetworkName.bitcoinTestnet;
+
   String get activeAddress => this.applicationModel!.activeAccount!.getAddress(this.applicationModel!.activeNetwork!.networkType.networkName)!;
 
   TokenModel get activeToken => this.applicationModel!.activeToken!;
