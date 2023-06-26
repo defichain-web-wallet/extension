@@ -374,25 +374,28 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
                                                   // )}';
                                                 });
                                               },
-                                              child: Text(
-                                                'Available: '
-                                                    '${(lockState.stakingModel!.balances[0].balance -
-                                                    lockState.stakingModel!.balances[0].pendingWithdrawals)}',
-                                                style: Theme
-                                                    .of(context)
-                                                    .textTheme
-                                                    .headline6!
-                                                    .copyWith(
-                                                  fontWeight:
-                                                  FontWeight.w600,
-                                                  color: Theme
-                                                      .of(
-                                                      context)
+                                              child: MouseRegion(
+                                                cursor: SystemMouseCursors.click,
+                                                child: Text(
+                                                  'Available: '
+                                                      '${(lockState.stakingModel!.balances[0].balance -
+                                                      lockState.stakingModel!.balances[0].pendingWithdrawals)}',
+                                                  style: Theme
+                                                      .of(context)
                                                       .textTheme
                                                       .headline6!
-                                                      .color!
-                                                      .withOpacity(
-                                                      0.3),
+                                                      .copyWith(
+                                                    fontWeight:
+                                                    FontWeight.w600,
+                                                    color: Theme
+                                                        .of(
+                                                        context)
+                                                        .textTheme
+                                                        .headline6!
+                                                        .color!
+                                                        .withOpacity(
+                                                        0.3),
+                                                  ),
                                                 ),
                                               ),
                                             ),
