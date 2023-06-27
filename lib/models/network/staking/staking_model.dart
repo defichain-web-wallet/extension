@@ -121,7 +121,7 @@ class RewardRouteModel {
 
   factory RewardRouteModel.fromJson(Map<String, dynamic> json) => RewardRouteModel(
         id: json['id'],
-        label: json['label'],
+        label: json['label'] ?? '',
         rewardPercent: json['rewardPercent'],
         targetAsset: json['targetAsset'],
         targetAddress: json['targetAddress'],

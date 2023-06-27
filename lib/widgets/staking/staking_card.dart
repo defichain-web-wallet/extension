@@ -67,7 +67,8 @@ class StakingCard extends StatelessWidget {
           firstColumnSubTitle: 'Staked',
           isStaking: true,
           needUpdateAccessToken: true,
-          errorMessage: lockState.status == LockStatusList.notFound
+          errorMessage: lockState.status == LockStatusList.notFound ||
+                  lockState.status == LockStatusList.expired
               ? 'Need to create access token of LOCK'
               : 'Need to pass KYC of LOCK',
           callback: () async {

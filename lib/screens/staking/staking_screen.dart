@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
@@ -45,7 +46,6 @@ class _StakingScreenState extends State<StakingScreen>
   late List<Widget> rewards;
 
   _onSaveRewardRoutes(BuildContext context) {
-    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
 
     // lockCubit.updateRewardRoutes(
@@ -65,18 +65,16 @@ class _StakingScreenState extends State<StakingScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
         return BlocBuilder<LockCubit, LockState>(
           builder: (lockContext, lockState) {
             if (lockState.status == LockStatusList.success) {
-              // List<LockRewardRoutesModel> rewards =
-              //     lockState.lockStakingDetails!.rewardRoutes!;
-              // controllers = List.generate(rewards.length, (index) {
-              //   return TextEditingController(
-              //       text: (rewards[index].rewardPercent! * 100).toString());
-              // });
-              // focusNodes = List.generate(rewards.length, (index) => FocusNode());
+              List<RewardRouteModel> rewards =
+                  lockState.stakingModel!.rewardRoutes;
+              controllers = List.generate(rewards.length, (index) {
+                return TextEditingController(
+                    text: (rewards[index].rewardPercent! * 100).toString());
+              });
+              focusNodes = List.generate(rewards.length, (index) => FocusNode());
               controller.text =
                   '${1 * 100}';
 
