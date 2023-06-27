@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/selectors/network/network_selector_button.dart';
 import 'package:defi_wallet/widgets/selectors/network/network_selector_content.dart';
@@ -38,6 +39,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     controller.hideMenu();
     walletCubit.changeActiveNetwork(item);
+    NavigatorService.pushReplacement(context, null);
   }
 
   @override
