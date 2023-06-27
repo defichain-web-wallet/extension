@@ -26,8 +26,8 @@ class AccountTypeSell extends StatefulWidget {
 
 class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController(text: 'test');
-  final _surnameController = TextEditingController(text: 'example');
+  final _nameController = TextEditingController();
+  final _surnameController = TextEditingController();
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode surnameFocusNode = FocusNode();
   final String titleText = '1/3. Introduce yourself';

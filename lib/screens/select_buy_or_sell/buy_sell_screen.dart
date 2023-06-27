@@ -14,6 +14,7 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -45,17 +46,20 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
   loadDfxData() {
     RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
-    AccessTokenModel? accessToken = walletCubit
-        .state
-        .applicationModel!
-        .activeNetwork!
-        .rampList[0]
-        .accessTokensMap[walletCubit.state.activeAccount.accountIndex]!;
-    hasAccessToken = accessToken != null;
-    if (hasAccessToken) {
+    AccessTokenModel? accessToken;
+    try {
+      accessToken = walletCubit
+          .state
+          .applicationModel!
+          .activeNetwork!
+          .rampList[0]
+          .accessTokensMap[walletCubit.state.activeAccount.accountIndex]!;
       rampCubit.setAccessToken(accessToken);
       rampCubit.loadUserDetails();
+    } catch (err) {
+      accessToken = null;
     }
+    hasAccessToken = accessToken != null;
   }
 
   @override
@@ -284,16 +288,27 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                         'assets/icons/increase_limits.png',
                                         callback: () async {
 
-                                          RampCubit rampCubit =
-                                          BlocProvider.of<RampCubit>(context);
-                                          WalletCubit walletCubit =
-                                          BlocProvider.of<WalletCubit>(context);
-                                          await rampCubit.signIn(
-                                            walletCubit.state.activeAccount,
-                                            'Qwerty123',
-                                            walletCubit.state.applicationModel!,
+                                          showDialog(
+                                            barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                            barrierDismissible: false,
+                                            context: context,
+                                            builder: (BuildContext dialogContext) {
+                                              return PassConfirmDialog(
+                                                onCancel: () {},
+                                                onSubmit: (password) async {
+                                                  RampCubit rampCubit =
+                                                  BlocProvider.of<RampCubit>(context);
+                                                  WalletCubit walletCubit =
+                                                  BlocProvider.of<WalletCubit>(context);
+                                                  await walletCubit.signUpToRamp(
+                                                    password,
+                                                  );
+                                                  loadDfxData();
+                                                },
+                                              );
+                                            },
                                           );
-                                          loadDfxData();
+
 
                                           // fiatCubit.setLoadingState();
 
