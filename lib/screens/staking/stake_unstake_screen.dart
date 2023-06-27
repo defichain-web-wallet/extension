@@ -99,17 +99,17 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
             {
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-    endDrawer: isFullScreen ? null : AccountDrawer(
-    width: buttonSmallWidth,
-    ),
-    appBar: NewMainAppBar(
-    bgColor: AppColors.viridian.withOpacity(0.16),
-    isShowLogo: false,
-    isShowNetworkSelector: false,
-    ),
+                  endDrawer: isFullScreen ? null : AccountDrawer(
+                    width: buttonSmallWidth,
+                  ),
+                  appBar: isFullScreen ? null : NewMainAppBar(
+                    bgColor: AppColors.viridian.withOpacity(0.16),
+                    isShowLogo: false,
+                    isShowNetworkSelector: false,
+                  ),
                 body: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.viridian.withOpacity(0.16),
+                    color: isFullScreen ? null : AppColors.viridian.withOpacity(0.16),
                   ),
                   child: Container(
                     padding: EdgeInsets.only(

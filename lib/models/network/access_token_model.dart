@@ -7,8 +7,13 @@ class AccessTokenModel {
   AccessTokenModel({
     required this.accessToken,
     required expireHours,
+    int existingTime = 0,
   }){
-    this.accessTokenExpireTime = expireHours * hour;
+    if (existingTime == 0) {
+      this.accessTokenExpireTime = expireHours * hour;
+    } else {
+      this.accessTokenExpireTime = existingTime;
+    }
   }
 
   bool isValid() => this.accessTokenExpireTime - hour < DateTime.now().millisecondsSinceEpoch;
@@ -17,6 +22,7 @@ class AccessTokenModel {
     return AccessTokenModel(
       accessToken: jsonModel['accessToken'],
       expireHours: jsonModel['expireHours'],
+      existingTime: jsonModel['expireHours'],
     );
   }
 
