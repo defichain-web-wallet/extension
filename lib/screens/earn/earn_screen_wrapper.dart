@@ -1,7 +1,10 @@
 import 'package:defi_wallet/bloc/refactoring/earn/earn_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/screens/earn/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
@@ -92,8 +95,7 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
                       SizedBox(
                         height: 19,
                       ),
-                      StakingCard(
-                      ),
+                      StakingCard(),
                       SizedBox(
                         height: 18,
                       ),
@@ -114,6 +116,40 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
     bool isLoading,
   ) {
     LmState lmState = BlocProvider.of<LmCubit>(context).state;
+    RatesState ratesState = BlocProvider.of<RatesCubit>(context).state;
+    WalletState walletState = BlocProvider.of<WalletCubit>(context).state;
+
+    List<BalanceModel> balances = walletState.getBalances();
+
+    late double investedBalance;
+    late double totalBalance;
+    late String roundedInvestedBalance;
+    late String roundedTotalBalance;
+    try {
+      investedBalance = ratesState.ratesModel!.getTotalAmount(
+        walletState.activeNetwork,
+        lmState.pairBalances!,
+      );
+
+      totalBalance = ratesState.ratesModel!.getTotalAmount(
+        walletState.activeNetwork,
+        balances,
+      );
+    } catch (_) {
+      investedBalance = 0;
+      totalBalance = 0;
+    } finally {
+      roundedInvestedBalance = BalancesHelper().numberStyling(
+        investedBalance,
+        fixed: true,
+        fixedCount: 2,
+      );
+      roundedTotalBalance = BalancesHelper().numberStyling(
+        totalBalance,
+        fixed: true,
+        fixedCount: 2,
+      );
+    }
     return EarnCard(
       isLoading: isLoading,
       title: 'Liquidity mining',
@@ -123,19 +159,25 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
       //TODO: add fiat value
       // firstColumnNumber: balancesHelper
       //     .numberStyling(tokensState.totalPairsBalance ?? 0, fixed: true),
-      firstColumnNumber: "0",
+      firstColumnNumber: roundedInvestedBalance,
       firstColumnAsset: 'USD',
       firstColumnSubTitle: 'Pooled',
       secondColumnNumber: lmState.averageApr,
       secondColumnAsset: '%',
       secondColumnSubTitle: 'Portfolio APR',
       isStaking: false,
-      callback: () => liquidityCallback(),
+      callback: () => liquidityCallback(
+        roundedInvestedBalance,
+        roundedTotalBalance,
+      ),
     );
   }
 
-  liquidityCallback() {
-    Widget redirectTo = LiquidityScreenNew();
+  liquidityCallback(String totalBalance, String investedBalance) {
+    Widget redirectTo = LiquidityScreenNew(
+      totalBalance: totalBalance,
+      investedBalance: investedBalance,
+    );
 
     NavigatorService.push(context, redirectTo);
   }

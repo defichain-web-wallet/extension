@@ -1,18 +1,11 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/screens/liquidity/choose_pool_pair_screen.dart';
-import 'package:defi_wallet/screens/liquidity/liquidity_pool_list.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
@@ -27,8 +20,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LiquidityScreenNew extends StatefulWidget {
+  final String totalBalance;
+  final String investedBalance;
 
-  const LiquidityScreenNew({Key? key}) : super(key: key);
+  const LiquidityScreenNew({
+    Key? key,
+    required this.totalBalance,
+    required this.investedBalance,
+  }) : super(key: key);
 
   @override
   State<LiquidityScreenNew> createState() => _LiquidityScreenNewState();
@@ -237,8 +236,7 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                                     ),
                                               ),
                                               Text(
-                                                // '\$ ${balancesHelper.numberStyling(totalBalance, fixed: true)}',
-                                                "0",
+                                                '\$ ${widget.totalBalance}',
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .headline5!
@@ -271,8 +269,7 @@ class _LiquidityScreenNewState extends State<LiquidityScreenNew>
                                                     ),
                                               ),
                                               Text(
-                                                // '\$ ${balancesHelper.numberStyling(totalPairsBalance, fixed: true)}',
-                                                "0",
+                                                '\$ ${widget.investedBalance}',
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .headline5!
