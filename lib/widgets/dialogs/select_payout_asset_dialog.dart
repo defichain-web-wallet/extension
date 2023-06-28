@@ -1,9 +1,10 @@
 import 'dart:ui';
 
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/mixins/dialog_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/lock_asset_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/add_token/token_list_tile.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -27,7 +28,7 @@ class _SelectPayoutAssetDialogState extends State<SelectPayoutAssetDialog>
   String titleText = 'Select your payout asset';
   String selectedAssetName = '';
   TextEditingController searchController = TextEditingController();
-  late List<LockAssetModel> assets;
+  late List<TokenModel> assets;
 
   @override
   Widget build(BuildContext dialogContext) {
@@ -35,10 +36,10 @@ class _SelectPayoutAssetDialogState extends State<SelectPayoutAssetDialog>
 
     return BlocBuilder<LockCubit, LockState>(
       builder: (context, lockState) {
-        selectedAssetName = lockState.lockRewardNewRoute!.targetAsset ??
-            lockState.assetsByCategories[0].name!;
+        // selectedAssetName = lockState.lockRewardNewRoute!.targetAsset ??
+        //     lockState.assetsByCategories[0].name!;
 
-        assets = lockState.assetsByCategories;
+        assets = lockState.selectedAssets!;
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
           child: AlertDialog(
@@ -169,13 +170,13 @@ class _SelectPayoutAssetDialogState extends State<SelectPayoutAssetDialog>
                                 children: [
                                   TokenListTile(
                                     isSingleSelect: true,
-                                    isSelect: assets[index].name! == selectedAssetName,
-                                    tokenName: assets[index].name!,
+                                    isSelect: assets[index].symbol == selectedAssetName,
+                                    tokenName: assets[index].displaySymbol,
                                     isDense: true,
                                     onTap: () {
-                                      lockCubit.updateLockRewardNewRoute(
-                                        asset: assets[index].name!,
-                                      );
+                                      // lockCubit.updateLockRewardNewRoute(
+                                      //   asset: assets[index].name!,
+                                      // );
                                     },
                                   ),
                                   SizedBox(

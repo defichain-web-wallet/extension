@@ -1,6 +1,15 @@
 part of 'lock_cubit.dart';
 
 enum LockStatusList { initial, loading, success, notFound, neededKyc, expired, failure }
+enum LockAssetCryptoCategory {
+  Crypto,
+  PoolPair,
+  Stock;
+
+  @override
+  String toString() => this.name;
+}
+
 
 class LockState extends Equatable {
   final LockStatusList status;
@@ -12,6 +21,9 @@ class LockState extends Equatable {
   final String? kycLink;
   final StakingModel? stakingModel;
   final StakingTokenModel? stakingTokenModel;
+  final List<TokenModel>? assets;
+  final List<TokenModel>? selectedAssets;
+  final LockAssetCryptoCategory? lockActiveAssetCategory;
   final double? availableBalance;
 
 
@@ -26,6 +38,9 @@ class LockState extends Equatable {
     this.kycLink,
     this.stakingModel,
     this.stakingTokenModel,
+    this.assets,
+    this.selectedAssets,
+    this.lockActiveAssetCategory,
   });
 
   @override
@@ -40,6 +55,9 @@ class LockState extends Equatable {
     stakingModel,
     stakingTokenModel,
     availableBalance,
+    assets,
+    selectedAssets,
+    lockActiveAssetCategory,
       ];
 
   LockState copyWith({
@@ -53,6 +71,9 @@ class LockState extends Equatable {
     StakingModel? stakingModel,
     StakingTokenModel? stakingTokenModel,
     double? availableBalance,
+    List<TokenModel>? assets,
+    List<TokenModel>? selectedAssets,
+    LockAssetCryptoCategory? lockActiveAssetCategory,
   }) {
     return LockState(
       status: status ?? this.status,
@@ -65,6 +86,9 @@ class LockState extends Equatable {
       stakingModel: stakingModel ?? this.stakingModel,
       stakingTokenModel: stakingTokenModel ?? this.stakingTokenModel,
       availableBalance: availableBalance ?? this.availableBalance,
+      assets: assets ?? this.assets,
+      selectedAssets: selectedAssets ?? this.selectedAssets,
+      lockActiveAssetCategory: lockActiveAssetCategory ?? this.lockActiveAssetCategory,
     );
   }
 }

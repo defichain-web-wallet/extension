@@ -7,6 +7,8 @@ import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_token_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
+import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
@@ -110,6 +112,9 @@ class LockCubit extends Cubit<LockState> {
   ) async {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
 
+    var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
+    final assets = await activeNetwork.getAvailableTokens();
+
     var accessKey = lockStaking.getAccessToken(account);
     if (accessKey != null) {
       if(accessKey.isValid()){
@@ -143,6 +148,8 @@ class LockCubit extends Cubit<LockState> {
           isKycDone: isKycDone,
           kycLink: kycLink,
           stakingModel: stakingModel,
+          assets: assets,
+          selectedAssets: assets.where((element) => !element.isPair && !element.isDAT && !element.isUTXO).toList(),
           stakingTokenModel: stakingTokenModel,
           //staking lock
         ));
@@ -152,5 +159,27 @@ class LockCubit extends Cubit<LockState> {
     } else {
       emit(state.copyWith(status: LockStatusList.notFound));
     }
+  }
+
+  updateLockAssetCategory(LockAssetCryptoCategory value) {
+    late List<TokenModel> selectedAssets;
+
+    switch (value) {
+      case LockAssetCryptoCategory.Crypto:
+        selectedAssets = state.assets!.where((element) => !element.isPair && !element.isDAT && !element.isUTXO).toList();
+        break;
+      case LockAssetCryptoCategory.Stock:
+        selectedAssets = state.assets!.where((element) => !element.isPair && element.isDAT && !element.isUTXO).toList();
+        break;
+      case LockAssetCryptoCategory.PoolPair:
+        selectedAssets = state.assets!.where((element) => element.isPair && !element.isUTXO).toList();
+        break;
+      default:
+        selectedAssets = state.assets!.where((element) => !element.isPair && !element.isDAT && !element.isUTXO).toList();
+    }
+    emit(state.copyWith(
+      selectedAssets: selectedAssets,
+      lockActiveAssetCategory: value,
+    ));
   }
 }
