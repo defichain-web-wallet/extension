@@ -329,6 +329,7 @@ class _SendScreenState extends State<SendScreen>
     TxState txState,
     AbstractNetworkModel activeNetwork,
   ) {
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     if (BalancesHelper().isAmountEmpty(amountController.text)) {
       showSnackBar(
         context,
@@ -340,7 +341,8 @@ class _SendScreenState extends State<SendScreen>
         ),
       );
     } else {
-      if (transactionState is! TransactionLoadingState) {
+      if (transactionState is! TransactionLoadingState ||
+          walletCubit.state.isSendReceiveOnly) {
         _send(txState, activeNetwork);
       } else {
         showSnackBar(

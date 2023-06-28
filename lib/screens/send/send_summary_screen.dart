@@ -632,12 +632,17 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
 
               await transactionCubit.setOngoingTransaction(txResponse);
             }
-            NavigatorService.pushReplacement(context, HomeScreen(
-              isLoadTokens: true,
-            ));
-            if (isFullScreen) {
-              NavigatorService.pushReplacement(context, null);
-            }
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) => HomeScreen(
+                  isLoadTokens: true,
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+            NavigatorService.pushReplacement(context, null);
           },
           callbackTryAgain: () async {
             await _sendTransaction(

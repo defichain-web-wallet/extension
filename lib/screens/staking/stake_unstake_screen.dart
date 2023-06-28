@@ -831,10 +831,14 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
 
               await transactionCubit.setOngoingTransaction(txResponse);
             }
-            NavigatorService.pushReplacement(
+            Navigator.pushReplacement(
               context,
-              HomeScreen(
-                isLoadTokens: true,
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) => HomeScreen(
+                  isLoadTokens: true,
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
               ),
             );
             NavigatorService.pushReplacement(context, null);
