@@ -27,14 +27,14 @@ import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SendScreenNew extends StatefulWidget {
-  const SendScreenNew({Key? key}) : super(key: key);
+class SendScreen extends StatefulWidget {
+  const SendScreen({Key? key}) : super(key: key);
 
   @override
-  State<SendScreenNew> createState() => _SendScreenNewState();
+  State<SendScreen> createState() => _SendScreenState();
 }
 
-class _SendScreenNewState extends State<SendScreenNew>
+class _SendScreenState extends State<SendScreen>
     with ThemeMixin, NetworkMixin, SnackBarMixin {
   TextEditingController addressController = TextEditingController();
   TextEditingController amountController = TextEditingController(text: '0');

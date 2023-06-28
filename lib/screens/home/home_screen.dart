@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen>
       ratesCubit.loadRates(walletCubit.state.activeNetwork);
     }
 
-    return BlocBuilder<WalletCubit, WalletState>(builder: (context, state) {
+    return BlocBuilder<WalletCubit, WalletState>(builder: (context, walletState) {
           return ScaffoldWrapper(
             isUpdate: true,
             builder: (
@@ -148,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen>
                                       activeTabIndex: homeState.tabIndex,
                                       isShowHomeCard: true,
                                     ),
-                                  if (txState is! TransactionInitialState)
+                                  if (txState is! TransactionInitialState && !walletState.isSendReceiveOnly)
                                     TransactionStatusBar(
                                       key: txKey,
                                     ),
