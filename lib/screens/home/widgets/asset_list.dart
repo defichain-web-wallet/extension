@@ -28,6 +28,24 @@ class AssetList extends StatelessWidget with ThemeMixin {
                 ratesState.status == RatesStatusList.success) {
               List<BalanceModel> balances = state.getBalances();
 
+              List<Map<String, dynamic>> availableBalances = balances.map((el) {
+                double convertedBalance =
+                    ratesState.ratesModel!.convertAmountBalance(
+                  state.activeNetwork,
+                  el,
+                );
+
+                return <String, dynamic>{
+                  'convertAmount': convertedBalance,
+                  'balance': el,
+                };
+              }).toList();
+
+              availableBalances.sort(
+                (a, b) => b['convertAmount'].compareTo(a['convertAmount']),
+              );
+
+
               return SliverFixedExtentList(
                 itemExtent: 64.0 + 6,
                 delegate: SliverChildBuilderDelegate(
@@ -43,11 +61,11 @@ class AssetList extends StatelessWidget with ThemeMixin {
                           ? null
                           : Theme.of(context).cardColor,
                       child: AssetCard(
-                        balanceModel: balances[index],
+                        assetDetails: availableBalances[index],
                       ),
                     );
                   },
-                  childCount: balances.length,
+                  childCount: availableBalances.length,
                 ),
               );
             } else {

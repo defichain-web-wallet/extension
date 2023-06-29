@@ -2,7 +2,6 @@ import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/widgets/assets/asset_logo.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
@@ -11,11 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AssetCard extends StatefulWidget {
-  final BalanceModel balanceModel;
+  final Map<String, dynamic> assetDetails;
 
   const AssetCard({
     Key? key,
-    required this.balanceModel,
+    required this.assetDetails,
   }) : super(key: key);
 
   @override
@@ -39,15 +38,12 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
   @override
   Widget build(BuildContext context) {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
-    final token = widget.balanceModel.lmPool ?? widget.balanceModel.token;
+    final token = widget.assetDetails['balance'].lmPool ?? widget.assetDetails['balance'].token;
 
     return BlocBuilder<RatesCubit, RatesState>(
       buildWhen: (prev, current) => current.status == RatesStatusList.success,
       builder: (context, ratesState) {
-        final convertedBalance = ratesState.ratesModel!.convertAmountBalance(
-          walletCubit.state.activeNetwork,
-          widget.balanceModel,
-        );
+        final convertedBalance = widget.assetDetails['convertAmount'];
 
         final roundedBalance = BalancesHelper().numberStyling(
           convertedBalance,
@@ -122,7 +118,7 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        getFormatTokenBalance(widget.balanceModel.balance),
+                        getFormatTokenBalance(widget.assetDetails['balance'].balance),
                         style: Theme.of(context).textTheme.headline6!.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
