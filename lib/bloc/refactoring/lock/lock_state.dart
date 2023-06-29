@@ -1,6 +1,6 @@
 part of 'lock_cubit.dart';
 
-enum LockStatusList { initial, loading, success, notFound, neededKyc, expired, failure }
+enum LockStatusList { initial, loading, success, update, notFound, neededKyc, expired, failure }
 enum LockAssetCryptoCategory {
   Crypto,
   PoolPair,
@@ -23,7 +23,7 @@ class LockState extends Equatable {
   final StakingTokenModel? stakingTokenModel;
   final List<TokenModel>? assets;
   final List<TokenModel>? selectedAssets;
-  final LockAssetCryptoCategory? lockActiveAssetCategory;
+  final LockAssetCryptoCategory lockActiveAssetCategory;
   final double? availableBalance;
 
 
@@ -40,8 +40,32 @@ class LockState extends Equatable {
     this.stakingTokenModel,
     this.assets,
     this.selectedAssets,
-    this.lockActiveAssetCategory,
+    this.lockActiveAssetCategory = LockAssetCryptoCategory.Crypto,
   });
+
+  List<RewardRouteModel> rewards () {
+    final rewardRoutes = this.stakingModel!.rewardRoutes;
+    RewardRouteModel? reinvestRoute;
+    try {
+      reinvestRoute = rewardRoutes.firstWhere(
+        (element) => element.label == 'Reinvest',
+      );
+    } catch (err) {
+      reinvestRoute = null;
+    }
+    double sum =
+      rewardRoutes.map((item) => item.rewardPercent).reduce((a, b) => a + b);
+    if (sum < 1 && reinvestRoute == null) {
+      double reinvestAmount = double.parse((1 - sum).toStringAsFixed(2));
+      rewardRoutes.add(RewardRouteModel(
+        id: 0,
+        label: 'Reinvest',
+        rewardPercent: reinvestAmount,
+        targetAsset: 'DFI',
+      ));
+    }
+    return rewardRoutes;
+  }
 
   @override
   List<Object?> get props => [

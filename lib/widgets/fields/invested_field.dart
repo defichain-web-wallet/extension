@@ -47,7 +47,7 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Container(
-          width: 218,
+          width: isFullScreen(context) ? 300 : 218,
           padding: const EdgeInsets.only(bottom: 6),
           child: TextFormField(
             focusNode: widget.focusNode,
@@ -92,7 +92,7 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
                 ),
               ),
               prefixIcon: Container(
-                width: 144,
+                width: isFullScreen(context) ? 215 : 144,
                 height: 56,
                 child: Padding(
                   padding: EdgeInsets.only(left: 16),

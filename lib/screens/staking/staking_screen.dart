@@ -1,5 +1,5 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
@@ -46,12 +46,12 @@ class _StakingScreenState extends State<StakingScreen>
   late List<Widget> rewards;
 
   _onSaveRewardRoutes(BuildContext context) {
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
 
-    // lockCubit.updateRewardRoutes(
-    //   accountCubit.state.accounts!.first,
-    //   lockCubit.state.lockStakingDetails!.rewardRoutes!,
-    // );
+    lockCubit.updateRewardRoutes(
+      walletCubit.state.activeNetwork,
+    );
     setState(() {
       isEdit = false;
     });
@@ -68,8 +68,7 @@ class _StakingScreenState extends State<StakingScreen>
         return BlocBuilder<LockCubit, LockState>(
           builder: (lockContext, lockState) {
             if (lockState.status == LockStatusList.success) {
-              List<RewardRouteModel> rewards =
-                  lockState.stakingModel!.rewardRoutes;
+              List<RewardRouteModel> rewards = lockState.rewards();
               controllers = List.generate(rewards.length, (index) {
                 return TextEditingController(
                     text: (rewards[index].rewardPercent! * 100).toString());
@@ -87,12 +86,7 @@ class _StakingScreenState extends State<StakingScreen>
                   bgColor: AppColors.viridian.withOpacity(0.16),
                   isShowLogo: false,
                   isShowNetworkSelector: false,
-                  callback: () {
-                    // lockCubit.updateLockStrategy(
-                    //   LockStrategyList.Masternode,
-                    //   accountCubit.state.accounts!.first,
-                    // );
-                  },
+                  callback: () {},
                 ),
                 body: Container(
                   decoration: BoxDecoration(

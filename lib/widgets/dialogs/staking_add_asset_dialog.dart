@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -72,10 +72,11 @@ class _StakingAddAssetDialogState extends State<StakingAddAssetDialog>
                 callback: () {
                   Navigator.pop(context);
                   lockCubit.updateLockRewardNewRoute(
+                      asset: widget.assetName,
                       address: addressController.text,
                       label: labelController.text,
                       percent: 0,
-                      isComplete: true
+                      isComplete: true,
                   );
                 },
               ),
