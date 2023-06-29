@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_remove_screen.dart';
 import 'package:defi_wallet/screens/liquidity/remove_liquidity.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_select_pool.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -42,7 +43,7 @@ class _MainLiquidityPairState extends State<MainLiquidityPair> with ThemeMixin {
 
     return GestureDetector(
       onTap: () {
-        if(widget.callback != null) {
+        if (widget.callback != null) {
           widget.callback!(widget.assetPair!);
         }
       },
@@ -98,66 +99,65 @@ class _MainLiquidityPairState extends State<MainLiquidityPair> with ThemeMixin {
                                 ),
                               ),
                             ),
-                            SizedBox(width: 5,),
+                            SizedBox(
+                              width: 5,
+                            ),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  if(widget.isOpen)Expanded(child: LiquidityAssetPair(assetPair: widget.assetPair, balance: widget.balance),),
-                ],
-              ),
-              if(widget.isOpen)SizedBox(height: 16,),
-              if(widget.isOpen)Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 140,
-                    child: AccentButton(
-                      callback: () {
-                        lockHelper.provideWithLockChecker(
-                          context,
-                              () =>
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation1,
-                                      animation2) =>
-                                      LiquidityRemoveScreen(
-                                        assetPair: widget.assetPair!,
-                                        balance: widget.balance!,
-                                      ),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
-                              ),
-                        );
-                      },
-                      label: 'Remove',
+                  if (widget.isOpen)
+                    Expanded(
+                      child: LiquidityAssetPair(
+                          assetPair: widget.assetPair, balance: widget.balance),
                     ),
-                  ),
-                  NewPrimaryButton(
-                    width: 140,
-                    callback: (){
-                      lockHelper.provideWithLockChecker(
-                        context,
-                            () => Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                LiquiditySelectPool(
-                                  assetPair: widget.assetPair!,
-                                ),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        ),
-                      );
-                    },
-                    title: 'Add Liquidity',
-                  ),
                 ],
               ),
+              if (widget.isOpen)
+                SizedBox(
+                  height: 16,
+                ),
+              if (widget.isOpen)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 140,
+                      child: AccentButton(
+                        callback: () {
+                          lockHelper.provideWithLockChecker(
+                            context,
+                            () {
+                              NavigatorService.push(
+                                context,
+                                LiquidityRemoveScreen(
+                                  assetPair: widget.assetPair!,
+                                  balance: widget.balance!,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        label: 'Remove',
+                      ),
+                    ),
+                    NewPrimaryButton(
+                      width: 140,
+                      callback: () {
+                        lockHelper.provideWithLockChecker(context, () {
+                          NavigatorService.push(
+                            context,
+                            LiquiditySelectPool(
+                              assetPair: widget.assetPair!,
+                            ),
+                          );
+                        });
+                      },
+                      title: 'Add Liquidity',
+                    ),
+                  ],
+                ),
             ],
           ),
         ),

@@ -12,6 +12,7 @@ class TokenModel {
   NetworkName networkName;
   bool isUTXO;
   late bool isPair;
+  bool isDAT;
   late Color color;
   late String imagePath;
 
@@ -22,11 +23,13 @@ class TokenModel {
     required this.displaySymbol,
     required this.networkName,
     this.isUTXO = false,
+    this.isDAT = false,
   }) {
     this.isPair = this.symbol.contains('-');
     this.color = getColorByTokenName(symbol: this.symbol);
     this.imagePath = getImagePath(symbol: this.symbol);
   }
+
 
   bool compare(TokenModel otherToken) {
     return
@@ -38,11 +41,16 @@ class TokenModel {
     Map<String, dynamic> json, {
     NetworkName? networkName,
   }) {
+    bool isDAT = false;
+    if(json['isDAT'] != null && json['isDAT'] != null){
+      isDAT = json['isDAT'] == true && json['isLPS'] == false;
+    }
     return TokenModel(
       id: json['id'],
       symbol: json['symbol'],
       name: json['name'],
       isUTXO: json['isUTXO'] ?? false,
+      isDAT: isDAT,
       displaySymbol: json['displaySymbol'],
       networkName: networkName ?? NetworkName.values.firstWhere(
         (value) => value.toString() == json['networkName'],

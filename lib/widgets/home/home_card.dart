@@ -1,4 +1,6 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/home/home_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
@@ -6,7 +8,8 @@ import 'package:defi_wallet/screens/earn/earn_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
 import 'package:defi_wallet/screens/swap/swap_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
-import 'package:defi_wallet/screens/send/send_screeen_new.dart';
+import 'package:defi_wallet/screens/send/send_screeen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/home/account_balance.dart';
 import 'package:defi_wallet/widgets/selectors/app_selector.dart';
@@ -14,7 +17,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeCard extends StatefulWidget {
-  const HomeCard({Key? key}) : super(key: key);
+  final bool isFullScreen;
+
+  HomeCard({Key? key, this.isFullScreen = false}) : super(key: key);
 
   @override
   State<HomeCard> createState() => _HomeCardState();
@@ -34,6 +39,8 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+
     return Container(
       width: homeCardWidth,
       height: homeCardHeight,
@@ -77,19 +84,11 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                 Flexible(
                   child: FlatButton(
                     title: 'Earn',
-                    iconPath: SettingsHelper.isBitcoin()
+                    iconPath: walletCubit.state.isSendReceiveOnly
                         ? 'assets/icons/earn_disabled.png'
                         : 'assets/icons/earn.png',
-                    callback: SettingsHelper.isBitcoin() ? null : () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              EarnScreen(),
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
-                        ),
-                      );
+                    callback: walletCubit.state.isSendReceiveOnly ? null : () {
+                      NavigatorService.push(context, EarnScreen());
                     },
                   ),
                 ),
@@ -99,19 +98,11 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                 Flexible(
                   child: FlatButton(
                     title: 'Buy/Sell',
-                    iconPath: SettingsHelper.isBitcoin()
+                    iconPath: walletCubit.state.isSendReceiveOnly
                         ? 'assets/icons/wallet_disabled.png'
                         : 'assets/icons/wallet.png',
-                    callback: SettingsHelper.isBitcoin() ? null : () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              BuySellScreen(),
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
-                        ),
-                      );
+                    callback: walletCubit.state.isSendReceiveOnly ? null : () {
+                      NavigatorService.push(context, BuySellScreen());
                     },
                   ),
                 ),
@@ -128,14 +119,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                     isPrimary: false,
                     iconPath: 'assets/icons/send_icon.svg',
                     callback: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) => SendScreenNew(),
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
-                        ),
-                      );
+                      NavigatorService.push(context, SendScreen());
                     },
                   ),
                 ),
@@ -148,14 +132,7 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                     isPrimary: false,
                     iconPath: 'assets/icons/receive_icon.svg',
                     callback: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) => ReceiveScreenNew(),
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
-                        ),
-                      );
+                      NavigatorService.push(context, ReceiveScreenNew());
                     },
                   ),
                 ),
@@ -168,10 +145,12 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                       return FlatButton(
                         title: 'Change',
                         isPrimary: false,
-                        iconPath: 'assets/icons/change_icon.svg',
-                        callback: () {
-                          if (SettingsHelper.isBitcoin() &&
-                              SettingsHelper.settings.network == 'testnet') {
+                      iconPath: walletCubit.state.isSendReceiveOnly
+                          ? 'assets/icons/change_icon_disabled.svg'
+                          : 'assets/icons/change_icon.svg',
+                      callback: walletCubit.state.isSendReceiveOnly ? null : () {
+                          late Widget changeWidget;
+                          if (walletCubit.state.isSendReceiveOnly) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -183,25 +162,12 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                             );
                             return;
                           }
-                          if (accountState.swapTutorialStatus == 'show' && SettingsHelper.isBitcoin()) {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) =>
-                                    SwapGuideScreen(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),
-                            );
+                          if (accountState.swapTutorialStatus == 'show' && walletCubit.state.isSendReceiveOnly) {
+                            changeWidget = SwapGuideScreen();
                           } else {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) => SwapScreen(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),);
+                            changeWidget = SwapScreen();
                           }
+                          NavigatorService.push(context, changeWidget);
                         },
                       );
                     }

@@ -33,7 +33,7 @@ class FlatButton extends StatelessWidget with ThemeMixin {
       );
     } else {
       return MaterialStatePropertyAll(
-        (isDarkTheme()) ? Colors.transparent : Colors.white,
+        (isDarkTheme()) ? Colors.transparent : Colors.white.withOpacity(0),
       );
     }
   }
@@ -47,6 +47,9 @@ class FlatButton extends StatelessWidget with ThemeMixin {
   }
 
   Color getSpecificBorderColor() {
+    if (callback == null) {
+      return Colors.transparent;
+    }
     return (isPrimary)
         ? Colors.transparent
         : AppColors.lavenderPurple.withOpacity(0.32);

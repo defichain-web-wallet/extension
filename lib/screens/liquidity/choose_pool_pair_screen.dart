@@ -5,6 +5,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_select_pool.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/liquidity/pool_asset_pair.dart';
@@ -39,13 +40,12 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
       ) {
       LmCubit lmCubit = BlocProvider.of<LmCubit>(context);
 
-
                 return Scaffold(
                   drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                  endDrawer: AccountDrawer(
+                  endDrawer: isFullScreen ? null : AccountDrawer(
                     width: buttonSmallWidth,
                   ),
-                  appBar: NewMainAppBar(
+                  appBar: isFullScreen ? null : NewMainAppBar(
                     isShowLogo: false,
                     callback: ()=>lmCubit.search(''),
                   ),
@@ -71,6 +71,8 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20),
                         topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                        bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                       ),
                     ),
                     child: Center(
@@ -239,21 +241,12 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                               hoverColor: Colors.transparent,
                                               splashColor: Colors.transparent,
                                               onTap: () async {
-                                                Navigator.push(
+                                                NavigatorService.push(
                                                   context,
-                                                  PageRouteBuilder(
-                                                    pageBuilder: (context,
-                                                            animation1,
-                                                            animation2) =>
-                                                        LiquiditySelectPool(
-                                                      assetPair:
-                                                      lmState.foundedPools![
-                                                              index],
-                                                    ),
-                                                    transitionDuration:
-                                                        Duration.zero,
-                                                    reverseTransitionDuration:
-                                                        Duration.zero,
+                                                  LiquiditySelectPool(
+                                                    assetPair:
+                                                    lmState.foundedPools![
+                                                    index],
                                                   ),
                                                 );
                                               },
@@ -281,21 +274,10 @@ class _ChoosePoolPairScreenState extends State<ChoosePoolPairScreen>
                                                   splashColor:
                                                       Colors.transparent,
                                                   onTap: () async {
-                                                    Navigator.push(
-                                                      context,
-                                                      PageRouteBuilder(
-                                                        pageBuilder: (context,
-                                                                animation1,
-                                                                animation2) =>
-                                                            LiquiditySelectPool(
-                                                          assetPair:
-                                                          lmState.foundedPools![
-                                                                  index],
-                                                        ),
-                                                        transitionDuration:
-                                                            Duration.zero,
-                                                        reverseTransitionDuration:
-                                                            Duration.zero,
+                                                    NavigatorService.push(context,
+                                                        LiquiditySelectPool(
+                                                          assetPair: lmState.foundedPools![
+                                                          index]
                                                       ),
                                                     );
                                                   },

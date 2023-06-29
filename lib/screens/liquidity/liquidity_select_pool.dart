@@ -11,6 +11,7 @@ import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -18,6 +19,7 @@ import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
 import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -137,12 +139,12 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
       TransactionState transactionState,
     ) {
       return Scaffold(
-        appBar: NewMainAppBar(
-          isShowLogo: false,
-        ),
         drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-        endDrawer: AccountDrawer(
+        endDrawer: isFullScreen ? null : AccountDrawer(
           width: buttonSmallWidth,
+        ),
+        appBar: isFullScreen ? null : NewMainAppBar(
+          isShowLogo: false,
         ),
         body: Container(
           padding: EdgeInsets.only(
@@ -164,15 +166,17 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
             borderRadius: BorderRadius.only(
               topRight: Radius.circular(20),
               topLeft: Radius.circular(20),
+              bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+              bottomRight: Radius.circular(isFullScreen ? 20 : 0),
             ),
           ),
-          child: _buildBody(context, transactionState),
+          child: _buildBody(context, transactionState, isFullScreen),
         ),
       );
     });
   }
 
-  Widget _buildBody(context, transactionState, {isFullSize = false}) {
+  Widget _buildBody(context, transactionState, isFullScreen) {
     double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
               assetFrom = widget.assetPair.tokens[0].symbol;
               assetTo =  widget.assetPair.tokens[1].symbol;
@@ -207,9 +211,9 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Set the amount',
-                            style: Theme.of(context).textTheme.headline3,
+                          PageTitle(
+                            title: 'Set the amount',
+                            isFullScreen: isFullScreen,
                           ),
                           SizedBox(
                             height: 16,
@@ -459,7 +463,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                               title: 'Cancel',
                               isPrimary: false,
                               callback: () {
-                                Navigator.of(context).pop();
+                                NavigatorService.pop(context);
                               },
                             ),
                           ),
@@ -487,38 +491,26 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                                       : () {
                                           if (transactionState
                                               is! TransactionLoadingState) {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation1,
-                                                        animation2) =>
-                                                    LiquidityConfirmation(
-                                                        assetPair:
-                                                            widget.assetPair,
-                                                        baseAmount: double.parse(
-                                                            _amountBaseController
-                                                                .text
-                                                                .replaceAll(
-                                                                    ',', '.')),
-                                                        quoteAmount: double.parse(
-                                                            _amountQuoteController
-                                                                .text
-                                                                .replaceAll(
-                                                                    ',', '.')),
-                                                        shareOfPool:
-                                                            shareOfPool,
-                                                        amountUSD: amountUSD,
-                                                        balanceUSD: balanceUSD,
-                                                        balanceA: balanceA,
-                                                        balanceB: balanceB,
-                                                        amount: amount),
-                                                transitionDuration:
-                                                    Duration.zero,
-                                                reverseTransitionDuration:
-                                                    Duration.zero,
-                                              ),
-                                            );
+                                            NavigatorService.push(context, LiquidityConfirmation(
+                                                assetPair:
+                                                widget.assetPair,
+                                                baseAmount: double.parse(
+                                                    _amountBaseController
+                                                        .text
+                                                        .replaceAll(
+                                                        ',', '.')),
+                                                quoteAmount: double.parse(
+                                                    _amountQuoteController
+                                                        .text
+                                                        .replaceAll(
+                                                        ',', '.')),
+                                                shareOfPool:
+                                                shareOfPool,
+                                                amountUSD: amountUSD,
+                                                balanceUSD: balanceUSD,
+                                                balanceA: balanceA,
+                                                balanceB: balanceB,
+                                                amount: amount));
                                           } else {
                                             showSnackBar(
                                               context,
@@ -545,48 +537,6 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
               ));
   }
 
-  // void _setBalanceAndAmountUSD(tokensState) {
-  //   var totalBalanceInUsd = tokensHelper.getAmountByUsd(
-  //         tokensState.tokensPairs,
-  //         balanceA,
-  //         widget.assetPair.tokenA!,
-  //       ) +
-  //       tokensHelper.getAmountByUsd(
-  //         tokensState.tokensPairs,
-  //         balanceB,
-  //         widget.assetPair.tokenB!,
-  //       );
-  //
-  //   var rateFrom = tokensHelper.getAmountByUsd(
-  //     tokensState.tokensPairs,
-  //     1,
-  //     widget.assetPair.tokenA!,
-  //   );
-  //   var rateTo = tokensHelper.getAmountByUsd(
-  //     tokensState.tokensPairs,
-  //     1,
-  //     widget.assetPair.tokenB!,
-  //   );
-  //
-  //   var totalAmountInUsd = tokensHelper.getAmountByUsd(
-  //         tokensState.tokensPairs,
-  //         double.parse(_amountBaseController.text.replaceAll(',', '.')),
-  //         widget.assetPair.tokenA!,
-  //       ) +
-  //       tokensHelper.getAmountByUsd(
-  //         tokensState.tokensPairs,
-  //         double.parse(_amountQuoteController.text.replaceAll(',', '.')),
-  //         widget.assetPair.tokenB!,
-  //       );
-  //
-  //   setState(() {
-  //     rateBalanceFromUsd = rateFrom.toStringAsFixed(4);
-  //     rateBalanceToUsd = rateTo.toStringAsFixed(4);
-  //     balanceUSD = totalBalanceInUsd;
-  //     amountUSD = totalAmountInUsd;
-  //   });
-  // }
-  //
   void _setAmount() {
     _setBalances();
     // _setBalanceAndAmountUSD(tokensState);

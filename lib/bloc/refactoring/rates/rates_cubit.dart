@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/rates/rates_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -35,5 +36,30 @@ class RatesCubit extends Cubit<RatesState> {
         status: RatesStatusList.failure,
       ));
     }
+  }
+
+  searchTokens({
+    String value = '',
+    List<TokenModel> existingTokens = const [],
+  }) {
+    List<TokenModel> tokens = [];
+
+    if (value.isEmpty) {
+      tokens = state.foundTokens;
+    } else {
+      for (TokenModel element in state.foundTokens) {
+        if (element.symbol.contains(value)) {
+          tokens.add(element);
+        }
+      }
+      if (existingTokens.isNotEmpty) {
+        existingTokens.forEach((element) {
+          tokens.removeWhere((token) => token.symbol == element.symbol);
+        });
+      }
+    }
+    emit(state.copyWith(
+      tokens: tokens,
+    ));
   }
 }

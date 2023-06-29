@@ -3,6 +3,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/screens/earn/earn_card.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +68,8 @@ class StakingCard extends StatelessWidget {
           firstColumnSubTitle: 'Staked',
           isStaking: true,
           needUpdateAccessToken: true,
-          errorMessage: lockState.status == LockStatusList.notFound
+          errorMessage: lockState.status == LockStatusList.notFound ||
+                  lockState.status == LockStatusList.expired
               ? 'Need to create access token of LOCK'
               : 'Need to pass KYC of LOCK',
           callback: () async {
@@ -104,24 +106,9 @@ class StakingCard extends StatelessWidget {
   stakingCallback(context) async {
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     if (lockCubit.state.isKycDone!) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => StakingScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, StakingScreen());
     } else {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              StakingKycStartScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, StakingKycStartScreen());
     }
   }
 }

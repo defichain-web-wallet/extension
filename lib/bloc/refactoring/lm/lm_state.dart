@@ -27,6 +27,9 @@ class LmState extends Equatable {
     this.availableBalances,
   });
 
+  double get balance =>
+      this.pairBalances!.fold(0.0, (sum, balance) => sum + balance.balance);
+
   @override
   List<Object?> get props => [
         status,

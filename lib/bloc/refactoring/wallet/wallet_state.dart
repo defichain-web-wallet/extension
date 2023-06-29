@@ -16,6 +16,9 @@ class WalletState extends Equatable {
     return balances;
   }
 
+  bool get isSendReceiveOnly =>
+      this.applicationModel!.activeNetwork!.getBridges().isEmpty;
+
   String get activeAddress => this.applicationModel!.activeAccount!.getAddress(this.applicationModel!.activeNetwork!.networkType.networkName)!;
 
   TokenModel get activeToken => this.applicationModel!.activeToken!;

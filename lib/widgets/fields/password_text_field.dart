@@ -59,6 +59,7 @@ class PasswordTextField extends StatefulWidget {
 }
 
 class _PasswordTextFieldState extends State<PasswordTextField> {
+  final regExp = RegExp("[0-9a-zA-Z-_+=?!@#\$%:;^&*(){}<>\"',.\/|]");
   static const String obscureSymbolCharacter = '●';
   static const int maxLines = 1;
 
@@ -99,8 +100,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
               TextFormField(
                 inputFormatters: widget.onlyEngCharacters
                     ? <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(
-                      RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(regExp),
                 ]
                     : [],
                 autofocus: widget.autofocus,
@@ -113,9 +113,9 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                 controller: widget.controller,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(
-                      backgroundColor: Colors.transparent,
-                      color: Colors.pink,
-                      fontSize: 10
+                    backgroundColor: Colors.transparent,
+                    color: Colors.pink,
+                    fontSize: 10,
                   ),
                   hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                   filled: true,
@@ -145,7 +145,10 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                     letterSpacing: 0,
                   ),
                   suffixIconConstraints:
-                  BoxConstraints(minHeight: 24, minWidth: 24),
+                  BoxConstraints(
+                    minHeight: 24,
+                    minWidth: 24,
+                  ),
                   suffixIcon: Padding(
                     padding: const EdgeInsetsDirectional.only(end: 16.0),
                     child: SuffixIcon(
@@ -164,7 +167,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                 ),
                 onChanged: widget.onChanged,
                 validator: widget.validator,
-              )
+              ),
             ],
           ),
         ),

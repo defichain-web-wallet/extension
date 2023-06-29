@@ -110,7 +110,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
   }
 
   List<AbstractBridge> getBridges() {
-    throw 'Not works yet';
+    return [];
   }
 
   List<AbstractExchangeModel> getExchanges() {

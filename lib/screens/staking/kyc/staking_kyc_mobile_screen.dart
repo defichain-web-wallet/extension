@@ -36,13 +36,13 @@ class _StakingKycMobileScreenState extends State<StakingKycMobileScreen>
       ) {
         return Scaffold(
           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-          endDrawer: AccountDrawer(
-            width: buttonSmallWidth,
-          ),
-          appBar: NewMainAppBar(
+            endDrawer: isFullScreen ? null : AccountDrawer(
+              width: buttonSmallWidth,
+            ),
+          appBar: isFullScreen ? null : NewMainAppBar(
             bgColor: AppColors.viridian.withOpacity(0.16),
-            isShowLogo: false,
             isShowNetworkSelector: false,
+            isShowLogo: false,
           ),
           body: Container(
             decoration:
@@ -72,6 +72,8 @@ class _StakingKycMobileScreenState extends State<StakingKycMobileScreen>
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
                       topLeft: Radius.circular(20),
+                      bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                      bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                     ),
                   ),
                   child: StretchBox(

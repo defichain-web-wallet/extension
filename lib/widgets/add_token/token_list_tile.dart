@@ -110,7 +110,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                                         height: 2,
                                       ),
                                       Text(
-                                        '${tokenHelper.getSpecificDefiName(widget.availableTokenName!)}',
+                                        '${widget.availableTokenName!}',
                                         style: Theme.of(context)
                                             .textTheme
                                             .headline5!

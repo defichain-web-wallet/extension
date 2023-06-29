@@ -1,19 +1,17 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/earn/earn_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/helpers/access_token_helper.dart';
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/screens/earn/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
-import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
-import 'package:defi_wallet/screens/staking/staking_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/staking/staking_card.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -21,11 +19,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EarnScreenWrapper extends StatefulWidget {
-  // final Function() loadEarnData;
+  final bool isFullScreen;
 
   EarnScreenWrapper({
     Key? key,
-    // required this.loadEarnData,
+    required this.isFullScreen,
   }) : super(key: key);
 
   @override
@@ -48,10 +46,10 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
 
     return Scaffold(
       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-      endDrawer: AccountDrawer(
-        width: accountDrawerWidth,
+      endDrawer: widget.isFullScreen ? null : AccountDrawer(
+        width: buttonSmallWidth,
       ),
-      appBar: NewMainAppBar(
+      appBar: widget.isFullScreen ? null : NewMainAppBar(
         isShowLogo: false,
       ),
       body: Container(
@@ -76,6 +74,8 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
           borderRadius: BorderRadius.only(
             topRight: Radius.circular(20),
             topLeft: Radius.circular(20),
+            bottomLeft: Radius.circular(isFullScreen(context) ? 20 : 0),
+            bottomRight: Radius.circular(isFullScreen(context) ? 20 : 0),
           ),
         ),
         child: Center(
@@ -91,26 +91,11 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
                 }
                   return Column(
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            titleText,
-                            style:
-                            Theme
-                                .of(context)
-                                .textTheme
-                                .headline3!
-                                .copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
+                      PageTitle(isFullScreen: widget.isFullScreen, title: titleText,),
                       SizedBox(
                         height: 19,
                       ),
-                      StakingCard(
-                      ),
+                      StakingCard(),
                       SizedBox(
                         height: 18,
                       ),
@@ -131,6 +116,40 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
     bool isLoading,
   ) {
     LmState lmState = BlocProvider.of<LmCubit>(context).state;
+    RatesState ratesState = BlocProvider.of<RatesCubit>(context).state;
+    WalletState walletState = BlocProvider.of<WalletCubit>(context).state;
+
+    List<BalanceModel> balances = walletState.getBalances();
+
+    late double investedBalance;
+    late double totalBalance;
+    late String roundedInvestedBalance;
+    late String roundedTotalBalance;
+    try {
+      investedBalance = ratesState.ratesModel!.getTotalAmount(
+        walletState.activeNetwork,
+        lmState.pairBalances!,
+      );
+
+      totalBalance = ratesState.ratesModel!.getTotalAmount(
+        walletState.activeNetwork,
+        balances,
+      );
+    } catch (_) {
+      investedBalance = 0;
+      totalBalance = 0;
+    } finally {
+      roundedInvestedBalance = BalancesHelper().numberStyling(
+        investedBalance,
+        fixed: true,
+        fixedCount: 2,
+      );
+      roundedTotalBalance = BalancesHelper().numberStyling(
+        totalBalance,
+        fixed: true,
+        fixedCount: 2,
+      );
+    }
     return EarnCard(
       isLoading: isLoading,
       title: 'Liquidity mining',
@@ -140,28 +159,26 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
       //TODO: add fiat value
       // firstColumnNumber: balancesHelper
       //     .numberStyling(tokensState.totalPairsBalance ?? 0, fixed: true),
-      firstColumnNumber: "0",
+      firstColumnNumber: roundedInvestedBalance,
       firstColumnAsset: 'USD',
       firstColumnSubTitle: 'Pooled',
       secondColumnNumber: lmState.averageApr,
       secondColumnAsset: '%',
       secondColumnSubTitle: 'Portfolio APR',
       isStaking: false,
-      callback: () => liquidityCallback(),
+      callback: () => liquidityCallback(
+        roundedInvestedBalance,
+        roundedTotalBalance,
+      ),
     );
   }
 
-
-  liquidityCallback() {
-    Widget redirectTo = LiquidityScreenNew();
-
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) => redirectTo,
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ),
+  liquidityCallback(String totalBalance, String investedBalance) {
+    Widget redirectTo = LiquidityScreenNew(
+      totalBalance: totalBalance,
+      investedBalance: investedBalance,
     );
+
+    NavigatorService.push(context, redirectTo);
   }
 }

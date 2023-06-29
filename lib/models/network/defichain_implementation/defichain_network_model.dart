@@ -1,5 +1,4 @@
 import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_bridge_model.dart';
@@ -9,6 +8,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_network_mod
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
+import 'package:defi_wallet/models/network/bitcoin_implementation/bridge_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_lm_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
@@ -141,7 +141,11 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }
 
   List<AbstractBridge> getBridges() {
-    throw 'Not works yet';
+    try {
+      return [BridgeModel(this.networkType)];
+    } catch (err) {
+      return [];
+    }
   }
 
   List<AbstractExchangeModel> getExchanges() {

@@ -2,11 +2,8 @@ import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/transaction/tx_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/lock_helper.dart';
-import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
@@ -16,12 +13,10 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/models/test_pool_swap_model.dart';
-import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -113,13 +108,13 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                   return Loader();
                 } else if (exchangeState.status == ExchangeStatusList.success) {
                   return Scaffold(
-                    appBar: NewMainAppBar(
-                      isShowLogo: false,
-                    ),
-                    drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                    endDrawer: AccountDrawer(
-                      width: buttonSmallWidth,
-                    ),
+                  appBar: isFullScreen ? null : NewMainAppBar(
+                  isShowLogo: false,
+                  ),
+                  drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
+                  endDrawer: isFullScreen ? null : AccountDrawer(
+                  width: buttonSmallWidth,
+                  ),
                     body: Container(
                       padding: EdgeInsets.only(
                         top: 22,
@@ -140,6 +135,8 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
                           topLeft: Radius.circular(20),
+    bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+    bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                         ),
                       ),
                       child: _buildBody(
@@ -201,12 +198,9 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Change',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .headline3,
+                    PageTitle(
+                      title: 'Change',
+                      isFullScreen: isFullScreen,
                     ),
                     SizedBox(
                       height: 16,

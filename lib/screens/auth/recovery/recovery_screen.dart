@@ -145,6 +145,33 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
     });
   }
 
+  void _onChangeTextField(String value) {
+    try {
+      String phraseBySeparator = value.replaceAll(
+        _regExpPhraseSeparators,
+        _replaceComaSeparator,
+      );
+      List<String> phraseFromClipboard = phraseBySeparator.split(
+        _replaceComaSeparator,
+      );
+      bool isEmptyNextItem = phraseFromClipboard[_fieldsLength].isEmpty;
+
+      if (phraseFromClipboard.length == _fieldsLength + 1 && isEmptyNextItem) {
+        phraseFromClipboard.removeWhere(
+          (element) => element.isEmpty,
+        );
+        setState(() {
+          _mnemonic = phraseFromClipboard;
+          _wordController.text = '';
+          _isViewTextField = false;
+          _confirmFocusNode.requestFocus();
+        });
+      }
+    } catch (err) {
+      print(err);
+    }
+  }
+
   void _onFieldSubmitted(String word) {
     try {
       if (_editableWordIndex != null) {
@@ -362,27 +389,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                                 autofocus: true,
                                 focusNode: _focusNode,
                                 readOnly: !_isViewTextField,
-                                onChanged: (String value) {
-                                  try {
-                                    final phraseBySeparator = value.replaceAll(
-                                      _regExpPhraseSeparators,
-                                      _replaceComaSeparator,
-                                    );
-                                    List<String> phraseFromClipboard =
-                                      phraseBySeparator.split(_replaceComaSeparator);
-                                    if (phraseFromClipboard.length ==
-                                        _fieldsLength) {
-                                      setState(() {
-                                        _mnemonic = phraseFromClipboard;
-                                        _wordController.text = '';
-                                        _isViewTextField = false;
-                                        _confirmFocusNode.requestFocus();
-                                      });
-                                    }
-                                  } catch (err) {
-                                    print(err);
-                                  }
-                                },
+                                onChanged: _onChangeTextField,
                               )
                             : NewPrimaryButton(
                                 focusNode: _confirmFocusNode,

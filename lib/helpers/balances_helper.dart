@@ -114,6 +114,7 @@ class BalancesHelper {
   String numberStyling(
     double number, {
     bool fixed = false,
+    bool isFormatRounded = false,
     int fixedCount = 2,
     FormatNumberType? type,
   }) {

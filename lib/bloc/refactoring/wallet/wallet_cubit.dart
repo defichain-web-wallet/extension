@@ -284,4 +284,27 @@ class WalletCubit extends Cubit<WalletState> {
                 wif: network.wif))
         .toBase58();
   }
+
+  signUpToRamp(String password) async {
+    try {
+      final applicationModel = state.applicationModel;
+      await (applicationModel!.activeNetwork!.rampList[0] as DFXRampModel).signUp(
+        state.activeAccount,
+        password,
+        state.applicationModel!,
+        state.activeNetwork,
+      );
+
+      await StorageService.saveApplication(applicationModel);
+
+      emit(state.copyWith(
+        status: WalletStatusList.success,
+        applicationModel: applicationModel,
+      ));
+    } catch (err) {
+      emit(state.copyWith(
+        status: WalletStatusList.failure,
+      ));
+    }
+  }
 }

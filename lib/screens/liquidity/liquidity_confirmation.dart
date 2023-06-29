@@ -1,16 +1,11 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
-import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
-import 'package:defi_wallet/services/transaction_service.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -22,7 +17,6 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -80,12 +74,12 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
         TransactionState transactionState,
       ) {
         return Scaffold(
-          appBar: NewMainAppBar(
-            isShowLogo: false,
-          ),
           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-          endDrawer: AccountDrawer(
+          endDrawer: isFullScreen ? null : AccountDrawer(
             width: buttonSmallWidth,
+          ),
+          appBar: isFullScreen ? null : NewMainAppBar(
+            isShowLogo: false,
           ),
           body: Container(
             padding: EdgeInsets.only(
@@ -107,16 +101,18 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(20),
                 topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                bottomRight: Radius.circular(isFullScreen ? 20 : 0),
               ),
             ),
-            child: _buildBody(context, transactionState),
+            child: _buildBody(context, transactionState, isFullScreen),
           ),
         );
       },
     );
   }
 
-  Widget _buildBody(context, transactionState) {
+  Widget _buildBody(context, transactionState, isFullScreen) {
     double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
     submitLabel = widget.removeLT == 0 ? 'Add' : 'Remove';
     return StretchBox(
@@ -571,7 +567,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
         TransactionCubit transactionCubit =
             BlocProvider.of<TransactionCubit>(context);
 
-        transactionCubit.setOngoingTransaction(txError);
+        await transactionCubit.setOngoingTransaction(txError);
       }
 
       showDialog(
@@ -595,6 +591,7 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
                   reverseTransitionDuration: Duration.zero,
                 ),
               );
+              NavigatorService.pushReplacement(context, null);
             },
             callbackTryAgain: () async {
               await submitLiquidityAction(context, transactionState, password,

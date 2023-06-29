@@ -7,6 +7,7 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_new_kyc_process_screen.dart';
 import 'package:defi_wallet/screens/staking/staking_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -70,13 +71,13 @@ class _StakingSelectVerificationScreenState
           builder: (accountContext, accountState) {
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-              endDrawer: AccountDrawer(
+              endDrawer: isFullScreen ? null : AccountDrawer(
                 width: buttonSmallWidth,
               ),
-              appBar: NewMainAppBar(
+              appBar: isFullScreen ? null : NewMainAppBar(
                 bgColor: AppColors.viridian.withOpacity(0.16),
-                isShowLogo: false,
                 isShowNetworkSelector: false,
+                isShowLogo: false,
               ),
               body: Container(
                 decoration:
@@ -106,6 +107,8 @@ class _StakingSelectVerificationScreenState
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(20),
                           topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                          bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                         ),
                       ),
                       child: StretchBox(
@@ -250,15 +253,10 @@ class _StakingSelectVerificationScreenState
                               callback: !isShowInfo
                                   ? () async {
                                       if (isNewKycProcess) {
-                                        Navigator.push(
+                                        NavigatorService.push(
                                           context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                    animation2) =>
-                                                StakingNewKycProcessScreen(kycLink: '',), //TODO: fix it
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
+                                          StakingNewKycProcessScreen(
+                                            kycLink: '',
                                           ),
                                         );
                                       }
@@ -270,16 +268,9 @@ class _StakingSelectVerificationScreenState
                                         } catch (_) {
                                           showSnackBar('User not found');
                                         }
-                                        Navigator.push(
+                                        NavigatorService.push(
                                           context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation1,
-                                                    animation2) =>
-                                                StakingScreen(),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
-                                          ),
+                                          StakingScreen(),
                                         );
                                       }
                                     }

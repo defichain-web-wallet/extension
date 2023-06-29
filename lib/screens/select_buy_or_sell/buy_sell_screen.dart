@@ -2,7 +2,6 @@ import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/helpers/access_token_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
@@ -10,9 +9,12 @@ import 'package:defi_wallet/screens/buy/buy_select_currency_screen.dart';
 import 'package:defi_wallet/screens/buy/tutorials/buy_tutorial_first_screen.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_first_screen.dart';
 import 'package:defi_wallet/screens/sell/selling_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
+import 'package:defi_wallet/widgets/common/page_title.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -44,17 +46,20 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
   loadDfxData() {
     RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
-    AccessTokenModel? accessToken = walletCubit
-        .state
-        .applicationModel!
-        .activeNetwork!
-        .rampList[0]
-        .accessTokensMap[walletCubit.state.activeAccount.accountIndex]!;
-    hasAccessToken = accessToken != null;
-    if (hasAccessToken) {
+    AccessTokenModel? accessToken;
+    try {
+      accessToken = walletCubit
+          .state
+          .applicationModel!
+          .activeNetwork!
+          .rampList[0]
+          .accessTokensMap[walletCubit.state.activeAccount.accountIndex]!;
       rampCubit.setAccessToken(accessToken);
       rampCubit.loadUserDetails();
+    } catch (err) {
+      accessToken = null;
     }
+    hasAccessToken = accessToken != null;
   }
 
   @override
@@ -83,10 +88,10 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
 
                 return Scaffold(
                   drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                  endDrawer: AccountDrawer(
+                  endDrawer: isFullScreen ? null : AccountDrawer(
                     width: buttonSmallWidth,
                   ),
-                  appBar: NewMainAppBar(
+                  appBar: isFullScreen ? null : NewMainAppBar(
                     isShowLogo: false,
                   ),
                   body: Container(
@@ -111,6 +116,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20),
                         topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                        bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                       ),
                     ),
                     child: Center(
@@ -122,16 +129,10 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                             Expanded(
                               child: Column(
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        titleText,
-                                        style: headline2.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
+                                  PageTitle(
+                                    title: titleText,
+                                    isFullScreen: isFullScreen,
+                                    isCenterAlign: true,
                                   ),
                                   SizedBox(
                                     height: 13,
@@ -287,16 +288,27 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                         'assets/icons/increase_limits.png',
                                         callback: () async {
 
-                                          RampCubit rampCubit =
-                                          BlocProvider.of<RampCubit>(context);
-                                          WalletCubit walletCubit =
-                                          BlocProvider.of<WalletCubit>(context);
-                                          await rampCubit.signIn(
-                                            walletCubit.state.activeAccount,
-                                            'Qwerty123',
-                                            walletCubit.state.applicationModel!,
+                                          showDialog(
+                                            barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                            barrierDismissible: false,
+                                            context: context,
+                                            builder: (BuildContext dialogContext) {
+                                              return PassConfirmDialog(
+                                                onCancel: () {},
+                                                onSubmit: (password) async {
+                                                  RampCubit rampCubit =
+                                                  BlocProvider.of<RampCubit>(context);
+                                                  WalletCubit walletCubit =
+                                                  BlocProvider.of<WalletCubit>(context);
+                                                  await walletCubit.signUpToRamp(
+                                                    password,
+                                                  );
+                                                  loadDfxData();
+                                                },
+                                              );
+                                            },
                                           );
-                                          loadDfxData();
+
 
                                           // fiatCubit.setLoadingState();
 
@@ -342,25 +354,9 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
 
   buyCallback(context, state) {
     if (true) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              BuyTutorialFirstScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, BuyTutorialFirstScreen());
     } else {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              BuySelectCurrencyScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      NavigatorService.push(context, BuySelectCurrencyScreen());
     }
   }
 
@@ -370,14 +366,6 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
     bool isSkipKyc =
         kycStatus == 'skip' || state.rampUserModel!.kycStatus == 'Completed';
     await box.close();
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) =>
-            isSkipKyc ? Selling() : AccountTypeSell(),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ),
-    );
+    NavigatorService.push(context, isSkipKyc ? Selling() : AccountTypeSell());
   }
 }

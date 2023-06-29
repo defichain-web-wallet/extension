@@ -7,8 +7,13 @@ class AccessTokenModel {
   AccessTokenModel({
     required this.accessToken,
     required expireHours,
+    int existingTime = 0,
   }){
-    this.accessTokenExpireTime = expireHours * hour;
+    if (existingTime == 0) {
+      this.accessTokenExpireTime = expireHours * hour;
+    } else {
+      this.accessTokenExpireTime = existingTime;
+    }
   }
 
   bool isValid() => this.accessTokenExpireTime - hour < DateTime.now().millisecondsSinceEpoch;
@@ -16,15 +21,16 @@ class AccessTokenModel {
   factory AccessTokenModel.fromJson(Map<String, dynamic> jsonModel) {
     return AccessTokenModel(
       accessToken: jsonModel['accessToken'],
-      expireHours: int.parse(jsonModel['expireHours']),
+      expireHours: jsonModel['expireHours'],
+      existingTime: jsonModel['expireHours'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'accessToken': this.accessToken.toString(),
-      'expireHours': this.accessTokenExpireTime.toString(),
-    };
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data["accessToken"] = this.accessToken.toString();
+    data["expireHours"] = this.accessTokenExpireTime;
+    return data;
   }
 }
 

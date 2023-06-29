@@ -1,9 +1,6 @@
-import 'dart:convert' as convert;
 import 'dart:ui';
 
-import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -188,6 +185,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog> with ThemeMixin, 
                               ),
                               PasswordTextField(
                                 autofocus: true,
+                                onlyEngCharacters: false,
                                 height: 71,
                                 controller: _passwordController,
                                 status: PasswordStatusList.initial,
