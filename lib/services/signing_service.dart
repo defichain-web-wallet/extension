@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
+import 'package:defi_wallet/requests/transaction_requests.dart';
 import 'package:defi_wallet/services/ledger_signing_service.dart';
 import 'package:defi_wallet/services/local_signing_service.dart';
 import 'package:defichaindart/defichaindart.dart';
@@ -29,7 +30,8 @@ abstract class SigningWalletService {
 
 class SigningServiceSelector {
   SigningWalletService _local = new LocalSigningService();
-  SigningWalletService _ledger = new LedgerSigningService();
+  SigningWalletService _ledger =
+      new LedgerSigningService(TransactionRequests());
 
   Future<SigningWalletService> get() async {
     var box = await Hive.openBox(HiveBoxes.client);

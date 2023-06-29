@@ -430,8 +430,8 @@ class TransactionService {
     _txb.setVersion(2);
 
     for (var utxo in selectedUTXO) {
-      var pubKey = await signingService.getPublicKey(
-          account, utxo.address!, SettingsHelper.settings.network!,
+      var pubKey = await signingService.getPublicKey(account, utxo.address!,
+          networkHelper.getNetwork(SettingsHelper.settings.network!),
           key: keyPair);
       final p2wpkh =
           P2WPKH(data: PaymentData(pubkey: pubKey), network: network).data!;
@@ -471,8 +471,12 @@ class TransactionService {
       await additional(_txb,
           networkHelper.getNetwork(SettingsHelper.settings.network!), newUTXO);
     }
-    var txHex = await signingService.signTransaction(_txb, account,
-        selectedUTXO, SettingsHelper.settings.network!, changeAddress,
+    var txHex = await signingService.signTransaction(
+        _txb,
+        account,
+        selectedUTXO,
+        networkHelper.getNetwork(SettingsHelper.settings.network!),
+        changeAddress,
         key: keyPair);
 
     TxResponseModel responseModel = TxResponseModel(
