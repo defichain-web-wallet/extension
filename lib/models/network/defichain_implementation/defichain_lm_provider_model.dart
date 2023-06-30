@@ -40,7 +40,7 @@ class DefichainLmProviderModel extends AbstractLmProviderModel {
     ECPair keypair =
         await network.getKeypair(password, account, applicationModel);
 
-    List<BalanceModel> balances = account.getPinnedBalances(network);
+    List<BalanceModel> balances = account.getPinnedBalances(network, mergeCoin: false);
     BalanceModel balanceUTXO = await network.getBalanceUTXO(
       balances,
       account.getAddress(network.networkType.networkName)!,
