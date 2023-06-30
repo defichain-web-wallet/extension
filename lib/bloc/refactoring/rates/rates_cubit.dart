@@ -47,8 +47,8 @@ class RatesCubit extends Cubit<RatesState> {
     if (value.isEmpty) {
       tokens = state.foundTokens;
     } else {
-      for (TokenModel element in state.foundTokens) {
-        if (element.symbol.contains(value)) {
+      for (TokenModel element in state.ratesModel!.tokens!) {
+        if (element.displaySymbol.toLowerCase().contains(value.toLowerCase())) {
           tokens.add(element);
         }
       }
