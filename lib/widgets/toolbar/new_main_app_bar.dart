@@ -16,7 +16,6 @@ class NewMainAppBar extends StatelessWidget
     with ThemeMixin
     implements PreferredSizeWidget {
   final bool isShowLogo;
-  final bool isSmallScreen;
   final bool isShowNetworkSelector;
   final Color? bgColor;
   final void Function()? callback;
@@ -24,7 +23,6 @@ class NewMainAppBar extends StatelessWidget
   NewMainAppBar({
     Key? key,
     this.isShowLogo = true,
-    this.isSmallScreen = false,
     this.isShowNetworkSelector = true,
     this.bgColor,
     this.callback,
@@ -71,7 +69,7 @@ class NewMainAppBar extends StatelessWidget
               )
             : Container(),
         actions: [
-          if (isSmallScreen)
+          if (!isFullScreen(context))
             SizedBox(
               width: 32,
               height: 32,
@@ -92,7 +90,7 @@ class NewMainAppBar extends StatelessWidget
             child: NewActionButton(
               iconPath: 'assets/icons/account_icon.svg',
               onPressed: () {
-                if (!isFullScreen(context)) {
+                if (!isLargeScreen(context)) {
                   Scaffold.of(context).openEndDrawer();
                 } else {
                   homeCubit.updateExtendedDrawer(

@@ -1,7 +1,6 @@
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/network/network_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
@@ -42,10 +41,26 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
     NavigatorService.pushReplacement(context, null);
   }
 
+  double _getVerticalMargin(BuildContext context) {
+    if (isLargeScreen(context)) {
+      return 2;
+    } else if (isSmallScreen(context)) {
+      return 10;
+    } else {
+      return -5;
+    }
+  }
+
+  double _getHorizontalMargin(BuildContext context) {
+    if (isLargeScreen(context)) {
+      return -34;
+    } else {
+      return 16;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double horizontalMargin = menuHelper.getHorizontalMargin(context);
-    bool isFullScreen = MediaQuery.of(context).size.width > ScreenSizes.medium;
     HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
 
     if (!widget.isAppBar) {
@@ -53,7 +68,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
         tabs: tabs,
         onChange: (item) => onChangeNetwork(item),
       );
-    } else if (isFullScreen) {
+    } else if (isLargeScreen(context)) {
       return Container(
         child: GestureDetector(
           onTap: () {
@@ -74,8 +89,8 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
         showArrow: false,
         barrierColor: Colors.transparent,
         pressType: PressType.singleClick,
-        verticalMargin: isFullScreen ? 2 : -5,
-        horizontalMargin: isFullScreen ? -34 : horizontalMargin,
+        verticalMargin: _getVerticalMargin(context),
+        horizontalMargin: _getHorizontalMargin(context),
         controller: controller,
         enablePassEvent: false,
       );

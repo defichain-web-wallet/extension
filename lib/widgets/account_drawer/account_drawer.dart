@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -13,20 +12,16 @@ import 'package:defi_wallet/widgets/account_drawer/selected_account.dart';
 import 'package:defi_wallet/widgets/buttons/account_menu_button.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_account_dialog.dart';
 import 'package:defi_wallet/widgets/defi_switch.dart';
-import 'package:defi_wallet/widgets/dialogs/wallet_lock_dialog.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 
 class AccountDrawer extends StatefulWidget {
   final double? width;
-  final bool isFullScreen;
 
   const AccountDrawer({
     Key? key,
     this.width = 280,
-    this.isFullScreen = false,
   }) : super(key: key);
 
   @override
@@ -66,15 +61,15 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
           accountsSelectorHeight = 260;
         }
         return BackdropFilter(
-          filter: widget.isFullScreen
+          filter: isLargeScreen(context)
               ? ImageFilter.blur(sigmaX: 0.0, sigmaY: 0.0)
               : ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
           child: Drawer(
             width: widget.width!,
             backgroundColor: Colors.transparent,
-            elevation: widget.isFullScreen ? 0 : 3,
+            elevation: isLargeScreen(context) ? 0 : 3,
             child: Padding(
-              padding: EdgeInsets.all(widget.isFullScreen ? 0 : 8),
+              padding: EdgeInsets.all(isLargeScreen(context) ? 0 : 8),
               child: Container(
                 decoration: BoxDecoration(
                   color: isDarkTheme()
@@ -113,7 +108,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      if (!widget.isFullScreen)
+                                      if (!isLargeScreen(context))
                                         Container(
                                           width: 16,
                                           height: 16,
