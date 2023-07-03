@@ -1,7 +1,5 @@
 import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/home/asset_card.dart';
@@ -13,9 +11,6 @@ class AssetList extends StatelessWidget with ThemeMixin {
   AssetList({
     Key? key,
   }) : super(key: key);
-
-  TokensHelper tokenHelper = TokensHelper();
-  BalancesHelper balancesHelper = BalancesHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +67,9 @@ class AssetList extends StatelessWidget with ThemeMixin {
               return SliverFillRemaining(
                 hasScrollBody: false,
                 child: Container(
-                  color: Theme.of(context).cardColor,
+                  color: isFullScreen(context)
+                      ? null
+                      : Theme.of(context).cardColor,
                   child: Center(
                     child: Text('Not yet any tokens'),
                   ),
