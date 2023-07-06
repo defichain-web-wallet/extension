@@ -4,6 +4,7 @@ import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_networ
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/bitcoin/blockcypher_requests.dart';
+import 'package:defi_wallet/services/signing_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 import 'package:defi_wallet/models/utxo_model.dart';
@@ -13,7 +14,7 @@ class BTCTransactionService {
 
   static Future<TxErrorModel> createSendTransaction(
       {required String senderAddress,
-      required ECPair keyPair,
+      required SigningService signingService,
       required String destinationAddress,
       required BitcoinNetworkModel network,
       required int amount,
@@ -43,14 +44,15 @@ class BTCTransactionService {
     final _txb = TransactionBuilder(network: network.getNetworkType());
     _txb.setVersion(2);
     var amountUtxo = 0;
-    selectedUtxo.forEach((utxo) {
+    selectedUtxo.forEach((utxo) async {
       amountUtxo += utxo.value!;
+      var pubKey = await signingService.getPublicKey();
       _txb.addInput(
           utxo.mintTxId,
           utxo.mintIndex,
           null,
           P2WPKH(
-                  data: PaymentData(pubkey: keyPair.publicKey),
+                  data: PaymentData(pubkey: pubKey),
                   network: network.getNetworkType())
               .data!
               .output);
@@ -60,11 +62,10 @@ class BTCTransactionService {
     if (amountUtxo > amount + fee + DUST) {
       _txb.addOutput(senderAddress, amountUtxo - (amount + fee));
     }
-    selectedUtxo.asMap().forEach((index, utxo) {
-      _txb.sign(vin: index, keyPair: keyPair, witnessValue: utxo.value);
-    });
-    TxErrorModel tx =
-        await BlockcypherRequests.sendTxHex(network, _txb.build().toHex());
+
+    var txHex = await signingService.signTransaction(_txb, selectedUtxo);
+
+    TxErrorModel tx = await BlockcypherRequests.sendTxHex(network, txHex);
     tx.txLoaderList![0].type = TxType.send;
     return tx;
   }

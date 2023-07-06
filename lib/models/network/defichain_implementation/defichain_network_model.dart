@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bridge_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
@@ -15,6 +16,7 @@ import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_mod
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/yield_machine_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:defi_wallet/models/network/staking_enum.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -32,7 +34,6 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   static const int DUST = 3000;
   static const int FEE = 3000;
   static const int RESERVED_BALANCES = 30000;
-
 
   DefichainNetworkModel(NetworkTypeModel networkType)
       : super(_validationNetworkName(networkType)) {
@@ -91,7 +92,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     );
     data['rampList'] = List.generate(
       this.rampList.length,
-          (index) => this.rampList[index].toJson(),
+      (index) => this.rampList[index].toJson(),
     );
 
     return data;
@@ -193,15 +194,12 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }) async {
     var tokens = await this.getAvailableTokens();
     var balanceList = await DFIBalanceRequests.getBalanceList(
-      network: this,
-      addressString: addressString,
-      tokens: tokens
-    );
+        network: this, addressString: addressString, tokens: tokens);
 
     return balanceList;
   }
 
-  TokenModel getDefaultToken(){
+  TokenModel getDefaultToken() {
     return TokenModel(
       isUTXO: true,
       name: 'Default Defi token',
@@ -212,7 +210,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     );
   }
 
-  bool isTokensPresent(){
+  bool isTokensPresent() {
     return true;
   }
 
@@ -221,7 +219,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     required TokenModel token,
     required TxType type,
   }) async {
-    List<BalanceModel> balances = account.getPinnedBalances(this, mergeCoin: false);
+    List<BalanceModel> balances =
+        account.getPinnedBalances(this, mergeCoin: false);
 
     double available = 0;
 
@@ -240,7 +239,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       switch (type) {
         case TxType.send:
           if (tokenDFIBalance.balance > FEE) {
-            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+            available = fromSatoshi(
+                coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
             break;
           } else {
             available = fromSatoshi(coinDFIBalance.balance - (FEE));
@@ -248,7 +248,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
           }
         case TxType.swap:
           if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+            available = fromSatoshi(
+                coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
             break;
           } else {
             available = fromSatoshi(tokenDFIBalance.balance);
@@ -256,7 +257,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
           }
         case TxType.addLiq:
           if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+            available = fromSatoshi(
+                coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
             break;
           } else {
             available = fromSatoshi(tokenDFIBalance.balance);
@@ -283,10 +285,14 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     );
   }
 
-  Future<ECPair> getKeypair(String password, AbstractAccountModel account, ApplicationModel applicationModel) async {
-    var mnemonic = applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
+  Future<ECPair> getKeypair(String password, AbstractAccountModel account,
+      ApplicationModel applicationModel) async {
+    var mnemonic =
+        (applicationModel.sourceList[account.sourceId]! as SourceSeedModel)
+            .getMnemonic(password);
     var masterKey = getMasterKeypairFormMnemonic(mnemonic);
-    return _getKeypairForPathPrivateKey(masterKey, account.accountIndex);
+    return _getKeypairForPathPrivateKey(
+        masterKey, (account as AccountModel).accountIndex);
   }
 
   Future<TxErrorModel> send(
@@ -295,15 +301,12 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       required String password,
       required TokenModel token,
       required double amount,
-        required ApplicationModel applicationModel,
-        int satPerByte = 0}) async {
-    ECPair keypair = await getKeypair(
-      password,
-      account,
-      applicationModel
-    );
+      required ApplicationModel applicationModel,
+      int satPerByte = 0}) async {
+    ECPair keypair = await getKeypair(password, account, applicationModel);
 
-    List<BalanceModel> balances = account.getPinnedBalances(this, mergeCoin: false);
+    List<BalanceModel> balances =
+        account.getPinnedBalances(this, mergeCoin: false);
     BalanceModel balanceUTXO = await getBalanceUTXO(
       balances,
       account.getAddress(this.networkType.networkName)!,
@@ -325,17 +328,9 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     );
   }
 
-  Future<String> signMessage(
-    AbstractAccountModel account,
-    String message,
-    String password,
-   ApplicationModel applicationModel
-  ) async {
-    ECPair keypair = await getKeypair(
-      password,
-      account,
-      applicationModel
-    );
+  Future<String> signMessage(AbstractAccountModel account, String message,
+      String password, ApplicationModel applicationModel) async {
+    ECPair keypair = await getKeypair(password, account, applicationModel);
 
     return keypair.signMessage(message, getNetworkType());
   }
@@ -365,20 +360,20 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     late BalanceModel? balance;
     try {
       //TODO: add filter by token or pair
-      balance = balances.where((element) => element.token != null).firstWhere((element) => element.token!.compare(token) && !element.token!.isUTXO);
+      balance = balances.where((element) => element.token != null).firstWhere(
+          (element) => element.token!.compare(token) && !element.token!.isUTXO);
     } catch (_) {
       //if not exist in balances we check blockchain
       var tokens = await this.getAvailableTokens();
       List<BalanceModel> balanceList = await DFIBalanceRequests.getBalanceList(
-        network: this,
-        addressString: addressString,
-          tokens: tokens
-      );
+          network: this, addressString: addressString, tokens: tokens);
       try {
         //TODO: add filter by token or pair
-        balance = balanceList.where((element) => element.token != null).firstWhere(
-          (element) => element.token!.compare(token) && !element.token!.isUTXO,
-        );
+        balance =
+            balanceList.where((element) => element.token != null).firstWhere(
+                  (element) =>
+                      element.token!.compare(token) && !element.token!.isUTXO,
+                );
       } catch (_) {
         //if in blockchain balance doesn't exist - we return 0
         balance = BalanceModel(balance: 0, token: token);
@@ -401,7 +396,8 @@ class DefichainNetworkModel extends AbstractNetworkModel {
 
   bip32.BIP32 getMasterKeypairFormMnemonic(List<String> mnemonic) {
     final seed = mnemonicToSeed(mnemonic.join(' '));
-    return bip32.BIP32.fromSeedWithCustomKey(seed, "@defichain/jellyfish-wallet-mnemonic", _getNetworkTypeBip32());
+    return bip32.BIP32.fromSeedWithCustomKey(
+        seed, "@defichain/jellyfish-wallet-mnemonic", _getNetworkTypeBip32());
   }
 
   ECPair _getKeypairForPathPublicKey(bip32.BIP32 masterKeypair, int account) {

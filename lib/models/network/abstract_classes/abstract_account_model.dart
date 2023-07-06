@@ -4,40 +4,30 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_network_mod
 import 'package:defi_wallet/models/network/network_name.dart';
 
 abstract class AbstractAccountModel {
-  final String publicKeyTestnet;
-  final String publicKeyMainnet;
   final String sourceId;
-  final Map<String, String> addresses;
   final Map<String, List<BalanceModel>> pinnedBalances;
-  final int accountIndex;
+
   String name;
   final List<AddressBookModel> addressBook;
   final List<AddressBookModel> lastSendList;
 
-  AbstractAccountModel(
-    this.publicKeyTestnet,
-    this.publicKeyMainnet,
-    this.sourceId,
-    this.addresses,
-    this.accountIndex,
-    this.pinnedBalances,
-    this.name,
-    this.addressBook,
-    this.lastSendList
-  );
+  AbstractAccountModel(this.sourceId, this.pinnedBalances, this.name,
+      this.addressBook, this.lastSendList);
 
-  void changeName(String name){
+  void changeName(String name) {
     this.name = name;
   }
 
   Map<String, dynamic> toJson();
 
   // Tokens
-  List<BalanceModel> getPinnedBalances(AbstractNetworkModel network, {bool mergeCoin = true, bool onlyPairs = false}) {
-    var balanceList = pinnedBalances[network.networkType.networkName.name] ?? [];
+  List<BalanceModel> getPinnedBalances(AbstractNetworkModel network,
+      {bool mergeCoin = true, bool onlyPairs = false}) {
+    var balanceList =
+        pinnedBalances[network.networkType.networkName.name] ?? [];
     List<BalanceModel> result = [];
     //TODO: maybe need to move this to network models
-    if(onlyPairs){
+    if (onlyPairs) {
       result = balanceList.where((element) {
         return element.lmPool != null;
       }).toList();
@@ -68,7 +58,6 @@ abstract class AbstractAccountModel {
         } else {
           result = balanceList;
         }
-
       } catch (err) {
         result = [];
       }
@@ -87,7 +76,8 @@ abstract class AbstractAccountModel {
 
   void unpinToken(BalanceModel balance, AbstractNetworkModel network) {
     try {
-      pinnedBalances[network.networkType.networkName.name]!.removeWhere((element) {
+      pinnedBalances[network.networkType.networkName.name]!
+          .removeWhere((element) {
         return element.compare(balance);
       });
     } catch (_) {
@@ -98,42 +88,57 @@ abstract class AbstractAccountModel {
   // Lists
 
   void addToAddressBook(
-      AddressBookModel address,
-  ){
+    AddressBookModel address,
+  ) {
     addressBook.add(address);
   }
 
   void addToLastSend(
-      AddressBookModel address,
-  ){
+    AddressBookModel address,
+  ) {
     lastSendList.add(address);
   }
+
   void editAddressBook(
-      AddressBookModel address,
-      ){
+    AddressBookModel address,
+  ) {
     int index = addressBook.indexWhere((element) => element.id == address.id);
     addressBook[index] = address;
   }
 
-  List<AddressBookModel> getAddressBook(NetworkName? networkName,){
-    if(networkName == null){
+  List<AddressBookModel> getAddressBook(
+    NetworkName? networkName,
+  ) {
+    if (networkName == null) {
       return addressBook;
     } else {
-      return addressBook.where((element) => element.network!.networkName == networkName).toList();
-    }
-  }
-  List<AddressBookModel> getLastSend(NetworkName? networkName,){
-    if(networkName == null){
-      return lastSendList;
-    } else {
-      return lastSendList.where((element) => element.network!.networkName == networkName).toList();
+      return addressBook
+          .where((element) => element.network!.networkName == networkName)
+          .toList();
     }
   }
 
-  void removeFromAddressBook(AddressBookModel address,){
+  List<AddressBookModel> getLastSend(
+    NetworkName? networkName,
+  ) {
+    if (networkName == null) {
+      return lastSendList;
+    } else {
+      return lastSendList
+          .where((element) => element.network!.networkName == networkName)
+          .toList();
+    }
+  }
+
+  void removeFromAddressBook(
+    AddressBookModel address,
+  ) {
     addressBook.removeWhere((element) => element.id == address.id);
   }
-  void removeFromLastSend(AddressBookModel address,){
+
+  void removeFromLastSend(
+    AddressBookModel address,
+  ) {
     lastSendList.removeWhere((element) => element.id == address.id);
   }
 

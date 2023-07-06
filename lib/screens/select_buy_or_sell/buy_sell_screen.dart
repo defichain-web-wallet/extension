@@ -5,6 +5,7 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/screens/buy/buy_select_currency_screen.dart';
 import 'package:defi_wallet/screens/buy/tutorials/buy_tutorial_first_screen.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_first_screen.dart';
@@ -48,12 +49,9 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     AccessTokenModel? accessToken;
     try {
-      accessToken = walletCubit
-          .state
-          .applicationModel!
-          .activeNetwork!
-          .rampList[0]
-          .accessTokensMap[walletCubit.state.activeAccount.accountIndex]!;
+      accessToken = walletCubit.state.applicationModel!.activeNetwork!
+              .rampList[0].accessTokensMap[
+          (walletCubit.state.activeAccount as AccountModel).accountIndex]!;
       rampCubit.setAccessToken(accessToken);
       rampCubit.loadUserDetails();
     } catch (err) {
@@ -88,12 +86,16 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
 
                 return Scaffold(
                   drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                  endDrawer: isFullScreen ? null : AccountDrawer(
-                    width: buttonSmallWidth,
-                  ),
-                  appBar: isFullScreen ? null : NewMainAppBar(
-                    isShowLogo: false,
-                  ),
+                  endDrawer: isFullScreen
+                      ? null
+                      : AccountDrawer(
+                          width: buttonSmallWidth,
+                        ),
+                  appBar: isFullScreen
+                      ? null
+                      : NewMainAppBar(
+                          isShowLogo: false,
+                        ),
                   body: Container(
                     padding: EdgeInsets.only(
                       top: 26,
@@ -146,12 +148,12 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                             .textTheme
                                             .headline5!
                                             .apply(
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .color!
-                                              .withOpacity(0.6),
-                                        ),
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .headline5!
+                                                  .color!
+                                                  .withOpacity(0.6),
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -169,8 +171,10 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                       ),
                                     ),
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Text(
                                           'Your limit',
@@ -184,9 +188,9 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                              MainAxisAlignment.center,
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.end,
+                                              CrossAxisAlignment.end,
                                           children: [
                                             if (isLoading && !hasAccessToken)
                                               Text(
@@ -195,8 +199,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                                     .textTheme
                                                     .headline1!
                                                     .copyWith(
-                                                  fontSize: 40,
-                                                ),
+                                                      fontSize: 40,
+                                                    ),
                                               )
                                             else ...[
                                               Text(
@@ -205,8 +209,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                                     .textTheme
                                                     .headline1!
                                                     .copyWith(
-                                                  fontSize: 40,
-                                                ),
+                                                      fontSize: 40,
+                                                    ),
                                               ),
                                               Text(
                                                 ' / $period',
@@ -214,8 +218,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                                     .textTheme
                                                     .headline5!
                                                     .copyWith(
-                                                  fontSize: 24,
-                                                ),
+                                                      fontSize: 24,
+                                                    ),
                                               ),
                                             ]
                                           ],
@@ -226,7 +230,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                   SizedBox(
                                     height: 16,
                                   ),
-                                  if (hasAccessToken && !isExpiredAccessToken) ...[
+                                  if (hasAccessToken &&
+                                      !isExpiredAccessToken) ...[
                                     Flexible(
                                       child: FlatButton(
                                         title: 'Buy',
@@ -253,10 +258,11 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                       child: FlatButton(
                                         title: 'Increase limit',
                                         iconPath:
-                                        'assets/icons/increase_limits.png',
+                                            'assets/icons/increase_limits.png',
                                         callback: () {
                                           if (hasAccessToken) {
-                                            String kycHash = rampState.rampUserModel!.kycHash!;
+                                            String kycHash = rampState
+                                                .rampUserModel!.kycHash!;
                                             launch(
                                               'https://payment.dfx.swiss/kyc?code=$kycHash',
                                             );
@@ -273,8 +279,8 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                           .textTheme
                                           .headline6!
                                           .copyWith(
-                                        color: Colors.red,
-                                      ),
+                                            color: Colors.red,
+                                          ),
                                     ),
                                     SizedBox(
                                       height: 12,
@@ -285,22 +291,26 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                             ? 'Update DFX token'
                                             : 'Create DFX account',
                                         iconPath:
-                                        'assets/icons/increase_limits.png',
+                                            'assets/icons/increase_limits.png',
                                         callback: () async {
-
                                           showDialog(
-                                            barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                            barrierColor: AppColors.tolopea
+                                                .withOpacity(0.06),
                                             barrierDismissible: false,
                                             context: context,
-                                            builder: (BuildContext dialogContext) {
+                                            builder:
+                                                (BuildContext dialogContext) {
                                               return PassConfirmDialog(
                                                 onCancel: () {},
                                                 onSubmit: (password) async {
                                                   RampCubit rampCubit =
-                                                  BlocProvider.of<RampCubit>(context);
+                                                      BlocProvider.of<
+                                                          RampCubit>(context);
                                                   WalletCubit walletCubit =
-                                                  BlocProvider.of<WalletCubit>(context);
-                                                  await walletCubit.signUpToRamp(
+                                                      BlocProvider.of<
+                                                          WalletCubit>(context);
+                                                  await walletCubit
+                                                      .signUpToRamp(
                                                     password,
                                                   );
                                                   loadDfxData();
@@ -308,7 +318,6 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                               );
                                             },
                                           );
-
 
                                           // fiatCubit.setLoadingState();
 

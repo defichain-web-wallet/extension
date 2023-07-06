@@ -1,6 +1,7 @@
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_token_model.dart';
@@ -34,7 +35,8 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
         expireHours: 24,
       );
       print(accessTokenModel.toJson());
-      this.accessTokensMap[account.accountIndex] = accessTokenModel;
+      this.accessTokensMap[(account as AccountModel).accountIndex] =
+          accessTokenModel;
       return true;
     }
     return false; //TODO: need to return ErrorModel with details
@@ -54,7 +56,8 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
     );
     String? accessToken = await LockRequests.signUp(data);
     if (accessToken != null) {
-      accessTokensMap[account.accountIndex] = AccessTokenModel(
+      accessTokensMap[(account as AccountModel).accountIndex] =
+          AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
       );
@@ -64,21 +67,25 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
   }
 
   Future<bool> isKycDone(AbstractAccountModel account) async {
-    var user = await LockRequests.getKYC(
-        this.accessTokensMap[account.accountIndex]!.accessToken);
+    var user = await LockRequests.getKYC(this
+        .accessTokensMap[(account as AccountModel).accountIndex]!
+        .accessToken);
     return user.kycStatus == 'Full' || user.kycStatus == 'Light';
   }
 
   Future<String> getKycLink(AbstractAccountModel account) async {
-    var user = await LockRequests.getKYC(
-        this.accessTokensMap[account.accountIndex]!.accessToken);
+    var user = await LockRequests.getKYC(this
+        .accessTokensMap[(account as AccountModel).accountIndex]!
+        .accessToken);
     return user.kycLink!;
   }
 
   Future<BigInt> getAmountStaked(
       AbstractAccountModel account, TokenModel token) async {
     var staking = await LockRequests.getStaking(
-        this.accessTokensMap[account.accountIndex]!.accessToken,
+        this
+            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessToken,
         'DeFiChain',
         'Masternode');
     BigInt balance = BigInt.from(0);
@@ -100,7 +107,9 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
     var token =
         availableTokens.firstWhere((element) => element.symbol == 'DFI');
     var analytics = await LockRequests.getAnalytics(
-        this.accessTokensMap[account.accountIndex]!.accessToken,
+        this
+            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessToken,
         'DFI',
         'DeFiChain',
         'Masternode');
@@ -119,7 +128,9 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
     var token =
         availableTokens.firstWhere((element) => element.symbol == 'DFI');
     var analytics = await LockRequests.getAnalytics(
-        this.accessTokensMap[account.accountIndex]!.accessToken,
+        this
+            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessToken,
         'DFI',
         'DeFiChain',
         'Masternode');
@@ -133,7 +144,9 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
 
   Future<StakingModel> getStaking(AbstractAccountModel account) async {
     return LockRequests.getStaking(
-        this.accessTokensMap[account.accountIndex]!.accessToken,
+        this
+            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessToken,
         'DeFiChain',
         'Masternode');
   }
@@ -157,7 +170,9 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
 
     if (tx.isError == false) {
       LockRequests.setDeposit(
-        this.accessTokensMap[account.accountIndex]!.accessToken,
+        this
+            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessToken,
         stakingModel.id,
         amount,
         asset,
@@ -177,13 +192,15 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
       String asset,
       ApplicationModel applicationModel) async {
     late WithdrawModel? withdrawModel;
-    try{
+    try {
       var existWithdraws = await LockRequests.getWithdraws(
-          this.accessTokensMap[account.accountIndex]!.accessToken,
+          this
+              .accessTokensMap[(account as AccountModel).accountIndex]!
+              .accessToken,
           stakingModel.id);
       if (existWithdraws!.isEmpty) {
         withdrawModel = await LockRequests.requestWithdraw(
-            this.accessTokensMap[account.accountIndex]!.accessToken,
+            this.accessTokensMap[(account).accountIndex]!.accessToken,
             stakingModel.id,
             amount,
             asset);
@@ -205,7 +222,7 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
           stakingModel.id,
           withdrawModel);
       return true;
-    } catch(e){
+    } catch (e) {
       return false;
     }
   }
@@ -248,8 +265,7 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
     ApplicationModel applicationModel,
     AbstractNetworkModel networkModel,
   ) async {
-    var address =
-        account.getAddress(networkModel.networkType.networkName)!;
+    var address = account.getAddress(networkModel.networkType.networkName)!;
     String signature = await networkModel.signMessage(
         account,
         'By_signing_this_message,_you_confirm_to_LOCK_that_you_are_the_sole_owner_of_the_provided_Blockchain_address._Your_ID:_$address',

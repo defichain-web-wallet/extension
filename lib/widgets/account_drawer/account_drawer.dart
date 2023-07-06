@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_overlay_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
@@ -149,7 +150,8 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                   setState(() {
                                                     walletCubit.editAccount(
                                                         s,
-                                                        state.activeAccount
+                                                        (state.activeAccount
+                                                                as AccountModel)
                                                             .accountIndex);
                                                   });
                                                 },
@@ -182,16 +184,17 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                   AccountMenuButton(
                                                       accountSelectMode: true,
                                                       account: accounts[index],
-                                                      callback: accounts[index]
+                                                      callback: (accounts[index]
+                                                                      as AccountModel)
                                                                   .accountIndex ==
-                                                              state
-                                                                  .activeAccount
+                                                              (state.activeAccount
+                                                                      as AccountModel)
                                                                   .accountIndex
                                                           ? null
                                                           : (accountIndex) async {
                                                               walletCubit.updateActiveAccount(
-                                                                  accounts[
-                                                                          index]
+                                                                  (accounts[index]
+                                                                          as AccountModel)
                                                                       .accountIndex);
                                                               Scaffold.of(
                                                                       context)

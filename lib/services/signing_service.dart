@@ -10,6 +10,13 @@ import 'package:defi_wallet/services/local_signing_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:hive/hive.dart';
 
+abstract class SigningService {
+  Future<Uint8List> getPublicKey();
+
+  Future<String> signTransaction(
+      TransactionBuilder txBuilder, List<UtxoModel> utxoModel);
+}
+
 abstract class SigningWalletService {
   Future<Uint8List> getPublicKey(
       AccountModel accountModel, String address, NetworkType network,

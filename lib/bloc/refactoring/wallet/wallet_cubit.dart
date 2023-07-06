@@ -80,7 +80,9 @@ class WalletCubit extends Cubit<WalletState> {
     var accountIndex = 0;
     var neededRestore = applicationModel.networks.length * 5;
     var restored = 0;
-    emit(state.copyWith(status: WalletStatusList.restore, restoreProgress: '($restored/$neededRestore)'));
+    emit(state.copyWith(
+        status: WalletStatusList.restore,
+        restoreProgress: '($restored/$neededRestore)'));
     while (hasHistory) {
       late AbstractAccountModel account;
       try {
@@ -122,11 +124,13 @@ class WalletCubit extends Cubit<WalletState> {
           presentBalance = true;
         }
         restored++;
-        emit(state.copyWith(status: WalletStatusList.restore, restoreProgress: '($restored/$neededRestore)'));
+        emit(state.copyWith(
+            status: WalletStatusList.restore,
+            restoreProgress: '($restored/$neededRestore)'));
       });
       hasHistory = presentBalance;
       if (presentBalance) {
-        if(restored + 1 >= neededRestore){
+        if (restored + 1 >= neededRestore) {
           neededRestore += applicationModel.networks.length * 5;
         }
         accountList.add(account);
@@ -198,7 +202,8 @@ class WalletCubit extends Cubit<WalletState> {
         state.applicationModel!.activeNetwork!.networkType.networkName.name;
     final balances =
         await state.applicationModel!.activeNetwork!.getAllBalances(
-      addressString: state.activeAccount.addresses[networkName]!,
+      addressString:
+          (state.activeAccount as AccountModel).addresses[networkName]!,
     );
     state.applicationModel!.activeAccount!.pinnedBalances[networkName] =
         balances;
@@ -215,9 +220,11 @@ class WalletCubit extends Cubit<WalletState> {
   editAccount(String name, int index) async {
     ApplicationModel applicationModel = state.applicationModel!;
     applicationModel.accounts
-        .firstWhere((element) => element.accountIndex == index)
+        .firstWhere(
+            (element) => (element as AccountModel).accountIndex == index)
         .changeName(name);
-    if (applicationModel.activeAccount!.accountIndex == index) {
+    if ((applicationModel.activeAccount! as AccountModel).accountIndex ==
+        index) {
       applicationModel.activeAccount!.changeName(name);
     }
 
@@ -233,8 +240,8 @@ class WalletCubit extends Cubit<WalletState> {
       status: WalletStatusList.loading,
     ));
     ApplicationModel applicationModel = state.applicationModel!;
-    AbstractAccountModel account = applicationModel.accounts
-        .firstWhere((element) => element.accountIndex == index);
+    AbstractAccountModel account = applicationModel.accounts.firstWhere(
+        (element) => (element as AccountModel).accountIndex == index);
     applicationModel.activeAccount = account;
 
     StorageService.saveApplication(applicationModel);
@@ -252,16 +259,40 @@ class WalletCubit extends Cubit<WalletState> {
     ApplicationModel applicationModel = state.applicationModel!;
     int maxIndex = 0;
     applicationModel.accounts.forEach((element) =>
-        element.accountIndex > maxIndex
+        (element as AccountModel).accountIndex > maxIndex
             ? maxIndex = element.accountIndex
             : null);
-    SourceSeedModel source = applicationModel.sourceList.values.first;
+    SourceSeedModel source =
+        applicationModel.sourceList.values.first as SourceSeedModel;
     AbstractAccountModel account = await AccountModel.fromPublicKeys(
         networkList: applicationModel.networks,
         accountIndex: maxIndex + 1,
         publicKeyMainnet: source.publicKeyMainnet,
         publicKeyTestnet: source.publicKeyTestnet,
         sourceId: source.id);
+    account.changeName(name);
+    applicationModel.accounts.add(account);
+
+    StorageService.saveApplication(applicationModel);
+
+    emit(state.copyWith(
+      status: WalletStatusList.success,
+      applicationModel: applicationModel,
+    ));
+  }
+
+  addNewLedgerAccount(String name, String address, Uint8List pubKey,
+      AbstractNetworkModel networkModel) async {
+    emit(state.copyWith(
+      status: WalletStatusList.loading,
+    ));
+    ApplicationModel applicationModel = state.applicationModel!;
+
+    AbstractAccountModel account = await LedgerAccountModel.fromLedger(
+        address: address,
+        publicKey: pubKey,
+        network: networkModel,
+        sourceId: "");
     account.changeName(name);
     applicationModel.accounts.add(account);
 

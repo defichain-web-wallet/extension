@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
@@ -51,10 +51,9 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
     String accountIndex = index.toString();
     if (accountIndex.length == 1) {
       return AppColors
-          .accountColors[widget.account!.accountIndex];
+          .accountColors[(widget.account! as AccountModel).accountIndex];
     } else {
-      return AppColors
-          .accountColors[int.parse(accountIndex[1])];
+      return AppColors.accountColors[int.parse(accountIndex[1])];
     }
   }
 
@@ -81,7 +80,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
             if (widget.account == null) {
               widget.callback!(defaultAccountId);
             } else {
-              widget.callback!(widget.account!.accountIndex);
+              widget.callback!((widget.account! as AccountModel).accountIndex);
             }
           }
         },
@@ -100,7 +99,8 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
           backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
           overlayColor: widget.isHoverBackgroundEffect
               ? MaterialStateProperty.all(
-                  widget.hoverBgColor ?? Theme.of(context).selectedRowColor.withOpacity(0.07),
+                  widget.hoverBgColor ??
+                      Theme.of(context).selectedRowColor.withOpacity(0.07),
                 )
               : MaterialStateProperty.all<Color>(Colors.transparent),
           elevation: MaterialStateProperty.all<double>(0.0),
@@ -120,12 +120,16 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                   child: Center(
                     child: Stack(
                       children: [
-                        if(widget.isTheme)
+                        if (widget.isTheme)
                           SvgPicture.asset(
                             '${widget.iconPath}',
                             color: isDarkTheme()
-                                ? isHover ? AppColors.blackRock : AppColors.white
-                                : isHover ? AppColors.white : AppColors.blackRock,
+                                ? isHover
+                                    ? AppColors.blackRock
+                                    : AppColors.white
+                                : isHover
+                                    ? AppColors.white
+                                    : AppColors.blackRock,
                           ),
                         if (!widget.isStaticBg && !widget.isTheme)
                           SvgPicture.asset(
@@ -154,7 +158,8 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                     if (widget.accountSelectMode)
                       CircleAvatar(
                         radius: 12,
-                        backgroundColor: getCircleAvatarColor(widget.account!.accountIndex)
+                        backgroundColor: getCircleAvatarColor(
+                                (widget.account! as AccountModel).accountIndex)
                             .withOpacity(0.16),
                         child: Text(
                           '${widget.title[0]}',
@@ -163,7 +168,9 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                               .headline4!
                               .copyWith(
                                   fontSize: 11,
-                                  color: getCircleAvatarColor(widget.account!.accountIndex)),
+                                  color: getCircleAvatarColor(
+                                      (widget.account! as AccountModel)
+                                          .accountIndex)),
                         ),
                       ),
                     if (widget.accountSelectMode)
@@ -186,7 +193,8 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                                   )
                               : Theme.of(context).textTheme.headline5!.copyWith(
                                     color: isHover || widget.isStaticBg
-                                        ? widget.hoverTextColor ?? AppColors.hollywoodCerise
+                                        ? widget.hoverTextColor ??
+                                            AppColors.hollywoodCerise
                                         : Theme.of(context)
                                             .textTheme
                                             .headline5!

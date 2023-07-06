@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
@@ -7,18 +9,41 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:defi_wallet/requests/bitcoin/blockcypher_requests.dart';
 import 'package:defi_wallet/services/bitcoin/btc_transaction_service.dart';
+import 'package:defi_wallet/services/signing_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
+
+class BitcoinSigningService extends SigningService {
+  final ECPair ecPair;
+  BitcoinSigningService({required this.ecPair});
+
+  @override
+  Future<Uint8List> getPublicKey() async {
+    return this.ecPair.publicKey!;
+  }
+
+  @override
+  Future<String> signTransaction(
+      TransactionBuilder txBuilder, List<UtxoModel> utxoModel) async {
+    utxoModel.asMap().forEach((index, utxo) {
+      txBuilder.sign(vin: index, keyPair: ecPair, witnessValue: utxo.value);
+    });
+    return txBuilder.build().toHex();
+  }
+}
 
 class BitcoinNetworkModel extends AbstractNetworkModel {
   BitcoinNetworkModel(NetworkTypeModel networkType)
@@ -188,9 +213,11 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
   Future<ECPair> getKeypair(String password, AbstractAccountModel account,
       ApplicationModel applicationModel) async {
     var mnemonic =
-        applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
+        (applicationModel.sourceList[account.sourceId]! as SourceSeedModel)
+            .getMnemonic(password);
     var masterKey = getMasterKeypairFormMnemonic(mnemonic);
-    return _getKeypairForPathPrivateKey(masterKey, account.accountIndex);
+    return _getKeypairForPathPrivateKey(
+        masterKey, (account as AccountModel).accountIndex);
   }
 
   Future<NetworkFeeModel> getNetworkFee() async {
@@ -215,7 +242,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
 
     return BTCTransactionService.createSendTransaction(
         senderAddress: account.getAddress(this.networkType.networkName)!,
-        keyPair: keypair,
+        signingService: new BitcoinSigningService(ecPair: keypair),
         balance: balances[0],
         destinationAddress: address,
         network: this,

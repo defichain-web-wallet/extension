@@ -1,5 +1,6 @@
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_token_model.dart';
@@ -8,7 +9,7 @@ import 'package:defi_wallet/models/tx_error_model.dart';
 
 import 'abstract_account_model.dart';
 
-abstract class  AbstractStakingProviderModel {
+abstract class AbstractStakingProviderModel {
   Map<int, AccessTokenModel> accessTokensMap = {};
 
   AbstractStakingProviderModel();
@@ -24,8 +25,8 @@ abstract class  AbstractStakingProviderModel {
 
   Future<bool> isKycDone(AbstractAccountModel account);
 
-  AccessTokenModel? getAccessToken(AbstractAccountModel account){
-    return accessTokensMap[account.accountIndex];
+  AccessTokenModel? getAccessToken(AbstractAccountModel account) {
+    return accessTokensMap[(account as AccountModel).accountIndex];
   }
 
   Future<List<StakingTokenModel>> getAvailableStakingTokens(

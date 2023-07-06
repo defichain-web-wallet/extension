@@ -2,12 +2,13 @@ class NetworkTypeModel {
   NetworkName networkName;
   String networkString;
   bool isTestnet;
+  bool isLocalWallet = true;
 
-  NetworkTypeModel({
-    required this.networkName,
-    required this.networkString,
-    required this.isTestnet,
-  });
+  NetworkTypeModel(
+      {required this.networkName,
+      required this.networkString,
+      required this.isTestnet,
+      required this.isLocalWallet});
 
   String get networkStringLowerCase => this.networkString.toLowerCase();
 
@@ -28,12 +29,14 @@ class NetworkTypeModel {
 
   factory NetworkTypeModel.fromJson(Map<String, dynamic> jsonModel) {
     return NetworkTypeModel(
-      networkName: NetworkName.values.firstWhere(
-        (value) => value.toString() == jsonModel['networkName'],
-      ),
-      networkString: jsonModel['networkString'],
-      isTestnet: jsonModel['isTestnet'],
-    );
+        networkName: NetworkName.values.firstWhere(
+          (value) => value.toString() == jsonModel['networkName'],
+        ),
+        networkString: jsonModel['networkString'],
+        isTestnet: jsonModel['isTestnet'],
+        isLocalWallet: jsonModel.containsKey("isLocalWallet")
+            ? jsonModel['isLocalWallet']
+            : true);
   }
 
   Map<String, dynamic> toJson() {
@@ -41,6 +44,7 @@ class NetworkTypeModel {
     data["networkName"] = this.networkName.toString();
     data["networkString"] = this.networkString;
     data["isTestnet"] = this.isTestnet;
+    data["isLocalWallet"] = this.isLocalWallet;
     return data;
   }
 }
