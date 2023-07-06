@@ -1,16 +1,16 @@
-import 'package:bloc/bloc.dart';
+import 'package:decimal/decimal.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_token_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/requests/defichain/staking/lock_requests.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,6 +59,113 @@ class LockCubit extends Cubit<LockState> {
     await StorageService.saveApplication(walletCubit.state.applicationModel!);
 
     await _checkAccessKey(context, lockStaking, account, stakingProviders);
+  }
+
+  updateRewardPercentages(List<double> values, {int index = 0}) {
+    emit(state.copyWith(
+      status: LockStatusList.success,
+    ));
+    double sum = 0;
+    final stakingModel = state.stakingModel!;
+
+    for (int i = 0; i < values.length; i++) {
+      stakingModel.rewardRoutes[i].rewardPercent = values[i];
+      if (stakingModel.rewardRoutes[i].label != 'Reinvest') {
+        sum += values[i];
+      }
+    }
+    Decimal reinvestPercent = Decimal.parse('1') - Decimal.parse(sum.toString());
+
+    var reinvest = stakingModel.rewardRoutes
+        .firstWhere((element) => element.label == 'Reinvest');
+
+    reinvest.rewardPercent = reinvestPercent.toDouble();
+
+    emit(state.copyWith(
+      stakingModel: stakingModel,
+      status: LockStatusList.success,
+    ));
+  }
+
+  removeRewardRoute(int index) {
+    emit(state.copyWith(
+      status: LockStatusList.update,
+    ));
+    StakingModel stakingModel = state.stakingModel!;
+    List<RewardRouteModel> routes = stakingModel.rewardRoutes!;
+    routes.removeAt(index);
+
+    List<double> rewardPercentages =
+    routes.map((e) => e.rewardPercent).toList();
+
+    emit(state.copyWith(
+      status: LockStatusList.success,
+      stakingModel: stakingModel,
+    ));
+    updateRewardPercentages(rewardPercentages);
+  }
+
+  updateRewardRoutes(
+    AbstractNetworkModel network,
+  ) async {
+    emit(state.copyWith(
+      status: LockStatusList.loading,
+    ));
+
+    List<RewardRouteModel> routes = List.from(state.stakingModel!.rewardRoutes);
+    var temp = routes.firstWhere((element) => element.label == 'Reinvest');
+    int index = routes.indexOf(temp);
+    routes.removeAt(index);
+    var rewardRoutesString = routes.map((e) => e.toJson()).toList();
+
+    try {
+      await LockRequests().updateRewards(
+        network.stakingList[0].accessTokensMap[0]!.accessToken,
+        rewardRoutesString,
+        state.stakingModel!.id,
+      );
+
+      emit(state.copyWith(
+        status: LockStatusList.success,
+      ));
+    } catch (err) {
+      emit(state.copyWith(
+        status: LockStatusList.failure,
+      ));
+    }
+  }
+
+  updateLockRewardNewRoute({
+    String? asset,
+    String? address,
+    String? label,
+    double? percent,
+    bool isComplete = false,
+  }) {
+    StakingModel stakingModel = state.stakingModel!;
+    stakingModel.rewardRouteNew = RewardRouteModel(
+      targetAsset: asset ?? stakingModel.rewardRouteNew!.targetAsset,
+      label: label ?? '',
+      targetBlockchain: 'DeFiChain',
+      targetAddress: address ?? '',
+      rewardPercent: percent ?? 0,
+      id: 0,
+    );
+
+    if (isComplete) {
+      emit(state.copyWith(
+        status: LockStatusList.update,
+      ));
+      StakingModel stakingModel = state.stakingModel!;
+      stakingModel.rewardRoutes = [
+        ...stakingModel.rewardRoutes,
+        stakingModel.rewardRouteNew!,
+      ];
+      emit(state.copyWith(
+        status: LockStatusList.success,
+        stakingModel: stakingModel,
+      ));
+    }
   }
 
   getAvailableBalances(context) async {

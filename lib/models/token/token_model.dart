@@ -11,6 +11,7 @@ class TokenModel {
   String displaySymbol;
   NetworkName networkName;
   bool isUTXO;
+  bool isLPS;
   late bool isPair;
   bool isDAT;
   late Color color;
@@ -22,6 +23,7 @@ class TokenModel {
     required this.name,
     required this.displaySymbol,
     required this.networkName,
+    this.isLPS = false,
     this.isUTXO = false,
     this.isDAT = false,
   }) {
@@ -50,6 +52,7 @@ class TokenModel {
       symbol: json['symbol'],
       name: json['name'],
       isUTXO: json['isUTXO'] ?? false,
+      isLPS: json['isLPS'] ?? false,
       isDAT: isDAT,
       displaySymbol: json['displaySymbol'],
       networkName: networkName ?? NetworkName.values.firstWhere(
@@ -77,7 +80,8 @@ class TokenModel {
       'name': this.name,
       'displaySymbol': this.displaySymbol,
       'networkName': this.networkName.toString(),
-      'isUTXO': this.isUTXO
+      'isUTXO': this.isUTXO,
+      'isLPS': this.isLPS,
     };
   }
 

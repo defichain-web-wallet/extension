@@ -19,7 +19,11 @@ class RatesState extends Equatable {
           this.tokens.isNotEmpty ? this.tokens : this.ratesModel!.tokens!;
 
       return tokens
-          .where((element) => !element.isPair && !element.symbol.contains('v1'))
+          .where((element) =>
+              !element.isPair &&
+              !element.symbol.contains('v1') &&
+              !element.isLPS &&
+              element.isDAT)
           .toList();
     } catch (err) {
       return [];

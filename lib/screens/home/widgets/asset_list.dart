@@ -1,7 +1,5 @@
 import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/widgets/home/asset_card.dart';
@@ -14,9 +12,6 @@ class AssetList extends StatelessWidget with ThemeMixin {
     Key? key,
   }) : super(key: key);
 
-  TokensHelper tokenHelper = TokensHelper();
-  BalancesHelper balancesHelper = BalancesHelper();
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RatesCubit, RatesState>(
@@ -27,6 +22,24 @@ class AssetList extends StatelessWidget with ThemeMixin {
                     state.status == WalletStatusList.update) &&
                 ratesState.status == RatesStatusList.success) {
               List<BalanceModel> balances = state.getBalances();
+
+              List<Map<String, dynamic>> availableBalances = balances.map((el) {
+                double convertedBalance =
+                    ratesState.ratesModel!.convertAmountBalance(
+                  state.activeNetwork,
+                  el,
+                );
+
+                return <String, dynamic>{
+                  'convertAmount': convertedBalance,
+                  'balance': el,
+                };
+              }).toList();
+
+              availableBalances.sort(
+                (a, b) => b['convertAmount'].compareTo(a['convertAmount']),
+              );
+
 
               return SliverFixedExtentList(
                 itemExtent: 64.0 + 6,
@@ -43,18 +56,20 @@ class AssetList extends StatelessWidget with ThemeMixin {
                           ? null
                           : Theme.of(context).cardColor,
                       child: AssetCard(
-                        balanceModel: balances[index],
+                        assetDetails: availableBalances[index],
                       ),
                     );
                   },
-                  childCount: balances.length,
+                  childCount: availableBalances.length,
                 ),
               );
             } else {
               return SliverFillRemaining(
                 hasScrollBody: false,
                 child: Container(
-                  color: Theme.of(context).cardColor,
+                  color: isFullScreen(context)
+                      ? null
+                      : Theme.of(context).cardColor,
                   child: Center(
                     child: Text('Not yet any tokens'),
                   ),

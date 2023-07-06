@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -40,11 +41,25 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
   @override
   void initState() {
     super.initState();
+    _loadAssetList();
+  }
+
+  _loadAssetList({String value = ''}) {
     RatesCubit ratesCubit =
     BlocProvider.of<RatesCubit>(context);
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+    List<BalanceModel> balances = walletCubit.state
+        .getBalances()
+        .where((element) => element.token != null)
+        .toList();
+    List<TokenModel> existingTokens = balances.map((e) => e.token!).toList();
 
-    ratesCubit.searchTokens();
+    ratesCubit.searchTokens(
+      existingTokens: existingTokens,
+      value: value,
+    );
   }
+
   @override
   Widget build(BuildContext context) {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
@@ -119,7 +134,7 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                 hintText: 'Search Token',
                                 isBorder: true,
                                 onChanged: (value) {
-                                  ratesCubit.searchTokens(value: value);
+                                  _loadAssetList(value: value);
                                 },
                               ),
                               SizedBox(

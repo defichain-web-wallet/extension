@@ -7,6 +7,7 @@ class StakingModel {
   double fee;
   List<StakingBalanceModel> balances;
   List<RewardRouteModel> rewardRoutes;
+  RewardRouteModel? rewardRouteNew;
 
   StakingModel({
     required this.id,
@@ -17,6 +18,7 @@ class StakingModel {
     required this.fee,
     required this.balances,
     required this.rewardRoutes,
+    this.rewardRouteNew,
   });
 
   factory StakingModel.fromJson(Map<String, dynamic> json) {
@@ -107,33 +109,45 @@ class RewardRouteModel {
   String label;
   double rewardPercent;
   String targetAsset;
-  String targetAddress;
-  String targetBlockchain;
+  String? targetAddress;
+  String? targetBlockchain;
 
   RewardRouteModel({
     required this.id,
     required this.label,
     required this.rewardPercent,
     required this.targetAsset,
-    required this.targetAddress,
-    required this.targetBlockchain,
+    this.targetAddress,
+    this.targetBlockchain,
   });
 
-  factory RewardRouteModel.fromJson(Map<String, dynamic> json) => RewardRouteModel(
-        id: json['id'],
-        label: json['label'] ?? '',
-        rewardPercent: json['rewardPercent'],
-        targetAsset: json['targetAsset'],
-        targetAddress: json['targetAddress'],
-        targetBlockchain: json['targetBlockchain'],
+  factory RewardRouteModel.fromJson(Map<String, dynamic> json) =>
+      RewardRouteModel(
+        id: json["id"],
+        label: json["label"] ?? '',
+        rewardPercent: json["rewardPercent"],
+        targetAsset: json["targetAsset"],
+        targetAddress: json["targetAddress"],
+        targetBlockchain: json["targetBlockchain"],
       );
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'label': label,
-        'rewardPercent': rewardPercent,
-        'targetAsset': targetAsset,
-        'targetAddress': targetAddress,
-        'targetBlockchain': targetBlockchain,
-      };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+
+    if (this.id != null) {
+      data["id"] = this.id;
+    }
+
+    if (this.targetAddress != '') {
+      data["targetAddress"] = this.targetAddress;
+    }
+
+    if (this.label != null) {
+      data["label"] = this.label;
+    }
+    data["rewardPercent"] = this.rewardPercent;
+    data["targetAsset"] = this.targetAsset;
+    data["targetBlockchain"] = this.targetBlockchain;
+    return data;
+  }
 }

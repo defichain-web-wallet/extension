@@ -71,6 +71,32 @@ class LockRequests {
     }
   }
 
+  Future<void> updateRewards(
+      String accessToken,
+      dynamic rewardRoutes,
+      int stakingId,
+      ) async {
+    try {
+      final Uri url = Uri.parse(
+          'https://api.lock.space/v1/staking/$stakingId/reward-routes');
+
+      final headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final body = jsonEncode(rewardRoutes);
+
+      final response = await http.put(url, headers: headers, body: body);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Error.safeToString(response.body);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
   static Future<String?> signIn(Map<String, String> data) async {
     try {
 

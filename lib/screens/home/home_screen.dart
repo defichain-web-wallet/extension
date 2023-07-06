@@ -100,14 +100,12 @@ class _HomeScreenState extends State<HomeScreen>
                   key: _scaffoldKey,
                   appBar: NewMainAppBar(
                     isShowLogo: true,
-                    isSmallScreen: !isFullScreen,
                   ),
                   drawerScrimColor: isFullScreen
                       ? Colors.transparent
                       : AppColors.tolopea.withOpacity(0.06),
                   endDrawer: AccountDrawer(
                     width: isFullScreen ? 298 : buttonSmallWidth,
-                    isFullScreen: isFullScreen,
                   ),
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {

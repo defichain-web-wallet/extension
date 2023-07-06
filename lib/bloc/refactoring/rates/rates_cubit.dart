@@ -45,19 +45,20 @@ class RatesCubit extends Cubit<RatesState> {
     List<TokenModel> tokens = [];
 
     if (value.isEmpty) {
-      tokens = state.foundTokens;
+      tokens = state.ratesModel!.tokens!;
     } else {
-      for (TokenModel element in state.foundTokens) {
-        if (element.symbol.contains(value)) {
+      for (TokenModel element in state.ratesModel!.tokens!) {
+        if (element.displaySymbol.toLowerCase().contains(value.toLowerCase())) {
           tokens.add(element);
         }
       }
-      if (existingTokens.isNotEmpty) {
-        existingTokens.forEach((element) {
-          tokens.removeWhere((token) => token.symbol == element.symbol);
-        });
-      }
     }
+    if (existingTokens.isNotEmpty) {
+      existingTokens.forEach((element) {
+        tokens.removeWhere((token) => token.symbol == element.symbol);
+      });
+    }
+    print(tokens);
     emit(state.copyWith(
       tokens: tokens,
     ));

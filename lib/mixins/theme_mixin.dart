@@ -10,4 +10,12 @@ mixin ThemeMixin {
   bool isFullScreen(BuildContext context) {
     return MediaQuery.of(context).size.width > ScreenSizes.medium;
   }
+
+  bool isLargeScreen(BuildContext context) {
+    return MediaQuery.of(context).size.width > ScreenSizes.large - 1;
+  }
+
+  bool isSmallScreen(BuildContext context) {
+    return MediaQuery.of(context).size.width > ScreenSizes.small - 1;
+  }
 }
