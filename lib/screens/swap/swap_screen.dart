@@ -10,6 +10,7 @@ import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
 import 'package:defi_wallet/screens/swap/swap_summary_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -860,16 +861,13 @@ class _SwapScreenState extends State<SwapScreen>
 
   submitReviewSwap(
     context,
-    bool isFullScreen, ) async {
+    bool isFullScreen,
+  ) async {
     if (isNumeric(amountFromController.text)) {
-        Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  SwapSummaryScreen(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ));
+      NavigatorService.push(
+        context,
+        SwapSummaryScreen(),
+      );
     }
   }
 
