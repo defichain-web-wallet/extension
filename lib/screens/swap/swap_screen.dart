@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/transaction/tx_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -34,7 +35,8 @@ class SwapScreen extends StatefulWidget {
   _SwapScreenState createState() => _SwapScreenState();
 }
 
-class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin {
+class _SwapScreenState extends State<SwapScreen>
+    with ThemeMixin, SnackBarMixin, FormatMixin {
   static const completeKycType = 'Completed';
 
   final TextEditingController amountFromController = TextEditingController(
@@ -314,7 +316,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         var amountToInput = exchangeCubit.calculateRate(exchangeState.selectedSecondInputBalance!.token!, exchangeState.selectedBalance!.token!, amount);
                         exchangeCubit.updateAmountsAndSlipage(amountFrom: amount, amountTo: amountToInput);
                         setState(() {
-                          amountToController.text = amountToInput.toString();
+                          final amount = formatNumberStyling(
+                            amountToInput,
+                            fixedCount: 8,
+                          );
+                          amountToController.text = amount.toString();
                         });
                       },
                       controller: amountFromController,
@@ -431,7 +437,11 @@ class _SwapScreenState extends State<SwapScreen> with ThemeMixin, SnackBarMixin 
                         var amountFromInput = exchangeCubit.calculateRate(exchangeState.selectedBalance!.token!, exchangeState.selectedSecondInputBalance!.token!, amount);
                         exchangeCubit.updateAmountsAndSlipage(amountFrom: amountFromInput, amountTo: amount);
                         setState(() {
-                          amountFromController.text = amountFromInput.toString();
+                          final amount = formatNumberStyling(
+                            amountFromInput,
+                            fixedCount: 8,
+                          );
+                          amountFromController.text = amount.toString();
                         });
                       },
                       balance: exchangeState.selectedSecondInputBalance,
