@@ -24,10 +24,11 @@ class WalletCubit extends Cubit<WalletState> {
 
   WalletState get walletState => state;
 
-  int toSatoshi(double value){
+  int toSatoshi(double value) {
     return state.activeNetwork.toSatoshi(value);
   }
-  double fromSatoshi(int value){
+
+  double fromSatoshi(int value) {
     return state.activeNetwork.fromSatoshi(value);
   }
 
@@ -74,11 +75,7 @@ class WalletCubit extends Cubit<WalletState> {
     var publicKeyTestnet = _getPublicKey(seed, true);
 
     var source = applicationModel.createSource(
-      mnemonic,
-      publicKeyTestnet,
-      publicKeyMainnet,
-    password
-    );
+        mnemonic, publicKeyTestnet, publicKeyMainnet, password);
 
     var accountIndex = 0;
     while (hasHistory) {
@@ -92,8 +89,9 @@ class WalletCubit extends Cubit<WalletState> {
           sourceId: source.id,
           isRestore: true,
         );
-        for(var network in applicationModel.networks){
-          if(network.networkType.networkName.name == NetworkName.defichainMainnet.name){
+        for (var network in applicationModel.networks) {
+          if (network.networkType.networkName.name ==
+              NetworkName.defichainMainnet.name) {
             await (network.stakingList[0] as LockStakingProviderModel).signIn(
               account,
               password,
@@ -108,7 +106,6 @@ class WalletCubit extends Cubit<WalletState> {
             );
           }
         }
-
       } catch (_) {
         print(_);
         rethrow;
@@ -160,7 +157,7 @@ class WalletCubit extends Cubit<WalletState> {
     }
   }
 
-  List<String> getMnemonic(String password){
+  List<String> getMnemonic(String password) {
     return state.applicationModel!.getMnemonic(password);
   }
 
@@ -209,10 +206,12 @@ class WalletCubit extends Cubit<WalletState> {
 
   editAccount(String name, int index) async {
     ApplicationModel applicationModel = state.applicationModel!;
-    applicationModel.accounts.firstWhere((element) => element.accountIndex == index).changeName(name);
-      if(applicationModel.activeAccount!.accountIndex == index){
-        applicationModel.activeAccount!.changeName(name);
-      }
+    applicationModel.accounts
+        .firstWhere((element) => element.accountIndex == index)
+        .changeName(name);
+    if (applicationModel.activeAccount!.accountIndex == index) {
+      applicationModel.activeAccount!.changeName(name);
+    }
 
     StorageService.saveApplication(applicationModel);
 
@@ -226,7 +225,8 @@ class WalletCubit extends Cubit<WalletState> {
       status: WalletStatusList.loading,
     ));
     ApplicationModel applicationModel = state.applicationModel!;
-    AbstractAccountModel account = applicationModel.accounts.firstWhere((element) => element.accountIndex == index);
+    AbstractAccountModel account = applicationModel.accounts
+        .firstWhere((element) => element.accountIndex == index);
     applicationModel.activeAccount = account;
 
     StorageService.saveApplication(applicationModel);
@@ -236,15 +236,24 @@ class WalletCubit extends Cubit<WalletState> {
       applicationModel: applicationModel,
     ));
   }
+
   addNewAccount(String name) async {
     emit(state.copyWith(
       status: WalletStatusList.loading,
     ));
     ApplicationModel applicationModel = state.applicationModel!;
     int maxIndex = 0;
-    applicationModel.accounts.forEach((element) => element.accountIndex > maxIndex ? maxIndex = element.accountIndex : null);
+    applicationModel.accounts.forEach((element) =>
+        element.accountIndex > maxIndex
+            ? maxIndex = element.accountIndex
+            : null);
     SourceSeedModel source = applicationModel.sourceList.values.first;
-    AbstractAccountModel account = await AccountModel.fromPublicKeys(networkList: applicationModel.networks,  accountIndex: maxIndex+1, publicKeyMainnet: source.publicKeyMainnet, publicKeyTestnet: source.publicKeyTestnet, sourceId: source.id);
+    AbstractAccountModel account = await AccountModel.fromPublicKeys(
+        networkList: applicationModel.networks,
+        accountIndex: maxIndex + 1,
+        publicKeyMainnet: source.publicKeyMainnet,
+        publicKeyTestnet: source.publicKeyTestnet,
+        sourceId: source.id);
     account.changeName(name);
     applicationModel.accounts.add(account);
 
@@ -256,7 +265,7 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
-  getCurrentNetwork(){
+  getCurrentNetwork() {
     return state.applicationModel!.activeNetwork;
   }
 
@@ -288,7 +297,8 @@ class WalletCubit extends Cubit<WalletState> {
   signUpToRamp(String password) async {
     try {
       final applicationModel = state.applicationModel;
-      await (applicationModel!.activeNetwork!.rampList[0] as DFXRampModel).signUp(
+      await (applicationModel!.activeNetwork!.rampList[0] as DFXRampModel)
+          .signUp(
         state.activeAccount,
         password,
         state.applicationModel!,

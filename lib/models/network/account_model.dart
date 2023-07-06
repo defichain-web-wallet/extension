@@ -83,6 +83,18 @@ class AccountModel extends AbstractAccountModel {
     return data;
   }
 
+  static Future<AccountModel> fromLedgerAddress(
+      {required AbstractNetworkModel networkModel,
+      required String address,
+      required String sourceId}) async {
+    Map<String, String> addresses = {};
+    Map<String, List<BalanceModel>> pinnedBalances = {};
+
+    addresses[networkModel.networkType.networkName.name] = address;
+    return AccountModel(
+        "", "", sourceId, addresses, -1, pinnedBalances, null, [], []);
+  }
+
   static Future<AccountModel> fromPublicKeys({
     required List<AbstractNetworkModel> networkList,
     required int accountIndex,

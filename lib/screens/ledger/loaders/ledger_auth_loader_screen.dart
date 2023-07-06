@@ -18,7 +18,6 @@ class LedgerAuthLoaderScreen extends StatefulWidget {
   final Function() callback;
   final Function() errorCallback;
   String currentStatus;
-
   LedgerAuthLoaderScreen({
     Key? key,
     required this.callback,
