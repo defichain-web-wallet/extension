@@ -13,6 +13,7 @@ import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
+import 'package:defi_wallet/widgets/common/app_tooltip.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -228,11 +229,13 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                   ),
                                   if (hasAccessToken && !isExpiredAccessToken) ...[
                                     Flexible(
-                                      child: FlatButton(
-                                        title: 'Buy',
-                                        iconPath: 'assets/icons/buy.png',
-                                        callback: () =>
-                                            buyCallback(context, rampState),
+                                      child: AppTooltip(
+                                        message: 'DFX effectively discontinues its services to offer on-ramp services for DeFiChain.',
+                                        child: FlatButton(
+                                          title: 'Buy',
+                                          iconPath: 'assets/icons/buy_disabled.png',
+                                          callback: null,
+                                        ),
                                       ),
                                     ),
                                     SizedBox(

@@ -57,56 +57,61 @@ class FlatButton extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: isPrimary ? largeHeight : mediumHeight,
-      child: ElevatedButton(
-        onPressed: callback,
-        style: Theme.of(context).outlinedButtonTheme.style!.copyWith(
-              backgroundColor: getSpecificBackgroundColor(),
-              shape: MaterialStatePropertyAll(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(buttonBorderRadius),
-                  ),
-                  side: BorderSide(
-                    color: getSpecificBorderColor(),
-                  ),
-                ),
-              ),
-            ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (iconPath != null)
-              Container(
-                width: isPrimary ? 16 : 14,
-                height: isPrimary ? 16 : 14,
-                child: (isPrimary) ? Image.asset(iconPath!) : SvgPicture.asset(
-                  iconPath!,
-                  color: isDarkTheme() ? Colors.white : AppColors.darkTextColor,
-                ),
-              ),
-            if (!isSmall)
-              ...[
-                SizedBox(
-                  width: 6.4,
-                ),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.button!.copyWith(
-                    fontSize: 13,
-                    color: (callback == null)
-                          ? Theme.of(context)
-                              .textTheme
-                              .button!
-                              .color!
-                              .withOpacity(0.2)
-                          : Theme.of(context).textTheme.button!.color!,
+    return MouseRegion(
+      cursor: callback == null
+          ? SystemMouseCursors.forbidden
+          : SystemMouseCursors.click,
+      child: Container(
+        height: isPrimary ? largeHeight : mediumHeight,
+        child: ElevatedButton(
+          onPressed: callback,
+          style: Theme.of(context).outlinedButtonTheme.style!.copyWith(
+                backgroundColor: getSpecificBackgroundColor(),
+                shape: MaterialStatePropertyAll(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(buttonBorderRadius),
                     ),
-                )
-              ]
-          ],
+                    side: BorderSide(
+                      color: getSpecificBorderColor(),
+                    ),
+                  ),
+                ),
+              ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (iconPath != null)
+                Container(
+                  width: isPrimary ? 16 : 14,
+                  height: isPrimary ? 16 : 14,
+                  child: (isPrimary) ? Image.asset(iconPath!) : SvgPicture.asset(
+                    iconPath!,
+                    color: isDarkTheme() ? Colors.white : AppColors.darkTextColor,
+                  ),
+                ),
+              if (!isSmall)
+                ...[
+                  SizedBox(
+                    width: 6.4,
+                  ),
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.button!.copyWith(
+                      fontSize: 13,
+                      color: (callback == null)
+                            ? Theme.of(context)
+                                .textTheme
+                                .button!
+                                .color!
+                                .withOpacity(0.2)
+                            : Theme.of(context).textTheme.button!.color!,
+                      ),
+                  )
+                ]
+            ],
+          ),
         ),
       ),
     );
