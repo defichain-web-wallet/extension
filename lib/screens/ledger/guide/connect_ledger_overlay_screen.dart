@@ -1,15 +1,12 @@
 import 'dart:ui';
 
-import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/ledger/guide/connect_ledger_final_screen.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_first_screen.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_fourth_screen.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_second_screen.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_third_screen.dart';
 import 'package:defi_wallet/screens/ledger/loaders/ledger_auth_loader_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ConnectLedgerOverlayScreen extends StatefulWidget {
   const ConnectLedgerOverlayScreen({Key? key}) : super(key: key);

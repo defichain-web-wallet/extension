@@ -4,7 +4,6 @@ import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_networ
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/bitcoin/blockcypher_requests.dart';
-import 'package:defi_wallet/services/signing_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 import 'package:defi_wallet/models/utxo_model.dart';

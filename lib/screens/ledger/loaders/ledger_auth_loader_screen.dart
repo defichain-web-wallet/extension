@@ -135,7 +135,7 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
         getStatusText(widget.currentStatus, need, restored);
       });
 
-      widget.callback!();
+      widget.callback();
     } on Exception catch (error) {
       print(error);
       await showDialog(
@@ -167,7 +167,7 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
       });
     }
     if (currentStatus == 'third-step' && need == restored) {
-      widget.callback!();
+      widget.callback();
     }
   }
 }

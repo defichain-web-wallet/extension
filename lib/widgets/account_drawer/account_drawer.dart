@@ -3,9 +3,7 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
-import 'package:defi_wallet/screens/ledger/guide/connect_ledger_first_screen.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_overlay_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_screen.dart';
@@ -117,8 +115,9 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                           child: IconButton(
                                             splashRadius: 12,
                                             padding: const EdgeInsets.all(0),
-                                            onPressed: () => Scaffold.of(context)
-                                                .closeEndDrawer(),
+                                            onPressed: () =>
+                                                Scaffold.of(context)
+                                                    .closeEndDrawer(),
                                             icon: Icon(
                                               Icons.close,
                                               size: 16,
@@ -181,29 +180,29 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                     thickness: 1,
                                                   ),
                                                   AccountMenuButton(
-                                                    accountSelectMode: true,
-                                                    account: accounts[index],
-                                                    callback: accounts[index]
-                                                                .accountIndex ==
-                                                            state.activeAccount
-                                                                .accountIndex
-                                                        ? null
-                                                        : (accountIndex) async {
-                                                            walletCubit
-                                                                .updateActiveAccount(
-                                                                    accounts[
-                                                                            index]
-                                                                        .accountIndex);
-                                                            Scaffold.of(context)
-                                                                .closeEndDrawer();
-                                                          },
-                                                    isHoverBackgroundEffect:
-                                                        false,
-                                                    iconPath:
-                                                        'assets/icons/add.svg',
-                                                    title:
-                                                        accounts[index].name!,
-                                                  ),
+                                                      accountSelectMode: true,
+                                                      account: accounts[index],
+                                                      callback: accounts[index]
+                                                                  .accountIndex ==
+                                                              state
+                                                                  .activeAccount
+                                                                  .accountIndex
+                                                          ? null
+                                                          : (accountIndex) async {
+                                                              walletCubit.updateActiveAccount(
+                                                                  accounts[
+                                                                          index]
+                                                                      .accountIndex);
+                                                              Scaffold.of(
+                                                                      context)
+                                                                  .closeEndDrawer();
+                                                            },
+                                                      isHoverBackgroundEffect:
+                                                          false,
+                                                      iconPath:
+                                                          'assets/icons/add.svg',
+                                                      title:
+                                                          accounts[index].name),
                                                 ],
                                               );
                                             },
