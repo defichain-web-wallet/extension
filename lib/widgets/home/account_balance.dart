@@ -61,7 +61,13 @@ class _AccountBalanceState extends State<AccountBalance> {
                 ),
               );
             } else {
-              return Container();
+              return Container(
+                child: BalanceText(
+                  isSmallFont: widget.isSmall,
+                  balance: 0,
+                  assetName: widget.asset,
+                ),
+              );
             }
           },
         );
