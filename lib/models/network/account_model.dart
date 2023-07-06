@@ -8,7 +8,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_account_mod
 
 class LedgerAccountModel extends AbstractAccountModel {
   final String address;
-  final Uint8List pubKey;
+  final String pubKey;
 
   LedgerAccountModel({
     required this.address,
@@ -83,7 +83,7 @@ class LedgerAccountModel extends AbstractAccountModel {
   static Future<LedgerAccountModel> fromLedger(
       {required AbstractNetworkModel network,
       required String address,
-      required Uint8List publicKey,
+      required String publicKey,
       required String sourceId}) async {
     Map<String, List<BalanceModel>> pinnedBalances = {};
 

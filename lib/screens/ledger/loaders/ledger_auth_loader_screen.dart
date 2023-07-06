@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:js_util';
 import 'dart:ui';
 
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
+import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:flutter/material.dart';
@@ -129,11 +133,15 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
   Future restoreWallet() async {
     await init();
     try {
-      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-      await accountCubit.restoreLedgerAccount(SettingsHelper.settings.network,
-          (need, restored) {
-        getStatusText(widget.currentStatus, need, restored);
-      });
+      WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+
+      var path = HDWalletService.derivePath(0);
+      var ledgerAddressJson =
+          await promiseToFuture<dynamic>(getAddress(path, false));
+      var ledgerAddress = jsonDecode(ledgerAddressJson);
+      var pubKey = ledgerAddress["publicKey"];
+      var address = ledgerAddress["bitcoinAddress"];
+      await walletCubit.addNewLedgerAccount("Ledger", address, pubKey);
 
       widget.callback();
     } on Exception catch (error) {

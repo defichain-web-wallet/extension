@@ -53,8 +53,7 @@ class _ConnectLedgerOverlayScreenState extends State<ConnectLedgerOverlayScreen>
           callback: () => {setState(() => this.currentStep = 6)},
           errorCallback: () => {setState(() => this.currentStep = 4)});
     } else if (currentStep == 6) {
-      //todo
-      print("FINISHED....");
+      Navigator.pop(context);
     }
     return Container();
   }

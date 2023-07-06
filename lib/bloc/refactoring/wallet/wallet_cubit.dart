@@ -281,17 +281,19 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
-  addNewLedgerAccount(String name, String address, Uint8List pubKey,
-      AbstractNetworkModel networkModel) async {
+  addNewLedgerAccount(String name, String address, String pubKey) async {
     emit(state.copyWith(
       status: WalletStatusList.loading,
     ));
     ApplicationModel applicationModel = state.applicationModel!;
+    var btcLedgerModel = applicationModel.networks
+        .where((element) => !element.networkType.isLocalWallet)
+        .first;
 
     AbstractAccountModel account = await LedgerAccountModel.fromLedger(
         address: address,
         publicKey: pubKey,
-        network: networkModel,
+        network: btcLedgerModel,
         sourceId: "");
     account.changeName(name);
     applicationModel.accounts.add(account);
