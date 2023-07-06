@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
+import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
@@ -61,7 +62,10 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
-  restoreWallet(List<String> mnemonic, String password) async {
+  restoreWallet(List<String> mnemonic, String password, {
+    List<AddressBookModel> lastSent = const [],
+    List<AddressBookModel> addressBook = const [],
+  }) async {
     emit(state.copyWith(status: WalletStatusList.loading));
     var seed = mnemonicToSeed(mnemonic.join(' '));
     var applicationModel = ApplicationModel(sourceList: {}, password: password);
@@ -93,6 +97,8 @@ class WalletCubit extends Cubit<WalletState> {
           publicKeyTestnet: publicKeyTestnet,
           publicKeyMainnet: publicKeyMainnet,
           sourceId: source.id,
+          lastSent: lastSent,
+          addressBook: addressBook,
           isRestore: true,
         );
         for(var network in applicationModel.networks){

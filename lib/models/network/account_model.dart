@@ -90,6 +90,8 @@ class AccountModel extends AbstractAccountModel {
     required String publicKeyMainnet,
     required String sourceId,
     isRestore = false,
+    List<AddressBookModel> lastSent = const [],
+    List<AddressBookModel> addressBook = const [],
   }) async {
     Map<String, String> addresses = {};
     Map<String, List<BalanceModel>> pinnedBalances = {};
@@ -116,8 +118,17 @@ class AccountModel extends AbstractAccountModel {
       }
     }
 
-    return AccountModel(publicKeyTestnet, publicKeyMainnet, sourceId, addresses,
-        accountIndex, pinnedBalances, null, [], []);
+    return AccountModel(
+      publicKeyTestnet,
+      publicKeyMainnet,
+      sourceId,
+      addresses,
+      accountIndex,
+      pinnedBalances,
+      null,
+      addressBook,
+      lastSent,
+    );
   }
 
   String? getAddress(NetworkName networkName) {

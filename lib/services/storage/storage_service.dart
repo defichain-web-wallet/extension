@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/services/storage/hive_service.dart';
@@ -40,6 +41,20 @@ class StorageService {
       return ApplicationModel.fromJSON(jsonList);
     } catch (error) {
       throw error;
+    }
+  }
+
+  static Future<void> clearStorageBox(String boxName) async {
+    await HiveService.clearBox(boxName);
+  }
+
+  static Future<List<String>?> getSavedMnemonic(String password) async {
+    var mnemonic = await HiveService.getData(HiveNames.savedMnemonic);
+
+    if (mnemonic != null) {
+      return EncryptHelper.getDecryptedData(mnemonic, password).split(',');
+    } else {
+      return null;
     }
   }
 }

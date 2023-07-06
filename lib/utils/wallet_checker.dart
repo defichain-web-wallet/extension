@@ -7,6 +7,7 @@ import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -35,8 +36,9 @@ class _WalletCheckerState extends State<WalletChecker> {
         applicationModel = null;
       }
       var box = await Hive.openBox(HiveBoxes.client);
-      bool isSavedMnemonic = await box.get(HiveNames.openedMnemonic) != null;
-      String? savedMnemonic = await box.get(HiveNames.openedMnemonic);
+      var savedMnemonic = await box.get(HiveNames.savedMnemonic);
+      bool isOpenedMnemonic = await box.get(HiveNames.openedMnemonic) != null;
+      String? openedMnemonic = await box.get(HiveNames.openedMnemonic);
 
       bool isRecoveryMnemonic =
           await box.get(HiveNames.recoveryMnemonic) != null;
@@ -48,62 +50,79 @@ class _WalletCheckerState extends State<WalletChecker> {
       await settingsHelper.loadSettings();
       await box.close();
 
-      if (applicationModel != null || isLedger) {
-        lockHelper.provideWithLockChecker(context, () async {
-          try {
-            await walletCubit.loadWalletDetails(
-              application: applicationModel,
-            );
-            await Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(HomeScreen(
-                      isLoadTokens: true,
-                    )),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
+      if (savedMnemonic != null) {
+        await lockHelper.lockWallet();
+
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) => ThemeChecker(
+              LockScreen(
+                savedMnemonic: savedMnemonic,
               ),
-            );
-          } catch (err) {
-            print(err);
-          }
-        });
-      } else {
-        if (isSavedMnemonic) {
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  ThemeChecker(SignupPhraseScreen(mnemonic: savedMnemonic)),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
             ),
-          );
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      } else {
+        if (applicationModel != null || isLedger) {
+          lockHelper.provideWithLockChecker(context, () async {
+            try {
+              await walletCubit.loadWalletDetails(
+                application: applicationModel,
+              );
+              await Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      ThemeChecker(HomeScreen(
+                    isLoadTokens: true,
+                  )),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
+            } catch (err) {
+              print(err);
+            }
+          });
         } else {
-          if (isRecoveryMnemonic) {
+          if (isOpenedMnemonic) {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
                 pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(RecoveryScreen(
-                  mnemonic: recoveryMnemonic,
-                )),
+                    ThemeChecker(SignupPhraseScreen(mnemonic: openedMnemonic)),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),
             );
           } else {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation1, animation2) =>
-                    ThemeChecker(WelcomeScreen()),
-                    // ThemeChecker(UiKit()),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
+            if (isRecoveryMnemonic) {
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      ThemeChecker(RecoveryScreen(
+                    mnemonic: recoveryMnemonic,
+                  )),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      ThemeChecker(WelcomeScreen()),
+                  // ThemeChecker(UiKit()),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
+            }
           }
         }
       }
