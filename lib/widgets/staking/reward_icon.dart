@@ -1,9 +1,7 @@
 import 'package:defi_wallet/mixins/dialog_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
-import 'package:defi_wallet/widgets/common/app_tooltip.dart';
 import 'package:defi_wallet/widgets/dialogs/select_payout_asset_dialog.dart';
-import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
