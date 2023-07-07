@@ -22,7 +22,7 @@ class AccountModel extends AbstractAccountModel {
             addresses,
             accountIndex,
             pinnedBalances,
-            name ?? 'Account${accountIndex + 1}',
+            name ?? 'Account ${accountIndex + 1}',
             addressBook,
             lastSend);
 
