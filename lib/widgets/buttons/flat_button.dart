@@ -9,6 +9,7 @@ class FlatButton extends StatelessWidget with ThemeMixin {
   final String? iconPath;
   final bool isPrimary;
   final bool isSmall;
+  final bool isActive;
 
   FlatButton({
     Key? key,
@@ -17,6 +18,7 @@ class FlatButton extends StatelessWidget with ThemeMixin {
     required this.title,
     this.isPrimary = true,
     this.isSmall = false,
+    this.isActive = false,
   }) : super(key: key);
 
   static const double mediumHeight = 48.0;
@@ -49,6 +51,9 @@ class FlatButton extends StatelessWidget with ThemeMixin {
   Color getSpecificBorderColor() {
     if (callback == null) {
       return Colors.transparent;
+    }
+    if (isActive && isPrimary) {
+      return AppColors.electricViolet;
     }
     return (isPrimary)
         ? Colors.transparent

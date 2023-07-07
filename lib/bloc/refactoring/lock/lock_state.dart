@@ -53,8 +53,20 @@ class LockState extends Equatable {
     } catch (err) {
       reinvestRoute = null;
     }
-    double sum =
-      rewardRoutes.map((item) => item.rewardPercent).reduce((a, b) => a + b);
+    double sum;
+    if (rewardRoutes.isNotEmpty) {
+      sum = rewardRoutes
+          .map((item) => item.rewardPercent)
+          .reduce((a, b) => a + b);
+    } else {
+      sum = 1.0;
+      rewardRoutes.add(RewardRouteModel(
+        id: 0,
+        label: 'Reinvest',
+        rewardPercent: 1,
+        targetAsset: 'DFI',
+      ));
+    }
     if (sum < 1 && reinvestRoute == null) {
       double reinvestAmount = double.parse((1 - sum).toStringAsFixed(2));
       rewardRoutes.add(RewardRouteModel(

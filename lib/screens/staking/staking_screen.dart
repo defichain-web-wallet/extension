@@ -320,8 +320,9 @@ class _StakingScreenState extends State<StakingScreen>
                                       ),
                                       if (!isEdit)
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: isFullScreen
+                                              ? MainAxisAlignment.center
+                                              : MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
                                               width: 140,
@@ -334,6 +335,10 @@ class _StakingScreenState extends State<StakingScreen>
                                                 },
                                               ),
                                             ),
+                                            if (isFullScreen)
+                                              SizedBox(
+                                                width: 16,
+                                              ),
                                             NewPrimaryButton(
                                               width: 140,
                                               title: 'Stake',
@@ -347,8 +352,9 @@ class _StakingScreenState extends State<StakingScreen>
                                         ),
                                       if (isEdit)
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: isFullScreen
+                                              ? MainAxisAlignment.center
+                                              : MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
                                               width: 140,
@@ -361,6 +367,10 @@ class _StakingScreenState extends State<StakingScreen>
                                                 },
                                               ),
                                             ),
+                                            if (isFullScreen)
+                                              SizedBox(
+                                                width: 16,
+                                              ),
                                             NewPrimaryButton(
                                               width: 140,
                                               title: 'Save',

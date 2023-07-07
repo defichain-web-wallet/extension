@@ -31,9 +31,9 @@ class _StakingHeaderState extends State<StakingHeader> with ThemeMixin {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        top: 8,
-        left: 16,
-        right: 16,
+        top: isFullScreen(context) ? 0 : 8,
+        left: isFullScreen(context) ? 0 : 16,
+        right: isFullScreen(context) ? 0 : 16,
         bottom: 16,
       ),
       child: Stack(
@@ -43,72 +43,60 @@ class _StakingHeaderState extends State<StakingHeader> with ThemeMixin {
             children: [
               Container(
                 margin: EdgeInsets.only(
-                  top: 20,
+                  top: isFullScreen(context) ? 0 : 20,
                 ),
-                padding: EdgeInsets.only(top: 38),
-                width: 328,
-                height: 123,
+                padding: EdgeInsets.only(top: isFullScreen(context) ? 80 : 38),
+                width: isFullScreen(context) ? 488 : 328,
+                height: isFullScreen(context) ? 167 : 123,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: isDarkTheme()
                       ? AppColors.white.withOpacity(0.04)
-                      : LightColors
-                      .scaffoldContainerBgColor,
+                      : LightColors.scaffoldContainerBgColor,
                   border: isDarkTheme()
                       ? Border.all(
-                    width: 1.0,
-                    color: Colors.white
-                        .withOpacity(0.05),
-                  )
+                          width: 1.0,
+                          color: Colors.white.withOpacity(0.05),
+                        )
                       : null,
                 ),
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       'DFI Staking by LOCK',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline5!
-                          .copyWith(
-                        fontSize: 16,
-                      ),
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                            fontSize: 16,
+                          ),
                     ),
                     SizedBox(
                       height: 4,
                     ),
                     Text(
                       '${getAprOrApyFormat(widget.apy, 'APY')} / '
-                          '${getAprOrApyFormat(widget.apr, 'APR')}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline5!
-                          .copyWith(
-                        fontSize: 12,
-                        color: Theme.of(context)
-                            .textTheme
-                            .headline5!
-                            .color!
-                            .withOpacity(0.6),
-                      ),
+                      '${getAprOrApyFormat(widget.apr, 'APR')}',
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .color!
+                                .withOpacity(0.6),
+                          ),
                     ),
                     SizedBox(
                       height: 4,
                     ),
                     Text(
                       '5.55% Fee',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline5!
-                          .copyWith(
-                        fontSize: 12,
-                        color: Theme.of(context)
-                            .textTheme
-                            .headline5!
-                            .color!
-                            .withOpacity(0.3),
-                      ),
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .color!
+                                .withOpacity(0.3),
+                          ),
                     ),
                   ],
                 ),
@@ -119,6 +107,7 @@ class _StakingHeaderState extends State<StakingHeader> with ThemeMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
+                margin: EdgeInsets.only(top: isFullScreen(context) ? 18 : 0),
                 padding: EdgeInsets.only(
                   top: 7.17,
                   bottom: 11.77,
