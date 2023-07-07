@@ -304,7 +304,6 @@ class _SwapScreenState extends State<SwapScreen>
                       //   )
                       // ],
                     AmountField(
-                      isAvailableTo: false,
                       type: TxType.swap,
                       suffix: amountFromInUsd,
                       isDisabledSelector: false,
@@ -313,16 +312,19 @@ class _SwapScreenState extends State<SwapScreen>
                         exchangeCubit.updateBalance(context, asset);
                       },
                       onChanged: (value) {
-                        double amount = double.parse(value);
-                        var amountToInput = exchangeCubit.calculateRate(exchangeState.selectedSecondInputBalance!.token!, exchangeState.selectedBalance!.token!, amount);
-                        exchangeCubit.updateAmountsAndSlipage(amountFrom: amount, amountTo: amountToInput);
-                        setState(() {
-                          final amount = formatNumberStyling(
-                            amountToInput,
-                            fixedCount: 8,
-                          );
-                          amountToController.text = amount.toString();
-                        });
+                        double amount = double.parse(formatNumberStyling(
+                          double.parse(value),
+                          fixedCount: 8,
+                        ));
+                        double amountToInput = exchangeCubit.calculateRate(exchangeState.selectedSecondInputBalance!.token!, exchangeState.selectedBalance!.token!, amount);
+                        amountToInput = double.parse(formatNumberStyling(
+                          amountToInput,
+                          fixedCount: 8,
+                        ));
+                          setState(() {
+                            amountToController.text = amountToInput.toString();
+                          });
+                          exchangeCubit.updateAmountsAndSlipage(amountFrom: amount, amountTo: amountToInput);
                       },
                       controller: amountFromController,
                       balance: exchangeState.selectedBalance,
@@ -426,6 +428,7 @@ class _SwapScreenState extends State<SwapScreen>
                       //   )
                       // ],
                     AmountField(
+                      isDisableAvailable: true,
                       type: TxType.swap,
                       suffix: amountToInUsd,
                       available: 0,
@@ -820,7 +823,7 @@ class _SwapScreenState extends State<SwapScreen>
                               )
                             ],
                           ),
-                          callback: !isDisableSubmit()
+                          callback: isDisableSubmit()
                               ? () {
                             TxCubit txCubit = BlocProvider.of<TxCubit>(context);
                             if (txCubit.transactionState is! TransactionLoadingState) {
@@ -873,7 +876,7 @@ class _SwapScreenState extends State<SwapScreen>
 
   bool isDisableSubmit() {
     try {
-      return double.parse(amountFromController.text) <= 0;
+      return double.parse(amountFromController.text) > 0 && double.parse(amountToController.text) > 0;
     } catch (err) {
       return false;
     }

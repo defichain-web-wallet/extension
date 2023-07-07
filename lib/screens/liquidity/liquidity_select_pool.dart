@@ -255,7 +255,6 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                           ),
                           AmountField(
                             type: TxType.addLiq,
-                            isAvailableTo: false,
                             // suffix: balancesHelper.numberStyling(amountToUSD,
                             //     fixedCount: 2, fixed: true),
                             available:
