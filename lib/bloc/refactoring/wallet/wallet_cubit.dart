@@ -157,11 +157,10 @@ class WalletCubit extends Cubit<WalletState> {
 
   loadWalletDetails({ApplicationModel? application}) async {
     try {
-      // List<AbstractAccountModel> accounts = await StorageService.loadAccounts();
       ApplicationModel applicationModel =
           application ?? await StorageService.loadApplication();
 
-      // applicationModel.activeAccount = applicationModel.accounts.first;
+      applicationModel.activeAccount = applicationModel.accounts[0];
 
       emit(state.copyWith(
         applicationModel: applicationModel,
