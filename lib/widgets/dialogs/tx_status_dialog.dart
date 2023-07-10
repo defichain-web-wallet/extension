@@ -131,7 +131,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
                 isSuccess: !widget.txResponse!.isError!,
                 title: !widget.txResponse!.isError! ? widget.title : 'Oops!',
                 subtitle: formatErrorMessage(),
-                specificError: widget.txResponse!.error!,
+                specificError: widget.txResponse!.error,
               ),
             ),
             Row(

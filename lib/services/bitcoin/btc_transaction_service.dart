@@ -21,7 +21,12 @@ class BTCTransactionService {
       required int satPerByte}) async {
     //romance portion fit sea price casual forward piano afraid erosion want replace excite figure place butter fortune empower rotate safe surface person distance simple
     //https://api.blockcypher.com/v1/btc/test3/addrs/tb1qhwqqsktldqypttltr59px506p890ce0sgj0fe7?unspentOnly=true
-
+    if (amount < DUST) {
+      return TxErrorModel(
+          isError: true,
+          error:
+          'Dust amount');
+    }
     var utxos = await BlockcypherRequests.getUTXOs(
         network: network, addressString: senderAddress);
     var fee = calculateBTCFee(2, 2, satPerByte);
