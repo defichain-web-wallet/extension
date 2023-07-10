@@ -46,6 +46,22 @@ class _StakingScreenState extends State<StakingScreen>
   _onSaveRewardRoutes(BuildContext context) {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    double sum = controllers
+        .map((e) => double.parse(e.text))
+        .reduce((value, element) => value + element);
+    if (sum > 100) {
+      showSnackBar(
+        context,
+        duration: 4,
+        title: 'Total percentage should not exceed 100%',
+        color: AppColors.txStatusError.withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
+        ),
+      );
+      return;
+    }
 
     lockCubit.updateRewardRoutes(
       walletCubit.state.activeNetwork,

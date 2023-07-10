@@ -44,7 +44,7 @@ class RewardRoutesList extends StatelessWidget {
               onChange: (value) {
                 if (value.isNotEmpty) {
                   List<double> rewardPercentages =
-                  controllers.map((e) => double.parse(e.text) / 100).toList();
+                    controllers.map((e) => double.parse(e.text) / 100).toList();
                   lockCubit.updateRewardPercentages(
                     rewardPercentages,
                     index: index,
