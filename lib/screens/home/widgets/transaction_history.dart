@@ -68,7 +68,7 @@ class _TransactionHistoryState extends State<TransactionHistory>
     return SliverFillRemaining(
       hasScrollBody: false,
       child: Container(
-        color: Theme.of(context).cardColor,
+        color: isFullScreen(context) ? null : Theme.of(context).cardColor,
         child: StatusLogoAndTitle(
           subtitle: 'Not yet any transaction',
           isTitlePosBefore: true,
