@@ -18,6 +18,11 @@ class WalletState extends Equatable {
     return balances;
   }
 
+  double unconfirmedBalance() {
+    final balances = getBalances();
+    return this.applicationModel!.activeNetwork!.fromSatoshi(balances.first.unconfirmedBalance);
+  }
+
   bool get isSendReceiveOnly =>
       this.applicationModel!.activeNetwork!.getBridges().isEmpty;
 

@@ -43,10 +43,11 @@ class BridgeModel extends AbstractBridge {
     String addressString,
   ) async {
     try {
-      return await BlockcypherRequests.getBalance(
+      final balance = await BlockcypherRequests.getBalance(
         network: network,
         addressString: addressString,
       );
+      return balance.balance;
     } catch (error) {
       throw error;
     }

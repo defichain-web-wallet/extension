@@ -1,4 +1,5 @@
 import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/models/balance/bitcoin/blockcypher_balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'dart:convert';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
@@ -10,7 +11,7 @@ import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:http/http.dart' as https;
 
 class BlockcypherRequests {
-  static Future<int> getBalance({
+  static Future<BlockcypherBalanceModel> getBalance({
     required BitcoinNetworkModel network,
     required String addressString,
   }) async {
@@ -22,7 +23,8 @@ class BlockcypherRequests {
 
       if (response.statusCode == 200) {
         dynamic data = jsonDecode(response.body);
-        return data['final_balance'];
+
+        return BlockcypherBalanceModel(balance: data['final_balance'], unconfirmedBalance: data['unconfirmed_balance'].abs());
       } else {
         throw Error.safeToString(response.statusCode);
       }

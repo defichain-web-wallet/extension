@@ -54,7 +54,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     return this._createAddressString(publicKeypair, accountIndex);
   }
 
-  TokenModel getDefaultToken(){
+  TokenModel getDefaultToken() {
     return TokenModel(
       isUTXO: true,
       name: 'Bitcoin',
@@ -69,14 +69,15 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     List<BalanceModel> balances,
     String addressString,
   ) async {
-    int balance = await BlockcypherRequests.getBalance(
+    final balance = await BlockcypherRequests.getBalance(
       network: this,
       addressString: addressString,
     );
 
     BalanceModel balanceModel = BalanceModel(
       token: getDefaultToken(),
-      balance: balance,
+      balance: balance.balance,
+      unconfirmedBalance: balance.unconfirmedBalance,
     );
     return balanceModel;
   }
@@ -84,8 +85,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
   Future<List<BalanceModel>> getAllBalances({
     required String addressString,
   }) async {
-    var balance = await getBalanceUTXO(
-        [], addressString);
+    var balance = await getBalanceUTXO([], addressString);
 
     return [balance];
   }
@@ -98,7 +98,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     throw 'Bitcoin network does not support tokens';
   }
 
-  bool isTokensPresent(){
+  bool isTokensPresent() {
     return false;
   }
 
@@ -173,8 +173,8 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
       network: this,
       addressString: account.getAddress(this.networkType.networkName)!,
     );
-    var fee =
-        fromSatoshi(BTCTransactionService.calculateBTCFee(utxoList.length, 1, satPerByte));
+    var fee = fromSatoshi(
+        BTCTransactionService.calculateBTCFee(utxoList.length, 1, satPerByte));
     var available = balance - fee;
     return available > 0 ? available : 0;
   }
@@ -186,8 +186,10 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     );
   }
 
-  Future<ECPair> getKeypair(String password, AbstractAccountModel account, ApplicationModel applicationModel) async {
-    var mnemonic = applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
+  Future<ECPair> getKeypair(String password, AbstractAccountModel account,
+      ApplicationModel applicationModel) async {
+    var mnemonic =
+        applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
     var masterKey = getMasterKeypairFormMnemonic(mnemonic);
     return _getKeypairForPathPrivateKey(masterKey, account.accountIndex);
   }
@@ -208,11 +210,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
       var networkFee = await BlockcypherRequests.getNetworkFee(this);
       satPerByte = networkFee.medium!;
     }
-    ECPair keypair = await getKeypair(
-      password,
-      account,
-      applicationModel
-    );
+    ECPair keypair = await getKeypair(password, account, applicationModel);
 
     List<BalanceModel> balances = account.getPinnedBalances(this);
 
@@ -226,17 +224,9 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
         satPerByte: satPerByte);
   }
 
-  Future<String> signMessage(
-    AbstractAccountModel account,
-    String message,
-    String password,
-      ApplicationModel applicationModel
-  ) async {
-    ECPair keypair = await getKeypair(
-      password,
-      account,
-        applicationModel
-    );
+  Future<String> signMessage(AbstractAccountModel account, String message,
+      String password, ApplicationModel applicationModel) async {
+    ECPair keypair = await getKeypair(password, account, applicationModel);
 
     return keypair.signMessage(message, getNetworkType());
   }
@@ -273,7 +263,8 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
 
   bip32.BIP32 getMasterKeypairFormMnemonic(List<String> mnemonic) {
     final seed = mnemonicToSeed(mnemonic.join(' '));
-    return bip32.BIP32.fromSeedWithCustomKey(seed, "@defichain/jellyfish-wallet-mnemonic", _getNetworkTypeBip32());
+    return bip32.BIP32.fromSeedWithCustomKey(
+        seed, "@defichain/jellyfish-wallet-mnemonic", _getNetworkTypeBip32());
   }
 
   String _getAddressFromKeyPair(ECPair keyPair) {
