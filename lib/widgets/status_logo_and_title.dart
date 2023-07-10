@@ -30,7 +30,6 @@ class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
 
   @override
   Widget build(BuildContext context) {
-    print(widget.specificError);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

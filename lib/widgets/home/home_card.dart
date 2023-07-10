@@ -75,13 +75,13 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                   height: 12,
                 ),
                 SizedBox(
-                  height: 56,
+                  height: 72,
                   child: AccountBalance(
                     asset: activeAsset,
                   ),
                 ),
                 SizedBox(
-                  height: 31,
+                  height: 16,
                 ),
                 Row(
                   children: [
