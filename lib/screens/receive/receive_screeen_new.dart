@@ -154,7 +154,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     });
                                   },
                                   child: Container(
-                                    width: isFullScreen ? 302 : 140,
+                                    width: isFullScreen ? 382 : 140,
                                     height: 43,
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -171,10 +171,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                       children: [
                                         Text(
                                           isFullScreen
-                                              ? cutAddress(
-                                                  state.activeAddress,
-                                                  range: 16,
-                                                )
+                                              ? state.activeAddress
                                               : cutAddress(state.activeAddress),
                                           style: headline5,
                                         ),
