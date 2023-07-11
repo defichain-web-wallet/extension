@@ -113,9 +113,17 @@ class RatesModel {
   }) {
     double amount = networkModel.fromSatoshi(balanceModel.balance);
     if (balanceModel.token != null) {
-      return getAmountByToken(amount, balanceModel.token!);
+      return getAmountByToken(
+        amount,
+        balanceModel.token!,
+        convertToken: convertToken,
+      );
     } else {
-      return getPoolPairsByToken(balanceModel.balance, balanceModel.lmPool!);
+      return getPoolPairsByToken(
+        balanceModel.balance,
+        balanceModel.lmPool!,
+        convertToken: convertToken,
+      );
     }
   }
 

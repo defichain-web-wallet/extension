@@ -16,6 +16,12 @@ class RatesCubit extends Cubit<RatesState> {
     ));
   }
 
+  updateActiveAsset(String asset) {
+    emit(state.copyWith(
+      activeAsset: asset,
+    ));
+  }
+
   loadRates(AbstractNetworkModel network) async {
     emit(state.copyWith(
       status: RatesStatusList.loading,

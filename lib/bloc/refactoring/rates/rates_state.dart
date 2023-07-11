@@ -6,11 +6,15 @@ class RatesState extends Equatable {
   final RatesStatusList status;
   final RatesModel? ratesModel;
   final List<TokenModel> tokens;
+  final List<String> items;
+  final String activeAsset;
 
   RatesState({
     this.status = RatesStatusList.initial,
     this.ratesModel,
     this.tokens = const [],
+    this.items = const ['USD', 'EUR', 'BTC'],
+    this.activeAsset = 'USD',
   });
 
   List<TokenModel> get foundTokens {
@@ -35,17 +39,23 @@ class RatesState extends Equatable {
         status,
         ratesModel,
         tokens,
+        items,
+        activeAsset,
       ];
 
   RatesState copyWith({
     RatesStatusList? status,
     RatesModel? ratesModel,
     List<TokenModel>? tokens = const [],
+    List<String>? items = const ['USD', 'EUR', 'BTC'],
+    String? activeAsset = 'USD',
   }) {
     return RatesState(
       status: status ?? this.status,
       ratesModel: ratesModel ?? this.ratesModel,
       tokens: tokens ?? this.tokens,
+      items: items ?? this.items,
+      activeAsset: activeAsset ?? this.activeAsset,
     );
   }
 }

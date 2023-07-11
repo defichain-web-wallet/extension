@@ -1,5 +1,6 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -64,7 +65,8 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                   child: AppSelector(
                     items: items,
                     onSelect: (String name) {
-                      print(name);
+                      RatesCubit ratesCubit = BlocProvider.of<RatesCubit>(context);
+                      ratesCubit.updateActiveAsset(name);
                       setState(() {
                         activeAsset = name;
                       });

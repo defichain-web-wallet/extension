@@ -43,6 +43,14 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
     return BlocBuilder<RatesCubit, RatesState>(
       buildWhen: (prev, current) => current.status == RatesStatusList.success,
       builder: (context, ratesState) {
+        late String ratesSymbol;
+        if (ratesState.activeAsset == 'USD') {
+          ratesSymbol = '\$';
+        } else if (ratesState.activeAsset == 'EUR') {
+          ratesSymbol = '€';
+        } else {
+          ratesSymbol = 'BTC';
+        }
         final convertedBalance = widget.assetDetails['convertAmount'];
 
         final roundedBalance = BalancesHelper().numberStyling(
@@ -126,8 +134,9 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
                       SizedBox(
                         height: 2,
                       ),
+                      if (ratesSymbol != 'BTC')
                       Text(
-                        '\$$roundedBalance',
+                        '$ratesSymbol $roundedBalance',
                         style: Theme.of(context).textTheme.headline6!.copyWith(
                               color: Theme.of(context)
                                   .textTheme
@@ -135,7 +144,18 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
                                   .color!
                                   .withOpacity(0.3),
                             ),
-                      ),
+                      )
+                      else
+                        Text(
+                          '$roundedBalance $ratesSymbol',
+                          style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .color!
+                                .withOpacity(0.3),
+                          ),
+                        )
                     ],
                   ),
                 )
