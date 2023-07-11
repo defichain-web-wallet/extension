@@ -235,13 +235,13 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
                   ),
                 );
               }
-              await HiveService.clearBox(HiveBoxes.client);
               await walletCubit.restoreWallet(
                 mnemonic,
                 _passwordController.text,
                 lastSent: lastSentAddressBook,
                 addressBook: mainAddressBook,
               );
+              await HiveService.update(HiveNames.savedMnemonic, null);
               parent.emitPending(false);
 
               Navigator.pushReplacement(
