@@ -27,7 +27,6 @@ class AssetList extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return BlocBuilder<RatesCubit, RatesState>(
       builder: (context, ratesState) {
-        print(ratesState.activeAsset);
         return BlocBuilder<WalletCubit, WalletState>(
           builder: (context, state) {
             if ((state.status == WalletStatusList.success ||

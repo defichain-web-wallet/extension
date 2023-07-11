@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/network/network_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,6 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
           : LightColors.networkMarkColor;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -88,10 +88,12 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                                     ),
                                     Text(
                                       'Networks',
-                                      style:
-                                      Theme.of(context).textTheme.headline4!.apply(
-                                        fontSizeDelta: 2,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline4!
+                                          .apply(
+                                            fontSizeDelta: 2,
+                                          ),
                                     )
                                   ],
                                 ),
@@ -100,15 +102,17 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                                 ),
                                 Text(
                                   'Jelly speaks more than one language. Select the network you want to use:',
-                                  style:
-                                  Theme.of(context).textTheme.headline6!.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline6!
-                                        .color!
-                                        .withOpacity(0.8),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .color!
+                                            .withOpacity(0.8),
+                                      ),
                                 ),
                                 SizedBox(
                                   height: 14,
@@ -117,7 +121,7 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                                   children: [
                                     ...List<Widget>.generate(
                                       tabs.length,
-                                          (index) => SelectorTabElement(
+                                      (index) => SelectorTabElement(
                                         isColoredTitle: true,
                                         title: tabs[index]['name'],
                                         callback: () {
@@ -125,10 +129,11 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                                             tabs[index]['value'],
                                           );
                                         },
-                                        isSelect:
-                                        networkState.currentNetworkSelectorTab ==
+                                        isSelect: networkState
+                                                .currentNetworkSelectorTab ==
                                             tabs[index]['value'],
-                                        isShownTestnet: networkState.isShownTestnet,
+                                        isShownTestnet:
+                                            networkState.isShownTestnet,
                                         isPaddingLeft: index % 2 == 1,
                                         indicatorWidth: 60,
                                       ),
@@ -136,8 +141,9 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                                   ],
                                 ),
                                 Divider(
-                                  color:
-                                  Theme.of(context).dividerColor.withOpacity(0.1),
+                                  color: Theme.of(context)
+                                      .dividerColor
+                                      .withOpacity(0.1),
                                 )
                               ],
                             ),
@@ -149,48 +155,80 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                               children: currentNetworksList
                                   .map(
                                     (item) => Column(
-                                  children: [
-                                    MouseRegion(
-                                      cursor: SystemMouseCursors.click,
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.translucent,
-                                        onTap: () => onChange(item),
-                                        child: Container(
-                                          height: 44,
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: 10,
-                                                height: 4,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                  BorderRadius.circular(8),
-                                                  color: getMarkColor(walletState
-                                                      .applicationModel!
-                                                      .activeNetwork!
-                                                      .networkType
-                                                      .networkName ==
-                                                      item.networkType
-                                                          .networkName),
-                                                ),
+                                      children: [
+                                        MouseRegion(
+                                          cursor: item.networkType
+                                                      .networkName !=
+                                                  NetworkName.defichainTestnet
+                                              ? SystemMouseCursors.click
+                                              : SystemMouseCursors.forbidden,
+                                          child: GestureDetector(
+                                            behavior:
+                                                HitTestBehavior.translucent,
+                                            onTap: () {
+                                              if (item.networkType
+                                                      .networkName !=
+                                                  NetworkName
+                                                      .defichainTestnet) {
+                                                onChange(item);
+                                              }
+                                            },
+                                            child: Container(
+                                              height: 44,
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width: 10,
+                                                    height: 4,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                      color: getMarkColor(walletState
+                                                              .applicationModel!
+                                                              .activeNetwork!
+                                                              .networkType
+                                                              .networkName ==
+                                                          item.networkType
+                                                              .networkName),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 8,
+                                                  ),
+                                                  Text(
+                                                    item.networkType
+                                                        .networkNameFormat,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline5!
+                                                        .copyWith(
+                                                          color: item.networkType
+                                                                      .networkName !=
+                                                                  NetworkName
+                                                                      .defichainTestnet
+                                                              ? Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .headline5!
+                                                                  .color
+                                                              : Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .headline5!
+                                                                  .color!
+                                                                  .withOpacity(
+                                                                      0.3),
+                                                        ),
+                                                  ),
+                                                ],
                                               ),
-                                              SizedBox(
-                                                width: 8,
-                                              ),
-                                              Text(
-                                                item.networkType.networkNameFormat,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5,
-                                              ),
-                                            ],
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              )
+                                  )
                                   .toList(),
                             ),
                           )
