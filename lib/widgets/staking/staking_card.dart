@@ -61,13 +61,13 @@ class StakingCard extends StatelessWidget {
         return EarnCard(
           isLoading: isLoading,
           title: 'Staking',
-          subTitle: '',
+          subTitle: 'N/A APY',
           imagePath: 'assets/images/dfi_staking.png',
-          firstColumnNumber: '0.00',
-          firstColumnAsset: '\$',
+          firstColumnNumber: 'N/A',
+          firstColumnAsset: '',
           firstColumnSubTitle: 'Staked',
           isStaking: true,
-          needUpdateAccessToken: true,
+          needUpdateAccessToken: false,
           errorMessage: lockState.status == LockStatusList.notFound ||
                   lockState.status == LockStatusList.expired
               ? 'Need to create access token of LOCK'
