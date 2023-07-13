@@ -36,29 +36,29 @@ class AddressBookModel {
     switch (oldNetwork) {
       case 'DefiChain Testnet':
         return NetworkTypeModel(
-          networkName: NetworkName.defichainTestnet,
-          networkString: NetworkName.defichainTestnet.toString(),
-          isTestnet: true,
-        );
+            networkName: NetworkName.defichainTestnet,
+            networkString: NetworkName.defichainTestnet.toString(),
+            isTestnet: true,
+            isLocalWallet: true);
       case 'Bitcoin Mainnet':
         return NetworkTypeModel(
-          networkName: NetworkName.bitcoinMainnet,
-          networkString: NetworkName.bitcoinMainnet.toString(),
-          isTestnet: false,
-        );
+            networkName: NetworkName.bitcoinMainnet,
+            networkString: NetworkName.bitcoinMainnet.toString(),
+            isTestnet: false,
+            isLocalWallet: true);
       case 'Bitcoin Testnet':
         return NetworkTypeModel(
-          networkName: NetworkName.bitcoinTestnet,
-          networkString: NetworkName.bitcoinTestnet.toString(),
-          isTestnet: true,
-        );
+            networkName: NetworkName.bitcoinTestnet,
+            networkString: NetworkName.bitcoinTestnet.toString(),
+            isTestnet: true,
+            isLocalWallet: true);
       case 'DefiChain Mainnet':
       default:
         return NetworkTypeModel(
-          networkName: NetworkName.defichainMainnet,
-          networkString: NetworkName.defichainMainnet.toString(),
-          isTestnet: false,
-        );
+            networkName: NetworkName.defichainMainnet,
+            networkString: NetworkName.defichainMainnet.toString(),
+            isTestnet: false,
+            isLocalWallet: true);
     }
   }
 }
