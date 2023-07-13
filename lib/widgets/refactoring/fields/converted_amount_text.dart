@@ -37,7 +37,7 @@ class ConvertedAmountText extends StatelessWidget {
         }
 
         return Text(
-          roundedAmount,
+          '\$$roundedAmount',
           style: Theme.of(context).textTheme.headline6!.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context)
