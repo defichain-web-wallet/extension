@@ -23,10 +23,11 @@ class LedgerWalletsHelper {
   static const int MaxIndexCheck = 2;
 
   Future<AccountModel> createNewAccount(
-      String network, int accountIndex) async {
+      String appName, String network, int accountIndex) async {
     AccountModel account = AccountModel(index: accountIndex);
     List<AddressModel> addressList = [];
-    addressList.add(await getAccountModelFromLedger(network, accountIndex));
+    addressList
+        .add(await getAccountModelFromLedger(appName, network, accountIndex));
 
     account.addressList = addressList;
     account.balanceList = [BalanceModel(token: 'DFI', balance: 0)];
@@ -39,12 +40,12 @@ class LedgerWalletsHelper {
   }
 
   Future<AddressModel> getAccountModelFromLedger(
-      String network, int index) async {
+      String appName, String network, int index) async {
     var path = HDWalletService.derivePath(index);
 
     try {
       var ledgerAddressJson =
-          await promiseToFuture<dynamic>(getAddress(path, false));
+          await promiseToFuture<dynamic>(getAddress(appName, path, false));
       var ledgerAddress = jsonDecode(ledgerAddressJson);
 
       var pubKey = ledgerAddress["publicKey"];
@@ -64,7 +65,7 @@ class LedgerWalletsHelper {
   }
 
   Future<List<AccountModel>> restoreWallet(
-      String network, Function(int, int) statusBar) async {
+      String appName, String network, Function(int, int) statusBar) async {
     List<AccountModel> accountList = [];
     int lastIndexWithHistory = 0;
 
@@ -74,7 +75,8 @@ class LedgerWalletsHelper {
       List<HistoryNew> historyList = [];
       List<HistoryModel> testnetHistoryList = [];
 
-      addressList.add(await getAccountModelFromLedger(network, accountIndex));
+      addressList
+          .add(await getAccountModelFromLedger(appName, network, accountIndex));
       var balances = await _balanceRequests.getBalanceListByAddressList(
           addressList, network);
 

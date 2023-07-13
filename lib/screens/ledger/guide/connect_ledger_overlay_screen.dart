@@ -9,7 +9,9 @@ import 'package:defi_wallet/screens/ledger/loaders/ledger_auth_loader_screen.dar
 import 'package:flutter/material.dart';
 
 class ConnectLedgerOverlayScreen extends StatefulWidget {
-  const ConnectLedgerOverlayScreen({Key? key}) : super(key: key);
+  final String appName;
+  const ConnectLedgerOverlayScreen({required this.appName, Key? key})
+      : super(key: key);
 
   @override
   State<ConnectLedgerOverlayScreen> createState() =>
@@ -51,7 +53,8 @@ class _ConnectLedgerOverlayScreenState extends State<ConnectLedgerOverlayScreen>
     } else if (currentStep == 5) {
       return new LedgerAuthLoaderScreen(
           callback: () => {setState(() => this.currentStep = 6)},
-          errorCallback: () => {setState(() => this.currentStep = 4)});
+          errorCallback: () => {setState(() => this.currentStep = 4)},
+          appName: this.widget.appName);
     } else if (currentStep == 6) {
       Navigator.pop(context);
     }

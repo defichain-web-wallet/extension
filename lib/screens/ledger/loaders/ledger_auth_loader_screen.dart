@@ -10,6 +10,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
+import 'package:defi_wallet/services/bitcoin_service.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
@@ -22,13 +23,17 @@ class LedgerAuthLoaderScreen extends StatefulWidget {
   final Function() callback;
   final Function() errorCallback;
   String currentStatus;
-  LedgerAuthLoaderScreen({
-    Key? key,
-    required this.callback,
-    required this.errorCallback,
-    this.isFullSize = true,
-    this.currentStatus = 'first-step',
-  }) : super(key: key);
+
+  final String appName;
+
+  LedgerAuthLoaderScreen(
+      {Key? key,
+      required this.callback,
+      required this.errorCallback,
+      required this.appName,
+      this.isFullSize = true,
+      this.currentStatus = 'first-step'})
+      : super(key: key);
 
   @override
   State<LedgerAuthLoaderScreen> createState() => _LedgerAuthLoaderScreenState();
@@ -135,9 +140,16 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
     try {
       WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
 
-      var path = HDWalletService.derivePath(0);
-      var ledgerAddressJson =
-          await promiseToFuture<dynamic>(getAddress(path, false));
+      String path;
+
+      if (this.widget.appName == "dfi") {
+        path = HDWalletService.derivePath(0);
+      } else {
+        path = new BitcoinService().deriveLedgerPath(0);
+      }
+
+      var ledgerAddressJson = await promiseToFuture<dynamic>(
+          getAddress(this.widget.appName, path, false));
       var ledgerAddress = jsonDecode(ledgerAddressJson);
       var pubKey = ledgerAddress["publicKey"];
       var address = ledgerAddress["bitcoinAddress"];

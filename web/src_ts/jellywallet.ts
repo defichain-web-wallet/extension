@@ -1,10 +1,11 @@
-import { JellyWalletLedger } from "./ledger-base.js";
-import { getLedgerDevices, isSupported, getFirstLedgerDevice } from "@ledgerhq/hw-transport-webusb/lib/webusb";
+
+//import { isSupported, getFirstLedgerDevice } from "@ledgerhq/hw-transport-webhid";
+import { LedgerJellywalletWrapper } from "./ledger_wrapper.js";
 
 (<any>window).jelly_init = () => {
     console.log("init jellywallet");
     if (!(<any>window).ledger)
-        (<any>window).ledger = new JellyWalletLedger();
+        (<any>window).ledger = new LedgerJellywalletWrapper();
 };
 
 
@@ -15,26 +16,26 @@ import { getLedgerDevices, isSupported, getFirstLedgerDevice } from "@ledgerhq/h
 }
 
 (<any>window).isUsbSupported = async () => {
-    if (await isSupported()) {
-        try {
-            var devices = await getFirstLedgerDevice();
-            if (devices) {
-                return 0;
-            }
-        }
-        catch(err) {
-            const isInPopup = function() {
-                return (typeof chrome != undefined && chrome.extension) ?
-                    chrome.extension.getViews({ type: "popup" }).length > 0 : null;
-            }
+    // if (await isSupported()) {
+    //     try {
+    //         var devices = await getFirstLedgerDevice();
+    //         if (devices) {
+    //             return 0;
+    //         }
+    //     }
+    //     catch (err) {
+    //         const isInPopup = function () {
+    //             return (typeof chrome != undefined && chrome.extension) ?
+    //                 chrome.extension.getViews({ type: "popup" }).length > 0 : null;
+    //         }
 
-            if(!isInPopup()) {
-                return 2;
-            }
+    //         if (!isInPopup()) {
+    //             return 2;
+    //         }
 
-            console.log(err);
-            return 1;
-        }
-    }
-    return 1;
+    //         console.log(err);
+    //         return 1;
+    //     }
+    // }
+    return 0;
 }

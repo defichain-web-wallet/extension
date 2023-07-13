@@ -16,35 +16,42 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ledgerhq/hw-transport-webhid": "6.24.1",
-    "@ledgerhq/hw-transport-webusb": "6.24.1",
+    "@ledgerhq/devices": "^8.0.1",
+    "@ledgerhq/hw-app-btc": "^10.0.5",
+    "@ledgerhq/hw-transport-webhid": "6.27.16",
+    "@ledgerhq/hw-transport-webusb": "6.27.16",
     "@ledgerhq/logs": "^6.10.0",
-    "@types/chrome": "^0.0.218",
-    "@types/node": "^16.11.7",
+    "@types/chrome": "^0.0.241",
+    "@types/node": "^20.4.2",
+    "@types/w3c-web-hid": "^1.0.3",
     "@types/w3c-web-usb": "^1.0.6",
     "bip174": "^2.0.1",
-    "core-js": "^3.21.1",
+    "core-js": "^3.31.1",
     "defichainjs-lib": "^6.0.4",
-    "hw-app-dfi": "^7.0.26",
+    "hw-app-dfi": "^7.1.0",
     "hw-transport-node-speculos-http": "6.27.4"
   },
   "devDependencies": {
-    "@parcel/packager-raw-url": "2.6.2",
-    "@parcel/transformer-webmanifest": "^2.6.2",
+    "@parcel/packager-raw-url": "2.9.3",
+    "@parcel/transformer-webmanifest": "^2.9.3",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
-    "parcel": "^2.6.2",
+    "parcel": "^2.9.3",
     "parcel-namer-custom": "^0.2.0",
-    "parcel-reporter-static-files-copy": "^1.3.4",
+    "parcel-reporter-static-files-copy": "^1.5.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
-    "rimraf": "^2.6.3",
+    "rimraf": "^5.0.1",
     "stream-browserify": "^3.0.0",
-    "ts-node": "^8.3.0",
+    "ts-node": "^10.9.1",
     "tslint": "^6.1.3",
-    "typescript": "^4.4.4"
+    "typescript": "^5.1.6",
+    "util": "^0.12.5"
   },
   "parcel-namer-custom": {
     ".js?$": "[folder]/[name].[ext]"
+  },
+  "alias": {
+    "@ledgerhq/devices": "@ledgerhq/devices/lib-es"
   }
 }

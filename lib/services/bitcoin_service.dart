@@ -9,14 +9,12 @@ class BitcoinService {
   final networkHelper = NetworkHelper();
 
   bip32.BIP32 getMasterKeypairFormSeed(Uint8List seed, String networkString) {
-    return bip32.BIP32.fromSeed(
-        seed,
-        networkHelper.getNetworkType(networkString));
+    return bip32.BIP32
+        .fromSeed(seed, networkHelper.getNetworkType(networkString));
   }
 
   ECPair getKeypairForPath(
       bip32.BIP32 masterKeypair, String path, String networkString) {
-
     return ECPair.fromPrivateKey(masterKeypair.derivePath(path).privateKey!,
         network: networkHelper.getNetwork(networkString));
   }
@@ -30,18 +28,25 @@ class BitcoinService {
     return "1129/0/0/$account";
   }
 
-  Future<String> getAddressFromKeyPair(ECPair keyPair, String networkString) async {
+  String deriveLedgerPath(int account) {
+    return "44'/0'/0'/0/$account";
+  }
+
+  Future<String> getAddressFromKeyPair(
+      ECPair keyPair, String networkString) async {
     final address = P2WPKH(
-          data: PaymentData(
-            pubkey: keyPair.publicKey,
-          ),
-          network: networkHelper.getNetwork(networkString),
-        ).data!.address;
+      data: PaymentData(
+        pubkey: keyPair.publicKey,
+      ),
+      network: networkHelper.getNetwork(networkString),
+    ).data!.address;
     return address!;
   }
 
-  Future<AddressModel> getAddressModelFromKeyPair(bip32.BIP32 masterKeyPair, accountIndex, String networkString) async {
-    final keyPair = getKeypairForPath(masterKeyPair, derivePath(accountIndex), networkString);
+  Future<AddressModel> getAddressModelFromKeyPair(
+      bip32.BIP32 masterKeyPair, accountIndex, String networkString) async {
+    final keyPair = getKeypairForPath(
+        masterKeyPair, derivePath(accountIndex), networkString);
     final addressString = await getAddressFromKeyPair(keyPair, networkString);
     return AddressModel(address: addressString, account: accountIndex);
   }

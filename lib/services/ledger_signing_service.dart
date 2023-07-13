@@ -80,7 +80,7 @@ class LedgerSigningService implements SigningWalletService {
       var jsonString = json.encode(prevOutsJson);
       jellyLedgerInit();
       var txHex = await promiseToFuture(signTransactionLedgerRaw(
-          jsonString, paths, txhex, network.messagePrefix, changePath));
+          "dfi", jsonString, paths, txhex, network.messagePrefix, changePath));
       return txHex;
     } catch (err) {
       print(err);
@@ -92,8 +92,9 @@ class LedgerSigningService implements SigningWalletService {
   Future<String> signMessage(AccountModel accountModel, String address,
       String message, NetworkType network,
       {ECPair? key}) async {
+    //TODO
     var signature = await promiseToFuture(
-        signMessageLedger(accountModel.addressList![0].getPath(), message));
+        signMessageLedger("", accountModel.addressList![0].getPath(), message));
     return signature;
   }
 

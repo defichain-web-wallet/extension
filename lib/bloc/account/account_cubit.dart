@@ -57,7 +57,7 @@ class AccountCubit extends Cubit<AccountState> {
 
     var box = await Hive.openBox(HiveBoxes.client);
     var encryptMnemonic =
-    EncryptHelper.getEncryptedData(mnemonic.join(','), password);
+        EncryptHelper.getEncryptedData(mnemonic.join(','), password);
     await box.put(HiveNames.savedMnemonic, encryptMnemonic);
     var encryptedPassword = Crypt.sha256(password).toString();
     await box.put(HiveNames.password, encryptedPassword);
@@ -82,7 +82,7 @@ class AccountCubit extends Cubit<AccountState> {
         masterKeyPairTestnet.chainCode,
         networkHelper.getNetworkType('bitcoin'));
     final masterKeyPairMainnet =
-    hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
+        hdWalletService.getMasterKeypairFormSeed(seed, mainnet);
     final masterKeyPairMainnetPublicKey = bip32.BIP32.fromPublicKey(
         masterKeyPairMainnet.publicKey,
         masterKeyPairMainnet.chainCode,
@@ -197,7 +197,7 @@ class AccountCubit extends Cubit<AccountState> {
 
         if (mnemonic != null) {
           var encryptMnemonic =
-          EncryptHelper.getEncryptedData(mnemonic.join(','), password);
+              EncryptHelper.getEncryptedData(mnemonic.join(','), password);
           await box.put(HiveNames.savedMnemonic, encryptMnemonic);
         }
       }
@@ -341,7 +341,7 @@ class AccountCubit extends Cubit<AccountState> {
     ));
   }
 
-  Future<AccountModel> addAccount() async {
+  Future<AccountModel> addAccount(String appName) async {
     List<AccountModel> accounts = state.accounts!;
     int newAccountIndex = accounts.length;
 
@@ -350,7 +350,7 @@ class AccountCubit extends Cubit<AccountState> {
 
     if (isLedger) {
       account = await ledgerWalletsHelper.createNewAccount(
-          SettingsHelper.settings.network!, newAccountIndex);
+          appName, SettingsHelper.settings.network!, newAccountIndex);
     } else {
       account = await walletsHelper.createNewAccount(
           state.masterKeyPairPublicKey!, SettingsHelper.settings.network!,
@@ -826,7 +826,8 @@ class AccountCubit extends Cubit<AccountState> {
     ));
   }
 
-  restoreLedgerAccount(String? network, Function(int, int) statusBar) async {
+  restoreLedgerAccount(
+      String appName, String? network, Function(int, int) statusBar) async {
     network = network ?? mainnet;
     var box = await Hive.openBox(HiveBoxes.client);
     await box.put(HiveNames.kycStatus, 'show');
@@ -843,8 +844,8 @@ class AccountCubit extends Cubit<AccountState> {
     ));
 
     try {
-      List<AccountModel> accounts =
-          await ledgerWalletsHelper.restoreWallet(network, (need, restored) {
+      List<AccountModel> accounts = await ledgerWalletsHelper
+          .restoreWallet(appName, network, (need, restored) {
         emit(state.copyWith(
           status: AccountStatusList.restore,
           needRestore: need + 10,
