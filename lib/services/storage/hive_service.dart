@@ -26,4 +26,14 @@ class HiveService {
       throw error;
     }
   }
+
+  static Future<void> clearBox(String boxName) async {
+    try {
+      var box = await Hive.openBox(boxName);
+      await box.clear();
+      await box.close();
+    } catch (error) {
+      throw error;
+    }
+  }
 }

@@ -1,11 +1,13 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
 import 'package:defi_wallet/screens/earn/earn_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
+import 'package:defi_wallet/screens/staking/staking_screen.dart';
 import 'package:defi_wallet/screens/swap/swap_screen.dart';
 import 'package:defi_wallet/screens/receive/receive_screeen_new.dart';
 import 'package:defi_wallet/screens/send/send_screeen.dart';
@@ -41,143 +43,163 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
   Widget build(BuildContext context) {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
 
-    return Container(
-      width: homeCardWidth,
-      height: homeCardHeight,
-      padding: const EdgeInsets.only(left: 12, top: 22, right: 12, bottom: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20.0),
-        border: isDarkTheme() ? Border.all(
-            width: 1,
-            color: Colors.white.withOpacity(0.04)) : null,
-      ),
-      child: Center(
-        child: Column(
-          children: [
-            SizedBox(
-              height: 21,
-              child: AppSelector(
-                items: items,
-                onSelect: (String name) {
-                  print(name);
-                  setState(() {
-                    activeAsset = name;
-                  });
-                },
-              ),
-            ),
-            SizedBox(
-              height: 12,
-            ),
-            SizedBox(
-              height: 56,
-              child: AccountBalance(
-                asset: activeAsset,
-              ),
-            ),
-            SizedBox(
-              height: 31,
-            ),
-            Row(
+    return BlocBuilder<HomeCubit, HomeState>(
+      builder: (context, homeState) {
+        return Container(
+          width: homeCardWidth,
+          height: homeCardHeight,
+          padding:
+              const EdgeInsets.only(left: 12, top: 22, right: 12, bottom: 12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(20.0),
+            border: isDarkTheme()
+                ? Border.all(width: 1, color: Colors.white.withOpacity(0.04))
+                : null,
+          ),
+          child: Center(
+            child: Column(
               children: [
-                Flexible(
-                  child: FlatButton(
-                    title: 'Earn',
-                    iconPath: walletCubit.state.isSendReceiveOnly
-                        ? 'assets/icons/earn_disabled.png'
-                        : 'assets/icons/earn.png',
-                    callback: walletCubit.state.isSendReceiveOnly ? null : () {
-                      NavigatorService.push(context, EarnScreen());
+                SizedBox(
+                  height: 21,
+                  child: AppSelector(
+                    items: items,
+                    onSelect: (String name) {
+                      RatesCubit ratesCubit = BlocProvider.of<RatesCubit>(context);
+                      ratesCubit.updateActiveAsset(name);
+                      setState(() {
+                        activeAsset = name;
+                      });
                     },
                   ),
                 ),
                 SizedBox(
-                  width: 8.0,
+                  height: 12,
                 ),
-                Flexible(
-                  child: FlatButton(
-                    title: 'Buy/Sell',
-                    iconPath: walletCubit.state.isSendReceiveOnly
-                        ? 'assets/icons/wallet_disabled.png'
-                        : 'assets/icons/wallet.png',
-                    callback: walletCubit.state.isSendReceiveOnly ? null : () {
-                      NavigatorService.push(context, BuySellScreen());
-                    },
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 7.0,
-            ),
-            Row(
-              children: [
-                Flexible(
-                  child: FlatButton(
-                    title: 'Send',
-                    isPrimary: false,
-                    iconPath: 'assets/icons/send_icon.svg',
-                    callback: () {
-                      NavigatorService.push(context, SendScreen());
-                    },
+                SizedBox(
+                  height: 72,
+                  child: AccountBalance(
+                    asset: activeAsset,
                   ),
                 ),
                 SizedBox(
-                  width: 7,
+                  height: 16,
                 ),
-                Flexible(
-                  child: FlatButton(
-                    title: 'Receive',
-                    isPrimary: false,
-                    iconPath: 'assets/icons/receive_icon.svg',
-                    callback: () {
-                      NavigatorService.push(context, ReceiveScreenNew());
-                    },
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: FlatButton(
+                        title: 'Earn',
+                        isActive: homeState.scrollView is EarnScreen ||
+                            homeState.scrollView is StakingScreen,
+                        iconPath: walletCubit.state.isSendReceiveOnly
+                            ? 'assets/icons/earn_disabled.png'
+                            : 'assets/icons/earn.png',
+                        callback: walletCubit.state.isSendReceiveOnly
+                            ? null
+                            : () {
+                                NavigatorService.push(context, EarnScreen());
+                              },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 8.0,
+                    ),
+                    Flexible(
+                      child: FlatButton(
+                        title: 'Buy/Sell',
+                        isActive: homeState.scrollView is BuySellScreen,
+                        iconPath: walletCubit.state.isSendReceiveOnly
+                            ? 'assets/icons/wallet_disabled.png'
+                            : 'assets/icons/wallet.png',
+                        callback: walletCubit.state.isSendReceiveOnly
+                            ? null
+                            : () {
+                                NavigatorService.push(context, BuySellScreen());
+                              },
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(
-                  width: 7,
+                  height: 7.0,
                 ),
-                Flexible(
-                  child: BlocBuilder<AccountCubit, AccountState>(
-                    builder: (context, accountState) {
-                      return FlatButton(
-                        title: 'Change',
+                Row(
+                  children: [
+                    Flexible(
+                      child: FlatButton(
+                        title: 'Send',
                         isPrimary: false,
-                      iconPath: walletCubit.state.isSendReceiveOnly
-                          ? 'assets/icons/change_icon_disabled.svg'
-                          : 'assets/icons/change_icon.svg',
-                      callback: walletCubit.state.isSendReceiveOnly ? null : () {
-                          late Widget changeWidget;
-                          if (walletCubit.state.isSendReceiveOnly) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Not allowed for testnet bitcoin',
-                                  style: Theme.of(context).textTheme.headline5,
-                                ),
-                                backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
-                              ),
-                            );
-                            return;
-                          }
-                          if (accountState.swapTutorialStatus == 'show' && walletCubit.state.isSendReceiveOnly) {
-                            changeWidget = SwapGuideScreen();
-                          } else {
-                            changeWidget = SwapScreen();
-                          }
-                          NavigatorService.push(context, changeWidget);
+                        iconPath: 'assets/icons/send_icon.svg',
+                        callback: () {
+                          NavigatorService.push(context, SendScreen());
                         },
-                      );
-                    }
-                  ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 7,
+                    ),
+                    Flexible(
+                      child: FlatButton(
+                        title: 'Receive',
+                        isPrimary: false,
+                        iconPath: 'assets/icons/receive_icon.svg',
+                        callback: () {
+                          NavigatorService.push(context, ReceiveScreenNew());
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 7,
+                    ),
+                    Flexible(
+                      child: BlocBuilder<AccountCubit, AccountState>(
+                          builder: (context, accountState) {
+                        return FlatButton(
+                          title: 'Change',
+                          isPrimary: false,
+                          iconPath: walletCubit.state.isSendReceiveOnly
+                              ? 'assets/icons/change_icon_disabled.svg'
+                              : 'assets/icons/change_icon.svg',
+                          callback: walletCubit.state.isSendReceiveOnly
+                              ? null
+                              : () {
+                                  late Widget changeWidget;
+                                  if (walletCubit.state.isSendReceiveOnly) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Not allowed for testnet bitcoin',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5,
+                                        ),
+                                        backgroundColor: Theme.of(context)
+                                            .snackBarTheme
+                                            .backgroundColor,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  if (accountState.swapTutorialStatus ==
+                                          'show' &&
+                                      walletCubit.state.isSendReceiveOnly) {
+                                    changeWidget = SwapGuideScreen();
+                                  } else {
+                                    changeWidget = SwapScreen();
+                                  }
+                                  NavigatorService.push(context, changeWidget);
+                                },
+                        );
+                      }),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

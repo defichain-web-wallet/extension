@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
@@ -37,7 +38,8 @@ class SwapSummaryScreen extends StatefulWidget {
   _SwapSummaryScreenState createState() => _SwapSummaryScreenState();
 }
 
-class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
+class _SwapSummaryScreenState extends State<SwapSummaryScreen>
+    with ThemeMixin, FormatMixin {
   BalancesHelper balancesHelper = BalancesHelper();
   TransactionService transactionService = TransactionService();
   bool isFailed = false;
@@ -101,6 +103,14 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
   Widget _buildBody(context, isFullScreen) => BlocBuilder<ExchangeCubit, ExchangeState>(
   builder: (context, state) {
     ExchangeCubit exchangeCubit = BlocProvider.of<ExchangeCubit>(context);
+    final amountFrom = formatNumberStyling(
+      state.amountFrom,
+      fixedCount: 8,
+    );
+    final amountTo = formatNumberStyling(
+      state.amountTo,
+      fixedCount: 8,
+    );
     return StretchBox(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -167,7 +177,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     width: 6,
                                   ),
                                   Text(
-                                    state.amountFrom.toString(),
+                                    amountFrom,
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline3!
@@ -206,7 +216,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               width: 6,
                             ),
                             Text(
-                              state.amountTo.toString(),
+                              amountTo,
                               style: Theme.of(context)
                                   .textTheme
                                   .headline3!

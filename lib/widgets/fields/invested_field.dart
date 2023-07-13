@@ -112,8 +112,8 @@ class _InvestedFieldState extends State<InvestedField> with ThemeMixin {
                             SizedBox(
                               width: 8,
                             ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   '${widget.tokenName} ',

@@ -94,14 +94,15 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     List<BalanceModel> balances,
     String addressString,
   ) async {
-    int balance = await BlockcypherRequests.getBalance(
+    final balance = await BlockcypherRequests.getBalance(
       network: this,
       addressString: addressString,
     );
 
     BalanceModel balanceModel = BalanceModel(
       token: getDefaultToken(),
-      balance: balance,
+      balance: balance.balance,
+      unconfirmedBalance: balance.unconfirmedBalance,
     );
     return balanceModel;
   }

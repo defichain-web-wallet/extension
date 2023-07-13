@@ -1,3 +1,4 @@
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -9,6 +10,7 @@ import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/home/home_sliver_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeTabsScrollView extends StatefulWidget {
   final TransactionState txState;
@@ -33,6 +35,8 @@ class _HomeTabsScrollViewState extends State<HomeTabsScrollView>
 
   @override
   Widget build(BuildContext context) {
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: CustomScrollView(
@@ -74,7 +78,7 @@ class _HomeTabsScrollViewState extends State<HomeTabsScrollView>
                       SizedBox(
                         width: 12,
                       ),
-                      if (!SettingsHelper.isBitcoin())
+                      if (!walletCubit.state.isSendReceiveOnly)
                         SizedBox(
                           width: 32,
                           height: 32,

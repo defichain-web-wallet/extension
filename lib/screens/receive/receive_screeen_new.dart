@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -154,7 +155,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     });
                                   },
                                   child: Container(
-                                    width: isFullScreen ? 302 : 140,
+                                    width: isFullScreen ? 382 : 140,
                                     height: 43,
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -171,10 +172,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                       children: [
                                         Text(
                                           isFullScreen
-                                              ? cutAddress(
-                                                  state.activeAddress,
-                                                  range: 16,
-                                                )
+                                              ? state.activeAddress
                                               : cutAddress(state.activeAddress),
                                           style: headline5,
                                         ),
@@ -248,7 +246,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                           NewPrimaryButton(
                             width: buttonSmallWidth,
                             callback: () {
-                              Navigator.pop(context);
+                              NavigatorService.pop(context);
                             },
                             titleWidget: Row(
                               mainAxisAlignment: MainAxisAlignment.center,

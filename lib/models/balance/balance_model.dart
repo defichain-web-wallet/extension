@@ -6,11 +6,13 @@ class BalanceModel {
   TokenModel? token;
   LmPoolModel? lmPool;
   int balance;
+  int unconfirmedBalance;
 
   BalanceModel({
     required this.balance,
     this.token,
     this.lmPool,
+    this.unconfirmedBalance = 0,
   }) {
     if (this.token == null && this.lmPool == null) {
       throw 'Empty token or LMPool';
@@ -40,6 +42,7 @@ class BalanceModel {
     if (this.lmPool != null) {
       data['lmPool'] = this.lmPool!.toJSON();
     }
+    data['unconfirmedBalance'] = this.unconfirmedBalance.toString();
     return data;
   }
 
@@ -51,6 +54,7 @@ class BalanceModel {
     if (network != null) {
       TokenModel? token;
       LmPoolModel? lmPool;
+      int unconfirmedBalance = 0;
       if (json['isLPS'] == false) {
         token = TokenModel.fromJSON(json,
             networkName: network.networkType.networkName);
@@ -61,10 +65,14 @@ class BalanceModel {
           tokens: tokens,
         );
       }
+      if (json['unconfirmedBalance'] != null) {
+        unconfirmedBalance = int.parse(json['unconfirmedBalance']);
+      }
       return BalanceModel(
         balance: network.toSatoshi(double.parse(json['amount'])),
         token: token,
         lmPool: lmPool,
+        unconfirmedBalance: unconfirmedBalance,
       );
     } else {
       return BalanceModel(

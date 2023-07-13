@@ -53,11 +53,13 @@ class ExchangeCubit extends Cubit<ExchangeState> {
 
   calculateRate(TokenModel fromToken, TokenModel toToken, double amount){
     var pair = state.selectedPairs!.firstWhere((element) => (element.base.compare(fromToken) && element.quote.compare(toToken)) || (element.quote.compare(fromToken) && element.base.compare(toToken)));
+    double rate = 0;
     if(pair.base.compare(fromToken)){
-      return amount * pair.ratio;
+      rate = amount * pair.ratio;
     } else {
-      return amount * pair.ratioReverse;
+      rate = amount * pair.ratioReverse;
     }
+    return rate;
   }
 
   updateBalance(context, BalanceModel balance) async {

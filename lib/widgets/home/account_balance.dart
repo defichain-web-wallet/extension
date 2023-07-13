@@ -41,9 +41,11 @@ class _AccountBalanceState extends State<AccountBalance> {
                 state.status == WalletStatusList.update) &&
                 ratesState.status == RatesStatusList.success) {
               late double totalBalance;
+              late double unconfirmedBalance;
 
               try {
                 List<BalanceModel> balances = state.getBalances();
+                unconfirmedBalance = state.unconfirmedBalance();
                 totalBalance = ratesState.ratesModel!.getTotalAmount(
                   state.activeNetwork,
                   balances,
@@ -51,6 +53,7 @@ class _AccountBalanceState extends State<AccountBalance> {
                 );
               } catch (_) {
                 totalBalance = 0.00;
+                unconfirmedBalance = 0.00;
               }
 
               return Container(
@@ -58,10 +61,17 @@ class _AccountBalanceState extends State<AccountBalance> {
                   isSmallFont: widget.isSmall,
                   balance: totalBalance,
                   assetName: widget.asset,
+                  unconfirmedBalance: unconfirmedBalance
                 ),
               );
             } else {
-              return Container();
+              return Container(
+                child: BalanceText(
+                  isSmallFont: widget.isSmall,
+                  balance: 0,
+                  assetName: widget.asset,
+                ),
+              );
             }
           },
         );

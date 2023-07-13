@@ -22,7 +22,7 @@ class AmountField extends StatefulWidget {
   final double? available;
   final String? suffix;
   final bool isDisabledSelector;
-  final bool isAvailableTo;
+  final bool isDisableAvailable;
   final TxType? type;
   final BalanceModel? balance;
 
@@ -36,7 +36,7 @@ class AmountField extends StatefulWidget {
     this.available = 35.02,
     this.suffix = '\$365.50',
     this.isDisabledSelector = false,
-    this.isAvailableTo = true,
+    this.isDisableAvailable = false,
     Key? key,
   }) : super(key: key);
 
@@ -144,7 +144,7 @@ class _AmountFieldState extends State<AmountField> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ConvertedAmountText(amount: double.tryParse(widget.controller.text), token: widget.balance!.token!),
-              GestureDetector(
+              !widget.isDisableAvailable ? GestureDetector(
                 onTap: () {
                   if (widget.controller.text != widget.available.toString()) {
                     widget.controller.text = widget.available.toString();
@@ -156,7 +156,7 @@ class _AmountFieldState extends State<AmountField> {
                   cursor: SystemMouseCursors.click,
                   child: AvailableAmountText(amount: widget.available!,),
                 ),
-              ),
+              ) : Container(),
             ],
           )
         ],

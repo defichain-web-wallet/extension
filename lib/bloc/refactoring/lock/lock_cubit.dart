@@ -74,12 +74,16 @@ class LockCubit extends Cubit<LockState> {
         sum += values[i];
       }
     }
-    Decimal reinvestPercent = Decimal.parse('1') - Decimal.parse(sum.toString());
+    try {
+      Decimal reinvestPercent = Decimal.parse('1') - Decimal.parse(sum.toString());
 
-    var reinvest = stakingModel.rewardRoutes
-        .firstWhere((element) => element.label == 'Reinvest');
+      var reinvest = stakingModel.rewardRoutes
+          .firstWhere((element) => element.label == 'Reinvest');
 
-    reinvest.rewardPercent = reinvestPercent.toDouble();
+      reinvest.rewardPercent = reinvestPercent.toDouble();
+    } catch (err) {
+      print('no reinvest strategy now');
+    }
 
     emit(state.copyWith(
       stakingModel: stakingModel,
@@ -113,9 +117,13 @@ class LockCubit extends Cubit<LockState> {
     ));
 
     List<RewardRouteModel> routes = List.from(state.stakingModel!.rewardRoutes);
-    var temp = routes.firstWhere((element) => element.label == 'Reinvest');
-    int index = routes.indexOf(temp);
-    routes.removeAt(index);
+    try {
+      var temp = routes.firstWhere((element) => element.label == 'Reinvest');
+      int index = routes.indexOf(temp);
+      routes.removeAt(index);
+    } catch (err) {
+      print('no reinvest strategy now');
+    }
     var rewardRoutesString = routes.map((e) => e.toJson()).toList();
 
     try {
