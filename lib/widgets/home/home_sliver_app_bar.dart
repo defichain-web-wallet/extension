@@ -1,3 +1,4 @@
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/screens/earn/earn_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
@@ -5,6 +6,7 @@ import 'package:defi_wallet/widgets/common/app_tooltip.dart';
 import 'package:defi_wallet/widgets/home/account_balance.dart';
 import 'package:defi_wallet/widgets/home/home_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeSliverAppBar extends StatefulWidget {
   const HomeSliverAppBar({Key? key}) : super(key: key);
@@ -19,6 +21,7 @@ class _HomeSliverAppBarState extends State<HomeSliverAppBar> {
 
   @override
   Widget build(BuildContext context) {
+    RatesCubit ratesCubit = BlocProvider.of<RatesCubit>(context);
     return SliverAppBar(
       pinned: true,
       floating: false,
@@ -49,7 +52,7 @@ class _HomeSliverAppBarState extends State<HomeSliverAppBar> {
                           children: [
                             Expanded(
                               child: AccountBalance(
-                                asset: 'USD',
+                                asset: ratesCubit.state.activeAsset,
                                 isSmall: true,
                               ),
                             ),
