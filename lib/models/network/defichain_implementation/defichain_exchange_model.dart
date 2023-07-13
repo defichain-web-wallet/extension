@@ -38,6 +38,7 @@ class DefichainExchangeModel extends AbstractExchangeModel {
     var utxoBalance = balances.firstWhere(
           (element) => element.token!.symbol == 'DFI' && !element.token!.isUTXO,
     );
+    //TODO: Ledger: You can check here account.sourceId and if this ledger - change DFITransactionService to a ledger service
     return DFITransactionService().createAndSendSwap(
       senderAddress: account.getAddress(network.networkType.networkName)!,
       network: DefichainNetworkModel(network.networkType),

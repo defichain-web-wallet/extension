@@ -4,6 +4,8 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_network_mod
 import 'package:defi_wallet/models/network/network_name.dart';
 
 abstract class AbstractAccountModel {
+  final String? publicKeyTestnet;
+  final String? publicKeyMainnet;
   final String sourceId;
   final Map<String, List<BalanceModel>> pinnedBalances;
 
@@ -11,7 +13,7 @@ abstract class AbstractAccountModel {
   final List<AddressBookModel> addressBook;
   final List<AddressBookModel> lastSendList;
 
-  AbstractAccountModel(this.sourceId, this.pinnedBalances, this.name,
+  AbstractAccountModel(this.publicKeyTestnet, this.publicKeyMainnet, this.sourceId, this.pinnedBalances, this.name,
       this.addressBook, this.lastSendList);
 
   void changeName(String name) {

@@ -5,6 +5,7 @@ import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_ledger_network_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
+import 'package:defi_wallet/models/network/ledger_account_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -146,7 +147,7 @@ class ApplicationModel {
     }).toList();
 
     final sourceListMapped = sourceList.map(
-      (key, value) => MapEntry(key, SourceSeedModel.fromJSON(value)),
+      (key, value) => MapEntry(key, SourceModel.fromJSON(value)),
     );
 
     return ApplicationModel(
@@ -161,16 +162,16 @@ class ApplicationModel {
   List<String> getMnemonic(String password) {
     var sourceModel = this.sourceList[this.activeAccount!.sourceId];
 
-    if (sourceModel is SourceSeedModel) {
+    if (sourceModel is SourceModel) {
       return sourceModel.getMnemonic(password);
     }
     return [];
   }
 
-  SourceSeedModel createSource(List<String> mnemonic, String publicKeyTestnet,
-      String publicKeyMainnet, String password) {
-    var source = new SourceSeedModel(
-        sourceName: SourceName.seed,
+  SourceModel createSource(
+      List<String>? mnemonic, String? publicKeyTestnet, String? publicKeyMainnet, String password, SourceName sourceName) {
+    var source = new SourceModel(
+        sourceName: sourceName,
         publicKeyMainnet: publicKeyMainnet,
         publicKeyTestnet: publicKeyTestnet,
         password: password,
@@ -180,7 +181,7 @@ class ApplicationModel {
   }
 
   ApplicationModel copyWith({
-    Map<String, SourceSeedModel>? sourceList,
+    Map<String, SourceModel>? sourceList,
     String? password,
     String? encryptedPassword,
     AbstractNetworkModel? activeNetwork,

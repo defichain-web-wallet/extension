@@ -288,7 +288,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   Future<ECPair> getKeypair(String password, AbstractAccountModel account,
       ApplicationModel applicationModel) async {
     var mnemonic =
-        (applicationModel.sourceList[account.sourceId]! as SourceSeedModel)
+        (applicationModel.sourceList[account.sourceId]! as SourceModel)
             .getMnemonic(password);
     var masterKey = getMasterKeypairFormMnemonic(mnemonic);
     return _getKeypairForPathPrivateKey(
@@ -301,9 +301,14 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       required String password,
       required TokenModel token,
       required double amount,
-      required ApplicationModel applicationModel,
-      int satPerByte = 0}) async {
-    ECPair keypair = await getKeypair(password, account, applicationModel);
+        required ApplicationModel applicationModel,
+        int satPerByte = 0}) async {
+    //TODO: Ledger: You can check here account.sourceId and check if this is ledger
+    ECPair keypair = await getKeypair(
+      password,
+      account,
+      applicationModel
+    );
 
     List<BalanceModel> balances =
         account.getPinnedBalances(this, mergeCoin: false);
@@ -316,7 +321,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       token,
       account.getAddress(this.networkType.networkName)!,
     );
-
+//TODO: Ledger: You can check here account.sourceId and if this ledger - change DFITransactionService to a ledger service
     return DFITransactionService().createSendTransaction(
       senderAddress: account.getAddress(this.networkType.networkName)!,
       keyPair: keypair,
