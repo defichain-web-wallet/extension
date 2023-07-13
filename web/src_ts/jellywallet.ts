@@ -1,4 +1,4 @@
-import { JellyWalletLedger } from "./ledger-base.js";
+import { JellyWalletLedger } from "./ledger-base.ts";
 import { getLedgerDevices, isSupported, getFirstLedgerDevice } from "@ledgerhq/hw-transport-webusb/lib/webusb";
 
 (<any>window).jelly_init = () => {

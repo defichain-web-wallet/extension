@@ -58,7 +58,7 @@ class DefichainLmProviderModel extends AbstractLmProviderModel {
       ),
       account.getAddress(network.networkType.networkName)!,
     );
-
+//TODO: Ledger: You can check here account.sourceId and if this ledger - change DFITransactionService to a ledger service
     return DFITransactionService().createAndSendLiqudity(
       senderAddress: account.getAddress(network.networkType.networkName)!,
       keyPair: keypair,
@@ -82,7 +82,7 @@ class DefichainLmProviderModel extends AbstractLmProviderModel {
       ApplicationModel applicationModel) async {
     ECPair keypair =
         await network.getKeypair(password, account, applicationModel);
-
+//TODO: Ledger: You can check here account.sourceId and if this ledger - change DFITransactionService to a ledger service
     return DFITransactionService().removeLiqudity(
       senderAddress: account.getAddress(network.networkType.networkName)!,
       keyPair: keypair,

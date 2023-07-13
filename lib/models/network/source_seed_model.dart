@@ -4,32 +4,21 @@ import 'package:uuid/uuid.dart';
 enum SourceName { seed, ledger }
 
 class SourceModel {
-  late String id;
-
-  SourceModel({String? id}) {
-    this.id = id ?? Uuid().v1();
-  }
-
-  Map<String, dynamic> toJSON() {
-    return {'id': id};
-  }
-}
-
-class SourceSeedModel extends SourceModel {
   String? mnemonic;
-  final String publicKeyTestnet;
-  final String publicKeyMainnet;
+  late String id;
+  final String? publicKeyTestnet;
+  final String? publicKeyMainnet;
   final SourceName sourceName;
 
-  SourceSeedModel(
+  SourceModel(
       {String? id,
       required this.sourceName,
       required this.publicKeyMainnet,
       required this.publicKeyTestnet,
       String? password,
       List<String>? mnemonic,
-      String? mnemonicFromStore})
-      : super(id: id) {
+      String? mnemonicFromStore}) {
+    this.id = id ?? Uuid().v1();
     if (sourceName.name == SourceName.seed.name) {
       if (mnemonicFromStore != null) {
         this.mnemonic = mnemonicFromStore;
@@ -70,8 +59,8 @@ class SourceSeedModel extends SourceModel {
     };
   }
 
-  factory SourceSeedModel.fromJSON(Map<String, dynamic> json) {
-    return SourceSeedModel(
+  factory SourceModel.fromJSON(Map<String, dynamic> json) {
+    return SourceModel(
       id: json['id'],
       mnemonicFromStore: json['mnemonic'],
       publicKeyTestnet: json['publicKeyTestnet'],

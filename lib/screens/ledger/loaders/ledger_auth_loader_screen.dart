@@ -63,7 +63,8 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
     }
     if (widget.currentStatus == 'first-step') {
       Future.delayed(const Duration(milliseconds: 10), () async {
-        await restoreWallet();
+        //TODO: ledger: you need password here. Need to ask password before restore
+        await restoreWallet('12345678');
       });
     }
     return Container(
@@ -130,7 +131,7 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
     );
   }
 
-  Future restoreWallet() async {
+  Future restoreWallet(password) async {
     await init();
     try {
       WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
@@ -138,10 +139,19 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
       var path = HDWalletService.derivePath(0);
       var ledgerAddressJson =
           await promiseToFuture<dynamic>(getAddress(path, false));
+      print(ledgerAddressJson);
       var ledgerAddress = jsonDecode(ledgerAddressJson);
       var pubKey = ledgerAddress["publicKey"];
       var address = ledgerAddress["bitcoinAddress"];
-      await walletCubit.addNewLedgerAccount("Ledger", address, pubKey);
+      await walletCubit.restoreWalletWithLedger(
+        password,
+          pubKey,
+          address
+        //TODO: ledger: This will exist after merge with actually changes
+        //     (need, restored) {
+        //   getStatusText(widget.currentStatus, need, restored);
+        // }
+      );
 
       widget.callback();
     } on Exception catch (error) {

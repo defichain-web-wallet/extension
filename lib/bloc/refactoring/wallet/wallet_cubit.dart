@@ -5,6 +5,7 @@ import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/ledger_account_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
@@ -31,6 +32,30 @@ class WalletCubit extends Cubit<WalletState> {
   double fromSatoshi(int value) {
     return state.activeNetwork.fromSatoshi(value);
   }
+  //TODO: ledger
+  // createWalletWithLedger(String password) async {
+  //   emit(state.copyWith(status: WalletStatusList.loading));
+  //   var applicationModel = ApplicationModel(sourceList: {}, password: password);
+  //
+  //
+  //   var source = applicationModel.createSource(
+  //       null, null, null, password, SourceName.ledger);
+  //
+  //   var account = await AccountModel.fromLedger(
+  //       networkList: applicationModel.networks,
+  //       accountIndex: 0,
+  //       sourceId: source.id);
+  //
+  //   applicationModel.activeAccount = account;
+  //   applicationModel.accounts = [account];
+  //
+  //   await StorageService.saveApplication(applicationModel);
+  //
+  //   emit(state.copyWith(
+  //     applicationModel: applicationModel,
+  //     status: WalletStatusList.success,
+  //   ));
+  // }
 
   createWallet(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: WalletStatusList.loading));
@@ -42,7 +67,7 @@ class WalletCubit extends Cubit<WalletState> {
     var publicKeyTestnet = _getPublicKey(seed, true);
 
     var source = applicationModel.createSource(
-        mnemonic, publicKeyTestnet, publicKeyMainnet, password);
+        mnemonic, publicKeyTestnet, publicKeyMainnet, password, SourceName.ledger);
 
     var account = await AccountModel.fromPublicKeys(
         networkList: applicationModel.networks,
@@ -75,7 +100,12 @@ class WalletCubit extends Cubit<WalletState> {
     var publicKeyTestnet = _getPublicKey(seed, true);
 
     var source = applicationModel.createSource(
-        mnemonic, publicKeyTestnet, publicKeyMainnet, password);
+      mnemonic,
+      publicKeyTestnet,
+      publicKeyMainnet,
+      password,
+      SourceName.seed
+    );
 
     var accountIndex = 0;
     var neededRestore = applicationModel.networks.length * 5;
@@ -133,6 +163,83 @@ class WalletCubit extends Cubit<WalletState> {
         if (restored + 1 >= neededRestore) {
           neededRestore += applicationModel.networks.length * 5;
         }
+        accountList.add(account);
+        accountIndex++;
+      }
+    }
+
+    applicationModel.accounts = accountList;
+    applicationModel.activeAccount = accountList.first;
+
+    // await StorageService.saveAccounts(accountList);
+    await StorageService.saveApplication(applicationModel);
+
+    emit(state.copyWith(
+      applicationModel: applicationModel,
+      status: WalletStatusList.success,
+    ));
+  }
+
+  restoreWalletWithLedger(String password, String pubKey, String address) async {
+    emit(state.copyWith(status: WalletStatusList.loading));
+    var applicationModel = ApplicationModel(sourceList: {}, password: password);
+    List<AbstractAccountModel> accountList = [];
+
+    bool hasHistory = true;
+
+    //TODO: maybe we need move this to different service
+
+    var source = applicationModel.createSource(
+        null,
+        null,
+        null,
+        password,
+        SourceName.ledger
+    );
+
+    var accountIndex = 0;
+    while (hasHistory) {
+      late AbstractAccountModel account;
+      try {
+        account = await LedgerAccountModel.fromLedger(
+          publicKey: pubKey,
+          network: applicationModel.networks.first,
+          address: address,
+          sourceId: source.id,
+          isRestore: true,
+        );
+        for(var network in applicationModel.networks){
+          if(network.networkType.networkName.name == NetworkName.defichainMainnet.name){
+            await (network.stakingList[0] as LockStakingProviderModel).signIn(
+              account,
+              password,
+              applicationModel,
+              network,
+            );
+            await (network.rampList[0] as DFXRampModel).signIn(
+              account,
+              password,
+              applicationModel,
+              network,
+            );
+          }
+        }
+
+      } catch (_) {
+        print(_);
+        rethrow;
+      }
+
+      //TODO: check tx history here
+      bool presentBalance = false;
+      applicationModel.networks.forEach((element) {
+        var balanceList = account.getPinnedBalances(element);
+        if (balanceList.length > 1 || balanceList.first.balance != 0) {
+          presentBalance = true;
+        }
+      });
+      hasHistory = presentBalance;
+      if (presentBalance) {
         accountList.add(account);
         accountIndex++;
       }
@@ -257,19 +364,17 @@ class WalletCubit extends Cubit<WalletState> {
       status: WalletStatusList.loading,
     ));
     ApplicationModel applicationModel = state.applicationModel!;
+    late AbstractAccountModel account;
     int maxIndex = 0;
     applicationModel.accounts.forEach((element) =>
-        (element as AccountModel).accountIndex > maxIndex
-            ? maxIndex = element.accountIndex
-            : null);
-    SourceSeedModel source =
-        applicationModel.sourceList.values.first as SourceSeedModel;
-    AbstractAccountModel account = await AccountModel.fromPublicKeys(
-        networkList: applicationModel.networks,
-        accountIndex: maxIndex + 1,
-        publicKeyMainnet: source.publicKeyMainnet,
-        publicKeyTestnet: source.publicKeyTestnet,
-        sourceId: source.id);
+    (element as AccountModel).accountIndex > maxIndex ?
+    maxIndex = element.accountIndex : null);
+
+    //TODO: ledger: here need to select needed source
+    SourceModel source = applicationModel.sourceList.values.first;
+       account = await AccountModel.fromPublicKeys(networkList: applicationModel.networks,  accountIndex: maxIndex+1, publicKeyMainnet: source.publicKeyMainnet!, publicKeyTestnet: source.publicKeyTestnet!, sourceId: source.id);
+
+
     account.changeName(name);
     applicationModel.accounts.add(account);
 

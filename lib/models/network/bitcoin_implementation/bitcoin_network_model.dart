@@ -213,7 +213,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
   Future<ECPair> getKeypair(String password, AbstractAccountModel account,
       ApplicationModel applicationModel) async {
     var mnemonic =
-        (applicationModel.sourceList[account.sourceId]! as SourceSeedModel)
+        (applicationModel.sourceList[account.sourceId]! as SourceModel)
             .getMnemonic(password);
     var masterKey = getMasterKeypairFormMnemonic(mnemonic);
     return _getKeypairForPathPrivateKey(
