@@ -2,6 +2,7 @@ import 'package:defi_wallet/bloc/available_amount/available_amount_cubit.dart';
 import 'package:defi_wallet/constants/input_formatters.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -22,6 +23,7 @@ class AmountField extends StatefulWidget {
   final bool isAvailableTo;
   final TxType? type;
   final AccountModel? account;
+  final BalanceModel? balance;
 
   AmountField({
     required this.onAssetSelect,
@@ -31,6 +33,7 @@ class AmountField extends StatefulWidget {
     required this.assets,
     this.type,
     this.account,
+    this.balance,
     this.available = 35.02,
     this.suffix = '\$365.50',
     this.isDisabledSelector = false,
@@ -73,11 +76,11 @@ class _AmountFieldState extends State<AmountField> {
       BlocProvider.of<AvailableAmountCubit>(context);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (widget.type == TxType.send) {
-        await availableAmountCubit.getAvailable(
-          widget.selectedAsset.symbol!,
-          widget.type!,
-          widget.account!,
-        );
+        // await availableAmountCubit.getAvailable(
+        //   widget.selectedAsset.symbol!,
+        //   widget.type!,
+        //   widget.account!,
+        // );
       } else if (widget.type == null) {
         await availableAmountCubit.btcAvailableBalance(
           widget.available!,
@@ -85,20 +88,17 @@ class _AmountFieldState extends State<AmountField> {
       }
       if (widget.type == TxType.swap || widget.type == TxType.addLiq) {
         if (widget.isAvailableTo) {
-          String assetSymbol = SettingsHelper.isBitcoin()
-              ? widget.selectedAsset.symbol!.replaceAll('d', '')
-              : widget.selectedAsset.symbol!;
-          await availableAmountCubit.getAvailableTo(
-            assetSymbol,
-            widget.type!,
-            widget.account!,
-          );
+          // await availableAmountCubit.getAvailableTo(
+          //   assetSymbol,
+          //   widget.type!,
+          //   widget.account!,
+          // );
         } else {
-          await availableAmountCubit.getAvailableFrom(
-            widget.selectedAsset.symbol!,
-            widget.type!,
-            widget.account!,
-          );
+          // await availableAmountCubit.getAvailableFrom(
+          //   widget.selectedAsset.symbol!,
+          //   widget.type!,
+          //   widget.account!,
+          // );
         }
       }
     });
@@ -112,7 +112,7 @@ class _AmountFieldState extends State<AmountField> {
 
   @override
   Widget build(BuildContext context) {
-    _loadAvailableBalance(context);
+    // var available = widget.balance!.balance.toString();
 
     return GestureDetector(
       onTap: () => _focusNode.requestFocus(),
@@ -193,57 +193,29 @@ class _AmountFieldState extends State<AmountField> {
                             .withOpacity(0.3),
                       ),
                 ),
-                BlocBuilder<AvailableAmountCubit, AvailableAmountState>(
-                  buildWhen: (prev, current) => current.status ==
-                      AvailableAmountStatusList.success,
-                  builder: (availableAmountContext, availableAmountState) {
-                    if (availableAmountState.status !=
-                        AvailableAmountStatusList.success) {
-                      return Container();
-                    } else {
-                      late String available;
-                      if (widget.type != null) {
-                        if (widget.type == TxType.send) {
-                          available = availableAmountState.available.toString();
-                        } else if (widget.type == TxType.swap ||
-                            widget.type == TxType.addLiq) {
-                          if (widget.isAvailableTo) {
-                            available =
-                                availableAmountState.availableTo.toString();
-                          } else {
-                            available =
-                                availableAmountState.availableFrom.toString();
-                          }
-                        }
-                      } else {
-                        available = widget.available.toString();
-                      }
-                      return GestureDetector(
-                        onTap: () {
-                          if (widget.controller.text != available) {
-                            widget.controller.text = available;
-                            widget.onChanged(widget.controller.text);
-                            _focusNode.requestFocus();
-                          }
-                        },
-                        child: MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: Text(
-                            'Available: $available',
-                            style:
-                                Theme.of(context).textTheme.headline6!.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline6!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
-                          ),
-                        ),
-                      );
+                GestureDetector(
+                  onTap: () {
+                    if (widget.controller.text != widget.available.toString()) {
+                      widget.controller.text = widget.available.toString();
+                      widget.onChanged(widget.controller.text);
+                      _focusNode.requestFocus();
                     }
                   },
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Text(
+                      'Available: ${widget.available}',
+                      style:
+                      Theme.of(context).textTheme.headline6!.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context)
+                            .textTheme
+                            .headline6!
+                            .color!
+                            .withOpacity(0.3),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             )

@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
@@ -32,7 +34,7 @@ class BuySelectCurrencyScreen extends StatefulWidget {
 }
 
 class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
-    with ThemeMixin {
+    with ThemeMixin, SnackBarMixin {
   String symbol = '';
   String titleText = 'Select currency';
   String subtitleText = 'Select the token you want to buy';
@@ -59,9 +61,9 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
 
   @override
   Widget build(BuildContext context) {
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
     if (iterator == 0) {
-      fiatCubit.loadAvailableAssets();
+      rampCubit.loadAssets();
       iterator++;
     }
     return ScaffoldWrapper(
@@ -71,23 +73,10 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
         TransactionState txState,
       ) {
         return BlocBuilder<TokensCubit, TokensState>(builder: (context, tokensState) {
-          return BlocBuilder<FiatCubit, FiatState>(
-            builder: (context, fiatState) {
-              if (fiatState.status == FiatStatusList.loading) {
-                return Loader();
-              } else if (fiatState.status == FiatStatusList.expired) {
-                Future.microtask(() => Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) =>
-                          LockScreen(),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    )));
-                return Container();
-              } else {
-                FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-                List<AssetByFiatModel> availableTokens = fiatCubit.getAssetsWithoutPair(fiatState.foundAssets!);
+          return BlocBuilder<RampCubit, RampState>(
+            builder: (context, rampState) {
+              if (rampState.status == RampStatusList.success) {
+                List<AssetByFiatModel> availableTokens = rampState.buyableAssets!;
                 return Scaffold(
                   drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                   endDrawer: isFullScreen ? null : AccountDrawer(
@@ -160,7 +149,7 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                                 CustomTextFormField(
                                   prefix: Icon(Icons.search),
                                   addressController: searchController,
-                                  hintText: 'Search in Settings',
+                                  hintText: 'Search Token',
                                   isBorder: true,
                                   onChanged: (value) {
                                     TokensCubit token =
@@ -168,7 +157,7 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                                     setState(() {
                                       FiatCubit fiat =
                                       BlocProvider.of<FiatCubit>(context);
-                                      fiat.search(fiatState.assets, value);
+                                      fiat.search(rampState.assets, value);
                                     });
                                   },
                                 ),
@@ -323,17 +312,13 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                                   width: 104,
                                   callback: () async {
                                     if (symbol == '') {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Chose a coin',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5,
-                                          ),
-                                          backgroundColor: Theme.of(context)
-                                              .snackBarTheme
-                                              .backgroundColor,
+                                      showSnackBar(
+                                        context,
+                                        title: 'Chose a coin',
+                                        color: AppColors.txStatusError.withOpacity(0.1),
+                                        prefix: Icon(
+                                          Icons.close,
+                                          color: AppColors.txStatusError,
                                         ),
                                       );
                                     } else {
@@ -352,6 +337,18 @@ class _BuySelectCurrencyScreenState extends State<BuySelectCurrencyScreen>
                     ),
                   ),
                 );
+              } else if (rampState.status == RampStatusList.expired) {
+                Future.microtask(() => Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) =>
+                          LockScreen(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    )));
+                return Container();
+              } else {
+                return Loader();
               }
             },
           );

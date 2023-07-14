@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/mixins/dialog_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -39,7 +39,7 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
   void initState() {
     super.initState();
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-    currentAddress = lockCubit.state.lockStakingDetails!.depositAddress!;
+    currentAddress = lockCubit.state.stakingModel!.depositAddress;
   }
 
   @override
@@ -159,25 +159,25 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
                           SizedBox(
                             height: 8,
                           ),
-                          BlocBuilder<AccountCubit, AccountState>(
+                          BlocBuilder<WalletCubit, WalletState>(
                             builder: (context, state) {
                               return Column(
                                 children: List.generate(
-                                  state.accounts!.length + 1,
+                                  state.accounts.length + 1,
                                       (index) {
-                                    if (index < state.accounts!.length)
+                                    if (index < state.accounts.length)
                                       return Column(
                                         children: [
                                           TokenListTile(
                                             isSingleSelect: true,
                                             isSelect:
-                                            currentAddress == state.accounts![index].addressList![0].address,
+                                            currentAddress == state.accounts[index].addresses['defichainMainnet'],
                                             tokenName: '',
                                             availableTokenName: '',
                                             onTap: () {
                                               setState(() {
-                                                currentLabel = state.accounts![index].name!;
-                                                currentAddress = state.accounts![index].addressList![0].address!;
+                                                currentLabel = state.accounts[index].name;
+                                                currentAddress = state.accounts[index].addresses['defichainMainnet']!;
                                               });
                                             },
                                             customContent: Row(
@@ -206,7 +206,7 @@ class _ChoosePayoutStrategyDialogState extends State<ChoosePayoutStrategyDialog>
                                                   width: 8,
                                                 ),
                                                 Text(
-                                                  state.accounts![index].name!,
+                                                  state.accounts[index].name,
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .headline5!

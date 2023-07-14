@@ -70,102 +70,94 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
             ),
           ],
         ),
-        GestureDetector(
-          onDoubleTap: () {
-            _focusNode.requestFocus();
-            widget.ibanController!.selection = TextSelection(
-                baseOffset: 0,
-                extentOffset: widget.ibanController!.text.length);
-          },
-          child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.transparent)),
-              child: Focus(
-                onFocusChange: (focused) {
-                  if (widget.onFocus != null) {
-                    widget.onFocus!();
-                  }
-                },
-                child: TextFormField(
-                  focusNode: _focusNode,
-                  textAlignVertical: TextAlignVertical.center,
-                  style: Theme.of(context).textTheme.headline5!.copyWith(
+        Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.transparent)),
+            child: Focus(
+              onFocusChange: (focused) {
+                if (widget.onFocus != null) {
+                  widget.onFocus!();
+                }
+              },
+              child: TextFormField(
+                focusNode: _focusNode,
+                textAlignVertical: TextAlignVertical.center,
+                style: Theme.of(context).textTheme.headline5!.copyWith(
+                  fontSize: 12,
+                ),
+                decoration: InputDecoration(
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 12.0, bottom: 12.0, left: 22, right: 22),
+                    child: Text(
+                      'IBAN',
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
                         fontSize: 12,
                       ),
-                  decoration: InputDecoration(
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 12.0, bottom: 12.0, left: 22, right: 22),
-                      child: Text(
-                        'IBAN',
-                        style: Theme.of(context).textTheme.headline5!.copyWith(
-                              fontSize: 12,
-                            ),
-                      ),
                     ),
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: IconButton(
-                        padding: EdgeInsets.only(left: 0),
-                        splashRadius: 1,
-                        icon: GestureDetector(
-                          onTap: () {
-                            Clipboard.getData(Clipboard.kTextPlain)
-                                .then((value) {
-                              final filter = RegExp(r'[A-Z]{2}[0-9]{20}');
-                              if (filter.hasMatch(value!.text!) &&
-                                  value.text!.length == 22) {
-                                widget.ibanController?.text = value.text!;
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                    'Invalid IBAN.',
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
-                                  )),
-                                );
-                              }
-                            });
-                          },
-                          child: SvgPicture.asset('assets/paste_icon.svg'),
-                        ),
-                        onPressed: () {},
-                      ),
-                    ),
-                    hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
-                    filled: true,
-                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                    enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                    focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                    hintStyle: passwordField.copyWith(
-                      color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                    hintText: widget.hintText,
                   ),
-                  onChanged: widget.onChanged,
-                  controller: widget.ibanController,
-                  inputFormatters: _maskFormatter,
-                  validator: (value) {
-                    switch (validationRule) {
-                      case 'IBAN':
-                        return value == null || value.isEmpty
-                            ? 'Please enter this field'
-                            : value != null && value.length < 16
-                                ? "Enter 16 characters"
-                                : null;
-                      default:
-                        return value == null || value.isEmpty
-                            ? 'Please enter this field'
-                            : null;
-                    }
-                  },
+                  suffixIcon: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: IconButton(
+                      padding: EdgeInsets.only(left: 0),
+                      splashRadius: 1,
+                      icon: GestureDetector(
+                        onTap: () {
+                          Clipboard.getData(Clipboard.kTextPlain)
+                              .then((value) {
+                            final filter = RegExp(r'[A-Z]{2}[0-9]{20}');
+                            if (filter.hasMatch(value!.text!) &&
+                                value.text!.length == 22) {
+                              widget.ibanController?.text = value.text!;
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                      'Invalid IBAN.',
+                                      style:
+                                      Theme.of(context).textTheme.headline5,
+                                    )),
+                              );
+                            }
+                          });
+                        },
+                        child: SvgPicture.asset('assets/paste_icon.svg'),
+                      ),
+                      onPressed: () {},
+                    ),
+                  ),
+                  hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
+                  filled: true,
+                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                  enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                  focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                  hintStyle: passwordField.copyWith(
+                    color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                  hintText: widget.hintText,
                 ),
-              )),
-        ),
+                onChanged: widget.onChanged,
+                controller: widget.ibanController,
+                inputFormatters: _maskFormatter,
+                validator: (value) {
+                  switch (validationRule) {
+                    case 'IBAN':
+                      return value == null || value.isEmpty
+                          ? 'Please enter this field'
+                          : value != null && value.length < 16
+                          ? "Enter 16 characters"
+                          : null;
+                    default:
+                      return value == null || value.isEmpty
+                          ? 'Please enter this field'
+                          : null;
+                  }
+                },
+              ),
+            )),
       ],
     );
   }

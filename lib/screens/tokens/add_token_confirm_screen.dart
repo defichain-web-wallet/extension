@@ -1,8 +1,8 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -20,11 +20,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddTokenConfirmScreen extends StatefulWidget {
-  final List<String> arguments;
+  final List<TokenModel> tokens;
 
   const AddTokenConfirmScreen({
     Key? key,
-    required this.arguments,
+    required this.tokens,
   }) : super(key: key);
 
   @override
@@ -36,163 +36,149 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
   TextEditingController searchController = TextEditingController();
   TokensHelper tokenHelper = TokensHelper();
   String titleText = 'Add token';
-  List<String> symbols = [];
 
   @override
   Widget build(BuildContext context) {
-    symbols = widget.arguments;
     return ScaffoldWrapper(
       builder: (
         BuildContext context,
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (context, accountState) {
-            if (accountState.status == AccountStatusList.success) {
-              return Scaffold(
-                drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: isFullScreen ? null : AccountDrawer(
-                  width: buttonSmallWidth,
-                ),
-                appBar: isFullScreen ? null : NewMainAppBar(
-                  isShowLogo: false,
-                ),
-                body: Container(
-                  padding: EdgeInsets.only(
-                    top: 22,
-                    bottom: 22,
-                    left: 16,
-                    right: 16,
-                  ),
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    color: isDarkTheme()
-                        ? DarkColors.scaffoldContainerBgColor
-                        : LightColors.scaffoldContainerBgColor,
-                    border: isDarkTheme()
-                        ? Border.all(
-                            width: 1.0,
-                            color: Colors.white.withOpacity(0.05),
-                          )
-                        : null,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      topLeft: Radius.circular(20),
-                      bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
-                      bottomRight: Radius.circular(isFullScreen ? 20 : 0),
-                    ),
-                  ),
-                  child: Center(
-                    child: StretchBox(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              PageTitle(
-                                title: titleText,
-                                isFullScreen: isFullScreen,
-                              ),
-                              SizedBox(
-                                height: 16,
-                              ),
-                              CustomTextFormField(
-                                prefix: Icon(Icons.search),
-                                addressController: searchController,
-                                hintText: 'Search in Settings',
-                                isBorder: true,
-                                onChanged: (value) {},
-                              ),
-                              SizedBox(
-                                height: 16,
-                              ),
-                              Text(
-                                searchController.text == ''
-                                    ? 'Popular Tokens'
-                                    : 'Search result',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline6!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
-                                textAlign: TextAlign.start,
-                              ),
-                              Container(
-                                height: 288,
-                                child: ListView.builder(
-                                  itemCount: symbols.length,
-                                  itemBuilder: (BuildContext context, index) {
-                                    String tokenName = symbols[index];
-                                    return Column(
-                                      children: [
-                                        SizedBox(
-                                          height: 8,
-                                        ),
-                                        TokenListTile(
-                                          isConfirm: true,
-                                          onTap: () {
-                                            print('12');
-                                          },
-                                          isSelect: false,
-                                          tokenName: '$tokenName',
-                                          availableTokenName:
-                                              '${symbols[index]}',
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
+        return Scaffold(
+          drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
+          endDrawer: isFullScreen ? null : AccountDrawer(
+            width: buttonSmallWidth,
+          ),
+          appBar: isFullScreen ? null : NewMainAppBar(
+            isShowLogo: false,
+          ),
+          body: Container(
+            padding: EdgeInsets.only(
+              top: 22,
+              bottom: 22,
+              left: 16,
+              right: 16,
+            ),
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              color: isDarkTheme()
+                  ? DarkColors.scaffoldContainerBgColor
+                  : LightColors.scaffoldContainerBgColor,
+              border: isDarkTheme()
+                  ? Border.all(
+                width: 1.0,
+                color: Colors.white.withOpacity(0.05),
+              )
+                  : null,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20),
+                topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                bottomRight: Radius.circular(isFullScreen ? 20 : 0),
+              ),
+            ),
+            child: Center(
+              child: StretchBox(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PageTitle(
+                          title: titleText,
+                          isFullScreen: isFullScreen,
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        CustomTextFormField(
+                          prefix: Icon(Icons.search),
+                          addressController: searchController,
+                          hintText: 'Search Token',
+                          isBorder: true,
+                          onChanged: (value) {},
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        Text(
+                          searchController.text == ''
+                              ? 'Popular Tokens'
+                              : 'Search result',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline6!
+                              .copyWith(
+                            color: Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .color!
+                                .withOpacity(0.3),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                width: 104,
-                                child: AccentButton(
-                                  callback: () {
-                                    NavigatorService.pop(context);
-                                  },
-                                  label: 'Cancel',
-                                ),
-                              ),
-                              NewPrimaryButton(
-                                width: 104,
-                                callback: () => submitAddToken(accountState),
-                                title: 'Confirm',
-                              ),
-                            ],
+                          textAlign: TextAlign.start,
+                        ),
+                        Container(
+                          height: 288,
+                          child: ListView.builder(
+                            itemCount: widget.tokens.length,
+                            itemBuilder: (BuildContext context, index) {
+                              TokenModel token = widget.tokens[index];
+                              return Column(
+                                children: [
+                                  SizedBox(
+                                    height: 8,
+                                  ),
+                                  TokenListTile(
+                                    isConfirm: true,
+                                    isSelect: false,
+                                    tokenName: token.symbol,
+                                    availableTokenName:
+                                    token.name,
+                                  ),
+                                ],
+                              );
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 104,
+                          child: AccentButton(
+                            callback: () {
+                              NavigatorService.pop(context);
+                            },
+                            label: 'Cancel',
+                          ),
+                        ),
+                        NewPrimaryButton(
+                          width: 104,
+                          callback: () => submitAddToken(),
+                          title: 'Confirm',
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              );
-            } else {
-              return Loader();
-            }
-          },
+              ),
+            ),
+          ),
         );
       },
     );
   }
 
-  submitAddToken(state) async {
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+  submitAddToken() async {
+    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
 
-    for (var tokenName in symbols) {
-      await accountCubit.addToken(tokenName);
-    }
+    await tokensCubit.addTokens(context, widget.tokens);
+
     LoggerService.invokeInfoLogg('user added new token');
     NavigatorService.pushReplacement(context, null);
   }

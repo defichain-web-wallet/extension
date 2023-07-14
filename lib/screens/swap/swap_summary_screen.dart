@@ -1,15 +1,11 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
-import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -29,22 +25,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SwapSummaryScreen extends StatefulWidget {
-  final String assetFrom;
-  final String assetTo;
-  final double amountFrom;
-  final double amountTo;
-  final double slippage;
-  final String btcTx;
+  // final String assetFrom;
+  // final String assetTo;
+  // final double amountFrom;
+  // final double amountTo;
+  // final double slippage;
+  // final String btcTx;
 
-  const SwapSummaryScreen(this.assetFrom, this.assetTo, this.amountFrom,
-      this.amountTo, this.slippage,
-      {this.btcTx = ''});
+  const SwapSummaryScreen();
 
   @override
   _SwapSummaryScreenState createState() => _SwapSummaryScreenState();
 }
 
-class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
+class _SwapSummaryScreenState extends State<SwapSummaryScreen>
+    with ThemeMixin, FormatMixin {
   BalancesHelper balancesHelper = BalancesHelper();
   TransactionService transactionService = TransactionService();
   bool isFailed = false;
@@ -105,7 +100,18 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
     );
   }
 
-  Widget _buildBody(context, isFullScreen) => StretchBox(
+  Widget _buildBody(context, isFullScreen) => BlocBuilder<ExchangeCubit, ExchangeState>(
+  builder: (context, state) {
+    ExchangeCubit exchangeCubit = BlocProvider.of<ExchangeCubit>(context);
+    final amountFrom = formatNumberStyling(
+      state.amountFrom,
+      fixedCount: 8,
+    );
+    final amountTo = formatNumberStyling(
+      state.amountTo,
+      fixedCount: 8,
+    );
+    return StretchBox(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -162,7 +168,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                   AssetLogo(
                                     size: 24,
                                     assetStyle:
-                                    TokensHelper().getAssetStyleByTokenName(widget.assetFrom),
+                                    TokensHelper().getAssetStyleByTokenName(state.selectedBalance!.token!.symbol),
                                     borderWidth: 0,
                                     isBorder: false,
 
@@ -171,7 +177,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                     width: 6,
                                   ),
                                   Text(
-                                    widget.amountFrom.toString(),
+                                    amountFrom,
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline3!
@@ -202,7 +208,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                             AssetLogo(
                               size: 24,
                               assetStyle:
-                              TokensHelper().getAssetStyleByTokenName(widget.assetTo),
+                              TokensHelper().getAssetStyleByTokenName(state.selectedSecondInputBalance!.token!.symbol),
                               borderWidth: 0,
                               isBorder: false,
                             ),
@@ -210,7 +216,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               width: 6,
                             ),
                             Text(
-                              widget.amountTo.toString(),
+                              amountTo,
                               style: Theme.of(context)
                                   .textTheme
                                   .headline3!
@@ -239,12 +245,7 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: BlocBuilder<AccountCubit, AccountState>(
-                  builder: (context, state) {
-                return BlocBuilder<TokensCubit, TokensState>(
-                  builder: (context, tokensState) {
-                    if (tokensState.status == TokensStatusList.success) {
-                      return Row(
+              child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
@@ -264,13 +265,13 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                               pendingText: 'Pending',
                               isCheckLock: false,
                               callback: (parent) async {
-                                final isLedger =
-                                    await SettingsHelper.isLedger();
-
-                                parent.emitPending(true);
-                                if (widget.btcTx != '') {
-                                  submitSwap(state, tokensState, "");
-                                } else if (!isLedger) {
+                                // final isLedger =
+                                //     await SettingsHelper.isLedger();
+                                //
+                                // parent.emitPending(true);
+                                // if (widget.btcTx != '') {
+                                //   submitSwap(state, tokensState, "");
+                                // } else if (!isLedger) {
                                   showDialog(
                                     barrierColor: AppColors.tolopea.withOpacity(0.06),
                                     barrierDismissible: false,
@@ -280,78 +281,55 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
                                           onSubmit: (password) async {
                                         parent.emitPending(true);
                                         await submitSwap(
+                                          context,
                                           state,
-                                          tokensState,
+                                          exchangeCubit,
                                           password,
                                         );
                                         parent.emitPending(false);
                                       });
                                     },
                                   );
-                                } else if (isLedger) {
-                                  showDialog(
-                                    barrierColor: AppColors.tolopea.withOpacity(0.06),
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (BuildContext context1) {
-                                      return LedgerCheckScreen(
-                                          onStartSign: (p, c) async {
-                                        parent.emitPending(true);
-                                        p.emitPending(true);
-                                        await submitSwap(
-                                            state, tokensState, null,
-                                            callbackOk: () {
-                                          Navigator.pop(c);
-                                        }, callbackFail: () {
-                                          parent.emitPending(true);
-                                          p.emitPending(true);
-                                        });
-                                        parent.emitPending(false);
-                                        p.emitPending(false);
-                                      });
-                                    },
-                                  );
-                                }
+                                // }
+                                // else if (isLedger) {
+                                //   showDialog(
+                                //     barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                //     barrierDismissible: false,
+                                //     context: context,
+                                //     builder: (BuildContext context1) {
+                                //       return LedgerCheckScreen(
+                                //           onStartSign: (p, c) async {
+                                //         parent.emitPending(true);
+                                //         p.emitPending(true);
+                                //         await submitSwap(
+                                //             state, tokensState, null,
+                                //             callbackOk: () {
+                                //           Navigator.pop(c);
+                                //         }, callbackFail: () {
+                                //           parent.emitPending(true);
+                                //           p.emitPending(true);
+                                //         });
+                                //         parent.emitPending(false);
+                                //         p.emitPending(false);
+                                //       });
+                                //     },
+                                //   );
+                                // }
                               },
                             ),
                           ),
                         ],
-                      );
-                    } else {
-                      return Container();
-                    }
-                  },
-                );
-              }),
+                      )
             )
           ],
         ),
-      );
+      ); });
 
-  submitSwap(state, tokenState, String? password,
+  submitSwap(context, ExchangeState exchangeState, ExchangeCubit exchangeCubit, String? password,
       {final Function()? callbackOk, final Function()? callbackFail}) async {
-    if (state.status == AccountStatusList.success) {
       late TxErrorModel txResponse;
-
       try {
-        if (widget.btcTx != '') {
-          BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
-          txResponse = await bitcoinCubit.sendTransaction(widget.btcTx);
-        }
-        if (widget.assetFrom != widget.assetTo) {
-          txResponse = await transactionService.createAndSendSwap(
-              keyPair: password != null
-                  ? (await HDWalletService().getKeypairFromStorage(
-                      password, state.activeAccount.index!))
-                  : null,
-              account: state.activeAccount,
-              tokenFrom: widget.assetFrom,
-              tokenTo: widget.assetTo,
-              amount: balancesHelper.toSatoshi(widget.amountFrom.toString()),
-              amountTo: balancesHelper.toSatoshi(widget.amountTo.toString()),
-              slippage: widget.slippage,
-              tokens: tokenState.tokens);
-        }
+          txResponse = await exchangeCubit.exchange(context, password);
       } on Exception catch (err) {
         print(err);
         throw err;
@@ -393,14 +371,14 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen> with ThemeMixin {
             callbackTryAgain: () async {
               print('TryAgain');
               await submitSwap(
-                state,
-                tokenState,
+                context,
+                exchangeState,
+                exchangeCubit,
                 password,
               );
             },
           );
         },
       );
-    }
   }
 }

@@ -1,41 +1,39 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/transaction/tx_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/dfx_requests.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
-import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/fields/iban_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
+import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/currency_selector.dart';
 import 'package:defi_wallet/widgets/selectors/iban_selector.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -58,11 +56,11 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
   static const completeKycType = 'Completed';
 
   final TextEditingController amountController =
-  TextEditingController(text: '0');
+      TextEditingController(text: '0');
   final TextEditingController _ibanController = TextEditingController();
   late FiatModel selectedFiat;
   final GlobalKey<IbanSelectorState> selectKeyIban =
-  GlobalKey<IbanSelectorState>();
+      GlobalKey<IbanSelectorState>();
   final _formKey = GlobalKey<FormState>();
 
   DfxRequests dfxRequests = DfxRequests();
@@ -88,178 +86,155 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       builder: (
-          BuildContext context,
-          bool isFullScreen,
-          TransactionState txState,
-          ) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (accountContext, accountState) {
+        BuildContext context,
+        bool isFullScreen,
+        TransactionState transactionState,
+      ) {
+        return BlocBuilder<WalletCubit, WalletState>(
+          builder: (accountContext, walletState) {
             if (iteratorFiat == 0) {
-              FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-              fiatCubit.loadAllAssets(isSell: true);
+              RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
+              rampCubit.loadFiatAssets();
               iteratorFiat++;
             }
-            return BlocBuilder<TokensCubit, TokensState>(
-              builder: (context, tokensState) {
-                return BlocBuilder<FiatCubit, FiatState>(
-                  builder: (BuildContext context, fiatState) {
-                    if (fiatState.status == FiatStatusList.loading) {
-                      return Loader();
-                    } else if (fiatState.status == FiatStatusList.expired) {
-                      Future.microtask(() => Navigator.pushReplacement(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) =>
-                                LockScreen(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          )));
-                      return Container();
-                    } else {
-                      IbanModel? currentIban;
-                      if (iterator == 0) {
-                        String targetFiat = widget.fiatName.isEmpty
-                            ? defaultCurrency
-                            : widget.fiatName;
-                        selectedFiat = fiatState.sellableFiatList!
-                            .firstWhere((element) => element.name == targetFiat);
-                        accountState.activeAccount!.balanceList!.forEach((el) {
-                          try {
-                            var assetList = fiatState.assets!.where((element) =>
-                            element.dexName == el.token && !el.isHidden!);
-                            assets.add(List.from(assetList)[0].dexName);
-                          } catch (_) {
-                            print(_);
-                          }
-                        });
-                        currentAsset = currentAsset ??
-                            getTokensList(accountState, tokensState, assets)
-                                .first;
-                        iterator++;
-                      }
-                      List<IbanModel> ibans = fiatState.ibanList!
-                          .where((element) =>
-                              element.fiat!.name! == selectedFiat.name!)
-                          .toList();
-                      List<String> stringIbans = [];
-                      List<IbanModel> uniqueIbans = [];
+            return BlocBuilder<TxCubit, TxState>(
+              builder: (context, txState) {
+                TxCubit txCubit = BlocProvider.of<TxCubit>(context);
 
-                      ibans.forEach((element) {
-                        stringIbans.add(element.iban!);
-                      });
+                if (txState.status == TxStatusList.initial) {
+                  txCubit.init(context, TxType.send);
+                }
 
-                      var stringUniqueIbans =
-                      Set<String>.from(stringIbans).toList();
-
-                      stringUniqueIbans.forEach((element) {
-                        uniqueIbans.add(fiatState.ibanList!
-                            .firstWhere((el) => el.iban == element));
-                      });
-                      return Scaffold(
-                        drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                        endDrawer: isFullScreen ? null : AccountDrawer(
-                          width: buttonSmallWidth,
-                        ),
-                        appBar: isFullScreen ? null : NewMainAppBar(
-                          isShowLogo: false,
-                        ),
-                        body: GestureDetector(
-                          onTap: hideOverlay,
-                          child: Container(
-                            padding: EdgeInsets.only(
-                              top: 22,
-                              bottom: 22,
-                              left: 16,
-                              right: 16,
-                            ),
-                            width: double.infinity,
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                              color: isDarkTheme()
-                                  ? DarkColors.drawerBgColor
-                                  : LightColors.scaffoldContainerBgColor,
-                              border: isDarkTheme()
-                                  ? Border.all(
-                                width: 1.0,
-                                color: Colors.white.withOpacity(0.05),
-                              )
-                                  : null,
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(20),
-                                topLeft: Radius.circular(20),
-                                bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
-                                bottomRight: Radius.circular(isFullScreen ? 20 : 0),
+                if (txState.status == TxStatusList.success) {
+                  return BlocBuilder<RampCubit, RampState>(
+                    builder: (BuildContext context, rampState) {
+                      if (rampState.status == RampStatusList.loading) {
+                        return Loader();
+                      } else if (rampState.status == RampStatusList.expired) {
+                        Future.microtask(() => Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation1, animation2) =>
+                                  LockScreen(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            )));
+                        return Container();
+                      } else {
+                        if (iterator == 0) {
+                          String targetFiat = widget.fiatName.isEmpty
+                              ? defaultCurrency
+                              : widget.fiatName;
+                          selectedFiat = rampState.fiatAssets!.firstWhere(
+                              (element) => element.name == targetFiat);
+                          iterator++;
+                        }
+                        List<IbanModel> uniqueIbans = rampState.uniqueIbans(
+                          selectedFiat,
+                        );
+                        return Scaffold(
+                          drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
+                          endDrawer: isFullScreen ? null : AccountDrawer(
+                            width: buttonSmallWidth,
+                          ),
+                          appBar: isFullScreen ? null : NewMainAppBar(
+                            isShowLogo: false,
+                            callback: hideOverlay,
+                          ),
+                          body: GestureDetector(
+                            onTap: hideOverlay,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                top: 22,
+                                bottom: 22,
+                                left: 16,
+                                right: 16,
                               ),
-                            ),
-                            child: Center(
-                              child: StretchBox(
-                                child: Column(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: Form(
-                                        key: _formKey,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            PageTitle(
-                                              title: titleText,
-                                              isFullScreen: isFullScreen,
-                                            ),
-                                            SizedBox(
-                                              height: 16,
-                                            ),
-                                            AmountField(
-                                              type: TxType.send,
-                                              account: accountState.activeAccount!,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  balanceInUsd =
-                                                      getUsdBalance(context);
-                                                });
-                                              },
-                                              suffix: balanceInUsd ??
-                                                  getUsdBalance(context),
-                                              onAssetSelect: (t) {
-                                                setState(() {
-                                                  currentAsset = t;
-                                                });
-                                              },
-                                              controller: amountController,
-                                              selectedAsset: currentAsset!,
-                                              assets: getTokensList(
-                                                accountState,
-                                                tokensState,
-                                                assets,
+                              width: double.infinity,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                color: isDarkTheme()
+                                    ? DarkColors.drawerBgColor
+                                    : LightColors.scaffoldContainerBgColor,
+                                border: isDarkTheme()
+                                    ? Border.all(
+                                        width: 1.0,
+                                        color: Colors.white.withOpacity(0.05),
+                                      )
+                                    : null,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(20),
+                                  topLeft: Radius.circular(20),
+                                  bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                                  bottomRight: Radius.circular(isFullScreen ? 20 : 0),
+                                ),
+                              ),
+                              child: Center(
+                                child: StretchBox(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: Form(
+                                          key: _formKey,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              PageTitle(
+                                                title: titleText,
+                                                isFullScreen: isFullScreen,
                                               ),
-                                            ),
-                                            SizedBox(height: 16),
-                                            Text(
-                                              'Fiat Currency',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline5,
-                                              textAlign: TextAlign.start,
-                                            ),
-                                            SizedBox(
-                                              height: 6,
-                                            ),
-                                            CurrencySelector(
-                                              currencies: fiatState.sellableFiatList!,
-                                              selectedCurrency: selectedFiat,
-                                              onSelect: (selected) {
-                                                setState(() {
-                                                  selectedFiat = selected;
-                                                });
-                                              },
-                                            ),
-                                            SizedBox(height: 16),
-                                            Container(
+                                              SizedBox(
+                                                height: 16,
+                                              ),
+                                              AmountField(
+                                                type: TxType.send,
+                                                balance: txState.activeBalance,
+                                                available:
+                                                    txState.availableBalance,
+                                                onChanged: (value) {
+                                                  setState(() {});
+                                                },
+                                                onAssetSelect: (asset) async {
+                                                  txCubit.changeActiveBalance(
+                                                    context,
+                                                    asset,
+                                                    TxType.send,
+                                                  );
+                                                },
+                                                suffix: balanceInUsd ?? '0.00',
+                                                controller: amountController,
+                                                assets: txState.balances!,
+                                              ),
+                                              SizedBox(height: 16),
+                                              Text(
+                                                'Fiat Currency',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5,
+                                                textAlign: TextAlign.start,
+                                              ),
+                                              SizedBox(
+                                                height: 6,
+                                              ),
+                                              CurrencySelector(
+                                                currencies:
+                                                    rampState.fiatAssets!,
+                                                selectedCurrency: selectedFiat,
+                                                onSelect: (selected) {
+                                                  setState(() {
+                                                    selectedFiat = selected;
+                                                  });
+                                                },
+                                              ),
+                                              SizedBox(height: 16),
+                                              Container(
                                                 child: widget.isNewIban ||
-                                                        fiatState.activeIban ==
+                                                        rampState.activeIban ==
                                                             null
                                                     ? IbanField(
                                                         isBorder: false,
@@ -272,229 +247,110 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                       )
                                                     : IbanSelector(
                                                         isBorder: false,
-                                                        fiatName: selectedFiat.name!,
+                                                        fiatName:
+                                                            selectedFiat.name!,
                                                         key: selectKeyIban,
                                                         onAnotherSelect:
                                                             hideOverlay,
                                                         ibanList: uniqueIbans,
-                                                        selectedIban:
-                                                            fiatState.activeIban!,
-                                                      )),
-                                            if (fiatState.kycStatus !=
-                                                completeKycType)
-                                            ...[
+                                                        selectedIban: rampState
+                                                            .activeIban!,
+                                                      ),
+                                              ),
                                               Padding(
-                                                padding: const EdgeInsets.symmetric(
-                                                    vertical: 6),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 6),
                                                 child: Divider(
-                                                    color: AppTheme.lightGreyColor),
+                                                    color: AppTheme
+                                                        .lightGreyColor),
                                               ),
                                               Container(
                                                 child: Row(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Column(
                                                       children: [
                                                         Container(
-                                                          padding: EdgeInsets.only(
-                                                              right: 10),
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  right: 10),
                                                           child: SvgPicture.asset(
                                                               'assets/icons/important_icon.svg'),
                                                         ),
                                                       ],
                                                     ),
                                                     Expanded(
-                                                      child: Column(
-                                                        children: [
-                                                          RichText(
-                                                            text: TextSpan(
-                                                              children: [
-                                                                TextSpan(
-                                                                    text:
+                                                      child: RichText(
+                                                        text: TextSpan(
+                                                          children: [
+                                                            TextSpan(
+                                                                text:
                                                                     'Your account needs to get verified once your daily transaction volume exceeds 900 €. If you want to increase the daily trading limit, please complete the ',
-                                                                    style: Theme.of(context).textTheme.headline6!.copyWith(
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headline6!
+                                                                    .copyWith(
                                                                         fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
+                                                                            FontWeight
+                                                                                .w600,
                                                                         color: Theme.of(context)
                                                                             .textTheme
                                                                             .headline6!
                                                                             .color!
                                                                             .withOpacity(0.6))),
-                                                                TextSpan(
-                                                                  text:
+                                                            TextSpan(
+                                                              text:
                                                                   'KYC (Know-Your-Customer) process.',
-                                                                  style: Theme.of(
+                                                              style: Theme.of(
                                                                       context)
-                                                                      .textTheme
-                                                                      .headline6!
-                                                                      .copyWith(
-                                                                      fontWeight: FontWeight
-                                                                          .w600,
-                                                                      color:
-                                                                      AppTheme.pinkColor),
-                                                                ),
-                                                              ],
+                                                                  .textTheme
+                                                                  .headline6!
+                                                                  .copyWith(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      color: AppTheme
+                                                                          .pinkColor),
                                                             ),
-                                                          ),
-                                                        ],
+                                                          ],
+                                                        ),
                                                       ),
                                                     )
                                                   ],
                                                 ),
                                               )
-                                            ]
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          width: buttonSmallWidth,
-                                          child: PendingButton(
-                                            'Sell',
-                                            callback: BalancesHelper().isAmountEmpty(amountController.text)
-                                                ? (parent) {
-                                                    showSnackBar(
-                                                      context,
-                                                      title: 'Amount is empty',
-                                                      color: AppColors
-                                                          .txStatusError
-                                                          .withOpacity(0.1),
-                                                      prefix: Icon(
-                                                        Icons.close,
-                                                        color: AppColors
-                                                            .txStatusError,
-                                                      ),
-                                                    );
-                                                  }
-                                                : (parent) async {
-                                                    parent.emitPending(true);
-                                                    lockHelper
-                                                        .provideWithLockChecker(
-                                                            context, () async {
-                                                      if (txState
-                                                          is TransactionLoadingState) {
-                                                        parent.emitPending(false);
-                                                        showSnackBar(
-                                                          context,
-                                                          title:
-                                                              'Please wait for the previous '
-                                                              'transaction',
-                                                          color: AppColors
-                                                              .txStatusError
-                                                              .withOpacity(0.1),
-                                                          prefix: Icon(
-                                                            Icons.close,
-                                                            color: AppColors
-                                                                .txStatusError,
-                                                          ),
-                                                        );
-                                                        return;
-                                                      }
-                                                      bool isEnough =
-                                                          isEnoughBalance(
-                                                              accountState);
-                                                      hideOverlay();
-                                                      if (_formKey.currentState!
-                                                          .validate()) {
-                                                        if (isEnough) {
-                                                          showDialog(
-                                                            barrierColor:
-                                                                AppColors
-                                                                    .tolopea
-                                                                    .withOpacity(
-                                                                        0.06),
-                                                            barrierDismissible:
-                                                                false,
-                                                            context: context,
-                                                            builder: (BuildContext
-                                                                context1) {
-                                                              return PassConfirmDialog(
-                                                                  onCancel: () {
-                                                                parent
-                                                                    .emitPending(
-                                                                        false);
-                                                              }, onSubmit:
-                                                                      (password) async {
-                                                                await _submitSell(
-                                                                  accountState,
-                                                                  tokensState,
-                                                                  fiatState,
-                                                                  password,
-                                                                  isFullScreen,
-                                                                );
-                                                                parent
-                                                                    .emitPending(
-                                                                        false);
-                                                              });
-                                                            },
-                                                          );
-                                                        } else {
-                                                          if (double.parse(
-                                                                  amountController
-                                                                      .text
-                                                                      .replaceAll(
-                                                                          ',',
-                                                                          '.')) ==
-                                                              0) {
-                                                            ScaffoldMessenger.of(
-                                                                    context)
-                                                                .showSnackBar(
-                                                              SnackBar(
-                                                                content: Text(
-                                                                  'Amount is empty',
-                                                                  style: Theme.of(
-                                                                          context)
-                                                                      .textTheme
-                                                                      .headline5,
-                                                                ),
-                                                                backgroundColor: Theme
-                                                                        .of(context)
-                                                                    .snackBarTheme
-                                                                    .backgroundColor,
-                                                              ),
-                                                            );
-                                                          } else {
-                                                            ScaffoldMessenger.of(
-                                                                    context)
-                                                                .showSnackBar(
-                                                              SnackBar(
-                                                                content: Text(
-                                                                  'Insufficient funds',
-                                                                  style: Theme.of(
-                                                                          context)
-                                                                      .textTheme
-                                                                      .headline5,
-                                                                ),
-                                                                backgroundColor: Theme
-                                                                        .of(context)
-                                                                    .snackBarTheme
-                                                                    .backgroundColor,
-                                                              ),
-                                                            );
-                                                          }
-                                                        }
-                                                      }
-                                                    });
-                                                  },
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ],
+                                      ),
+                                      SizedBox(
+                                        width: buttonSmallWidth,
+                                        child: PendingButton(
+                                          'Sell',
+                                          callback: (parent) => _sellCallback(
+                                            parent,
+                                            txState,
+                                            walletState,
+                                            rampState,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    }
-                  },
-                );
+                        );
+                      }
+                    },
+                  );
+                } else {
+                  return Loader();
+                }
               },
             );
           },
@@ -503,72 +359,114 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
     );
   }
 
-  getTokensList(accountState, tokensState, targetAssets) {
-    List<TokensModel> tempList = [];
-    List<TokensModel> resList = [];
-    accountState.balances!.forEach((element) {
-      tokensState.tokens!.forEach((el) {
-        if (element.token == el.symbol) {
-          tempList.add(el);
-        }
-      });
-    });
-    targetAssets.forEach((element) {
-      tempList.forEach((el) {
-        if (element == el.symbol) {
-          resList.add(el);
-        }
-      });
-    });
-
-    return resList;
-  }
-
-  String getUsdBalance(context) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    try {
-      var amount = tokenHelper.getAmountByUsd(
-        tokensCubit.state.tokensPairs!,
-        double.parse(amountController.text.replaceAll(',', '.')),
-        currentAsset!.symbol!,
+  void _sellCallback(parent, TxState txState, walletState, rampState) {
+    if (BalancesHelper().isAmountEmpty(amountController.text)) {
+      showSnackBar(
+        context,
+        title: 'Amount is empty',
+        color: AppColors.txStatusError.withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
+        ),
       );
-      return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
-    } catch (err) {
-      return '0.00';
+    } else {
+      parent.emitPending(true);
+      lockHelper.provideWithLockChecker(context, () async {
+        bool isEnough = txState.activeBalance!.balance >
+            double.parse(amountController.text);
+        hideOverlay();
+        if (_formKey.currentState!.validate()) {
+          if (isEnough) {
+            showDialog(
+              barrierColor: AppColors.tolopea.withOpacity(0.06),
+              barrierDismissible: false,
+              context: context,
+              builder: (BuildContext context1) {
+                return PassConfirmDialog(onCancel: () {
+                  parent.emitPending(false);
+                }, onSubmit: (password) async {
+                  await _submitSell(
+                    walletState,
+                    rampState,
+                    txState.currentAsset!,
+                    password,
+                  );
+                  parent.emitPending(false);
+                });
+              },
+            );
+          } else {
+            if (double.parse(amountController.text.replaceAll(',', '.')) == 0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Amount is empty',
+                    style: Theme.of(context).textTheme.headline5,
+                  ),
+                  backgroundColor:
+                      Theme.of(context).snackBarTheme.backgroundColor,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Insufficient funds',
+                    style: Theme.of(context).textTheme.headline5,
+                  ),
+                  backgroundColor:
+                      Theme.of(context).snackBarTheme.backgroundColor,
+                ),
+              );
+            }
+          }
+        }
+      });
     }
   }
 
   _submitSell(
-      AccountState accountState,
-      TokensState tokensState,
-      FiatState fiatState,
-      String password,
-      bool isFullScreen,
-      ) async {
+    WalletState walletState,
+    RampState rampState,
+    TokenModel token,
+    String password,
+  ) async {
     try {
       String address;
       double amount = double.parse(amountController.text.replaceAll(',', '.'));
       IbanModel? foundedIban;
       try {
-        foundedIban = fiatState.ibanList!.firstWhere((el) =>
-        el.active! &&
-            el.iban == fiatState.activeIban!.iban &&
+        foundedIban = rampState.ibans!.firstWhere((el) =>
+            el.isSellable! &&
+            el.active! &&
+            el.iban == rampState.activeIban!.iban &&
             el.fiat!.name == selectedFiat.name);
       } catch (_) {
         print(_);
       }
       String iban = _ibanController.text.isNotEmpty
           ? _ibanController.text
-          : fiatState.activeIban!.iban!;
+          : rampState.activeIban!.iban!;
       if (foundedIban == null || widget.isNewIban) {
-        Map sellDetails =
-        await dfxRequests.sell(iban, selectedFiat, fiatState.accessToken!);
+        Map sellDetails = await dfxRequests.sell(
+          iban,
+          selectedFiat,
+          rampState.dfxRampModel!.accessTokensMap[0]!.accessToken,
+        );
         address = sellDetails["deposit"]["address"];
       } else {
         address = foundedIban.deposit["address"];
       }
-      await _sendTransaction(context, tokensState, currentAsset!.symbol!,
-          accountState.activeAccount!, isFullScreen, address, amount, password);
+      await _sendTransaction(
+        context,
+        walletState,
+        token,
+        walletState.activeAccount,
+        address,
+        amount,
+        password,
+      );
     } catch (err) {
       showSnackBar(
         context,
@@ -588,51 +486,33 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
     } catch (_) {}
   }
 
-  double getAvailableBalance(accountState) {
-    int balance = accountState.activeAccount!.balanceList!
-        .firstWhere((el) => el.token! == currentAsset!.symbol! && !el.isHidden!)
-        .balance!;
-    final int fee = 3000;
-    return convertFromSatoshi(balance - fee);
-  }
-
-  bool isEnoughBalance(state) {
-    int balance = state.activeAccount.balanceList!
-        .firstWhere((el) => el.token! == currentAsset!.symbol! && !el.isHidden)
-        .balance!;
-    return convertFromSatoshi(balance) >=
-        double.parse(amountController.text.replaceAll(',', '.')) &&
-        double.parse(amountController.text.replaceAll(',', '.')) > 0;
-  }
-
-  _sendTransaction(context, tokensState, String token, AccountModel account, bool isFullScreen,
-      String address, double amount, String password) async {
+  _sendTransaction(
+    context,
+    WalletState walletState,
+    TokenModel token,
+    AbstractAccountModel account,
+    String address,
+    double amount,
+    String password,
+  ) async {
     TxErrorModel? txResponse;
     try {
-      ECPair keyPair = await HDWalletService()
-          .getKeypairFromStorage(password, account.index!);
-      if (token == 'DFI') {
-        txResponse = await transactionService.createAndSendTransaction(
-            keyPair: keyPair,
-            account: account,
-            destinationAddress: address,
-            amount: balancesHelper.toSatoshi(amount.toString()),
-            tokens: tokensState.tokens);
-      } else {
-        txResponse = await transactionService.createAndSendToken(
-            keyPair: keyPair,
-            account: account,
-            token: token,
-            destinationAddress: address,
-            amount: balancesHelper.toSatoshi(amount.toString()),
-            tokens: tokensState.tokens);
-      }
+      final network = walletState.applicationModel!.activeNetwork!;
+
+      txResponse = await network.send(
+        account: walletState.activeAccount,
+        address: address,
+        password: password,
+        token: token,
+        amount: double.parse(amountController.text),
+        applicationModel: walletState.applicationModel!,
+      );
     } catch (err) {
       print(err);
     }
     if (!txResponse!.isError!) {
       TransactionCubit transactionCubit =
-      BlocProvider.of<TransactionCubit>(context);
+          BlocProvider.of<TransactionCubit>(context);
 
       await transactionCubit.setOngoingTransaction(txResponse);
     }
@@ -643,7 +523,8 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
       builder: (BuildContext dialogContext) {
         return TxStatusDialog(
           title: 'Transaction initiated',
-          subtitle: 'Your transaction is now processed in the background. It will take up to 48h until the money arrives in your bank account. Thanks for choosing DFX.',
+          subtitle:
+              'Your transaction is now processed in the background. It will take up to 48h until the money arrives in your bank account. Thanks for choosing DFX.',
           buttonLabel: 'Done',
           txResponse: txResponse,
           callbackOk: () {
@@ -660,13 +541,11 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
             NavigatorService.pushReplacement(context, null);
           },
           callbackTryAgain: () async {
-            print('TryAgain');
             await _sendTransaction(
               context,
-              tokensState,
-              currentAsset!.symbol!,
-              account,
-              isFullScreen,
+              walletState,
+              token,
+              walletState.activeAccount,
               address,
               amount,
               password,

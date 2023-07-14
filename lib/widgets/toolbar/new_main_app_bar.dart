@@ -12,9 +12,10 @@ import 'dart:js' as js;
 
 import 'package:flutter_bloc/flutter_bloc.dart'; // ignore: avoid_web_libraries_in_flutter
 
-class NewMainAppBar extends StatelessWidget with ThemeMixin implements PreferredSizeWidget {
+class NewMainAppBar extends StatelessWidget
+    with ThemeMixin
+    implements PreferredSizeWidget {
   final bool isShowLogo;
-  final bool isSmallScreen;
   final bool isShowNetworkSelector;
   final Color? bgColor;
   final void Function()? callback;
@@ -22,7 +23,6 @@ class NewMainAppBar extends StatelessWidget with ThemeMixin implements Preferred
   NewMainAppBar({
     Key? key,
     this.isShowLogo = true,
-    this.isSmallScreen = false,
     this.isShowNetworkSelector = true,
     this.bgColor,
     this.callback,
@@ -69,7 +69,7 @@ class NewMainAppBar extends StatelessWidget with ThemeMixin implements Preferred
               )
             : Container(),
         actions: [
-          if (isSmallScreen)
+          if (!isFullScreen(context))
             SizedBox(
               width: 32,
               height: 32,
@@ -90,7 +90,7 @@ class NewMainAppBar extends StatelessWidget with ThemeMixin implements Preferred
             child: NewActionButton(
               iconPath: 'assets/icons/account_icon.svg',
               onPressed: () {
-                if (!isFullScreen(context)) {
+                if (!isLargeScreen(context)) {
                   Scaffold.of(context).openEndDrawer();
                 } else {
                   homeCubit.updateExtendedDrawer(

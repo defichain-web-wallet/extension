@@ -63,17 +63,6 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   static const String obscureSymbolCharacter = '●';
   static const int maxLines = 1;
 
-  _onSelectInputText() {
-    if (widget.controller.text.isNotEmpty) {
-      widget.controller.selection =
-          TextSelection(
-              baseOffset: 0,
-              extentOffset:
-              widget.controller
-                  .text.length);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(

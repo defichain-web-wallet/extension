@@ -1,9 +1,10 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
+import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -20,10 +21,18 @@ class TransactionStatusBar extends StatefulWidget {
 
 class _TransactionStatusBarState extends State<TransactionStatusBar>
     with SnackBarMixin, TickerProviderStateMixin {
+  late NetworkTypeModel networkType;
   late final AnimationController animationController = AnimationController(
     vsync: this,
     duration: Duration(seconds: 2),
   )..repeat();
+
+  @override
+  void initState() {
+    super.initState();
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+    networkType = walletCubit.state.activeNetwork.networkType;
+  }
 
   @override
   void dispose() {
@@ -134,8 +143,7 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
                 await accountCubit.updateAccountDetails();
               } else {
                 launch(
-                  '${Hosts.defiScanLiveTx}/$txId' +
-                      '?network=${SettingsHelper.settings.network!}',
+                  '${Hosts.defiScanLiveTx}/$txId?network=${networkType.networkString}',
                 );
               }
             },
@@ -152,8 +160,7 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
           ),
           onTapCallback: () async {
             launch(
-              '${Hosts.defiScanLiveTx}/$txId' +
-                  '?network=${SettingsHelper.settings.network!}',
+              '${Hosts.defiScanLiveTx}/$txId?network=${networkType.networkString}',
             );
           }
         );

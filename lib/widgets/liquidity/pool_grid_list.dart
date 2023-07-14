@@ -1,11 +1,12 @@
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_select_pool.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/widgets/liquidity/pool_asset_pair.dart';
 import 'package:flutter/material.dart';
 
 class PoolGridList extends StatelessWidget {
-  final List<AssetPairModel>? tokensPairs;
+  final List<LmPoolModel>? tokensPairs;
   final bool? isFullSize;
 
   const PoolGridList({Key? key, this.tokensPairs, this.isFullSize})

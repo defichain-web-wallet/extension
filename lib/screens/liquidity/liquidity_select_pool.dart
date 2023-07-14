@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
@@ -6,6 +7,8 @@ import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
@@ -15,8 +18,8 @@ import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
+import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
-import 'package:defi_wallet/widgets/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -26,7 +29,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 
 class LiquiditySelectPool extends StatefulWidget {
-  final AssetPairModel assetPair;
+  final LmPoolModel assetPair;
 
   const LiquiditySelectPool({Key? key, required this.assetPair})
       : super(key: key);
@@ -73,6 +76,8 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
   bool isShowDetails = true;
   String rateBalanceFromUsd = '';
   String rateBalanceToUsd = '';
+  List<BalanceModel> balances = [];
+  LmCubit? lmCubit;
 
   @override
   void dispose() {
@@ -84,6 +89,10 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
   @override
   void initState() {
     super.initState();
+    lmCubit = BlocProvider.of<LmCubit>(context);
+    balances = lmCubit!.getBalances(widget.assetPair, context);
+    lmCubit!.getAvailableBalances(widget.assetPair, context);
+    balance = lmCubit!.getPoolBalance(widget.assetPair, context);
     _amountBaseController.addListener(() {
       if (_amountBaseController.text == '') {
         setState(() {
@@ -102,12 +111,11 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
         isNotEmptyAmountQuote = true;
       }
     });
-    TokensState tokensState = BlocProvider.of<TokensCubit>(context).state;
     _focusBase.addListener(onFocusBaseField);
     _focusQuote.addListener(onFocusQuoteField);
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      _setShareOfPool();
-      _setAmount(tokensState);
+      _setShareOfPool(lmCubit!);
+      _setAmount();
     });
   }
 
@@ -169,42 +177,33 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
   }
 
   Widget _buildBody(context, transactionState, isFullScreen) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
     double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
-    return BlocBuilder<TokensCubit, TokensState>(
-      builder: (tokenContext, tokensState) {
-        return BlocBuilder<AccountCubit, AccountState>(
-            builder: (accountContext, accountState) {
-          if (tokensState.status == TokensStatusList.success) {
-            if (accountState.status == AccountStatusList.success) {
-              assetFrom = widget.assetPair.symbol!.split('-')[0];
-              assetTo = widget.assetPair.symbol!.split('-')[1];
-              accountState.activeAccount!.balanceList!.forEach((el) {
-                if (el.token == widget.assetPair.symbol!) {
-                  balance = el.balance!;
-                }
-                if (el.token == assetFrom) {
-                  balanceFrom = el.balance!;
-                }
-                if (el.token == assetTo) {
-                  balanceTo = el.balance!;
-                }
-              });
+              assetFrom = widget.assetPair.tokens[0].symbol;
+              assetTo =  widget.assetPair.tokens[1].symbol;
+                // if (el.token == widget.assetPair.symbol!) {
+                //   balance = el.balance!;
+                // }
+                // if (el.token == assetFrom) {
+                //   balanceFrom = el.balance!;
+                // }
+                // if (el.token == assetTo) {
+                //   balanceTo = el.balance!;
+                // }
 
-              try {
-                var baseBalance = List.from(
-                    accountState.activeAccount!.balanceList!.where((element) =>
-                        element.token == widget.assetPair.tokenA))[0];
-                var quoteBalance = List.from(
-                    accountState.activeAccount!.balanceList!.where((element) =>
-                        element.token == widget.assetPair.tokenB))[0];
-                isErrorBalance = balanceA > baseBalance.balance ||
-                    balanceB > quoteBalance.balance;
-              } catch (err) {
-                isErrorBalance = true;
-              }
-
-              return StretchBox(
+              // try {
+              //   var baseBalance = List.from(
+              //       accountState.activeAccount!.balanceList!.where((element) =>
+              //           element.token == widget.assetPair.tokens[0]))[0];
+              //   var quoteBalance = List.from(
+              //       accountState.activeAccount!.balanceList!.where((element) =>
+              //           element.token == widget.assetPair.tokens[1]))[0];
+              //   isErrorBalance = balanceA > baseBalance.balance ||
+              //       balanceB > quoteBalance.balance;
+              // } catch (err) {
+              //   isErrorBalance = true;
+              // }
+    return BlocBuilder<LmCubit, LmState>(
+        builder: (lmContext, lmState) => StretchBox(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -220,80 +219,71 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                             height: 16,
                           ),
                           AmountField(
-                            account: accountState.activeAccount,
                             type: TxType.addLiq,
-                            suffix: balancesHelper.numberStyling(amountFromUSD,
-                                fixedCount: 2, fixed: true),
+                            // suffix: balancesHelper.numberStyling(amountFromUSD,
+                            //     fixedCount: 2, fixed: true),
                             available:
-                                getAvailableAmount(accountState, assetFrom),
+                                lmState.status == LmStatusList.success ? lmState.availableBalances![0] : 0,
                             onAssetSelect: (asset) {},
                             onChanged: (value) {
-                              try {
-                                var amountFrom = tokensHelper.getAmountByUsd(
-                                  tokensCubit.state.tokensPairs!,
-                                  double.parse(value.replaceAll(',', '.')),
-                                  assetFrom,
-                                );
-                                setState(() {
-                                  amountFromUSD = amountFrom;
-                                  amountToUSD = amountFromUSD;
+                              // try {
+                              //   var amountFrom = tokensHelper.getAmountByUsd(
+                              //     tokensCubit.state.tokensPairs!,
+                              //     double.parse(value.replaceAll(',', '.')),
+                              //     assetFrom,
+                              //   );
+                              //   setState(() {
+                              //     amountFromUSD = amountFrom;
+                              //     amountToUSD = amountFromUSD;
                                   onChanged(
                                     _amountQuoteController,
                                     value,
-                                    widget.assetPair.reserveBDivReserveA!,
-                                    tokensState,
+                                    widget.assetPair.percentages![1] / widget.assetPair.percentages![0],
+                                      lmCubit!
                                   );
-                                });
-                              } catch (err) {
-                                print(err);
-                              }
+                              //   });
+                              // } catch (err) {
+                              //   print(err);
+                              // }
                             },
                             controller: _amountBaseController,
-                            selectedAsset: TokensModel(
-                              name: assetFrom,
-                              symbol: assetFrom,
-                            ),
-                            assets: [],
+                            assets: [balances[0]],
+                            balance: balances[0],
                           ),
                           SizedBox(
                             height: 8,
                           ),
                           AmountField(
-                            account: accountState.activeAccount,
                             type: TxType.addLiq,
-                            isAvailableTo: false,
-                            suffix: balancesHelper.numberStyling(amountToUSD,
-                                fixedCount: 2, fixed: true),
+                            // suffix: balancesHelper.numberStyling(amountToUSD,
+                            //     fixedCount: 2, fixed: true),
                             available:
-                                getAvailableAmount(accountState, assetTo),
+                            lmState.status == LmStatusList.success ? lmState.availableBalances![1] : 0,
                             onAssetSelect: (asset) {},
                             onChanged: (value) {
-                              try {
-                                var amountTo = tokensHelper.getAmountByUsd(
-                                  tokensCubit.state.tokensPairs!,
-                                  double.parse(value.replaceAll(',', '.')),
-                                  assetTo,
-                                );
-                                setState(() {
-                                  amountToUSD = amountTo;
-                                  amountFromUSD = amountToUSD;
+                              // try {
+                              //   var amountTo = tokensHelper.getAmountByUsd(
+                              //     tokensCubit.state.tokensPairs!,
+                              //     double.parse(value.replaceAll(',', '.')),
+                              //     assetTo,
+                              //   );
+                              //   setState(() {
+                              //     amountToUSD = amountTo;
+                              //     amountFromUSD = amountToUSD;
                                   onChanged(
                                     _amountBaseController,
                                     value,
-                                    widget.assetPair.reserveADivReserveB!,
-                                    tokensState,
+                                    widget.assetPair.percentages![0] / widget.assetPair.percentages![1],
+                                    lmCubit!,
                                   );
-                                });
-                              } catch (err) {
-                                print(err);
-                              }
+                              //   });
+                              // } catch (err) {
+                              //   print(err);
+                              // }
                             },
                             controller: _amountQuoteController,
-                            selectedAsset: TokensModel(
-                              name: assetTo,
-                              symbol: assetTo,
-                            ),
-                            assets: [],
+                            assets: [balances[1]],
+                            balance: balances[1],
                           ),
                           SizedBox(
                             height: 24,
@@ -365,7 +355,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                                         text: TextSpan(children: [
                                           TextSpan(
                                             text:
-                                                '1 $assetFrom = ${widget.assetPair.reserveBDivReserveA!.toStringAsFixed(2)} $assetTo',
+                                                '1 $assetFrom = ${(widget.assetPair.percentages![1]/widget.assetPair.percentages![0]).toStringAsFixed(4)} $assetTo',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .headline5!
@@ -395,7 +385,7 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                                         text: TextSpan(children: [
                                           TextSpan(
                                             text:
-                                                '1 $assetTo = ${widget.assetPair.reserveADivReserveB!.toStringAsFixed(8)} $assetFrom',
+                                                '1 $assetTo = ${(widget.assetPair.percentages![0]/widget.assetPair.percentages![1]).toStringAsFixed(4)} $assetFrom',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .headline5!
@@ -543,85 +533,30 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
                     ),
                   ],
                 ),
-              );
-            } else {
-              return Container();
-            }
-          } else {
-            return Container();
-          }
-        });
-      },
-    );
+              ));
   }
 
-  void _setBalanceAndAmountUSD(tokensState) {
-    var totalBalanceInUsd = tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          balanceA,
-          widget.assetPair.tokenA!,
-        ) +
-        tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          balanceB,
-          widget.assetPair.tokenB!,
-        );
-
-    var rateFrom = tokensHelper.getAmountByUsd(
-      tokensState.tokensPairs,
-      1,
-      widget.assetPair.tokenA!,
-    );
-    var rateTo = tokensHelper.getAmountByUsd(
-      tokensState.tokensPairs,
-      1,
-      widget.assetPair.tokenB!,
-    );
-
-    var totalAmountInUsd = tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          double.parse(_amountBaseController.text.replaceAll(',', '.')),
-          widget.assetPair.tokenA!,
-        ) +
-        tokensHelper.getAmountByUsd(
-          tokensState.tokensPairs,
-          double.parse(_amountQuoteController.text.replaceAll(',', '.')),
-          widget.assetPair.tokenB!,
-        );
-
-    setState(() {
-      rateBalanceFromUsd = rateFrom.toStringAsFixed(2);
-      rateBalanceToUsd = rateTo.toStringAsFixed(2);
-      balanceUSD = totalBalanceInUsd;
-      amountUSD = totalAmountInUsd;
-    });
-  }
-
-  void _setAmount(tokensState) {
+  void _setAmount() {
     _setBalances();
-    _setBalanceAndAmountUSD(tokensState);
+    // _setBalanceAndAmountUSD(tokensState);
     setState(() {
       amount = double.parse(_amountBaseController.text.replaceAll(',', '.')) /
-          (widget.assetPair.reserveA! / widget.assetPair.totalLiquidity!);
+          (widget.assetPair.percentages![0] / widget.assetPair.percentages![2]);
     });
   }
 
   void _setBalances() {
     setState(() {
-      balanceA = (balance / widget.assetPair.totalLiquidityRaw!) *
-          widget.assetPair.reserveA!;
-      balanceB = (balance / widget.assetPair.totalLiquidityRaw!) *
-          widget.assetPair.reserveB!;
+      balanceA = (convertFromSatoshi(balance) / widget.assetPair.percentages![2]) *
+          widget.assetPair.percentages![0];
+      balanceB = (convertFromSatoshi(balance) / widget.assetPair.percentages![2]) *
+          widget.assetPair.percentages![1];
     });
   }
-
-  void _setShareOfPool() {
+  //
+  void _setShareOfPool(LmCubit lmCubit) {
     setState(() {
-      if (widget.assetPair.totalLiquidityRaw! != 0) {
-        shareOfPool = (convertToSatoshi(
-                double.parse(_amountBaseController.text.replaceAll(',', '.'))) /
-            widget.assetPair.totalLiquidityRaw!);
-      }
+      shareOfPool = lmCubit.calculateShareOfPool(convertToSatoshi(double.parse(_amountBaseController.text.replaceAll(',', '.'))), 100, widget.assetPair);
     });
   }
 
@@ -640,41 +575,17 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
   }
 
   bool isDisableSubmit(context) {
-    int amountFrom = convertToSatoshi(
-        double.parse(_amountBaseController.text.replaceAll(',', '.')));
-    int amountTo = convertToSatoshi(
-        double.parse(_amountQuoteController.text.replaceAll(',', '.')));
+    double amountFrom =
+        double.parse(_amountBaseController.text.replaceAll(',', '.'));
+    double amountTo =
+        double.parse(_amountQuoteController.text.replaceAll(',', '.'));
 
-    bool returnValue = balanceFrom == 0 ||
-        balanceTo == 0 ||
-        amountFrom > balanceFrom ||
-        amountTo > balanceTo;
-
-    return balanceFrom == 0 ||
-        balanceTo == 0 ||
-        amountFrom > balanceFrom ||
-        amountTo > balanceTo;
+    return lmCubit!.state.availableBalances![0] == 0 ||
+    lmCubit!.state.availableBalances![1] == 0 ||
+        amountFrom > lmCubit!.state.availableBalances![0] ||
+        amountTo > lmCubit!.state.availableBalances![1];
   }
 
-  setMaxAmount(
-      TextEditingController controller,
-      TextEditingController toController,
-      String asset,
-      double reserve,
-      state,
-      tokensState) {
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      setState(() {
-        int balance = state.activeAccount!.balanceList!
-            .firstWhere((el) => el.token! == asset)
-            .balance!;
-        double amount = getAmountByFee(balance, asset);
-        controller.text = amount.toString();
-
-        onChanged(toController, controller.text, reserve, tokensState);
-      });
-    });
-  }
 
   double getAmountByFee(int balance, String token) {
     int fee = token == 'DFI' ? 21000 : 0;
@@ -682,16 +593,15 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
     return (amount > 0) ? convertFromSatoshi(balance - fee) : 0.0;
   }
 
-  onChanged(TextEditingController controller, String value, double reserve,
-      tokensState) {
+  onChanged(TextEditingController controller, String value, double reserve, LmCubit lmCubit) {
     print(controller.text);
     try {
       double baseAmount = double.parse(value.replaceAll(',', '.'));
       if (!(baseAmount * reserve).isNaN) {
         controller.text = (baseAmount * reserve).toStringAsFixed(8);
-        _setShareOfPool();
+        _setShareOfPool(lmCubit);
       }
-      _setAmount(tokensState);
+      _setAmount();
     } catch (_) {
       controller.text = '0';
     }

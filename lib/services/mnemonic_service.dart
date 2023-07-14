@@ -13,7 +13,7 @@ Uint8List convertMnemonicToSeed(List<String> mnemonic) {
 Future<List<String>> getMnemonic(String password) async{
   var box = await Hive.openBox(HiveBoxes.client);
   var mnemonic = await box.get(HiveNames.savedMnemonic);
-  return EncryptHelper().getDecryptedData(mnemonic, password).split(',');
+  return EncryptHelper.getDecryptedData(mnemonic, password).split(',');
 }
 
 bool isCorrectWord(String word) {

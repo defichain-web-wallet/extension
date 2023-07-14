@@ -42,6 +42,7 @@ class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
       'Jelly is now processing your transaction in the background. Your account balance will be updated in a few minutes.';
 
   String formatErrorMessage() {
+    print(widget.txResponse!.error);
     if (widget.txResponse!.error != null &&
         widget.txResponse!.error! == specificError) {
       return 'Swap price is higher than the'
@@ -120,12 +121,17 @@ class _TxStatusDialogState extends State<TxStatusDialog> with ThemeMixin {
             Container(
               constraints: BoxConstraints(maxWidth: 312),
               width: 312,
-              height: !widget.txResponse!.isError! ? 350 : 335,
+              height: widget.txResponse!.error == null
+                  ? !widget.txResponse!.isError!
+                      ? 350
+                      : 335
+                  : 360,
               child: StatusLogoAndTitle(
                 isSmall: false,
                 isSuccess: !widget.txResponse!.isError!,
                 title: !widget.txResponse!.isError! ? widget.title : 'Oops!',
                 subtitle: formatErrorMessage(),
+                specificError: widget.txResponse!.error,
               ),
             ),
             Row(

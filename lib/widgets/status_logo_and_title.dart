@@ -1,11 +1,10 @@
-import 'dart:math' as math;
-
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:flutter/material.dart';
 
 class StatusLogoAndTitle extends StatefulWidget {
   final String? title;
   final String? subtitle;
+  final String? specificError;
   final bool isTitlePosBefore;
   final Widget? subtitleWidget;
   final bool isSuccess;
@@ -15,6 +14,7 @@ class StatusLogoAndTitle extends StatefulWidget {
     Key? key,
     this.title,
     this.subtitle,
+    this.specificError,
     this.subtitleWidget,
     this.isTitlePosBefore = false,
     this.isSuccess = false,
@@ -116,6 +116,23 @@ class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
             ),
           ],
         ],
+        if (widget.specificError != null)
+          ...[
+            SizedBox(
+              height: 8,
+            ),
+            Text(
+              widget.specificError!,
+              style: Theme.of(context).textTheme.headline5!.copyWith(
+                fontSize: 13,
+                color: Theme.of(context)
+                    .textTheme
+                    .headline5!
+                    .color!
+                    .withOpacity(0.4),
+              ),
+            )
+          ]
       ],
     );
   }

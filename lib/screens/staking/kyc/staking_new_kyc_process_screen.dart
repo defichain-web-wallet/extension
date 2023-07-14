@@ -1,4 +1,3 @@
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/staking/kyc/staking_kyc_mobile_screen.dart';
@@ -12,11 +11,11 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/custom_select_tile.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class StakingNewKycProcessScreen extends StatefulWidget {
-  const StakingNewKycProcessScreen({Key? key}) : super(key: key);
+  const StakingNewKycProcessScreen({Key? key, required this.kycLink}) : super(key: key);
+  final String kycLink;
 
   @override
   State<StakingNewKycProcessScreen> createState() =>
@@ -42,8 +41,6 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<LockCubit, LockState>(
-          builder: (lockContext, lockState) {
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: isFullScreen ? null : AccountDrawer(
@@ -236,8 +233,7 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                                   NavigatorService.push(
                                     context,
                                     StakingKycMobileScreen(
-                                      kycLink:
-                                          lockState.lockUserDetails!.kycLink!,
+                                      kycLink: widget.kycLink,
                                     ),
                                   );
                                 } else {
@@ -247,8 +243,7 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                                     context: context,
                                     builder: (BuildContext dialogContext) {
                                       return RedirectToLockDialog(
-                                        kycLink:
-                                            lockState.lockUserDetails!.kycLink!,
+                                        kycLink: widget.kycLink,
                                       );
                                     },
                                   );
@@ -287,8 +282,6 @@ class _StakingNewKycProcessScreenState extends State<StakingNewKycProcessScreen>
                 ),
               ),
             );
-          },
-        );
       },
     );
   }

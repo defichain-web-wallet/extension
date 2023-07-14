@@ -65,6 +65,8 @@ class _BuyTutorialFirstScreenState extends State<BuyTutorialFirstScreen>
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(20),
                 topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                bottomRight: Radius.circular(isFullScreen ? 20 : 0),
               ),
             ),
             child: Center(
@@ -76,12 +78,9 @@ class _BuyTutorialFirstScreenState extends State<BuyTutorialFirstScreen>
                     Expanded(
                       child: Column(
                         children: [
-                          Container(
-                            height: 68,
-                            child: PageTitle(
-                              title: titleText,
-                              isFullScreen: isFullScreen,
-                            ),
+                          PageTitle(
+                            title: titleText,
+                            isFullScreen: isFullScreen,
                           ),
                           SizedBox(
                             height: 12,

@@ -1,20 +1,16 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/error_placeholder.dart';
 import 'package:defi_wallet/widgets/home/home_extended_view.dart';
 import 'package:defi_wallet/widgets/home/home_tabs_scroll_view.dart';
 import 'package:defi_wallet/widgets/home/transaction_status_bar.dart';
-import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -38,7 +34,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
-  static const int tickerTimerUpdate = 15;
+  static const int timerDuration = 30;
   static const double extendedBoxWidth = 1440 - 32;
   static const double extendedFirstColumnWidth = 328;
   static const double extendedLastColumnWidth = 488;
@@ -67,8 +63,11 @@ class _HomeScreenState extends State<HomeScreen>
     tabController!.addListener(tabListener);
     TransactionCubit transactionCubit =
         BlocProvider.of<TransactionCubit>(context);
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
 
-    transactionCubit.checkOngoingTransaction();
+    transactionCubit.checkOngoingTransaction(
+      walletCubit.state.activeNetwork.networkType,
+    );
 
     lockHelper.updateTimer();
   }
@@ -83,19 +82,16 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-    BitcoinCubit bitcoinCubit = BlocProvider.of<BitcoinCubit>(context);
+    RatesCubit ratesCubit = BlocProvider.of<RatesCubit>(context);
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     if (widget.isLoadTokens) {
-      tokensCubit.loadTokensFromStorage();
+      ratesCubit.loadRates(walletCubit.state.activeNetwork);
+    }
+    if (walletCubit.state.isSendReceiveOnly) {
+      walletCubit.updateAccountBalances();
     }
 
-    return BlocBuilder<AccountCubit, AccountState>(builder: (context, state) {
-      if (SettingsHelper.isBitcoin()) {
-        bitcoinCubit.loadDetails(state.activeAccount!.bitcoinAddress!);
-      }
-      return BlocBuilder<TokensCubit, TokensState>(
-        builder: (context, tokensState) {
+    return BlocBuilder<WalletCubit, WalletState>(builder: (context, walletState) {
           return ScaffoldWrapper(
             isUpdate: true,
             builder: (
@@ -103,45 +99,24 @@ class _HomeScreenState extends State<HomeScreen>
               bool isFullScreen,
               TransactionState txState,
             ) {
-              if (state.status == AccountStatusList.loading ||
-                  tokensState.status == TokensStatusList.loading) {
-                return Container(
-                  child: Center(
-                    child: Loader(),
-                  ),
-                );
-              } else if (tokensState.status == TokensStatusList.failure) {
-                return Container(
-                  child: Center(
-                    child: ErrorPlaceholder(
-                      message: 'API error',
-                      description:
-                          'Please change the API on settings and try again',
-                    ),
-                  ),
-                );
-              } else {
                 return Scaffold(
                   key: _scaffoldKey,
                   appBar: NewMainAppBar(
                     isShowLogo: true,
-                    isSmallScreen: !isFullScreen,
                   ),
                   drawerScrimColor: isFullScreen
                       ? Colors.transparent
                       : AppColors.tolopea.withOpacity(0.06),
                   endDrawer: AccountDrawer(
                     width: isFullScreen ? 298 : buttonSmallWidth,
-                    isFullScreen: isFullScreen,
                   ),
                   body: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, homeState) {
-                      if (timer == null && !SettingsHelper.isBitcoin()) {
-                        timer =
-                            Timer.periodic(Duration(seconds: tickerTimerUpdate),
-                                (timer) async {
-                          await accountCubit.loadAccounts();
-                        });
+                      if (timer == null) {
+                        timer = Timer.periodic(
+                          Duration(seconds: timerDuration),
+                          (timer) async => walletCubit.updateAccountBalances(),
+                        );
                       }
                       if (widget.snackBarMessage.isNotEmpty &&
                           !isShownSnackBar) {
@@ -174,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen>
                                       activeTabIndex: homeState.tabIndex,
                                       isShowHomeCard: true,
                                     ),
-                                  if (txState is! TransactionInitialState)
+                                  if (txState is! TransactionInitialState && !walletState.isSendReceiveOnly)
                                     TransactionStatusBar(
                                       key: txKey,
                                     ),
@@ -187,11 +162,9 @@ class _HomeScreenState extends State<HomeScreen>
                     },
                   ),
                 );
-              }
+
             },
           );
-        },
-      );
     });
   }
 }

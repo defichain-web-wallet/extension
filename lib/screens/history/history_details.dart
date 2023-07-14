@@ -22,7 +22,6 @@ import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/history/widgets/history_icon_type.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
-import 'package:defi_wallet/screens/send/send_status_screen.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -126,26 +125,27 @@ class _HistoryDetailsState extends State<HistoryDetails>
           body: BlocBuilder<TokensCubit, TokensState>(
             builder: (context, tokensState) {
               AssetPairModel? assetPairModel;
-              if (txCategory == 'PoolSwap') {
-                try {
-                  assetPairModel = tokensState.tokensPairs!
-                      .firstWhere((element) =>
-                  element.tokenA == tokenNameFirst &&
-                      element.tokenB == tokenNameSecond);
-                } catch (err) {
-                  print(err);
-                }
-              }
-              totalBalanceByUsd = tokensHelper.getAmountByUsd(
-                tokensState.tokensPairs!,
-                widget.dfxHistoryModel!.value!,
-                tokenNameFirst!,
-              );
-              String totalBalanceByUsdFormat = balancesHelper.numberStyling(
-                totalBalanceByUsd,
-                fixed: true,
-                fixedCount: 6,
-              );
+              // if (txCategory == 'PoolSwap') {
+              //   try {
+              //     assetPairModel = tokensState.tokensPairs!
+              //         .firstWhere((element) =>
+              //     element.tokenA == tokenNameFirst &&
+              //         element.tokenB == tokenNameSecond);
+              //   } catch (err) {
+              //     print(err);
+              //   }
+              // }
+              // totalBalanceByUsd = tokensHelper.getAmountByUsd(
+              //   tokensState.tokensPairs!,
+              //   widget.dfxHistoryModel!.value!,
+              //   tokenNameFirst!,
+              // );
+              // String totalBalanceByUsdFormat = balancesHelper.numberStyling(
+              //   totalBalanceByUsd,
+              //   fixed: true,
+              //   fixedCount: 6,
+              // );
+              String totalBalanceByUsdFormat = '0';
 
               return Stack(
                 children: [

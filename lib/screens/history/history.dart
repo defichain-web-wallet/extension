@@ -16,7 +16,7 @@ import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/screens/history/widgets/filter_list.dart';
 import 'package:defi_wallet/utils/convert.dart';
-import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
+import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -59,37 +59,14 @@ class _HistoryState extends State<History> {
               if (constraints.maxWidth < ScreenSizes.medium) {
                 return Scaffold(
                   body: _buildBody(context),
-                  appBar: MainAppBar(
-                      title: 'History',
-                      action: Padding(
-                        padding: const EdgeInsets.only(right: 14),
-                        child: FilterList(
-                          onSelect: () {},
-                        ),
-                      ),
-                      isShowBottom: !(state is TransactionInitialState),
-                      height: !(state is TransactionInitialState)
-                          ? toolbarHeightWithBottom
-                          : toolbarHeight),
+                  appBar: NewMainAppBar(),
                 );
               } else {
                 return Container(
                   padding: const EdgeInsets.only(top: 20),
                   child: Scaffold(
                     body: _buildBody(context, isCustomBgColor: true),
-                    appBar: MainAppBar(
-                      title: 'History',
-                      isSmall: true,
-                      isShowBottom: !(state is TransactionInitialState),
-                      height: !(state is TransactionInitialState)
-                          ? toolbarHeightWithBottom
-                          : toolbarHeight,
-                      action: Padding(
-                          padding: const EdgeInsets.only(right: 14),
-                          child: FilterList(
-                            onSelect: () {},
-                          )),
-                    ),
+                    appBar: NewMainAppBar(),
                   ),
                 );
               }
@@ -318,8 +295,8 @@ class _HistoryState extends State<History> {
                                                     .textTheme
                                                     .headline5,
                                               ),
-                                              Text(
-                                                  "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
+                                              // Text(
+                                              //     "${balancesHelper.numberStyling(tokenHelper.getAmountByUsd(tokensState.tokensPairs!, txValue, tokenName), fixed: true, fixedCount: 4)} $currency")
                                             ],
                                           ),
                                         ),

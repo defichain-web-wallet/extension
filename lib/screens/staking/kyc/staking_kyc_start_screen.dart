@@ -1,6 +1,5 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -110,8 +109,8 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                           height: 4,
                                         ),
                                         Text(
-                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')} / '
-                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apr!, 'APR')}',
+                                          '${getAprOrApyFormat(lockState.stakingTokenModel!.apy!, 'APY')} / '
+                                          '${getAprOrApyFormat(lockState.stakingTokenModel!.apr!, 'APR')}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5!
@@ -167,7 +166,7 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                                   ),
                                                   Text(
                                                     'Stake DFI and earn up to '
-                                                    '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')}',
+                                                    '${getAprOrApyFormat(lockState.stakingTokenModel!.apy!, 'APY')}',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .subtitle1!
@@ -320,7 +319,9 @@ class _StakingKycStartScreenState extends State<StakingKycStartScreen>
                                     } else {
                                       NavigatorService.push(
                                         context,
-                                        StakingNewKycProcessScreen(),
+                                        StakingNewKycProcessScreen(
+                                          kycLink: lockState.kycLink!,
+                                        ),
                                       );
                                     }
                                   },

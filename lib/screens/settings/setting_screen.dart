@@ -1,16 +1,13 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/dialog_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/settings/setting_language_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_recovery_seed_screen.dart';
-import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
-import 'package:defi_wallet/widgets/dialogs/staking_add_asset_dialog.dart';
-import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
@@ -38,8 +35,6 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<AccountCubit, AccountState>(
-          builder: (context, state) {
             return Scaffold(
               drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
               endDrawer: isFullScreen ? null : AccountDrawer(
@@ -101,9 +96,9 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
                                       context: context,
                                       builder: (BuildContext contextDialog) {
                                         return PassConfirmDialog(
-                                          onSubmit: (val) async {
-                                            var mnemonic =
-                                                await getMnemonic(val);
+                                          onSubmit: (password) async {
+                                            final walletCubit = BlocProvider.of<WalletCubit>(context);
+                                            List<String> mnemonic = walletCubit.getMnemonic(password);
                                             NavigatorService.pushReplacement(
                                               context,
                                               SettingRecoverySeedScreen(
@@ -153,7 +148,5 @@ class _SettingScreenState extends State<SettingScreen> with ThemeMixin, DialogMi
             );
           },
         );
-      },
-    );
   }
 }

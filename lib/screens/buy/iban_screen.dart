@@ -1,4 +1,4 @@
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -55,9 +55,9 @@ class _IbanScreenState extends State<IbanScreen>
 
   @override
   Widget build(BuildContext context) {
-    FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
+    RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
     if (iterator == 0) {
-      fiatCubit.loadIbanList(asset: widget.asset);
+      rampCubit.loadIbans(asset: widget.asset);
       iterator++;
     }
 
@@ -67,15 +67,15 @@ class _IbanScreenState extends State<IbanScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        return BlocBuilder<FiatCubit, FiatState>(
-          builder: (context, fiatState) {
-            if (fiatState.status == FiatStatusList.loading) {
+        return BlocBuilder<RampCubit, RampState>(
+          builder: (context, rampState) {
+            if (rampState.status == RampStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.success) {
+            } else if (rampState.status == RampStatusList.success) {
               List<String> stringIbans = [];
               List<IbanModel> uniqueIbans = [];
 
-              fiatState.ibanList!.forEach((element) {
+              rampState.ibans!.forEach((element) {
                 stringIbans.add(element.iban!);
               });
 
@@ -83,7 +83,7 @@ class _IbanScreenState extends State<IbanScreen>
 
               stringUniqueIbans.forEach((element) {
                 uniqueIbans.add(
-                    fiatState.ibanList!.firstWhere((el) => el.iban == element));
+                    rampState.ibans!.firstWhere((el) => el.iban == element));
               });
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -156,7 +156,7 @@ class _IbanScreenState extends State<IbanScreen>
                                 child: Column(
                                   children: [
                                     widget.isNewIban ||
-                                            fiatState.activeIban == null
+                                            rampState.activeIban == null
                                         ? IbanField(
                                             ibanController: _ibanController,
                                             hintText:
@@ -169,7 +169,7 @@ class _IbanScreenState extends State<IbanScreen>
                                             key: selectKeyIban,
                                             onAnotherSelect: hideOverlay,
                                             ibanList: uniqueIbans,
-                                            selectedIban: fiatState.activeIban!,
+                                            selectedIban: rampState.activeIban!,
                                           )
                                   ],
                                 ),
@@ -197,7 +197,7 @@ class _IbanScreenState extends State<IbanScreen>
                                     parent.emitPending(true);
                                     try {
                                       hideOverlay();
-                                      await submit(context, fiatState);
+                                      await submit(context, rampState);
                                     } finally {
                                       parent.emitPending(false);
                                     }
@@ -221,18 +221,17 @@ class _IbanScreenState extends State<IbanScreen>
     );
   }
 
-  submit(context, fiatState) async {
+  submit(context, rampState) async {
     if (_formKey.currentState!.validate()) {
-      FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-      String iban = (widget.isNewIban || fiatState.activeIban == null)
+      RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
+      String iban = (widget.isNewIban || rampState.activeIban == null)
           ? _ibanController.text
-          : fiatState.activeIban.iban;
+          : rampState.activeIban.iban;
       try {
-        if (widget.isNewIban || fiatState.activeIban == null) {
-          await fiatCubit.saveBuyDetails(
+        if (widget.isNewIban || rampState.activeIban == null) {
+          await rampCubit.buy(
             iban,
             widget.asset,
-            fiatState.accessToken!,
           );
         }
 

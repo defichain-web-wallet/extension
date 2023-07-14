@@ -255,7 +255,9 @@ class _StakingSelectVerificationScreenState
                                       if (isNewKycProcess) {
                                         NavigatorService.push(
                                           context,
-                                          StakingNewKycProcessScreen(),
+                                          StakingNewKycProcessScreen(
+                                            kycLink: '',
+                                          ),
                                         );
                                       }
                                       if (isKycHandover) {

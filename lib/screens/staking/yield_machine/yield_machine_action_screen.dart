@@ -110,11 +110,11 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                     );
                     currentAsset = currentAsset ?? assets.first;
 
-                    usdAmount = getUsdBalance(
-                      context,
-                      controller.text,
-                      currentAsset!.symbol!,
-                    );
+                    // usdAmount = getUsdBalance(
+                    //   context,
+                    //   controller.text,
+                    //   currentAsset!.symbol!,
+                    // );
                     if (widget.isDeposit) {
                       available = convertFromSatoshi(accountState.balances!
                           .firstWhere((element) =>
@@ -192,11 +192,11 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                         },
                                         onChanged: (asset) {
                                           setState(() {
-                                            usdAmount = getUsdBalance(
-                                              context,
-                                              controller.text,
-                                              currentAsset!.symbol!,
-                                            );
+                                            // usdAmount = getUsdBalance(
+                                            //   context,
+                                            //   controller.text,
+                                            //   currentAsset!.symbol!,
+                                            // );
                                           });
                                         },
                                         controller: controller,
@@ -381,23 +381,23 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
                                                             .emitPending(false);
                                                       },
                                                       onSubmit: (password) {
-                                                        depositCallback(
-                                                          password,
-                                                          accountState
-                                                              .accounts!.first,
-                                                          lockState
-                                                              .lockStakingDetails!
-                                                              .depositAddress!,
-                                                          tokensState.tokens!,
-                                                          accountState
-                                                              .accounts!
-                                                              .first
-                                                              .lockAccessToken!,
-                                                          lockState
-                                                              .lockStakingDetails!
-                                                              .id!,
-                                                          currentAsset!.symbol!,
-                                                        );
+                                                        // depositCallback(
+                                                        //   password,
+                                                        //   accountState
+                                                        //       .accounts!.first,
+                                                        //   lockState
+                                                        //       .lockStakingDetails!
+                                                        //       .depositAddress!,
+                                                        //   tokensState.tokens!,
+                                                        //   accountState
+                                                        //       .accounts!
+                                                        //       .first
+                                                        //       .lockAccessToken!,
+                                                        //   lockState
+                                                        //       .lockStakingDetails!
+                                                        //       .id!,
+                                                        //   currentAsset!.symbol!,
+                                                        // );
                                                       },
                                                     );
                                                   },
@@ -632,23 +632,23 @@ class _YieldMachineActionScreenState extends State<YieldMachineActionScreen>
     );
   }
 
-  String getUsdBalance(
-    context,
-    String balance,
-    String asset,
-  ) {
-    TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
-    try {
-      var amount = tokenHelper.getAmountByUsd(
-        tokensCubit.state.tokensPairs!,
-        double.parse(balance),
-        asset,
-      );
-      return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
-    } catch (err) {
-      return '0.00';
-    }
-  }
+  // String getUsdBalance(
+  //   context,
+  //   String balance,
+  //   String asset,
+  // ) {
+  //   TokensCubit tokensCubit = BlocProvider.of<TokensCubit>(context);
+  //   try {
+  //     var amount = tokenHelper.getAmountByUsd(
+  //       tokensCubit.state.tokensPairs!,
+  //       double.parse(balance),
+  //       asset,
+  //     );
+  //     return balancesHelper.numberStyling(amount, fixedCount: 2, fixed: true);
+  //   } catch (err) {
+  //     return '0.00';
+  //   }
+  // }
 
   getTokensList(tokensState, targetAssets, {AccountState? accountState}) {
     List<TokensModel> resList = [];

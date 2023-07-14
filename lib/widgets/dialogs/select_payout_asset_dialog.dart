@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/mixins/dialog_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/lock_asset_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/add_token/token_list_tile.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -25,9 +25,9 @@ class SelectPayoutAssetDialog extends StatefulWidget {
 class _SelectPayoutAssetDialogState extends State<SelectPayoutAssetDialog>
     with ThemeMixin, DialogMixin {
   String titleText = 'Select your payout asset';
-  String selectedAssetName = '';
+  String? selectedAssetName;
   TextEditingController searchController = TextEditingController();
-  late List<LockAssetModel> assets;
+  late List<TokenModel> assets;
 
   @override
   Widget build(BuildContext dialogContext) {
@@ -35,10 +35,12 @@ class _SelectPayoutAssetDialogState extends State<SelectPayoutAssetDialog>
 
     return BlocBuilder<LockCubit, LockState>(
       builder: (context, lockState) {
-        selectedAssetName = lockState.lockRewardNewRoute!.targetAsset ??
-            lockState.assetsByCategories[0].name!;
 
-        assets = lockState.assetsByCategories;
+        assets = lockState.selectedAssets!;
+        assets.sort((a, b) => b.id.compareTo(a.id));
+
+        selectedAssetName = selectedAssetName ?? assets[0].name;
+
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
           child: AlertDialog(
@@ -77,7 +79,7 @@ class _SelectPayoutAssetDialogState extends State<SelectPayoutAssetDialog>
                       Navigator.pop(dialogContext);
                       showAppDialog(
                         ChoosePayoutStrategyDialog(
-                          assetName: selectedAssetName,
+                          assetName: selectedAssetName!,
                         ),
                         dialogContext,
                       );
@@ -169,13 +171,13 @@ class _SelectPayoutAssetDialogState extends State<SelectPayoutAssetDialog>
                                 children: [
                                   TokenListTile(
                                     isSingleSelect: true,
-                                    isSelect: assets[index].name! == selectedAssetName,
-                                    tokenName: assets[index].name!,
+                                    isSelect: assets[index].symbol == selectedAssetName,
+                                    tokenName: assets[index].symbol,
                                     isDense: true,
                                     onTap: () {
-                                      lockCubit.updateLockRewardNewRoute(
-                                        asset: assets[index].name!,
-                                      );
+                                      setState(() {
+                                        selectedAssetName = assets[index].symbol;
+                                      });
                                     },
                                   ),
                                   SizedBox(

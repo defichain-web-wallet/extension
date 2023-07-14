@@ -1,4 +1,4 @@
-import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
@@ -52,17 +52,17 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
         bool isFullScreen,
         TransactionState txState,
       ) {
-        FiatCubit fiatCubit = BlocProvider.of<FiatCubit>(context);
-        fiatCubit.loadCountryList();
-        return BlocBuilder<FiatCubit, FiatState>(
-          builder: (BuildContext context, fiatState) {
-            if (fiatState.personalInfo != null) {
-              _nameController.text = fiatState.personalInfo!.firstname!;
-              _surnameController.text = fiatState.personalInfo!.surname!;
-            }
-            if (fiatState.status == FiatStatusList.loading) {
+        RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
+        rampCubit.loadCountries();
+        return BlocBuilder<RampCubit, RampState>(
+          builder: (BuildContext context, rampState) {
+            // if (rampState.personalInfo != null) {
+            //   _nameController.text = rampState.personalInfo!.firstname!;
+            //   _surnameController.text = rampState.personalInfo!.surname!;
+            // }
+            if (rampState.status == RampStatusList.loading) {
               return Loader();
-            } else if (fiatState.status == FiatStatusList.expired) {
+            } else if (rampState.status == RampStatusList.expired) {
               Future.microtask(() => Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
@@ -263,15 +263,22 @@ class _AccountTypeSellState extends State<AccountTypeSell> with ThemeMixin {
                                   if (_formKey.currentState!.validate()) {
                                     lockHelper.provideWithLockChecker(context,
                                         () {
-                                      FiatCubit fiatCubit =
-                                          BlocProvider.of<FiatCubit>(context);
-                                      fiatCubit.setUserName(
-                                          _nameController.text,
-                                          _surnameController.text);
-                                      NavigatorService.push(
-                                        context,
-                                        SellKycSecondScreen(),
+                                      RampCubit rampCubit =
+                                          BlocProvider.of<RampCubit>(context);
+                                      rampCubit.setUserName(
+                                        _nameController.text,
+                                        _surnameController.text,
                                       );
+                                      Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                SellKycSecondScreen(),
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration:
+                                                Duration.zero,
+                                          ));
                                     });
                                   }
                                 },

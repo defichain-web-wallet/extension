@@ -46,7 +46,7 @@ class HistoryHelper {
       if (SettingsHelper.settings.network! ==
           'mainnet') {
         launch(
-          'https://live.blockcypher.com/btc/tx/$txId',
+            'https://live.blockcypher.com/btc/tx/$txId',
         );
       } else {
         launch(

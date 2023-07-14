@@ -29,18 +29,23 @@ class HomeExtendedView extends StatelessWidget with ThemeMixin {
       buildWhen: (prev, current) => true,
       builder: (context, homeState) {
         return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: isLargeScreen(context)
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 264,
-              width: 272,
-              alignment: Alignment.topCenter,
-              child: homeState.isShowExtendedNetworkSelector ? NetworkSelector(
-                onSelect: () {},
-                isAppBar: false,
-              ) : null,
-            ),
+            if (isLargeScreen(context))
+              Container(
+                height: 264,
+                width: 272,
+                alignment: Alignment.topCenter,
+                child: homeState.isShowExtendedNetworkSelector
+                    ? NetworkSelector(
+                        onSelect: () {},
+                        isAppBar: false,
+                      )
+                    : null,
+              ),
             Container(
               width: firstColumnWidth,
               child: Column(
@@ -51,6 +56,10 @@ class HomeExtendedView extends StatelessWidget with ThemeMixin {
                 ],
               ),
             ),
+            if (!isLargeScreen(context))
+              SizedBox(
+                width: 16,
+              ),
             Flexible(
               child: Container(
                 padding:
@@ -73,13 +82,15 @@ class HomeExtendedView extends StatelessWidget with ThemeMixin {
                     : homeState.scrollView,
               ),
             ),
-            Container(
-              width: 272,
-              child: homeState.isShowExtendedAccountDrawer ? AccountDrawer(
+            if (isLargeScreen(context))
+              Container(
                 width: 272,
-                isFullScreen: true,
-              ) : null,
-            ),
+                child: homeState.isShowExtendedAccountDrawer
+                    ? AccountDrawer(
+                        width: 272,
+                      )
+                    : null,
+              ),
           ],
         );
       },

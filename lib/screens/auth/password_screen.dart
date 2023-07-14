@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
@@ -196,13 +197,13 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         ),
                         Container(
                           width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
-                          child: BlocBuilder<AccountCubit, AccountState>(
+                          child: BlocBuilder<WalletCubit, WalletState>(
                             builder: (context, state) {
                               return PendingButton(
                                 'Create password',
                                 pendingText: state.status ==
-                                        AccountStatusList.restore
-                                    ? 'Processing (${state.restored}/${state.needRestore})'
+                                        WalletStatusList.restore
+                                    ? 'Processing ${state.restoreProgress}'
                                     : 'Processing...',
                                 isCheckLock: false,
                                 callback: _enableBtn && isConfirm

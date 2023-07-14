@@ -1,10 +1,9 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/lock_reward_routes_model.dart';
+import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/screens/error_screen.dart';
 import 'package:defi_wallet/screens/staking/stake_unstake_screen.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
@@ -18,12 +17,10 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/staking/reward_icon.dart';
 import 'package:defi_wallet/widgets/staking/reward_routes.dart';
-import 'package:defi_wallet/widgets/staking/staking_tabs.dart';
-import 'package:defi_wallet/widgets/staking/yield_machine/yield_machine_balances.dart';
+import 'package:defi_wallet/widgets/staking/staking_header.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class StakingScreen extends StatefulWidget {
   const StakingScreen({
@@ -37,22 +34,37 @@ class StakingScreen extends StatefulWidget {
 class _StakingScreenState extends State<StakingScreen>
     with ThemeMixin, SnackBarMixin {
   final String titleText = 'Staking';
-  final String headerTextStaking = 'DFI Staking by LOCK';
   final String headerTextYieldMachine = 'Yield Machine by LOCK';
   bool isEdit = false;
   bool isFirstBuild = true;
   TextEditingController controller = TextEditingController();
   late List<TextEditingController> controllers;
   late List<FocusNode> focusNodes;
+
   late List<Widget> rewards;
 
   _onSaveRewardRoutes(BuildContext context) {
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-    AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
+    double sum = controllers
+        .map((e) => double.parse(e.text))
+        .reduce((value, element) => value + element);
+    if (sum > 100) {
+      showSnackBar(
+        context,
+        duration: 4,
+        title: 'Total percentage should not exceed 100%',
+        color: AppColors.txStatusError.withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
+        ),
+      );
+      return;
+    }
 
     lockCubit.updateRewardRoutes(
-      accountCubit.state.accounts!.first,
-      lockCubit.state.lockStakingDetails!.rewardRoutes!,
+      walletCubit.state.activeNetwork,
     );
     setState(() {
       isEdit = false;
@@ -67,41 +79,17 @@ class _StakingScreenState extends State<StakingScreen>
         bool isFullScreen,
         TransactionState txState,
       ) {
-        AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
-        LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-        if (isFirstBuild) {
-          lockCubit.loadStakingDetails(accountCubit.state.accounts!.first);
-          isFirstBuild = false;
-        }
         return BlocBuilder<LockCubit, LockState>(
           builder: (lockContext, lockState) {
             if (lockState.status == LockStatusList.success) {
-              List<LockRewardRoutesModel> rewards =
-                  lockState.lockStakingDetails!.rewardRoutes!;
+              List<RewardRouteModel> rewards = lockState.rewards();
               controllers = List.generate(rewards.length, (index) {
                 return TextEditingController(
                     text: (rewards[index].rewardPercent! * 100).toString());
               });
               focusNodes = List.generate(rewards.length, (index) => FocusNode());
               controller.text =
-                  '${lockState.lockStakingDetails!.rewardRoutes![0].rewardPercent! * 100}';
-              bool isYieldMachine =
-                  lockState.lockStrategy == LockStrategyList.LiquidityMining;
-
-              if (lockState.errorMessage.isNotEmpty) {
-                Future<Null>.delayed(Duration.zero, () {
-                  showSnackBar(
-                    context,
-                    title: lockState.errorMessage,
-                    color: AppColors.txStatusError.withOpacity(0.1),
-                    prefix: Icon(
-                      Icons.close,
-                      color: AppColors.txStatusError,
-                    ),
-                  );
-                });
-                lockCubit.updateErrorMessage('');
-              }
+                  '${1 * 100}';
 
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
@@ -112,131 +100,18 @@ class _StakingScreenState extends State<StakingScreen>
                   bgColor: AppColors.viridian.withOpacity(0.16),
                   isShowLogo: false,
                   isShowNetworkSelector: false,
-                  callback: () {
-                    lockCubit.updateLockStrategy(
-                      LockStrategyList.Masternode,
-                      accountCubit.state.accounts!.first,
-                    );
-                  },
+                  callback: () {},
                 ),
                 body: Container(
                   decoration: BoxDecoration(
-                      color: AppColors.viridian.withOpacity(0.16)),
+                    color: isFullScreen ? null : AppColors.viridian.withOpacity(0.16) ,
+                  ),
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        Container(
-                          padding: EdgeInsets.only(
-                            top: 8,
-                            left: 16,
-                            right: 16,
-                            bottom: 16,
-                          ),
-                          child: Stack(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                      top: 20,
-                                    ),
-                                    padding: EdgeInsets.only(top: 38),
-                                    width: 328,
-                                    height: 123,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: isDarkTheme()
-                                          ? AppColors.white.withOpacity(0.04)
-                                          : LightColors
-                                              .scaffoldContainerBgColor,
-                                      border: isDarkTheme()
-                                          ? Border.all(
-                                              width: 1.0,
-                                              color: Colors.white
-                                                  .withOpacity(0.05),
-                                            )
-                                          : null,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          !lockState.isYieldMachine
-                                              ? headerTextStaking
-                                              : headerTextYieldMachine,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .copyWith(
-                                                fontSize: 16,
-                                              ),
-                                        ),
-                                        SizedBox(
-                                          height: 4,
-                                        ),
-                                        Text(
-                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apy!, 'APY')} / '
-                                          '${getAprOrApyFormat(lockState.lockAnalyticsDetails!.apr!, 'APR')}',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.6),
-                                              ),
-                                        ),
-                                        SizedBox(
-                                          height: 4,
-                                        ),
-                                        Text(
-                                          '5.55% Fee',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .copyWith(
-                                                fontSize: 12,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .headline5!
-                                                    .color!
-                                                    .withOpacity(0.3),
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.only(
-                                      top: 7.17,
-                                      bottom: 11.77,
-                                      left: 3,
-                                      right: 12.77,
-                                    ),
-                                    width: 50,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Color(0xFF167156),
-                                    ),
-                                    child: SvgPicture.asset(
-                                      'assets/icons/staking_lock.svg',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                        StakingHeader(
+                          apr: lockState.stakingTokenModel!.apr!,
+                          apy: lockState.stakingTokenModel!.apy!,
                         ),
                         Container(
                           padding: EdgeInsets.only(
@@ -260,6 +135,8 @@ class _StakingScreenState extends State<StakingScreen>
                             borderRadius: BorderRadius.only(
                               topRight: Radius.circular(20),
                               topLeft: Radius.circular(20),
+                              bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                              bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                             ),
                           ),
                           child: StretchBox(
@@ -273,6 +150,12 @@ class _StakingScreenState extends State<StakingScreen>
                                 SizedBox(
                                   height: 16,
                                 ),
+                                // StakingTabs(
+                                //   lockStrategy: lockState.lockStrategy,
+                                // ),
+                                SizedBox(
+                                  height: 24,
+                                ),
                                 Container(
                                   width: double.infinity,
                                   padding: EdgeInsets.all(16),
@@ -285,7 +168,7 @@ class _StakingScreenState extends State<StakingScreen>
                                   ),
                                   child: Column(
                                     children: [
-                                      if (!lockState.isYieldMachine) ...[
+                                      ...[
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -293,7 +176,7 @@ class _StakingScreenState extends State<StakingScreen>
                                               CrossAxisAlignment.center,
                                           children: [
                                             Text(
-                                              '${lockState.lockStakingDetails!.asset} Staking',
+                                              '${lockState.stakingModel!.balances[0].asset} Staking',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline4!
@@ -302,7 +185,7 @@ class _StakingScreenState extends State<StakingScreen>
                                                   ),
                                             ),
                                             Text(
-                                              '${lockState.lockStakingDetails!.balance} ${lockState.lockStakingDetails!.asset}',
+                                              '${lockState.stakingModel!.balances[0].balance} ${lockState.stakingModel!.balances[0].asset}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline4!
@@ -335,9 +218,9 @@ class _StakingScreenState extends State<StakingScreen>
                                                   ),
                                             ),
                                             Text(
-                                              '${lockState.lockStakingDetails!.pendingDeposits == 0 ? '' : '+'}'
-                                              '${lockState.lockStakingDetails!.pendingDeposits}'
-                                              ' ${lockState.lockStakingDetails!.asset}',
+                                              '${lockState.stakingModel!.balances[0].pendingDeposits == 0 ? '' : '+'}'
+                                              '${lockState.stakingModel!.balances[0].pendingDeposits}'
+                                              ' ${lockState.stakingModel!.balances[0].asset}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline5!
@@ -375,9 +258,9 @@ class _StakingScreenState extends State<StakingScreen>
                                                   ),
                                             ),
                                             Text(
-                                              '${lockState.lockStakingDetails!.pendingWithdrawals == 0 ? '' : '-'}'
-                                              '${lockState.lockStakingDetails!.pendingWithdrawals}'
-                                              ' ${lockState.lockStakingDetails!.asset}',
+                                              '${lockState.stakingModel!.balances[0].pendingWithdrawals == 0 ? '' : '-'}'
+                                              '${lockState.stakingModel!.balances[0].pendingWithdrawals}'
+                                              ' ${lockState.stakingModel!.balances[0].asset}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headline5!
@@ -392,8 +275,9 @@ class _StakingScreenState extends State<StakingScreen>
                                             ),
                                           ],
                                         ),
-                                      ] else
-                                        YieldMachineBalance(),
+                                      ],
+                                    // else
+                                    //     YieldMachineBalance(),
                                       SizedBox(
                                         height: 16,
                                       ),
@@ -452,8 +336,9 @@ class _StakingScreenState extends State<StakingScreen>
                                       ),
                                       if (!isEdit)
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: isFullScreen
+                                              ? MainAxisAlignment.center
+                                              : MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
                                               width: 140,
@@ -466,6 +351,10 @@ class _StakingScreenState extends State<StakingScreen>
                                                 },
                                               ),
                                             ),
+                                            if (isFullScreen)
+                                              SizedBox(
+                                                width: 16,
+                                              ),
                                             NewPrimaryButton(
                                               width: 140,
                                               title: 'Stake',
@@ -479,8 +368,9 @@ class _StakingScreenState extends State<StakingScreen>
                                         ),
                                       if (isEdit)
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: isFullScreen
+                                              ? MainAxisAlignment.center
+                                              : MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
                                               width: 140,
@@ -493,6 +383,10 @@ class _StakingScreenState extends State<StakingScreen>
                                                 },
                                               ),
                                             ),
+                                            if (isFullScreen)
+                                              SizedBox(
+                                                width: 16,
+                                              ),
                                             NewPrimaryButton(
                                               width: 140,
                                               title: 'Save',
@@ -522,13 +416,5 @@ class _StakingScreenState extends State<StakingScreen>
         );
       },
     );
-  }
-
-  String getAprOrApyFormat(double amount, String amountType) {
-    return '${BalancesHelper().numberStyling(
-      (amount * 100),
-      fixed: true,
-      fixedCount: 2,
-    )}% $amountType';
   }
 }

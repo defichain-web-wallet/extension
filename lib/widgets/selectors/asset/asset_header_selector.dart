@@ -27,13 +27,7 @@ class AssetHeaderSelector extends StatefulWidget {
 class _AssetHeaderSelectorState extends State<AssetHeaderSelector>
     with ThemeMixin {
   String formatAssetName(String value) {
-    if (SettingsHelper.isBitcoin()) {
-      return widget.assetCode;
-    } else {
-      return TokensHelper().getTokenWithPrefix(
-        widget.assetCode,
-      );
-    }
+    return widget.assetCode;
   }
 
   @override

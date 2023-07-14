@@ -8,9 +8,16 @@ mixin SnackBarMixin {
   // Hack for infinite showing snack bar
   static const int seconds = 3;
 
-  showSnackBar(context, {String title = '', Color? color, Widget? prefix,}) {
+  showSnackBar(
+    context, {
+    String title = '',
+    int? duration,
+    Color? color,
+    Widget? prefix,
+  }) {
     SnackBar snackBar = bottomSnackBar(context,
       title: title,
+      duration: duration,
       color: color ?? AppColors.txStatusDone.withOpacity(0.08),
       prefix: prefix ??  Icon(
         Icons.done,
@@ -26,6 +33,7 @@ mixin SnackBarMixin {
     required Color color,
     required String title,
     String? subtitle,
+    int? duration,
     Widget? prefix,
     Widget? suffix,
     Function? onTapCallback,
@@ -49,7 +57,7 @@ mixin SnackBarMixin {
         prefix: prefix,
         onTapCallback: onTapCallback,
       ),
-      duration: Duration(seconds: seconds),
+      duration: Duration(seconds: duration ?? seconds),
       backgroundColor: Colors.transparent,
     );
   }

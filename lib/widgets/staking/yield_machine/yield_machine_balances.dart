@@ -23,11 +23,11 @@ class YieldMachineBalance extends StatelessWidget {
         double totalBalance = 0;
         state.availableBalances.forEach((element) {
           if (element.balance! > 0) {
-            totalBalance += tokensHelper.getAmountByUsd(
-              tokensCubit.state.tokensPairs!,
-              element.balance!,
-              element.asset!,
-            );
+            // totalBalance += tokensHelper.getAmountByUsd(
+            //   tokensCubit.state.tokensPairs!,
+            //   element.balance!,
+            //   element.asset!,
+            // );
           }
         });
         return Column(

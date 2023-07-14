@@ -1,100 +1,99 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/lock/lock_cubit.dart';
-import 'package:defi_wallet/helpers/access_token_helper.dart';
+import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/screens/earn/earn_card.dart';
+import 'package:defi_wallet/screens/staking/kyc/staking_kyc_start_screen.dart';
+import 'package:defi_wallet/screens/staking/staking_screen.dart';
+import 'package:defi_wallet/services/navigation/navigator_service.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StakingCard extends StatelessWidget {
-  final Function() loadEarnData;
-  final Function() callback;
-
   const StakingCard({
     Key? key,
-    required this.loadEarnData,
-    required this.callback,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print(LockStrategyList.Masternode.toString());
     return BlocBuilder<LockCubit, LockState>(builder: (context, lockState) {
+      LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
       var isLoading = lockState.status == LockStatusList.initial ||
           lockState.status == LockStatusList.loading;
-      var isExpiredAccessToken = lockState.status == LockStatusList.expired;
-      LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-      AccountCubit accountCubit = BlocProvider.of<AccountCubit>(context);
       if (lockState.status == LockStatusList.success || isLoading) {
         return EarnCard(
           isLoading: isLoading,
           title: 'Staking',
-          subTitle: isLoading
-              ? ''
-              : 'up to '
+          subTitle: lockState.lockAccountPresent!
+              ? 'up to '
                   '${BalancesHelper().numberStyling(
-                  (lockState.lockAnalyticsDetails!.apy! * 100),
+                  (lockState.stakingTokenModel!.apy! * 100),
                   fixed: true,
                   fixedCount: 2,
-                )}% APY',
+                )}% APY'
+              : 'N/A',
           imagePath: 'assets/images/dfi_staking.png',
           firstColumnNumber: isLoading
               ? ''
-              : lockCubit.checkVerifiedUser()
+              : lockState.lockAccountPresent!
                   ? BalancesHelper().numberStyling(
-                      lockState.lockStakingDetails!.balance!,
+                      lockState.stakingModel!.balances.first.balance,
                       fixed: true,
                       fixedCount: 2,
                     )
                   : '0.00',
-          firstColumnAsset: lockCubit.checkVerifiedUser()
-              ? lockState.lockStakingDetails!.asset!
+          firstColumnAsset: lockState.lockAccountPresent!
+              ? lockState.stakingModel!.balances.first.asset
               : 'DFI',
           firstColumnSubTitle: 'Staked',
           isStaking: true,
           needUpdateAccessToken: false,
           errorMessage: 'Need to create account of LOCK',
           callback: () {
-            bool isEmptyToken =
-                accountCubit.state.accounts!.first.lockAccessToken == null ||
-                    accountCubit.state.accounts!.first.lockAccessToken!.isEmpty;
-            if (isEmptyToken || isExpiredAccessToken) {
-              var needDfxToken =
-                  accountCubit.state.accounts!.first.accessToken == null ||
-                      accountCubit.state.accounts!.first.accessToken!.isEmpty;
-              AccessTokenHelper.setupLockAccessToken(
-                context,
-                loadEarnData,
-                needUpdateDfx: needDfxToken || isExpiredAccessToken,
-                dialogMessage:
-                    'Please entering your password for create account',
-              );
-            } else {
-              if (!isLoading) {
-                callback();
-              }
+            if (!isLoading) {
+              stakingCallback(context);
             }
           },
         );
-      } else if (lockState.status == LockStatusList.expired) {
+      } else if (lockState.status == LockStatusList.notFound ||
+          lockState.status == LockStatusList.neededKyc ||
+          lockState.status == LockStatusList.expired) {
         return EarnCard(
           isLoading: isLoading,
           title: 'Staking',
-          subTitle: '',
+          subTitle: 'N/A APY',
           imagePath: 'assets/images/dfi_staking.png',
-          firstColumnNumber: '0.00',
-          firstColumnAsset: '\$',
+          firstColumnNumber: 'N/A',
+          firstColumnAsset: '',
           firstColumnSubTitle: 'Staked',
           isStaking: true,
-          needUpdateAccessToken: true,
-          errorMessage: 'Need to update access token of LOCK',
+          needUpdateAccessToken: false,
+          errorMessage: lockState.status == LockStatusList.notFound ||
+                  lockState.status == LockStatusList.expired
+              ? 'Need to create access token of LOCK'
+              : 'Need to pass KYC of LOCK',
           callback: () async {
-            lockCubit.setLoadingState();
-            await AccessTokenHelper.setupLockAccessToken(context, loadEarnData,
-                needUpdateDfx: true,
-                isExistingAccount: true,
-                dialogMessage:
-                    'Please entering your password for restore connecting to LOCK');
+            if (lockState.status == LockStatusList.neededKyc) {
+              stakingCallback(context);
+            } else
+              showDialog(
+                barrierColor: AppColors.tolopea.withOpacity(0.06),
+                barrierDismissible: false,
+                context: context,
+                builder: (BuildContext dialogContext) {
+                  return PassConfirmDialog(
+                    onCancel: () {},
+                    onSubmit: (password) async {
+                      if (lockState.status == LockStatusList.notFound) {
+                        await lockCubit.signUp(context, password);
+                      } else {
+                        await lockCubit.signIn(context, password);
+                      }
+                      await stakingCallback(context);
+                    },
+                  );
+                },
+              );
           },
         );
       } else {
@@ -102,5 +101,14 @@ class StakingCard extends StatelessWidget {
         return Text('LOCK is offline');
       }
     });
+  }
+
+  stakingCallback(context) async {
+    LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
+    if (lockCubit.state.isKycDone!) {
+      NavigatorService.push(context, StakingScreen());
+    } else {
+      NavigatorService.push(context, StakingKycStartScreen());
+    }
   }
 }
