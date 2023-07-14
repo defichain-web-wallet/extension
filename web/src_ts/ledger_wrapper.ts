@@ -6,6 +6,7 @@ import Transport from "@ledgerhq/hw-transport"
 
 import { listen } from "@ledgerhq/logs";
 import TransportWebHID from "@ledgerhq/hw-transport-webhid";
+import SpeculosTransport from "hw-transport-node-speculos-http";
 
 export class LedgerJellywalletWrapper {
 
@@ -13,8 +14,8 @@ export class LedgerJellywalletWrapper {
     private ledgerBtc = new JellyWalletBtcLedger();
 
     async getTransport(): Promise<Transport> {
-        // return await SpeculosTransport.open({ baseURL: "172.21.226.17:5000" });
-        return await TransportWebHID.create();
+        return await SpeculosTransport.open({ baseURL: "172.28.169.51:5000" });
+        //return await TransportWebHID.create();
     }
 
     private parseAppName(buffer: Buffer) {

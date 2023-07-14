@@ -90,29 +90,32 @@ class WelcomeScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 12),
-                            Container(
-                              width: isFullScreen
-                                  ? buttonFullWidth
-                                  : buttonSmallWidth,
-                              child: AccentButton(
-                                isOpasity: true,
-                                isCheckLock: false,
-                                label: 'Set up wallet with Ledger',
-                                callback: () {
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                              LedgerAuthLoaderScreen(callback: ()=>{}, errorCallback: ()=>{}),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            SizedBox(height: 12),
+                            // Container(
+                            //   width: isFullScreen
+                            //       ? buttonFullWidth
+                            //       : buttonSmallWidth,
+                            //   child: AccentButton(
+                            //     isOpasity: true,
+                            //     isCheckLock: false,
+                            //     label: 'Set up wallet with Ledger',
+                            //     callback: () {
+                            //       Navigator.push(
+                            //         context,
+                            //         PageRouteBuilder(
+                            //           pageBuilder:
+                            //               (context, animation1, animation2) =>
+                            //                   LedgerAuthLoaderScreen(
+                            //                       callback: () => {},
+                            //                       errorCallback: () => {},
+                            //                       appName: "btc"),
+                            //           transitionDuration: Duration.zero,
+                            //           reverseTransitionDuration: Duration.zero,
+                            //         ),
+                            //       );
+                            //     },
+                            //   ),
+                            // ),
+                            // SizedBox(height: 12),
                             NewPrimaryButton(
                               width: isFullScreen
                                   ? buttonFullWidth

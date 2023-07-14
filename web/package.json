@@ -2,6 +2,7 @@
   "name": "jelly-wallet-web",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "source": "index-base.html",
   "directories": {
     "lib": "lib"
@@ -29,7 +30,7 @@
     "core-js": "^3.31.1",
     "defichainjs-lib": "^6.0.4",
     "hw-app-dfi": "^7.1.0",
-    "hw-transport-node-speculos-http": "6.27.4"
+    "hw-transport-node-speculos-http": "6.27.17"
   },
   "devDependencies": {
     "@parcel/packager-raw-url": "2.9.3",
