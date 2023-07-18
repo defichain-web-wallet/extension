@@ -8,6 +8,7 @@ import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/storage/hive_service.dart';
@@ -156,15 +157,30 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
     });
 
     if (widget.savedMnemonic == null) {
-      var applicationModel = await StorageService.loadApplication();
+      ApplicationModel applicationModel =
+          await StorageService.loadApplication();
       if (applicationModel.validatePassword(_passwordController.text)) {
         setState(() {
           isValid = true;
           _formKey.currentState!.validate();
         });
+        int hourInMilliseconds = 60 * 60 * 1000;
 
+        int expireTime = applicationModel.activeNetwork!.stakingList[0]
+            .accessTokensMap[0]!.expireTime - hourInMilliseconds;
+        int currentTime = DateTime.now().millisecondsSinceEpoch;
+
+        bool isExpire = expireTime < currentTime;
         parent.emitPending(true);
-        await walletCubit.loadWalletDetails();
+        if (isExpire) {
+          await walletCubit.updateAccessKeys(
+            applicationModel,
+            _passwordController.text,
+          );
+        }
+        await walletCubit.loadWalletDetails(
+          application: applicationModel,
+        );
         parent.emitPending(false);
         LoggerService.invokeInfoLogg('user was unlock wallet');
 

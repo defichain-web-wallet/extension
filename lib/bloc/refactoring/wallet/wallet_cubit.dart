@@ -155,6 +155,39 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
+  updateAccessKeys(ApplicationModel applicationModel, String password) async {
+    try {
+      for (var network in applicationModel.networks) {
+        if (network.networkType.networkName.name ==
+            NetworkName.defichainMainnet.name) {
+          applicationModel.accounts.forEach((element) async {
+            await (network.stakingList[0] as LockStakingProviderModel).signIn(
+              element,
+              password,
+              applicationModel,
+              network,
+            );
+            await (network.rampList[0] as DFXRampModel).signIn(
+              element,
+              password,
+              applicationModel,
+              network,
+            );
+          });
+        }
+      }
+
+      emit(state.copyWith(
+        applicationModel: applicationModel,
+        status: WalletStatusList.success,
+      ));
+    } catch (_) {
+      emit(state.copyWith(
+        status: WalletStatusList.failure,
+      ));
+    }
+  }
+
   loadWalletDetails({ApplicationModel? application}) async {
     try {
       ApplicationModel applicationModel =

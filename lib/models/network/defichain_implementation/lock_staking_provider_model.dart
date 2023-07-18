@@ -32,6 +32,7 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
       final accessTokenModel = AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
+        expireTime: DateTime.now().millisecondsSinceEpoch,
       );
       print(accessTokenModel.toJson());
       this.accessTokensMap[account.accountIndex] = accessTokenModel;
