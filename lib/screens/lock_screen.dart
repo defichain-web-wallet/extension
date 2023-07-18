@@ -11,6 +11,7 @@ import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/services/password_service.dart';
 import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
@@ -81,7 +82,6 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
                         child: Column(
                           children: [
                             PasswordTextField(
-                              onlyEngCharacters: false,
                               isOpasity: !isFullScreen,
                               height: 71,
                               controller: _passwordController,
@@ -99,7 +99,7 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
                                 setState(() =>
                                     isPasswordObscure = !isPasswordObscure);
                               },
-                              validator: (val){
+                              validator: (val) {
                                 return isValid ? null : "Incorrect password";
                               },
                             ),
@@ -110,7 +110,7 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
                                 pendingText: 'Pending...',
                                 isCheckLock: false,
                                 globalKey: globalKey,
-                                callback: (parent) => _restoreWallet(parent),
+                                callback: (parent) => _submit(parent),
                               ),
                             ),
                             SizedBox(height: 20),
@@ -121,15 +121,16 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
                               ),
                               onTap: isEnable
                                   ? () => Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                      RecoveryScreen(),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
-                              )
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1,
+                                                  animation2) =>
+                                              RecoveryScreen(),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration:
+                                              Duration.zero,
+                                        ),
+                                      )
                                   : null,
                             ),
                           ],
@@ -146,7 +147,18 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
     );
   }
 
-  void _restoreWallet(parent) async {
+  Future _submit(parent) async {
+    await PasswordService().handleCorrectAndRun(
+      context,
+      _passwordController.text,
+      isLockScreen: true,
+      () async {
+        await _restoreWallet(parent);
+      },
+    );
+  }
+
+  Future _restoreWallet(parent) async {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
 
     setState(() {
@@ -166,17 +178,20 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
         });
         int hourInMilliseconds = 60 * 60 * 1000;
 
-        int expireTime = applicationModel.activeNetwork!.stakingList[0]
-            .accessTokensMap[0]!.expireTime - hourInMilliseconds;
-        int currentTime = DateTime.now().millisecondsSinceEpoch;
+        final accessTokensMap =
+            applicationModel.activeNetwork!.stakingList[0].accessTokensMap;
+        if (accessTokensMap.length > 0) {
+          int expireTime = accessTokensMap[0]!.expireTime - hourInMilliseconds;
+          int currentTime = DateTime.now().millisecondsSinceEpoch;
 
-        bool isExpire = expireTime < currentTime;
-        parent.emitPending(true);
-        if (isExpire) {
-          await walletCubit.updateAccessKeys(
-            applicationModel,
-            _passwordController.text,
-          );
+          bool isExpire = expireTime < currentTime;
+          parent.emitPending(true);
+          if (isExpire) {
+            await walletCubit.updateAccessKeys(
+              applicationModel,
+              _passwordController.text,
+            );
+          }
         }
         await walletCubit.loadWalletDetails(
           application: applicationModel,
@@ -229,7 +244,8 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
 
             try {
               var lastSent = await HiveService.getData(HiveNames.lastSent);
-              var addressBook = await HiveService.getData(HiveNames.addressBook);
+              var addressBook =
+                  await HiveService.getData(HiveNames.addressBook);
               List<AddressBookModel> lastSentAddressBook = [];
               List<AddressBookModel> mainAddressBook = [];
 
@@ -246,8 +262,8 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
                 var mainAddressBookList = json.decode(addressBook);
                 mainAddressBook = List.generate(
                   mainAddressBookList.length,
-                      (index) => AddressBookModel.fromJson(
-                        mainAddressBookList[index],
+                  (index) => AddressBookModel.fromJson(
+                    mainAddressBookList[index],
                   ),
                 );
               }
