@@ -59,6 +59,7 @@ class DFXRampModel extends AbstractOnOffRamp {
       accessTokensMap[account.accountIndex] = AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
+        expireTime: DateTime.now().millisecondsSinceEpoch,
       );
     }
   }
