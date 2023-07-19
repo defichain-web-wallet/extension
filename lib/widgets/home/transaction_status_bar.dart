@@ -4,6 +4,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -20,7 +21,7 @@ class TransactionStatusBar extends StatefulWidget {
 }
 
 class _TransactionStatusBarState extends State<TransactionStatusBar>
-    with SnackBarMixin, TickerProviderStateMixin {
+    with SnackBarMixin, ThemeMixin, TickerProviderStateMixin {
   late NetworkTypeModel networkType;
   late final AnimationController animationController = AnimationController(
     vsync: this,
@@ -105,6 +106,7 @@ class _TransactionStatusBarState extends State<TransactionStatusBar>
               turns: Tween(begin: 0.0, end: 1.0).animate(animationController),
               child: SvgPicture.asset(
                 'assets/icons/circular_spinner.svg',
+                color: isDarkTheme() ? AppColors.white : AppColors.blackRock,
               ),
             ),
           );
