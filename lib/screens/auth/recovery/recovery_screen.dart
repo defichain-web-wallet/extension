@@ -100,21 +100,11 @@ class _RecoveryScreenState extends State<RecoveryScreen>
               } catch (err) {
                 showSnackBar(
                   context,
-                  title: 'Something went wrong',
+                  title: 'Recoverring error. Please try later',
                   color: AppColors.txStatusError.withOpacity(0.1),
                   prefix: Icon(
                     Icons.close,
                     color: AppColors.txStatusError,
-                  ),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Something error',
-                      style: Theme.of(context).textTheme.headline5,
-                    ),
-                    backgroundColor:
-                        Theme.of(context).snackBarTheme.backgroundColor,
                   ),
                 );
               }
