@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class SwapAccountSelectorDialog extends StatefulWidget {
   final Function()? deleteCallback;
   final Function(String name, String address) confirmCallback;
-  final Function(int index) onSelect;
+  final Function(String id) onSelect;
 
   const SwapAccountSelectorDialog({
     Key? key,
@@ -100,14 +100,13 @@ class _SwapAccountSelectorDialog extends State<SwapAccountSelectorDialog> {
                         ),
                         Text(
                           'Select the account you want to change from',
-                          style:
-                          Theme.of(context).textTheme.headline5!.apply(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .color!
-                                .withOpacity(0.6),
-                          ),
+                          style: Theme.of(context).textTheme.headline5!.apply(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .color!
+                                    .withOpacity(0.6),
+                              ),
                         ),
                         SizedBox(
                           height: 16,
@@ -124,7 +123,7 @@ class _SwapAccountSelectorDialog extends State<SwapAccountSelectorDialog> {
                                     AccountMenuButton(
                                       accountSelectMode: true,
                                       callback: (index) {
-                                        widget.onSelect(index);
+                                        widget.onSelect(index!.id!);
                                         Navigator.pop(context);
                                       },
                                       // account: accounts[index],

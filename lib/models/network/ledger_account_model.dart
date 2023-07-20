@@ -2,6 +2,7 @@ import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 
 class LedgerAccountModel extends AbstractAccountModel {
@@ -9,6 +10,7 @@ class LedgerAccountModel extends AbstractAccountModel {
   final String pubKey;
 
   LedgerAccountModel({
+    required String? id,
     required this.address,
     required this.pubKey,
     required String sourceId,
@@ -16,35 +18,34 @@ class LedgerAccountModel extends AbstractAccountModel {
     required String name,
     required List<AddressBookModel> addressBook,
     required List<AddressBookModel> lastSend,
-  }) : super(null, pubKey, sourceId, pinnedBalances, name, addressBook, lastSend);
+  }) : super(id, null, pubKey, sourceId, pinnedBalances, name, addressBook,
+            lastSend);
+
+  @override
+  List<AbstractNetworkModel> getNetworkModelList(ApplicationModel model) {
+    return model.networks
+        .where((element) => !element.networkType.isLocalWallet)
+        .toList();
+  }
 
   factory LedgerAccountModel.fromJson(
       Map<String, dynamic> jsonModel, List<AbstractNetworkModel> networkList) {
     Map<String, List<BalanceModel>> pinnedBalances = {};
 
-    for (var network in networkList) {
-      var balanceList = jsonModel['pinnedBalances']
-      [network.networkType.networkName.name] as List;
-      pinnedBalances[network.networkType.networkName.name] =
-      List<BalanceModel>.generate(
-        balanceList.length,
-            (index) => BalanceModel.fromJSON(balanceList[index]),
-      );
-    }
-
     var addressBookList = jsonModel["addressBook"] as List;
     final addressBook = List<AddressBookModel>.generate(
       addressBookList.length,
-          (index) => AddressBookModel.fromJson(addressBookList[index]),
+      (index) => AddressBookModel.fromJson(addressBookList[index]),
     );
 
     var lastSendList = jsonModel["lastSendList"] as List;
     final lastSend = List<AddressBookModel>.generate(
       lastSendList.length,
-          (index) => AddressBookModel.fromJson(lastSendList[index]),
+      (index) => AddressBookModel.fromJson(lastSendList[index]),
     );
 
     return LedgerAccountModel(
+        id: jsonModel['id'],
         address: jsonModel['address'],
         pubKey: jsonModel['pubKey'],
         sourceId: jsonModel['sourceId'],
@@ -62,6 +63,7 @@ class LedgerAccountModel extends AbstractAccountModel {
   @override
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data["id"] = this.id;
     data["sourceId"] = this.sourceId;
     data["pubKey"] = this.pubKey;
     data["address"] = this.address;
@@ -80,12 +82,14 @@ class LedgerAccountModel extends AbstractAccountModel {
 
   static Future<LedgerAccountModel> fromLedger(
       {required AbstractNetworkModel network,
-        required String address,
-        required String publicKey,
-        required String sourceId, isRestore = false}) async {
+      required String address,
+      required String publicKey,
+      required String sourceId,
+      isRestore = false}) async {
     Map<String, List<BalanceModel>> pinnedBalances = {};
 
     return LedgerAccountModel(
+        id: null,
         address: address,
         pubKey: publicKey,
         sourceId: sourceId,

@@ -1,9 +1,12 @@
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:uuid/uuid.dart';
 
 abstract class AbstractAccountModel {
+  late String? id;
   final String? publicKeyTestnet;
   final String? publicKeyMainnet;
   final String sourceId;
@@ -13,12 +16,23 @@ abstract class AbstractAccountModel {
   final List<AddressBookModel> addressBook;
   final List<AddressBookModel> lastSendList;
 
-  AbstractAccountModel(this.publicKeyTestnet, this.publicKeyMainnet, this.sourceId, this.pinnedBalances, this.name,
-      this.addressBook, this.lastSendList);
+  AbstractAccountModel(
+      this.id,
+      this.publicKeyTestnet,
+      this.publicKeyMainnet,
+      this.sourceId,
+      this.pinnedBalances,
+      this.name,
+      this.addressBook,
+      this.lastSendList) {
+    this.id = id ?? Uuid().v1().toString();
+  }
 
   void changeName(String name) {
     this.name = name;
   }
+
+  List<AbstractNetworkModel> getNetworkModelList(ApplicationModel model);
 
   Map<String, dynamic> toJson();
 

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:math';
 
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
@@ -13,7 +14,7 @@ class AccountMenuButton extends StatefulWidget {
   final String title;
   final bool isStaticBg;
   final bool isHoverBackgroundEffect;
-  final void Function(int index)? callback;
+  final void Function(AbstractAccountModel? accountModel)? callback;
   final Widget? afterTitleWidget;
   final bool accountSelectMode;
   final AbstractAccountModel? account;
@@ -47,13 +48,12 @@ class AccountMenuButton extends StatefulWidget {
 class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
   bool isHover = false;
 
-  Color getCircleAvatarColor(int index) {
-    String accountIndex = index.toString();
-    if (accountIndex.length == 1) {
+  Color getCircleAvatarColor() {
+    if (widget.account is AccountModel) {
       return AppColors
           .accountColors[(widget.account! as AccountModel).accountIndex];
     } else {
-      return AppColors.accountColors[int.parse(accountIndex[1])];
+      return AppColors.accountColors[Random().nextInt(10)];
     }
   }
 
@@ -75,12 +75,11 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                     ])),
       child: ElevatedButton(
         onPressed: () {
-          const int defaultAccountId = 0;
           if (widget.callback != null) {
             if (widget.account == null) {
-              widget.callback!(defaultAccountId);
+              widget.callback!(null);
             } else {
-              widget.callback!((widget.account! as AccountModel).accountIndex);
+              widget.callback!(widget.account);
             }
           }
         },
@@ -158,20 +157,15 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
                     if (widget.accountSelectMode)
                       CircleAvatar(
                         radius: 12,
-                        backgroundColor: getCircleAvatarColor(
-                                (widget.account! as AccountModel).accountIndex)
-                            .withOpacity(0.16),
-                        child: Text(
-                          '${widget.title[0]}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline4!
-                              .copyWith(
-                                  fontSize: 11,
-                                  color: getCircleAvatarColor(
-                                      (widget.account! as AccountModel)
-                                          .accountIndex)),
-                        ),
+                        backgroundColor:
+                            getCircleAvatarColor().withOpacity(0.16),
+                        child: Text('${widget.title[0]}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline4!
+                                .copyWith(
+                                    fontSize: 11,
+                                    color: getCircleAvatarColor())),
                       ),
                     if (widget.accountSelectMode)
                       SizedBox(

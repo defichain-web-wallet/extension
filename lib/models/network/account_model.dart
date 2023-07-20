@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 
@@ -11,6 +12,7 @@ class AccountModel extends AbstractAccountModel {
   final int accountIndex;
 
   AccountModel(
+    String? id,
     String publicKeyTestnet,
     String publicKeyMainnet,
     String sourceId,
@@ -20,8 +22,15 @@ class AccountModel extends AbstractAccountModel {
     String? name,
     List<AddressBookModel> addressBook,
     List<AddressBookModel> lastSend,
-  ) : super(publicKeyTestnet, publicKeyMainnet, sourceId, pinnedBalances, name ?? 'Account${accountIndex + 1}',
-            addressBook, lastSend);
+  ) : super(id, publicKeyTestnet, publicKeyMainnet, sourceId, pinnedBalances,
+            name ?? 'Account${accountIndex + 1}', addressBook, lastSend);
+
+  @override
+  List<AbstractNetworkModel> getNetworkModelList(ApplicationModel model) {
+    return model.networks
+        .where((element) => element.networkType.isLocalWallet)
+        .toList();
+  }
 
   factory AccountModel.fromJson(
       Map<String, dynamic> jsonModel, List<AbstractNetworkModel> networkList) {
@@ -50,6 +59,7 @@ class AccountModel extends AbstractAccountModel {
     );
 
     return AccountModel(
+        jsonModel.containsKey("id") ? jsonModel['id'] : null,
         jsonModel['publicKeyTestnet'],
         jsonModel['publicKeyMainnet'],
         jsonModel['sourceId'],
@@ -63,6 +73,7 @@ class AccountModel extends AbstractAccountModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data["id"] = this.id;
     data["sourceId"] = this.sourceId;
     data["publicKeyTestnet"] = this.publicKeyTestnet;
     data["publicKeyMainnet"] = this.publicKeyMainnet;
@@ -100,9 +111,9 @@ class AccountModel extends AbstractAccountModel {
       if (isRestore) {
         try {
           pinnedBalances[network.networkType.networkName.name] =
-          await network.getAllBalances(
-              addressString:
-              addresses[network.networkType.networkName.name]!);
+              await network.getAllBalances(
+                  addressString:
+                      addresses[network.networkType.networkName.name]!);
         } catch (_) {
           pinnedBalances[network.networkType.networkName.name] = [
             BalanceModel(balance: 0, token: network.getDefaultToken())
@@ -116,6 +127,7 @@ class AccountModel extends AbstractAccountModel {
     }
 
     return AccountModel(
+      null,
       publicKeyTestnet,
       publicKeyMainnet,
       sourceId,

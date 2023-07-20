@@ -14,8 +14,8 @@ export class LedgerJellywalletWrapper {
     private ledgerBtc = new JellyWalletBtcLedger();
 
     async getTransport(): Promise<Transport> {
-        return await SpeculosTransport.open({ baseURL: "172.28.169.51:5000" });
-        //return await TransportWebHID.create();
+        // return await SpeculosTransport.open({ baseURL: "172.28.169.51:5000" });
+        return await TransportWebHID.create();
     }
 
     private parseAppName(buffer: Buffer) {
