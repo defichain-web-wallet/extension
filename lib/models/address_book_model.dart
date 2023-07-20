@@ -20,8 +20,11 @@ class AddressBookModel {
     } catch (_) {
       this.network = _getNewNetworkType(json['network']);
     }
-
-    this.id = int.tryParse(json['id']);
+    try {
+      this.id = json['id'];
+    } catch (_) {
+      this.id = DateTime.now().millisecondsSinceEpoch;
+    }
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();

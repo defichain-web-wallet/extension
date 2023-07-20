@@ -49,7 +49,7 @@ class _AmountFieldState extends State<AmountField> {
   bool _onFocused = false;
 
   _onFocusChange() {
-    if (widget.controller.text == '0') {
+    if (double.tryParse(widget.controller.text) == 0) {
       widget.controller.text = '';
     }
 

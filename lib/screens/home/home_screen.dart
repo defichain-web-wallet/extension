@@ -87,6 +87,9 @@ class _HomeScreenState extends State<HomeScreen>
     if (widget.isLoadTokens) {
       ratesCubit.loadRates(walletCubit.state.activeNetwork);
     }
+    if (walletCubit.state.isSendReceiveOnly) {
+      walletCubit.updateAccountBalances();
+    }
 
     return BlocBuilder<WalletCubit, WalletState>(builder: (context, walletState) {
           return ScaffoldWrapper(
