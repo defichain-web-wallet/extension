@@ -132,6 +132,9 @@ class RatesModel {
     List<BalanceModel> balances, {
     String convertToken = 'USDT',
   }) {
+    if (balances.isEmpty) {
+      return 0;
+    }
     return balances.map<double>((e) {
       if (e.token != null) {
         return getAmountByToken(
@@ -158,6 +161,9 @@ class RatesModel {
     String testnetSymbol = 'DFI-$convertToken';
 
     try {
+      if (poolPairs == null || poolPairs!.isEmpty) {
+        return 0.0;
+      }
       LmPoolModel assetPair = this.poolPairs!.firstWhere((element) =>
           element.symbol == symbol || element.symbol == testnetSymbol);
       if (token.symbol == 'DFI') {

@@ -97,6 +97,11 @@ class ApplicationModel {
           networkName: NetworkName.bitcoinMainnet,
           networkString: 'mainnet',
           isTestnet: false,
+          isLocalWallet: false)),
+      new BitcoinLedgerNetworkModel(new NetworkTypeModel(
+          networkName: NetworkName.bitcoinTestnet,
+          networkString: 'testnet',
+          isTestnet: true,
           isLocalWallet: false))
     ];
   }
@@ -168,8 +173,8 @@ class ApplicationModel {
     return [];
   }
 
-  SourceModel createSource(
-      List<String>? mnemonic, String? publicKeyTestnet, String? publicKeyMainnet, String password, SourceName sourceName) {
+  SourceModel createSource(List<String>? mnemonic, String? publicKeyTestnet,
+      String? publicKeyMainnet, String password, SourceName sourceName) {
     var source = new SourceModel(
         sourceName: sourceName,
         publicKeyMainnet: publicKeyMainnet,

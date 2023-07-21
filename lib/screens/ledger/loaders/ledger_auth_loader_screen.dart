@@ -142,10 +142,15 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
 
       String path;
 
+      bool isTestnet = this.widget.appName == "test";
       if (this.widget.appName == "dfi") {
         path = HDWalletService.derivePath(0);
       } else {
-        path = new BitcoinService().deriveLedgerPath(0);
+        path = new BitcoinService().deriveLedgerPath(
+            walletCubit.state.accounts
+                .where((element) => element is LedgerAuthLoaderScreen)
+                .length,
+            isTestnet);
       }
 
       var ledgerAddressJson = await promiseToFuture<dynamic>(
@@ -153,7 +158,12 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
       var ledgerAddress = jsonDecode(ledgerAddressJson);
       var pubKey = ledgerAddress["publicKey"];
       var address = ledgerAddress["bitcoinAddress"];
-      await walletCubit.addNewLedgerAccount("Ledger", address, pubKey);
+
+      if (pubKey == null || address == null || pubKey == "" || address == "") {
+        throw new Exception("no address generated..");
+      }
+      await walletCubit.addNewLedgerAccount(
+          "Ledger", address, pubKey, isTestnet);
 
       widget.callback();
     } on Exception catch (error) {

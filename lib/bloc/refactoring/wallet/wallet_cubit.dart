@@ -184,7 +184,7 @@ class WalletCubit extends Cubit<WalletState> {
   }
 
   restoreWalletWithLedger(
-      String password, String pubKey, String address) async {
+      String password, String pubKey, String address, bool isTestnet) async {
     emit(state.copyWith(status: WalletStatusList.loading));
     var applicationModel = ApplicationModel(sourceList: {}, password: password);
     List<AbstractAccountModel> accountList = [];
@@ -204,6 +204,7 @@ class WalletCubit extends Cubit<WalletState> {
           publicKey: pubKey,
           network: applicationModel.networks.first,
           address: address,
+          isTestnet: isTestnet,
           sourceId: source.id,
           isRestore: true,
         );
@@ -307,8 +308,9 @@ class WalletCubit extends Cubit<WalletState> {
         state.applicationModel!.activeNetwork!.networkType.networkName.name;
     final balances =
         await state.applicationModel!.activeNetwork!.getAllBalances(
-      addressString:
-          (state.activeAccount as AccountModel).addresses[networkName]!,
+      addressString: state.activeAccount!.getNetworkAddress(
+        state.applicationModel!.activeNetwork!,
+      ),
     );
     state.applicationModel!.activeAccount!.pinnedBalances[networkName] =
         balances;
@@ -322,14 +324,12 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
-  editAccount(String name, int index) async {
+  editAccount(String name, String id) async {
     ApplicationModel applicationModel = state.applicationModel!;
     applicationModel.accounts
-        .firstWhere(
-            (element) => (element as AccountModel).accountIndex == index)
+        .firstWhere((element) => element.id == id)
         .changeName(name);
-    if ((applicationModel.activeAccount! as AccountModel).accountIndex ==
-        index) {
+    if (applicationModel.activeAccount!.id == id) {
       applicationModel.activeAccount!.changeName(name);
     }
 
@@ -394,18 +394,22 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
-  addNewLedgerAccount(String name, String address, String pubKey) async {
+  addNewLedgerAccount(
+      String name, String address, String pubKey, bool isTestnet) async {
     emit(state.copyWith(
       status: WalletStatusList.loading,
     ));
     ApplicationModel applicationModel = state.applicationModel!;
     var btcLedgerModel = applicationModel.networks
-        .where((element) => !element.networkType.isLocalWallet)
+        .where((element) =>
+            !element.networkType.isLocalWallet &&
+            element.networkType.isTestnet == isTestnet)
         .first;
 
     AbstractAccountModel account = await LedgerAccountModel.fromLedger(
         address: address,
         publicKey: pubKey,
+        isTestnet: isTestnet,
         network: btcLedgerModel,
         sourceId: "");
     account.changeName(name);

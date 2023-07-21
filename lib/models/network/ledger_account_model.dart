@@ -8,11 +8,13 @@ import 'package:defi_wallet/models/network/network_name.dart';
 class LedgerAccountModel extends AbstractAccountModel {
   final String address;
   final String pubKey;
+  final bool isTestnet;
 
   LedgerAccountModel({
     required String? id,
     required this.address,
     required this.pubKey,
+    required this.isTestnet,
     required String sourceId,
     required Map<String, List<BalanceModel>> pinnedBalances,
     required String name,
@@ -24,7 +26,9 @@ class LedgerAccountModel extends AbstractAccountModel {
   @override
   List<AbstractNetworkModel> getNetworkModelList(ApplicationModel model) {
     return model.networks
-        .where((element) => !element.networkType.isLocalWallet)
+        .where((element) =>
+            !element.networkType.isLocalWallet &&
+            element.networkType.isTestnet == isTestnet)
         .toList();
   }
 
@@ -47,6 +51,7 @@ class LedgerAccountModel extends AbstractAccountModel {
     return LedgerAccountModel(
         id: jsonModel['id'],
         address: jsonModel['address'],
+        isTestnet: jsonModel['isTestnet'].toString().toLowerCase() == "true",
         pubKey: jsonModel['pubKey'],
         sourceId: jsonModel['sourceId'],
         pinnedBalances: pinnedBalances,
@@ -66,6 +71,7 @@ class LedgerAccountModel extends AbstractAccountModel {
     data["id"] = this.id;
     data["sourceId"] = this.sourceId;
     data["pubKey"] = this.pubKey;
+    data["isTestnet"] = this.isTestnet ? "true" : "false";
     data["address"] = this.address;
     data["name"] = this.name;
     data["type"] = "ledger";
@@ -84,6 +90,7 @@ class LedgerAccountModel extends AbstractAccountModel {
       {required AbstractNetworkModel network,
       required String address,
       required String publicKey,
+      required bool isTestnet,
       required String sourceId,
       isRestore = false}) async {
     Map<String, List<BalanceModel>> pinnedBalances = {};
@@ -91,11 +98,17 @@ class LedgerAccountModel extends AbstractAccountModel {
     return LedgerAccountModel(
         id: null,
         address: address,
+        isTestnet: isTestnet,
         pubKey: publicKey,
         sourceId: sourceId,
         pinnedBalances: pinnedBalances,
         name: "Ledger",
         addressBook: [],
         lastSend: []);
+  }
+
+  @override
+  String getNetworkAddress(AbstractNetworkModel networkModel) {
+    return address;
   }
 }

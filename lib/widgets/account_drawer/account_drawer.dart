@@ -151,9 +151,8 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                   setState(() {
                                                     walletCubit.editAccount(
                                                         s,
-                                                        (state.activeAccount
-                                                                as AccountModel)
-                                                            .accountIndex);
+                                                        state
+                                                            .activeAccount.id!);
                                                   });
                                                 },
                                                 name: state.activeAccount.name,
@@ -257,7 +256,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                 builder:
                                                     (BuildContext context) {
                                                   return ConnectLedgerOverlayScreen(
-                                                      appName: "btc");
+                                                      appName: "test");
                                                   // return CreateEditAccountDialog(
                                                   //   callback: (s) async {
                                                   //     await walletCubit

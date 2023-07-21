@@ -17,7 +17,7 @@ export class JellyWalletBtcLedger {
         listen((log) => console.log(log));
 
 
-        const dfi = new AppBtc({ transport: transport });
+        const dfi = new AppBtc({ transport: transport, currency: "bitcoin_testnet" });
         return dfi;
     }
 
@@ -44,12 +44,12 @@ export class JellyWalletBtcLedger {
             const timeoutError = new Error('TIME_OUT')
             const addressPromise = appBtc.getWalletPublicKey(path, {
                 verify: verify,
-                format: "bech32",
+                format: "p2sh"
             });
             const timeoutPromise = new Promise<never>((_, reject) => {
                 setTimeout(() => {
                     reject(timeoutError);
-                }, 2000);
+                }, 5000);
             });
 
             const address = await Promise.race([addressPromise, timeoutPromise]);

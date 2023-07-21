@@ -34,6 +34,8 @@ abstract class AbstractAccountModel {
 
   List<AbstractNetworkModel> getNetworkModelList(ApplicationModel model);
 
+  String getNetworkAddress(AbstractNetworkModel networkModel);
+
   Map<String, dynamic> toJson();
 
   // Tokens

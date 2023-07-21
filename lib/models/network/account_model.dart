@@ -26,6 +26,11 @@ class AccountModel extends AbstractAccountModel {
             name ?? 'Account${accountIndex + 1}', addressBook, lastSend);
 
   @override
+  String getNetworkAddress(AbstractNetworkModel networkModel) {
+    return addresses[networkModel.networkType.networkName.name]!;
+  }
+
+  @override
   List<AbstractNetworkModel> getNetworkModelList(ApplicationModel model) {
     return model.networks
         .where((element) => element.networkType.isLocalWallet)

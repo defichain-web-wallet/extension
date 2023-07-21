@@ -28,8 +28,8 @@ class BitcoinService {
     return "1129/0/0/$account";
   }
 
-  String deriveLedgerPath(int account) {
-    return "44'/0'/0'/$account";
+  String deriveLedgerPath(int account, bool isTestnet) {
+    return "49'/${isTestnet ? "1" : "0"}'/0'/0/$account";
   }
 
   Future<String> getAddressFromKeyPair(

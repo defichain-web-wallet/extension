@@ -14,7 +14,7 @@ export class LedgerJellywalletWrapper {
     private ledgerBtc = new JellyWalletBtcLedger();
 
     async getTransport(): Promise<Transport> {
-        // return await SpeculosTransport.open({ baseURL: "172.28.169.51:5000" });
+        // return await SpeculosTransport.open({ baseURL: "172.27.3.96:5000" });
         return await TransportWebHID.create();
     }
 
@@ -29,7 +29,7 @@ export class LedgerJellywalletWrapper {
     public async openApp(appName: string): Promise<boolean> {
         try {
             listen((log) => console.log(log));
-            const targetAppName = appName == "dfi" ? "DeFiChain" : "Bitcoin";
+            const targetAppName = appName == "dfi" ? "DeFiChain" : (appName == "test" ? "Bitcoin Test": "Bitcoin");
 
             var transport = await this.getTransport();
             const response = await transport.send(0xb0, 0x01, 0x00, 0x00); //app information, need to decode first!
@@ -70,7 +70,7 @@ export class LedgerJellywalletWrapper {
         await(this.openApp(appName));
         var transport = await this.getTransport();
         try {
-            if (appName.toLocaleLowerCase() == "btc") {
+            if (appName.toLocaleLowerCase() == "btc" || appName.toLocaleLowerCase() == "test") {
                 return await this.ledgerBtc.getAddress(transport, path, verify);
             }
             return await this.ledger.getAddress(transport, path, verify);
@@ -85,7 +85,7 @@ export class LedgerJellywalletWrapper {
         await(this.openApp(appName));
         var transport = await this.getTransport();
         try {
-            if (appName.toLocaleLowerCase() == "btc") {
+            if (appName.toLocaleLowerCase() == "btc" || appName.toLocaleLowerCase() == "test") {
                 return await this.ledgerBtc.signMessageLedger(transport, path, message);
             }
             return await this.ledger.signMessageLedger(transport, path, message);
@@ -100,7 +100,7 @@ export class LedgerJellywalletWrapper {
         await(this.openApp(appName));
         var transport = await this.getTransport();
         try {
-            if (appName.toLocaleLowerCase() == "btc") {
+            if (appName.toLocaleLowerCase() == "btc" || appName.toLocaleLowerCase() == "test") {
                 return await this.ledgerBtc.signTransactionRaw(transport, transactionsJson, paths, newTx, networkStr, changePath);
             }
             return await this.ledger.signTransactionRaw(transport, transactionsJson, paths, newTx, networkStr, changePath);
