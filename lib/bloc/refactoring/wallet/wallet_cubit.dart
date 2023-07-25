@@ -87,6 +87,7 @@ class WalletCubit extends Cubit<WalletState> {
     var accountIndex = 0;
     var neededRestore = applicationModel.networks.length * 5;
     var restored = 0;
+    late AbstractAccountModel firstAccount;
     emit(state.copyWith(status: WalletStatusList.restore, restoreProgress: '($restored/$neededRestore)'));
     while (hasHistory) {
       late AbstractAccountModel account;
@@ -140,7 +141,15 @@ class WalletCubit extends Cubit<WalletState> {
         }
         accountList.add(account);
         accountIndex++;
+      } else {
+        if(accountIndex == 0){
+          firstAccount = account;
+        }
       }
+    }
+
+    if(accountList.isEmpty){
+      accountList.add(firstAccount);
     }
 
     applicationModel.accounts = accountList;

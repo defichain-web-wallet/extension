@@ -120,9 +120,10 @@ class ApplicationModel {
     final sourceList = json['sourceList'] as Map<String, dynamic>;
     final password = json['password'] as String;
     final activeAccount = AccountModel.fromJson(json['activeAccount'], networks);
-    final activeNetwork = networks.firstWhere(
-      (element) => element.networkType.networkName == savedNetwork.networkName,
-    );
+    final activeNetwork = networks.first;
+    // final activeNetwork = networks.firstWhere(
+    //   (element) => element.networkType.networkName == savedNetwork.networkName,
+    // );
     final accounts = (json['accounts'] as List)
         .map((json) => AccountModel.fromJson(json, networks))
         .toList();
