@@ -22,7 +22,6 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/sliders/polygon_slider_thumb.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,8 +70,8 @@ class _StakeUnstakeScreenState extends State<StakeUnstakeScreen>
   }
 
   _onFocusChange() {
-    if (controller.text == '') {
-      controller.text = '0';
+    if (double.tryParse(controller.text) == 0) {
+      controller.text = '';
     }
     setState(() {
       _onFocused = _focusNode.hasFocus;
