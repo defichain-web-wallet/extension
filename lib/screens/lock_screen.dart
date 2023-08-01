@@ -1,13 +1,15 @@
-import 'dart:convert' as Convert;
 import 'dart:convert';
+import 'dart:developer';
 import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
+import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
@@ -34,28 +36,22 @@ class LockScreen extends StatefulWidget {
   _LockScreenState createState() => _LockScreenState();
 }
 
-class _LockScreenState extends State<LockScreen> with SnackBarMixin {
-  SettingsHelper settingsHelper = SettingsHelper();
+class _LockScreenState extends State<LockScreen>
+    with SnackBarMixin, ThemeMixin {
   bool isPasswordObscure = true;
-  bool isEnable = true;
-  bool isValid = true;
-  bool isVisiblePasswordField = true;
-  bool isFailed = false;
-  Convert.Codec<String, String> stringToBase64 =
-      Convert.utf8.fuse(Convert.base64);
+  bool isCorrectPassword = true;
+  bool isDisableSubmit = false;
   GlobalKey globalKey = GlobalKey();
-  final _formKey = GlobalKey<FormState>();
-  TextEditingController _passwordController = TextEditingController();
-
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  TextEditingController passwordController = TextEditingController();
   PasswordStatusList passwordStatus = PasswordStatusList.initial;
 
   @override
   Widget build(BuildContext context) {
-    bool isFullScreen = MediaQuery.of(context).size.width > ScreenSizes.medium;
     return Scaffold(
       body: Stack(
         children: [
-          if (!isFullScreen)
+          if (!isFullScreen(context))
             ExtensionWelcomeBg()
           else
             Center(
@@ -78,13 +74,13 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
                         bottom: 0,
                       ),
                       child: Form(
-                        key: _formKey,
+                        key: formKey,
                         child: Column(
                           children: [
                             PasswordTextField(
-                              isOpasity: !isFullScreen,
+                              isOpasity: !isFullScreen(context),
                               height: 71,
-                              controller: _passwordController,
+                              controller: passwordController,
                               status: passwordStatus,
                               hint: 'Your password',
                               label: 'Password',
@@ -100,7 +96,9 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
                                     isPasswordObscure = !isPasswordObscure);
                               },
                               validator: (val) {
-                                return isValid ? null : "Incorrect password";
+                                return isCorrectPassword
+                                    ? null
+                                    : "Incorrect password";
                               },
                             ),
                             StretchBox(
@@ -119,7 +117,7 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
                                 'Forgot password?',
                                 style: AppTheme.defiUnderlineText,
                               ),
-                              onTap: isEnable
+                              onTap: isDisableSubmit
                                   ? () => Navigator.push(
                                         context,
                                         PageRouteBuilder(
@@ -150,7 +148,7 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
   Future _submit(parent) async {
     await PasswordService().handleCorrectAndRun(
       context,
-      _passwordController.text,
+      passwordController.text,
       isLockScreen: true,
       () async {
         await _restoreWallet(parent);
@@ -162,59 +160,82 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
 
     setState(() {
-      isValid = true;
-      _formKey.currentState!.validate();
-      isFailed = false;
-      isEnable = false;
+      isCorrectPassword = true;
+      formKey.currentState!.validate();
+      isDisableSubmit = true;
     });
 
     if (widget.savedMnemonic == null) {
-      ApplicationModel applicationModel =
-          await StorageService.loadApplication();
-      if (applicationModel.validatePassword(_passwordController.text)) {
-        setState(() {
-          isValid = true;
-          _formKey.currentState!.validate();
-        });
-        int hourInMilliseconds = 60 * 60 * 1000;
-
-        final accessTokensMap =
-            applicationModel.activeNetwork!.stakingList[0].accessTokensMap;
-        if (accessTokensMap.length > 0) {
-          int expireTime = accessTokensMap[0]!.expireTime - hourInMilliseconds;
-          int currentTime = DateTime.now().millisecondsSinceEpoch;
-
-          bool isExpire = expireTime < currentTime;
-          parent.emitPending(true);
-          if (isExpire) {
-            await walletCubit.updateAccessKeys(
-              applicationModel,
-              _passwordController.text,
-            );
-          }
-        }
-        await walletCubit.loadWalletDetails(
-          application: applicationModel,
-        );
-        parent.emitPending(false);
-        LoggerService.invokeInfoLogg('user was unlock wallet');
-
-        Navigator.pushReplacement(
+      ApplicationModel? applicationModel;
+      try {
+        applicationModel = await StorageService.loadApplication();
+      } catch (err) {
+        log('Error: Failure load applicationModel');
+        log(err.toString());
+      }
+      if (applicationModel == null) {
+        showSnackBar(
           context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                HomeScreen(isLoadTokens: true),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
+          title: 'Failure loading application details',
+          color: AppColors.txStatusError.withOpacity(0.1),
+          prefix: Icon(
+            Icons.close,
+            color: AppColors.txStatusError,
           ),
         );
       } else {
-        _setInvalidPasswordField();
+        if (applicationModel.validatePassword(passwordController.text)) {
+          setState(() {
+            isCorrectPassword = true;
+            formKey.currentState!.validate();
+          });
+
+          List<AbstractStakingProviderModel> accessTokensMap;
+
+          try {
+            accessTokensMap =
+                applicationModel.activeNetwork!.getStakingProviders();
+
+            if (accessTokensMap.length > 0) {
+              AccessTokenModel accessTokenModel =
+                  accessTokensMap[0].accessTokensMap[0]!;
+
+              parent.emitPending(true);
+
+              if (accessTokenModel.isExpire()) {
+                await walletCubit.updateAccessKeys(
+                  applicationModel,
+                  passwordController.text,
+                );
+              }
+            }
+          } catch (err) {
+            log('Error: Failure updating access tokens');
+            log(err.toString());
+          }
+          await walletCubit.loadWalletDetails(
+            application: applicationModel,
+          );
+          parent.emitPending(false);
+          LoggerService.invokeInfoLogg('user was unlock wallet');
+
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  HomeScreen(isLoadTokens: true),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        } else {
+          _setInvalidPasswordField();
+        }
       }
     } else {
       var encryptedPassword = await HiveService.getData(HiveNames.password);
-      if (Crypt(encryptedPassword).match(_passwordController.text)) {
-        await _restoreExistingWallet(_passwordController.text, context, parent);
+      if (Crypt(encryptedPassword).match(passwordController.text)) {
+        await _restoreExistingWallet(passwordController.text, context, parent);
       } else {
         _setInvalidPasswordField();
       }
@@ -239,7 +260,7 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
 
             List<String> mnemonic = EncryptHelper.getDecryptedData(
               widget.savedMnemonic,
-              _passwordController.text,
+              passwordController.text,
             ).split(',');
 
             try {
@@ -269,7 +290,7 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
               }
               await walletCubit.restoreWallet(
                 mnemonic,
-                _passwordController.text,
+                passwordController.text,
                 lastSent: lastSentAddressBook,
                 addressBook: mainAddressBook,
               );
@@ -306,11 +327,10 @@ class _LockScreenState extends State<LockScreen> with SnackBarMixin {
 
   _setInvalidPasswordField() {
     setState(() {
-      isValid = false;
-      _formKey.currentState!.validate();
+      isCorrectPassword = false;
+      formKey.currentState!.validate();
       passwordStatus = PasswordStatusList.error;
-      isFailed = true;
-      isEnable = true;
+      isDisableSubmit = false;
     });
   }
 }

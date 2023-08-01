@@ -26,10 +26,9 @@ class ApplicationModel {
     AbstractAccountModel? activeAccount,
     TokenModel? activeToken,
   }) {
-    if(password != null){
+    if (password != null) {
       this.password = encryptPassword(password);
-
-    } else if(encryptedPassword != null){
+    } else if (encryptedPassword != null) {
       this.password = encryptedPassword;
     } else {
       throw 'Password is required';
@@ -53,11 +52,11 @@ class ApplicationModel {
     );
   }
 
-  String encryptPassword(String password){
+  String encryptPassword(String password) {
     return Crypt.sha256(password).toString();
   }
 
-  bool validatePassword(String password){
+  bool validatePassword(String password) {
     return Crypt(this.password).match(password);
   }
 
@@ -67,24 +66,36 @@ class ApplicationModel {
         .toList();
   }
 
-  static List<AbstractNetworkModel> initNetworks(){
+  static List<AbstractNetworkModel> initNetworks() {
     return [
-      new DefichainNetworkModel(new NetworkTypeModel(
+      DefichainNetworkModel(
+        NetworkTypeModel(
           networkName: NetworkName.defichainMainnet,
           networkString: 'mainnet',
-          isTestnet: false)),
-      new DefichainNetworkModel(new NetworkTypeModel(
+          isTestnet: false,
+        ),
+      ),
+      DefichainNetworkModel(
+        NetworkTypeModel(
           networkName: NetworkName.defichainTestnet,
           networkString: 'testnet',
-          isTestnet: true)),
-      new BitcoinNetworkModel(new NetworkTypeModel(
+          isTestnet: true,
+        ),
+      ),
+      BitcoinNetworkModel(
+        NetworkTypeModel(
           networkName: NetworkName.bitcoinMainnet,
           networkString: 'mainnet',
-          isTestnet: false)),
-      new BitcoinNetworkModel(new NetworkTypeModel(
+          isTestnet: false,
+        ),
+      ),
+      BitcoinNetworkModel(
+        NetworkTypeModel(
           networkName: NetworkName.bitcoinTestnet,
           networkString: 'testnet',
-          isTestnet: true))
+          isTestnet: true,
+        ),
+      )
     ];
   }
 
@@ -106,24 +117,29 @@ class ApplicationModel {
 
   factory ApplicationModel.fromJSON(Map<String, dynamic> json) {
     final networksListJson = json['networks'];
-    final networks = List.generate(networksListJson.length, (index) {
-      final network = networksListJson[index];
-      if (network['networkType']['networkName'].contains('defichain')) {
-        return DefichainNetworkModel.fromJson(network);
-      } else {
-        return BitcoinNetworkModel.fromJson(network);
-      }
-    });
+    final networks = List.generate(
+      networksListJson.length,
+      (index) {
+        final network = networksListJson[index];
+        if (network['networkType']['networkName'].contains('defichain')) {
+          return DefichainNetworkModel.fromJson(network);
+        } else {
+          return BitcoinNetworkModel.fromJson(network);
+        }
+      },
+    );
     final savedNetwork = NetworkTypeModel.fromJson(
       json['activeNetwork']['networkType'],
     );
     final sourceList = json['sourceList'] as Map<String, dynamic>;
     final password = json['password'] as String;
-    final activeAccount = AccountModel.fromJson(json['activeAccount'], networks);
-    final activeNetwork = networks.first;
-    // final activeNetwork = networks.firstWhere(
-    //   (element) => element.networkType.networkName == savedNetwork.networkName,
-    // );
+    final activeAccount = AccountModel.fromJson(
+      json['activeAccount'],
+      networks,
+    );
+    final activeNetwork = networks.firstWhere(
+      (element) => element.networkType.networkName == savedNetwork.networkName,
+    );
     final accounts = (json['accounts'] as List)
         .map((json) => AccountModel.fromJson(json, networks))
         .toList();
@@ -141,18 +157,23 @@ class ApplicationModel {
     )..networks = networks;
   }
 
-  List<String> getMnemonic(String password){
+  List<String> getMnemonic(String password) {
     return this.sourceList[this.activeAccount!.sourceId]!.getMnemonic(password);
   }
 
   SourceSeedModel createSource(
-      List<String> mnemonic, String publicKeyTestnet, String publicKeyMainnet, String password) {
-    var source = new SourceSeedModel(
-        sourceName: SourceName.seed,
-        publicKeyMainnet: publicKeyMainnet,
-        publicKeyTestnet: publicKeyTestnet,
-        password: password,
-        mnemonic: mnemonic);
+    List<String> mnemonic,
+    String publicKeyTestnet,
+    String publicKeyMainnet,
+    String password,
+  ) {
+    SourceSeedModel source = SourceSeedModel(
+      sourceName: SourceName.seed,
+      publicKeyMainnet: publicKeyMainnet,
+      publicKeyTestnet: publicKeyTestnet,
+      password: password,
+      mnemonic: mnemonic,
+    );
     sourceList[source.id] = source;
     return source;
   }
