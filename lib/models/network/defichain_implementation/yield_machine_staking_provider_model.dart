@@ -32,6 +32,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
       accessTokensMap[account.accountIndex] = AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
+        expireTime: DateTime.now().millisecondsSinceEpoch,
       );
       return true;
     }
@@ -55,6 +56,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
       accessTokensMap[account.accountIndex] = AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
+        expireTime: DateTime.now().millisecondsSinceEpoch,
       );
       return true;
     }
