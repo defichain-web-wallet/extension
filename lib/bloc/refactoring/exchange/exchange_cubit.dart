@@ -1,4 +1,3 @@
-import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token/exchange_pair_model.dart';
@@ -13,7 +12,7 @@ part 'exchange_state.dart';
 class ExchangeCubit extends Cubit<ExchangeState> {
   ExchangeCubit() : super(ExchangeState());
 
-  setInitial(){
+  setInitial() {
     emit(state.copyWith(status: ExchangeStatusList.initial));
   }
 
@@ -37,7 +36,11 @@ class ExchangeCubit extends Cubit<ExchangeState> {
     ));
   }
 //assetFrom.symbol == 'DUSD' && assetTo!.symbol == 'DFI' slippage + 0.3
-  updateAmountsAndSlipage({double? slippage, double? amountFrom, double? amountTo}){
+  updateAmountsAndSlipage({
+    double? slippage,
+    double? amountFrom,
+    double? amountTo,
+  }) {
     emit(state.copyWith(
       slippage: slippage,
       amountFrom: amountFrom,
@@ -51,10 +54,17 @@ class ExchangeCubit extends Cubit<ExchangeState> {
     ));
   }
 
-  calculateRate(TokenModel fromToken, TokenModel toToken, double amount){
-    var pair = state.selectedPairs!.firstWhere((element) => (element.base.compare(fromToken) && element.quote.compare(toToken)) || (element.quote.compare(fromToken) && element.base.compare(toToken)));
+  double calculateRate(
+    TokenModel fromToken,
+    TokenModel toToken,
+    double amount,
+  ) {
     double rate = 0;
-    if(pair.base.compare(fromToken)){
+    ExchangePairModel pair = state.selectedPairs!.firstWhere((element) =>
+        (element.base.compare(fromToken) && element.quote.compare(toToken)) ||
+        (element.quote.compare(fromToken) && element.base.compare(toToken)));
+
+    if (pair.base.compare(fromToken)) {
       rate = amount * pair.ratio;
     } else {
       rate = amount * pair.ratioReverse;
@@ -66,15 +76,15 @@ class ExchangeCubit extends Cubit<ExchangeState> {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     var account = walletCubit.state.applicationModel!.activeAccount!;
     var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
-    
+
     var activePairs = state.availablePairs!
         .where((pair) =>
-    pair.base.compare(balance.token!) ||
-        pair.quote.compare(balance.token!))
+            pair.base.compare(balance.token!) ||
+            pair.quote.compare(balance.token!))
         .toList();
 
     var secondInputBalances = _prepareSecondInputBalances(activePairs, balance);
-    var selectedSecondInputBalance =  secondInputBalances[0];
+    var selectedSecondInputBalance = secondInputBalances[0];
     var availableBalance = await activeNetwork.getAvailableBalance(
         account: account, token: balance.token!, type: TxType.swap);
 
@@ -87,9 +97,18 @@ class ExchangeCubit extends Cubit<ExchangeState> {
     ));
   }
 
-  String getRateStringFormat(){
-    ExchangePairModel pair = state.selectedPairs!.firstWhere((element) => (element.base.compare(state.selectedBalance!.token!) && element.quote.compare(state.selectedSecondInputBalance!.token!) || (element.base.compare(state.selectedSecondInputBalance!.token!) && element.quote.compare(state.selectedBalance!.token!))));
-    var rate = pair.base.compare(state.selectedBalance!.token!) ? pair.ratioReverse : pair.ratio;
+  String getRateStringFormat() {
+    ExchangePairModel pair = state.selectedPairs!.firstWhere(
+      (element) => (element.base.compare(state.selectedBalance!.token!) &&
+              element.quote.compare(state.selectedSecondInputBalance!.token!) ||
+          (element.base.compare(state.selectedSecondInputBalance!.token!) &&
+              element.quote.compare(
+                state.selectedBalance!.token!,
+              ))),
+    );
+    var rate = pair.base.compare(state.selectedBalance!.token!)
+        ? pair.ratioReverse
+        : pair.ratio;
     return '1 ${state.selectedBalance!.token!.symbol} = ${rate.toStringAsFixed(8)} ${state.selectedSecondInputBalance!.token!.symbol}';
   }
 
@@ -99,17 +118,35 @@ class ExchangeCubit extends Cubit<ExchangeState> {
     var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
     var exchange = activeNetwork.getExchanges().first;
     var slipage = state.slippage;
-    if(state.selectedBalance!.token!.symbol == 'DUSD' && state.selectedSecondInputBalance!.token!.symbol == 'DFI'){
+    if (state.selectedBalance!.token!.symbol == 'DUSD' &&
+        state.selectedSecondInputBalance!.token!.symbol == 'DFI') {
       slipage = slipage + 0.3;
     }
 
-    return exchange.exchange(account, activeNetwork, password, state.selectedBalance!.token!, state.amountFrom, state.amountTo, state.selectedSecondInputBalance!.token!, slipage, walletCubit.state.applicationModel!);
+    return exchange.exchange(
+      account,
+      activeNetwork,
+      password,
+      state.selectedBalance!.token!,
+      state.amountFrom,
+      state.amountTo,
+      state.selectedSecondInputBalance!.token!,
+      slipage,
+      walletCubit.state.applicationModel!,
+    );
   }
-  
-  List<BalanceModel> _prepareSecondInputBalances(List<ExchangePairModel> pairs, BalanceModel selectedBalance){
+
+  List<BalanceModel> _prepareSecondInputBalances(
+    List<ExchangePairModel> pairs,
+    BalanceModel selectedBalance,
+  ) {
     List<BalanceModel> balances = [];
     pairs.forEach((pair) {
-      balances.add(BalanceModel(balance: 0, token:pair.base.compare(selectedBalance.token!) ? pair.quote : pair.base));
+      balances.add(BalanceModel(
+          balance: 0,
+          token: pair.base.compare(selectedBalance.token!)
+              ? pair.quote
+              : pair.base));
     });
     return balances;
   }
