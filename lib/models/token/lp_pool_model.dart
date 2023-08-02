@@ -5,6 +5,7 @@ class LmPoolModel extends TokenModel {
   List<TokenModel> tokens;
   List<double>? percentages;
   List<double>? reserves;
+  List<double> prices;
   double? totalLiquidityRaw;
   double? apr;
   double? apy;
@@ -19,6 +20,7 @@ class LmPoolModel extends TokenModel {
     required this.tokens,
     this.percentages,
     this.reserves,
+    this.prices = const [1,1],
     this.totalLiquidityRaw,
     this.apr,
     this.apy,
@@ -58,6 +60,10 @@ class LmPoolModel extends TokenModel {
     if (this.percentages != null) {
       data['percentages'] = this.percentages;
     }
+    data['priceRatio'] = {
+      'ab': this.prices.first.toString(),
+      'ba': this.prices.last.toString()
+    };
     if (this.reserves != null) {
       data['reserves'] = this.reserves;
     }
@@ -79,6 +85,15 @@ class LmPoolModel extends TokenModel {
     List<TokenModel>? tokens,
   }) {
     List<double>? percentages;
+    List<double>? prices = [1, 1];
+
+    if (json['priceRatio'] != null) {
+      prices = [
+        double.tryParse(json['priceRatio']['ab']) ?? 1.0,
+        double.tryParse(json['priceRatio']['ba']) ?? 1.0,
+      ];
+    }
+
     if (networkName != null && tokens != null) {
       List<String> symbols = json['symbol'].split('-');
 
@@ -133,6 +148,7 @@ class LmPoolModel extends TokenModel {
         displaySymbol: json['displaySymbol'],
         networkName: networkName,
         tokens: [tokenA, tokenB],
+        prices: prices,
         reserves: [
           reserveA,
           reserveB,
@@ -149,6 +165,7 @@ class LmPoolModel extends TokenModel {
         networkName: NetworkName.values.firstWhere(
           (value) => value.toString() == json['networkName'],
         ),
+        prices: prices,
         tokens: List.generate(
           json['tokens'].length,
           (index) => TokenModel.fromJSON(

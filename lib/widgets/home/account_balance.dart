@@ -20,17 +20,6 @@ class AccountBalance extends StatefulWidget {
 }
 
 class _AccountBalanceState extends State<AccountBalance> {
-  String getSpecificTokenName(String token) {
-    switch (token) {
-      case 'USD':
-        return 'USDT';
-      case 'EUR':
-        return 'EUROC';
-      default:
-        return token;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RatesCubit, RatesState>(
@@ -49,7 +38,9 @@ class _AccountBalanceState extends State<AccountBalance> {
                 totalBalance = ratesState.ratesModel!.getTotalAmount(
                   state.activeNetwork,
                   balances,
-                  convertToken: getSpecificTokenName(widget.asset),
+                  convertToken: ratesState.ratesModel!.getSpecificTokenName(
+                    widget.asset,
+                  ),
                 );
               } catch (_) {
                 totalBalance = 0.00;
