@@ -12,17 +12,6 @@ class AssetList extends StatelessWidget with ThemeMixin {
     Key? key,
   }) : super(key: key);
 
-  String getSpecificTokenName(String token) {
-    switch (token) {
-      case 'USD':
-        return 'USDT';
-      case 'EUR':
-        return 'EUROC';
-      default:
-        return token;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RatesCubit, RatesState>(
@@ -39,7 +28,9 @@ class AssetList extends StatelessWidget with ThemeMixin {
                     ratesState.ratesModel!.convertAmountBalance(
                   state.activeNetwork,
                   el,
-                  convertToken: getSpecificTokenName(ratesState.activeAsset),
+                  convertToken: ratesState.ratesModel!.getSpecificTokenName(
+                    ratesState.activeAsset,
+                  ),
                 );
 
                 return <String, dynamic>{

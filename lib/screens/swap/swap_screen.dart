@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
@@ -37,8 +39,6 @@ class SwapScreen extends StatefulWidget {
 
 class _SwapScreenState extends State<SwapScreen>
     with ThemeMixin, SnackBarMixin, FormatMixin {
-  static const completeKycType = 'Completed';
-
   final TextEditingController amountFromController = TextEditingController(
     text: '0.00',
   );
@@ -158,16 +158,6 @@ class _SwapScreenState extends State<SwapScreen>
             } else {
               return Loader();
             }
-            // assets = tokensHelper.getTokensList(
-            //   accountState,
-            //   tokensState,
-            //   targetList: assets,
-            // );
-            // tokensForSwap = tokensHelper.getTokensList(
-            //   accountState,
-            //   tokensState,
-            //   targetList: tokensForSwap,
-            // );
           },
         );
       });
@@ -184,8 +174,6 @@ class _SwapScreenState extends State<SwapScreen>
       TransactionState transactionState,
       isFullScreen) {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
-    double arrowRotateDegAccountFrom = false ? 180 : 0;
-    double arrowRotateDegAccountTo = false ? 180 : 0;
     bool isShowStabilizationFee = exchangeState
                     .selectedBalance!.token!.symbol ==
                 'DUSD' &&
@@ -222,101 +210,6 @@ class _SwapScreenState extends State<SwapScreen>
                 SizedBox(
                   height: 16,
                 ),
-                //TODO:This is block for bitcoin network. Comment this because bitcoin currently is unavailable
-                // ...[
-                //   Center(
-                //     child: Container(
-                //       height: 24,
-                //       width: 78,
-                //       alignment: Alignment.center,
-                //       decoration: BoxDecoration(
-                //           color: isDarkTheme()
-                //             ? DarkColors.swapNetworkMarkBgColor
-                //             : LightColors.swapNetworkMarkBgColor,
-                //         borderRadius: BorderRadius.circular(36)
-                //       ),
-                //       child: Text(
-                //         'Bitcoin Mainnet',
-                //         style: Theme.of(context).textTheme.headline6!.copyWith(
-                //           fontSize: 8,
-                //           color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3)
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                //   Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     children: [
-                //       Flexible(
-                //         child: Text(
-                //           'Swap from',
-                //           style: Theme.of(context).textTheme.headline5!.copyWith(
-                //             color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
-                //           ),
-                //         ),
-                //       ),
-                //       GestureDetector(
-                //         onTap: () {
-                //           showDialog(
-                //             barrierColor: AppColors.tolopea.withOpacity(0.06),
-                //             barrierDismissible: false,
-                //             context: context,
-                //             builder: (BuildContext context) {
-                //               return SwapAccountSelectorDialog(
-                //                 confirmCallback: (name, address) {},
-                //                 onSelect: (int index) {
-                //                 BitcoinCubit bitcoinCubit =
-                //                     BlocProvider.of<BitcoinCubit>(
-                //                         context);
-                //                 setState(() {
-                //                   accountFrom =
-                //                       accountState.accounts[index];
-                //                   bitcoinCubit.loadAvailableBalance(
-                //                     accountFrom.bitcoinAddress!,
-                //                   );
-                //                 });
-                //               },
-                //             );
-                //             },
-                //           );
-                //         },
-                //         child: Row(
-                //           mainAxisAlignment: MainAxisAlignment.end,
-                //           children: [
-                //             Container(
-                //               constraints: BoxConstraints(maxWidth: 150),
-                //               child: TickerText(
-                //                 isSpecialDuration: true,
-                //                 child: Text(
-                //                   accountFrom.name!,
-                //                   style: Theme.of(context).textTheme.headline5!.copyWith(
-                //                     fontSize: 13,
-                //                   ),
-                //                 ),
-                //               ),
-                //             ),
-                //             SizedBox(
-                //               width: 8,
-                //             ),
-                //             RotationTransition(
-                //               turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
-                //               child: SizedBox(
-                //                 width: 10,
-                //                 height: 10,
-                //                 child: SvgPicture.asset(
-                //                   'assets/icons/arrow_down.svg',
-                //                 ),
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       )
-                //     ],
-                //   ),
-                //   SizedBox(
-                //     height: 6,
-                //   )
-                // ],
                 AmountField(
                   type: TxType.swap,
                   suffix: amountFromInUsd,
@@ -326,23 +219,31 @@ class _SwapScreenState extends State<SwapScreen>
                     exchangeCubit.updateBalance(context, asset);
                   },
                   onChanged: (value) {
-                    double amount = double.parse(formatNumberStyling(
-                      double.parse(value),
-                      fixedCount: 8,
-                    ));
-                    double amountToInput = exchangeCubit.calculateRate(
+                    try {
+                      double amount = double.parse(
+                        formatNumberStyling(
+                          double.parse(value),
+                          fixedCount: 8,
+                        ),
+                      );
+                      double amountToInput = exchangeCubit.calculateRate(
                         exchangeState.selectedSecondInputBalance!.token!,
                         exchangeState.selectedBalance!.token!,
-                        amount);
-                    amountToInput = double.parse(formatNumberStyling(
-                      amountToInput,
-                      fixedCount: 8,
-                    ));
-                    setState(() {
-                      amountToController.text = amountToInput.toString();
-                    });
-                    exchangeCubit.updateAmountsAndSlipage(
-                        amountFrom: amount, amountTo: amountToInput);
+                        amount,
+                      );
+                      setState(() {
+                        amountToController.text = formatNumberStyling(
+                          amountToInput,
+                          fixedCount: 8,
+                        );
+                      });
+                      exchangeCubit.updateAmountsAndSlipage(
+                        amountFrom: amount,
+                        amountTo: amountToInput,
+                      );
+                    } catch (err) {
+                      log(err.toString());
+                    }
                   },
                   controller: amountFromController,
                   balance: exchangeState.selectedBalance,
@@ -351,100 +252,6 @@ class _SwapScreenState extends State<SwapScreen>
                 SizedBox(
                   height: 8,
                 ),
-                //TODO:This is block for bitcoin network. Comment this because bitcoin currently is unavailable
-                // ...[
-                //   SizedBox(
-                //     height: 8,
-                //   ),
-                //   Center(
-                //     child: Container(
-                //       height: 24,
-                //       width: 90,
-                //       alignment: Alignment.center,
-                //       decoration: BoxDecoration(
-                //           color: isDarkTheme()
-                //               ? DarkColors.swapNetworkMarkBgColor
-                //               : LightColors.swapNetworkMarkBgColor,
-                //           borderRadius: BorderRadius.circular(36)
-                //       ),
-                //       child: Text(
-                //         'DeFiChain Mainnet',
-                //         style: Theme.of(context).textTheme.headline6!.copyWith(
-                //             fontSize: 8,
-                //             color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.3)
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                //   Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     children: [
-                //       Flexible(
-                //         child: Text(
-                //           'Swap to',
-                //           style: Theme.of(context).textTheme.headline5!.copyWith(
-                //             color: Theme.of(context).textTheme.headline5!.color!.withOpacity(0.3),
-                //           ),
-                //         ),
-                //       ),
-                //       GestureDetector(
-                //         onTap: () {
-                //           showDialog(
-                //             barrierColor: AppColors.tolopea.withOpacity(0.06),
-                //             barrierDismissible: false,
-                //             context: context,
-                //             builder: (BuildContext context) {
-                //               return SwapAccountSelectorDialog(
-                //                 confirmCallback: (name, address) {},
-                //                 onSelect: (int index) {
-                //                   FiatCubit fiatCubit =
-                //                     BlocProvider.of<FiatCubit>(context);
-                //                   setState(() {
-                //                     accountTo = accountState.accounts[index];
-                //                   });
-                //                   fiatCubit.loadCryptoRoute(accountTo);
-                //                 },
-                //               );
-                //             },
-                //           );
-                //         },
-                //         child: Row(
-                //           mainAxisAlignment: MainAxisAlignment.end,
-                //           children: [
-                //             Container(
-                //               constraints: BoxConstraints(maxWidth: 150),
-                //               child: TickerText(
-                //                 isSpecialDuration: true,
-                //                 child: Text(
-                //                   accountTo.name!,
-                //                   style: Theme.of(context).textTheme.headline5!.copyWith(
-                //                     fontSize: 13,
-                //                   ),
-                //                 ),
-                //               ),
-                //             ),
-                //             SizedBox(
-                //               width: 8,
-                //             ),
-                //             RotationTransition(
-                //               turns: AlwaysStoppedAnimation(arrowRotateDegAccountFrom / 360),
-                //               child: SizedBox(
-                //                 width: 10,
-                //                 height: 10,
-                //                 child: SvgPicture.asset(
-                //                   'assets/icons/arrow_down.svg',
-                //                 ),
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       )
-                //     ],
-                //   ),
-                //   SizedBox(
-                //     height: 6,
-                //   )
-                // ],
                 AmountField(
                   isDisableAvailable: true,
                   type: TxType.swap,
@@ -454,27 +261,37 @@ class _SwapScreenState extends State<SwapScreen>
                     exchangeCubit.updateBalanceTo(context, asset);
                   },
                   onChanged: (value) {
-                    double amount = double.parse(value);
+                    try {
+                      double amount = double.parse(
+                        formatNumberStyling(
+                          double.parse(value),
+                          fixedCount: 8,
+                        ),
+                      );
 
-                    var amountFromInput = exchangeCubit.calculateRate(
+                      double amountFromInput = exchangeCubit.calculateRate(
                         exchangeState.selectedBalance!.token!,
                         exchangeState.selectedSecondInputBalance!.token!,
-                        amount);
-                    exchangeCubit.updateAmountsAndSlipage(
-                        amountFrom: amountFromInput, amountTo: amount);
-                    setState(() {
-                      final amount = formatNumberStyling(
-                        amountFromInput,
-                        fixedCount: 8,
+                        amount,
                       );
-                      amountFromController.text = amount.toString();
-                    });
+                      exchangeCubit.updateAmountsAndSlipage(
+                        amountFrom: amountFromInput,
+                        amountTo: amount,
+                      );
+                      setState(() {
+                        amountFromController.text = formatNumberStyling(
+                          amountFromInput,
+                          fixedCount: 8,
+                        );
+                      });
+                    } catch (err) {
+                      log(err.toString());
+                    }
                   },
                   balance: exchangeState.selectedSecondInputBalance,
                   controller: amountToController,
                   assets: exchangeState.secondInputBalances!,
                 ),
-                //TODO:This is block for bitcoin network. Comment this because bitcoin currently is unavailable
                 ...[
                   SizedBox(
                     height: 12,
@@ -614,22 +431,6 @@ class _SwapScreenState extends State<SwapScreen>
                                     fontSize: 12,
                                   ),
                         ),
-                        // Text(
-                        //   ' (\$${balancesHelper.numberStyling(rateQuoteUsd, fixedCount: 2, fixed: true)})',
-                        //   style: Theme
-                        //       .of(context)
-                        //       .textTheme
-                        //       .headline5!
-                        //       .copyWith(
-                        //     fontSize: 12,
-                        //     color: Theme
-                        //         .of(context)
-                        //         .textTheme
-                        //         .headline5!
-                        //         .color!
-                        //         .withOpacity(0.3),
-                        //   ),
-                        // )
                       ],
                     ),
                   ),
@@ -710,88 +511,6 @@ class _SwapScreenState extends State<SwapScreen>
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Column(
               children: [
-                //TODO:This is block for bitcoin network. Comment this because bitcoin currently is unavailable
-                //if bitcoin{
-                // return Column(
-                //   children: [
-                //     if (fiatState.status == FiatStatusList.success && fiatState.kycStatus != completeKycType)
-                //       Padding(
-                //         padding: const EdgeInsets.only(bottom: 14.0),
-                //         child: InkWell(
-                //           onTap: () {
-                //             String kycHash = fiatState.kycHash!;
-                //             launch(
-                //                 'https://payment.dfx.swiss/kyc?code=$kycHash');
-                //           },
-                //           child: RichText(
-                //             text: TextSpan(
-                //               text:
-                //                   'Please complete the KYC process to enable this feature',
-                //               style: Theme.of(context)
-                //                   .textTheme
-                //                   .headline5
-                //                   ?.apply(color: AppTheme.pinkColor),
-                //             ),
-                //           ),
-                //         ),
-                //       )
-                //     else if (fiatState.errorMessage == "\"Missing bank transaction\"")
-                //       Padding(
-                //         padding: const EdgeInsets.only(bottom: 14.0),
-                //         child: Text(
-                //           'Please do buy or sell first',
-                //           style: Theme.of(context)
-                //               .textTheme
-                //               .headline5
-                //               ?.apply(color: Theme.of(context)
-                //               .textTheme
-                //               .headline5!.color!.withOpacity(0.6)),
-                //         ),
-                //       ),
-                //     NewPrimaryButton(
-                //       titleWidget: Row(
-                //         mainAxisAlignment: MainAxisAlignment.center,
-                //         children: [
-                //           SizedBox(
-                //             width: 16,
-                //             height: 16,
-                //             child: SvgPicture.asset(
-                //               'assets/icons/change_icon.svg',
-                //               color: AppColors.white,
-                //             ),
-                //           ),
-                //           SizedBox(
-                //             width: 8,
-                //           ),
-                //           Text(
-                //             'Preview Change',
-                //             style: Theme.of(context)
-                //                 .textTheme
-                //                 .button!
-                //                 .copyWith(
-                //                   fontWeight: FontWeight.w800,
-                //                   color: AppColors.white,
-                //                   fontSize: 14,
-                //                 ),
-                //           )
-                //         ],
-                //       ),
-                //       callback: !isDisableSubmit() &&
-                //               (fiatState.kycStatus ==
-                //                   completeKycType) &&
-                //               fiatState.errorMessage == null
-                //           ? () => submitReviewSwap(
-                //                 accountState,
-                //                 transactionState,
-                //                 context,
-                //                 isFullScreen,
-                //                 cryptoRoute: fiatState.cryptoRoute,
-                //               )
-                //           : null,
-                //     ),
-                //   ],
-                // );
-                // else
                 NewPrimaryButton(
                   titleWidget: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -819,8 +538,7 @@ class _SwapScreenState extends State<SwapScreen>
                   ),
                   callback: isDisableSubmit()
                       ? () {
-                          if (transactionState
-                              is! TransactionLoadingState) {
+                          if (transactionState is! TransactionLoadingState) {
                             submitReviewSwap(
                               context,
                               isFullScreen,

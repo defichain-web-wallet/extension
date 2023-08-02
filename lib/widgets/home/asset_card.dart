@@ -55,7 +55,7 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
 
         final roundedBalance = BalancesHelper().numberStyling(
           convertedBalance,
-          fixedCount: 2,
+          fixedCount: convertedBalance < 0.1 ? 8 : 2,
         );
 
         return Container(
