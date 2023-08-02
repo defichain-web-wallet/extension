@@ -393,9 +393,15 @@ class RampCubit extends Cubit<RampState> {
         rampUserModel: userModel,
       ));
     } catch (error) {
-      emit(state.copyWith(
-        status: RampStatusList.failure,
-      ));
+      if (error == '401') {
+        emit(state.copyWith(
+          status: RampStatusList.expired,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: RampStatusList.failure,
+        ));
+      }
     }
   }
 

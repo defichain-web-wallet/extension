@@ -299,31 +299,14 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                               return PassConfirmDialog(
                                                 onCancel: () {},
                                                 onSubmit: (password) async {
-                                                  RampCubit rampCubit =
-                                                  BlocProvider.of<RampCubit>(context);
-                                                  WalletCubit walletCubit =
-                                                  BlocProvider.of<WalletCubit>(context);
-                                                  await walletCubit.signUpToRamp(
+                                                  updateAccessToken(
                                                     password,
+                                                    isExpiredAccessToken,
                                                   );
-                                                  loadDfxData();
                                                 },
                                               );
                                             },
                                           );
-
-
-                                          // fiatCubit.setLoadingState();
-
-                                          // AccessTokenHelper.setupLockAccessToken(
-                                          //   context,
-                                          //   loadDfxData,
-                                          //   needUpdateLock: false,
-                                          //   isExistingAccount: isExpiredAccessToken,
-                                          //   dialogMessage: isExpiredAccessToken
-                                          //       ? 'Please entering your password for update DFX access token'
-                                          //       : 'Please entering your password for create DFX account',
-                                          // );
                                         },
                                       ),
                                     ),
@@ -353,6 +336,21 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
         );
       },
     );
+  }
+
+  updateAccessToken(String password, bool isExpiredAccessToken) async {
+    WalletCubit walletCubit =
+    BlocProvider.of<WalletCubit>(context);
+    if (isExpiredAccessToken) {
+      await walletCubit.signInToRamp(
+        password,
+      );
+    } else {
+      await walletCubit.signUpToRamp(
+        password,
+      );
+    }
+    loadDfxData();
   }
 
   buyCallback(context, state) {
