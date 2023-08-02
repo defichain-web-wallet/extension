@@ -10,21 +10,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StakingCard extends StatelessWidget {
+  final bool isLoading;
+
   const StakingCard({
     Key? key,
+    required this.isLoading,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LockCubit, LockState>(builder: (context, lockState) {
       LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
-      var isLoading = lockState.status == LockStatusList.initial ||
+      var isLoadingCard = lockState.status == LockStatusList.initial ||
           lockState.status == LockStatusList.loading;
-      if (lockState.status == LockStatusList.success || isLoading) {
+      if (lockState.status == LockStatusList.success || isLoadingCard) {
         return EarnCard(
-          isLoading: isLoading,
+          isLoading: isLoadingCard || isLoading,
           title: 'Staking',
-          subTitle: lockState.lockAccountPresent!
+          subTitle: !isLoading && lockState.lockAccountPresent!
               ? 'up to '
                   '${BalancesHelper().numberStyling(
                   (lockState.stakingTokenModel!.apy! * 100),
@@ -33,16 +36,16 @@ class StakingCard extends StatelessWidget {
                 )}% APY'
               : 'N/A',
           imagePath: 'assets/images/dfi_staking.png',
-          firstColumnNumber: isLoading
+          firstColumnNumber: isLoadingCard
               ? ''
-              : lockState.lockAccountPresent!
+              : !isLoading && lockState.lockAccountPresent!
                   ? BalancesHelper().numberStyling(
                       lockState.stakingModel!.balances.first.balance,
                       fixed: true,
                       fixedCount: 2,
                     )
                   : '0.00',
-          firstColumnAsset: lockState.lockAccountPresent!
+          firstColumnAsset: !isLoading && lockState.lockAccountPresent!
               ? lockState.stakingModel!.balances.first.asset
               : 'DFI',
           firstColumnSubTitle: 'Staked',
@@ -50,7 +53,7 @@ class StakingCard extends StatelessWidget {
           needUpdateAccessToken: false,
           errorMessage: 'Need to create account of LOCK',
           callback: () {
-            if (!isLoading) {
+            if (!isLoadingCard) {
               stakingCallback(context);
             }
           },
@@ -59,9 +62,9 @@ class StakingCard extends StatelessWidget {
           lockState.status == LockStatusList.neededKyc ||
           lockState.status == LockStatusList.expired) {
         return EarnCard(
-          isLoading: isLoading,
+          isLoading: isLoadingCard,
           title: 'Staking',
-          subTitle: 'N/A APY',
+          subTitle: lockState.status == LockStatusList.expired ? 'Provide to update access token of LOCK' : 'N/A APY',
           imagePath: 'assets/images/dfi_staking.png',
           firstColumnNumber: 'N/A',
           firstColumnAsset: '',

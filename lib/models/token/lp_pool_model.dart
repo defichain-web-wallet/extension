@@ -71,7 +71,7 @@ class LmPoolModel extends TokenModel {
       data['totalLiquidityRaw'] = this.totalLiquidityRaw;
     }
     if (this.apr != null) {
-      data['apr']['total'] = this.apr;
+      data['apr'] = { 'total': this.apr };
     }
     if (this.apy != null) {
       data['apy'] = this.apy;
@@ -138,7 +138,7 @@ class LmPoolModel extends TokenModel {
 
       double? apr;
       if(json["apr"]!= null){
-        apr = json["apr"]['total'];
+        apr = json["apr"]["total"];
       }
       return LmPoolModel(
         id: json['id'],

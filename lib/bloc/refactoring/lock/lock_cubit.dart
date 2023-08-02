@@ -232,7 +232,7 @@ class LockCubit extends Cubit<LockState> {
 
     var accessKey = lockStaking.getAccessToken(account);
     if (accessKey != null) {
-      if(accessKey.isValid()){
+      if(!accessKey.isExpire()) {
         bool lockAccountPresent = false;
         bool isKycDone = false;
         String kycLink = '';
@@ -247,27 +247,30 @@ class LockCubit extends Cubit<LockState> {
           account,
           walletCubit.state.activeNetwork,
         );
-        if (!isKycDone) {
-          status = LockStatusList.neededKyc;
-          kycLink = await lockStaking.getKycLink(account);
-        } else {
-          status = LockStatusList.success;
-          stakingModel = await lockStaking.getStaking(account);
+        try {
+          if (!isKycDone) {
+            status = LockStatusList.neededKyc;
+            kycLink = await lockStaking.getKycLink(account);
+          } else {
+            status = LockStatusList.success;
+            stakingModel = await lockStaking.getStaking(account);
+          }
+          emit(state.copyWith(
+            status: status,
+            stakingProviders: stakingProviders,
+            lockStaking: lockStaking,
+            accessKey: accessKey,
+            lockAccountPresent: lockAccountPresent,
+            isKycDone: isKycDone,
+            kycLink: kycLink,
+            stakingModel: stakingModel,
+            assets: assets,
+            selectedAssets: assets.where((element) => !element.isPair && !element.isDAT && !element.isUTXO).toList(),
+            stakingTokenModel: stakingTokenModel,
+          ));
+        } catch (err) {
+          emit(state.copyWith(status: LockStatusList.expired));
         }
-        emit(state.copyWith(
-          status: status,
-          stakingProviders: stakingProviders,
-          lockStaking: lockStaking,
-          accessKey: accessKey,
-          lockAccountPresent: lockAccountPresent,
-          isKycDone: isKycDone,
-          kycLink: kycLink,
-          stakingModel: stakingModel,
-          assets: assets,
-          selectedAssets: assets.where((element) => !element.isPair && !element.isDAT && !element.isUTXO).toList(),
-          stakingTokenModel: stakingTokenModel,
-          //staking lock
-        ));
       } else {
         emit(state.copyWith(status: LockStatusList.expired));
       }

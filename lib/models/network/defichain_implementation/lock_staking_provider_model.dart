@@ -72,9 +72,13 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
   }
 
   Future<String> getKycLink(AbstractAccountModel account) async {
-    var user = await LockRequests.getKYC(
-        this.accessTokensMap[account.accountIndex]!.accessToken);
-    return user.kycLink!;
+    try {
+      var user = await LockRequests.getKYC(
+          this.accessTokensMap[account.accountIndex]!.accessToken);
+      return user.kycLink!;
+    } catch (err) {
+      rethrow;
+    }
   }
 
   Future<BigInt> getAmountStaked(

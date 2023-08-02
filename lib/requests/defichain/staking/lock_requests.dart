@@ -1,14 +1,10 @@
 import 'dart:convert';
-import 'package:defi_wallet/helpers/encrypt_helper.dart';
-import 'package:defi_wallet/models/account_model.dart';
+import 'dart:developer';
 import 'package:defi_wallet/models/lock_analytics_model.dart';
-import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
 import 'package:defi_wallet/models/lock_withdraw_model.dart';
 import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:defi_wallet/models/network/staking/withdraw_model.dart';
-import 'package:defi_wallet/services/lock_service.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -47,9 +43,9 @@ class LockRequests {
       final response = await http.post(url, headers: headers);
       dynamic data = jsonDecode(response.body);
       return LockUserModel.fromJson(data);
-    } catch (_) {
-      print(_);
-      throw 'Request error'; //TODO: add error model
+    } catch (err) {
+      log(err.toString());
+      rethrow;
     }
   }
 
