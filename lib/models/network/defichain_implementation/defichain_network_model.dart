@@ -11,7 +11,6 @@ import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bridge_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_lm_provider_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/yield_machine_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
@@ -39,7 +38,6 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     if (!networkType.isTestnet) {
       this.stakingList.add(new LockStakingProviderModel());
       this.stakingList.add(new YieldMachineStakingProviderModel());
-      this.rampList.add(new DFXRampModel());
     }
 
     this.lmList.add(new DefichainLmProviderModel());
@@ -53,7 +51,6 @@ class DefichainNetworkModel extends AbstractNetworkModel {
 
   factory DefichainNetworkModel.fromJson(Map<String, dynamic> json) {
     final stakingListJson = json['stakingList'];
-    final rampListJson = json['rampList'];
 
     final stakingList = List.generate(
       stakingListJson.length,
@@ -67,17 +64,10 @@ class DefichainNetworkModel extends AbstractNetworkModel {
         }
       },
     );
-    final rampList = List.generate(
-      rampListJson.length,
-      (index) => DFXRampModel.fromJson(
-        rampListJson[index],
-      ),
-    );
     return DefichainNetworkModel(
       NetworkTypeModel.fromJson(json['networkType']),
     )
       ..stakingList = stakingList
-      ..rampList = rampList
       ..lmList = [DefichainLmProviderModel()]
       ..exchangeList = [DefichainExchangeModel()];
   }
@@ -88,10 +78,6 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     data['stakingList'] = List.generate(
       this.stakingList.length,
       (index) => this.stakingList[index].toJson(),
-    );
-    data['rampList'] = List.generate(
-      this.rampList.length,
-          (index) => this.rampList[index].toJson(),
     );
 
     return data;

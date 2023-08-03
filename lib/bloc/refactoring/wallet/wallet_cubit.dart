@@ -4,7 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -110,12 +109,6 @@ class WalletCubit extends Cubit<WalletState> {
               applicationModel,
               network,
             );
-            await (network.rampList[0] as DFXRampModel).signIn(
-              account,
-              password,
-              applicationModel,
-              network,
-            );
           }
         }
 
@@ -171,12 +164,6 @@ class WalletCubit extends Cubit<WalletState> {
             NetworkName.defichainMainnet.name) {
           applicationModel.accounts.forEach((element) async {
             await (network.stakingList[0] as LockStakingProviderModel).signIn(
-              element,
-              password,
-              applicationModel,
-              network,
-            );
-            await (network.rampList[0] as DFXRampModel).signIn(
               element,
               password,
               applicationModel,
@@ -338,51 +325,5 @@ class WalletCubit extends Cubit<WalletState> {
                 ),
                 wif: network.wif))
         .toBase58();
-  }
-
-  signUpToRamp(String password) async {
-    try {
-      final applicationModel = state.applicationModel;
-      await (applicationModel!.activeNetwork!.rampList[0] as DFXRampModel).signUp(
-        state.activeAccount,
-        password,
-        state.applicationModel!,
-        state.activeNetwork,
-      );
-
-      await StorageService.saveApplication(applicationModel);
-
-      emit(state.copyWith(
-        status: WalletStatusList.success,
-        applicationModel: applicationModel,
-      ));
-    } catch (err) {
-      emit(state.copyWith(
-        status: WalletStatusList.failure,
-      ));
-    }
-  }
-
-  signInToRamp(String password) async {
-    try {
-      final applicationModel = state.applicationModel;
-      await (applicationModel!.activeNetwork!.rampList[0] as DFXRampModel).signIn(
-        state.activeAccount,
-        password,
-        state.applicationModel!,
-        state.activeNetwork,
-      );
-
-      await StorageService.saveApplication(applicationModel);
-
-      emit(state.copyWith(
-        status: WalletStatusList.success,
-        applicationModel: applicationModel,
-      ));
-    } catch (err) {
-      emit(state.copyWith(
-        status: WalletStatusList.failure,
-      ));
-    }
   }
 }
