@@ -2,7 +2,6 @@ import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/home/home_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/dex/swap_guide_screen.dart';
 import 'package:defi_wallet/screens/earn/earn_screen.dart';
@@ -109,10 +108,10 @@ class _HomeCardState extends State<HomeCard> with ThemeMixin {
                       child: FlatButton(
                         title: 'Buy/Sell',
                         isActive: homeState.scrollView is BuySellScreen,
-                        iconPath: walletCubit.state.isSendReceiveOnly
+                        iconPath: walletCubit.state.isDisableRamp
                             ? 'assets/icons/wallet_disabled.png'
                             : 'assets/icons/wallet.png',
-                        callback: walletCubit.state.isSendReceiveOnly
+                        callback: walletCubit.state.isDisableRamp
                             ? null
                             : () {
                                 NavigatorService.push(context, BuySellScreen());
