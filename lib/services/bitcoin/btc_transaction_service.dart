@@ -23,10 +23,7 @@ class BTCTransactionService {
     //romance portion fit sea price casual forward piano afraid erosion want replace excite figure place butter fortune empower rotate safe surface person distance simple
     //https://api.blockcypher.com/v1/btc/test3/addrs/tb1qhwqqsktldqypttltr59px506p890ce0sgj0fe7?unspentOnly=true
     if (amount < DUST) {
-      return TxErrorModel(
-          isError: true,
-          error:
-          'Dust amount');
+      return TxErrorModel(isError: true, error: 'Dust amount');
     }
     var utxos = await BlockcypherRequests.getUTXOs(
         network: network, addressString: senderAddress);
@@ -68,7 +65,8 @@ class BTCTransactionService {
       _txb.addOutput(senderAddress, amountUtxo - (amount + fee));
     }
 
-    var txHex = await signingService.signTransaction(_txb, selectedUtxo);
+    var txHex =
+        await signingService.signTransaction(_txb, selectedUtxo, senderAddress);
 
     TxErrorModel tx = await BlockcypherRequests.sendTxHex(network, txHex);
     tx.txLoaderList![0].type = TxType.send;

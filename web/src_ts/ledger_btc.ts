@@ -44,7 +44,7 @@ export class JellyWalletBtcLedger {
             const timeoutError = new Error('TIME_OUT')
             const addressPromise = appBtc.getWalletPublicKey(path, {
                 verify: verify,
-                format: "p2sh"
+                format: "bech32"
             });
             const timeoutPromise = new Promise<never>((_, reject) => {
                 setTimeout(() => {

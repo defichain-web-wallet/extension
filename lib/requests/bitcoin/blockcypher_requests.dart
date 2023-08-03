@@ -17,14 +17,38 @@ class BlockcypherRequests {
   }) async {
     try {
       final Uri url = Uri.parse(
-          '${Hosts.blockcypherApi}/btc/${network.networkType.isTestnet ? 'test3' : 'main'}/addrs/$addressString/balance');
+          '${Hosts.blockcypherApi}/btc/${network.networkType.isTestnet ? 'test3' : 'main'}/addrs/$addressString/balance?token=1355b9463e944bdf85601553e8ad3ae6');
 
       final response = await https.get(url);
 
       if (response.statusCode == 200) {
         dynamic data = jsonDecode(response.body);
 
-        return BlockcypherBalanceModel(balance: data['final_balance'], unconfirmedBalance: data['unconfirmed_balance'].abs());
+        return BlockcypherBalanceModel(
+            balance: data['final_balance'],
+            unconfirmedBalance: data['unconfirmed_balance'].abs());
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static Future<String> getRawTx({
+    required BitcoinNetworkModel network,
+    required String txHash,
+  }) async {
+    try {
+      final Uri url = Uri.parse(
+          '${Hosts.blockcypherApi}/btc/${network.networkType.isTestnet ? 'test3' : 'main'}/txs/$txHash?includeHex=true');
+
+      final response = await https.get(url);
+
+      if (response.statusCode == 200) {
+        dynamic data = jsonDecode(response.body);
+
+        return data["hex"];
       } else {
         throw Error.safeToString(response.statusCode);
       }
@@ -159,7 +183,7 @@ class BlockcypherRequests {
     final data = jsonDecode(response.body);
     if (response.statusCode == 201) {
       return TxErrorModel(isError: false, txLoaderList: [
-         TxLoaderModel(txId: data['tx']['hash'], txHex: txHex)
+        TxLoaderModel(txId: data['tx']['hash'], txHex: txHex)
       ]);
     } else {
       return TxErrorModel(isError: true, error: data['error']);

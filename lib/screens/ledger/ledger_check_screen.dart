@@ -94,7 +94,7 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                         height: 63,
                       ),
                       Text(
-                        'Now connect your Ledger device and open the DeFiChain Application',
+                        'Now connect your Ledger device',
                         style: Theme.of(context).textTheme.headline5!.copyWith(
                               color: Theme.of(context)
                                   .textTheme

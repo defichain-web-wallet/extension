@@ -36,8 +36,8 @@ class BitcoinSigningService extends SigningService {
   }
 
   @override
-  Future<String> signTransaction(
-      TransactionBuilder txBuilder, List<UtxoModel> utxoModel) async {
+  Future<String> signTransaction(TransactionBuilder txBuilder,
+      List<UtxoModel> utxoModel, String changePath) async {
     utxoModel.asMap().forEach((index, utxo) {
       txBuilder.sign(vin: index, keyPair: ecPair, witnessValue: utxo.value);
     });

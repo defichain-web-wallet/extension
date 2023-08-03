@@ -8,6 +8,7 @@ import 'package:defi_wallet/models/network/network_name.dart';
 class LedgerAccountModel extends AbstractAccountModel {
   final String address;
   final String pubKey;
+  final String path;
   final bool isTestnet;
 
   LedgerAccountModel({
@@ -18,6 +19,7 @@ class LedgerAccountModel extends AbstractAccountModel {
     required String sourceId,
     required Map<String, List<BalanceModel>> pinnedBalances,
     required String name,
+    required this.path,
     required List<AddressBookModel> addressBook,
     required List<AddressBookModel> lastSend,
   }) : super(id, null, pubKey, sourceId, pinnedBalances, name, addressBook,
@@ -56,6 +58,7 @@ class LedgerAccountModel extends AbstractAccountModel {
         sourceId: jsonModel['sourceId'],
         pinnedBalances: pinnedBalances,
         name: jsonModel["name"],
+        path: jsonModel["path"],
         addressBook: addressBook,
         lastSend: lastSend);
   }
@@ -83,6 +86,8 @@ class LedgerAccountModel extends AbstractAccountModel {
     data["addressBook"] = this.addressBook.map((e) => e.toJson()).toList();
     data["lastSendList"] = this.lastSendList.map((e) => e.toJson()).toList();
 
+    data["path"] = this.path;
+
     return data;
   }
 
@@ -90,6 +95,7 @@ class LedgerAccountModel extends AbstractAccountModel {
       {required AbstractNetworkModel network,
       required String address,
       required String publicKey,
+      required String path,
       required bool isTestnet,
       required String sourceId,
       isRestore = false}) async {
@@ -103,6 +109,7 @@ class LedgerAccountModel extends AbstractAccountModel {
         sourceId: sourceId,
         pinnedBalances: pinnedBalances,
         name: "Ledger",
+        path: path,
         addressBook: [],
         lastSend: []);
   }

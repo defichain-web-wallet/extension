@@ -129,6 +129,12 @@ class ApplicationModel {
       if (network['networkType']['networkName'].contains('defichain')) {
         return DefichainNetworkModel.fromJson(network);
       } else {
+        final isLocalWallet = network['networkType']['isLocalWallet'];
+
+        if (!isLocalWallet) {
+          return BitcoinLedgerNetworkModel.fromJson(network);
+        }
+
         return BitcoinNetworkModel.fromJson(network);
       }
     });
@@ -137,8 +143,15 @@ class ApplicationModel {
     );
     final sourceList = json['sourceList'] as Map<String, dynamic>;
     final password = json['password'] as String;
-    final activeAccount =
-        AccountModel.fromJson(json['activeAccount'], networks);
+
+    AbstractAccountModel activeAccount;
+    if (json['activeAccount']['type'] == "ledger") {
+      activeAccount =
+          LedgerAccountModel.fromJson(json['activeAccount'], networks);
+    } else {
+      activeAccount = AccountModel.fromJson(json['activeAccount'], networks);
+    }
+
     final activeNetwork = networks.firstWhere(
       (element) => element.networkType.networkName == savedNetwork.networkName,
     );
