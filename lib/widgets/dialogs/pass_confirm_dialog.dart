@@ -264,24 +264,25 @@ class _PassConfirmDialogState extends State<PassConfirmDialog>
         _formKey.currentState!.validate();
       });
 
-      Navigator.pop(context);
-
+      Navigator.of(context).pop(true);
       if (!walletCubit.walletState.activeNetwork.networkType.isLocalWallet) {
-        showDialog(
+        await showDialog(
           barrierColor: AppColors.tolopea.withOpacity(0.06),
           barrierDismissible: false,
-          context: context,
+          context: widget.context,
           builder: (BuildContext context1) {
-            return LedgerCheckScreen(onStartSign: (p, c) async {
-              p.emitPending(true);
-              await widget.onSubmit(_passwordController.text);
-              p.emitPending(false);
-
-              Navigator.pop(context);
-            });
+            return LedgerCheckScreen(
+                onStartSign: (p, c) async {
+                  p.emitPending(true);
+                  await widget.onSubmit(_passwordController.text);
+                  p.emitPending(false);
+                  Navigator.of(context).pop(true);
+                },
+                context: widget.context);
           },
         );
       } else {
+        Navigator.of(context).pop(true);
         widget.onSubmit(_passwordController.text);
       }
     } else {

@@ -18,7 +18,7 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
   final double _logoHeight = 200.0;
   final double _logoRotateDeg = 17.5;
   String subtitleTextOops =
-      'Something went wrong, Jelly couldn\'t communicate with your ledger. Make sure you have connected your ledger and opened the DeFiChain application!';
+      'Something went wrong, Jelly couldn\'t communicate with your ledger. Make sure you have connected your ledger and opened the correct application!';
   String deviceLocked =
       'Something went wrong, Jelly detected that your ledger is still locked. Please unlock your ledger and retry!';
   String transactionAborted =
@@ -29,6 +29,8 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
       'Jelly detected that you did not select any USB device. Please select and allow an USB connection to continue!';
   String couldNotClaimUsbDevice =
       'Jelly could not claim your ledger. Please check if some other application is using the device.';
+  String deviceAlreadyOpened =
+      'Jelly could not connect your ledger. Please refresh the wallet and try again.';
 
   late String errorMessage;
 
@@ -50,6 +52,10 @@ class _LedgerErrorDialogState extends State<LedgerErrorDialog> {
       errorMessage = noUsbDeviceSelected;
     } else if (widget.error.toString().contains("claim")) {
       errorMessage = noUsbDeviceSelected;
+    } else if (widget.error
+        .toString()
+        .contains("The device is already open.")) {
+      errorMessage = deviceAlreadyOpened;
     }
   }
 

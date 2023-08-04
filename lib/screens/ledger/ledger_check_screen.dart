@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 
 class LedgerCheckScreen extends StatefulWidget {
   final Function(dynamic parent, BuildContext context) onStartSign;
+  final BuildContext context;
 
-  const LedgerCheckScreen({Key? key, required this.onStartSign})
+  const LedgerCheckScreen(
+      {Key? key, required this.onStartSign, required this.context})
       : super(key: key);
 
   @override
@@ -123,20 +125,22 @@ class _LedgerCheckScreenState extends State<LedgerCheckScreen> with ThemeMixin {
                             });
                             try {
                               await this.widget.onStartSign(parent, context);
-
-                              Navigator.pop(context);
-                            } catch (error) {
+                            } on Exception catch (error) {
                               print(error);
-                              showDialog(
+                              await showDialog(
                                 barrierColor:
                                     AppColors.tolopea.withOpacity(0.06),
                                 barrierDismissible: false,
-                                context: context,
+                                context: widget.context,
                                 builder: (BuildContext dialogContext) {
-                                  return LedgerErrorDialog(
-                                      error: error as Exception);
+                                  return LedgerErrorDialog(error: error);
                                 },
                               );
+
+                              Navigator.of(context).pop(true);
+                            } catch (error) {
+                              print("unhandled error...");
+                              print(error);
                             } finally {
                               parent.emitPending(false);
                               setState(() {

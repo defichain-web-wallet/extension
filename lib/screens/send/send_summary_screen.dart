@@ -443,6 +443,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                   password,
                                                   isFullScreen,
                                                 );
+
+                                                parent.emitPending(true);
                                               },
                                               context: context,
                                             );

@@ -12,6 +12,7 @@ import 'package:defi_wallet/models/network/ledger_account_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
+import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:defi_wallet/requests/bitcoin/blockcypher_requests.dart';
 import 'package:defi_wallet/requests/transaction_requests.dart';
