@@ -3,6 +3,8 @@ import 'package:defi_wallet/bloc/network/network_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/selectors/network/network_selector_button.dart';
@@ -29,15 +31,25 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
   CustomPopupMenuController controller = CustomPopupMenuController();
   MenuHelper menuHelper = MenuHelper();
 
+  late AbstractAccountModel activeAccount;
+
   final List<dynamic> tabs = [
     {'value': NetworkTabs.all, 'name': 'Mainnet'},
     {'value': NetworkTabs.test, 'name': 'Testnet'},
   ];
 
-  onChangeNetwork(dynamic item) {
+  void initState() {
+    super.initState();
+
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+    activeAccount = walletCubit.state.activeAccount;
+  }
+
+  onChangeNetwork(AbstractNetworkModel item) {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     controller.hideMenu();
     walletCubit.changeActiveNetwork(item);
+
     NavigatorService.pushReplacement(context, null);
   }
 
@@ -59,41 +71,64 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
     }
   }
 
+  onWalletStateChanged(WalletState state) {
+    if (state.activeAccount.id != activeAccount.id) {
+      setState(() {
+        activeAccount = state.activeAccount;
+        var firstNetworkModel =
+            activeAccount.getNetworkModelList(state.applicationModel!).first;
+        onChangeNetwork(firstNetworkModel);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
 
     if (!widget.isAppBar) {
-      return NetworkSelectorContent(
-        tabs: tabs,
-        onChange: (item) => onChangeNetwork(item),
-      );
-    } else if (isLargeScreen(context)) {
-      return Container(
-        child: GestureDetector(
-          onTap: () {
-            homeCubit.updateExtendedSelector(
-              !homeCubit.state.isShowExtendedNetworkSelector,
-            );
+      return BlocListener<WalletCubit, WalletState>(
+          listener: (BuildContext context, WalletState state) {
+            onWalletStateChanged(state);
           },
-          child: NetworkSelectorButton(),
-        ),
-      );
+          child: NetworkSelectorContent(
+            tabs: tabs,
+            onChange: (item) => onChangeNetwork(item),
+          ));
+    } else if (isLargeScreen(context)) {
+      return BlocListener<WalletCubit, WalletState>(
+          listener: (BuildContext context, WalletState state) {
+            onWalletStateChanged(state);
+          },
+          child: Container(
+            child: GestureDetector(
+              onTap: () {
+                homeCubit.updateExtendedSelector(
+                  !homeCubit.state.isShowExtendedNetworkSelector,
+                );
+              },
+              child: NetworkSelectorButton(),
+            ),
+          ));
     } else {
-      return CustomPopupMenu(
-        child: NetworkSelectorButton(),
-        menuBuilder: () => NetworkSelectorContent(
-          tabs: tabs,
-          onChange: (item) => onChangeNetwork(item),
-        ),
-        showArrow: false,
-        barrierColor: Colors.transparent,
-        pressType: PressType.singleClick,
-        verticalMargin: _getVerticalMargin(context),
-        horizontalMargin: _getHorizontalMargin(context),
-        controller: controller,
-        enablePassEvent: false,
-      );
+      return BlocListener<WalletCubit, WalletState>(
+          listener: (BuildContext context, WalletState state) {
+            onWalletStateChanged(state);
+          },
+          child: CustomPopupMenu(
+            child: NetworkSelectorButton(),
+            menuBuilder: () => NetworkSelectorContent(
+              tabs: tabs,
+              onChange: (item) => onChangeNetwork(item),
+            ),
+            showArrow: false,
+            barrierColor: Colors.transparent,
+            pressType: PressType.singleClick,
+            verticalMargin: _getVerticalMargin(context),
+            horizontalMargin: _getHorizontalMargin(context),
+            controller: controller,
+            enablePassEvent: false,
+          ));
     }
   }
 }

@@ -1,17 +1,11 @@
-import 'package:defi_wallet/bloc/available_amount/available_amount_cubit.dart';
 import 'package:defi_wallet/constants/input_formatters.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
-import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/refactoring/fields/available_amount_text.dart';
 import 'package:defi_wallet/widgets/refactoring/fields/converted_amount_text.dart';
 import 'package:defi_wallet/widgets/refactoring/selectors/asset/asset_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 
 class AmountField extends StatefulWidget {
@@ -58,18 +52,6 @@ class _AmountFieldState extends State<AmountField> {
     });
   }
 
-  _onSelectInputText() {
-    _focusNode.requestFocus();
-    if (widget.controller.text.isNotEmpty) {
-      widget.controller.selection =
-          TextSelection(
-              baseOffset: 0,
-              extentOffset:
-              widget.controller
-                  .text.length);
-    }
-  }
-
   @override
   void initState() {
     _focusNode.addListener(_onFocusChange);
@@ -90,11 +72,11 @@ class _AmountFieldState extends State<AmountField> {
         borderRadius: BorderRadius.circular(12),
         border: _onFocused
             ? GradientBoxBorder(
-          gradient: gradientWrongMnemonicWord,
-        )
+                gradient: gradientWrongMnemonicWord,
+              )
             : Border.all(
-          color: LightColors.amountFieldBorderColor.withOpacity(0.32),
-        ),
+                color: LightColors.amountFieldBorderColor.withOpacity(0.32),
+              ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,8 +96,8 @@ class _AmountFieldState extends State<AmountField> {
                       focusNode: _focusNode,
                       onChanged: (value) => widget.onChanged(value),
                       style: Theme.of(context).textTheme.headline4!.copyWith(
-                        fontSize: 20,
-                      ),
+                            fontSize: 20,
+                          ),
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -143,20 +125,27 @@ class _AmountFieldState extends State<AmountField> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ConvertedAmountText(amount: double.tryParse(widget.controller.text), token: widget.balance!.token!),
-              !widget.isDisableAvailable ? GestureDetector(
-                onTap: () {
-                  if (widget.controller.text != widget.available.toString()) {
-                    widget.controller.text = widget.available.toString();
-                    widget.onChanged(widget.controller.text);
-                    _focusNode.requestFocus();
-                  }
-                },
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: AvailableAmountText(amount: widget.available!,),
-                ),
-              ) : Container(),
+              ConvertedAmountText(
+                  amount: double.tryParse(widget.controller.text),
+                  token: widget.balance!.token!),
+              !widget.isDisableAvailable
+                  ? GestureDetector(
+                      onTap: () {
+                        if (widget.controller.text !=
+                            widget.available.toString()) {
+                          widget.controller.text = widget.available.toString();
+                          widget.onChanged(widget.controller.text);
+                          _focusNode.requestFocus();
+                        }
+                      },
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: AvailableAmountText(
+                          amount: widget.available!,
+                        ),
+                      ),
+                    )
+                  : Container(),
             ],
           )
         ],

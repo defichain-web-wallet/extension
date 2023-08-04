@@ -201,6 +201,12 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     var fee = fromSatoshi(
         BTCTransactionService.calculateBTCFee(utxoList.length, 1, satPerByte));
     var available = balance - fee;
+
+    if (this.networkType.isTestnet) {
+      //btc testnet does not need that much fee
+      return balance - 0.0001;
+    }
+
     return available > 0 ? available : 0;
   }
 

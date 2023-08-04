@@ -280,7 +280,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                             .isPair(widget.token.symbol))
                                           AssetPair(
                                             isBorder: false,
-                                            pair: widget.token.symbol!,
+                                            pair: widget.token.symbol,
                                             height: 20,
                                           ),
                                         if (!tokenHelper
@@ -513,14 +513,16 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
   }
 
   Future submitSend(
-    state,
+    WalletState state,
     password,
     isFullScreen, {
     final Function()? callbackOk,
   }) async {
     try {
       if (widget.amount > 0) {
-        await _callback(
+        await _sendTransaction(
+          context,
+          widget.token,
           state,
           password,
           isFullScreen,
@@ -529,23 +531,10 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       }
     } catch (err) {
       print(err);
+      if (!state.applicationModel!.activeNetwork!.networkType.isLocalWallet) {
+        throw err;
+      }
     }
-  }
-
-  Future _callback(
-    WalletState walletState,
-    String? password,
-    bool isFullScreen, {
-    final Function()? callbackOk,
-  }) async {
-    await _sendTransaction(
-      context,
-      widget.token,
-      walletState,
-      password,
-      isFullScreen,
-      callbackOk: callbackOk,
-    );
   }
 
   Future _sendTransaction(
@@ -559,20 +548,11 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
     TxErrorModel? txResponse;
     AddressBookCubit addressBookCubit =
         BlocProvider.of<AddressBookCubit>(context);
-    // final isLedger = await SettingsHelper.isLedger();
 
-    // TODO: not working now
-    // ECPair? keyPair;
-    // if (!isLedger) {
-    //   keyPair = await HDWalletService().getKeypairFromStorage(
-    //     password,
-    //     walletState.activeAccount!.accountIndex,
-    //   );
-    // }
     var network = walletState.applicationModel!.activeNetwork!;
 
     txResponse = await network.send(
-      account: walletState.activeAccount!,
+      account: walletState.activeAccount,
       address: address,
       password: password!,
       token: token,

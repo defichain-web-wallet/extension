@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/update_active_account_change.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
@@ -354,8 +355,6 @@ class WalletCubit extends Cubit<WalletState> {
     if (networks.length >= 0) {
       changeActiveNetwork(networks.first);
     }
-
-    StorageService.saveApplication(applicationModel);
 
     emit(state.copyWith(
       status: WalletStatusList.success,
