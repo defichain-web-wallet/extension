@@ -40,7 +40,6 @@ class _LockScreenState extends State<LockScreen>
     with SnackBarMixin, ThemeMixin {
   bool isPasswordObscure = true;
   bool isCorrectPassword = true;
-  bool isDisableSubmit = false;
   GlobalKey globalKey = GlobalKey();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController passwordController = TextEditingController();
@@ -112,24 +111,25 @@ class _LockScreenState extends State<LockScreen>
                               ),
                             ),
                             SizedBox(height: 20),
-                            InkWell(
-                              child: Text(
-                                'Forgot password?',
-                                style: AppTheme.defiUnderlineText,
+                            MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                child: Text(
+                                  'Forgot password?',
+                                  style: AppTheme.defiUnderlineText,
+                                ),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation1,
+                                        animation2) =>
+                                        RecoveryScreen(),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration:
+                                    Duration.zero,
+                                  ),
+                                ),
                               ),
-                              onTap: isDisableSubmit
-                                  ? () => Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1,
-                                                  animation2) =>
-                                              RecoveryScreen(),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
-                                        ),
-                                      )
-                                  : null,
                             ),
                           ],
                         ),
@@ -162,7 +162,6 @@ class _LockScreenState extends State<LockScreen>
     setState(() {
       isCorrectPassword = true;
       formKey.currentState!.validate();
-      isDisableSubmit = true;
     });
 
     if (widget.savedMnemonic == null) {
@@ -330,7 +329,6 @@ class _LockScreenState extends State<LockScreen>
       isCorrectPassword = false;
       formKey.currentState!.validate();
       passwordStatus = PasswordStatusList.error;
-      isDisableSubmit = false;
     });
   }
 }

@@ -64,7 +64,9 @@ class StakingCard extends StatelessWidget {
         return EarnCard(
           isLoading: isLoadingCard,
           title: 'Staking',
-          subTitle: lockState.status == LockStatusList.expired ? 'Provide to update access token of LOCK' : 'N/A APY',
+          subTitle: lockState.status == LockStatusList.expired
+              ? 'Click to log in'
+              : 'N/A APY',
           imagePath: 'assets/images/dfi_staking.png',
           firstColumnNumber: 'N/A',
           firstColumnAsset: '',
