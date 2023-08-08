@@ -538,6 +538,20 @@ class _SwapScreenState extends State<SwapScreen>
                   ),
                   callback: isDisableSubmit()
                       ? () {
+                          if (double.parse(amountFromController.text
+                                  .replaceAll(',', '')) >
+                              exchangeState.availableFrom) {
+                            showSnackBar(
+                              context,
+                              title: 'Insufficient funds',
+                              color: AppColors.txStatusError.withOpacity(0.1),
+                              prefix: Icon(
+                                Icons.close,
+                                color: AppColors.txStatusError,
+                              ),
+                            );
+                            return;
+                          }
                           if (transactionState is! TransactionLoadingState) {
                             submitReviewSwap(
                               context,
@@ -584,8 +598,8 @@ class _SwapScreenState extends State<SwapScreen>
 
   bool isDisableSubmit() {
     try {
-      return double.parse(amountFromController.text) > 0 &&
-          double.parse(amountToController.text) > 0;
+      return double.parse(amountFromController.text.replaceAll(',', '')) > 0 &&
+          double.parse(amountToController.text.replaceAll(',', '')) > 0;
     } catch (err) {
       return false;
     }
