@@ -427,7 +427,7 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                       pendingText: 'Pending',
                                       callback: (parent) async {
                                         parent.emitPending(true);
-                                        showDialog(
+                                        await showDialog(
                                           barrierColor: AppColors.tolopea
                                               .withOpacity(0.06),
                                           barrierDismissible: false,
@@ -443,13 +443,13 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
                                                   password,
                                                   isFullScreen,
                                                 );
-
-                                                parent.emitPending(true);
                                               },
                                               context: context,
                                             );
                                           },
                                         );
+
+                                        parent?.emitPending(false);
                                       },
                                     ),
                                   ),

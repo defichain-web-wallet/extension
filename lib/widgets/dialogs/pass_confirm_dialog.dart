@@ -3,9 +3,7 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
-import 'package:defi_wallet/screens/ledger/loaders/ledger_auth_loader_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -264,8 +262,8 @@ class _PassConfirmDialogState extends State<PassConfirmDialog>
         _formKey.currentState!.validate();
       });
 
-      Navigator.of(context).pop(true);
       if (!walletCubit.walletState.activeNetwork.networkType.isLocalWallet) {
+        Navigator.of(context).pop();
         await showDialog(
           barrierColor: AppColors.tolopea.withOpacity(0.06),
           barrierDismissible: false,
@@ -282,8 +280,8 @@ class _PassConfirmDialogState extends State<PassConfirmDialog>
           },
         );
       } else {
-        Navigator.of(context).pop(true);
         widget.onSubmit(_passwordController.text);
+        Navigator.of(context).pop();
       }
     } else {
       setState(() {
