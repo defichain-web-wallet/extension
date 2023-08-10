@@ -163,7 +163,7 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
         throw new Exception("no address generated..");
       }
       await walletCubit.addNewLedgerAccount(
-          "Ledger", address, pubKey, path, isTestnet);
+          "Ledger " + this.widget.appName, address, pubKey, path, isTestnet);
 
       widget.callback();
     } on Exception catch (error) {

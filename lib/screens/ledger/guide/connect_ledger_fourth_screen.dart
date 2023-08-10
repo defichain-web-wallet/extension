@@ -11,8 +11,15 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:flutter/material.dart';
 import 'package:js/js_util.dart';
 
+class LedgerAppName {
+  String appName;
+  String title;
+
+  LedgerAppName(this.appName, this.title);
+}
+
 class ConnectLedgerFourthScreen extends StatefulWidget {
-  final void Function() callback;
+  final void Function(String appName) callback;
 
   const ConnectLedgerFourthScreen({Key? key, required this.callback})
       : super(key: key);
@@ -25,8 +32,24 @@ class ConnectLedgerFourthScreen extends StatefulWidget {
 class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
     with ThemeMixin {
   String subtitleText =
-      'Once you set up the wallet with Ledger you can only use Jellywallet with Ledger.';
+      'Please select the network you want to connect. Ensure that your ledger is connected, unlocked and the correct app is open.';
   String titleText = '4.';
+
+  List<LedgerAppName> apps = List<LedgerAppName>.empty(growable: true);
+
+  initState() {
+    super.initState();
+
+    apps.add(LedgerAppName("btc", "Bitcoin"));
+    apps.add(LedgerAppName("test", "Bitcoin Testnet"));
+
+    //for later use!
+    //apps.add(LedgerAppName("dfi", "DeFiChain"));
+    //apps.add(LedgerAppName("dfitest", "DeFiChain Testnet"));
+    selectedApp = apps.first;
+  }
+
+  LedgerAppName? selectedApp;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +92,7 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                     height: 8,
                   ),
                   Container(
-                    height: 105,
+                    // height: 105,
                     child: Text(
                       subtitleText,
                       style: Theme.of(context).textTheme.headline5!.copyWith(
@@ -82,6 +105,35 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                       textAlign: TextAlign.center,
                     ),
                   ),
+                  ListTile(
+                    title: const Text('Bitcoin'),
+                    leading: Radio<LedgerAppName>(
+                      value: apps[0],
+                      groupValue: selectedApp,
+                      fillColor: MaterialStateColor.resolveWith(
+                          (states) => AppColors.pink),
+                      onChanged: (LedgerAppName? value) {
+                        setState(() {
+                          selectedApp = value!;
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Bitcoin Testnet'),
+                    leading: Radio<LedgerAppName>(
+                      value: apps[1],
+                      groupValue: selectedApp,
+                      fillColor: MaterialStateColor.resolveWith(
+                          (states) => AppColors.pink),
+                      onChanged: (LedgerAppName? value) {
+                        setState(() {
+                          selectedApp = value!;
+                        });
+                      },
+                    ),
+                  ),
+                  Container(height: 50),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -117,7 +169,7 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                             }
                             return;
                           }
-                          this.widget.callback();
+                          this.widget.callback(this.selectedApp!.appName);
                         },
                         title: 'Next',
                       ),

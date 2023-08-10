@@ -9,9 +9,7 @@ import 'package:defi_wallet/screens/ledger/loaders/ledger_auth_loader_screen.dar
 import 'package:flutter/material.dart';
 
 class ConnectLedgerOverlayScreen extends StatefulWidget {
-  final String appName;
-  const ConnectLedgerOverlayScreen({required this.appName, Key? key})
-      : super(key: key);
+  const ConnectLedgerOverlayScreen({Key? key}) : super(key: key);
 
   @override
   State<ConnectLedgerOverlayScreen> createState() =>
@@ -21,6 +19,8 @@ class ConnectLedgerOverlayScreen extends StatefulWidget {
 class _ConnectLedgerOverlayScreenState extends State<ConnectLedgerOverlayScreen>
     with ThemeMixin {
   int currentStep = 1;
+
+  String? appName;
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +48,15 @@ class _ConnectLedgerOverlayScreenState extends State<ConnectLedgerOverlayScreen>
       return new ConnectLedgerThirdScreen(
           callback: () => {setState(() => this.currentStep = 4)});
     } else if (currentStep == 4) {
-      return new ConnectLedgerFourthScreen(
-          callback: () => {setState(() => this.currentStep = 5)});
+      return new ConnectLedgerFourthScreen(callback: (String appName) {
+        setState(() => this.currentStep = 5);
+        this.appName = appName;
+      });
     } else if (currentStep == 5) {
       return new LedgerAuthLoaderScreen(
           callback: () => {setState(() => this.currentStep = 6)},
           errorCallback: () => {setState(() => this.currentStep = 4)},
-          appName: this.widget.appName);
+          appName: this.appName!);
     } else if (currentStep == 6) {
       Navigator.pop(context);
     }

@@ -255,8 +255,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                                 context: context,
                                                 builder:
                                                     (BuildContext context) {
-                                                  return ConnectLedgerOverlayScreen(
-                                                      appName: "test");
+                                                  return ConnectLedgerOverlayScreen();
                                                   // return CreateEditAccountDialog(
                                                   //   callback: (s) async {
                                                   //     await walletCubit
