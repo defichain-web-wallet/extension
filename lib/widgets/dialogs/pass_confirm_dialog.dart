@@ -274,7 +274,7 @@ class _PassConfirmDialogState extends State<PassConfirmDialog>
                   p.emitPending(true);
                   await widget.onSubmit(_passwordController.text);
                   p.emitPending(false);
-                  Navigator.of(context).pop(true);
+                  Navigator.of(context1).pop(true);
                 },
                 context: widget.context);
           },
