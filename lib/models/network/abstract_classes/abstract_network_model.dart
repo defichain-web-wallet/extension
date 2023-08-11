@@ -14,7 +14,6 @@ import 'abstract_on_off_ramp_model.dart';
 import 'abstract_staking_provider_model.dart';
 
 abstract class AbstractNetworkModel {
-  static const int COIN = 100000000;
 
   final NetworkTypeModel networkType;
   late List<AbstractStakingProviderModel> stakingList = [];
@@ -85,9 +84,9 @@ abstract class AbstractNetworkModel {
 
   bool stakingAvailable() => getStakingProviders().length > 0;
 
-  int toSatoshi(double amount) => (amount * COIN).round();
+  dynamic toSatoshi(double amount);
 
-  double fromSatoshi(int amount) => amount / COIN;
+  dynamic fromSatoshi(int amount);
 
   bool lmAvailable() => getLmProviders().length > 0;
 
@@ -113,7 +112,7 @@ abstract class AbstractNetworkModel {
         required TokenModel token,
         required double amount,
       required ApplicationModel applicationModel,
-      int satPerByte = 0});
+      int satPerByte = 0, int gasPrice = 0, int maxGas = 0});
 
   Future<String> signMessage(
       AbstractAccountModel account,

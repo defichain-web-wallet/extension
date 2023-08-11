@@ -27,6 +27,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
   static const int DUST = 3000;
   static const int FEE = 3000;
   static const int RESERVED_BALANCES = 30000;
+  static const int COIN = 100000000;
 
   static NetworkTypeModel _validationNetworkName(NetworkTypeModel networkType) {
     if (networkType.networkName != NetworkName.bitcoinTestnet &&
@@ -64,6 +65,10 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
       networkName: this.networkType.networkName,
     );
   }
+
+  int toSatoshi(double amount) => (amount * COIN).round();
+
+  double fromSatoshi(int amount) => amount / COIN;
 
   Future<BalanceModel> getBalanceUTXO(
     List<BalanceModel> balances,
@@ -205,7 +210,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
       required TokenModel token,
       required double amount,
       required ApplicationModel applicationModel,
-      int satPerByte = 0}) async {
+        int satPerByte = 0, int gasPrice = 0, int maxGas = 0}) async {
     if (satPerByte == 0) {
       var networkFee = await BlockcypherRequests.getNetworkFee(this);
       satPerByte = networkFee.medium!;

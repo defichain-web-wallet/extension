@@ -21,6 +21,10 @@ class NetworkTypeModel {
         return 'Bitcoin Mainnet';
       case NetworkName.bitcoinTestnet:
         return 'Bitcoin Testnet';
+      case NetworkName.ethereumMainnet:
+        return 'Ethereum Mainnet';
+      case NetworkName.ethereumTestnet:
+        return 'Ethereum Testnet';
       default:
         return 'Unknown name';
     }
@@ -49,7 +53,9 @@ enum NetworkName {
   defichainMainnet,
   defichainTestnet,
   bitcoinMainnet,
-  bitcoinTestnet;
+  bitcoinTestnet,
+  ethereumTestnet,
+  ethereumMainnet;
 
   @override
   String toString() => this.name;

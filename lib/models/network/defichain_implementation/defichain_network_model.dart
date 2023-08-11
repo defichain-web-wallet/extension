@@ -32,7 +32,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   static const int DUST = 3000;
   static const int FEE = 3000;
   static const int RESERVED_BALANCES = 30000;
-
+  static const int COIN = 100000000;
 
   DefichainNetworkModel(NetworkTypeModel networkType)
       : super(_validationNetworkName(networkType)) {
@@ -50,6 +50,11 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   Future<NetworkFeeModel> getNetworkFee() async {
     throw 'Not available for this network';
   }
+
+
+  int toSatoshi(double amount) => (amount * COIN).round();
+
+  double fromSatoshi(int amount) => amount / COIN;
 
   factory DefichainNetworkModel.fromJson(Map<String, dynamic> json) {
     final stakingListJson = json['stakingList'];
@@ -296,7 +301,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       required TokenModel token,
       required double amount,
         required ApplicationModel applicationModel,
-        int satPerByte = 0}) async {
+        int satPerByte = 0, int gasPrice = 0, int maxGas = 0}) async {
     ECPair keypair = await getKeypair(
       password,
       account,

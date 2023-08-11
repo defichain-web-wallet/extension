@@ -4,6 +4,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_network_mod
 import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -95,7 +96,15 @@ class ApplicationModel {
           networkString: 'testnet',
           isTestnet: true,
         ),
-      )
+      ),
+      EthereumNetworkModel(
+          NetworkTypeModel(
+            networkName: NetworkName.ethereumMainnet,
+            networkString: 'mainnet',
+            isTestnet: false,
+          ),
+          'https://eth.llamarpc.com',
+          []),
     ];
   }
 
