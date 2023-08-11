@@ -5,8 +5,10 @@ import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/screens/earn/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -140,7 +142,15 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
         walletState.activeNetwork,
         balances,
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'earn_screen_wrapper.dart',
+          method: 'liquidityMiningCard',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       investedBalance = 0;
       totalBalance = 0;
     } finally {

@@ -3,11 +3,13 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -112,8 +114,15 @@ class WalletCubit extends Cubit<WalletState> {
           }
         }
 
-      } catch (_) {
-        print(_);
+      } catch (error, stackTrace) {
+        SentryService.captureException(
+          ErrorModel(
+            file: 'wallet_cubit.dart',
+            method: 'restoreWallet',
+            exception: error.toString(),
+          ),
+          stackTrace: stackTrace,
+        );
         rethrow;
       }
 
@@ -177,7 +186,15 @@ class WalletCubit extends Cubit<WalletState> {
         applicationModel: applicationModel,
         status: WalletStatusList.success,
       ));
-    } catch (_) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'wallet_cubit.dart',
+          method: 'updateAccessKeys',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       emit(state.copyWith(
         status: WalletStatusList.failure,
       ));
@@ -195,7 +212,15 @@ class WalletCubit extends Cubit<WalletState> {
         applicationModel: applicationModel,
         status: WalletStatusList.success,
       ));
-    } catch (error) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'wallet_cubit.dart',
+          method: 'loadWalletDetails',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       emit(state.copyWith(
         status: WalletStatusList.failure,
       ));

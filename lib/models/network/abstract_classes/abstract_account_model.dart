@@ -1,7 +1,9 @@
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 
 abstract class AbstractAccountModel {
   final String publicKeyTestnet;
@@ -90,7 +92,15 @@ abstract class AbstractAccountModel {
       pinnedBalances[network.networkType.networkName.name]!.removeWhere((element) {
         return element.compare(balance);
       });
-    } catch (_) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'abstract_account_model.dart',
+          method: 'unpinToken',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       throw 'Empty balance list for this network';
     }
   }

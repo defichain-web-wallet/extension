@@ -1,16 +1,16 @@
-import 'dart:developer';
-
 import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
 import 'package:defi_wallet/screens/swap/swap_summary_screen.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -161,8 +161,15 @@ class _SwapScreenState extends State<SwapScreen>
           },
         );
       });
-    } catch (e) {
-      print(e);
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'swap_screen.dart',
+          method: 'build',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       return Container();
     }
   }
@@ -241,8 +248,15 @@ class _SwapScreenState extends State<SwapScreen>
                         amountFrom: amount,
                         amountTo: amountToInput,
                       );
-                    } catch (err) {
-                      log(err.toString());
+                    } catch (error, stackTrace) {
+                      SentryService.captureException(
+                        ErrorModel(
+                          file: 'swap_screen.dart',
+                          method: 'onChanged:amountFrom',
+                          exception: error.toString(),
+                        ),
+                        stackTrace: stackTrace,
+                      );
                     }
                   },
                   controller: amountFromController,
@@ -284,8 +298,15 @@ class _SwapScreenState extends State<SwapScreen>
                           fixedCount: 8,
                         );
                       });
-                    } catch (err) {
-                      log(err.toString());
+                    } catch (error, stackTrace) {
+                      SentryService.captureException(
+                        ErrorModel(
+                          file: 'swap_screen.dart',
+                          method: 'onChanged:amountTo',
+                          exception: error.toString(),
+                        ),
+                        stackTrace: stackTrace,
+                      );
                     }
                   },
                   balance: exchangeState.selectedSecondInputBalance,
@@ -344,7 +365,8 @@ class _SwapScreenState extends State<SwapScreen>
                             ),
                             onPressed: () => setState(() {
                               exchangeCubit.updateAmountsAndSlipage(
-                                  slippage: 0.03);
+                                slippage: 0.03,
+                              );
                               isShowSlippageField = false;
                               // hideOverlay();
                             }),
@@ -356,9 +378,18 @@ class _SwapScreenState extends State<SwapScreen>
                               var slippage = double.parse(value) / 100;
                               exchangeCubit.updateAmountsAndSlipage(
                                   slippage: slippage);
-                            } catch (err) {
+                            } catch (error, stackTrace) {
+                              SentryService.captureException(
+                                ErrorModel(
+                                  file: 'swap_screen.dart',
+                                  method: 'onChanged:slippage',
+                                  exception: error.toString(),
+                                ),
+                                stackTrace: stackTrace,
+                              );
                               exchangeCubit.updateAmountsAndSlipage(
-                                  slippage: 0.03);
+                                slippage: 0.03,
+                              );
                             }
                           });
                         },
@@ -600,7 +631,15 @@ class _SwapScreenState extends State<SwapScreen>
     try {
       return double.parse(amountFromController.text.replaceAll(',', '')) > 0 &&
           double.parse(amountToController.text.replaceAll(',', '')) > 0;
-    } catch (err) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'swap_screen.dart',
+          method: 'onChanged:slippage',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }
