@@ -222,11 +222,21 @@ class EthereumNetworkModel extends AbstractNetworkModel {
       {required AbstractAccountModel account,
       required TokenModel token,
       TxType type = TxType.send,
-      NetworkFeeModel? fee}) async {
+      EthereumNetworkFeeModel? fee}) async {
     try{
       var balance = await this.getBalance(account: account, token: token);
       if(token.isUTXO){
-        return balance;
+        if(fee == null){
+          fee = (await this.getNetworkFee() as EthereumNetworkFeeModel) ;
+        }
+
+        //calculating fee
+        final gasPriceInWei = fee.gasPrice! * 1000000000;
+        final totalGasFeeInWei = gasPriceInWei * fee.gasLimit!;
+        final totalGasFeeInEther = totalGasFeeInWei * 0.000000000000000001;
+        //calculating fee
+
+        return fromSatoshi(toSatoshi(balance) - toSatoshi(totalGasFeeInEther));
       } else {
         return balance;
       }
@@ -257,9 +267,11 @@ class EthereumNetworkModel extends AbstractNetworkModel {
   Future<NetworkFeeModel> getNetworkFee() async {
     final client = Web3Client(this.rpcUrl, Client());
     final gasPrice = await client.getGasPrice();
-    final gasEstimate = await client.estimateGas();
+
+    final gasEstimate = 21000;
+
     return EthereumNetworkFeeModel(
-        gasPrice: gasPrice.getInWei.toInt(), gasLimit: gasEstimate.toInt());
+        gasPrice: gasPrice.getValueInUnit(EtherUnit.gwei).toInt(), gasLimit: gasEstimate);
   }
 
   Future<TxErrorModel> send(
