@@ -106,8 +106,22 @@ class ApplicationModel {
           ),
           'https://eth.llamarpc.com',
           [
-            EthereumTokenModel(id: '0xdAC17F958D2ee523a2206206994597C13D831ec7', contractAddress: '0xdAC17F958D2ee523a2206206994597C13D831ec7', tokenDecimals: 6, displaySymbol: 'USDT', symbol: 'USDT', name: 'Tether USD', networkName: NetworkName.ethereumMainnet),
-            EthereumTokenModel(id: '0xF04f22b39bF419FdEc8eAE7C69c5E89872915f53', contractAddress: '0xF04f22b39bF419FdEc8eAE7C69c5E89872915f53', tokenDecimals: 18, displaySymbol: 'DASH', symbol: 'DASH', name: 'Dash', networkName: NetworkName.ethereumMainnet),
+            EthereumTokenModel(
+                id: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+                contractAddress: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+                tokenDecimals: 6,
+                displaySymbol: 'USDT',
+                symbol: 'USDT',
+                name: 'Tether USD',
+                networkName: NetworkName.ethereumMainnet),
+            EthereumTokenModel(
+                id: '0xF04f22b39bF419FdEc8eAE7C69c5E89872915f53',
+                contractAddress: '0xF04f22b39bF419FdEc8eAE7C69c5E89872915f53',
+                tokenDecimals: 18,
+                displaySymbol: 'DASH',
+                symbol: 'DASH',
+                name: 'Dash',
+                networkName: NetworkName.ethereumMainnet),
           ]),
     ];
   }

@@ -149,7 +149,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
   }
 
   Future<List<TokenModel>> getAvailableTokens() async {
-    throw 'Ethereum network does not support tokens';
+    return this.popularTokens;
   }
 
   Uri getTransactionExplorer(String tx) {
