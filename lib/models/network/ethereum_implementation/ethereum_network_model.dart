@@ -301,8 +301,10 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     }
     String senderAddress = account.getAddress(this.networkType.networkName)!;
     return ETHTransactionService.createSendTransaction(
-        amount: toSatoshi(amount,
-            decimals: (token as EthereumTokenModel).tokenDecimals),
+        amount: toSatoshi(
+          amount,
+          decimals: token.tokenDecimals,
+        ),
         credentials: keypair,
         destinationAddress: address,
         rpcUrl: 'https://eth.llamarpc.com',

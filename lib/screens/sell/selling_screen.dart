@@ -202,8 +202,8 @@ class _SellingState extends State<Selling> with ThemeMixin, SnackBarMixin {
                                                 onAssetSelect: (asset) async {
                                                   txCubit.changeActiveBalance(
                                                     context,
-                                                    asset,
                                                     TxType.send,
+                                                    balanceModel: asset,
                                                   );
                                                 },
                                                 suffix: balanceInUsd ?? '0.00',

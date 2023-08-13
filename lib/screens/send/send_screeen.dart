@@ -7,6 +7,8 @@ import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_fee_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
@@ -50,9 +52,22 @@ class _SendScreenState extends State<SendScreen>
   String subtitleText = 'Please enter the recipient and amount';
   bool isAddNewContact = false;
   bool isShowCheckbox = false;
+  EthereumNetworkFeeModel? networkFeeModel;
+
+  void loadNetworkFee() async {
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    AbstractNetworkModel activeNetwork = walletCubit.state.activeNetwork;
+    if (activeNetwork is EthereumNetworkModel) {
+      networkFeeModel =
+          await activeNetwork.getNetworkFee() as EthereumNetworkFeeModel;
+      gasPriceController.text = networkFeeModel!.gasPrice.toString();
+      gasLimitController.text = networkFeeModel!.gasLimit.toString();
+    }
+  }
 
   @override
   void initState() {
+    loadNetworkFee();
     addressController.addListener(() {
       if (addressController.text != '') {
         setState(() {
@@ -157,12 +172,12 @@ class _SendScreenState extends State<SendScreen>
                                         .textTheme
                                         .headline5!
                                         .apply(
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .color!
-                                              .withOpacity(0.6),
-                                        ),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.6),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -203,7 +218,7 @@ class _SendScreenState extends State<SendScreen>
                                   Text(
                                     'Asset',
                                     style:
-                                        Theme.of(context).textTheme.headline5,
+                                    Theme.of(context).textTheme.headline5,
                                   ),
                                 ],
                               ),
@@ -222,12 +237,15 @@ class _SendScreenState extends State<SendScreen>
                                 available: txState.availableBalance,
                                 // available: true,
                                 isDisabledSelector:
-                                    !activeNetwork.isTokensPresent(),
+                                !activeNetwork.isTokensPresent(),
                                 suffix: balanceInUsd ?? '0.00',
                                 // ?? getUsdBalance(context), //TODO: fix it
                                 onAssetSelect: (asset) async {
                                   txCubit.changeActiveBalance(
-                                      context, asset, TxType.send);
+                                    context,
+                                    TxType.send,
+                                    balanceModel: asset,
+                                  );
                                 },
                                 controller: amountController,
                                 assets: txState.balances!,
@@ -235,17 +253,22 @@ class _SendScreenState extends State<SendScreen>
                               SizedBox(
                                 height: 16,
                               ),
-                              if (activeNetwork.isGas())
+                              if (activeNetwork is EthereumNetworkModel)
                                 Column(
                                   children: [
                                     Row(
                                       children: [
                                         Expanded(
                                           child: GasField(
-                                            label: 'Gas price',
+                                            label: 'Gas price (GWEI)',
                                             controller: gasPriceController,
                                             onChange: (String value) {
-                                              print(value);
+                                              txCubit.changeActiveBalance(
+                                                context,
+                                                TxType.send,
+                                                gasPrice: int.tryParse(gasPriceController.text),
+                                                gasLimit: int.tryParse(gasLimitController.text),
+                                              );
                                             },
                                           ),
                                         ),
@@ -257,7 +280,12 @@ class _SendScreenState extends State<SendScreen>
                                             label: 'Gas limit',
                                             controller: gasLimitController,
                                             onChange: (String value) {
-                                              print(value);
+                                              txCubit.changeActiveBalance(
+                                                context,
+                                                TxType.send,
+                                                gasPrice: int.tryParse(gasPriceController.text),
+                                                gasLimit: int.tryParse(gasLimitController.text),
+                                              );
                                             },
                                           ),
                                         ),
@@ -279,7 +307,7 @@ class _SendScreenState extends State<SendScreen>
                                     Text(
                                       'Fees',
                                       style:
-                                          Theme.of(context).textTheme.headline5,
+                                      Theme.of(context).textTheme.headline5,
                                     ),
                                   ],
                                 ),
@@ -318,13 +346,13 @@ class _SendScreenState extends State<SendScreen>
                                         .textTheme
                                         .headline5!
                                         .copyWith(
-                                          fontWeight: FontWeight.w400,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .color!
-                                              .withOpacity(0.8),
-                                        ),
+                                      fontWeight: FontWeight.w400,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .color!
+                                          .withOpacity(0.8),
+                                    ),
                                   ),
                                 ),
                               if (addressController.text != '')
@@ -336,11 +364,11 @@ class _SendScreenState extends State<SendScreen>
                                 callback: isDisable(txState)
                                     ? null
                                     : () => _submit(
-                                          context,
-                                          transactionState,
-                                          txState,
-                                          activeNetwork,
-                                        ),
+                                  context,
+                                  transactionState,
+                                  txState,
+                                  activeNetwork,
+                                ),
                                 title: 'Continue',
                               ),
                             ],

@@ -1,6 +1,7 @@
-import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_fee_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -53,14 +54,41 @@ class TxCubit extends Cubit<TxState> {
     }
   }
 
-  changeActiveBalance(context, BalanceModel balanceModel, TxType txType) async {
+  changeActiveBalance(
+    context,
+    TxType txType, {
+    BalanceModel? balanceModel,
+    int? gasPrice,
+    int? gasLimit,
+  }) async {
     try {
       final walletCubit = BlocProvider.of<WalletCubit>(context);
       var account = walletCubit.state.applicationModel!.activeAccount!;
       var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
-      var token = balanceModel.token ?? balanceModel.lmPool;
-      var availableBalance = await activeNetwork.getAvailableBalance(
-          account: account, token: token!, type: txType);
+      var token;
+      if (balanceModel == null) {
+        token = state.activeBalance!.token;
+      } else {
+        token = balanceModel.token ?? balanceModel.lmPool;
+      }
+      var availableBalance;
+      if (activeNetwork is EthereumNetworkModel) {
+        availableBalance = await activeNetwork.getAvailableBalance(
+          account: account,
+          token: token!,
+          type: txType,
+          fee: EthereumNetworkFeeModel(
+            gasPrice: gasPrice ?? 0,
+            gasLimit: gasLimit ?? 0,
+          ),
+        );
+      } else {
+        availableBalance = await activeNetwork.getAvailableBalance(
+          account: account,
+          token: token!,
+          type: txType,
+        );
+      }
       emit(state.copyWith(
           status: TxStatusList.success,
           activeBalance: balanceModel,
