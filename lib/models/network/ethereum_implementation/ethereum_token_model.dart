@@ -3,7 +3,6 @@ import 'package:defi_wallet/models/token/token_model.dart';
 
 class EthereumTokenModel extends TokenModel {
   String contractAddress;
-  int tokenDecimals;
 
   EthereumTokenModel({
     required id,
@@ -12,7 +11,7 @@ class EthereumTokenModel extends TokenModel {
     required name,
     required displaySymbol,
     required networkName,
-    required this.tokenDecimals,
+    required tokenDecimals,
   }) : super(
     id: id,
     symbol: symbol,
@@ -20,6 +19,7 @@ class EthereumTokenModel extends TokenModel {
     displaySymbol: displaySymbol,
     networkName: networkName,
     isUTXO: false,
+    tokenDecimals: tokenDecimals,
   );
 
   Map<String, dynamic> toJson() {

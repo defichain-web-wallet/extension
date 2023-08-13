@@ -238,17 +238,29 @@ class EthereumNetworkModel extends AbstractNetworkModel {
       int maxGas = 0}) async {
     EthPrivateKey keypair =
         await getKeypair(password, account, applicationModel);
+    DeployedContract? contract;
+    if (!token.isUTXO) {
+      final jsonString =
+          await rootBundle.loadString('assets/abi/erc20_abi.json');
+      final contractAddress = EthereumAddress.fromHex(
+          (token as EthereumTokenModel).contractAddress);
+      final contractAbi = ContractAbi.fromJson(jsonString, 'Token');
+      contract = DeployedContract(
+        contractAbi,
+        contractAddress,
+      );
+    }
     String senderAddress = account.getAddress(this.networkType.networkName)!;
     return ETHTransactionService.createSendTransaction(
-      amount: toSatoshi(amount,
-          decimals: (token as EthereumTokenModel).tokenDecimals),
-      credentials: keypair,
-      destinationAddress: address,
-      rpcUrl: 'https://eth.llamarpc.com',
-      senderAddress: senderAddress,
-      maxGas: maxGas,
-      gasPrice: gasPrice,
-    );
+        amount: toSatoshi(amount,
+            decimals: (token as EthereumTokenModel).tokenDecimals),
+        credentials: keypair,
+        destinationAddress: address,
+        rpcUrl: 'https://eth.llamarpc.com',
+        senderAddress: senderAddress,
+        maxGas: maxGas,
+        gasPrice: gasPrice,
+        contract: contract);
   }
 
   int toSatoshi(double amount, {int decimals = 16}) =>

@@ -16,6 +16,7 @@ class TokenModel {
   bool isDAT;
   late Color color;
   late String imagePath;
+  int tokenDecimals;
 
   TokenModel({
     required this.id,
@@ -23,6 +24,7 @@ class TokenModel {
     required this.name,
     required this.displaySymbol,
     required this.networkName,
+    this.tokenDecimals = 8,
     this.isLPS = false,
     this.isUTXO = false,
     this.isDAT = false,
@@ -54,6 +56,7 @@ class TokenModel {
       isUTXO: json['isUTXO'] ?? false,
       isLPS: json['isLPS'] ?? false,
       isDAT: isDAT,
+      tokenDecimals: json['tokenDecimals'],
       displaySymbol: json['displaySymbol'],
       networkName: networkName ?? NetworkName.values.firstWhere(
         (value) => value.toString() == json['networkName'],
@@ -82,6 +85,7 @@ class TokenModel {
       'networkName': this.networkName.toString(),
       'isUTXO': this.isUTXO,
       'isLPS': this.isLPS,
+      'tokenDecimals': this.tokenDecimals,
     };
   }
 
