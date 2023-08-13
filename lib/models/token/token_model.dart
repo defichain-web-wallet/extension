@@ -56,7 +56,7 @@ class TokenModel {
       isUTXO: json['isUTXO'] ?? false,
       isLPS: json['isLPS'] ?? false,
       isDAT: isDAT,
-      tokenDecimals: json['tokenDecimals'],
+      tokenDecimals: json['tokenDecimals'] ?? 8,
       displaySymbol: json['displaySymbol'],
       networkName: networkName ?? NetworkName.values.firstWhere(
         (value) => value.toString() == json['networkName'],
