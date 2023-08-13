@@ -1,12 +1,10 @@
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/transaction_history.dart';
 import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
-import 'package:defi_wallet/screens/tokens/import_token_screen.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/home/home_sliver_app_bar.dart';
@@ -87,17 +85,10 @@ class _HomeTabsScrollViewState extends State<HomeTabsScrollView>
                           child: NewActionButton(
                             iconPath: 'assets/icons/add_black.svg',
                             onPressed: () {
-                              if (!walletCubit.state.isSendReceiveOnly) {
-                                NavigatorService.push(
-                                  context,
-                                  AddTokenScreen(),
-                                );
-                              } else {
-                                NavigatorService.push(
-                                  context,
-                                  ImportTokenScreen(),
-                                );
-                              }
+                              NavigatorService.push(
+                                context,
+                                AddTokenScreen(),
+                              );
                             },
                           ),
                         ),

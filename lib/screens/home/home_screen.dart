@@ -6,6 +6,7 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/home/home_extended_view.dart';
@@ -87,7 +88,8 @@ class _HomeScreenState extends State<HomeScreen>
     if (widget.isLoadTokens) {
       ratesCubit.loadRates(walletCubit.state.activeNetwork);
     }
-    if (walletCubit.state.isSendReceiveOnly) {
+    if (walletCubit.state.isSendReceiveOnly &&
+        walletCubit.state.activeNetwork is! EthereumNetworkModel) {
       walletCubit.updateAccountBalances();
     }
 

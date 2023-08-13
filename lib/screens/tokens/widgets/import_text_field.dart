@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -7,14 +9,18 @@ class ImportTextField extends StatelessWidget with ThemeMixin {
   final String label;
   final String hint;
   final TextEditingController controller;
+  final Function(String value)? onChanged;
   final bool isNumber;
+  final bool readonly;
 
   ImportTextField({
     super.key,
     required this.label,
     required this.hint,
     required this.controller,
+    this.onChanged,
     this.isNumber = false,
+    this.readonly = false,
   });
 
   @override
@@ -52,12 +58,14 @@ class ImportTextField extends StatelessWidget with ThemeMixin {
                   ? DarkColors.hintTextColor
                   : LightColors.hintTextColor,
             ),
-            contentPadding: EdgeInsets.only(left: 12),
+            contentPadding: EdgeInsets.symmetric(horizontal: 12),
             hintText: hint,
           ),
+          onChanged: (String value) => onChanged!(value),
           validator: (value) {
             return value == null || value.isEmpty ? "Enter this field" : null;
           },
+          readOnly: readonly,
         ),
       ],
     );

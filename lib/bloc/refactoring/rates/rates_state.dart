@@ -22,13 +22,17 @@ class RatesState extends Equatable {
       final tokens =
           this.tokens.isNotEmpty ? this.tokens : this.ratesModel!.tokens!;
 
-      return tokens
-          .where((element) =>
-              !element.isPair &&
-              !element.symbol.contains('v1') &&
-              !element.isLPS &&
-              element.isDAT)
-          .toList();
+      if (this.tokens is List<EthereumTokenModel>) {
+        return tokens;
+      } else {
+        return tokens
+            .where((element) =>
+        !element.isPair &&
+            !element.symbol.contains('v1') &&
+            !element.isLPS &&
+            element.isDAT)
+            .toList();
+      }
     } catch (err) {
       return [];
     }

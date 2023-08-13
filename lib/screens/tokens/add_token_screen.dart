@@ -3,7 +3,9 @@ import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
+import 'package:defi_wallet/screens/tokens/import_token_screen.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -18,6 +20,7 @@ import 'package:defi_wallet/widgets/status_logo_and_title.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'add_token_confirm_screen.dart';
 
@@ -44,7 +47,7 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
     _loadAssetList();
   }
 
-  _loadAssetList({String value = ''}) {
+  _loadAssetList({String value = ''}) async {
     RatesCubit ratesCubit =
     BlocProvider.of<RatesCubit>(context);
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
@@ -53,10 +56,14 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
         .where((element) => element.token != null)
         .toList();
     List<TokenModel> existingTokens = balances.map((e) => e.token!).toList();
-
+    List<TokenModel> ethTokens = [];
+    if (walletCubit.state.activeNetwork is EthereumNetworkModel) {
+      ethTokens = await walletCubit.state.activeNetwork.getAvailableTokens();
+    }
     ratesCubit.searchTokens(
       existingTokens: existingTokens,
       value: value,
+      allTokens: ethTokens,
     );
   }
 
@@ -121,9 +128,41 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              PageTitle(
-                                title: titleText,
-                                isFullScreen: isFullScreen,
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                                children: [
+                                  PageTitle(
+                                    title: titleText,
+                                    isFullScreen: isFullScreen,
+                                  ),
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        NavigatorService.push(
+                                          context,
+                                          ImportTokenScreen(),
+                                        );
+                                      },
+                                      child: Container(
+                                        width: 32,
+                                        height: 32,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.portage
+                                              .withOpacity(0.15),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Center(
+                                          child: SvgPicture.asset(
+                                            'assets/icons/add_black.svg',
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               SizedBox(
                                 height: 16,

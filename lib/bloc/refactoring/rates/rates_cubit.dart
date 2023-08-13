@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_token_model.dart';
 import 'package:defi_wallet/models/network/rates/rates_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:equatable/equatable.dart';
@@ -27,8 +28,7 @@ class RatesCubit extends Cubit<RatesState> {
       status: RatesStatusList.loading,
     ));
 
-    RatesModel ratesModel = state.ratesModel ??
-        RatesModel();
+    RatesModel ratesModel = state.ratesModel ?? RatesModel();
 
     try {
       await ratesModel.loadTokens(network);
@@ -47,13 +47,16 @@ class RatesCubit extends Cubit<RatesState> {
   searchTokens({
     String value = '',
     List<TokenModel> existingTokens = const [],
+    List<TokenModel> allTokens = const [],
   }) {
+    List<TokenModel> generalTokens =
+        allTokens.isNotEmpty ? allTokens : state.ratesModel!.tokens!;
     List<TokenModel> tokens = [];
 
     if (value.isEmpty) {
-      tokens = state.ratesModel!.tokens!;
+      tokens = generalTokens;
     } else {
-      for (TokenModel element in state.ratesModel!.tokens!) {
+      for (TokenModel element in generalTokens) {
         if (element.displaySymbol.toLowerCase().contains(value.toLowerCase())) {
           tokens.add(element);
         }
@@ -64,7 +67,6 @@ class RatesCubit extends Cubit<RatesState> {
         tokens.removeWhere((token) => token.symbol == element.symbol);
       });
     }
-    print(tokens);
     emit(state.copyWith(
       tokens: tokens,
     ));
