@@ -106,27 +106,29 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     List<BalanceModel> balances,
     TokenModel token,
     String addressString,
-  )  async {
-    return balances.where((element) => element.token != null).firstWhere((element) => element.token!.compare(token));
+  ) async {
+    return balances
+        .where((element) => element.token != null)
+        .firstWhere((element) => element.token!.compare(token));
   }
 
   Future<List<BalanceModel>> getAllBalances({
     required String addressString,
-   AbstractAccountModel? account,
+    AbstractAccountModel? account,
   }) async {
     List<BalanceModel> balances = [];
     var balanceUtxo = await getBalanceUTXO([], addressString);
     balances.add(balanceUtxo);
-    if(account != null) {
+    if (account != null) {
       List<BalanceModel> oldBalances = account.getPinnedBalances(this);
       print(oldBalances.length);
 
       final client = Web3Client(this.rpcUrl, Client());
-      final jsonString = await rootBundle.loadString(
-          'assets/abi/erc20_abi.json');
+      final jsonString =
+          await rootBundle.loadString('assets/abi/erc20_abi.json');
       final contractAbi = ContractAbi.fromJson(jsonString, 'Token');
       for (var balance in oldBalances) {
-        if(!balance.token!.isUTXO){
+        if (!balance.token!.isUTXO) {
           final contractAddress = EthereumAddress.fromHex(
               (balance.token as EthereumTokenModel).contractAddress);
           final contract = DeployedContract(
@@ -205,16 +207,14 @@ class EthereumNetworkModel extends AbstractNetworkModel {
   }) async {
     List<BalanceModel> balances = account.getPinnedBalances(this);
     if (balances.length > 0) {
-      return fromSatoshi(balances[0].balance,
-          decimals: token.tokenDecimals);
+      return fromSatoshi(balances[0].balance, decimals: token.tokenDecimals);
     } else {
       var balance = await getBalanceUTXO(
           balances, account.getAddress(this.networkType.networkName)!);
 
       account.pinToken(balance, this);
 
-      return fromSatoshi(balance.balance,
-          decimals: token.tokenDecimals);
+      return fromSatoshi(balance.balance, decimals: token.tokenDecimals);
     }
   }
 
@@ -223,35 +223,35 @@ class EthereumNetworkModel extends AbstractNetworkModel {
       required TokenModel token,
       TxType type = TxType.send,
       EthereumNetworkFeeModel? fee}) async {
-    try{
+    try {
       var balance = await this.getBalance(account: account, token: token);
-      if(token.isUTXO){
-        if(fee == null){
-          fee = (await this.getNetworkFee() as EthereumNetworkFeeModel) ;
+      if (token.isUTXO) {
+        if (fee == null) {
+          fee = (await this.getNetworkFee() as EthereumNetworkFeeModel);
         }
 
-        //calculating fee
-        final gasPriceInWei = fee.gasPrice! * 1000000000;
-        final totalGasFeeInWei = gasPriceInWei * fee.gasLimit!;
-        final totalGasFeeInEther = totalGasFeeInWei * 0.000000000000000001;
-        //calculating fee
-
-        return fromSatoshi(toSatoshi(balance) - toSatoshi(totalGasFeeInEther));
+        return fromSatoshi(toSatoshi(balance) -
+            toSatoshi(calculateFee(fee!.gasPrice!, fee.gasLimit!)));
       } else {
         return balance;
       }
-    } catch(e){
+    } catch (e) {
       print(e);
       return 0;
     }
+  }
 
+  double calculateFee(int gasPrice, int gasLimit) {
+    final gasPriceInWei = gasPrice! * 1000000000;
+    final totalGasFeeInWei = gasPriceInWei * gasLimit!;
+    return totalGasFeeInWei * 0.000000000000000001;
   }
 
   bool checkAddress(String address) {
-    try{
+    try {
       EthereumAddress.fromHex(address);
       return true;
-    }catch(e){
+    } catch (e) {
       return false;
     }
   }
@@ -271,7 +271,8 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     final gasEstimate = 21000;
 
     return EthereumNetworkFeeModel(
-        gasPrice: gasPrice.getValueInUnit(EtherUnit.gwei).toInt(), gasLimit: gasEstimate);
+        gasPrice: gasPrice.getValueInUnit(EtherUnit.gwei).toInt(),
+        gasLimit: gasEstimate);
   }
 
   Future<TxErrorModel> send(
