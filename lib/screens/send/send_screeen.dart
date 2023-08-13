@@ -3,6 +3,7 @@ import 'package:defi_wallet/bloc/refactoring/transaction/tx_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
@@ -39,7 +40,7 @@ class SendScreen extends StatefulWidget {
 }
 
 class _SendScreenState extends State<SendScreen>
-    with ThemeMixin, NetworkMixin, SnackBarMixin {
+    with ThemeMixin, NetworkMixin, SnackBarMixin, FormatMixin {
   TextEditingController addressController = TextEditingController();
   TextEditingController amountController = TextEditingController(text: '0');
   TextEditingController gasPriceController = TextEditingController(text: '0');
@@ -53,6 +54,7 @@ class _SendScreenState extends State<SendScreen>
   bool isAddNewContact = false;
   bool isShowCheckbox = false;
   EthereumNetworkFeeModel? networkFeeModel;
+  String? estimatedFee;
 
   void loadNetworkFee() async {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
@@ -62,6 +64,11 @@ class _SendScreenState extends State<SendScreen>
           await activeNetwork.getNetworkFee() as EthereumNetworkFeeModel;
       gasPriceController.text = networkFeeModel!.gasPrice.toString();
       gasLimitController.text = networkFeeModel!.gasLimit.toString();
+      double fee = activeNetwork.calculateFee(
+        networkFeeModel!.gasPrice!,
+        networkFeeModel!.gasLimit!,
+      );
+      estimatedFee = formatNumberStyling(fee, fixedCount: 6);
     }
   }
 
@@ -262,14 +269,8 @@ class _SendScreenState extends State<SendScreen>
                                           child: GasField(
                                             label: 'Gas price (GWEI)',
                                             controller: gasPriceController,
-                                            onChange: (String value) {
-                                              txCubit.changeActiveBalance(
-                                                context,
-                                                TxType.send,
-                                                gasPrice: int.tryParse(gasPriceController.text),
-                                                gasLimit: int.tryParse(gasLimitController.text),
-                                              );
-                                            },
+                                            onChange: (String value) =>
+                                                _onChangeGasField(value),
                                           ),
                                         ),
                                         SizedBox(
@@ -279,14 +280,8 @@ class _SendScreenState extends State<SendScreen>
                                           child: GasField(
                                             label: 'Gas limit',
                                             controller: gasLimitController,
-                                            onChange: (String value) {
-                                              txCubit.changeActiveBalance(
-                                                context,
-                                                TxType.send,
-                                                gasPrice: int.tryParse(gasPriceController.text),
-                                                gasLimit: int.tryParse(gasLimitController.text),
-                                              );
-                                            },
+                                            onChange: (String value) =>
+                                                _onChangeGasField(value),
                                           ),
                                         ),
                                       ],
@@ -296,7 +291,7 @@ class _SendScreenState extends State<SendScreen>
                                     ),
                                     GasCard(
                                       assetName: 'ETH',
-                                      amount: 0.123456,
+                                      amount: estimatedFee ?? '0.00',
                                       convertedAmount: 0.02,
                                     ),
                                   ],
@@ -386,6 +381,24 @@ class _SendScreenState extends State<SendScreen>
         );
       },
     );
+  }
+
+  _onChangeGasField(String value) {
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    final txCubit = BlocProvider.of<TxCubit>(context);
+    EthereumNetworkModel activeNetwork = walletCubit.getCurrentNetwork();
+
+    txCubit.changeActiveBalance(
+      context,
+      TxType.send,
+      gasPrice: int.tryParse(gasPriceController.text),
+      gasLimit: int.tryParse(gasLimitController.text),
+    );
+    double fee = activeNetwork.calculateFee(
+      int.tryParse(gasPriceController.text)!,
+      int.tryParse(gasLimitController.text)!,
+    );
+    estimatedFee = formatNumberStyling(fee, fixedCount: 6);
   }
 
   bool isDisable(TxState txState) {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class GasCard extends StatelessWidget {
   final String assetName;
-  final double amount;
+  final String amount;
   final double convertedAmount;
 
   const GasCard({
@@ -40,12 +40,12 @@ class GasCard extends StatelessWidget {
                 RichText(
                   text: TextSpan(
                     children: [
-                      TextSpan(
-                        text: '\$$convertedAmount  ',
-                        style: Theme.of(context).textTheme.headline5!.copyWith(
-                          fontSize: 12,
-                        ),
-                      ),
+                      // TextSpan(
+                      //   text: '\$$convertedAmount  ',
+                      //   style: Theme.of(context).textTheme.headline5!.copyWith(
+                      //     fontSize: 12,
+                      //   ),
+                      // ),
                       TextSpan(
                         text: '$amount $assetName',
                         style: Theme.of(context).textTheme.headline5!.copyWith(
@@ -104,72 +104,5 @@ class GasCard extends StatelessWidget {
         ],
       ),
     );
-    // return Container(
-    //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-    //   decoration: BoxDecoration(
-    //     borderRadius: BorderRadius.circular(10),
-    //     border: Border.all(
-    //         color: AppColors.portage.withOpacity(0.12)),
-    //   ),
-    //   child: Row(
-    //     children: [
-    //       Expanded(
-    //         child: Column(
-    //           mainAxisAlignment: MainAxisAlignment.start,
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           children: [
-    //             Text(
-    //               'Estimated gas fee',
-    //               style: Theme.of(context).textTheme.headline5,
-    //             )
-    //           ],
-    //         ),
-    //       ),
-    //       Expanded(
-    //         child: Column(
-    //           mainAxisAlignment: MainAxisAlignment.start,
-    //           crossAxisAlignment: CrossAxisAlignment.end,
-    //           children: [
-    //             RichText(
-    //               text: TextSpan(
-    //                 children: [
-    //                   TextSpan(
-    //                     text: '\$$convertedAmount  ',
-    //                     style: Theme.of(context).textTheme.headline5,
-    //                   ),
-    //                   TextSpan(
-    //                     text: '$amount $assetName',
-    //                     style: Theme.of(context).textTheme.headline5!.copyWith(
-    //                       fontWeight: FontWeight.bold,
-    //                     ),
-    //                   ),
-    //                 ],
-    //               ),
-    //             ),
-    //             SizedBox(
-    //               height: 6,
-    //             ),
-    //             RichText(
-    //               text: TextSpan(
-    //                 children: [
-    //                   TextSpan(
-    //                     text: 'Max fee:  ',
-    //                     style: Theme.of(context).textTheme.headline5!.copyWith(
-    //                       fontWeight: FontWeight.bold,
-    //                     ),
-    //                   ),
-    //                   TextSpan(
-    //                     text: '$amount $assetName',
-    //                     style: Theme.of(context).textTheme.headline5,
-    //                   ),
-    //                 ],
-    //               ),
-    //             )
-    //           ],
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 }
