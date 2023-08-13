@@ -73,6 +73,10 @@ abstract class AbstractNetworkModel {
 
   bool isTokensPresent();
 
+  bool isGas() {
+    return false;
+  }
+
   Future<List<BalanceModel>> getAllBalances({
     required String addressString,
   });

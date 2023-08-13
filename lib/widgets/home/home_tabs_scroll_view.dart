@@ -6,6 +6,7 @@ import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
 import 'package:defi_wallet/screens/home/widgets/transaction_history.dart';
 import 'package:defi_wallet/screens/tokens/add_token_screen.dart';
+import 'package:defi_wallet/screens/tokens/import_token_screen.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/widgets/buttons/new_action_button.dart';
 import 'package:defi_wallet/widgets/home/home_sliver_app_bar.dart';
@@ -78,17 +79,25 @@ class _HomeTabsScrollViewState extends State<HomeTabsScrollView>
                       SizedBox(
                         width: 12,
                       ),
-                      if (!walletCubit.state.isSendReceiveOnly)
+                      if (!walletCubit.state.isSendReceiveOnly ||
+                          walletCubit.state.activeNetwork.isGas())
                         SizedBox(
                           width: 32,
                           height: 32,
                           child: NewActionButton(
                             iconPath: 'assets/icons/add_black.svg',
                             onPressed: () {
-                              NavigatorService.push(
-                                context,
-                                AddTokenScreen(),
-                              );
+                              if (!walletCubit.state.isSendReceiveOnly) {
+                                NavigatorService.push(
+                                  context,
+                                  AddTokenScreen(),
+                                );
+                              } else {
+                                NavigatorService.push(
+                                  context,
+                                  ImportTokenScreen(),
+                                );
+                              }
                             },
                           ),
                         ),

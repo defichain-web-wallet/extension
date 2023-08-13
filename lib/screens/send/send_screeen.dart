@@ -23,6 +23,8 @@ import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/selectors/fees_selector.dart';
+import 'package:defi_wallet/widgets/send/gas_card.dart';
+import 'package:defi_wallet/widgets/send/gas_field.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,6 +40,8 @@ class _SendScreenState extends State<SendScreen>
     with ThemeMixin, NetworkMixin, SnackBarMixin {
   TextEditingController addressController = TextEditingController();
   TextEditingController amountController = TextEditingController(text: '0');
+  TextEditingController gasPriceController = TextEditingController(text: '0');
+  TextEditingController gasLimitController = TextEditingController(text: '0');
   FocusNode addressFocusNode = FocusNode();
   AddressBookModel contact = AddressBookModel();
   String suffixText = '';
@@ -231,7 +235,45 @@ class _SendScreenState extends State<SendScreen>
                               SizedBox(
                                 height: 16,
                               ),
-                              if (!activeNetwork.isTokensPresent()) ...[
+                              if (activeNetwork.isGas())
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: GasField(
+                                            label: 'Gas price',
+                                            controller: gasPriceController,
+                                            onChange: (String value) {
+                                              print(value);
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Expanded(
+                                          child: GasField(
+                                            label: 'Gas limit',
+                                            controller: gasLimitController,
+                                            onChange: (String value) {
+                                              print(value);
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 8,
+                                    ),
+                                    GasCard(
+                                      assetName: 'ETH',
+                                      amount: 0.123456,
+                                      convertedAmount: 0.02,
+                                    ),
+                                  ],
+                                ),
+                              if (!activeNetwork.isTokensPresent() && !activeNetwork.isGas()) ...[
                                 Row(
                                   children: [
                                     Text(

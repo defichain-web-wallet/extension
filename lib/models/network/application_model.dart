@@ -132,6 +132,8 @@ class ApplicationModel {
         final network = networksListJson[index];
         if (network['networkType']['networkName'].contains('defichain')) {
           return DefichainNetworkModel.fromJson(network);
+        } else if (network['networkType']['networkName'].contains('eth')) {
+          return EthereumNetworkModel.fromJson(network);
         } else {
           return BitcoinNetworkModel.fromJson(network);
         }

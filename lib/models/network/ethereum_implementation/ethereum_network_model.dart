@@ -120,6 +120,10 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     return false;
   }
 
+  bool isGas() {
+    return true;
+  }
+
   List<HistoryModel> getHistory(String networkName, String? txid) {
     return [];
   }
