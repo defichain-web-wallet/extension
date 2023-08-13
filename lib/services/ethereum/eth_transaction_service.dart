@@ -55,7 +55,7 @@ class ETHTransactionService {
         Transaction(
           from: EthereumAddress.fromHex(senderAddress),
           to: EthereumAddress.fromHex(destinationAddress),
-          gasPrice: EtherAmount.inWei(BigInt.from(gasPrice)),
+          gasPrice: EtherAmount.fromInt(EtherUnit.gwei, gasPrice),
           maxGas: maxGas,
           value: EtherAmount.fromInt(EtherUnit.wei, amount),
         ),
@@ -92,7 +92,7 @@ class ETHTransactionService {
       function: function,
       parameters: [toAddress, amountBigint],
       from: EthereumAddress.fromHex(senderAddress),
-      gasPrice: EtherAmount.inWei(BigInt.from(gasPrice)),
+      gasPrice: EtherAmount.fromInt(EtherUnit.gwei, gasPrice),
       maxGas: maxGas,
     );
     try {
