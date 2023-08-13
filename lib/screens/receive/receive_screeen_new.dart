@@ -27,9 +27,7 @@ class ReceiveScreenNew extends StatefulWidget {
 
 class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
   bool isCopied = false;
-  String hintText =
-      'This is your personal wallet address.\nYou can use it to receive DFI and DST tokens like dBTC, dETH, dTSLA & more.';
-  String btcHintText = 'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
+
 
   cutAddress(String s, {int range = 5}) {
     return s.substring(0, range) +
@@ -196,7 +194,7 @@ class _ReceiveScreenNewState extends State<ReceiveScreenNew> with ThemeMixin {
                                     width: 272,
                                     height: 48,
                                     child: Text(
-                                      SettingsHelper.isBitcoin() ? btcHintText : hintText,
+                                      state.receiveHint(),
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context).textTheme.headline6!.apply(
                                           color: Theme.of(context).textTheme.headline6!.color!

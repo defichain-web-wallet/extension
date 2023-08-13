@@ -249,6 +249,7 @@ class WalletCubit extends Cubit<WalletState> {
     final balances =
         await state.applicationModel!.activeNetwork!.getAllBalances(
       addressString: state.activeAccount.addresses[networkName]!,
+          account: state.activeAccount
     );
     state.applicationModel!.activeAccount!.pinnedBalances[networkName] =
         balances;

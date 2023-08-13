@@ -89,6 +89,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
 
   Future<List<BalanceModel>> getAllBalances({
     required String addressString,
+    AbstractAccountModel? account,
   }) async {
     var balance = await getBalanceUTXO([], addressString);
 

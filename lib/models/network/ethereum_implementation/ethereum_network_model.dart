@@ -10,6 +10,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_fee_model.dart';
 import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_token_model.dart';
@@ -100,20 +101,53 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     return balanceModel;
   }
 
-  Future<List<BalanceModel>> getAllBalances({
-    required String addressString,
-  }) async {
-    var balance = await getBalanceUTXO([], addressString);
-
-    return [balance];
-  }
-
   Future<BalanceModel> getBalanceToken(
     List<BalanceModel> balances,
     TokenModel token,
     String addressString,
-  ) {
-    throw 'Bitcoin network does not support tokens';
+  )  async {
+    return balances.where((element) => element.token != null).firstWhere((element) => element.token!.compare(token));
+  }
+
+  Future<List<BalanceModel>> getAllBalances({
+    required String addressString,
+   AbstractAccountModel? account,
+  }) async {
+    List<BalanceModel> balances = [];
+    var balanceUtxo = await getBalanceUTXO([], addressString);
+    balances.add(balanceUtxo);
+    if(account != null) {
+      List<BalanceModel> oldBalances = account.getPinnedBalances(this);
+      print(oldBalances.length);
+
+      final client = Web3Client(this.rpcUrl, Client());
+      final jsonString = await rootBundle.loadString(
+          'assets/abi/erc20_abi.json');
+      final contractAbi = ContractAbi.fromJson(jsonString, 'Token');
+      for (var balance in oldBalances) {
+        if(!balance.token!.isUTXO){
+          final contractAddress = EthereumAddress.fromHex(
+              (balance.token as EthereumTokenModel).contractAddress);
+          final contract = DeployedContract(
+            contractAbi,
+            contractAddress,
+          );
+
+          // Get the balance
+          final function = contract.function('balanceOf');
+          final List<dynamic> result = await client.call(
+            contract: contract,
+            function: function,
+            params: [addressString],
+          );
+          balance.balance = result.first;
+
+          balances.add(balance);
+        }
+      }
+    }
+
+    return balances;
   }
 
   bool isTokensPresent() {
@@ -171,7 +205,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     List<BalanceModel> balances = account.getPinnedBalances(this);
     if (balances.length > 0) {
       return fromSatoshi(balances[0].balance,
-          decimals: (token as EthereumTokenModel).tokenDecimals);
+          decimals: token.tokenDecimals);
     } else {
       var balance = await getBalanceUTXO(
           balances, account.getAddress(this.networkType.networkName)!);
@@ -179,35 +213,36 @@ class EthereumNetworkModel extends AbstractNetworkModel {
       account.pinToken(balance, this);
 
       return fromSatoshi(balance.balance,
-          decimals: (token as EthereumTokenModel).tokenDecimals);
+          decimals: token.tokenDecimals);
     }
   }
 
   Future<double> getAvailableBalance(
       {required AbstractAccountModel account,
       required TokenModel token,
-      TxType type = TxType.send}) async {
-    // if (satPerByte == 0) {
-    //   var networkFee = await BlockcypherRequests.getNetworkFee(this);
-    //   satPerByte = networkFee.medium!;
-    // }
-    // var balance = await this.getBalance(account: account, token: token);
-    // var utxoList = await BlockcypherRequests.getUTXOs(
-    //   network: this,
-    //   addressString: account.getAddress(this.networkType.networkName)!,
-    // );
-    // var fee = fromSatoshi(
-    //     BTCTransactionService.calculateBTCFee(utxoList.length, 1, satPerByte));
-    // var available = balance - fee;
-    // return available > 0 ? available : 0;
-    return 0;
+      TxType type = TxType.send,
+      NetworkFeeModel? fee}) async {
+    try{
+      var balance = await this.getBalance(account: account, token: token);
+      if(token.isUTXO){
+        return balance;
+      } else {
+        return balance;
+      }
+    } catch(e){
+      print(e);
+      return 0;
+    }
+
   }
 
   bool checkAddress(String address) {
-    return Address.validateAddress(
-      address,
-      getNetworkType(),
-    );
+    try{
+      EthereumAddress.fromHex(address);
+      return true;
+    }catch(e){
+      return false;
+    }
   }
 
   Future<EthPrivateKey> getKeypair(String password,
@@ -320,10 +355,6 @@ class EthereumNetworkModel extends AbstractNetworkModel {
   String _createAddressString(bip32.BIP32 masterKeyPair, int accountIndex) {
     final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
     return _getAddressFromPrivateKey(keyPair);
-  }
-
-  NetworkType getNetworkType() {
-    return this.networkType.isTestnet ? networks.testnet : networks.bitcoin;
   }
 
   // private

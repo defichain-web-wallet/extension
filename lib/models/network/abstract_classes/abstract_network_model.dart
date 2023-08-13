@@ -1,3 +1,4 @@
+import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
@@ -55,7 +56,7 @@ abstract class AbstractNetworkModel {
   Future<double> getAvailableBalance({
     required AbstractAccountModel account,
     required TokenModel token,
-    required TxType type,
+    required TxType type
   });
 
   TokenModel getDefaultToken();
@@ -79,6 +80,7 @@ abstract class AbstractNetworkModel {
 
   Future<List<BalanceModel>> getAllBalances({
     required String addressString,
+    AbstractAccountModel? account,
   });
 
   // Earn

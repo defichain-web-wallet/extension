@@ -195,6 +195,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
 
   Future<List<BalanceModel>> getAllBalances({
     required String addressString,
+    AbstractAccountModel? account,
   }) async {
     var tokens = await this.getAvailableTokens();
     var balanceList = await DFIBalanceRequests.getBalanceList(

@@ -30,6 +30,26 @@ class WalletState extends Equatable {
 
   TokenModel get activeToken => this.applicationModel!.activeToken!;
 
+  String receiveHint() {
+    switch (this.activeNetwork.networkType.networkName) {
+      case NetworkName.ethereumMainnet:
+        return 'This is your personal wallet address.\nYou can use it to receive ETH and tokens like BTC, ETH, USDT & more.';
+      case  NetworkName.ethereumTestnet:
+        return 'This is your personal wallet address.\nYou can use it to receive ETH and tokens like BTC, ETH, USDT & more.';
+      case  NetworkName.bitcoinTestnet:
+        return 'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
+      case  NetworkName.bitcoinMainnet:
+        return 'This is your personal wallet address.\nYou can use it to receive Bitcoin.';
+      case  NetworkName.defichainMainnet:
+        return 'This is your personal wallet address.\nYou can use it to receive DFI and DST tokens like dBTC, dETH, dTSLA & more.';
+      case  NetworkName.defichainTestnet:
+        return 'This is your personal wallet address.\nYou can use it to receive DFI and DST tokens like dBTC, dETH, dTSLA & more.';
+
+      default:
+        return 'This is your personal wallet address.\nYou can use it to receive DFI and DST tokens like dBTC, dETH, dTSLA & more.';
+    }
+  }
+
   AbstractNetworkModel get activeNetwork =>
       this.applicationModel!.activeNetwork!;
 
