@@ -19,6 +19,7 @@ import 'package:defi_wallet/services/bitcoin/btc_transaction_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
+import 'dart:math' as Math;
 
 class BitcoinNetworkModel extends AbstractNetworkModel {
   BitcoinNetworkModel(NetworkTypeModel networkType)
@@ -66,9 +67,9 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     );
   }
 
-  int toSatoshi(double amount) => (amount * COIN).round();
+  int toSatoshi(double amount, {int decimals = 8}) => (amount * Math.pow(10, decimals)).round();
 
-  double fromSatoshi(int amount) => amount / COIN;
+  double fromSatoshi(int amount, {int decimals = 8}) => amount / Math.pow(10, decimals);
 
   Future<BalanceModel> getBalanceUTXO(
     List<BalanceModel> balances,

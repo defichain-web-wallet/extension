@@ -90,9 +90,9 @@ abstract class AbstractNetworkModel {
 
   bool stakingAvailable() => getStakingProviders().length > 0;
 
-  dynamic toSatoshi(double amount);
+  dynamic toSatoshi(double amount, {int decimals = 8});
 
-  dynamic fromSatoshi(int amount);
+  dynamic fromSatoshi(int amount, {int decimals = 8});
 
   bool lmAvailable() => getLmProviders().length > 0;
 

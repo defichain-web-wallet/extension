@@ -25,9 +25,9 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
   TokensHelper tokensHelper = TokensHelper();
   BalancesHelper balancesHelper = BalancesHelper();
 
-  String getFormatTokenBalance(int tokenBalance) {
+  String getFormatTokenBalance(int tokenBalance, int decimals) {
     WalletCubit homeCubit = BlocProvider.of<WalletCubit>(context);
-    final balance = homeCubit.state.activeNetwork.fromSatoshi(tokenBalance);
+    final balance = homeCubit.state.activeNetwork.fromSatoshi(tokenBalance,decimals: decimals);
     return balancesHelper.numberStyling(
       balance,
       fixedCount: 8,
@@ -126,7 +126,7 @@ class _AssetCardState extends State<AssetCard> with FormatMixin{
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        getFormatTokenBalance(widget.assetDetails['balance'].balance),
+                        getFormatTokenBalance(widget.assetDetails['balance'].balance, token.tokenDecimals),
                         style: Theme.of(context).textTheme.headline6!.copyWith(
                               fontWeight: FontWeight.w700,
                             ),

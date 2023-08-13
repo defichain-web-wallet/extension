@@ -82,6 +82,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
       name: 'Ethereum',
       symbol: 'ETH',
       displaySymbol: 'ETH',
+      tokenDecimals: 18,
       id: '-1',
       networkName: this.networkType.networkName,
     );
@@ -96,7 +97,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
         await client.getBalance(EthereumAddress.fromHex(addressString));
     BalanceModel balanceModel = BalanceModel(
       token: getDefaultToken(),
-      balance: balance.getInEther.toInt(), //TODO: fix it before production
+      balance: balance.getInWei.toInt(), //TODO: fix it before production
     );
     return balanceModel;
   }

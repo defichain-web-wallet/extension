@@ -27,6 +27,7 @@ import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
+import 'dart:math' as Math;
 
 class DefichainNetworkModel extends AbstractNetworkModel {
   static const int DUST = 3000;
@@ -52,9 +53,11 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   }
 
 
-  int toSatoshi(double amount) => (amount * COIN).round();
+  int toSatoshi(double amount, {int decimals = 8}) =>
+      (amount * Math.pow(10, decimals)).round();
 
-  double fromSatoshi(int amount) => amount / COIN;
+  double fromSatoshi(int amount, {int decimals = 8}) =>
+      amount / Math.pow(10, decimals);
 
   factory DefichainNetworkModel.fromJson(Map<String, dynamic> json) {
     final stakingListJson = json['stakingList'];
