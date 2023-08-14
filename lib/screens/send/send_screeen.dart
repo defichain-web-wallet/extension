@@ -157,219 +157,223 @@ class _SendScreenState extends State<SendScreen>
                       bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                     ),
                   ),
-                  child: Center(
-                    child: StretchBox(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              PageTitle(
-                                title: titleText,
-                                isFullScreen: isFullScreen,
-                              ),
-                              SizedBox(
-                                height: 8,
-                              ),
-                              Row(
+                  child: StretchBox(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Container(
+                              child: Column(
                                 children: [
-                                  Text(
-                                    subtitleText,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline5!
-                                        .apply(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.6),
-                                    ),
+                                  PageTitle(
+                                    title: titleText,
+                                    isFullScreen: isFullScreen,
                                   ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 24,
-                              ),
-                              AddressFieldNew(
-                                addressFocusNode: addressFocusNode,
-                                clearPrefix: () {
-                                  setState(() {
-                                    contact = AddressBookModel();
-                                  });
-                                },
-                                onChange: (val) {
-                                  if (val == '') {
-                                    setState(() {
-                                      isAddNewContact = false;
-                                    });
-                                  }
-                                },
-                                controller: addressController,
-                                getAddress: (val) {
-                                  addressController.text = val;
-                                },
-                                getContact: (val) {
-                                  setState(() {
-                                    addressController.text = '';
-                                    contact = val;
-                                  });
-                                },
-                                contact: contact,
-                              ),
-                              SizedBox(
-                                height: 16,
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    'Asset',
-                                    style:
-                                    Theme.of(context).textTheme.headline5,
+                                  SizedBox(
+                                    height: 8,
                                   ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 6,
-                              ),
-                              AmountField(
-                                type: TxType.send,
-                                balance: txState.activeBalance,
-                                onChanged: (value) {
-                                  setState(() {
-                                    //TODO: fix USD balance
-                                    // balanceInUsd = getUsdBalance(context);
-                                  });
-                                },
-                                available: txState.availableBalance,
-                                // available: true,
-                                isDisabledSelector:
-                                !activeNetwork.isTokensPresent(),
-                                suffix: balanceInUsd ?? '0.00',
-                                // ?? getUsdBalance(context), //TODO: fix it
-                                onAssetSelect: (asset) async {
-                                  txCubit.changeActiveBalance(
-                                    context,
-                                    TxType.send,
-                                    balanceModel: asset,
-                                  );
-                                },
-                                controller: amountController,
-                                assets: txState.balances!,
-                              ),
-                              SizedBox(
-                                height: 16,
-                              ),
-                              if (activeNetwork is EthereumNetworkModel)
-                                Column(
-                                  children: [
-                                    Row(
+                                  Row(
+                                    children: [
+                                      Text(
+                                        subtitleText,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .apply(
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .color!
+                                              .withOpacity(0.6),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 24,
+                                  ),
+                                  AddressFieldNew(
+                                    addressFocusNode: addressFocusNode,
+                                    clearPrefix: () {
+                                      setState(() {
+                                        contact = AddressBookModel();
+                                      });
+                                    },
+                                    onChange: (val) {
+                                      if (val == '') {
+                                        setState(() {
+                                          isAddNewContact = false;
+                                        });
+                                      }
+                                    },
+                                    controller: addressController,
+                                    getAddress: (val) {
+                                      addressController.text = val;
+                                    },
+                                    getContact: (val) {
+                                      setState(() {
+                                        addressController.text = '';
+                                        contact = val;
+                                      });
+                                    },
+                                    contact: contact,
+                                  ),
+                                  SizedBox(
+                                    height: 16,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Asset',
+                                        style:
+                                        Theme.of(context).textTheme.headline5,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 6,
+                                  ),
+                                  AmountField(
+                                    type: TxType.send,
+                                    balance: txState.activeBalance,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        //TODO: fix USD balance
+                                        // balanceInUsd = getUsdBalance(context);
+                                      });
+                                    },
+                                    available: txState.availableBalance,
+                                    // available: true,
+                                    isDisabledSelector: txState.balances!.length == 1,
+                                    suffix: balanceInUsd ?? '0.00',
+                                    // ?? getUsdBalance(context), //TODO: fix it
+                                    onAssetSelect: (asset) async {
+                                      txCubit.changeActiveBalance(
+                                        context,
+                                        TxType.send,
+                                        balanceModel: asset,
+                                      );
+                                    },
+                                    controller: amountController,
+                                    assets: txState.balances!,
+                                  ),
+                                  SizedBox(
+                                    height: 16,
+                                  ),
+                                  if (activeNetwork is EthereumNetworkModel)
+                                    Column(
                                       children: [
-                                        Expanded(
-                                          child: GasField(
-                                            label: 'Gas price (GWEI)',
-                                            controller: gasPriceController,
-                                            onChange: (String value) =>
-                                                _onChangeGasField(value),
-                                          ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: GasField(
+                                                label: 'Gas price (GWEI)',
+                                                controller: gasPriceController,
+                                                onChange: (String value) =>
+                                                    _onChangeGasField(value),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 8,
+                                            ),
+                                            Expanded(
+                                              child: GasField(
+                                                label: 'Gas limit',
+                                                controller: gasLimitController,
+                                                onChange: (String value) =>
+                                                    _onChangeGasField(value),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         SizedBox(
-                                          width: 8,
+                                          height: 8,
                                         ),
-                                        Expanded(
-                                          child: GasField(
-                                            label: 'Gas limit',
-                                            controller: gasLimitController,
-                                            onChange: (String value) =>
-                                                _onChangeGasField(value),
-                                          ),
+                                        GasCard(
+                                          assetName: txState
+                                              .activeBalance!.token!.symbol,
+                                          amount: estimatedFee ?? '0.00',
+                                          convertedAmount: 0.02,
+                                        ),
+                                      ],
+                                    ),
+                                  if (!activeNetwork.isTokensPresent() && !activeNetwork.isGas()) ...[
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Fees',
+                                          style:
+                                          Theme.of(context).textTheme.headline5,
                                         ),
                                       ],
                                     ),
                                     SizedBox(
-                                      height: 8,
+                                      height: 6,
                                     ),
-                                    GasCard(
-                                      assetName: 'ETH',
-                                      amount: estimatedFee ?? '0.00',
-                                      convertedAmount: 0.02,
+                                    FeesSelector(
+                                      onSelect: (int fee) {
+                                        txCubit.changeActiveFee(fee);
+                                      },
+                                      activeFee: txState.activeFee,
+                                      fees: [
+                                        txState.networkFee!.low!,
+                                        txState.networkFee!.medium!,
+                                        txState.networkFee!.high!,
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              if (!activeNetwork.isTokensPresent() && !activeNetwork.isGas()) ...[
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Fees',
-                                      style:
-                                      Theme.of(context).textTheme.headline5,
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 6,
-                                ),
-                                FeesSelector(
-                                  onSelect: (int fee) {
-                                    txCubit.changeActiveFee(fee);
-                                  },
-                                  activeFee: txState.activeFee,
-                                  fees: [
-                                    txState.networkFee!.low!,
-                                    txState.networkFee!.medium!,
-                                    txState.networkFee!.high!,
-                                  ],
-                                ),
-                              ]
-                            ],
+                                  ]
+                                ],
+                              ),
+                            ),
                           ),
-                          Column(
-                            children: [
-                              if (isShowCheckbox)
-                                DefiCheckbox(
-                                  callback: (val) {
-                                    setState(() {
-                                      isAddNewContact = val!;
-                                    });
-                                  },
-                                  value: isAddNewContact,
-                                  width: 250,
-                                  isShowLabel: false,
-                                  textWidget: Text(
-                                    'Add contact to Address Book',
-                                    style: Theme.of(context)
+                        ),
+                        Column(
+                          children: [
+                            if (isShowCheckbox)
+                              DefiCheckbox(
+                                callback: (val) {
+                                  setState(() {
+                                    isAddNewContact = val!;
+                                  });
+                                },
+                                value: isAddNewContact,
+                                width: 250,
+                                isShowLabel: false,
+                                textWidget: Text(
+                                  'Add contact to Address Book',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                    fontWeight: FontWeight.w400,
+                                    color: Theme.of(context)
                                         .textTheme
                                         .headline5!
-                                        .copyWith(
-                                      fontWeight: FontWeight.w400,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.8),
-                                    ),
+                                        .color!
+                                        .withOpacity(0.8),
                                   ),
                                 ),
-                              if (addressController.text != '')
-                                SizedBox(
-                                  height: 18.5,
-                                ),
-                              NewPrimaryButton(
-                                width: buttonSmallWidth,
-                                callback: isDisable(txState)
-                                    ? null
-                                    : () => _submit(
-                                  context,
-                                  transactionState,
-                                  txState,
-                                  activeNetwork,
-                                ),
-                                title: 'Continue',
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            if (addressController.text != '')
+                              SizedBox(
+                                height: 18.5,
+                              ),
+                            NewPrimaryButton(
+                              width: buttonSmallWidth,
+                              callback: isDisable(txState)
+                                  ? null
+                                  : () => _submit(
+                                context,
+                                transactionState,
+                                txState,
+                                activeNetwork,
+                              ),
+                              title: 'Continue',
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -479,6 +483,8 @@ class _SendScreenState extends State<SendScreen>
                         amount: double.parse(amountController.text),
                         token: state.currentAsset!,
                         fee: state.activeFee,
+                        gasPrice: int.tryParse(gasPriceController.text),
+                        gasLimit: int.tryParse(gasLimitController.text),
                         // fee: state.activeFee,
                       ));
                   Navigator.pop(dialogContext);
@@ -494,6 +500,8 @@ class _SendScreenState extends State<SendScreen>
                 amount: double.parse(amountController.text),
                 token: state.currentAsset!,
                 fee: state.activeFee,
+                gasPrice: int.tryParse(gasPriceController.text),
+                gasLimit: int.tryParse(gasLimitController.text),
                 // fee: state.activeFee,
               ));
         }

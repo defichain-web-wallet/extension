@@ -1,22 +1,16 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
-import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
-import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -47,6 +41,8 @@ class SendSummaryScreen extends StatefulWidget {
   final double amount;
   final bool isAfterAddContact;
   final int? fee;
+  final int? gasPrice;
+  final int? gasLimit;
   final bool isLedger;
 
   const SendSummaryScreen({
@@ -59,6 +55,8 @@ class SendSummaryScreen extends StatefulWidget {
     this.isAfterAddContact = false,
     this.isLedger = false,
     this.fee = 0,
+    this.gasPrice = 0,
+    this.gasLimit = 0,
   }) : super(key: key);
 
   @override
@@ -607,6 +605,8 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
       amount: widget.amount,
       applicationModel: walletState.applicationModel!,
       satPerByte: widget.fee ?? 0,
+      gasPrice: widget.gasPrice!,
+      maxGas: widget.gasLimit!,
     );
 
     addressBookCubit.addAddressToLastSent(context,
