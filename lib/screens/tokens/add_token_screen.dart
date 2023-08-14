@@ -59,12 +59,20 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
     List<TokenModel> ethTokens = [];
     if (walletCubit.state.activeNetwork is EthereumNetworkModel) {
       ethTokens = await walletCubit.state.activeNetwork.getAvailableTokens();
+
+      if (ethTokens.length > 0) {
+        ratesCubit.searchTokens(
+          existingTokens: existingTokens,
+          value: value,
+          allTokens: ethTokens,
+        );
+      }
+    } else {
+      ratesCubit.searchTokens(
+        existingTokens: existingTokens,
+        value: value,
+      );
     }
-    ratesCubit.searchTokens(
-      existingTokens: existingTokens,
-      value: value,
-      allTokens: ethTokens,
-    );
   }
 
   @override
@@ -82,6 +90,11 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
         return BlocBuilder<RatesCubit, RatesState>(
           builder: (context, ratesState) {
             if (ratesState.status == RatesStatusList.success) {
+              final availableTokens =
+                  (walletCubit.state.activeNetwork is EthereumNetworkModel)
+                      ? ratesState.tokens
+                      : ratesState.foundTokens;
+
               return Scaffold(
                 drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
                 endDrawer: isFullScreen
@@ -197,20 +210,19 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                               ),
                               Container(
                                 height: isFullScreen
-                                    ? ratesState.foundTokens.length != 0
+                                    ? availableTokens.length != 0
                                         ? 478
                                         : 487
-                                    : ratesState.foundTokens.length != 0
+                                    : availableTokens.length != 0
                                         ? 288
                                         : 297,
-                                child: ratesState.foundTokens.length != 0
+                                child: availableTokens.length != 0
                                     ? ListView.builder(
                                         itemCount:
-                                            ratesState.foundTokens.length,
+                                            availableTokens.length,
                                         itemBuilder:
                                             (BuildContext context, index) {
-                                          String tokenName = ratesState
-                                              .foundTokens[index].symbol
+                                          String tokenName = availableTokens[index].symbol
                                               .toString();
                                           return Column(
                                             children: [
@@ -221,25 +233,21 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                                 isSingleSelect: false,
                                                 onTap: () {
                                                   setState(() {
-                                                    tokens.contains(ratesState
-                                                            .foundTokens[index])
+                                                    tokens.contains(availableTokens[index])
                                                         ? tokens.remove(
-                                                            ratesState
-                                                                    .foundTokens[
+                                                        availableTokens[
                                                                 index])
-                                                        : tokens.add(ratesState
-                                                                .foundTokens[
+                                                        : tokens.add(availableTokens[
                                                             index]);
                                                     tokens =
                                                         tokens.toSet().toList();
                                                   });
                                                 },
                                                 isSelect: tokens.contains(
-                                                    ratesState
-                                                        .foundTokens[index]),
+                                                    availableTokens[index]),
                                                 tokenName: '$tokenName',
                                                 availableTokenName:
-                                                    '${ratesState.foundTokens[index].name}',
+                                                    '${availableTokens[index].name}',
                                               ),
                                             ],
                                           );
