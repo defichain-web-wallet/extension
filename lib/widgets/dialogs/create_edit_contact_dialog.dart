@@ -1,19 +1,22 @@
 import 'dart:ui';
 
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/addresses_helper.dart';
-import 'package:defi_wallet/mixins/network_mixin.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateEditContactDialog extends StatefulWidget {
   final bool isEdit;
   final bool isDisableEditAddress;
   final Function()? deleteCallback;
-  final Function(String name, String address, NetworkTypeModel network) confirmCallback;
+  final Function(String name, String address, NetworkTypeModel network)
+      confirmCallback;
   final String contactName;
   final String address;
 
@@ -33,13 +36,14 @@ class CreateEditContactDialog extends StatefulWidget {
 }
 
 class _CreateEditContactDialogState extends State<CreateEditContactDialog>
-    with ThemeMixin, NetworkMixin {
+    with ThemeMixin, SnackBarMixin {
   AddressesHelper addressHelper = AddressesHelper();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   FocusNode nameFocusNode = FocusNode();
   FocusNode addressFocusNode = FocusNode();
   FocusNode submitFocusNode = FocusNode();
+  final formKey = GlobalKey<FormState>();
   String editTitleText = 'Edit contact';
   String createTitleText = 'New contact';
   String titleContactName = 'Contact`s Name';
@@ -52,7 +56,6 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   late String titleText;
   late double contentHeight;
   late bool isEnable;
-  late NetworkTypeModel? network;
 
   @override
   void dispose() {
@@ -69,7 +72,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   void initState() {
     _nameController.text = widget.contactName;
     _addressController.text = widget.address;
-    contentHeight = widget.isEdit ? 336 : 299;
+    contentHeight = widget.isEdit ? 356 : 329;
     titleText = widget.isEdit ? editTitleText : createTitleText;
     checkButtonStatus();
     super.initState();
@@ -78,8 +81,7 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
   checkButtonStatus() {
     setState(() {
       if (_nameController.text.length > 0 &&
-          _addressController.text.isNotEmpty &&
-          (isValidAddress)) {
+          _addressController.text.isNotEmpty) {
         isEnable = true;
       } else {
         isEnable = false;
@@ -89,6 +91,8 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
 
   @override
   Widget build(BuildContext context) {
+    final walletCubit = BlocProvider.of<WalletCubit>(context);
+    final activeNetwork = walletCubit.state.activeNetwork;
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
       child: AlertDialog(
@@ -125,12 +129,19 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                 width: 104,
                 callback: isEnable
                     ? () async {
-                        network = addressNetwork(context, _addressController.text);
-                        widget.confirmCallback!(
-                          _nameController.text,
+                        bool isValid = activeNetwork.checkAddress(
                           _addressController.text,
-                          network!,
                         );
+                        setState(() {
+                          isValidAddress = isValid;
+                        });
+                        if (formKey.currentState!.validate()) {
+                          widget.confirmCallback!(
+                            _nameController.text,
+                            _addressController.text,
+                            activeNetwork.networkType,
+                          );
+                        }
                       }
                     : null,
                 title: 'Confirm',
@@ -212,32 +223,24 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                               .selectedRowColor
                               .withOpacity(0.07),
                         ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  titleContactName,
-                                  style: headline5,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 6,
-                            ),
-                            Container(
-                              height: 44,
-                              child: GestureDetector(
-                                onDoubleTap: () {
-                                  nameFocusNode.requestFocus();
-                                  if (_nameController.text.isNotEmpty) {
-                                    _nameController.selection = TextSelection(
-                                        baseOffset: 0,
-                                        extentOffset:
-                                            _nameController.text.length);
-                                  }
-                                },
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    titleContactName,
+                                    style: headline5,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 6,
+                              ),
+                              Container(
+                                height: 44,
                                 child: TextFormField(
                                   focusNode: nameFocusNode,
                                   controller: _nameController,
@@ -264,12 +267,10 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                     hintText: hintContactName,
                                   ),
                                   onChanged: (value) async {
-                                    isValidAddress =
-                                        addressNetwork(context, _addressController.text) != null;
                                     checkButtonStatus();
                                   },
                                   onFieldSubmitted: (val) {
-                                    if(widget.isDisableEditAddress) {
+                                    if (widget.isDisableEditAddress) {
                                       submitFocusNode.requestFocus();
                                     } else {
                                       addressFocusNode.requestFocus();
@@ -277,71 +278,65 @@ class _CreateEditContactDialogState extends State<CreateEditContactDialog>
                                   },
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 16,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  titleAddress,
-                                  style: headline5,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 6,
-                            ),
-                            Container(
-                              height: 44,
-                              child: GestureDetector(
-                                onDoubleTap: () {
-                                  addressFocusNode.requestFocus();
-                                  if (_addressController.text.isNotEmpty) {
-                                    _addressController.selection =
-                                        TextSelection(
-                                            baseOffset: 0,
-                                            extentOffset:
-                                                _addressController.text.length);
-                                  }
-                                },
-                                child: TextFormField(
-                                  readOnly: widget.isDisableEditAddress,
-                                  focusNode: addressFocusNode,
-                                  controller: _addressController,
-                                  decoration: InputDecoration(
-                                    hoverColor: Theme.of(context)
-                                        .inputDecorationTheme
-                                        .hoverColor,
-                                    filled: true,
-                                    fillColor: Theme.of(context)
-                                        .inputDecorationTheme
-                                        .fillColor,
-                                    enabledBorder: Theme.of(context)
-                                        .inputDecorationTheme
-                                        .enabledBorder,
-                                    focusedBorder: Theme.of(context)
-                                        .inputDecorationTheme
-                                        .focusedBorder,
-                                    hintStyle: passwordField.copyWith(
-                                      color: isDarkTheme()
-                                          ? DarkColors.hintTextColor
-                                          : LightColors.hintTextColor,
-                                    ),
-                                    hintText: hintAddress,
-                                  ),
-                                  onChanged: (value) async {
-                                    isValidAddress = addressNetwork(context, _addressController.text) != null;
-                                    checkButtonStatus();
-                                  },
-                                  onFieldSubmitted: (val) {
-                                    submitFocusNode.requestFocus();
-                                  },
-                                ),
+                              SizedBox(
+                                height: 16,
                               ),
-                            ),
-                          ],
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    titleAddress,
+                                    style: headline5,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 6,
+                              ),
+                              TextFormField(
+                                readOnly: widget.isDisableEditAddress,
+                                focusNode: addressFocusNode,
+                                controller: _addressController,
+                                decoration: InputDecoration(
+                                  errorStyle: TextStyle(
+                                    backgroundColor: Colors.transparent,
+                                    color: Colors.pink,
+                                    fontSize: 12,
+                                  ),
+                                  hoverColor: Theme.of(context)
+                                      .inputDecorationTheme
+                                      .hoverColor,
+                                  filled: true,
+                                  fillColor: Theme.of(context)
+                                      .inputDecorationTheme
+                                      .fillColor,
+                                  enabledBorder: Theme.of(context)
+                                      .inputDecorationTheme
+                                      .enabledBorder,
+                                  focusedBorder: Theme.of(context)
+                                      .inputDecorationTheme
+                                      .focusedBorder,
+                                  hintStyle: passwordField.copyWith(
+                                    color: isDarkTheme()
+                                        ? DarkColors.hintTextColor
+                                        : LightColors.hintTextColor,
+                                  ),
+                                  hintText: hintAddress,
+                                ),
+                                onChanged: (value) async {
+                                  checkButtonStatus();
+                                },
+                                validator: (val) {
+                                  return isValidAddress
+                                      ? null
+                                      : "Incorrect address";
+                                },
+                                onFieldSubmitted: (val) {
+                                  submitFocusNode.requestFocus();
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

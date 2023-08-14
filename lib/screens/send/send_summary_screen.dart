@@ -7,7 +7,6 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
@@ -64,7 +63,7 @@ class SendSummaryScreen extends StatefulWidget {
 }
 
 class _SendSummaryScreenState extends State<SendSummaryScreen>
-    with ThemeMixin, NetworkMixin, SnackBarMixin {
+    with ThemeMixin, SnackBarMixin {
   TransactionService transactionService = TransactionService();
   BalancesHelper balancesHelper = BalancesHelper();
   String secondStepLoaderText =

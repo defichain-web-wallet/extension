@@ -4,7 +4,6 @@ import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/format_mixin.dart';
-import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
@@ -40,7 +39,7 @@ class SendScreen extends StatefulWidget {
 }
 
 class _SendScreenState extends State<SendScreen>
-    with ThemeMixin, NetworkMixin, SnackBarMixin, FormatMixin {
+    with ThemeMixin, SnackBarMixin, FormatMixin {
   TextEditingController addressController = TextEditingController();
   TextEditingController amountController = TextEditingController(text: '0');
   TextEditingController gasPriceController = TextEditingController(text: '0');

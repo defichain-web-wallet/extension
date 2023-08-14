@@ -1,18 +1,9 @@
-import 'dart:convert';
-
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:equatable/equatable.dart';
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 
 part 'address_book_state.dart';
 
@@ -40,12 +31,16 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var currentNetwork = walletCubit.state.applicationModel!.activeNetwork!;
     addressBook.network = currentNetwork.networkType;
     account.addToAddressBook(addressBook);
-
+    final addressBookByNetwork = account.addressBook
+        .where((element) =>
+            element.network!.networkName.name ==
+            currentNetwork.networkType.networkName.name)
+        .toList();
     StorageService.saveApplication(walletCubit.state.applicationModel!);
 
     emit(state.copyWith(
       status: AddressBookStatusList.success,
-      addressBookList: account.addressBook,
+      addressBookList: addressBookByNetwork,
     ));
   }
 
@@ -133,8 +128,8 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     }
     emit(state.copyWith(
       status: AddressBookStatusList.success,
-      addressBookList: account.addressBook,
-      lastSentList: account.lastSendList,
+      addressBookList: addressBook,
+      lastSentList: lastSend,
     ));
   }
 }

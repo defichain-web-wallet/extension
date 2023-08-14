@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
-import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -12,7 +11,6 @@ import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:defi_wallet/widgets/status_logo_and_title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
 class AddressBookDialog extends StatefulWidget {
   final Function(AddressBookModel contact)? getContact;
@@ -29,7 +27,7 @@ class AddressBookDialog extends StatefulWidget {
 }
 
 class _AddressBookDialogState extends State<AddressBookDialog>
-    with ThemeMixin, NetworkMixin {
+    with ThemeMixin {
   int iterator = 0;
   TextEditingController controller = TextEditingController();
   List<AddressBookModel>? viewList = [];
@@ -41,7 +39,7 @@ class _AddressBookDialogState extends State<AddressBookDialog>
     super.initState();
     AddressBookCubit addressBookCubit = BlocProvider.of<AddressBookCubit>(context);
 
-    addressBookCubit.init(context);
+    addressBookCubit.init(context, currentNetowk: true);
   }
 
   @override

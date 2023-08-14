@@ -1,5 +1,4 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
-import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -21,7 +20,7 @@ class LastSentTile extends StatefulWidget {
   State<LastSentTile> createState() => _LastSentTileState();
 }
 
-class _LastSentTileState extends State<LastSentTile> with NetworkMixin, ThemeMixin {
+class _LastSentTileState extends State<LastSentTile> with ThemeMixin {
   cutAddress(String s) {
     return s.substring(0, 14) + '...' + s.substring(28, 42);
   }

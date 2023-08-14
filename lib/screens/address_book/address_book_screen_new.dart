@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/screens/address_book/delete_contact_dialog.dart';
@@ -30,7 +29,7 @@ class AddressBookScreenNew extends StatefulWidget {
 }
 
 class _AddressBookScreenNewState extends State<AddressBookScreenNew>
-    with ThemeMixin, NetworkMixin {
+    with ThemeMixin {
   int iterator = 0;
   TextEditingController controller = TextEditingController();
   final TextEditingController addressController = TextEditingController();
@@ -56,7 +55,7 @@ class _AddressBookScreenNewState extends State<AddressBookScreenNew>
   @override
   void initState() {
     addressBookCubit = BlocProvider.of<AddressBookCubit>(context);
-    addressBookCubit.init(context);
+    addressBookCubit.init(context, currentNetowk: true);
     super.initState();
   }
 
