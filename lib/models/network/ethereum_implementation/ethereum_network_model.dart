@@ -13,7 +13,6 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_pro
 import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_fee_model.dart';
-import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_token_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -38,7 +37,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 class EthereumNetworkModel extends AbstractNetworkModel {
   String rpcUrl;
-  List<EthereumTokenModel> popularTokens;
+  List<TokenModel> popularTokens;
 
   EthereumNetworkModel(
       NetworkTypeModel networkType, this.rpcUrl, this.popularTokens)
@@ -58,7 +57,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
       json['rpcUrl'],
       List.generate(
         json['popularTokens'].length,
-        (index) => EthereumTokenModel.fromJSON(json['popularTokens'][index]),
+        (index) => TokenModel.fromJSON(json['popularTokens'][index]),
       ),
     );
   }
@@ -67,7 +66,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['networkType'] = this.networkType.toJson();
     data['rpcUrl'] = this.rpcUrl;
-    data['popularTokens'] = this.popularTokens.map((e) => e.toJson()).toList();
+    data['popularTokens'] = this.popularTokens.map((e) => e.toJSON()).toList();
     return data;
   }
 
@@ -130,7 +129,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
       for (var balance in oldBalances) {
         if (!balance.token!.isUTXO) {
           final contractAddress = EthereumAddress.fromHex(
-              (balance.token as EthereumTokenModel).contractAddress);
+              balance.token!.id);
           final contract = DeployedContract(
             contractAbi,
             contractAddress,
@@ -141,9 +140,9 @@ class EthereumNetworkModel extends AbstractNetworkModel {
           final List<dynamic> result = await client.call(
             contract: contract,
             function: function,
-            params: [addressString],
+            params: [EthereumAddress.fromHex(addressString)],
           );
-          balance.balance = result.first;
+          balance.balance = result.first.toInt();
 
           balances.add(balance);
         }
@@ -292,7 +291,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
       final jsonString =
           await rootBundle.loadString('assets/abi/erc20_abi.json');
       final contractAddress = EthereumAddress.fromHex(
-          (token as EthereumTokenModel).contractAddress);
+          token.id);
       final contractAbi = ContractAbi.fromJson(jsonString, 'Token');
       contract = DeployedContract(
         contractAbi,
@@ -320,7 +319,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
   double fromSatoshi(int amount, {int decimals = 16}) =>
       amount / (Math.pow(10, decimals));
 
-  Future<EthereumTokenModel> getTokenByContractAddress(
+  Future<TokenModel> getTokenByContractAddress(
       String contractAddress) async {
     final client = Web3Client(this.rpcUrl, Client());
 
@@ -350,9 +349,8 @@ class EthereumNetworkModel extends AbstractNetworkModel {
         .call(contract: contract, function: nameFunction, params: []);
     final tokenName = nameResponse[0].toString();
 
-    return EthereumTokenModel(
+    return TokenModel(
         id: contractAddress,
-        contractAddress: contractAddress,
         symbol: tokenSymbol,
         name: tokenName,
         displaySymbol: tokenSymbol,

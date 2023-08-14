@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
-import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_token_model.dart';
 import 'package:defi_wallet/models/network/rates/rates_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:equatable/equatable.dart';

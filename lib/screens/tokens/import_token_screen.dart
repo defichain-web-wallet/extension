@@ -4,7 +4,6 @@ import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
-import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_token_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/screens/tokens/widgets/import_text_field.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
@@ -107,7 +106,7 @@ class _ImportTokenScreenState extends State<ImportTokenScreen>
                                 onChanged: (String value) async {
                                   print(value);
                                   try {
-                                    EthereumTokenModel token =
+                                    TokenModel token =
                                         await (walletState.activeNetwork
                                                 as EthereumNetworkModel)
                                             .getTokenByContractAddress(
