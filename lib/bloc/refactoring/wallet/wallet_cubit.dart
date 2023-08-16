@@ -292,7 +292,7 @@ class WalletCubit extends Cubit<WalletState> {
       applicationModel: applicationModel,
     ));
   }
-  addNewAccount(String name) async {
+  addNewAccount(String name, String password) async {
     emit(state.copyWith(
       status: WalletStatusList.loading,
     ));

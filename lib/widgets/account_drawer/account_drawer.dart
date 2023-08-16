@@ -54,8 +54,7 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
         var accounts = state.accounts;
         if (accounts.length == 1) {
           accountsSelectorHeight = 195;
-        }
-        else if (accounts.length == 2) {
+        } else if (accounts.length == 2) {
           accountsSelectorHeight = 237;
         } else {
           accountsSelectorHeight = 260;
@@ -115,8 +114,9 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                           child: IconButton(
                                             splashRadius: 12,
                                             padding: const EdgeInsets.all(0),
-                                            onPressed: () => Scaffold.of(context)
-                                                .closeEndDrawer(),
+                                            onPressed: () =>
+                                                Scaffold.of(context)
+                                                    .closeEndDrawer(),
                                             icon: Icon(
                                               Icons.close,
                                               size: 16,
@@ -138,21 +138,23 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                         accountName: state.activeAccount.name,
                                         onEdit: () {
                                           showDialog(
-                                            barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                            barrierColor: AppColors.tolopea
+                                                .withOpacity(0.06),
                                             barrierDismissible: false,
                                             context: context,
                                             builder: (BuildContext context) {
                                               return CreateEditAccountDialog(
-                                                callback: (s) {
+                                                callback: (name, password) {
                                                   setState(() {
-                                                    walletCubit.editAccount(s,
-                                                         state
-                                                            .activeAccount
+                                                    walletCubit.editAccount(
+                                                        name,
+                                                        state.activeAccount
                                                             .accountIndex);
                                                   });
                                                 },
                                                 name: state.activeAccount.name,
                                                 isEdit: true,
+                                                context: context,
                                               );
                                             },
                                           );
@@ -166,45 +168,43 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                           child: ListView.builder(
                                             itemCount: accounts.length,
                                             itemBuilder: (context, index) {
-                                                return Column(
-                                                  children: [
-                                                    Divider(
-                                                      height: 1,
-                                                      endIndent: 12,
-                                                      indent: 12,
-                                                      color: Theme.of(context)
-                                                          .dividerColor
-                                                          .withOpacity(0.05),
-                                                      thickness: 1,
-                                                    ),
-                                                    AccountMenuButton(
-                                                      accountSelectMode: true,
-                                                      account: accounts[index],
-                                                      callback: accounts[index]
-                                                                  .accountIndex ==
-                                                              state
-                                                                  .activeAccount
-                                                                  .accountIndex
-                                                          ? null
-                                                          : (accountIndex) async {
-                                                        walletCubit
-                                                                  .updateActiveAccount(
-                                                                      accounts[
-                                                                              index]
-                                                                          .accountIndex);
-                                                              Scaffold.of(
-                                                                      context)
-                                                                  .closeEndDrawer();
-                                                            },
-                                                      isHoverBackgroundEffect:
-                                                          false,
-                                                      iconPath:
-                                                          'assets/icons/add.svg',
-                                                      title:
-                                                          accounts[index].name!,
-                                                    ),
-                                                  ],
-                                                );
+                                              return Column(
+                                                children: [
+                                                  Divider(
+                                                    height: 1,
+                                                    endIndent: 12,
+                                                    indent: 12,
+                                                    color: Theme.of(context)
+                                                        .dividerColor
+                                                        .withOpacity(0.05),
+                                                    thickness: 1,
+                                                  ),
+                                                  AccountMenuButton(
+                                                    accountSelectMode: true,
+                                                    account: accounts[index],
+                                                    callback: accounts[index]
+                                                                .accountIndex ==
+                                                            state.activeAccount
+                                                                .accountIndex
+                                                        ? null
+                                                        : (accountIndex) async {
+                                                            walletCubit
+                                                                .updateActiveAccount(
+                                                                    accounts[
+                                                                            index]
+                                                                        .accountIndex);
+                                                            Scaffold.of(context)
+                                                                .closeEndDrawer();
+                                                          },
+                                                    isHoverBackgroundEffect:
+                                                        false,
+                                                    iconPath:
+                                                        'assets/icons/add.svg',
+                                                    title:
+                                                        accounts[index].name!,
+                                                  ),
+                                                ],
+                                              );
                                             },
                                           ),
                                         ),
@@ -221,31 +221,31 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
                                             thickness: 1,
                                           ),
                                           AccountMenuButton(
-                                            callback: (index) {
-                                              showDialog(
-                                                barrierColor:
-                                                AppColors.tolopea.withOpacity(0.06),
-                                                barrierDismissible:
-                                                false,
+                                            callback: (index) async {
+                                              await showDialog(
+                                                barrierColor: AppColors.tolopea
+                                                    .withOpacity(0.06),
+                                                barrierDismissible: false,
                                                 context: context,
-                                                builder: (BuildContext
-                                                context) {
+                                                builder:
+                                                    (BuildContext context) {
                                                   return CreateEditAccountDialog(
                                                     callback:
-                                                        (s) async {
+                                                        (name, password) async {
                                                       await walletCubit
-                                                          .addNewAccount(s);
+                                                          .addNewAccount(
+                                                        name,
+                                                        password,
+                                                      );
                                                     },
+                                                    context: context,
                                                   );
                                                 },
                                               );
                                             },
-                                            isHoverBackgroundEffect:
-                                            false,
-                                            iconPath:
-                                            'assets/icons/add.svg',
-                                            title:
-                                            'Create new account',
+                                            isHoverBackgroundEffect: false,
+                                            iconPath: 'assets/icons/add.svg',
+                                            title: 'Create new account',
                                           ),
                                         ],
                                       )

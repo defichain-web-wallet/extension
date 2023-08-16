@@ -7,6 +7,7 @@ import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,13 +18,15 @@ import 'package:simple_gradient_text/simple_gradient_text.dart';
 class CreateEditAccountDialog extends StatefulWidget {
   final bool isEdit;
   final String? name;
-  final Function(String s)? callback;
+  final Function(String name, String password)? callback;
+  final BuildContext context;
 
   const CreateEditAccountDialog({
     Key? key,
     this.isEdit = false,
     this.name,
     this.callback,
+    required this.context,
   }) : super(key: key);
 
   @override
@@ -149,11 +152,28 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with 
                     callback: () async {
                      if(_formKey.currentState!.validate()) {
                         if (_nameController.text.length > 3) {
-                          if (_pickedImage != null) {
-                            await _saveImageToStorage();
-                          }
-                          widget.callback!(_nameController.text);
-                          Navigator.pop(context);
+                          await showDialog(
+                            barrierColor: AppColors.tolopea.withOpacity(0.06),
+                            barrierDismissible: false,
+                            context: widget.context,
+                            builder:
+                                (BuildContext context1) {
+                              return PassConfirmDialog(
+                                onCancel: () {},
+                                onSubmit: (password) async {
+                                  if (_pickedImage != null) {
+                                    await _saveImageToStorage();
+                                  }
+                                  widget.callback!(
+                                    _nameController.text,
+                                    password,
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                context: widget.context,
+                              );
+                            },
+                          );
                         }
                       }
                     },
@@ -349,12 +369,28 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with 
                                         if(_formKey.currentState!.validate()) {
                                           if (_nameController.text.length >
                                               3) {
-                                            if (_pickedImage != null) {
-                                              await _saveImageToStorage();
-                                            }
-                                            widget.callback!(
-                                                _nameController.text);
-                                            Navigator.pop(context);
+                                            await showDialog(
+                                              barrierColor: AppColors.tolopea.withOpacity(0.06),
+                                              barrierDismissible: false,
+                                              context: widget.context,
+                                              builder:
+                                                  (BuildContext context1) {
+                                                return PassConfirmDialog(
+                                                  onCancel: () {},
+                                                  onSubmit: (password) async {
+                                                    if (_pickedImage != null) {
+                                                      await _saveImageToStorage();
+                                                    }
+                                                    widget.callback!(
+                                                      _nameController.text,
+                                                      password,
+                                                    );
+                                                    Navigator.pop(context);
+                                                  },
+                                                  context: widget.context,
+                                                );
+                                              },
+                                            );
                                           }
                                         }
                                       },
