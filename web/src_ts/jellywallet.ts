@@ -1,5 +1,6 @@
 
-//import { isSupported, getFirstLedgerDevice } from "@ledgerhq/hw-transport-webhid";
+
+import TransportWebHID from "@ledgerhq/hw-transport-webhid";
 import { LedgerJellywalletWrapper } from "./ledger_wrapper.js";
 
 (<any>window).jelly_init = () => {
@@ -16,26 +17,27 @@ import { LedgerJellywalletWrapper } from "./ledger_wrapper.js";
 }
 
 (<any>window).isUsbSupported = async () => {
-    // if (await isSupported()) {
-    //     try {
-    //         var devices = await getFirstLedgerDevice();
-    //         if (devices) {
-    //             return 0;
-    //         }
-    //     }
-    //     catch (err) {
-    //         const isInPopup = function () {
-    //             return (typeof chrome != undefined && chrome.extension) ?
-    //                 chrome.extension.getViews({ type: "popup" }).length > 0 : null;
-    //         }
+    (<any>window).jelly_init();
+    if (TransportWebHID.isSupported) {
+        try {
+            var devices = await TransportWebHID.list();
+            if (devices.length >= 0) {
+                return 0;
+            }
+        }
+        catch (err) {
+            const isInPopup = function () {
+                return (typeof chrome != undefined && chrome.extension) ?
+                    chrome.extension.getViews({ type: "popup" }).length > 0 : null;
+            }
 
-    //         if (!isInPopup()) {
-    //             return 2;
-    //         }
+            if (!isInPopup()) {
+                return 2;
+            }
 
-    //         console.log(err);
-    //         return 1;
-    //     }
-    // }
-    return 0;
+            console.log(err);
+            return 1;
+        }
+    }
+    return 1;
 }

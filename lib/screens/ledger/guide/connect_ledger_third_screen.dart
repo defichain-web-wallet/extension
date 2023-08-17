@@ -36,7 +36,8 @@ class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
   Widget build(BuildContext context) {
     return Center(
       child: StretchBox(
-        child: Column(
+        child: SingleChildScrollView(
+            child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
@@ -44,8 +45,8 @@ class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
               children: [
                 Image.asset(
                   'assets/images/defi_ledger_seed_phrase.png',
-                  width: 303.87,
-                  height: 247.3,
+                  width: 202.94,
+                  height: 176.44,
                 ),
                 SizedBox(
                   width: 24,
@@ -70,7 +71,7 @@ class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
                     height: 8,
                   ),
                   Container(
-                    height: 105,
+                    height: 80,
                     child: Text(
                       subtitleText,
                       style: Theme.of(context).textTheme.headline5!.copyWith(
@@ -87,7 +88,7 @@ class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 104,
+                        width: 80,
                         child: AccentButton(
                           callback: () {
                             Navigator.pop(context);
@@ -108,7 +109,7 @@ class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
               ),
             ),
           ],
-        ),
+        )),
       ),
     );
   }

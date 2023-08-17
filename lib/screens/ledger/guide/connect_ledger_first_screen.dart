@@ -33,8 +33,8 @@ class _ConnectLedgerFirstScreenState extends State<ConnectLedgerFirstScreen>
           children: [
             Image.asset(
               'assets/images/defi_no_seed_phrase.png',
-              width: 262.94,
-              height: 236.44,
+              width: 202.94,
+              height: 176.44,
             ),
             Container(
               child: Column(
@@ -54,7 +54,7 @@ class _ConnectLedgerFirstScreenState extends State<ConnectLedgerFirstScreen>
                     height: 8,
                   ),
                   Container(
-                    height: 105,
+                    height: 80,
                     child: Text(
                       subtitleText,
                       style: Theme.of(context).textTheme.headline5!.copyWith(
@@ -71,7 +71,7 @@ class _ConnectLedgerFirstScreenState extends State<ConnectLedgerFirstScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 104,
+                        width: 80,
                         child: AccentButton(
                           callback: () {
                             Navigator.pop(context);
@@ -80,7 +80,7 @@ class _ConnectLedgerFirstScreenState extends State<ConnectLedgerFirstScreen>
                         ),
                       ),
                       NewPrimaryButton(
-                        width: 104,
+                        width: 80,
                         callback: () {
                           this.widget.callback();
                         },

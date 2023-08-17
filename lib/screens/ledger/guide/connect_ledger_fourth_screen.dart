@@ -55,6 +55,7 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
   Widget build(BuildContext context) {
     return Center(
       child: StretchBox(
+          child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -66,8 +67,8 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                 ),
                 Image.asset(
                   'assets/images/defi_ledger_screen.png',
-                  width: 268.7,
-                  height: 247.3,
+                  width: 202.94,
+                  height: 176.44,
                 ),
                 // SizedBox(
                 //   width: 23,
@@ -107,6 +108,7 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                   ),
                   ListTile(
                     title: const Text('Bitcoin'),
+                    tileColor: Colors.transparent,
                     leading: Radio<LedgerAppName>(
                       value: apps[0],
                       groupValue: selectedApp,
@@ -121,6 +123,7 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                   ),
                   ListTile(
                     title: const Text('Bitcoin Testnet'),
+                    tileColor: Colors.transparent,
                     leading: Radio<LedgerAppName>(
                       value: apps[1],
                       groupValue: selectedApp,
@@ -133,12 +136,12 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                       },
                     ),
                   ),
-                  Container(height: 50),
+                  Container(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 104,
+                        width: 80,
                         child: AccentButton(
                           callback: () {
                             Navigator.pop(context);
@@ -147,7 +150,7 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                         ),
                       ),
                       NewPrimaryButton(
-                        width: 104,
+                        width: 80,
                         callback: () async {
                           var usbSupported =
                               await promiseToFuture(isUsbSupported());
@@ -180,7 +183,7 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 }

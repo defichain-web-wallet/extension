@@ -13,7 +13,7 @@ export class LedgerJellywalletWrapper {
     private ledger = new JellyWalletLedger();
     private ledgerBtc = new JellyWalletBtcLedger();
 
-    async getTransport(): Promise<Transport> {
+    public async getTransport(): Promise<Transport> {
         // return await SpeculosTransport.open({ baseURL: "172.27.3.96:5000" });
         return await TransportWebHID.create();
     }
@@ -27,9 +27,10 @@ export class LedgerJellywalletWrapper {
     }
 
     public async openApp(appName: string): Promise<boolean> {
-        var transport = await this.getTransport();
+        var transport:Transport;
           
         try {
+            transport = await this.getTransport();
             listen((log) => console.log(log));
             const targetAppName = appName == "dfi" ? "DeFiChain" : (appName == "test" ? "Bitcoin Test": "Bitcoin");
 
@@ -61,7 +62,9 @@ export class LedgerJellywalletWrapper {
         }
         catch (err) {
             console.log(err);
-            await transport.close();
+            if(transport) {
+                await transport.close();
+            }
             throw err;
         }
     }

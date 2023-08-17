@@ -44,8 +44,8 @@ class _ConnectLedgerSecondScreenState extends State<ConnectLedgerSecondScreen>
               children: [
                 Image.asset(
                   'assets/images/defi_love_ledger.png',
-                  width: 304.99,
-                  height: 247.3,
+                  width: 202.94,
+                  height: 176.44,
                 ),
                 SizedBox(
                   width: 23,
@@ -87,7 +87,7 @@ class _ConnectLedgerSecondScreenState extends State<ConnectLedgerSecondScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 104,
+                        width: 80,
                         child: AccentButton(
                           callback: () {
                             Navigator.pop(context);
@@ -96,7 +96,7 @@ class _ConnectLedgerSecondScreenState extends State<ConnectLedgerSecondScreen>
                         ),
                       ),
                       NewPrimaryButton(
-                        width: 104,
+                        width: 80,
                         callback: () {
                           this.widget.callback();
                         },
