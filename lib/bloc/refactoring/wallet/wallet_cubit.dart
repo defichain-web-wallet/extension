@@ -49,7 +49,8 @@ class WalletCubit extends Cubit<WalletState> {
         accountIndex: 0,
         publicKeyTestnet: publicKeyTestnet,
         publicKeyMainnet: publicKeyMainnet,
-        sourceId: source.id);
+        password: password,
+        source: source);
 
     applicationModel.activeAccount = account;
     applicationModel.accounts = [account];
@@ -97,9 +98,10 @@ class WalletCubit extends Cubit<WalletState> {
           accountIndex: accountIndex,
           publicKeyTestnet: publicKeyTestnet,
           publicKeyMainnet: publicKeyMainnet,
-          sourceId: source.id,
+          source: source,
           lastSent: lastSent,
           addressBook: addressBook,
+          password: password,
           isRestore: true,
         );
         for(var network in applicationModel.networks){
@@ -300,7 +302,7 @@ class WalletCubit extends Cubit<WalletState> {
     int maxIndex = 0;
     applicationModel.accounts.forEach((element) => element.accountIndex > maxIndex ? maxIndex = element.accountIndex : null);
     SourceSeedModel source = applicationModel.sourceList.values.first;
-    AbstractAccountModel account = await AccountModel.fromPublicKeys(networkList: applicationModel.networks,  accountIndex: maxIndex+1, publicKeyMainnet: source.publicKeyMainnet, publicKeyTestnet: source.publicKeyTestnet, sourceId: source.id);
+    AbstractAccountModel account = await AccountModel.fromPublicKeys(networkList: applicationModel.networks,  accountIndex: maxIndex+1, publicKeyMainnet: source.publicKeyMainnet, publicKeyTestnet: source.publicKeyTestnet, source: source, password: password);
     account.changeName(name);
     applicationModel.accounts.add(account);
 

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:defi_wallet/config/config.dart';
@@ -10,10 +9,10 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
-import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_fee_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
+import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -21,18 +20,14 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_account_mod
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/services/ethereum/eth_transaction_service.dart';
 import 'package:defichaindart/defichaindart.dart';
-import 'package:defichaindart/src/models/networks.dart' as networks;
 
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:http/http.dart';
-import 'package:web3dart/web3dart.dart';
 import 'dart:math' as Math;
 
-import 'package:bip32/bip32.dart' as bip32;
-import 'package:hex/hex.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class EthereumNetworkModel extends AbstractNetworkModel {
@@ -70,9 +65,15 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     return data;
   }
 
+  @deprecated
   String createAddress(String publicKey, int accountIndex) {
-    var publicKeypair = bip32.BIP32.fromBase58(publicKey);
-    return this._createAddressString(publicKeypair, accountIndex);
+    throw 'Use createAddressFromPrivateKey';
+  }
+
+  Future<String> createAddressFromPrivateKey(String privateKey, int accountIndex, String password, SourceSeedModel source) async {
+    final keypair = await getKeypairWithoutAccount(password,
+        accountIndex, source);
+    return this._createAddressString(keypair, accountIndex);
   }
 
   TokenModel getDefaultToken() {
@@ -205,16 +206,8 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     required TokenModel token,
   }) async {
     List<BalanceModel> balances = account.getPinnedBalances(this);
-    if (balances.length > 0) {
-      return fromSatoshi(balances[0].balance, decimals: token.tokenDecimals);
-    } else {
-      var balance = await getBalanceUTXO(
-          balances, account.getAddress(this.networkType.networkName)!);
-
-      account.pinToken(balance, this);
-
-      return fromSatoshi(balance.balance, decimals: token.tokenDecimals);
-    }
+    var balance = await this.getBalanceToken(balances, token, '');
+    return this.fromSatoshi(balance.balance, decimals: token.tokenDecimals);
   }
 
   Future<double> getAvailableBalance(
@@ -228,11 +221,11 @@ class EthereumNetworkModel extends AbstractNetworkModel {
         if (fee == null) {
           fee = (await this.getNetworkFee() as EthereumNetworkFeeModel);
         }
-
-        return fromSatoshi(toSatoshi(balance) -
-            toSatoshi(calculateFee(fee!.gasPrice!, fee.gasLimit!)));
+        balance = fromSatoshi(toSatoshi(balance) -
+            toSatoshi(calculateFee(fee.gasPrice!, fee.gasLimit!)));
+        return balance < 0 ? 0 : balance;
       } else {
-        return balance;
+        return balance < 0 ? 0 : balance;
       }
     } catch (e) {
       print(e);
@@ -261,6 +254,14 @@ class EthereumNetworkModel extends AbstractNetworkModel {
         applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
     var masterKey = getMasterKeypairFormMnemonic(mnemonic);
     return _getEthPrivateKeyForPathPrivateKey(masterKey, account.accountIndex);
+  }
+
+  Future<EthPrivateKey> getKeypairWithoutAccount(String password,
+      int accountIndex, SourceSeedModel source) async {
+    var mnemonic =
+    source.getMnemonic(password);
+    var masterKey = getMasterKeypairFormMnemonic(mnemonic);
+    return _getEthPrivateKeyForPathPrivateKey(masterKey, accountIndex);
   }
 
   Future<NetworkFeeModel> getNetworkFee() async {
@@ -306,7 +307,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
         ),
         credentials: keypair,
         destinationAddress: address,
-        rpcUrl: 'https://eth.llamarpc.com',
+        rpcUrl: rpcUrl,
         senderAddress: senderAddress,
         maxGas: maxGas,
         gasPrice: gasPrice,
@@ -366,18 +367,11 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     return bytesToHex(signature, include0x: true);
   }
 
-  String _createAddressString(bip32.BIP32 masterKeyPair, int accountIndex) {
-    final keyPair = _getKeypairForPathPublicKey(masterKeyPair, accountIndex);
-    return _getAddressFromPrivateKey(keyPair);
+  String _createAddressString(EthPrivateKey masterKeyPair, int accountIndex) {
+    return _getAddressFromPrivateKey(masterKeyPair);
   }
 
   // private
-
-  EthPrivateKey _getKeypairForPathPublicKey(
-      bip32.BIP32 masterKeypair, int account) {
-    return EthPrivateKey.fromInt(_bytesToBigInt(
-        masterKeypair.derivePath(_derivePath(account)).publicKey));
-  }
 
   EthPrivateKey _getEthPrivateKeyForPathPrivateKey(
     bip32.BIP32 masterKeypair,

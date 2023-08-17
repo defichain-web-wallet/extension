@@ -1,9 +1,11 @@
-import 'dart:math';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:http/http.dart' as http;
 
 class ETHTransactionService {
   static Future<TxErrorModel> createSendTransaction(
@@ -15,7 +17,7 @@ class ETHTransactionService {
       required String rpcUrl,
       required int maxGas,
       required int gasPrice}) async {
-    final client = Web3Client(rpcUrl, Client());
+
     if (contract != null) {
       return sendTokenTransaction(
           senderAddress: senderAddress,
@@ -48,18 +50,21 @@ class ETHTransactionService {
       required int gasPrice}) async {
     final client = Web3Client(rpcUrl, Client());
     try {
+      var nonce = await client.getTransactionCount(EthereumAddress.fromHex(senderAddress));
       var tx = await client.sendTransaction(
         credentials,
-        fetchChainIdFromNetworkId: true,
-        chainId: null,
+        fetchChainIdFromNetworkId: true, chainId: null,
         Transaction(
-          from: EthereumAddress.fromHex(senderAddress),
+          nonce: nonce,
+          from:  EthereumAddress.fromHex(senderAddress),
           to: EthereumAddress.fromHex(destinationAddress),
-          gasPrice: EtherAmount.fromInt(EtherUnit.gwei, gasPrice),
           maxGas: maxGas,
+          gasPrice: EtherAmount.fromInt(EtherUnit.gwei, gasPrice),
           value: EtherAmount.fromInt(EtherUnit.wei, amount),
         ),
       );
+
+
       return TxErrorModel(
           isError: false, txLoaderList: [TxLoaderModel(txId: tx)]);
     } catch (e) {
@@ -83,9 +88,8 @@ class ETHTransactionService {
     final amountBigint = BigInt.from(amount);
 
     final function = contract.function('transfer');
-    final data = function.encodeCall(
-      [toAddress, amountBigint],
-    );
+
+    var nonce = await client.getTransactionCount(EthereumAddress.fromHex(senderAddress));
 
     final transaction = Transaction.callContract(
       contract: contract,

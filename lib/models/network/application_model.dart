@@ -120,6 +120,15 @@ class ApplicationModel {
                 name: 'Dash',
                 networkName: NetworkName.ethereumMainnet),
           ]),
+      EthereumNetworkModel(
+          NetworkTypeModel(
+            networkName: NetworkName.ethereumTestnet,
+            networkString: 'testnet',
+            isTestnet: true,
+          ),
+          'https://endpoints.omniatech.io/v1/eth/sepolia/public',
+          [
+          ]),
     ];
   }
 

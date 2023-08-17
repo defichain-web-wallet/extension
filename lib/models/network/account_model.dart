@@ -1,8 +1,10 @@
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/source_seed_model.dart';
 
 class AccountModel extends AbstractAccountModel {
   AccountModel(
@@ -88,7 +90,8 @@ class AccountModel extends AbstractAccountModel {
     required int accountIndex,
     required String publicKeyTestnet,
     required String publicKeyMainnet,
-    required String sourceId,
+    required SourceSeedModel source,
+    required String password,
     isRestore = false,
     List<AddressBookModel> lastSent = const [],
     List<AddressBookModel> addressBook = const [],
@@ -97,9 +100,17 @@ class AccountModel extends AbstractAccountModel {
     Map<String, List<BalanceModel>> pinnedBalances = {};
 
     for (final network in networkList) {
-      addresses[network.networkType.networkName.name] = network.createAddress(
-          network.networkType.isTestnet ? publicKeyTestnet : publicKeyMainnet,
-          accountIndex);
+      var publicKey = network.networkType.isTestnet ? publicKeyTestnet : publicKeyMainnet;
+      if(network is EthereumNetworkModel){
+        publicKey = publicKeyMainnet;
+        addresses[network.networkType.networkName.name] = await network.createAddressFromPrivateKey(
+            publicKey,
+            accountIndex, password, source);
+      } else {
+        addresses[network.networkType.networkName.name] = network.createAddress(
+            publicKey,
+            accountIndex);
+      }
       if (isRestore) {
         try {
           pinnedBalances[network.networkType.networkName.name] =
@@ -121,7 +132,7 @@ class AccountModel extends AbstractAccountModel {
     return AccountModel(
       publicKeyTestnet,
       publicKeyMainnet,
-      sourceId,
+      source.id,
       addresses,
       accountIndex,
       pinnedBalances,
