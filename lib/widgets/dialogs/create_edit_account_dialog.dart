@@ -159,6 +159,7 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with 
                             builder:
                                 (BuildContext context1) {
                               return PassConfirmDialog(
+                                message: 'Please confirm creating new account\nby entering your password',
                                 onCancel: () {},
                                 onSubmit: (password) async {
                                   if (_pickedImage != null) {
@@ -376,6 +377,7 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with 
                                               builder:
                                                   (BuildContext context1) {
                                                 return PassConfirmDialog(
+                                                  message: 'Please confirm creating new account\nby entering your password',
                                                   onCancel: () {},
                                                   onSubmit: (password) async {
                                                     if (_pickedImage != null) {

@@ -1,6 +1,7 @@
 import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
@@ -31,14 +32,12 @@ class AddTokenScreen extends StatefulWidget {
   State<AddTokenScreen> createState() => _AddTokenScreenState();
 }
 
-class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
+class _AddTokenScreenState extends State<AddTokenScreen>
+    with ThemeMixin, SnackBarMixin {
   TextEditingController searchController = TextEditingController();
   String titleText = 'Add token';
   String subtitleTextOops =
       'We can`t find the token with such name.\nPlease try more';
-  final double _logoWidth = 210.0;
-  final double _logoHeight = 200.0;
-  final double _logoRotateDeg = 17.5;
   List<TokenModel> tokens = List.empty(growable: true);
 
   @override
@@ -114,8 +113,6 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                     left: 16,
                     right: 16,
                   ),
-                  width: double.infinity,
-                  height: double.infinity,
                   decoration: BoxDecoration(
                     color: isDarkTheme()
                         ? DarkColors.scaffoldContainerBgColor
@@ -136,123 +133,117 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                   child: Center(
                     child: StretchBox(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  PageTitle(
-                                    title: titleText,
-                                    isFullScreen: isFullScreen,
-                                  ),
-                                  MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        NavigatorService.push(
-                                          context,
-                                          ImportTokenScreen(),
-                                        );
-                                      },
-                                      child: Container(
-                                        width: 32,
-                                        height: 32,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.portage
-                                              .withOpacity(0.15),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Center(
-                                          child: SvgPicture.asset(
-                                            'assets/icons/add_black.svg',
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    PageTitle(
+                                      title: titleText,
+                                      isFullScreen: isFullScreen,
+                                    ),
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          NavigatorService.push(
+                                            context,
+                                            ImportTokenScreen(),
+                                          );
+                                        },
+                                        child: Container(
+                                          width: 32,
+                                          height: 32,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.portage
+                                                .withOpacity(0.15),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Center(
+                                            child: SvgPicture.asset(
+                                              'assets/icons/add_black.svg',
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 16,
-                              ),
-                              CustomTextFormField(
-                                prefix: Icon(Icons.search),
-                                addressController: searchController,
-                                hintText: 'Search Token',
-                                isBorder: true,
-                                onChanged: (value) {
-                                  _loadAssetList(value: value);
-                                },
-                              ),
-                              SizedBox(
-                                height: 16,
-                              ),
-                              Text(
-                                searchController.text == ''
-                                    ? 'Popular Tokens'
-                                    : 'Search result',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline6!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
-                                textAlign: TextAlign.start,
-                              ),
-                              Container(
-                                height: isFullScreen
-                                    ? availableTokens.length != 0
-                                        ? 478
-                                        : 487
-                                    : availableTokens.length != 0
-                                        ? 288
-                                        : 297,
-                                child: availableTokens.length != 0
-                                    ? ListView.builder(
-                                        itemCount:
-                                            availableTokens.length,
-                                        itemBuilder:
-                                            (BuildContext context, index) {
-                                          String tokenName = availableTokens[index].symbol
-                                              .toString();
-                                          return Column(
-                                            children: [
-                                              SizedBox(
-                                                height: 8,
-                                              ),
-                                              TokenListTile(
-                                                isSingleSelect: false,
-                                                onTap: () {
-                                                  setState(() {
-                                                    tokens.contains(availableTokens[index])
-                                                        ? tokens.remove(
-                                                        availableTokens[
-                                                                index])
-                                                        : tokens.add(availableTokens[
-                                                            index]);
-                                                    tokens =
-                                                        tokens.toSet().toList();
-                                                  });
-                                                },
-                                                isSelect: tokens.contains(
-                                                    availableTokens[index]),
-                                                tokenName: '$tokenName',
-                                                availableTokenName:
-                                                    '${availableTokens[index].name}',
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                CustomTextFormField(
+                                  prefix: Icon(Icons.search),
+                                  addressController: searchController,
+                                  hintText: 'Search Token',
+                                  isBorder: true,
+                                  onChanged: (value) {
+                                    _loadAssetList(value: value);
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                Text(
+                                  searchController.text == ''
+                                      ? 'Popular Tokens'
+                                      : 'Search result',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .color!
+                                            .withOpacity(0.3),
+                                      ),
+                                  textAlign: TextAlign.start,
+                                ),
+                                availableTokens.length != 0
+                                    ? Expanded(
+                                      child: ListView.builder(
+                                          itemCount:
+                                              availableTokens.length,
+                                          itemBuilder:
+                                              (BuildContext context, index) {
+                                            String tokenName = availableTokens[index].displaySymbol
+                                                .toString();
+                                            return Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 8,
+                                                ),
+                                                TokenListTile(
+                                                  isSingleSelect: false,
+                                                  onTap: () {
+                                                    setState(() {
+                                                      tokens.contains(availableTokens[index])
+                                                          ? tokens.remove(
+                                                          availableTokens[
+                                                                  index])
+                                                          : tokens.add(availableTokens[
+                                                              index]);
+                                                      tokens =
+                                                          tokens.toSet().toList();
+                                                    });
+                                                  },
+                                                  isSelect: tokens.contains(
+                                                      availableTokens[index]),
+                                                  tokenName: '$tokenName',
+                                                  availableTokenName:
+                                                      '${availableTokens[index].name}',
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                    )
                                     : Center(
                                         child: StatusLogoAndTitle(
                                           title: 'Oops!',
@@ -260,23 +251,23 @@ class _AddTokenScreenState extends State<AddTokenScreen> with ThemeMixin {
                                           isSmall: true,
                                         ),
                                       ),
-                              ),
-                            ],
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 12,
                           ),
                           NewPrimaryButton(
                             width: buttonSmallWidth,
                             callback: () {
                               if (tokens.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Chose a least one coin',
-                                      style:
-                                          Theme.of(context).textTheme.headline5,
-                                    ),
-                                    backgroundColor: Theme.of(context)
-                                        .snackBarTheme
-                                        .backgroundColor,
+                                showSnackBar(
+                                  context,
+                                  title: 'Chose a least one coin',
+                                  color: AppColors.txStatusError.withOpacity(0.1),
+                                  prefix: Icon(
+                                    Icons.close,
+                                    color: AppColors.txStatusError,
                                   ),
                                 );
                               } else {

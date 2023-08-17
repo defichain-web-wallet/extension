@@ -78,7 +78,8 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                               SizedBox(
                                 width: 11,
                               ),
-                              if (tokenHelper.isPair(widget.tokenName))
+                              if (tokenHelper
+                                  .isPair(widget.tokenName.replaceAll('d', '')))
                                 AssetPair(
                                   isBorder: false,
                                   pair: widget.tokenName,
@@ -90,7 +91,8 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                                   borderWidth: widget.isDense ? 0 : 5,
                                   assetStyle:
                                       tokenHelper.getAssetStyleByTokenName(
-                                          widget.tokenName),
+                                    widget.tokenName.replaceAll('d', ''),
+                                  ),
                                 ),
                               SizedBox(
                                 width: 11,
@@ -100,30 +102,29 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    '${tokenHelper.getTokenWithPrefix(widget.tokenName)}',
+                                    '${widget.tokenName}',
                                     style:
                                         Theme.of(context).textTheme.headline5,
                                   ),
-                                  if (widget.availableTokenName != null)
-                                    ...[
-                                      SizedBox(
-                                        height: 2,
-                                      ),
-                                      Text(
-                                        '${widget.availableTokenName!}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline5!
-                                            .copyWith(
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline5!
-                                              .color!
-                                              .withOpacity(0.3),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ]
+                                  if (widget.availableTokenName != null) ...[
+                                    SizedBox(
+                                      height: 2,
+                                    ),
+                                    Text(
+                                      '${widget.availableTokenName!}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .copyWith(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .headline5!
+                                                .color!
+                                                .withOpacity(0.3),
+                                            fontSize: 12,
+                                          ),
+                                    ),
+                                  ]
                                 ],
                               ),
                             ],
@@ -145,7 +146,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                           Padding(
                             padding: EdgeInsets.only(right: 16),
                             child: Text(
-                              '0 ${tokenHelper.getTokenWithPrefix(widget.availableTokenName!)}',
+                              '0 ${widget.availableTokenName}',
                               style: Theme.of(context).textTheme.headline5,
                             ),
                           ),

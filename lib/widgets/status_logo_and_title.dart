@@ -27,7 +27,6 @@ class StatusLogoAndTitle extends StatefulWidget {
 
 class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
     with ThemeMixin {
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -78,8 +77,16 @@ class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
                 widget.isSuccess
                     ? 'assets/images/jelly_success.png'
                     : 'assets/images/jelly_oops.png',
-                width: widget.isSmall ? 187 : widget.isSuccess ? 223 : 225,
-                height: widget.isSmall ? 180 : widget.isSuccess ? 218 : 224,
+                width: widget.isSmall
+                    ? 187
+                    : widget.isSuccess
+                        ? 223
+                        : 225,
+                height: widget.isSmall
+                    ? 180
+                    : widget.isSuccess
+                        ? 218
+                        : 224,
               ),
             ),
           ],
@@ -95,7 +102,7 @@ class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
             ),
           if (widget.subtitle != null) ...[
             SizedBox(
-              height: 8,
+              height: 7,
             ),
             widget.subtitleWidget ??
                 Text(
@@ -116,23 +123,22 @@ class _StatusLogoAndTitleState extends State<StatusLogoAndTitle>
             ),
           ],
         ],
-        if (widget.specificError != null)
-          ...[
-            SizedBox(
-              height: 8,
-            ),
-            Text(
-              widget.specificError!,
-              style: Theme.of(context).textTheme.headline5!.copyWith(
-                fontSize: 13,
-                color: Theme.of(context)
-                    .textTheme
-                    .headline5!
-                    .color!
-                    .withOpacity(0.4),
-              ),
-            )
-          ]
+        if (widget.specificError != null) ...[
+          SizedBox(
+            height: 8,
+          ),
+          Text(
+            widget.specificError!,
+            style: Theme.of(context).textTheme.headline5!.copyWith(
+                  fontSize: 13,
+                  color: Theme.of(context)
+                      .textTheme
+                      .headline5!
+                      .color!
+                      .withOpacity(0.4),
+                ),
+          )
+        ]
       ],
     );
   }

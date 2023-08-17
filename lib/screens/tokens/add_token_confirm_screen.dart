@@ -82,68 +82,71 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
             child: Center(
               child: StretchBox(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        PageTitle(
-                          title: titleText,
-                          isFullScreen: isFullScreen,
-                        ),
-                        SizedBox(
-                          height: 16,
-                        ),
-                        CustomTextFormField(
-                          prefix: Icon(Icons.search),
-                          addressController: searchController,
-                          hintText: 'Search Token',
-                          isBorder: true,
-                          onChanged: (value) {},
-                        ),
-                        SizedBox(
-                          height: 16,
-                        ),
-                        Text(
-                          searchController.text == ''
-                              ? 'Popular Tokens'
-                              : 'Search result',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .copyWith(
-                            color: Theme.of(context)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PageTitle(
+                            title: titleText,
+                            isFullScreen: isFullScreen,
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          CustomTextFormField(
+                            prefix: Icon(Icons.search),
+                            addressController: searchController,
+                            hintText: 'Search Token',
+                            isBorder: true,
+                            onChanged: (value) {},
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          Text(
+                            searchController.text == ''
+                                ? 'Popular Tokens'
+                                : 'Search result',
+                            style: Theme.of(context)
                                 .textTheme
-                                .headline5!
-                                .color!
-                                .withOpacity(0.3),
+                                .headline6!
+                                .copyWith(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .color!
+                                  .withOpacity(0.3),
+                            ),
+                            textAlign: TextAlign.start,
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                        Container(
-                          height: 288,
-                          child: ListView.builder(
-                            itemCount: widget.tokens.length,
-                            itemBuilder: (BuildContext context, index) {
-                              TokenModel token = widget.tokens[index];
-                              return Column(
-                                children: [
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                  TokenListTile(
-                                    isConfirm: true,
-                                    isSelect: false,
-                                    tokenName: token.symbol,
-                                    availableTokenName:
-                                    token.name,
-                                  ),
-                                ],
-                              );
-                            },
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: widget.tokens.length,
+                              itemBuilder: (BuildContext context, index) {
+                                TokenModel token = widget.tokens[index];
+                                return Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 8,
+                                    ),
+                                    TokenListTile(
+                                      isConfirm: true,
+                                      isSelect: false,
+                                      tokenName: token.displaySymbol,
+                                      availableTokenName:
+                                      token.name,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 12,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
