@@ -10,12 +10,14 @@ class LedgerAccountModel extends AbstractAccountModel {
   final String pubKey;
   final String path;
   final bool isTestnet;
+  final String appName;
 
   LedgerAccountModel({
     required String? id,
     required this.address,
     required this.pubKey,
     required this.isTestnet,
+    required this.appName,
     required String sourceId,
     required Map<String, List<BalanceModel>> pinnedBalances,
     required String name,
@@ -54,6 +56,7 @@ class LedgerAccountModel extends AbstractAccountModel {
         id: jsonModel['id'],
         address: jsonModel['address'],
         isTestnet: jsonModel['isTestnet'].toString().toLowerCase() == "true",
+        appName: jsonModel['appName'],
         pubKey: jsonModel['pubKey'],
         sourceId: jsonModel['sourceId'],
         pinnedBalances: pinnedBalances,
@@ -75,6 +78,7 @@ class LedgerAccountModel extends AbstractAccountModel {
     data["sourceId"] = this.sourceId;
     data["pubKey"] = this.pubKey;
     data["isTestnet"] = this.isTestnet ? "true" : "false";
+    data['appName'] = this.appName;
     data["address"] = this.address;
     data["name"] = this.name;
     data["type"] = "ledger";
@@ -98,6 +102,7 @@ class LedgerAccountModel extends AbstractAccountModel {
       required String path,
       required bool isTestnet,
       required String sourceId,
+      required String appName,
       isRestore = false}) async {
     Map<String, List<BalanceModel>> pinnedBalances = {};
 
@@ -105,6 +110,7 @@ class LedgerAccountModel extends AbstractAccountModel {
         id: null,
         address: address,
         isTestnet: isTestnet,
+        appName: appName,
         pubKey: publicKey,
         sourceId: sourceId,
         pinnedBalances: pinnedBalances,

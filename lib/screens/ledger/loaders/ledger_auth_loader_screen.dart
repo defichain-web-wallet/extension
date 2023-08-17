@@ -9,6 +9,8 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_ledger_network_model.dart';
+import 'package:defi_wallet/models/network/ledger_account_model.dart';
 import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
 import 'package:defi_wallet/services/bitcoin_service.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';
@@ -143,14 +145,15 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
       String path;
 
       bool isTestnet = this.widget.appName == "test";
+      var index = walletCubit.state.accounts
+          .where((element) =>
+              element is LedgerAccountModel &&
+              element.appName == this.widget.appName)
+          .length;
       if (this.widget.appName == "dfi") {
-        path = HDWalletService.derivePath(0);
+        path = HDWalletService.derivePath(index);
       } else {
-        path = new BitcoinService().deriveLedgerPath(
-            walletCubit.state.accounts
-                .where((element) => element is LedgerAuthLoaderScreen)
-                .length,
-            isTestnet);
+        path = new BitcoinService().deriveLedgerPath(index, isTestnet);
       }
 
       var ledgerAddressJson = await promiseToFuture<dynamic>(
@@ -163,7 +166,12 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
         throw new Exception("no address generated..");
       }
       await walletCubit.addNewLedgerAccount(
-          "Ledger " + this.widget.appName, address, pubKey, path, isTestnet);
+          "Ledger ${this.widget.appName} (${index + 1})",
+          address,
+          pubKey,
+          path,
+          isTestnet,
+          this.widget.appName);
 
       widget.callback();
     } on Exception catch (error) {

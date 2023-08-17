@@ -185,7 +185,7 @@ class WalletCubit extends Cubit<WalletState> {
   }
 
   restoreWalletWithLedger(String password, String pubKey, String address,
-      String path, bool isTestnet) async {
+      String path, bool isTestnet, String appName) async {
     emit(state.copyWith(status: WalletStatusList.loading));
     var applicationModel = ApplicationModel(sourceList: {}, password: password);
     List<AbstractAccountModel> accountList = [];
@@ -207,6 +207,7 @@ class WalletCubit extends Cubit<WalletState> {
           address: address,
           path: path,
           isTestnet: isTestnet,
+          appName: appName,
           sourceId: source.id,
           isRestore: true,
         );
@@ -395,7 +396,7 @@ class WalletCubit extends Cubit<WalletState> {
   }
 
   addNewLedgerAccount(String name, String address, String pubKey, String path,
-      bool isTestnet) async {
+      bool isTestnet, String appName) async {
     emit(state.copyWith(
       status: WalletStatusList.loading,
     ));
@@ -411,6 +412,7 @@ class WalletCubit extends Cubit<WalletState> {
         publicKey: pubKey,
         path: path,
         isTestnet: isTestnet,
+        appName: appName,
         network: btcLedgerModel,
         sourceId: "");
     account.changeName(name);

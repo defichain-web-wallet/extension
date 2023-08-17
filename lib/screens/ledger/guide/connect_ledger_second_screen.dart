@@ -39,18 +39,10 @@ class _ConnectLedgerSecondScreenState extends State<ConnectLedgerSecondScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/defi_love_ledger.png',
-                  width: 202.94,
-                  height: 176.44,
-                ),
-                SizedBox(
-                  width: 23,
-                ),
-              ],
+            Image.asset(
+              'assets/images/defi_love_ledger.png',
+              width: 202.94,
+              height: 176.44,
             ),
             Container(
               child: Column(
@@ -63,7 +55,7 @@ class _ConnectLedgerSecondScreenState extends State<ConnectLedgerSecondScreen>
                     height: 19,
                   ),
                   Text(
-                    '$titleText Connect Ledger',
+                    '$titleText Connect',
                     style: Theme.of(context).textTheme.headline3,
                   ),
                   SizedBox(

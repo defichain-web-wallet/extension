@@ -59,21 +59,10 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 29,
-                ),
-                Image.asset(
-                  'assets/images/defi_ledger_screen.png',
-                  width: 202.94,
-                  height: 176.44,
-                ),
-                // SizedBox(
-                //   width: 23,
-                // ),
-              ],
+            Image.asset(
+              'assets/images/defi_ledger_screen.png',
+              width: 202.94,
+              height: 176.44,
             ),
             Container(
               child: Column(
@@ -86,7 +75,7 @@ class _ConnectLedgerFourthScreenState extends State<ConnectLedgerFourthScreen>
                     height: 19,
                   ),
                   Text(
-                    '$titleText Connect Ledger',
+                    '$titleText Connect',
                     style: Theme.of(context).textTheme.headline3,
                   ),
                   SizedBox(

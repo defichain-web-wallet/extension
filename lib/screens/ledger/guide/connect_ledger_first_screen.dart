@@ -47,7 +47,7 @@ class _ConnectLedgerFirstScreenState extends State<ConnectLedgerFirstScreen>
                     height: 19,
                   ),
                   Text(
-                    '$titleText Connect Ledger',
+                    '$titleText Connect',
                     style: Theme.of(context).textTheme.headline3,
                   ),
                   SizedBox(

@@ -23,7 +23,7 @@ class ConnectLedgerThirdScreen extends StatefulWidget {
 class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
     with ThemeMixin {
   String subtitleText =
-      'If your Ledger is lost or defect you will need to set up a replacement device with your recovery phrase obtained through Ledger itself.';
+      'If your Ledger is broken/lost you will need a replacement device with your Ledger recovery phrase.';
   String titleText = '3.';
 
   initState() {
@@ -36,22 +36,13 @@ class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
   Widget build(BuildContext context) {
     return Center(
       child: StretchBox(
-        child: SingleChildScrollView(
-            child: Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/defi_ledger_seed_phrase.png',
-                  width: 202.94,
-                  height: 176.44,
-                ),
-                SizedBox(
-                  width: 24,
-                ),
-              ],
+            Image.asset(
+              'assets/images/defi_ledger_seed_phrase.png',
+              width: 202.94,
+              height: 176.44,
             ),
             Container(
               child: Column(
@@ -64,7 +55,7 @@ class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
                     height: 19,
                   ),
                   Text(
-                    '$titleText Connect Ledger',
+                    '$titleText Connect',
                     style: Theme.of(context).textTheme.headline3,
                   ),
                   SizedBox(
@@ -97,7 +88,7 @@ class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
                         ),
                       ),
                       NewPrimaryButton(
-                        width: 104,
+                        width: 80,
                         callback: () {
                           this.widget.callback();
                         },
@@ -109,7 +100,7 @@ class _ConnectLedgerThirdScreenState extends State<ConnectLedgerThirdScreen>
               ),
             ),
           ],
-        )),
+        ),
       ),
     );
   }
