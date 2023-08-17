@@ -27,11 +27,12 @@ export class LedgerJellywalletWrapper {
     }
 
     public async openApp(appName: string): Promise<boolean> {
+        var transport = await this.getTransport();
+          
         try {
             listen((log) => console.log(log));
             const targetAppName = appName == "dfi" ? "DeFiChain" : (appName == "test" ? "Bitcoin Test": "Bitcoin");
 
-            var transport = await this.getTransport();
             const response = await transport.send(0xb0, 0x01, 0x00, 0x00); //app information, need to decode first!
 
             const openAppName = this.parseAppName(response);
@@ -42,7 +43,6 @@ export class LedgerJellywalletWrapper {
                 await transport.close();
                 return;
             }
-
 
             const quitApp = await transport.send(0xb0, 0xa7, 0x00, 0x00);
             console.log("close app", quitApp);
@@ -61,6 +61,7 @@ export class LedgerJellywalletWrapper {
         }
         catch (err) {
             console.log(err);
+            await transport.close();
             throw err;
         }
     }

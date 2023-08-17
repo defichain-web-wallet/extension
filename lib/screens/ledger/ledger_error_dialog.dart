@@ -5,7 +5,7 @@ import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:flutter/material.dart';
 
 class LedgerErrorDialog extends StatefulWidget {
-  final Exception? error;
+  final Object? error;
 
   const LedgerErrorDialog({Key? key, required this.error}) : super(key: key);
 

@@ -21,7 +21,7 @@ import 'package:hive/hive.dart';
 class LedgerAuthLoaderScreen extends StatefulWidget {
   final bool isFullSize;
   final Function() callback;
-  final Function() errorCallback;
+  final Function(Object error) errorCallback;
   String currentStatus;
 
   final String appName;
@@ -176,7 +176,17 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
           return LedgerErrorDialog(error: error);
         },
       );
-      widget.errorCallback();
+      widget.errorCallback(error);
+    } catch (er) {
+      await showDialog(
+        barrierColor: AppColors.tolopea.withOpacity(0.06),
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return LedgerErrorDialog(error: er);
+        },
+      );
+      widget.errorCallback(er);
     }
   }
 

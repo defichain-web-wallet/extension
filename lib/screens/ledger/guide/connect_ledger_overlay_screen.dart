@@ -55,7 +55,9 @@ class _ConnectLedgerOverlayScreenState extends State<ConnectLedgerOverlayScreen>
     } else if (currentStep == 5) {
       return new LedgerAuthLoaderScreen(
           callback: () => {setState(() => this.currentStep = 6)},
-          errorCallback: () => {setState(() => this.currentStep = 4)},
+          errorCallback: (error) {
+            setState(() => this.currentStep = 4);
+          },
           appName: this.appName!);
     } else if (currentStep == 6) {
       Navigator.pop(context);
