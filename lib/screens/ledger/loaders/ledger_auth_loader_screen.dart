@@ -148,7 +148,8 @@ class _LedgerAuthLoaderScreenState extends State<LedgerAuthLoaderScreen>
       var index = walletCubit.state.accounts
           .where((element) =>
               element is LedgerAccountModel &&
-              element.appName == this.widget.appName)
+              element.appName == this.widget.appName &&
+              element.isTestnet == isTestnet)
           .length;
       if (this.widget.appName == "dfi") {
         path = HDWalletService.derivePath(index);
