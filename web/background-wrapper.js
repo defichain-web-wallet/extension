@@ -1,30 +1,31 @@
-const oceanDefichainApi = 'https://ocean.defichain.com/v0';
+const mainnetApi = 'http://ocean.mydefichain.com/v0';
+const testnetApi = 'https://testnet-ocean.mydefichain.com:8443/v0';
 
 let openRequest = indexedDB.open("rates", 1);
 
-async function loadTokens(path, next = 0) {
+async function loadTokens(api, path, next = 0) {
     var result
     var nextLoadedTokens = []
     var nextPage = next != 0 ? `&next=${next}` : ''
-    var response = await fetch(oceanDefichainApi + `${path}?size=200` + nextPage)
+    var response = await fetch(api + `${path}?size=200` + nextPage)
         .then((response) => response.json())
 
     if (response.hasOwnProperty('page')) {
         var next = response.page.next
-        nextLoadedTokens = await loadTokens(path, next)
+        nextLoadedTokens = await loadTokens(api, path, next)
     }
     return [...response['data'], ...nextLoadedTokens]
 }
 
 
 async function setupRates() {
-    var tokensMainnetData = await loadTokens('/mainnet/tokens')
+    var tokensMainnetData = await loadTokens(mainnetApi, '/mainnet/tokens')
 
-    var tokensTestnetData = await loadTokens('/testnet/tokens')
+    var tokensTestnetData = await loadTokens(testnetApi, '/testnet/tokens')
 
-    var poolpairsMainnetData = await loadTokens('/mainnet/poolpairs')
+    var poolpairsMainnetData = await loadTokens(mainnetApi, '/mainnet/poolpairs')
 
-    var poolpairsTestnetData = await loadTokens('/testnet/poolpairs')
+    var poolpairsTestnetData = await loadTokens(testnetApi, '/testnet/poolpairs')
 
     var ratesResponse = await fetch('https://api.exchangerate.host/latest?base=USD')
         .then((response) => {
