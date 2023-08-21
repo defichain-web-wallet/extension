@@ -8,11 +8,13 @@ import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/password_service.dart';
 import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
@@ -168,9 +170,17 @@ class _LockScreenState extends State<LockScreen>
       ApplicationModel? applicationModel;
       try {
         applicationModel = await StorageService.loadApplication();
-      } catch (err) {
-        log('Error: Failure load applicationModel');
-        log(err.toString());
+      } catch (error, stackTrace) {
+        print('Error: Failure load applicationModel');
+        print(error);
+        SentryService.captureException(
+          ErrorModel(
+            file: 'lock_screen.dart',
+            method: 'build',
+            exception: error.toString(),
+          ),
+          stackTrace: stackTrace,
+        );
       }
       if (applicationModel == null) {
         showSnackBar(
@@ -208,9 +218,17 @@ class _LockScreenState extends State<LockScreen>
                 );
               }
             }
-          } catch (err) {
-            log('Error: Failure updating access tokens');
-            log(err.toString());
+          } catch (error, stackTrace) {
+            print('Error: Failure updating access tokens');
+            print(error.toString());
+            SentryService.captureException(
+              ErrorModel(
+                file: 'lock_screen.dart',
+                method: '_restoreWallet',
+                exception: error.toString(),
+              ),
+              stackTrace: stackTrace,
+            );
           }
           await walletCubit.loadWalletDetails(
             application: applicationModel,
@@ -306,7 +324,7 @@ class _LockScreenState extends State<LockScreen>
                   reverseTransitionDuration: Duration.zero,
                 ),
               );
-            } catch (err) {
+            } catch (error, stackTrace) {
               parent.emitPending(false);
               showSnackBar(
                 context,
@@ -316,6 +334,14 @@ class _LockScreenState extends State<LockScreen>
                   Icons.close,
                   color: AppColors.txStatusError,
                 ),
+              );
+              SentryService.captureException(
+                ErrorModel(
+                  file: 'lock_screen.dart',
+                  method: '_restoreExistingWallet',
+                  exception: error.toString(),
+                ),
+                stackTrace: stackTrace,
               );
             }
           },

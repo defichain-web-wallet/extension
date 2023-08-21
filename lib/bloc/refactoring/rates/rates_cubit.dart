@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/rates/rates_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -37,7 +39,15 @@ class RatesCubit extends Cubit<RatesState> {
         status: RatesStatusList.success,
         ratesModel: ratesModel,
       ));
-    } catch (_) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'rates_cubit.dart',
+          method: 'loadRates',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       emit(state.copyWith(
         status: RatesStatusList.failure,
       ));

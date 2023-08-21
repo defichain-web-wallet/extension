@@ -1,4 +1,6 @@
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveService {
@@ -8,7 +10,15 @@ class HiveService {
       var data = await box.get(key);
       await box.close();
       return data;
-    } catch (error) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'hive_service.dart',
+          method: 'getData:key=$key',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       throw error;
     }
   }
@@ -22,7 +32,15 @@ class HiveService {
       var box = await Hive.openBox(HiveBoxes.client);
       await box.put(key, data);
       await box.close();
-    } catch (error) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'hive_service.dart',
+          method: 'update:key=$key',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       throw error;
     }
   }
@@ -32,7 +50,15 @@ class HiveService {
       var box = await Hive.openBox(boxName);
       await box.clear();
       await box.close();
-    } catch (error) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'hive_service.dart',
+          method: 'clearBox:key=$boxName',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       throw error;
     }
   }
