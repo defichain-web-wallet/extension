@@ -1,10 +1,11 @@
-import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -48,7 +49,15 @@ class TxCubit extends Cubit<TxState> {
           availableBalance: availableBalance,
           networkFee: netwrokFee,
           activeFee: activeFee));
-    } catch (e) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'tx_cubit.dart',
+          method: 'init',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       emit(state.copyWith(status: TxStatusList.failure));
     }
   }
@@ -65,7 +74,15 @@ class TxCubit extends Cubit<TxState> {
           status: TxStatusList.success,
           activeBalance: balanceModel,
           availableBalance: availableBalance));
-    } catch (e) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'tx_cubit.dart',
+          method: 'changeActiveBalance',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       emit(state.copyWith(status: TxStatusList.failure));
     }
   }

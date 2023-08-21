@@ -1,16 +1,14 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -26,7 +24,6 @@ import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:defi_wallet/models/focus_model.dart';
 
 class LiquiditySelectPool extends StatefulWidget {
   final LmPoolModel assetPair;
@@ -602,8 +599,16 @@ class _LiquiditySelectPoolState extends State<LiquiditySelectPool>
         _setShareOfPool(lmCubit);
       }
       _setAmount();
-    } catch (_) {
+    } catch (error, stackTrace) {
       controller.text = '0';
+      SentryService.captureException(
+        ErrorModel(
+          file: 'liquidity_select_pool.dart',
+          method: 'onChanged',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
     }
   }
 
