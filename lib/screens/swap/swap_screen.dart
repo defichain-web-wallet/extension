@@ -97,70 +97,73 @@ class _SwapScreenState extends State<SwapScreen>
   @override
   Widget build(BuildContext context) {
     try {
-      return ScaffoldWrapper(builder: (
-        BuildContext context,
-        bool isFullScreen,
-        TransactionState transactionState,
-      ) {
-        return BlocBuilder<ExchangeCubit, ExchangeState>(
-          builder: (exchangeContext, exchangeState) {
-            ExchangeCubit exchangeCubit =
-                BlocProvider.of<ExchangeCubit>(context);
-            if (exchangeState.status == ExchangeStatusList.initial) {
-              exchangeCubit.init(context);
-              return Loader();
-            } else if (exchangeState.status == ExchangeStatusList.success) {
-              return Scaffold(
-                appBar: isFullScreen
-                    ? null
-                    : NewMainAppBar(
-                        isShowLogo: false,
+      return ScaffoldWrapper(
+        builder: (
+          BuildContext context,
+          bool isFullScreen,
+          TransactionState transactionState,
+        ) {
+          return BlocBuilder<ExchangeCubit, ExchangeState>(
+            builder: (exchangeContext, exchangeState) {
+              ExchangeCubit exchangeCubit =
+                  BlocProvider.of<ExchangeCubit>(context);
+              if (exchangeState.status == ExchangeStatusList.initial) {
+                exchangeCubit.init(context);
+                return Loader();
+              } else if (exchangeState.status == ExchangeStatusList.success) {
+                return Scaffold(
+                  appBar: isFullScreen
+                      ? null
+                      : NewMainAppBar(
+                          isShowLogo: false,
+                        ),
+                  drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
+                  endDrawer: isFullScreen
+                      ? null
+                      : AccountDrawer(
+                          width: buttonSmallWidth,
+                        ),
+                  body: Container(
+                    padding: EdgeInsets.only(
+                      top: 22,
+                      bottom: 22,
+                      left: 16,
+                      right: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDarkTheme()
+                          ? DarkColors.networkDropdownBgColor
+                          : LightColors.scaffoldContainerBgColor,
+                      border: isDarkTheme()
+                          ? Border.all(
+                              width: 1.0,
+                              color: Colors.white.withOpacity(0.05),
+                            )
+                          : null,
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                        bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                       ),
-                drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: isFullScreen
-                    ? null
-                    : AccountDrawer(
-                        width: buttonSmallWidth,
-                      ),
-                body: Container(
-                  padding: EdgeInsets.only(
-                    top: 22,
-                    bottom: 22,
-                    left: 16,
-                    right: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDarkTheme()
-                        ? DarkColors.networkDropdownBgColor
-                        : LightColors.scaffoldContainerBgColor,
-                    border: isDarkTheme()
-                        ? Border.all(
-                            width: 1.0,
-                            color: Colors.white.withOpacity(0.05),
-                          )
-                        : null,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      topLeft: Radius.circular(20),
-                      bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
-                      bottomRight: Radius.circular(isFullScreen ? 20 : 0),
+                    ),
+                    child: _buildBody(
+                      context,
+                      exchangeCubit,
+                      exchangeState,
+                      transactionState,
+                      isFullScreen,
                     ),
                   ),
-                  child: _buildBody(
-                    context,
-                    exchangeCubit,
-                    exchangeState,
-                    transactionState,
-                    isFullScreen,
-                  ),
-                ),
-              );
-            } else {
-              return Loader();
-            }
-          },
-        );
-      });
+                );
+              } else {
+                return Loader();
+              }
+            },
+          );
+        },
+        isUpdate: true,
+      );
     } catch (error, stackTrace) {
       SentryService.captureException(
         ErrorModel(
