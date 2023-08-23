@@ -89,8 +89,6 @@ class ETHTransactionService {
 
     final function = contract.function('transfer');
 
-    var nonce = await client.getTransactionCount(EthereumAddress.fromHex(senderAddress));
-
     final transaction = Transaction.callContract(
       contract: contract,
       function: function,

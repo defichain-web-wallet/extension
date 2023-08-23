@@ -264,11 +264,15 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     return _getEthPrivateKeyForPathPrivateKey(masterKey, accountIndex);
   }
 
-  Future<NetworkFeeModel> getNetworkFee() async {
+  Future<NetworkFeeModel> getNetworkFee({TokenModel? token}) async {
     final client = Web3Client(this.rpcUrl, Client());
     final gasPrice = await client.getGasPrice();
-
-    final gasEstimate = 21000;
+    var gasEstimate = 21000;
+    if(token != null){ //TODO: need to find
+      if(!token.isUTXO){
+        gasEstimate = 50000;
+      }
+    }
 
     return EthereumNetworkFeeModel(
         gasPrice: gasPrice.getValueInUnit(EtherUnit.gwei).toInt(),
