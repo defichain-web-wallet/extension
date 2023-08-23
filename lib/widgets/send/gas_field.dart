@@ -35,7 +35,8 @@ class GasField extends StatelessWidget {
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.allow(
-                  RegExp(r'(^-?\d*\.?d*\,?\d*)')),
+                RegExp(r'(^-?\d+$)'),
+              ),
             ],
             controller: controller,
             decoration: InputDecoration(

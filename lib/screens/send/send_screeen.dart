@@ -19,6 +19,7 @@ import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/dialogs/create_edit_contact_dialog.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
+import 'package:defi_wallet/widgets/dialogs/modal_dialog.dart';
 import 'package:defi_wallet/widgets/fields/address_field_new.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/refactoring/fields/amount_field.dart';
@@ -386,20 +387,50 @@ class _SendScreenState extends State<SendScreen>
     );
   }
 
+  _confirmFees(Function() callback) {
+    showDialog(
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return ModalDialog(
+          title: 'Confirm fees',
+          message: 'You have entered a fee less than the recommended one. In this case, the transaction can be processed for a long time, or not go through at all.',
+          onClose: () {},
+          onSubmit: () {
+            callback();
+          },
+        );
+      },
+    );
+  }
+
   _onChangeGasField(String value) {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     final txCubit = BlocProvider.of<TxCubit>(context);
+    late int gasPrice;
+    late int gasLimit;
+    try {
+      gasPrice = int.parse(gasPriceController.text);
+      gasLimit = int.parse(gasLimitController.text);
+    } catch (err) {
+      gasPrice = networkFeeModel!.gasPrice ?? 0;
+      gasLimit = networkFeeModel!.gasLimit ?? 0;
+      gasPriceController.text = gasPrice.toString();
+      gasLimitController.text = gasLimit.toString();
+    }
+
     EthereumNetworkModel activeNetwork = walletCubit.getCurrentNetwork();
 
     txCubit.changeActiveBalance(
       context,
       TxType.send,
-      gasPrice: int.tryParse(gasPriceController.text),
-      gasLimit: int.tryParse(gasLimitController.text),
+      gasPrice: gasPrice,
+      gasLimit: gasLimit,
     );
     double fee = activeNetwork.calculateFee(
-      int.tryParse(gasPriceController.text)!,
-      int.tryParse(gasLimitController.text)!,
+      gasPrice,
+      gasLimit,
     );
     estimatedFee = formatNumberStyling(fee, fixedCount: 6);
   }
@@ -429,7 +460,18 @@ class _SendScreenState extends State<SendScreen>
     } else {
       if (transactionState is! TransactionLoadingState ||
           walletCubit.state.isSendReceiveOnly) {
-        _send(txState, activeNetwork);
+        if (activeNetwork is EthereumNetworkModel) {
+          int? gasPrice = int.tryParse(gasPriceController.text);
+          int? gasLimit = int.tryParse(gasLimitController.text);
+          if (gasPrice! < networkFeeModel!.gasPrice! ||
+              gasLimit! < networkFeeModel!.gasLimit!) {
+            _confirmFees(() => _send(txState, activeNetwork));
+          } else {
+            _send(txState, activeNetwork);
+          }
+        } else {
+          _send(txState, activeNetwork);
+        }
       } else {
         showSnackBar(
           context,
@@ -448,6 +490,9 @@ class _SendScreenState extends State<SendScreen>
     TxState state,
     AbstractNetworkModel activeNetwork,
   ) async {
+    // print(networkFeeModel!.gasPrice);
+    print(gasPriceController.text);
+    print(gasLimitController.text);
     AddressBookCubit addressBookCubit =
         BlocProvider.of<AddressBookCubit>(context);
     if (addressController.text != '') {
