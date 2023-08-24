@@ -395,7 +395,7 @@ class _SendScreenState extends State<SendScreen>
       builder: (BuildContext dialogContext) {
         return ModalDialog(
           title: 'Confirm fees',
-          message: 'You have entered a fee less than the recommended one. In this case, the transaction can be processed for a long time, or not go through at all.',
+          message: 'Your fee is lower than the recommended amount. The transaction may be delayed or fail.',
           onClose: () {},
           onSubmit: () {
             callback();
