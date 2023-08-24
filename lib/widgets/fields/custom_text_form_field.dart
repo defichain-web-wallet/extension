@@ -1,8 +1,7 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatefulWidget {
   final TextEditingController? addressController;
@@ -26,7 +25,8 @@ class CustomTextFormField extends StatefulWidget {
   State<CustomTextFormField> createState() => _CustomTextFormFieldState();
 }
 
-class _CustomTextFormFieldState extends State<CustomTextFormField> with ThemeMixin{
+class _CustomTextFormFieldState extends State<CustomTextFormField>
+    with ThemeMixin {
   final _focusNode = FocusNode();
 
   @override
@@ -52,7 +52,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> with ThemeMix
           enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
           focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
           hintStyle: passwordField.copyWith(
-            color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+            color: isDarkTheme()
+                ? DarkColors.hintTextColor
+                : LightColors.hintTextColor,
           ),
           prefixIcon: widget.prefix,
           contentPadding: const EdgeInsets.symmetric(horizontal: 10),
@@ -72,9 +74,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> with ThemeMix
                   ? "Enter min. 6 characters"
                   : null;
             case 'name':
-              return value == null || value.isEmpty
-                  ? "Enter your name"
-                  : null;
+              return value == null || value.isEmpty ? "Enter your name" : null;
             case 'surname':
               return value == null || value.isEmpty
                   ? "Enter your surname"

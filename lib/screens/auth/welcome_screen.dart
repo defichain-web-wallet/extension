@@ -1,10 +1,9 @@
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_placeholder_screen.dart';
-import 'package:defi_wallet/screens/ledger/guide/connect_ledger_first_screen.dart';
-import 'package:defi_wallet/screens/ledger/loaders/ledger_auth_loader_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -13,7 +12,6 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:defi_wallet/client/hive_names.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WelcomeScreen extends StatelessWidget {

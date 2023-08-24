@@ -1,30 +1,21 @@
-import 'dart:convert';
-
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:equatable/equatable.dart';
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 
 part 'address_book_state.dart';
 
 class AddressBookCubit extends Cubit<AddressBookState> {
   AddressBookCubit() : super(AddressBookState());
 
-  NetworkTypeModel? getNetworkType(context, String address){
+  NetworkTypeModel? getNetworkType(context, String address) {
     NetworkTypeModel? networkTypeModel;
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     final networks = walletCubit.state.applicationModel!.networks;
     networks.forEach((element) {
-      if(element.checkAddress(address)){
+      if (element.checkAddress(address)) {
         networkTypeModel = element.networkType;
       }
     });
@@ -82,6 +73,7 @@ class AddressBookCubit extends Cubit<AddressBookState> {
       lastSentList: account.lastSendList,
     ));
   }
+
   deleteAddress(context, AddressBookModel addressBook) async {
     emit(state.copyWith(
       status: AddressBookStatusList.loading,
@@ -114,7 +106,6 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     ));
   }
 
-
   init(context, {bool currentNetowk = false}) async {
     emit(state.copyWith(
       status: AddressBookStatusList.loading,
@@ -124,17 +115,24 @@ class AddressBookCubit extends Cubit<AddressBookState> {
     var network = walletCubit.state.applicationModel!.activeNetwork!;
     late List<AddressBookModel> addressBook;
     late List<AddressBookModel> lastSend;
-    if(currentNetowk){
-      addressBook = account.addressBook.where((element) => element.network!.networkName.name == network.networkType.networkName.name).toList();
-      lastSend = account.lastSendList.where((element) => element.network!.networkName.name == network.networkType.networkName.name).toList();
+    if (currentNetowk) {
+      addressBook = account.addressBook
+          .where((element) =>
+              element.network!.networkName.name ==
+              network.networkType.networkName.name)
+          .toList();
+      lastSend = account.lastSendList
+          .where((element) =>
+              element.network!.networkName.name ==
+              network.networkType.networkName.name)
+          .toList();
     } else {
       addressBook = account.addressBook;
       lastSend = account.lastSendList;
     }
     emit(state.copyWith(
-      status: AddressBookStatusList.success,
-      addressBookList: account.addressBook,
-      lastSentList: account.lastSendList,
-    ));
+        status: AddressBookStatusList.success,
+        addressBookList: account.addressBook,
+        lastSentList: account.lastSendList));
   }
 }

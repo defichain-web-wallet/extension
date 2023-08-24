@@ -1,3 +1,4 @@
+import 'package:country_list_pick/country_list_pick.dart';
 import 'package:defi_wallet/bloc/fiat/fiat_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_second_screen.dart';
@@ -7,9 +8,7 @@ import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class CountrySell extends StatefulWidget {
   const CountrySell({Key? key}) : super(key: key);

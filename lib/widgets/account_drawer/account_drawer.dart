@@ -3,21 +3,19 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/network/account_model.dart';
-import 'package:defi_wallet/models/network/ledger_account_model.dart';
 import 'package:defi_wallet/screens/address_book/address_book_screen_new.dart';
 import 'package:defi_wallet/screens/ledger/guide/connect_ledger_overlay_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
 import 'package:defi_wallet/screens/settings/setting_screen.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
+import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/utils/theme/theme_manager.dart';
 import 'package:defi_wallet/widgets/account_drawer/selected_account.dart';
 import 'package:defi_wallet/widgets/buttons/account_menu_button.dart';
-import 'package:defi_wallet/widgets/dialogs/create_edit_account_dialog.dart';
 import 'package:defi_wallet/widgets/defi_switch.dart';
+import 'package:defi_wallet/widgets/dialogs/create_edit_account_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
 
 class AccountDrawer extends StatefulWidget {
   final double? width;

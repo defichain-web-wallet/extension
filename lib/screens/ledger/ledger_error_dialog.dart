@@ -1,7 +1,7 @@
-import 'dart:ui';
 import 'dart:math' as math;
+import 'dart:ui';
+
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:flutter/material.dart';
 
 class LedgerErrorDialog extends StatefulWidget {

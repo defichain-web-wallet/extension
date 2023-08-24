@@ -1,6 +1,3 @@
-import 'dart:typed_data';
-
-import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_lm_provider_model.dart';
@@ -9,13 +6,6 @@ import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:equatable/equatable.dart';
-import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
-import 'package:defi_wallet/models/network/account_model.dart';
-import 'package:defi_wallet/models/network/application_model.dart';
-import 'package:defi_wallet/services/storage/storage_service.dart';
-import 'package:defichaindart/defichaindart.dart';
-import 'package:bip32_defichain/bip32.dart' as bip32;
-import 'package:defichaindart/src/models/networks.dart' as networks;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'lm_state.dart';
@@ -24,15 +14,12 @@ class LmCubit extends Cubit<LmState> {
   LmCubit() : super(LmState());
 
   setInitial() {
-    emit(state.copyWith(
-        status: LmStatusList.initial));
+    emit(state.copyWith(status: LmStatusList.initial));
   }
 
   search(String value) {
     if (value == '') {
-      emit(state.copyWith(
-        foundedPools: state.availablePools
-      ));
+      emit(state.copyWith(foundedPools: state.availablePools));
     } else {
       List<LmPoolModel> pools = [];
 
@@ -41,30 +28,35 @@ class LmCubit extends Cubit<LmState> {
           pools.add(element);
         }
       });
-      emit(state.copyWith(
-          foundedPools: pools
-      ));
+      emit(state.copyWith(foundedPools: pools));
     }
   }
-  List<double> calculateAmountFromLiqudity(int amount, LmPoolModel pair){
-    var amountA = (amount / state.activeNetwork!.toSatoshi(pair.percentages![2])) *
-        pair.percentages![0];
-    var amountB = (amount / state.activeNetwork!.toSatoshi(pair.percentages![2])) *
-        pair.percentages![1];
+
+  List<double> calculateAmountFromLiqudity(int amount, LmPoolModel pair) {
+    var amountA =
+        (amount / state.activeNetwork!.toSatoshi(pair.percentages![2])) *
+            pair.percentages![0];
+    var amountB =
+        (amount / state.activeNetwork!.toSatoshi(pair.percentages![2])) *
+            pair.percentages![1];
     return [amountA, amountB];
   }
-   double calculateShareOfPool(int balance, double currentSliderValue, LmPoolModel pair){
-     return (balance *
-         (currentSliderValue / 100) /
-         state.activeNetwork!.toSatoshi(pair.percentages![2]));
-   }
 
-  Future<TxErrorModel> removeLiqudity(String password, LmPoolModel pool, double amount, context){
+  double calculateShareOfPool(
+      int balance, double currentSliderValue, LmPoolModel pair) {
+    return (balance *
+        (currentSliderValue / 100) /
+        state.activeNetwork!.toSatoshi(pair.percentages![2]));
+  }
+
+  Future<TxErrorModel> removeLiqudity(
+      String password, LmPoolModel pool, double amount, context) {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     var application = walletCubit.state.applicationModel!;
     var account = walletCubit.state.applicationModel!.activeAccount!;
     var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
-    return state.lmProvider!.removeBalance(account, activeNetwork, password, pool, amount, application);
+    return state.lmProvider!.removeBalance(
+        account, activeNetwork, password, pool, amount, application);
   }
 
   getAvailableBalances(LmPoolModel pool, context) async {
@@ -74,15 +66,15 @@ class LmCubit extends Cubit<LmState> {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     var account = walletCubit.state.applicationModel!.activeAccount!;
     var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
-    var balanceA = await activeNetwork.getAvailableBalance(account: account, token: pool.tokens[0], type: TxType.addLiq);
-    var balanceB = await activeNetwork.getAvailableBalance(account: account, token: pool.tokens[1], type: TxType.addLiq);
+    var balanceA = await activeNetwork.getAvailableBalance(
+        account: account, token: pool.tokens[0], type: TxType.addLiq);
+    var balanceB = await activeNetwork.getAvailableBalance(
+        account: account, token: pool.tokens[1], type: TxType.addLiq);
     emit(state.copyWith(
-        status: LmStatusList.success,
-      availableBalances: [balanceA, balanceB]
-    ));
+        status: LmStatusList.success, availableBalances: [balanceA, balanceB]));
   }
 
-  List<BalanceModel> getBalances(LmPoolModel pool, context){
+  List<BalanceModel> getBalances(LmPoolModel pool, context) {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     var account = walletCubit.state.applicationModel!.activeAccount!;
     var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
@@ -90,11 +82,11 @@ class LmCubit extends Cubit<LmState> {
     BalanceModel balanceA = BalanceModel(balance: 0, token: pool.tokens[0]);
     BalanceModel balanceB = BalanceModel(balance: 0, token: pool.tokens[1]);
     balances.forEach((element) {
-      if(element.token != null){
-        if(element.token!.compare(pool.tokens[0])){
+      if (element.token != null) {
+        if (element.token!.compare(pool.tokens[0])) {
           balanceA.balance = element.balance;
         }
-        if(element.token!.compare(pool.tokens[1])){
+        if (element.token!.compare(pool.tokens[1])) {
           balanceB.balance = element.balance;
         }
       }
@@ -102,15 +94,15 @@ class LmCubit extends Cubit<LmState> {
     return [balanceA, balanceB];
   }
 
-  int getPoolBalance(LmPoolModel pool, context){
+  int getPoolBalance(LmPoolModel pool, context) {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     var account = walletCubit.state.applicationModel!.activeAccount!;
     var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
     var balances = account.getPinnedBalances(activeNetwork, onlyPairs: true);
     int balance = 0;
     balances.forEach((element) {
-      if(element.lmPool != null){
-        if(element.lmPool!.id == pool.id){
+      if (element.lmPool != null) {
+        if (element.lmPool!.id == pool.id) {
           balance = element.balance;
         }
       }
@@ -118,14 +110,14 @@ class LmCubit extends Cubit<LmState> {
     return balance;
   }
 
-
-
-  Future<TxErrorModel> addLiqudity(String password, LmPoolModel pool, List<double> amounts, context){
+  Future<TxErrorModel> addLiqudity(
+      String password, LmPoolModel pool, List<double> amounts, context) {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     var application = walletCubit.state.applicationModel!;
     var account = walletCubit.state.applicationModel!.activeAccount!;
     var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
-    return state.lmProvider!.addBalance(account, activeNetwork, password, pool, amounts, application);
+    return state.lmProvider!.addBalance(
+        account, activeNetwork, password, pool, amounts, application);
   }
 
   init(context) async {
@@ -134,7 +126,8 @@ class LmCubit extends Cubit<LmState> {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     var account = walletCubit.state.applicationModel!.activeAccount!;
     var activeNetwork = walletCubit.state.applicationModel!.activeNetwork!;
-    var pairBalances = account.getPinnedBalances(activeNetwork, onlyPairs: true);
+    var pairBalances =
+        account.getPinnedBalances(activeNetwork, onlyPairs: true);
     var lmProviders = activeNetwork.getLmProviders();
     var lmProvider = lmProviders[0];
     var pools = await lmProvider.getAvailableLmPools(activeNetwork);
@@ -145,16 +138,15 @@ class LmCubit extends Cubit<LmState> {
     var maxApr = _getMaxAPR(pools);
     var averageApr = _calculateAverageAPR(pools);
     emit(state.copyWith(
-      status: LmStatusList.success,
-      //liquidity
-      averageApr: _getAprFormat(averageApr, false),
-      maxApr: _getAprFormat(maxApr, true),
-      pairBalances: pairBalances,
-      availablePools: pools,
-      foundedPools: pools,
-      activeNetwork: activeNetwork,
-      lmProvider: lmProvider
-    ));
+        status: LmStatusList.success,
+        //liquidity
+        averageApr: _getAprFormat(averageApr, false),
+        maxApr: _getAprFormat(maxApr, true),
+        pairBalances: pairBalances,
+        availablePools: pools,
+        foundedPools: pools,
+        activeNetwork: activeNetwork,
+        lmProvider: lmProvider));
   }
 
   double _getMaxAPR(List<LmPoolModel> tokenPairs) {
@@ -184,11 +176,10 @@ class LmCubit extends Cubit<LmState> {
 
     if (apr != 0) {
       result =
-      '${(apr * 100).toStringAsFixed(2)} ${isPersentSymbol == true ? '%' : ''}';
+          '${(apr * 100).toStringAsFixed(2)} ${isPersentSymbol == true ? '%' : ''}';
     } else {
       result = 'N/A';
     }
     return '$result';
   }
-
 }

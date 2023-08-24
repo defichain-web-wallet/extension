@@ -1,5 +1,4 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -85,8 +84,8 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
                 focusNode: _focusNode,
                 textAlignVertical: TextAlignVertical.center,
                 style: Theme.of(context).textTheme.headline5!.copyWith(
-                  fontSize: 12,
-                ),
+                      fontSize: 12,
+                    ),
                 decoration: InputDecoration(
                   prefixIcon: Padding(
                     padding: const EdgeInsets.only(
@@ -94,8 +93,8 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
                     child: Text(
                       'IBAN',
                       style: Theme.of(context).textTheme.headline5!.copyWith(
-                        fontSize: 12,
-                      ),
+                            fontSize: 12,
+                          ),
                     ),
                   ),
                   suffixIcon: Padding(
@@ -105,8 +104,7 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
                       splashRadius: 1,
                       icon: GestureDetector(
                         onTap: () {
-                          Clipboard.getData(Clipboard.kTextPlain)
-                              .then((value) {
+                          Clipboard.getData(Clipboard.kTextPlain).then((value) {
                             final filter = RegExp(r'[A-Z]{2}[0-9]{20}');
                             if (filter.hasMatch(value!.text!) &&
                                 value.text!.length == 22) {
@@ -115,10 +113,9 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                     content: Text(
-                                      'Invalid IBAN.',
-                                      style:
-                                      Theme.of(context).textTheme.headline5,
-                                    )),
+                                  'Invalid IBAN.',
+                                  style: Theme.of(context).textTheme.headline5,
+                                )),
                               );
                             }
                           });
@@ -131,10 +128,14 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
                   hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                   filled: true,
                   fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                  enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                  focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                  enabledBorder:
+                      Theme.of(context).inputDecorationTheme.enabledBorder,
+                  focusedBorder:
+                      Theme.of(context).inputDecorationTheme.focusedBorder,
                   hintStyle: passwordField.copyWith(
-                    color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                    color: isDarkTheme()
+                        ? DarkColors.hintTextColor
+                        : LightColors.hintTextColor,
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                   hintText: widget.hintText,
@@ -148,8 +149,8 @@ class _IbanFieldState extends State<IbanField> with ThemeMixin {
                       return value == null || value.isEmpty
                           ? 'Please enter this field'
                           : value != null && value.length < 16
-                          ? "Enter 16 characters"
-                          : null;
+                              ? "Enter 16 characters"
+                              : null;
                     default:
                       return value == null || value.isEmpty
                           ? 'Please enter this field'

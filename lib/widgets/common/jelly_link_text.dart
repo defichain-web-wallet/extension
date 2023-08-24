@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/theme/theme.dart';
-
 class JellyLinkText extends StatelessWidget {
   final List<Color> colors = [Color(0xFFFF00A3), Color(0xFFBC00C0)];
   final double rectangle = 3.4;

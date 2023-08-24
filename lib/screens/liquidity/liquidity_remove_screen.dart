@@ -1,14 +1,11 @@
 import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -76,7 +73,8 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
 
   void _setShareOfPool() {
     setState(() {
-      shareOfPool = lmCubit!.calculateShareOfPool(widget.balance, currentSliderValue, widget.assetPair);
+      shareOfPool = lmCubit!.calculateShareOfPool(
+          widget.balance, currentSliderValue, widget.assetPair);
     });
   }
 
@@ -118,17 +116,21 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
       amountB = (shareOfPool * widget.assetPair.percentages![1]);
     });
   }
+
 //TODO: move to cubit
   void _setBalanceA() {
     setState(() {
-      balanceA = (widget.balance / convertToSatoshi(widget.assetPair.percentages![2])) *
+      balanceA = (widget.balance /
+              convertToSatoshi(widget.assetPair.percentages![2])) *
           widget.assetPair.percentages![0];
     });
   }
+
 //TODO: move to cubit
   void _setBalanceB() {
     setState(() {
-      balanceB = (widget.balance / convertToSatoshi(widget.assetPair.percentages![2])) *
+      balanceB = (widget.balance /
+              convertToSatoshi(widget.assetPair.percentages![2])) *
           widget.assetPair.percentages![1];
     });
   }
@@ -144,12 +146,16 @@ class _LiquidityRemoveScreenState extends State<LiquidityRemoveScreen>
         double arrowRotateDeg = isShowDetails ? 180.0 : 0.0;
         return Scaffold(
           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-          endDrawer: isFullScreen ? null : AccountDrawer(
-            width: buttonSmallWidth,
-          ),
-          appBar: isFullScreen ? null : NewMainAppBar(
-            isShowLogo: false,
-          ),
+          endDrawer: isFullScreen
+              ? null
+              : AccountDrawer(
+                  width: buttonSmallWidth,
+                ),
+          appBar: isFullScreen
+              ? null
+              : NewMainAppBar(
+                  isShowLogo: false,
+                ),
           body: Container(
             padding: EdgeInsets.only(
               top: 22,

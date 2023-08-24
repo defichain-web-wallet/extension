@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/error/error_model.dart';

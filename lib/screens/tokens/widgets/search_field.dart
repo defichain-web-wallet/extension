@@ -1,6 +1,5 @@
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class SearchField extends StatefulWidget {
   final TextEditingController? controller;
@@ -24,7 +23,7 @@ class _SearchFieldState extends State<SearchField> {
 
   @override
   void initState() {
-    _focusNode.addListener(() { });
+    _focusNode.addListener(() {});
     // TODO: implement initState
     super.initState();
   }
@@ -35,8 +34,7 @@ class _SearchFieldState extends State<SearchField> {
       onDoubleTap: () {
         _focusNode.requestFocus();
         widget.controller!.selection = TextSelection(
-            baseOffset: 0,
-            extentOffset: widget.controller!.text.length);
+            baseOffset: 0, extentOffset: widget.controller!.text.length);
       },
       child: Container(
         height: 46,
@@ -65,7 +63,8 @@ class _SearchFieldState extends State<SearchField> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(
-                    color: Theme.of(context).textTheme.button!.decorationColor!),
+                    color:
+                        Theme.of(context).textTheme.button!.decorationColor!),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),

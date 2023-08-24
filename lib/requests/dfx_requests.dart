@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:defi_wallet/client/hive_names.dart';
+
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
@@ -11,7 +11,6 @@ import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/staking_model.dart';
 import 'package:defi_wallet/services/dfx_service.dart';
 import 'package:defichaindart/defichaindart.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 
 class DfxRequests {
@@ -255,9 +254,8 @@ class DfxRequests {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return IbanModel.fromJson(data);
       } else {
-        throw Error.safeToString(data['message'] is List
-            ? data['message'][0]
-            : data['message']);
+        throw Error.safeToString(
+            data['message'] is List ? data['message'][0] : data['message']);
       }
     } catch (err) {
       throw err;

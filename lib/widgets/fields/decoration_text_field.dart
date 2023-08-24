@@ -1,4 +1,3 @@
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +34,7 @@ class _DecorationTextFieldState extends State<DecorationTextField> {
       onDoubleTap: () {
         widget.focusNode!.requestFocus();
         widget.controller!.selection = TextSelection(
-            baseOffset: 0,
-            extentOffset: widget.controller!.text.length);
+            baseOffset: 0, extentOffset: widget.controller!.text.length);
       },
       child: Container(
         height: 48,

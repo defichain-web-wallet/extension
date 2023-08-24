@@ -1,12 +1,11 @@
-import 'package:defi_wallet/models/balance/balance_model.dart';
-import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:defi_wallet/widgets/selectors/asset/asset_header_selector.dart';
-import 'package:defi_wallet/widgets/selectors/asset/asset_item_selector.dart';
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:defi_wallet/helpers/menu_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:defi_wallet/widgets/selectors/asset/asset_header_selector.dart';
+import 'package:defi_wallet/widgets/selectors/asset/asset_item_selector.dart';
 import 'package:flutter/material.dart';
 
 class AssetSelector extends StatefulWidget {
@@ -33,10 +32,10 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
 
   bool _isShowDropdown = false;
 
-
   @override
   Widget build(BuildContext context) {
-    var selectedAsset = widget.selectedAsset.token ?? widget.selectedAsset.lmPool;
+    var selectedAsset =
+        widget.selectedAsset.token ?? widget.selectedAsset.lmPool;
     double horizontalMargin = menuHelper.getHorizontalMargin(context);
 
     return CustomPopupMenu(
@@ -53,98 +52,103 @@ class _AssetSelectorState extends State<AssetSelector> with ThemeMixin {
           isShown: _isShowDropdown && !widget.isDisabled,
         ),
       ),
-      menuBuilder: () => widget.isDisabled ? Container() : Container(
-        margin: const EdgeInsets.only(top: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(
-            Radius.circular(16),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor,
-              spreadRadius: 4,
-              blurRadius: 12,
-              offset: Offset(0, 8),
-            ),
-          ],
-        ),
-        child: CustomPaint(
-          isComplex: true,
-          willChange: true,
-          painter: ArrowPainter(),
-          child: ClipPath(
-            clipper: ArrowClipper(),
-            child: Container(
-              color: isDarkTheme()
-                  ? DarkColors.networkDropdownBgColor
-                  : LightColors.networkDropdownBgColor,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              width: 344,
-              child: Container(
-                padding: const EdgeInsets.only(
-                  top: 16,
-                  bottom: 16,
+      menuBuilder: () => widget.isDisabled
+          ? Container()
+          : Container(
+              margin: const EdgeInsets.only(top: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(16),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 20,
-                      child: Text(
-                        'Pick the currency you want to change from',
-                        style:
-                        Theme.of(context).textTheme.headline6!.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .color!
-                              .withOpacity(0.3),
-                        ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).shadowColor,
+                    spreadRadius: 4,
+                    blurRadius: 12,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: CustomPaint(
+                isComplex: true,
+                willChange: true,
+                painter: ArrowPainter(),
+                child: ClipPath(
+                  clipper: ArrowClipper(),
+                  child: Container(
+                    color: isDarkTheme()
+                        ? DarkColors.networkDropdownBgColor
+                        : LightColors.networkDropdownBgColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    width: 344,
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                        top: 16,
+                        bottom: 16,
                       ),
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Container(
-                      height: 210,
-                      child: SingleChildScrollView(
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            ...List<Widget>.generate(
-                              widget.assets.length,
-                                  (index) {
-                                var asset = widget.assets[index].lmPool ?? widget.assets[index].token;
-                                return AssetItemSelector(
-                                  assetCode: asset!.symbol,
-                                  assetName: asset.isPair
-                                      ? tokenHelper
-                                      .getSpecificDefiPairName(
-                                      asset.name)
-                                      : tokenHelper.getSpecificDefiName(
-                                      asset.name),
-                                  isActive: selectedAsset.symbol ==
-                                      asset.symbol,
-                                  onChange: () {
-                                    widget.onSelect(widget.assets[index]);
-                                    controller.hideMenu();
-                                  },
-                                );
-                              },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 20,
+                            child: Text(
+                              'Pick the currency you want to change from',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline6!
+                                        .color!
+                                        .withOpacity(0.3),
+                                  ),
                             ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                          Container(
+                            height: 210,
+                            child: SingleChildScrollView(
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  ...List<Widget>.generate(
+                                    widget.assets.length,
+                                    (index) {
+                                      var asset = widget.assets[index].lmPool ??
+                                          widget.assets[index].token;
+                                      return AssetItemSelector(
+                                        assetCode: asset!.symbol,
+                                        assetName: asset.isPair
+                                            ? tokenHelper
+                                                .getSpecificDefiPairName(
+                                                    asset.name)
+                                            : tokenHelper.getSpecificDefiName(
+                                                asset.name),
+                                        isActive: selectedAsset.symbol ==
+                                            asset.symbol,
+                                        onChange: () {
+                                          widget.onSelect(widget.assets[index]);
+                                          controller.hideMenu();
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
       showArrow: false,
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,

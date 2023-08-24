@@ -1,15 +1,14 @@
 import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
-import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_transaction_requests.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
-import 'package:defi_wallet/requests/transaction_requests.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
 import 'transaction_state.dart';
 
 class TransactionCubit extends Cubit<TransactionState> {

@@ -1,9 +1,9 @@
 import 'dart:typed_data';
+
 import 'package:bip32_defichain/bip32.dart' as bip32;
-import 'package:defi_wallet/models/address_model.dart';
-import 'package:defi_wallet/services/mnemonic_service.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
+import 'package:defi_wallet/models/address_model.dart';
+import 'package:defichaindart/defichaindart.dart';
 
 class BitcoinService {
   final networkHelper = NetworkHelper();

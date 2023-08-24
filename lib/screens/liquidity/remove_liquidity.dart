@@ -3,18 +3,17 @@ import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_confirmation.dart';
+import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/primary_button.dart';
+import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_constrained_box.dart';
 import 'package:defi_wallet/widgets/toolbar/main_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RemoveLiquidity extends StatefulWidget {

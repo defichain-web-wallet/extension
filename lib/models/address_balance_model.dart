@@ -1,6 +1,5 @@
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
-import 'package:defichaindart/defichaindart.dart';
 
 class AddressBalanceModel {
   String? address;

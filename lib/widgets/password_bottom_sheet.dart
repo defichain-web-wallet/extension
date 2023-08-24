@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/services/hd_wallet_service.dart';

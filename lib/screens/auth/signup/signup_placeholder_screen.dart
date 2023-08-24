@@ -10,8 +10,6 @@ import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:math' as math;
 
 class SignupPlaceholderScreen extends StatefulWidget {
   final String password;
@@ -114,12 +112,13 @@ class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen>
                                       PageRouteBuilder(
                                         pageBuilder:
                                             (context, animation1, animation2) =>
-                                            SignupAccountScreen(
-                                              password: widget.password,
-                                              mnemonic: mnemonic,
-                                            ),
+                                                SignupAccountScreen(
+                                          password: widget.password,
+                                          mnemonic: mnemonic,
+                                        ),
                                         transitionDuration: Duration.zero,
-                                        reverseTransitionDuration: Duration.zero,
+                                        reverseTransitionDuration:
+                                            Duration.zero,
                                       ),
                                     );
                                   },
@@ -146,7 +145,9 @@ class _SignupPlaceholderScreenState extends State<SignupPlaceholderScreen>
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: NewPrimaryButton(
-                              width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
+                              width: isFullScreen
+                                  ? buttonFullWidth
+                                  : buttonSmallWidth,
                               title: 'Continue',
                               callback: () => Navigator.push(
                                 context,

@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';

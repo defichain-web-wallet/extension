@@ -1,46 +1,23 @@
-import 'dart:async';
-import 'dart:ui';
-
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
 import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
-import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
 import 'package:defi_wallet/helpers/history_new.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/network_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/account_model.dart';
-import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/asset_pair_model.dart';
-import 'package:defi_wallet/models/history_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/history/widgets/history_icon_type.dart';
-import 'package:defi_wallet/screens/home/home_screen.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
-import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/buttons/accent_button.dart';
-import 'package:defi_wallet/widgets/buttons/restore_button.dart';
-import 'package:defi_wallet/widgets/dialogs/pass_confirm_dialog.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
-import 'package:defi_wallet/widgets/dialogs/tx_status_dialog.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HistoryDetails extends StatefulWidget {
   final HistoryNew? dfxHistoryModel;
@@ -198,7 +175,7 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                         txCategory,
                                       ),
                                       style:
-                                      Theme.of(context).textTheme.headline5,
+                                          Theme.of(context).textTheme.headline5,
                                     ),
                                   ),
                                   SizedBox(
@@ -210,13 +187,13 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                         .textTheme
                                         .headline6!
                                         .copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline6!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
+                                          fontWeight: FontWeight.w600,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .color!
+                                              .withOpacity(0.3),
+                                        ),
                                   ),
                                   SizedBox(
                                     height: 12,
@@ -230,10 +207,11 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline3!
                                               .copyWith(
-                                            fontSize: 36,
-                                          ),
+                                                fontSize: 36,
+                                              ),
                                         ),
-                                        if (txCategory != 'AddPoolLiquidity' && txCategory != 'RemovePoolLiquidity')
+                                        if (txCategory != 'AddPoolLiquidity' &&
+                                            txCategory != 'RemovePoolLiquidity')
                                           SvgPicture.asset(
                                             'assets/history/changed.svg',
                                             width: 20,
@@ -249,8 +227,8 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline3!
                                               .copyWith(
-                                            fontSize: 36,
-                                          ),
+                                                fontSize: 36,
+                                              ),
                                         )
                                       ],
                                     )
@@ -261,8 +239,8 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                           .textTheme
                                           .headline3!
                                           .copyWith(
-                                        fontSize: 42,
-                                      ),
+                                            fontSize: 42,
+                                          ),
                                     ),
                                   Text(
                                     '\$$totalBalanceByUsdFormat',
@@ -270,13 +248,13 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                         .textTheme
                                         .headline5!
                                         .copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .headline6!
-                                          .color!
-                                          .withOpacity(0.3),
-                                    ),
+                                          fontWeight: FontWeight.w600,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .color!
+                                              .withOpacity(0.3),
+                                        ),
                                   ),
                                   SizedBox(
                                     height: 24,
@@ -289,57 +267,57 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                             .textTheme
                                             .headline5!
                                             .copyWith(
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                       )
                                     ],
                                   ),
                                   SizedBox(
                                     height: 24,
                                   ),
-                                  if (txCategory == 'AddPoolLiquidity' || txCategory == 'RemovePoolLiquidity')
-                                    ...[
-                                      Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            'Added Liquidity',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .copyWith(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .headline5!
-                                                  .color!
-                                                  .withOpacity(0.3),
-                                            ),
-                                          ),
-                                          Text(
-                                            '$txValue ${widget.dfxHistoryModel!.tokens![2].code}',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5!,
-                                          ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10),
-                                        child: Divider(
-                                          color: Theme.of(context)
-                                              .dividerColor
-                                              .withOpacity(0.16),
+                                  if (txCategory == 'AddPoolLiquidity' ||
+                                      txCategory == 'RemovePoolLiquidity') ...[
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Added Liquidity',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color!
+                                                    .withOpacity(0.3),
+                                              ),
                                         ),
+                                        Text(
+                                          '$txValue ${widget.dfxHistoryModel!.tokens![2].code}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5!,
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Divider(
+                                        color: Theme.of(context)
+                                            .dividerColor
+                                            .withOpacity(0.16),
                                       ),
-                                    ],
+                                    ),
+                                  ],
                                   if (txCategory == 'PoolSwap')
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Total',
@@ -347,16 +325,16 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline5!
                                               .copyWith(
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .color!
-                                                .withOpacity(0.3),
-                                          ),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color!
+                                                    .withOpacity(0.3),
+                                              ),
                                         ),
                                         Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.end,
+                                              CrossAxisAlignment.end,
                                           children: [
                                             Text(
                                               '$txValueFirst $tokenNameFirst',
@@ -377,7 +355,7 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                   else
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           isSend ? 'Send to' : 'Received from',
@@ -385,12 +363,12 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline5!
                                               .copyWith(
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .color!
-                                                .withOpacity(0.3),
-                                          ),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color!
+                                                    .withOpacity(0.3),
+                                              ),
                                         ),
                                         Text(
                                           cutAddress(
@@ -413,9 +391,9 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                   if (txCategory == 'PoolSwap')
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Price',
@@ -423,16 +401,16 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline5!
                                               .copyWith(
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .color!
-                                                .withOpacity(0.3),
-                                          ),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color!
+                                                    .withOpacity(0.3),
+                                              ),
                                         ),
                                         Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.end,
+                                              CrossAxisAlignment.end,
                                           children: [
                                             Text(
                                               '${assetPairModel!.reserveBDivReserveA!.toStringAsFixed(6)} $tokenNameFirst per $tokenNameSecond',
@@ -450,47 +428,48 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                         )
                                       ],
                                     )
-                                  else if (txCategory != 'AddPoolLiquidity' && txCategory != 'RemovePoolLiquidity')
-                                    ...[
-                                      Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            'Amount',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .copyWith(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .headline5!
-                                                  .color!
-                                                  .withOpacity(0.3),
-                                            ),
-                                          ),
-                                          Text(
-                                            '$txValue $tokenNameFirst',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5!,
-                                          ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10),
-                                        child: Divider(
-                                          color: Theme.of(context)
-                                              .dividerColor
-                                              .withOpacity(0.16),
-                                        ),
-                                      ),
-                                    ],
-                                  if (txCategory != 'AddPoolLiquidity' && txCategory != 'RemovePoolLiquidity')
+                                  else if (txCategory != 'AddPoolLiquidity' &&
+                                      txCategory != 'RemovePoolLiquidity') ...[
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Amount',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color!
+                                                    .withOpacity(0.3),
+                                              ),
+                                        ),
+                                        Text(
+                                          '$txValue $tokenNameFirst',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5!,
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Divider(
+                                        color: Theme.of(context)
+                                            .dividerColor
+                                            .withOpacity(0.16),
+                                      ),
+                                    ),
+                                  ],
+                                  if (txCategory != 'AddPoolLiquidity' &&
+                                      txCategory != 'RemovePoolLiquidity')
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           'Fee',
@@ -498,12 +477,12 @@ class _HistoryDetailsState extends State<HistoryDetails>
                                               .textTheme
                                               .headline5!
                                               .copyWith(
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .headline5!
-                                                .color!
-                                                .withOpacity(0.3),
-                                          ),
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline5!
+                                                    .color!
+                                                    .withOpacity(0.3),
+                                              ),
                                         ),
                                         Text(
                                           '${widget.dfxHistoryModel!.feeValue!.toStringAsFixed(8)} $tokenNameFirst',

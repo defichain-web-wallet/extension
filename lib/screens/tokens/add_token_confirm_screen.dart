@@ -12,7 +12,6 @@ import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
-import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -47,12 +46,16 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
       ) {
         return Scaffold(
           drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-          endDrawer: isFullScreen ? null : AccountDrawer(
-            width: buttonSmallWidth,
-          ),
-          appBar: isFullScreen ? null : NewMainAppBar(
-            isShowLogo: false,
-          ),
+          endDrawer: isFullScreen
+              ? null
+              : AccountDrawer(
+                  width: buttonSmallWidth,
+                ),
+          appBar: isFullScreen
+              ? null
+              : NewMainAppBar(
+                  isShowLogo: false,
+                ),
           body: Container(
             padding: EdgeInsets.only(
               top: 22,
@@ -68,9 +71,9 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
                   : LightColors.scaffoldContainerBgColor,
               border: isDarkTheme()
                   ? Border.all(
-                width: 1.0,
-                color: Colors.white.withOpacity(0.05),
-              )
+                      width: 1.0,
+                      color: Colors.white.withOpacity(0.05),
+                    )
                   : null,
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(20),
@@ -108,16 +111,14 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
                           searchController.text == ''
                               ? 'Popular Tokens'
                               : 'Search result',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .color!
-                                .withOpacity(0.3),
-                          ),
+                          style:
+                              Theme.of(context).textTheme.headline6!.copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .color!
+                                        .withOpacity(0.3),
+                                  ),
                           textAlign: TextAlign.start,
                         ),
                         Container(
@@ -135,8 +136,7 @@ class _AddTokenConfirmScreenState extends State<AddTokenConfirmScreen>
                                     isConfirm: true,
                                     isSelect: false,
                                     tokenName: token.symbol,
-                                    availableTokenName:
-                                    token.name,
+                                    availableTokenName: token.name,
                                   ),
                                 ],
                               );

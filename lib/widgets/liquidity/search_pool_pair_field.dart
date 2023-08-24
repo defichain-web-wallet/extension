@@ -1,17 +1,13 @@
 import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SearchPoolPairField extends StatefulWidget {
   final TextEditingController controller;
 
-  const SearchPoolPairField(
-      {Key? key, required this.controller})
+  const SearchPoolPairField({Key? key, required this.controller})
       : super(key: key);
 
   @override

@@ -1,5 +1,4 @@
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

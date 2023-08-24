@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
+
 import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
@@ -15,6 +15,7 @@ import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/errors/sentry_service.dart';
+import 'package:defi_wallet/services/logger_service.dart';
 import 'package:defi_wallet/services/password_service.dart';
 import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
@@ -27,7 +28,6 @@ import 'package:defi_wallet/widgets/fields/password_text_field.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:defi_wallet/services/logger_service.dart';
 
 class LockScreen extends StatefulWidget {
   final String? savedMnemonic;
@@ -123,12 +123,11 @@ class _LockScreenState extends State<LockScreen>
                                 onTap: () => Navigator.push(
                                   context,
                                   PageRouteBuilder(
-                                    pageBuilder: (context, animation1,
-                                        animation2) =>
-                                        RecoveryScreen(),
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            RecoveryScreen(),
                                     transitionDuration: Duration.zero,
-                                    reverseTransitionDuration:
-                                    Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
                                   ),
                                 ),
                               ),

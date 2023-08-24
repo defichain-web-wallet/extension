@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 @immutable
 class AuthState {
   final bool? isLoading;
-  List<String>? mnemonic;
+  final List<String>? mnemonic;
 
   AuthState({this.isLoading, this.mnemonic});
 

@@ -1,5 +1,4 @@
 import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';

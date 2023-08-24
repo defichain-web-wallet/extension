@@ -1,9 +1,8 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
-import 'package:defi_wallet/widgets/dialogs/address_book_dialog.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
+import 'package:defi_wallet/widgets/dialogs/address_book_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AddressFieldNew extends StatefulWidget {
   final TextEditingController controller;
@@ -29,8 +28,7 @@ class AddressFieldNew extends StatefulWidget {
   State<AddressFieldNew> createState() => _AddressFieldNewState();
 }
 
-class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin{
-
+class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin {
   @override
   void initState() {
     // TODO: implement initState
@@ -67,10 +65,14 @@ class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin{
                 hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                 filled: true,
                 fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
+                enabledBorder:
+                    Theme.of(context).inputDecorationTheme.enabledBorder,
+                focusedBorder:
+                    Theme.of(context).inputDecorationTheme.focusedBorder,
                 hintStyle: passwordField.copyWith(
-                  color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
+                  color: isDarkTheme()
+                      ? DarkColors.hintTextColor
+                      : LightColors.hintTextColor,
                 ),
                 prefixIcon: (widget.contact.name != null &&
                         widget.controller.text == '')
@@ -107,8 +109,10 @@ class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin{
                                   onTap: widget.clearPrefix,
                                   child: Icon(
                                     Icons.close,
-                                    color: isDarkTheme() ? AppColors.white.withOpacity(0.5) : AppColors.darkTextColor
-                                        .withOpacity(0.5),
+                                    color: isDarkTheme()
+                                        ? AppColors.white.withOpacity(0.5)
+                                        : AppColors.darkTextColor
+                                            .withOpacity(0.5),
                                     size: 12,
                                   ),
                                 ),
@@ -138,7 +142,8 @@ class _AddressFieldNewState extends State<AddressFieldNew> with ThemeMixin{
                       },
                       child: Image.asset(
                         'assets/images/address_book.png',
-                        width: 16, height: 16,
+                        width: 16,
+                        height: 16,
                       ),
                     ),
                   ),

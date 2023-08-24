@@ -1,21 +1,10 @@
-import 'dart:ui';
-
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
-import 'package:defi_wallet/bloc/bitcoin/bitcoin_cubit.dart';
-import 'package:defi_wallet/bloc/tokens/tokens_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/history_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/history/history_details.dart';
-import 'package:defi_wallet/screens/history/widgets/icon_history_type.dart';
-import 'package:defi_wallet/utils/convert.dart';
-import 'package:defi_wallet/utils/theme/theme.dart';
-import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/status_logo_and_title.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class TransactionHistory extends StatefulWidget {
@@ -42,7 +31,8 @@ class _TransactionHistoryState extends State<TransactionHistory>
 
   _scrollListener() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
-        !_controller.position.outOfRange && !isFullLoadedHistory) {
+        !_controller.position.outOfRange &&
+        !isFullLoadedHistory) {
       setState(() {
         isScrollPositionOnBottom = true;
         initialTransactionIndex += defaultShowItemsCount;

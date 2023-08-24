@@ -1,10 +1,3 @@
-import 'dart:typed_data';
-
-import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/models/lock_reward_routes_model.dart';
-import 'package:defi_wallet/services/hd_wallet_service.dart';
-import 'package:defichaindart/defichaindart.dart';
-
 class LockAnalyticsModel {
   String? updated;
   double? apr;
@@ -15,9 +8,13 @@ class LockAnalyticsModel {
 
   LockAnalyticsModel(
       {this.updated,
-      this.apr, this.apy, this.operatorCount, this.tvl, this.asset});
+      this.apr,
+      this.apy,
+      this.operatorCount,
+      this.tvl,
+      this.asset});
 
-  LockAnalyticsModel.fromJson(Map<String, dynamic> json)  {
+  LockAnalyticsModel.fromJson(Map<String, dynamic> json) {
     this.updated = json["updated"];
     this.apr = json["apr"];
     this.apy = json["apy"];

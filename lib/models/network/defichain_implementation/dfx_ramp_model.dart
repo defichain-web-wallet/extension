@@ -7,6 +7,7 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_account_mod
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_on_off_ramp_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
+import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
@@ -56,7 +57,8 @@ class DFXRampModel extends AbstractOnOffRamp {
     );
     String? accessToken = await DFXRequests.signIn(data);
     if (accessToken != null) {
-      accessTokensMap[account.accountIndex] = AccessTokenModel(
+      accessTokensMap[(account as AccountModel).accountIndex] =
+          AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
         expireTime: DateTime.now().millisecondsSinceEpoch,
@@ -78,7 +80,8 @@ class DFXRampModel extends AbstractOnOffRamp {
     );
     String? accessToken = await DFXRequests.signUp(data);
     if (accessToken != null) {
-      accessTokensMap[account.accountIndex] = AccessTokenModel(
+      accessTokensMap[(account as AccountModel).accountIndex] =
+          AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
         expireTime: DateTime.now().millisecondsSinceEpoch,

@@ -1,7 +1,6 @@
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 
 class CustomSelectTile extends StatefulWidget {
   final bool isSelected;
@@ -73,7 +72,7 @@ class _CustomSelectTileState extends State<CustomSelectTile> with ThemeMixin {
                               ? Theme.of(context).scaffoldBackgroundColor
                               : Colors.transparent,
                           borderRadius:
-                          BorderRadius.circular(widget.isSelected ? 4 : 6),
+                              BorderRadius.circular(widget.isSelected ? 4 : 6),
                         ),
                         child: Container(
                           width: widget.isSelected ? 8 : 12,
@@ -82,8 +81,8 @@ class _CustomSelectTileState extends State<CustomSelectTile> with ThemeMixin {
                             color: isDarkTheme()
                                 ? AppColors.viridian.withOpacity(0.16)
                                 : Colors.transparent,
-                            borderRadius:
-                                BorderRadius.circular(widget.isSelected ? 4 : 6),
+                            borderRadius: BorderRadius.circular(
+                                widget.isSelected ? 4 : 6),
                           ),
                           child: Container(
                             width: widget.isSelected ? 8 : 12,

@@ -2,9 +2,7 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
-import 'package:defi_wallet/models/balance_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -112,8 +110,9 @@ class AssetSelectSwapState extends State<AssetSelectSwap> {
                               Row(
                                 children: [
                                   SvgPicture.asset(
-                                    tokenHelper.getImageNameByTokenName(
-                                        widget.selectedToken.replaceAll('d', '')),
+                                    tokenHelper.getImageNameByTokenName(widget
+                                        .selectedToken
+                                        .replaceAll('d', '')),
                                     height: 24,
                                     width: 24,
                                   ),
@@ -188,8 +187,10 @@ class AssetSelectSwapState extends State<AssetSelectSwap> {
                                               ? 'assets/arrow_up.svg'
                                               : 'assets/arrow_down.svg'
                                           : 'assets/arrow_down.svg'),
-                                  color:
-                                      Theme.of(context).textTheme.headline5!.color,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .color,
                                 ),
                             ],
                           ),

@@ -1,7 +1,6 @@
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/focus_model.dart';
 import 'package:defi_wallet/utils/app_theme/app_theme.dart';
-import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -63,8 +62,7 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
             onDoubleTap: () {
               widget.focusNode!.requestFocus();
               widget.controller!.selection = TextSelection(
-                  baseOffset: 0,
-                  extentOffset: widget.controller!.text.length);
+                  baseOffset: 0, extentOffset: widget.controller!.text.length);
             },
             child: Container(
               decoration: BoxDecoration(
@@ -116,8 +114,7 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
                               borderSide: BorderSide(color: Colors.transparent),
                             ),
                             suffixText: widget.selectedAsset,
-                            contentPadding:
-                                const EdgeInsets.only(left: 10),
+                            contentPadding: const EdgeInsets.only(left: 10),
                           ),
                           onChanged: widget.onChanged ?? null,
                           controller: widget.controller,
@@ -137,14 +134,16 @@ class _DecorationTextFieldNewState extends State<DecorationTextFieldNew> {
                             children: [
                               Text(
                                 '${widget.amountInUsd} $currency',
-                                style:
-                                    Theme.of(context).textTheme.headline4!.apply(
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .color!
-                                              .withOpacity(0.5),
-                                        ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline4!
+                                    .apply(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .color!
+                                          .withOpacity(0.5),
+                                    ),
                               ),
                             ],
                           ),

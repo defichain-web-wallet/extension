@@ -1,14 +1,13 @@
 import 'dart:convert';
-import 'package:basic_utils/basic_utils.dart';
+
 import 'package:defi_wallet/helpers/addresses_helper.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
+import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/address_balance_model.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/models/balance_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
-import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,7 +17,8 @@ class BalanceRequests {
   var addressesHelper = AddressesHelper();
   var balancesHelper = BalancesHelper();
 
-  Future<List<BalanceModel>> getBalanceListByAddress(String address, bool sumDFI, String network) async {
+  Future<List<BalanceModel>> getBalanceListByAddress(
+      String address, bool sumDFI, String network) async {
     try {
       String hostUrl = SettingsHelper.getHostApiUrl();
       String urlAddress = '$hostUrl/$network/address/$address/tokens';
@@ -34,7 +34,8 @@ class BalanceRequests {
           return balances;
         }
 
-        var dfiBalance = await getBalanceDFIcoinByAddress(address, sumDFI, network);
+        var dfiBalance =
+            await getBalanceDFIcoinByAddress(address, sumDFI, network);
         var presentDFI = false;
         data['data'].forEach((el) {
           int amount = convertToSatoshi(double.parse(el['amount']));
@@ -64,7 +65,8 @@ class BalanceRequests {
     }
   }
 
-  Future<BalanceModel> getBalanceDFIcoinByAddress(String address, bool sumDFI, String network) async {
+  Future<BalanceModel> getBalanceDFIcoinByAddress(
+      String address, bool sumDFI, String network) async {
     try {
       String hostUrl = SettingsHelper.getHostApiUrl();
       String urlAddress = '$hostUrl/$network/address/$address/balance';
@@ -79,7 +81,9 @@ class BalanceRequests {
           return BalanceModel(token: '\$DFI', balance: 0);
         }
 
-        return BalanceModel(token: '\$DFI', balance: convertToSatoshi(double.parse(data['data'])));
+        return BalanceModel(
+            token: '\$DFI',
+            balance: convertToSatoshi(double.parse(data['data'])));
       }
       return BalanceModel(token: '\$DFI', balance: 0);
     } catch (err) {
@@ -87,10 +91,12 @@ class BalanceRequests {
     }
   }
 
-  Future<List<BalanceModel>> getBalanceListByAddressList(List<AddressModel> addressList, String network) async {
+  Future<List<BalanceModel>> getBalanceListByAddressList(
+      List<AddressModel> addressList, String network) async {
     try {
       List<BalanceModel> balanceList = [];
-      var addressListString = addressesHelper.getAddressStringFromListAddressModel(addressList);
+      var addressListString =
+          addressesHelper.getAddressStringFromListAddressModel(addressList);
 
       for (var address in addressListString) {
         var balances = await getBalanceListByAddress(address, true, network);
@@ -104,13 +110,18 @@ class BalanceRequests {
     }
   }
 
-  Future<List<AddressBalanceModel>> getAddressBalanceListByAddressList(List<AddressModel> addressList) async {
+  Future<List<AddressBalanceModel>> getAddressBalanceListByAddressList(
+      List<AddressModel> addressList) async {
     try {
       List<AddressBalanceModel> balanceList = [];
       for (var i = 0; i < addressList.length; i++) {
-        var balances = await getBalanceListByAddress(addressList[i].address!, false, networkHelper.getNetworkString());
+        var balances = await getBalanceListByAddress(
+            addressList[i].address!, false, networkHelper.getNetworkString());
 
-        balanceList.add(AddressBalanceModel(address: addressList[i].address!, balanceList: balances, addressModel: addressList[i]));
+        balanceList.add(AddressBalanceModel(
+            address: addressList[i].address!,
+            balanceList: balances,
+            addressModel: addressList[i]));
       }
       return balanceList;
     } catch (_) {

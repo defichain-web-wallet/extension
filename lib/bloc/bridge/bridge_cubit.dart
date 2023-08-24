@@ -15,10 +15,10 @@ class BridgeCubit extends Cubit<BridgeState> {
 
   BitcoinNetworkModel bitcoinNetworkModel = BitcoinNetworkModel(
     NetworkTypeModel(
-      networkName: NetworkName.defichainMainnet,
-      networkString: 'defichainMainnet',
-      isTestnet: false,
-    ),
+        networkName: NetworkName.defichainMainnet,
+        networkString: 'defichainMainnet',
+        isTestnet: false,
+        isLocalWallet: false),
   );
 
   loadDetails(AddressModel address) async {

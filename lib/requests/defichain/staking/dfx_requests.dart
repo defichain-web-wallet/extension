@@ -1,22 +1,19 @@
 import 'dart:convert';
+
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
-import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/lock_analytics_model.dart';
 import 'package:defi_wallet/models/lock_staking_model.dart';
 import 'package:defi_wallet/models/lock_user_model.dart';
 import 'package:defi_wallet/models/lock_withdraw_model.dart';
 import 'package:defi_wallet/services/lock_service.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:http/http.dart' as http;
-
 
 class DFXRequests {
   LockService lockService = LockService();
   EncryptHelper encryptHelper = EncryptHelper();
 
-  static Future<String> signUp(Map<String, String>  signature) async {
+  static Future<String> signUp(Map<String, String> signature) async {
     try {
-
       final Uri url = Uri.parse('https://api.lock.space/v1/auth/sign-up');
 
       final headers = {
@@ -37,9 +34,8 @@ class DFXRequests {
     }
   }
 
-  static Future<String> signIn(Map<String, String>  signature) async {
+  static Future<String> signIn(Map<String, String> signature) async {
     try {
-
       final Uri url = Uri.parse('https://api.lock.space/v1/auth/sign-in');
 
       final headers = {
@@ -120,14 +116,14 @@ class DFXRequests {
   }
 
   Future<bool> setDeposit(
-      String accessToken,
-      int stakingId,
-      double amount,
-      String txId,
-      ) async {
+    String accessToken,
+    int stakingId,
+    double amount,
+    String txId,
+  ) async {
     try {
       final Uri url =
-      Uri.parse('https://api.lock.space/v1/staking/$stakingId/deposit');
+          Uri.parse('https://api.lock.space/v1/staking/$stakingId/deposit');
 
       final headers = {
         'Content-type': 'application/json',
@@ -149,13 +145,13 @@ class DFXRequests {
   }
 
   Future<LockWithdrawModel?> requestWithdraw(
-      String accessToken,
-      int stakingId,
-      double amount,
-      ) async {
+    String accessToken,
+    int stakingId,
+    double amount,
+  ) async {
     try {
       final Uri url =
-      Uri.parse('https://api.lock.space/v1/staking/$stakingId/withdrawal');
+          Uri.parse('https://api.lock.space/v1/staking/$stakingId/withdrawal');
 
       final headers = {
         'Content-type': 'application/json',
@@ -179,12 +175,10 @@ class DFXRequests {
   }
 
   Future<List<LockWithdrawModel>?> getWithdraws(
-      String accessToken,
-      int stakingId
-      ) async {
+      String accessToken, int stakingId) async {
     try {
-      final Uri url =
-      Uri.parse('https://api.lock.space/v1/staking/$stakingId/withdrawal/drafts');
+      final Uri url = Uri.parse(
+          'https://api.lock.space/v1/staking/$stakingId/withdrawal/drafts');
 
       final headers = {
         'Content-type': 'application/json',
@@ -207,12 +201,10 @@ class DFXRequests {
   }
 
   Future<LockWithdrawModel?> changeAmountWithdraw(
-      String accessToken,
-      int stakingId, int withdrawId, double amount
-      ) async {
+      String accessToken, int stakingId, int withdrawId, double amount) async {
     try {
-      final Uri url =
-      Uri.parse('https://api.lock.space/v1/staking/$stakingId/withdrawal/$withdrawId/amount');
+      final Uri url = Uri.parse(
+          'https://api.lock.space/v1/staking/$stakingId/withdrawal/$withdrawId/amount');
 
       final headers = {
         'Content-type': 'application/json',
@@ -237,10 +229,10 @@ class DFXRequests {
   }
 
   Future<LockStakingModel?> signedWithdraw(
-      String accessToken,
-      int stakingId,
-      LockWithdrawModel withdrawModel,
-      ) async {
+    String accessToken,
+    int stakingId,
+    LockWithdrawModel withdrawModel,
+  ) async {
     try {
       final Uri url = Uri.parse(
           'https://api.lock.space/v1/staking/$stakingId/withdrawal/${withdrawModel.id}/sign');
@@ -268,7 +260,8 @@ class DFXRequests {
 
   Future<LockAnalyticsModel?> getAnalytics(String accessToken) async {
     try {
-      final Uri url = Uri.parse('https://api.lock.space/v1/analytics/staking?asset=DFI&blockchain=DeFiChain&strategy=Masternode');
+      final Uri url = Uri.parse(
+          'https://api.lock.space/v1/analytics/staking?asset=DFI&blockchain=DeFiChain&strategy=Masternode');
 
       final headers = {
         'Content-type': 'application/json',

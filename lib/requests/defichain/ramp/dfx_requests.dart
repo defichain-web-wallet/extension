@@ -1,14 +1,13 @@
 import 'dart:convert';
+
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/available_asset_model.dart';
 import 'package:defi_wallet/models/crypto_route_model.dart';
 import 'package:defi_wallet/models/fiat_history_model.dart';
 import 'package:defi_wallet/models/fiat_model.dart';
 import 'package:defi_wallet/models/iban_model.dart';
-import 'package:defi_wallet/models/kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_kyc_model.dart';
 import 'package:defi_wallet/models/network/ramp/ramp_user_model.dart';
-import 'package:defi_wallet/models/network/staking/staking_model.dart';
 import 'package:http/http.dart' as http;
 
 class DFXRequests {

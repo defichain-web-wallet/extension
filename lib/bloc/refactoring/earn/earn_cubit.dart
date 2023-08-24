@@ -1,6 +1,3 @@
-import 'dart:typed_data';
-
-import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/lock/lock_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
@@ -18,8 +15,7 @@ class EarnCubit extends Cubit<EarnState> {
     lmCubit.setInitial();
     LockCubit lockCubit = BlocProvider.of<LockCubit>(context);
     lockCubit.setInitial();
-    emit(state.copyWith(
-        status: EarnStatusList.initial));
+    emit(state.copyWith(status: EarnStatusList.initial));
   }
 
   init(context) async {

@@ -1,15 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:js_util';
-import 'dart:ui';
 
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_ledger_network_model.dart';
 import 'package:defi_wallet/models/network/ledger_account_model.dart';
 import 'package:defi_wallet/screens/ledger/ledger_error_dialog.dart';
 import 'package:defi_wallet/services/bitcoin_service.dart';

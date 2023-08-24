@@ -1,8 +1,5 @@
-import 'dart:ui';
-
 import 'package:defi_wallet/ledger/jelly_ledger.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/ledger/guide/connect_ledger_third_screen.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/dotted_tab.dart';

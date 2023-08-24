@@ -75,8 +75,7 @@ class AccountCubit extends Cubit<AccountState> {
         masterKeyPairTestnet.publicKey,
         masterKeyPairTestnet.chainCode,
         networkHelper.getNetworkType(testnet));
-    final masterKeyPairTestnetB =
-        hdWalletService.getMasterKeypairFormSeed(seed, testnet);
+
     final masterKeyPairTestnetPublicKeyB = bip32.BIP32.fromPublicKey(
         masterKeyPairTestnet.publicKey,
         masterKeyPairTestnet.chainCode,

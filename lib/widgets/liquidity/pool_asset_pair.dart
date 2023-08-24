@@ -1,15 +1,11 @@
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
-import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class PoolAssetPair extends StatefulWidget {
   final LmPoolModel assetPair;

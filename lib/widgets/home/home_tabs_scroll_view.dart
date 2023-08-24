@@ -1,6 +1,5 @@
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_list.dart';
 import 'package:defi_wallet/screens/home/widgets/tab_bar/tab_bar_header.dart';
@@ -32,7 +31,6 @@ class HomeTabsScrollView extends StatefulWidget {
 
 class _HomeTabsScrollViewState extends State<HomeTabsScrollView>
     with ThemeMixin {
-
   @override
   Widget build(BuildContext context) {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
@@ -41,8 +39,7 @@ class _HomeTabsScrollViewState extends State<HomeTabsScrollView>
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: CustomScrollView(
         slivers: [
-          if (widget.isShowHomeCard)
-            HomeSliverAppBar(),
+          if (widget.isShowHomeCard) HomeSliverAppBar(),
           SliverAppBar(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             pinned: true,
@@ -104,9 +101,8 @@ class _HomeTabsScrollViewState extends State<HomeTabsScrollView>
               hasScrollBody: false,
               child: Container(
                 height: widget.txState is! TransactionInitialState ? 90 : 0,
-                color: isFullScreen(context)
-                    ? null
-                    : Theme.of(context).cardColor,
+                color:
+                    isFullScreen(context) ? null : Theme.of(context).cardColor,
               ),
             )
           ] else ...[
@@ -115,9 +111,8 @@ class _HomeTabsScrollViewState extends State<HomeTabsScrollView>
               hasScrollBody: false,
               child: Container(
                 height: widget.txState is! TransactionInitialState ? 90 : 0,
-                color: isFullScreen(context)
-                    ? null
-                    : Theme.of(context).cardColor,
+                color:
+                    isFullScreen(context) ? null : Theme.of(context).cardColor,
               ),
             ),
           ]

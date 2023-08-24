@@ -1,9 +1,7 @@
 import 'package:defi_wallet/bloc/address_book/address_book_cubit.dart';
-import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/settings_model.dart';
-import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 mixin NetworkMixin {

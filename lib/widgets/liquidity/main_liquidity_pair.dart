@@ -1,14 +1,10 @@
 import 'package:defi_wallet/helpers/lock_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/asset_pair_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_remove_screen.dart';
-import 'package:defi_wallet/screens/liquidity/remove_liquidity.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_select_pool.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
-import 'package:defi_wallet/utils/app_theme/app_theme.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -16,7 +12,6 @@ import 'package:defi_wallet/widgets/liquidity/asset_pair.dart';
 import 'package:defi_wallet/widgets/liquidity/liquidity_asset_pair.dart';
 import 'package:defi_wallet/widgets/ticker_text.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 
 class MainLiquidityPair extends StatefulWidget {
   final LmPoolModel? assetPair;

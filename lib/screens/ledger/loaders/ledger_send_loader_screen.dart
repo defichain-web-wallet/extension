@@ -6,7 +6,6 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
-import 'package:defi_wallet/widgets/toolbar/welcome_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class LedgerSendLoaderScreen extends StatefulWidget {

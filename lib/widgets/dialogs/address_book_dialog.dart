@@ -12,7 +12,6 @@ import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:defi_wallet/widgets/status_logo_and_title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
 class AddressBookDialog extends StatefulWidget {
   final Function(AddressBookModel contact)? getContact;
@@ -39,7 +38,8 @@ class _AddressBookDialogState extends State<AddressBookDialog>
   @override
   void initState() {
     super.initState();
-    AddressBookCubit addressBookCubit = BlocProvider.of<AddressBookCubit>(context);
+    AddressBookCubit addressBookCubit =
+        BlocProvider.of<AddressBookCubit>(context);
 
     addressBookCubit.init(context);
   }
@@ -213,7 +213,8 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                                                             .address!,
                                                     networkName:
                                                         viewList![index]
-                                                            .network!.networkNameFormat,
+                                                            .network!
+                                                            .networkNameFormat,
                                                   ),
                                                 ),
                                               ),
@@ -244,9 +245,11 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                           Expanded(
                             child: Container(
                               width: double.infinity,
-                              child: (addressBookState.lastSentList != null && addressBookState.lastSentList!.isNotEmpty)
+                              child: (addressBookState.lastSentList != null &&
+                                      addressBookState.lastSentList!.isNotEmpty)
                                   ? ListView.builder(
-                                      itemCount: addressBookState.lastSentList!.length,
+                                      itemCount:
+                                          addressBookState.lastSentList!.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return Padding(
@@ -259,7 +262,9 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                                                   if (widget.getAddress !=
                                                       null) {
                                                     widget.getAddress!(
-                                                        addressBookState.lastSentList![index]
+                                                        addressBookState
+                                                            .lastSentList![
+                                                                index]
                                                             .address!);
                                                     Navigator.pop(context);
                                                   }
@@ -268,7 +273,8 @@ class _AddressBookDialogState extends State<AddressBookDialog>
                                                   cursor:
                                                       SystemMouseCursors.click,
                                                   child: LastSentTile(
-                                                    address: addressBookState.lastSentList![index],
+                                                    address: addressBookState
+                                                        .lastSentList![index],
                                                     index: index,
                                                   ),
                                                 ),

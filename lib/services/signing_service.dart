@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/models/account_model.dart';
-import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:defi_wallet/requests/transaction_requests.dart';
 import 'package:defi_wallet/services/ledger_signing_service.dart';

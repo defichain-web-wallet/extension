@@ -1,6 +1,5 @@
 import 'package:defi_wallet/bloc/available_amount/available_amount_cubit.dart';
 import 'package:defi_wallet/constants/input_formatters.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/account_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
@@ -62,18 +61,14 @@ class _AmountFieldState extends State<AmountField> {
   _onSelectInputText() {
     _focusNode.requestFocus();
     if (widget.controller.text.isNotEmpty) {
-      widget.controller.selection =
-          TextSelection(
-              baseOffset: 0,
-              extentOffset:
-              widget.controller
-                  .text.length);
+      widget.controller.selection = TextSelection(
+          baseOffset: 0, extentOffset: widget.controller.text.length);
     }
   }
 
   _loadAvailableBalance(BuildContext context) {
     AvailableAmountCubit availableAmountCubit =
-      BlocProvider.of<AvailableAmountCubit>(context);
+        BlocProvider.of<AvailableAmountCubit>(context);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (widget.type == TxType.send) {
         // await availableAmountCubit.getAvailable(
@@ -205,15 +200,14 @@ class _AmountFieldState extends State<AmountField> {
                     cursor: SystemMouseCursors.click,
                     child: Text(
                       'Available: ${widget.available}',
-                      style:
-                      Theme.of(context).textTheme.headline6!.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context)
-                            .textTheme
-                            .headline6!
-                            .color!
-                            .withOpacity(0.3),
-                      ),
+                      style: Theme.of(context).textTheme.headline6!.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .color!
+                                .withOpacity(0.3),
+                          ),
                     ),
                   ),
                 ),
