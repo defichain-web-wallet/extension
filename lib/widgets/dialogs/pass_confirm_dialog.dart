@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
 import 'package:defi_wallet/services/password_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
@@ -279,8 +280,27 @@ class _PassConfirmDialogState extends State<PassConfirmDialog>
         isValid = true;
         _formKey.currentState!.validate();
       });
-      widget.onSubmit(_passwordController.text);
-      Navigator.pop(context);
+      if (!walletCubit.walletState.activeNetwork.networkType.isLocalWallet) {
+        Navigator.of(context).pop();
+        await showDialog(
+          barrierColor: AppColors.tolopea.withOpacity(0.06),
+          barrierDismissible: false,
+          context: widget.context,
+          builder: (BuildContext context1) {
+            return LedgerCheckScreen(
+                onStartSign: (p, c) async {
+                  p.emitPending(true);
+                  await widget.onSubmit(_passwordController.text);
+                  p.emitPending(false);
+                  Navigator.of(context1).pop(true);
+                },
+                context: widget.context);
+          },
+        );
+      } else {
+        widget.onSubmit(_passwordController.text);
+        Navigator.of(context).pop();
+      }
     } else {
       setState(() {
         isValid = false;
