@@ -9,6 +9,7 @@ import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_fee_model.dart';
 import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
+import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/send/send_summary_screen.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
@@ -56,12 +57,12 @@ class _SendScreenState extends State<SendScreen>
   EthereumNetworkFeeModel? networkFeeModel;
   String? estimatedFee;
 
-  void loadNetworkFee() async {
+  void loadNetworkFee({TokenModel? token}) async {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     AbstractNetworkModel activeNetwork = walletCubit.state.activeNetwork;
     if (activeNetwork is EthereumNetworkModel) {
-      networkFeeModel =
-          await activeNetwork.getNetworkFee() as EthereumNetworkFeeModel;
+      networkFeeModel = await activeNetwork.getNetworkFee(token: token)
+          as EthereumNetworkFeeModel;
       gasPriceController.text = networkFeeModel!.gasPrice.toString();
       gasLimitController.text = networkFeeModel!.gasLimit.toString();
       double fee = activeNetwork.calculateFee(
@@ -249,6 +250,9 @@ class _SendScreenState extends State<SendScreen>
                                     suffix: balanceInUsd ?? '0.00',
                                     // ?? getUsdBalance(context), //TODO: fix it
                                     onAssetSelect: (asset) async {
+                                      loadNetworkFee(
+                                        token: asset.token,
+                                      );
                                       txCubit.changeActiveBalance(
                                         context,
                                         TxType.send,
