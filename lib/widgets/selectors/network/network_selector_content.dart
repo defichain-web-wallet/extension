@@ -50,8 +50,9 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
             builder: (context, walletState) {
               return BlocBuilder<NetworkCubit, NetworkState>(
                 builder: (context, networkState) {
-                  final currentNetworksList = walletState
-                      .applicationModel!.networks
+                  var account = walletState.activeAccount;
+                  final currentNetworksList = account
+                      .getNetworkModelList(walletState.applicationModel!)
                       .where((element) =>
                           element.networkType.isTestnet ==
                           (networkState.currentNetworkSelectorTab !=

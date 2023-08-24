@@ -87,36 +87,48 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
     HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
 
     if (!widget.isAppBar) {
-      return NetworkSelectorContent(
-        tabs: tabs,
-        onChange: (item) => onChangeNetwork(item),
-      );
-    } else if (isLargeScreen(context)) {
-      return Container(
-        child: GestureDetector(
-          onTap: () {
-            homeCubit.updateExtendedSelector(
-              !homeCubit.state.isShowExtendedNetworkSelector,
-            );
+      return BlocListener<WalletCubit, WalletState>(
+          listener: (BuildContext context, WalletState state) {
+            onWalletStateChanged(state);
           },
-          child: NetworkSelectorButton(),
-        ),
-      );
+          child: NetworkSelectorContent(
+            tabs: tabs,
+            onChange: (item) => onChangeNetwork(item),
+          ));
+    } else if (isLargeScreen(context)) {
+      return BlocListener<WalletCubit, WalletState>(
+          listener: (BuildContext context, WalletState state) {
+            onWalletStateChanged(state);
+          },
+          child: Container(
+            child: GestureDetector(
+              onTap: () {
+                homeCubit.updateExtendedSelector(
+                  !homeCubit.state.isShowExtendedNetworkSelector,
+                );
+              },
+              child: NetworkSelectorButton(),
+            ),
+          ));
     } else {
-      return CustomPopupMenu(
-        child: NetworkSelectorButton(),
-        menuBuilder: () => NetworkSelectorContent(
-          tabs: tabs,
-          onChange: (item) => onChangeNetwork(item),
-        ),
-        showArrow: false,
-        barrierColor: Colors.transparent,
-        pressType: PressType.singleClick,
-        verticalMargin: _getVerticalMargin(context),
-        horizontalMargin: _getHorizontalMargin(context),
-        controller: controller,
-        enablePassEvent: false,
-      );
+      return BlocListener<WalletCubit, WalletState>(
+          listener: (BuildContext context, WalletState state) {
+            onWalletStateChanged(state);
+          },
+          child: CustomPopupMenu(
+            child: NetworkSelectorButton(),
+            menuBuilder: () => NetworkSelectorContent(
+              tabs: tabs,
+              onChange: (item) => onChangeNetwork(item),
+            ),
+            showArrow: false,
+            barrierColor: Colors.transparent,
+            pressType: PressType.singleClick,
+            verticalMargin: _getVerticalMargin(context),
+            horizontalMargin: _getHorizontalMargin(context),
+            controller: controller,
+            enablePassEvent: false,
+          ));
     }
   }
 }
