@@ -2,9 +2,12 @@ import 'package:defi_wallet/bloc/refactoring/lm/lm_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_bloc.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/convert.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -53,7 +56,7 @@ class LiquidityConfirmation extends StatefulWidget {
 }
 
 class _LiquidityConfirmationState extends State<LiquidityConfirmation>
-    with ThemeMixin {
+    with ThemeMixin, SnackBarMixin {
   String appBarTitle = 'Confirmation';
   String submitLabel = '';
   String secondStepLoaderTextAdd =
@@ -530,16 +533,21 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
     );
   }
 
-  submitLiquidityAction(context, transactionState, password,
-      {final Function()? callbackOk, final Function()? callbackFail}) async {
+  submitLiquidityAction(
+    context,
+    transactionState,
+    password, {
+    final Function()? callbackOk,
+    final Function()? callbackFail,
+  }) async {
     if (transactionState is TransactionLoadingState) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Wait for the previous transaction to complete',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+      showSnackBar(
+        context,
+        title: 'Wait for the previous transaction to complete',
+        color: AppColors.txStatusError.withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
         ),
       );
       return;
@@ -600,17 +608,25 @@ class _LiquidityConfirmationState extends State<LiquidityConfirmation>
           );
         },
       );
-    } catch (err) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'liquidity_confirmation.dart',
+          method: 'submitLiquidityAction',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       if (callbackFail != null) {
         callbackFail();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Something went wrong. Please, try later',
-              style: Theme.of(context).textTheme.headline5,
-            ),
-            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+        showSnackBar(
+          context,
+          title: 'Something went wrong. Please, try later',
+          color: AppColors.txStatusError.withOpacity(0.1),
+          prefix: Icon(
+            Icons.close,
+            color: AppColors.txStatusError,
           ),
         );
       }

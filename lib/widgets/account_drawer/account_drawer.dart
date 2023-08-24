@@ -56,9 +56,9 @@ class _AccountDrawerState extends State<AccountDrawer> with ThemeMixin {
         WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
         var accounts = state.accounts;
         if (accounts.length == 1) {
-          accountsSelectorHeight = 245;
+          accountsSelectorHeight = 195;
         } else if (accounts.length == 2) {
-          accountsSelectorHeight = 280;
+          accountsSelectorHeight = 237;
         } else {
           accountsSelectorHeight = 320;
         }

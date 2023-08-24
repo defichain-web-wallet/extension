@@ -1,7 +1,6 @@
 import 'package:defi_wallet/bloc/network/network_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/selectors/selector_tab_element.dart';
 import 'package:flutter/material.dart';
@@ -51,10 +50,8 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
             builder: (context, walletState) {
               return BlocBuilder<NetworkCubit, NetworkState>(
                 builder: (context, networkState) {
-                  var account = walletState.activeAccount;
-
-                  final currentNetworksList = account
-                      .getNetworkModelList(walletState.applicationModel!)
+                  final currentNetworksList = walletState
+                      .applicationModel!.networks
                       .where((element) =>
                           element.networkType.isTestnet ==
                           (networkState.currentNetworkSelectorTab !=
@@ -159,21 +156,12 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                                     (item) => Column(
                                       children: [
                                         MouseRegion(
-                                          cursor: item.networkType
-                                                      .networkName !=
-                                                  NetworkName.defichainTestnet
-                                              ? SystemMouseCursors.click
-                                              : SystemMouseCursors.forbidden,
+                                          cursor: SystemMouseCursors.click,
                                           child: GestureDetector(
                                             behavior:
                                                 HitTestBehavior.translucent,
                                             onTap: () {
-                                              if (item.networkType
-                                                      .networkName !=
-                                                  NetworkName
-                                                      .defichainTestnet) {
-                                                onChange(item);
-                                              }
+                                              onChange(item);
                                             },
                                             child: Container(
                                               height: 44,
@@ -205,22 +193,11 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                                                         .textTheme
                                                         .headline5!
                                                         .copyWith(
-                                                          color: item.networkType
-                                                                      .networkName !=
-                                                                  NetworkName
-                                                                      .defichainTestnet
-                                                              ? Theme.of(
-                                                                      context)
+                                                          color:
+                                                              Theme.of(context)
                                                                   .textTheme
                                                                   .headline5!
-                                                                  .color
-                                                              : Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .headline5!
-                                                                  .color!
-                                                                  .withOpacity(
-                                                                      0.3),
+                                                                  .color,
                                                         ),
                                                   ),
                                                 ],

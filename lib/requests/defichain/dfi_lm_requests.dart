@@ -13,12 +13,14 @@ class DFILmRequests {
   }) async {
     final query = {
       'size': '200',
-      'next': next ?? '',
     };
 
-    //TODO: add fallback url
+    if (next != null) {
+      query['next'] = next;
+    }
+
     final Uri url = Uri.https(
-      Hosts.oceanDefichainHome,
+      networkType.isTestnet ? Hosts.testnetHost : Hosts.mainnetHost,
       '/v0/${networkType.networkStringLowerCase}/poolpairs',
       query,
     );

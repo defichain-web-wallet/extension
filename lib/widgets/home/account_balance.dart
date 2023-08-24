@@ -20,17 +20,6 @@ class AccountBalance extends StatefulWidget {
 }
 
 class _AccountBalanceState extends State<AccountBalance> {
-  String getSpecificTokenName(String token) {
-    switch (token) {
-      case 'USD':
-        return 'USDT';
-      case 'EUR':
-        return 'EUROC';
-      default:
-        return token;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RatesCubit, RatesState>(
@@ -38,7 +27,7 @@ class _AccountBalanceState extends State<AccountBalance> {
         return BlocBuilder<WalletCubit, WalletState>(
           builder: (context, state) {
             if ((state.status == WalletStatusList.success ||
-                state.status == WalletStatusList.update) &&
+                    state.status == WalletStatusList.update) &&
                 ratesState.status == RatesStatusList.success) {
               late double totalBalance;
               late double unconfirmedBalance;
@@ -49,7 +38,9 @@ class _AccountBalanceState extends State<AccountBalance> {
                 totalBalance = ratesState.ratesModel!.getTotalAmount(
                   state.activeNetwork,
                   balances,
-                  convertToken: getSpecificTokenName(widget.asset),
+                  convertToken: ratesState.ratesModel!.getSpecificTokenName(
+                    widget.asset,
+                  ),
                 );
               } catch (_) {
                 totalBalance = 0.00;
@@ -57,13 +48,11 @@ class _AccountBalanceState extends State<AccountBalance> {
               }
 
               return Container(
-                child: BalanceText(
-                  isSmallFont: widget.isSmall,
-                  balance: totalBalance,
-                  assetName: widget.asset,
-                  unconfirmedBalance: unconfirmedBalance
-                ),
-              );
+                  child: BalanceText(
+                      isSmallFont: widget.isSmall,
+                      balance: totalBalance,
+                      assetName: widget.asset,
+                      unconfirmedBalance: unconfirmedBalance));
             } else {
               return Container(
                 child: BalanceText(

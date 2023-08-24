@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
+import 'package:defi_wallet/services/password_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/accent_button.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -187,7 +187,6 @@ class _PassConfirmDialogState extends State<PassConfirmDialog>
                             ),
                             PasswordTextField(
                               autofocus: true,
-                              onlyEngCharacters: false,
                               height: 71,
                               controller: _passwordController,
                               status: PasswordStatusList.initial,
@@ -206,6 +205,15 @@ class _PassConfirmDialogState extends State<PassConfirmDialog>
                                     isPasswordObscure = !isPasswordObscure);
                               },
                               validator: (val) {
+                                if (!PasswordService.targetRegExp
+                                    .hasMatch(val!)) {
+                                  String disallowedCharacters =
+                                      PasswordService()
+                                          .getDisallowedCharacters(password);
+
+                                  return 'Character(s) \'$disallowedCharacters\' are not allowed. '
+                                      'Only english alphabet characters are allowed in the password.';
+                                }
                                 return isValid ? null : "Incorrect password";
                               },
                               onSubmitted: (val) {
@@ -248,7 +256,17 @@ class _PassConfirmDialogState extends State<PassConfirmDialog>
     );
   }
 
-  void _restoreWallet(context) async {
+  Future _confirm(BuildContext context) async {
+    await PasswordService().handleCorrectAndRun(
+      widget.context,
+      _passwordController.text,
+      () async {
+        await _restoreWallet(context);
+      },
+    );
+  }
+
+  Future _restoreWallet(context) async {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     setState(() {
       isValid = true;
@@ -261,27 +279,8 @@ class _PassConfirmDialogState extends State<PassConfirmDialog>
         isValid = true;
         _formKey.currentState!.validate();
       });
-
-      if (!walletCubit.walletState.activeNetwork.networkType.isLocalWallet) {
-        Navigator.of(context).pop();
-        await showDialog(
-          barrierColor: AppColors.tolopea.withOpacity(0.06),
-          barrierDismissible: false,
-          context: widget.context,
-          builder: (BuildContext context1) {
-            return LedgerCheckScreen(
-                onStartSign: (p, c) async {
-                  p.emitPending(true);
-                  await widget.onSubmit(_passwordController.text);
-                  p.emitPending(false);
-                },
-                context: widget.context);
-          },
-        );
-      } else {
-        widget.onSubmit(_passwordController.text);
-        Navigator.of(context).pop();
-      }
+      widget.onSubmit(_passwordController.text);
+      Navigator.pop(context);
     } else {
       setState(() {
         isValid = false;

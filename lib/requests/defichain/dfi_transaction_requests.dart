@@ -1,28 +1,25 @@
 import 'dart:convert';
-import 'package:defi_wallet/helpers/addresses_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
-import 'package:defi_wallet/models/address_model.dart';
+import 'package:defi_wallet/config/config.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/models/utxo_model.dart';
 import 'package:http/http.dart' as http;
 
-import '../../models/settings_model.dart';
-
 class DFITransactionRequests {
-  var addressesHelper = AddressesHelper();
-
-  static Future<List<UtxoModel>> getUTXOs(
-      {required String address, required String networkString, String fallbackUrl = ''}) async {
+  static Future<List<UtxoModel>> getUTXOs({
+    required String address,
+    required AbstractNetworkModel network,
+    Uri? fallbackUri,
+  }) async {
     List<UtxoModel> utxos = [];
 
     try {
-      String hostUrl = SettingsHelper.getHostApiUrl(); //TODO: need to change this part
-      String urlAddress = fallbackUrl.isEmpty
-          ? '$hostUrl/$networkString/address/$address/transactions/unspent'
-          : fallbackUrl;
+      final Uri _url = fallbackUri == null ? Uri.https(
+        network.networkType.isTestnet ? Hosts.testnetHost : Hosts.mainnetHost,
+        '/v0/${network.networkType.networkStringLowerCase}/address/$address/transactions/unspent',
+      ) : fallbackUri!;
 
-      final Uri _url = Uri.parse(urlAddress);
       final _headers = {
         'Content-type': 'application/json',
       };
@@ -36,14 +33,16 @@ class DFITransactionRequests {
         utxos.add(utxoModel);
       });
     } catch (err) {
-      if (fallbackUrl.isEmpty &&
-          SettingsHelper.settings.apiName == ApiName.auto) {
-        String fallbackUrlAddress = networkString ==
-            'mainnet'
-            ? 'http://ocean.mydefichain.com:3000/v0/mainnet/address/$address/transactions/unspent'
-            : 'https://testnet-ocean.mydefichain.com:8443/v0/testnet/address/$address/transactions/unspent';
+      if (fallbackUri == null) {
+        final Uri _fallbackUri = Uri.https(
+          network.networkType.isTestnet ? Hosts.fallbackTestnetHost : Hosts.fallbackMainnetHost,
+          '/v0/${network.networkType.networkStringLowerCase}/address/$address/transactions/unspent',
+        );
         return getUTXOs(
-            address: address, networkString: networkString, fallbackUrl: fallbackUrlAddress);
+          address: address,
+          network: network,
+          fallbackUri: _fallbackUri,
+        );
       } else {
         throw err;
       }
@@ -52,15 +51,16 @@ class DFITransactionRequests {
     return utxos;
   }
 
-  static Future<TxErrorModel> sendTxHex({required String txHex, required String networkString,
-      String fallbackUrl = ''}) async {
+  static Future<TxErrorModel> sendTxHex({
+    required String txHex,
+    required AbstractNetworkModel network,
+    Uri? fallbackUri,
+  }) async {
     try {
-      String hostUrl = SettingsHelper.getHostApiUrl(); //TODO: need to change this part
-      String urlAddress = fallbackUrl.isEmpty
-          ? '$hostUrl/$networkString/rawtx/send'
-          : fallbackUrl;
-
-      final Uri _url = Uri.parse(urlAddress);
+      final Uri _url = fallbackUri == null ? Uri.https(
+        network.networkType.isTestnet ? Hosts.testnetHost : Hosts.mainnetHost,
+        '/v0/${network.networkType.networkStringLowerCase}/rawtx/send',
+      ) : fallbackUri!;
 
       final _headers = {
         'Content-type': 'application/json',
@@ -73,18 +73,37 @@ class DFITransactionRequests {
       final response = await http.post(_url, headers: _headers, body: _body);
       final data = jsonDecode(response.body);
       if (response.statusCode == 201) {
-        return TxErrorModel(isError: false, txLoaderList: [TxLoaderModel(txId: data['data'], txHex: txHex)]);
+        return TxErrorModel(
+          isError: false,
+          txLoaderList: [
+            TxLoaderModel(
+              txId: data['data'],
+              txHex: txHex,
+            ),
+          ],
+        );
       } else {
-        return TxErrorModel(isError: true, error: data['error']['message']);
+        return TxErrorModel(
+          isError: true,
+          error: data['error']['message'],
+        );
       }
     } catch (err) {
-      if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
-        String fallbackUrlAddress = networkString == 'mainnet'
-            ? 'http://ocean.mydefichain.com:3000/v0/mainnet/address/mainnet/rawtx/send'
-            : 'https://testnet-ocean.mydefichain.com:8443/v0/testnet/rawtx/send';
-        return sendTxHex(txHex: txHex, networkString: networkString, fallbackUrl: fallbackUrlAddress);
+      if (fallbackUri == null) {
+        final Uri _fallbackUri = Uri.https(
+          network.networkType.isTestnet ? Hosts.fallbackTestnetHost : Hosts.fallbackMainnetHost,
+          '/v0/${network.networkType.networkStringLowerCase}/rawtx/send',
+        );
+        return sendTxHex(
+          txHex: txHex,
+          network: network,
+          fallbackUri: _fallbackUri,
+        );
       } else {
-        return TxErrorModel(isError: true, error: jsonEncode(err));
+        return TxErrorModel(
+          isError: true,
+          error: jsonEncode(err),
+        );
       }
     }
   }

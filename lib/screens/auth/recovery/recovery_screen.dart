@@ -1,16 +1,14 @@
-import 'package:crypt/crypt.dart';
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
-import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
-import 'package:defi_wallet/services/logger_service.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/mnemonic_service.dart';
-import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
@@ -22,7 +20,6 @@ import 'package:defichaindart/defichaindart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
 class RecoveryScreen extends StatefulWidget {
@@ -37,7 +34,8 @@ class RecoveryScreen extends StatefulWidget {
   State<RecoveryScreen> createState() => _RecoveryScreenState();
 }
 
-class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
+class _RecoveryScreenState extends State<RecoveryScreen>
+    with ThemeMixin, SnackBarMixin {
   static const double _mnemonicBoxWidth = 328;
   static final RegExp _regExpPhraseSeparators = RegExp('[ .,;:|/-]+');
   static final String _replaceComaSeparator = ',';
@@ -101,15 +99,22 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
                     reverseTransitionDuration: Duration.zero,
                   ),
                 );
-              } catch (err) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Something error',
-                      style: Theme.of(context).textTheme.headline5,
-                    ),
-                    backgroundColor:
-                        Theme.of(context).snackBarTheme.backgroundColor,
+              } catch (error, stackTrace) {
+                await SentryService.captureException(
+                  ErrorModel(
+                    file: 'recovery_screen.dart',
+                    method: '_onSubmitRecovery',
+                    exception: error.toString(),
+                  ),
+                  stackTrace: stackTrace,
+                );
+                showSnackBar(
+                  context,
+                  title: 'Recoverring error. Please try later',
+                  color: AppColors.txStatusError.withOpacity(0.1),
+                  prefix: Icon(
+                    Icons.close,
+                    color: AppColors.txStatusError,
                   ),
                 );
               }
@@ -167,8 +172,15 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
           _confirmFocusNode.requestFocus();
         });
       }
-    } catch (err) {
-      print(err);
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'recovery_screen.dart',
+          method: '_onChangeTextField',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -212,8 +224,15 @@ class _RecoveryScreenState extends State<RecoveryScreen> with ThemeMixin {
           }
         });
       }
-    } catch (err) {
-      print(err);
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'recovery_screen.dart',
+          method: '_onFieldSubmitted',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
     }
   }
 

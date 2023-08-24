@@ -1,8 +1,13 @@
 class Hosts {
-  static const String oceanDefichainHome = 'ocean.defichain.com';
-  static const String oceanDefichain = 'https://$oceanDefichainHome/v0';
-  static const String myDefichain = 'http://ocean.mydefichain.com:3000/v0';
-  static const String ocean = 'https://testnet-ocean.mydefichain.com:8443/v0';
+  static const String mainnetHost = 'ocean.mydefichain.com';
+  static const String testnetHost = 'testnet-ocean.mydefichain.com:8443';
+  static const String myDefichainMainnet = 'https://$mainnetHost/v0';
+  static const String myDefichainTestnet = 'https://$testnetHost/v0';
+
+  static const String fallbackMainnetHost = 'ocean.defichain.com';
+  static const String fallbackTestnetHost = 'testnet.ocean.jellyfishsdk.com';
+  static const String fallbackMainnetUrl = 'https://$fallbackMainnetHost/v0';
+  static const String fallbackTestnetUrl = 'https://$fallbackTestnetHost/v0';
 
   static const String defiScanHome = 'defiscan.live';
   static const String defiScanLiveTx = 'https://$defiScanHome/transactions/';
@@ -22,7 +27,8 @@ class LockApi {
 }
 
 class JellyLinks {
-  static const String termsAndConditions = 'https://jellywallet.io/terms-and-conditions/';
+  static const String termsAndConditions =
+      'https://jellywallet.io/terms-and-conditions/';
   static const String telegramGroup = 'https://t.me/jellywallet_eng';
 }
 

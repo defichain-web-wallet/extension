@@ -8,6 +8,7 @@ import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_lm_requests.dart';
 import 'package:defi_wallet/requests/defichain/dfi_token_requests.dart';
 import 'package:defi_wallet/utils/convert.dart';
+import 'package:defi_wallet/utils/graph.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class RatesModel {
@@ -132,9 +133,6 @@ class RatesModel {
     List<BalanceModel> balances, {
     String convertToken = 'USDT',
   }) {
-    if (balances.isEmpty) {
-      return 0;
-    }
     return balances.map<double>((e) {
       if (e.token != null) {
         return getAmountByToken(
@@ -157,39 +155,64 @@ class RatesModel {
     TokenModel token, {
     String convertToken = 'USDT',
   }) {
-    String symbol = '$convertToken-DFI';
-    String testnetSymbol = 'DFI-$convertToken';
+    LmPoolModel lmPoolModel;
+    double sum = amount;
+
+    if (token.symbol == convertToken) {
+      return amount;
+    }
 
     try {
-      if (poolPairs == null || poolPairs!.isEmpty) {
+      if (token.symbol == 'DUSD') {
+        LmPoolModel foundToken = this.poolPairs!.firstWhere((element) =>
+        element.tokens.first.symbol == convertToken &&
+            element.tokens.last.symbol == token.symbol);
+        return (1.0 / foundToken.prices.last) * amount;
+      } else {
+        LmPoolModel foundToken = this.poolPairs!.firstWhere((element) =>
+        element.tokens.first.symbol == token.symbol &&
+            element.tokens.last.symbol == convertToken);
+        return (1.0 / foundToken.prices.first) * amount;
+      }
+    } catch (_) {
+      List<String> adjacencyList = this
+          .poolPairs!
+          .map((e) => e.symbol)
+          .where(
+            (element) =>
+        element != 'EUROC-DUSD' &&
+            element != 'DUSD-EUROC' &&
+            element != 'USDT-DUSD',
+      )
+          .toList();
+
+      Graph graph = Graph(adjacencyList);
+
+      List<String> path;
+      try {
+        path = graph.findPath(token.symbol, convertToken);
+      } catch (_) {
         return 0.0;
       }
-      LmPoolModel assetPair = this.poolPairs!.firstWhere((element) =>
-          element.symbol == symbol || element.symbol == testnetSymbol);
-      if (token.symbol == 'DFI') {
-        return assetPair.reserveADivReserveB * amount;
-      }
 
-      // TODO: convert to DUSD doesn't work correctly. Need to check later
-      LmPoolModel targetPair = this.poolPairs!.firstWhere((item) {
-        return item.tokens.first.symbol == token.symbol &&
-            (item.tokens.last.symbol == 'DFI' ||
-                item.tokens.last.symbol == 'DUSD');
+      path.forEach((symbol) {
+        try {
+          lmPoolModel =
+              this.poolPairs!.firstWhere((element) => element.symbol == symbol);
+          if ((path.indexOf(symbol) == path.length - 1 &&
+              token.symbol != 'USDT') ||
+              symbol == 'USDT-DFI' ||
+              (token.symbol == 'USDT' && convertToken == 'BTC')) {
+            sum = (1 / lmPoolModel.prices.last) * sum;
+          } else {
+            sum = (1 / lmPoolModel.prices.first) * sum;
+          }
+        } catch (err) {
+          print(err);
+        }
       });
 
-      double dfiByConvertToken = assetPair.reserveADivReserveB;
-      double dfiByToken = targetPair.reserveBDivReserveA;
-
-      double result;
-      if (targetPair.tokens.last.symbol == 'DUSD') {
-        result = (dfiByConvertToken * amount);
-        return result;
-      } else {
-        double result = (dfiByToken * amount) * dfiByConvertToken;
-        return result;
-      }
-    } catch (err) {
-      return 0.00;
+      return sum;
     }
   }
 
@@ -227,6 +250,17 @@ class RatesModel {
       return baseBalanceByAsset + quoteBalanceByAsset;
     } catch (_) {
       return 0.00;
+    }
+  }
+
+  String getSpecificTokenName(String token) {
+    switch (token) {
+      case 'USD':
+        return 'USDT';
+      case 'EUR':
+        return 'EUROC';
+      default:
+        return token;
     }
   }
 }

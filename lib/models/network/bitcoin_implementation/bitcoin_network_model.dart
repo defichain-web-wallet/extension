@@ -12,7 +12,6 @@ import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_pro
 import 'package:defi_wallet/models/network/account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
-import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -201,12 +200,6 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
     var fee = fromSatoshi(
         BTCTransactionService.calculateBTCFee(utxoList.length, 1, satPerByte));
     var available = balance - fee;
-
-    if (this.networkType.isTestnet) {
-      //btc testnet does not need that much fee
-      return balance - 0.0001;
-    }
-
     return available > 0 ? available : 0;
   }
 
@@ -220,8 +213,7 @@ class BitcoinNetworkModel extends AbstractNetworkModel {
   Future<ECPair> getKeypair(String password, AbstractAccountModel account,
       ApplicationModel applicationModel) async {
     var mnemonic =
-        (applicationModel.sourceList[account.sourceId]! as SourceModel)
-            .getMnemonic(password);
+        applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
     var masterKey = getMasterKeypairFormMnemonic(mnemonic);
     return _getKeypairForPathPrivateKey(
         masterKey, (account as AccountModel).accountIndex);

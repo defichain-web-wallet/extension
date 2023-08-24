@@ -2,7 +2,6 @@ import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/balance/bitcoin/blockcypher_balance_model.dart';
 import 'package:defi_wallet/models/history_model.dart';
 import 'dart:convert';
-import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_network_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
@@ -17,7 +16,7 @@ class BlockcypherRequests {
   }) async {
     try {
       final Uri url = Uri.parse(
-          '${Hosts.blockcypherApi}/btc/${network.networkType.isTestnet ? 'test3' : 'main'}/addrs/$addressString/balance?token=1355b9463e944bdf85601553e8ad3ae6');
+          '${Hosts.blockcypherApi}/btc/${network.networkType.isTestnet ? 'test3' : 'main'}/addrs/$addressString/balance');
 
       final response = await https.get(url);
 

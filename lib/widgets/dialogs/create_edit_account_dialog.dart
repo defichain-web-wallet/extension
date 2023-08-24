@@ -31,8 +31,7 @@ class CreateEditAccountDialog extends StatefulWidget {
       _CreateEditAccountDialogState();
 }
 
-class _CreateEditAccountDialogState extends State<CreateEditAccountDialog>
-    with ThemeMixin {
+class _CreateEditAccountDialogState extends State<CreateEditAccountDialog> with ThemeMixin{
   TextEditingController _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   FocusNode nameFocusNode = FocusNode();
@@ -148,7 +147,7 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog>
                     width: 104,
                     globalKey: globalKey,
                     callback: () async {
-                      if (_formKey.currentState!.validate()) {
+                     if(_formKey.currentState!.validate()) {
                         if (_nameController.text.length > 3) {
                           if (_pickedImage != null) {
                             await _saveImageToStorage();
@@ -347,8 +346,9 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog>
                                     height: 71,
                                     child: TextFormField(
                                       onSaved: (val) async {
-                                        if (_formKey.currentState!.validate()) {
-                                          if (_nameController.text.length > 3) {
+                                        if(_formKey.currentState!.validate()) {
+                                          if (_nameController.text.length >
+                                              3) {
                                             if (_pickedImage != null) {
                                               await _saveImageToStorage();
                                             }
@@ -360,36 +360,27 @@ class _CreateEditAccountDialogState extends State<CreateEditAccountDialog>
                                       },
                                       controller: _nameController,
                                       focusNode: nameFocusNode,
-                                      onEditingComplete: () => (globalKey
-                                              .currentWidget! as ElevatedButton)
-                                          .onPressed!(),
+                                      onEditingComplete: () =>
+                                          (globalKey.currentWidget! as ElevatedButton)
+                                              .onPressed!(),
                                       decoration: InputDecoration(
                                         errorStyle: TextStyle(
                                             backgroundColor: Colors.transparent,
                                             color: Colors.pink,
-                                            fontSize: 10),
-                                        hoverColor: Theme.of(context)
-                                            .inputDecorationTheme
-                                            .hoverColor,
+                                            fontSize: 10
+                                        ),
+                                        hoverColor: Theme.of(context).inputDecorationTheme.hoverColor,
                                         filled: true,
-                                        fillColor: Theme.of(context)
-                                            .inputDecorationTheme
-                                            .fillColor,
-                                        enabledBorder: Theme.of(context)
-                                            .inputDecorationTheme
-                                            .enabledBorder,
-                                        focusedBorder: Theme.of(context)
-                                            .inputDecorationTheme
-                                            .focusedBorder,
+                                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                        enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
+                                        focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
                                         hintText: 'Enter your Account`s Name',
                                         hintStyle: passwordField.copyWith(
-                                          color: isDarkTheme()
-                                              ? DarkColors.hintTextColor
-                                              : LightColors.hintTextColor,
+                                          color: isDarkTheme() ? DarkColors.hintTextColor : LightColors.hintTextColor,
                                         ),
                                       ),
                                       validator: (value) {
-                                        if (value!.length > 3) {
+                                        if(value!.length > 3) {
                                           return null;
                                         } else {
                                           return 'Must be more than 3 characters';

@@ -87,48 +87,36 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
     HomeCubit homeCubit = BlocProvider.of<HomeCubit>(context);
 
     if (!widget.isAppBar) {
-      return BlocListener<WalletCubit, WalletState>(
-          listener: (BuildContext context, WalletState state) {
-            onWalletStateChanged(state);
-          },
-          child: NetworkSelectorContent(
-            tabs: tabs,
-            onChange: (item) => onChangeNetwork(item),
-          ));
+      return NetworkSelectorContent(
+        tabs: tabs,
+        onChange: (item) => onChangeNetwork(item),
+      );
     } else if (isLargeScreen(context)) {
-      return BlocListener<WalletCubit, WalletState>(
-          listener: (BuildContext context, WalletState state) {
-            onWalletStateChanged(state);
+      return Container(
+        child: GestureDetector(
+          onTap: () {
+            homeCubit.updateExtendedSelector(
+              !homeCubit.state.isShowExtendedNetworkSelector,
+            );
           },
-          child: Container(
-            child: GestureDetector(
-              onTap: () {
-                homeCubit.updateExtendedSelector(
-                  !homeCubit.state.isShowExtendedNetworkSelector,
-                );
-              },
-              child: NetworkSelectorButton(),
-            ),
-          ));
+          child: NetworkSelectorButton(),
+        ),
+      );
     } else {
-      return BlocListener<WalletCubit, WalletState>(
-          listener: (BuildContext context, WalletState state) {
-            onWalletStateChanged(state);
-          },
-          child: CustomPopupMenu(
-            child: NetworkSelectorButton(),
-            menuBuilder: () => NetworkSelectorContent(
-              tabs: tabs,
-              onChange: (item) => onChangeNetwork(item),
-            ),
-            showArrow: false,
-            barrierColor: Colors.transparent,
-            pressType: PressType.singleClick,
-            verticalMargin: _getVerticalMargin(context),
-            horizontalMargin: _getHorizontalMargin(context),
-            controller: controller,
-            enablePassEvent: false,
-          ));
+      return CustomPopupMenu(
+        child: NetworkSelectorButton(),
+        menuBuilder: () => NetworkSelectorContent(
+          tabs: tabs,
+          onChange: (item) => onChangeNetwork(item),
+        ),
+        showArrow: false,
+        barrierColor: Colors.transparent,
+        pressType: PressType.singleClick,
+        verticalMargin: _getVerticalMargin(context),
+        horizontalMargin: _getHorizontalMargin(context),
+        controller: controller,
+        enablePassEvent: false,
+      );
     }
   }
 }

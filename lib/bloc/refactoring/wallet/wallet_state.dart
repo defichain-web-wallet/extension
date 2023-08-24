@@ -14,44 +14,35 @@ class WalletState extends Equatable {
   });
 
   List<BalanceModel> getBalances() {
-    List<BalanceModel> balances = this
-        .applicationModel!
-        .activeAccount!
-        .getPinnedBalances(applicationModel!.activeNetwork!);
+    List<BalanceModel> balances = this.applicationModel!.activeAccount!.getPinnedBalances(applicationModel!.activeNetwork!);
     return balances;
   }
 
   double unconfirmedBalance() {
     final balances = getBalances();
-    if (balances.isEmpty) {
-      return 0;
-    }
-    return this
-        .applicationModel!
-        .activeNetwork!
-        .fromSatoshi(balances.first.unconfirmedBalance);
+    return this.applicationModel!.activeNetwork!.fromSatoshi(balances.first.unconfirmedBalance);
   }
 
   bool get isSendReceiveOnly =>
       this.applicationModel!.activeNetwork!.getBridges().isEmpty;
+  bool get isDisableRamp =>
+      this.applicationModel!.activeNetwork!.getRamps().isEmpty;
 
-  String get activeAddress => this.applicationModel!.activeAccount!.getAddress(
-      this.applicationModel!.activeNetwork!.networkType.networkName)!;
+  String get activeAddress => this.applicationModel!.activeAccount!.getAddress(this.applicationModel!.activeNetwork!.networkType.networkName)!;
 
   TokenModel get activeToken => this.applicationModel!.activeToken!;
 
   AbstractNetworkModel get activeNetwork =>
       this.applicationModel!.activeNetwork!;
 
-  AbstractAccountModel get activeAccount =>
-      this.applicationModel!.activeAccount!;
+  AbstractAccountModel get activeAccount => this.applicationModel!.activeAccount!;
   List<AbstractAccountModel> get accounts => this.applicationModel!.accounts;
 
   @override
   List<Object?> get props => [
         status,
         applicationModel,
-        restoreProgress,
+    restoreProgress,
       ];
 
   WalletState copyWith({

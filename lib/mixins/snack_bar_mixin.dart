@@ -14,15 +14,19 @@ mixin SnackBarMixin {
     int? duration,
     Color? color,
     Widget? prefix,
+    bool isLockScreen = false,
   }) {
-    SnackBar snackBar = bottomSnackBar(context,
+    SnackBar snackBar = bottomSnackBar(
+      context,
       title: title,
       duration: duration,
       color: color ?? AppColors.txStatusDone.withOpacity(0.08),
-      prefix: prefix ??  Icon(
-        Icons.done,
-        color: AppColors.txStatusDone,
-      ),
+      isLockScreen: isLockScreen,
+      prefix: prefix ??
+          Icon(
+            Icons.done,
+            color: AppColors.txStatusDone,
+          ),
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -37,6 +41,7 @@ mixin SnackBarMixin {
     Widget? prefix,
     Widget? suffix,
     Function? onTapCallback,
+    bool isLockScreen = false,
   }) {
     return SnackBar(
       behavior: SnackBarBehavior.floating,
@@ -56,6 +61,7 @@ mixin SnackBarMixin {
         suffix: suffix,
         prefix: prefix,
         onTapCallback: onTapCallback,
+        isLockScreen: isLockScreen,
       ),
       duration: Duration(seconds: duration ?? seconds),
       backgroundColor: Colors.transparent,
@@ -70,6 +76,7 @@ mixin SnackBarMixin {
     Widget? prefix,
     Widget? suffix,
     Function? onTapCallback,
+    bool isLockScreen = false,
   }) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
@@ -112,11 +119,17 @@ mixin SnackBarMixin {
                         TickerText(
                           child: Text(
                             title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(
-                                    fontWeight: FontWeight.w500, fontSize: 13),
+                            style:
+                                Theme.of(context).textTheme.headline5!.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: isLockScreen
+                                          ? AppColors.white
+                                          : Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .color,
+                                    ),
                           ),
                         ),
                         if (subtitle != null) ...[

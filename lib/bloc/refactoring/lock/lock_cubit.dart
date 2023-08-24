@@ -1,5 +1,6 @@
 import 'package:decimal/decimal.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
@@ -11,6 +12,7 @@ import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/requests/defichain/staking/lock_requests.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -136,7 +138,15 @@ class LockCubit extends Cubit<LockState> {
       emit(state.copyWith(
         status: LockStatusList.success,
       ));
-    } catch (err) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'lock_cubit.dart',
+          method: 'updateRewardRoutes',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       emit(state.copyWith(
         status: LockStatusList.failure,
       ));
@@ -232,7 +242,7 @@ class LockCubit extends Cubit<LockState> {
 
     var accessKey = lockStaking.getAccessToken(account);
     if (accessKey != null) {
-      if(accessKey.isValid()){
+      if(!accessKey.isExpire()) {
         bool lockAccountPresent = false;
         bool isKycDone = false;
         String kycLink = '';
@@ -247,27 +257,37 @@ class LockCubit extends Cubit<LockState> {
           account,
           walletCubit.state.activeNetwork,
         );
-        if (!isKycDone) {
-          status = LockStatusList.neededKyc;
-          kycLink = await lockStaking.getKycLink(account);
-        } else {
-          status = LockStatusList.success;
-          stakingModel = await lockStaking.getStaking(account);
+        try {
+          if (!isKycDone) {
+            status = LockStatusList.neededKyc;
+            kycLink = await lockStaking.getKycLink(account);
+          } else {
+            status = LockStatusList.success;
+            stakingModel = await lockStaking.getStaking(account);
+          }
+          emit(state.copyWith(
+            status: status,
+            stakingProviders: stakingProviders,
+            lockStaking: lockStaking,
+            accessKey: accessKey,
+            lockAccountPresent: lockAccountPresent,
+            isKycDone: isKycDone,
+            kycLink: kycLink,
+            stakingModel: stakingModel,
+            assets: assets,
+            selectedAssets: assets.where((element) => !element.isPair && !element.isDAT && !element.isUTXO).toList(),
+            stakingTokenModel: stakingTokenModel,
+          ));
+        } catch (error) {
+          SentryService.captureMessage(
+            ErrorModel(
+              file: 'lock_cubit.dart',
+              method: '_checkAccessKey',
+              exception: error.toString(),
+            ),
+          );
+          emit(state.copyWith(status: LockStatusList.expired));
         }
-        emit(state.copyWith(
-          status: status,
-          stakingProviders: stakingProviders,
-          lockStaking: lockStaking,
-          accessKey: accessKey,
-          lockAccountPresent: lockAccountPresent,
-          isKycDone: isKycDone,
-          kycLink: kycLink,
-          stakingModel: stakingModel,
-          assets: assets,
-          selectedAssets: assets.where((element) => !element.isPair && !element.isDAT && !element.isUTXO).toList(),
-          stakingTokenModel: stakingTokenModel,
-          //staking lock
-        ));
       } else {
         emit(state.copyWith(status: LockStatusList.expired));
       }

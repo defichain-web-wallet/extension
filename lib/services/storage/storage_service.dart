@@ -4,6 +4,8 @@ import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/storage/hive_service.dart';
 
 class StorageService {
@@ -15,9 +17,16 @@ class StorageService {
       String jsonString = json.encode(data);
       var encryptedAccounts = stringToBase64.encode(jsonString);
       await HiveService.update(HiveNames.accounts, encryptedAccounts);
-    } catch (err) {
-      print(err);
-      throw err;
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'storage_service.dart',
+          method: 'saveAccounts',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
+      throw error;
     }
   }
 
@@ -27,9 +36,16 @@ class StorageService {
       final jsonString = json.encode(applicationModelJson);
       final encryptedApplication = stringToBase64.encode(jsonString);
       await HiveService.update(HiveNames.application, encryptedApplication);
-    } catch (err) {
-      print(err);
-      throw err;
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'storage_service.dart',
+          method: 'saveApplication',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
+      throw error;
     }
   }
 
@@ -39,7 +55,15 @@ class StorageService {
       var decryptedApplication = stringToBase64.decode(savedApplication);
       dynamic jsonList = json.decode(decryptedApplication);
       return ApplicationModel.fromJSON(jsonList);
-    } catch (error) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'storage_service.dart',
+          method: 'loadApplication',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       throw error;
     }
   }

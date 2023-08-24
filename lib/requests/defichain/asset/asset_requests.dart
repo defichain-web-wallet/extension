@@ -20,7 +20,7 @@ class AssetsRequests {
     }
 
     final Uri url = Uri.https(
-      Hosts.oceanDefichainHome,
+      network.networkType.isTestnet ? Hosts.testnetHost : Hosts.mainnetHost,
       '/v0/${network.networkType.networkStringLowerCase}/$path',
       query,
     );

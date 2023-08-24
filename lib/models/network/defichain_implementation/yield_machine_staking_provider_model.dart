@@ -34,6 +34,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
           AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
+        expireTime: DateTime.now().millisecondsSinceEpoch,
       );
       return true;
     }
@@ -58,6 +59,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
           AccessTokenModel(
         accessToken: accessToken,
         expireHours: 24,
+        expireTime: DateTime.now().millisecondsSinceEpoch,
       );
       return true;
     }
@@ -82,7 +84,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
       AbstractAccountModel account, TokenModel token) async {
     var staking = await LockRequests.getStaking(
         this
-            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessTokensMap[(account as AccountModel)..accountIndex]!
             .accessToken,
         'DeFiChain',
         'LiquidityMining');
@@ -106,7 +108,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
         availableTokens.firstWhere((element) => element.symbol == 'DFI');
     var analytics = await LockRequests.getAnalytics(
         this
-            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessTokensMap[(account as AccountModel)..accountIndex]!
             .accessToken,
         'DFI',
         'DeFiChain',
@@ -127,7 +129,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
         availableTokens.firstWhere((element) => element.symbol == 'DFI');
     var analytics = await LockRequests.getAnalytics(
         this
-            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessTokensMap[(account as AccountModel)..accountIndex]!
             .accessToken,
         'DFI',
         'DeFiChain',
@@ -143,7 +145,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
   Future<StakingModel> getStaking(AbstractAccountModel account) async {
     return LockRequests.getStaking(
         this
-            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessTokensMap[(account as AccountModel)..accountIndex]!
             .accessToken,
         'DeFiChain',
         'LiquidityMining');
@@ -168,7 +170,7 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     if (tx.isError == false) {
       LockRequests.setDeposit(
         this
-            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessTokensMap[(account as AccountModel)..accountIndex]!
             .accessToken,
         stakingModel.id,
         amount,
@@ -191,13 +193,13 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     late WithdrawModel? withdrawModel;
     var existWithdraws = await LockRequests.getWithdraws(
         this
-            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessTokensMap[(account as AccountModel)..accountIndex]!
             .accessToken,
         stakingModel.id);
     if (existWithdraws!.isEmpty) {
       withdrawModel = await LockRequests.requestWithdraw(
         this
-            .accessTokensMap[(account as AccountModel).accountIndex]!
+            .accessTokensMap[(account as AccountModel)..accountIndex]!
             .accessToken,
         stakingModel.id,
         amount,
@@ -205,7 +207,9 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
       );
     } else {
       withdrawModel = await LockRequests.changeAmountWithdraw(
-          this.accessTokensMap[account.accountIndex]!.accessToken,
+          this
+              .accessTokensMap[(account as AccountModel)..accountIndex]!
+              .accessToken,
           stakingModel.id,
           existWithdraws[0].id!,
           amount);
@@ -217,7 +221,9 @@ class YieldMachineStakingProviderModel extends AbstractStakingProviderModel {
     withdrawModel.signature = await network.signMessage(
         account, withdrawModel.signMessage!, password, applicationModel);
     await LockRequests.signedWithdraw(
-        this.accessTokensMap[account.accountIndex]!.accessToken,
+        this
+            .accessTokensMap[(account as AccountModel)..accountIndex]!
+            .accessToken,
         stakingModel.id,
         withdrawModel);
     return true;

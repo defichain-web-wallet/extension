@@ -12,11 +12,9 @@ import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bridge_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_exchange_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_lm_provider_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/yield_machine_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
-import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:defi_wallet/models/network/staking_enum.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -40,7 +38,6 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     if (!networkType.isTestnet) {
       this.stakingList.add(new LockStakingProviderModel());
       this.stakingList.add(new YieldMachineStakingProviderModel());
-      this.rampList.add(new DFXRampModel());
     }
 
     this.lmList.add(new DefichainLmProviderModel());
@@ -54,7 +51,6 @@ class DefichainNetworkModel extends AbstractNetworkModel {
 
   factory DefichainNetworkModel.fromJson(Map<String, dynamic> json) {
     final stakingListJson = json['stakingList'];
-    final rampListJson = json['rampList'];
 
     final stakingList = List.generate(
       stakingListJson.length,
@@ -68,17 +64,10 @@ class DefichainNetworkModel extends AbstractNetworkModel {
         }
       },
     );
-    final rampList = List.generate(
-      rampListJson.length,
-      (index) => DFXRampModel.fromJson(
-        rampListJson[index],
-      ),
-    );
     return DefichainNetworkModel(
       NetworkTypeModel.fromJson(json['networkType']),
     )
       ..stakingList = stakingList
-      ..rampList = rampList
       ..lmList = [DefichainLmProviderModel()]
       ..exchangeList = [DefichainExchangeModel()];
   }
@@ -89,10 +78,6 @@ class DefichainNetworkModel extends AbstractNetworkModel {
     data['stakingList'] = List.generate(
       this.stakingList.length,
       (index) => this.stakingList[index].toJson(),
-    );
-    data['rampList'] = List.generate(
-      this.rampList.length,
-      (index) => this.rampList[index].toJson(),
     );
 
     return data;
@@ -288,8 +273,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
   Future<ECPair> getKeypair(String password, AbstractAccountModel account,
       ApplicationModel applicationModel) async {
     var mnemonic =
-        (applicationModel.sourceList[account.sourceId]! as SourceModel)
-            .getMnemonic(password);
+        applicationModel.sourceList[account.sourceId]!.getMnemonic(password);
     var masterKey = getMasterKeypairFormMnemonic(mnemonic);
     return _getKeypairForPathPrivateKey(
         masterKey, (account as AccountModel).accountIndex);
@@ -301,14 +285,9 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       required String password,
       required TokenModel token,
       required double amount,
-        required ApplicationModel applicationModel,
-        int satPerByte = 0}) async {
-    //TODO: Ledger: You can check here account.sourceId and check if this is ledger
-    ECPair keypair = await getKeypair(
-      password,
-      account,
-      applicationModel
-    );
+      required ApplicationModel applicationModel,
+      int satPerByte = 0}) async {
+    ECPair keypair = await getKeypair(password, account, applicationModel);
 
     List<BalanceModel> balances =
         account.getPinnedBalances(this, mergeCoin: false);
@@ -321,7 +300,7 @@ class DefichainNetworkModel extends AbstractNetworkModel {
       token,
       account.getAddress(this.networkType.networkName)!,
     );
-//TODO: Ledger: You can check here account.sourceId and if this ledger - change DFITransactionService to a ledger service
+
     return DFITransactionService().createSendTransaction(
       senderAddress: account.getAddress(this.networkType.networkName)!,
       keyPair: keypair,

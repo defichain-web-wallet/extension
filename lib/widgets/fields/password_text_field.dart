@@ -31,7 +31,6 @@ class PasswordTextField extends StatefulWidget {
   final bool isShowObscureIcon;
   final bool isCaptionShown;
   final bool isOpasity;
-  final bool onlyEngCharacters;
 
   const PasswordTextField({
     Key? key,
@@ -51,7 +50,6 @@ class PasswordTextField extends StatefulWidget {
     this.isShowObscureIcon = false,
     this.isCaptionShown = true,
     this.isOpasity = false,
-    this.onlyEngCharacters = true,
   }) : super(key: key);
 
   @override
@@ -98,11 +96,6 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                   ),
                 ),
               TextFormField(
-                inputFormatters: widget.onlyEngCharacters
-                    ? <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(regExp),
-                ]
-                    : [],
                 autofocus: widget.autofocus,
                 maxLines: maxLines,
                 obscuringCharacter: obscureSymbolCharacter,

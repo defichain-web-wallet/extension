@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
+import 'package:defi_wallet/requests/defichain/dfi_transaction_requests.dart';
 import 'package:defi_wallet/requests/history_requests.dart';
 import 'package:defi_wallet/requests/transaction_requests.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -16,22 +18,22 @@ class TransactionCubit extends Cubit<TransactionState> {
   HistoryRequests historyRequests = HistoryRequests();
   Timer? timer;
 
-  checkOngoingTransaction(NetworkTypeModel networkType) async {
+  checkOngoingTransaction(AbstractNetworkModel network) async {
     var box = await Hive.openBox(HiveBoxes.client);
     var txId = await box.get(HiveNames.ongoingTransaction);
     await box.close();
     if (txId != null) {
       TxErrorModel txErrorModel = TxErrorModel.fromJson(txId);
-      await onChangeTransactionState(txErrorModel, networkType);
+      await onChangeTransactionState(txErrorModel, network);
       timer = Timer.periodic(Duration(seconds: 2), (timer) async {
-        await onChangeTransactionState(txErrorModel, networkType, timer: timer);
+        await onChangeTransactionState(txErrorModel, network, timer: timer);
       });
     }
   }
 
   onChangeTransactionState(
     TxErrorModel txErrorModel,
-    NetworkTypeModel networkType, {
+    AbstractNetworkModel network, {
     dynamic timer,
   }) async {
     bool isOngoing;
@@ -42,15 +44,16 @@ class TransactionCubit extends Cubit<TransactionState> {
       );
       isOngoing = await historyRequests.getTxPresent(
         loadingTx.txId!,
-        networkType.networkString,
+        network,
       );
       if (isOngoing) {
         if (txErrorModel.txLoaderList!.length > 1 &&
             txErrorModel.txLoaderList!.indexOf(loadingTx) == 0 &&
             txErrorModel.txLoaderList![lastTxIndex].txHex != null) {
-          TxErrorModel tempTxErrorModel = await TransactionRequests().sendTxHex(
-            txErrorModel.txLoaderList![lastTxIndex].txHex!,
-          );
+          TxErrorModel tempTxErrorModel =
+              await DFITransactionRequests.sendTxHex(
+                  txHex: txErrorModel.txLoaderList![lastTxIndex].txHex!,
+                  network: network);
           txErrorModel.txLoaderList![lastTxIndex].txId =
               tempTxErrorModel.txLoaderList![0].txId;
         }

@@ -9,7 +9,6 @@ import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/defichain/dfi_exchange_requests.dart';
 import 'package:defi_wallet/services/defichain/dfi_transaction_service.dart';
-import 'package:defi_wallet/services/storage/hive_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 class DefichainExchangeModel extends AbstractExchangeModel {
@@ -17,7 +16,7 @@ class DefichainExchangeModel extends AbstractExchangeModel {
     AbstractNetworkModel network,
   ) {
     return DFIExchangeRequests.getExchangePairs(
-      networkType: network.networkType,
+      network: network,
     );
   }
 
@@ -38,7 +37,6 @@ class DefichainExchangeModel extends AbstractExchangeModel {
     var utxoBalance = balances.firstWhere(
           (element) => element.token!.symbol == 'DFI' && !element.token!.isUTXO,
     );
-    //TODO: Ledger: You can check here account.sourceId and if this ledger - change DFITransactionService to a ledger service
     return DFITransactionService().createAndSendSwap(
       senderAddress: account.getAddress(network.networkType.networkName)!,
       network: DefichainNetworkModel(network.networkType),

@@ -51,7 +51,7 @@ class _AccountMenuButtonState extends State<AccountMenuButton> with ThemeMixin {
   Color getCircleAvatarColor() {
     if (widget.account is AccountModel) {
       return AppColors
-          .accountColors[(widget.account! as AccountModel).accountIndex];
+          .accountColors[(widget.account as AccountModel).accountIndex];
     } else {
       return AppColors.accountColors[Random().nextInt(10)];
     }

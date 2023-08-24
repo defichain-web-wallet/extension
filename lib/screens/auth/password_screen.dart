@@ -1,6 +1,7 @@
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
+import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
+import 'package:defi_wallet/services/password_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/defi_checkbox.dart';
@@ -25,7 +26,7 @@ class PasswordScreen extends StatefulWidget {
   State<PasswordScreen> createState() => _PasswordScreenState();
 }
 
-class _PasswordScreenState extends State<PasswordScreen> {
+class _PasswordScreenState extends State<PasswordScreen> with SnackBarMixin {
   GlobalKey _formKey = GlobalKey<FormState>();
   TextEditingController password = TextEditingController();
   TextEditingController confirm = TextEditingController();
@@ -196,22 +197,19 @@ class _PasswordScreenState extends State<PasswordScreen> {
                           height: 24,
                         ),
                         Container(
-                          width: isFullScreen ? buttonFullWidth : buttonSmallWidth,
+                          width:
+                              isFullScreen ? buttonFullWidth : buttonSmallWidth,
                           child: BlocBuilder<WalletCubit, WalletState>(
                             builder: (context, state) {
                               return PendingButton(
                                 'Create password',
-                                pendingText: state.status ==
-                                        WalletStatusList.restore
-                                    ? 'Processing ${state.restoreProgress}'
-                                    : 'Processing...',
+                                pendingText:
+                                    state.status == WalletStatusList.restore
+                                        ? 'Processing ${state.restoreProgress}'
+                                        : 'Processing...',
                                 isCheckLock: false,
                                 callback: _enableBtn && isConfirm
-                                    ? (parent) async {
-                                        parent.emitPending(true);
-                                        await widget.onSubmitted(password.text);
-                                        parent.emitPending(false);
-                                      }
+                                    ? (parent) async => _submit(parent)
                                     : null,
                               );
                             },
@@ -227,5 +225,17 @@ class _PasswordScreenState extends State<PasswordScreen> {
         ),
       );
     });
+  }
+
+  _submit(parent) async {
+    await PasswordService().handleCorrectAndRun(
+      context,
+      password.text,
+      () async {
+        parent.emitPending(true);
+        await widget.onSubmitted(password.text);
+        parent.emitPending(false);
+      },
+    );
   }
 }

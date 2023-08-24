@@ -1,16 +1,16 @@
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
-import 'package:defi_wallet/bloc/refactoring/wallet/update_active_account_change.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
-import 'package:defi_wallet/models/network/defichain_implementation/dfx_ramp_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/ledger_account_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
 import 'package:defi_wallet/models/network/account_model.dart';
@@ -34,30 +34,6 @@ class WalletCubit extends Cubit<WalletState> {
   double fromSatoshi(int value) {
     return state.activeNetwork.fromSatoshi(value);
   }
-  //TODO: ledger
-  // createWalletWithLedger(String password) async {
-  //   emit(state.copyWith(status: WalletStatusList.loading));
-  //   var applicationModel = ApplicationModel(sourceList: {}, password: password);
-  //
-  //
-  //   var source = applicationModel.createSource(
-  //       null, null, null, password, SourceName.ledger);
-  //
-  //   var account = await AccountModel.fromLedger(
-  //       networkList: applicationModel.networks,
-  //       accountIndex: 0,
-  //       sourceId: source.id);
-  //
-  //   applicationModel.activeAccount = account;
-  //   applicationModel.accounts = [account];
-  //
-  //   await StorageService.saveApplication(applicationModel);
-  //
-  //   emit(state.copyWith(
-  //     applicationModel: applicationModel,
-  //     status: WalletStatusList.success,
-  //   ));
-  // }
 
   createWallet(List<String> mnemonic, String password) async {
     emit(state.copyWith(status: WalletStatusList.loading));
@@ -69,7 +45,7 @@ class WalletCubit extends Cubit<WalletState> {
     var publicKeyTestnet = _getPublicKey(seed, true);
 
     var source = applicationModel.createSource(mnemonic, publicKeyTestnet,
-        publicKeyMainnet, password, SourceName.ledger);
+        publicKeyMainnet, password, SourceName.seed);
 
     var account = await AccountModel.fromPublicKeys(
         networkList: applicationModel.networks,
@@ -112,6 +88,7 @@ class WalletCubit extends Cubit<WalletState> {
     var accountIndex = 0;
     var neededRestore = applicationModel.networks.length * 5;
     var restored = 0;
+    late AbstractAccountModel firstAccount;
     emit(state.copyWith(
         status: WalletStatusList.restore,
         restoreProgress: '($restored/$neededRestore)'));
@@ -137,16 +114,17 @@ class WalletCubit extends Cubit<WalletState> {
               applicationModel,
               network,
             );
-            await (network.rampList[0] as DFXRampModel).signIn(
-              account,
-              password,
-              applicationModel,
-              network,
-            );
           }
         }
-      } catch (_) {
-        print(_);
+      } catch (error, stackTrace) {
+        SentryService.captureException(
+          ErrorModel(
+            file: 'wallet_cubit.dart',
+            method: 'restoreWallet',
+            exception: error.toString(),
+          ),
+          stackTrace: stackTrace,
+        );
         rethrow;
       }
 
@@ -169,7 +147,15 @@ class WalletCubit extends Cubit<WalletState> {
         }
         accountList.add(account);
         accountIndex++;
+      } else {
+        if (accountIndex == 0) {
+          firstAccount = account;
+        }
       }
+    }
+
+    if (accountList.isEmpty) {
+      accountList.add(firstAccount);
     }
 
     applicationModel.accounts = accountList;
@@ -184,80 +170,39 @@ class WalletCubit extends Cubit<WalletState> {
     ));
   }
 
-  restoreWalletWithLedger(String password, String pubKey, String address,
-      String path, bool isTestnet, String appName) async {
-    emit(state.copyWith(status: WalletStatusList.loading));
-    var applicationModel = ApplicationModel(sourceList: {}, password: password);
-    List<AbstractAccountModel> accountList = [];
-
-    bool hasHistory = true;
-
-    //TODO: maybe we need move this to different service
-
-    var source = applicationModel.createSource(
-        null, null, null, password, SourceName.ledger);
-
-    var accountIndex = 0;
-    while (hasHistory) {
-      late AbstractAccountModel account;
-      try {
-        account = await LedgerAccountModel.fromLedger(
-          publicKey: pubKey,
-          network: applicationModel.networks.first,
-          address: address,
-          path: path,
-          isTestnet: isTestnet,
-          appName: appName,
-          sourceId: source.id,
-          isRestore: true,
-        );
-        for (var network in applicationModel.networks) {
-          if (network.networkType.networkName.name ==
-              NetworkName.defichainMainnet.name) {
+  updateAccessKeys(ApplicationModel applicationModel, String password) async {
+    try {
+      for (var network in applicationModel.networks) {
+        if (network.networkType.networkName.name ==
+            NetworkName.defichainMainnet.name) {
+          applicationModel.accounts.forEach((element) async {
             await (network.stakingList[0] as LockStakingProviderModel).signIn(
-              account,
+              element,
               password,
               applicationModel,
               network,
             );
-            await (network.rampList[0] as DFXRampModel).signIn(
-              account,
-              password,
-              applicationModel,
-              network,
-            );
-          }
+          });
         }
-      } catch (_) {
-        print(_);
-        rethrow;
       }
 
-      //TODO: check tx history here
-      bool presentBalance = false;
-      applicationModel.networks.forEach((element) {
-        var balanceList = account.getPinnedBalances(element);
-        if (balanceList.length > 1 || balanceList.first.balance != 0) {
-          presentBalance = true;
-        }
-      });
-      hasHistory = presentBalance;
-      if (presentBalance) {
-        accountList.add(account);
-        accountIndex++;
-      }
+      emit(state.copyWith(
+        applicationModel: applicationModel,
+        status: WalletStatusList.success,
+      ));
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'wallet_cubit.dart',
+          method: 'updateAccessKeys',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
+      emit(state.copyWith(
+        status: WalletStatusList.failure,
+      ));
     }
-
-    applicationModel.accounts = accountList;
-    applicationModel.activeAccount = accountList.first;
-
-    // await StorageService.saveAccounts(accountList);
-    await StorageService.saveApplication(applicationModel);
-
-    emit(state.copyWith(
-      applicationModel: applicationModel,
-      status: WalletStatusList.success,
-    ));
   }
 
   loadWalletDetails({ApplicationModel? application}) async {
@@ -271,7 +216,15 @@ class WalletCubit extends Cubit<WalletState> {
         applicationModel: applicationModel,
         status: WalletStatusList.success,
       ));
-    } catch (error) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'wallet_cubit.dart',
+          method: 'loadWalletDetails',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       emit(state.copyWith(
         status: WalletStatusList.failure,
       ));
@@ -311,7 +264,7 @@ class WalletCubit extends Cubit<WalletState> {
         state.applicationModel!.activeNetwork!.networkType.networkName.name;
     final balances =
         await state.applicationModel!.activeNetwork!.getAllBalances(
-      addressString: state.activeAccount!.getNetworkAddress(
+      addressString: state.activeAccount.getNetworkAddress(
         state.applicationModel!.activeNetwork!,
       ),
     );
@@ -453,29 +406,5 @@ class WalletCubit extends Cubit<WalletState> {
                 ),
                 wif: network.wif))
         .toBase58();
-  }
-
-  signUpToRamp(String password) async {
-    try {
-      final applicationModel = state.applicationModel;
-      await (applicationModel!.activeNetwork!.rampList[0] as DFXRampModel)
-          .signUp(
-        state.activeAccount,
-        password,
-        state.applicationModel!,
-        state.activeNetwork,
-      );
-
-      await StorageService.saveApplication(applicationModel);
-
-      emit(state.copyWith(
-        status: WalletStatusList.success,
-        applicationModel: applicationModel,
-      ));
-    } catch (err) {
-      emit(state.copyWith(
-        status: WalletStatusList.failure,
-      ));
-    }
   }
 }

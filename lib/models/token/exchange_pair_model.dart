@@ -34,14 +34,17 @@ class ExchangePairModel {
     List<dynamic> jsonList,
     NetworkName? networkName,
   ) {
-    List<ExchangePairModel> pairs = List.generate(
-      jsonList.length,
-      (index) => ExchangePairModel.fromJSON(
-        jsonList[index],
-        networkName,
-      ),
-    );
-
-    return pairs;
+    List<ExchangePairModel> result = [];
+    jsonList.forEach((element) {
+      if (!element['symbol'].contains('v1') && element['status']) {
+        result.add(
+          ExchangePairModel.fromJSON(
+            element,
+            networkName,
+          ),
+        );
+      }
+    });
+    return result;
   }
 }

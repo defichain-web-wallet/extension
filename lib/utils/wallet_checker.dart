@@ -2,12 +2,14 @@ import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/lock_helper.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/auth/signup/signup_phrase_screen.dart';
 import 'package:defi_wallet/screens/auth/welcome_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/lock_screen.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defi_wallet/utils/theme/theme_checker.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -24,9 +26,40 @@ class _WalletCheckerState extends State<WalletChecker> {
   SettingsHelper settingsHelper = SettingsHelper();
   LockHelper lockHelper = LockHelper();
 
+  redirectToHome(ApplicationModel applicationModel) {
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+
+    lockHelper.provideWithLockChecker(context, () async {
+      try {
+        await walletCubit.loadWalletDetails(
+          application: applicationModel,
+        );
+        await Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                ThemeChecker(HomeScreen(
+              isLoadTokens: true,
+            )),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      } catch (error, stackTrace) {
+        SentryService.captureException(
+          ErrorModel(
+            file: 'wallet_checker.dart',
+            method: 'redirectToHome',
+            exception: error.toString(),
+          ),
+          stackTrace: stackTrace,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     ApplicationModel? applicationModel;
 
     Future<void> checkWallets() async {
@@ -43,9 +76,6 @@ class _WalletCheckerState extends State<WalletChecker> {
       bool isRecoveryMnemonic =
           await box.get(HiveNames.recoveryMnemonic) != null;
       String? recoveryMnemonic = await box.get(HiveNames.recoveryMnemonic);
-
-      bool isLedger =
-          await box.get(HiveNames.ledgerWalletSetup, defaultValue: false);
 
       await settingsHelper.loadSettings();
       await box.close();
@@ -66,27 +96,8 @@ class _WalletCheckerState extends State<WalletChecker> {
           ),
         );
       } else {
-        if (applicationModel != null || isLedger) {
-          lockHelper.provideWithLockChecker(context, () async {
-            try {
-              await walletCubit.loadWalletDetails(
-                application: applicationModel,
-              );
-              await Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) =>
-                      ThemeChecker(HomeScreen(
-                    isLoadTokens: true,
-                  )),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ),
-              );
-            } catch (err) {
-              print(err);
-            }
-          });
+        if (applicationModel != null) {
+          redirectToHome(applicationModel!);
         } else {
           if (isOpenedMnemonic) {
             Navigator.pushReplacement(

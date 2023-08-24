@@ -5,12 +5,13 @@ import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/screens/earn/earn_card.dart';
 import 'package:defi_wallet/screens/liquidity/liquidity_screen_new.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
-import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/staking/staking_card.dart';
@@ -46,12 +47,16 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
 
     return Scaffold(
       drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-      endDrawer: widget.isFullScreen ? null : AccountDrawer(
-        width: buttonSmallWidth,
-      ),
-      appBar: widget.isFullScreen ? null : NewMainAppBar(
-        isShowLogo: false,
-      ),
+      endDrawer: widget.isFullScreen
+          ? null
+          : AccountDrawer(
+              width: buttonSmallWidth,
+            ),
+      appBar: widget.isFullScreen
+          ? null
+          : NewMainAppBar(
+              isShowLogo: false,
+            ),
       body: Container(
         padding: EdgeInsets.only(
           top: 22,
@@ -81,31 +86,33 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
         child: Center(
           child: StretchBox(
             child: BlocBuilder<EarnCubit, EarnState>(
-              builder: (earnContext, earnState) {
-                EarnCubit earnCubit = BlocProvider.of<EarnCubit>(context);
-                if(earnState.status == EarnStatusList.loading || earnState.status == EarnStatusList.initial){
-                  if(earnState.status == EarnStatusList.initial){
-                    earnCubit.init(context);
-                  }
-                  return Loader();
-                }
-                  return Column(
-                    children: [
-                      PageTitle(isFullScreen: widget.isFullScreen, title: titleText,),
-                      SizedBox(
-                        height: 19,
-                      ),
-                      StakingCard(),
-                      SizedBox(
-                        height: 18,
-                      ),
-                      liquidityMiningCard(
+                builder: (earnContext, earnState) {
+              EarnCubit earnCubit = BlocProvider.of<EarnCubit>(context);
+              if (earnState.status == EarnStatusList.initial) {
+                earnCubit.init(context);
+              }
+              return Column(
+                children: [
+                  PageTitle(
+                    isFullScreen: widget.isFullScreen,
+                    title: titleText,
+                  ),
+                  SizedBox(
+                    height: 19,
+                  ),
+                  StakingCard(
+                    isLoading: earnState.status == EarnStatusList.initial ||
                         earnState.status == EarnStatusList.loading,
-                      ),
-                    ],
-                  );
-                }
-            ),
+                  ),
+                  SizedBox(
+                    height: 18,
+                  ),
+                  liquidityMiningCard(
+                    earnState.status == EarnStatusList.loading,
+                  ),
+                ],
+              );
+            }),
           ),
         ),
       ),
@@ -135,7 +142,15 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
         walletState.activeNetwork,
         balances,
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'earn_screen_wrapper.dart',
+          method: 'liquidityMiningCard',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       investedBalance = 0;
       totalBalance = 0;
     } finally {
@@ -153,16 +168,12 @@ class _EarnScreenWrapperState extends State<EarnScreenWrapper> with ThemeMixin {
     return EarnCard(
       isLoading: isLoading,
       title: 'Liquidity mining',
-      subTitle:
-          'up to ${lmState.maxApr} APR',
+      subTitle: 'up to ${lmState.maxApr ?? 'N/A'} APR',
       imagePath: 'assets/pair_icons/dfi_btc.png',
-      //TODO: add fiat value
-      // firstColumnNumber: balancesHelper
-      //     .numberStyling(tokensState.totalPairsBalance ?? 0, fixed: true),
       firstColumnNumber: roundedInvestedBalance,
       firstColumnAsset: 'USD',
       firstColumnSubTitle: 'Pooled',
-      secondColumnNumber: lmState.averageApr,
+      secondColumnNumber: lmState.averageApr ?? 'N/A',
       secondColumnAsset: '%',
       secondColumnSubTitle: 'Portfolio APR',
       isStaking: false,
