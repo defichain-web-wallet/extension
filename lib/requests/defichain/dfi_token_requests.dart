@@ -18,9 +18,8 @@ class DFITokenRequests {
     }
 
     try {
-      //TODO: add fallback url
       final Uri url = Uri.https(
-        Hosts.oceanDefichainHome,
+        networkType.isTestnet ? Hosts.testnetHost : Hosts.mainnetHost,
         '/v0/${networkType.networkStringLowerCase}/tokens',
         query,
       );
@@ -28,8 +27,10 @@ class DFITokenRequests {
 
       if (response.statusCode == 200) {
         dynamic json = jsonDecode(response.body);
-        List<TokenModel> tokens =
-            TokenModel.fromJSONList(json['data'], networkType.networkName);
+        List<TokenModel> tokens = TokenModel.fromJSONList(
+          json['data'],
+          networkType.networkName,
+        );
 
         if (json['page'] != null) {
           var nextTokenList = await getTokens(

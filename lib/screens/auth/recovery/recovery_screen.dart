@@ -3,9 +3,11 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/screens/auth/password_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/mnemonic_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/auth/mnemonic_word.dart';
@@ -97,7 +99,15 @@ class _RecoveryScreenState extends State<RecoveryScreen>
                     reverseTransitionDuration: Duration.zero,
                   ),
                 );
-              } catch (err) {
+              } catch (error, stackTrace) {
+                await SentryService.captureException(
+                  ErrorModel(
+                    file: 'recovery_screen.dart',
+                    method: '_onSubmitRecovery',
+                    exception: error.toString(),
+                  ),
+                  stackTrace: stackTrace,
+                );
                 showSnackBar(
                   context,
                   title: 'Recoverring error. Please try later',
@@ -162,8 +172,15 @@ class _RecoveryScreenState extends State<RecoveryScreen>
           _confirmFocusNode.requestFocus();
         });
       }
-    } catch (err) {
-      print(err);
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'recovery_screen.dart',
+          method: '_onChangeTextField',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -207,8 +224,15 @@ class _RecoveryScreenState extends State<RecoveryScreen>
           }
         });
       }
-    } catch (err) {
-      print(err);
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'recovery_screen.dart',
+          method: '_onFieldSubmitted',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
     }
   }
 

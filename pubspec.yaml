@@ -73,6 +73,7 @@ dependencies:
   encrypt: ^5.0.1
 
   sentry_flutter: ^7.8.0
+  flutter_dotenv: ^5.1.0
 
   percent_indicator: ^4.0.0
 
@@ -127,6 +128,7 @@ flutter:
     - assets/tokens/
     - assets/currencies/
     - assets/pair_icons/
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

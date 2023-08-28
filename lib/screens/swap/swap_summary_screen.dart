@@ -4,8 +4,10 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -325,16 +327,29 @@ class _SwapSummaryScreenState extends State<SwapSummaryScreen>
         ),
       ); });
 
-  submitSwap(context, ExchangeState exchangeState, ExchangeCubit exchangeCubit, String? password,
-      {final Function()? callbackOk, final Function()? callbackFail}) async {
-      late TxErrorModel txResponse;
+  submitSwap(
+    context,
+    ExchangeState exchangeState,
+    ExchangeCubit exchangeCubit,
+    String? password, {
+    final Function()? callbackOk,
+    final Function()? callbackFail,
+  }) async {
+    late TxErrorModel txResponse;
       try {
           txResponse = await exchangeCubit.exchange(context, password);
-      } on Exception catch (err) {
-        print(err);
-        throw err;
-      } catch (err) {
-        print(err);
+      } on Exception catch (error) {
+        throw error;
+      } catch (error, stackTrace) {
+        print(error);
+        SentryService.captureException(
+          ErrorModel(
+            file: 'swap_summary_screen.dart',
+            method: 'submitSwap',
+            exception: error.toString(),
+          ),
+          stackTrace: stackTrace,
+        );
         txResponse = TxErrorModel(isError: true);
         if (callbackFail != null) callbackFail();
       }

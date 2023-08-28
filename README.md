@@ -10,14 +10,18 @@ Jellywallet supports Google Chrome, and Chromium-based browsers. We recommend us
 
 2. Clone this repository:
 
-3. Go to directory with app and install dependencies:
+3. Create `.env` file in the root folder with the next content and change the value to the correct DSN from [sentry.io](https://docs.sentry.io/product/sentry-basics/dsn-explainer):
+
+        SENTRY_DSN = https://sentry.io/add-your-dsn-here
+
+4. Go to directory with app and install dependencies:
 
         flutter pub get
 
 ## Build
 Make build for upload to chrome extensions
 
-    flutter build web --csp --web-renderer html  --no-sound-null-safety
+    flutter build web --csp --web-renderer html
 
 ## Deploy
 1. In Chrome, open chrome://extensions/

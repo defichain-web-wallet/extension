@@ -1,1 +1,1 @@
-{"name": "Jellywallet", "version": "2.1.6", "icons": {"16": "/icons/16.png", "48": "/icons/48.png", "128": "/icons/128.png"}, "description": "Jellywallet extension", "storage": {"managed_schema": "schema.json"}}
+{"name": "Jellywallet", "version": "2.1.8", "icons": {"16": "/icons/16.png", "48": "/icons/48.png", "128": "/icons/128.png"}, "description": "Jellywallet extension", "storage": {"managed_schema": "schema.json"}}

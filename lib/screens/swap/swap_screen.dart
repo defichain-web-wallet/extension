@@ -1,16 +1,16 @@
-import 'dart:developer';
-
 import 'package:defi_wallet/bloc/refactoring/exchange/exchange_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/format_mixin.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
 import 'package:defi_wallet/screens/dex/widgets/slippage_button.dart';
 import 'package:defi_wallet/screens/home/widgets/asset_select_swap.dart';
 import 'package:defi_wallet/screens/swap/swap_summary_screen.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
@@ -97,72 +97,82 @@ class _SwapScreenState extends State<SwapScreen>
   @override
   Widget build(BuildContext context) {
     try {
-      return ScaffoldWrapper(builder: (
-        BuildContext context,
-        bool isFullScreen,
-        TransactionState transactionState,
-      ) {
-        return BlocBuilder<ExchangeCubit, ExchangeState>(
-          builder: (exchangeContext, exchangeState) {
-            ExchangeCubit exchangeCubit =
-                BlocProvider.of<ExchangeCubit>(context);
-            if (exchangeState.status == ExchangeStatusList.initial) {
-              exchangeCubit.init(context);
-              return Loader();
-            } else if (exchangeState.status == ExchangeStatusList.success) {
-              return Scaffold(
-                appBar: isFullScreen
-                    ? null
-                    : NewMainAppBar(
-                        isShowLogo: false,
+      return ScaffoldWrapper(
+        builder: (
+          BuildContext context,
+          bool isFullScreen,
+          TransactionState transactionState,
+        ) {
+          return BlocBuilder<ExchangeCubit, ExchangeState>(
+            builder: (exchangeContext, exchangeState) {
+              ExchangeCubit exchangeCubit =
+                  BlocProvider.of<ExchangeCubit>(context);
+              if (exchangeState.status == ExchangeStatusList.initial) {
+                exchangeCubit.init(context);
+                return Loader();
+              } else if (exchangeState.status == ExchangeStatusList.success) {
+                return Scaffold(
+                  appBar: isFullScreen
+                      ? null
+                      : NewMainAppBar(
+                          isShowLogo: false,
+                        ),
+                  drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
+                  endDrawer: isFullScreen
+                      ? null
+                      : AccountDrawer(
+                          width: buttonSmallWidth,
+                        ),
+                  body: Container(
+                    padding: EdgeInsets.only(
+                      top: 22,
+                      bottom: 22,
+                      left: 16,
+                      right: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDarkTheme()
+                          ? DarkColors.networkDropdownBgColor
+                          : LightColors.scaffoldContainerBgColor,
+                      border: isDarkTheme()
+                          ? Border.all(
+                              width: 1.0,
+                              color: Colors.white.withOpacity(0.05),
+                            )
+                          : null,
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
+                        bottomRight: Radius.circular(isFullScreen ? 20 : 0),
                       ),
-                drawerScrimColor: AppColors.tolopea.withOpacity(0.06),
-                endDrawer: isFullScreen
-                    ? null
-                    : AccountDrawer(
-                        width: buttonSmallWidth,
-                      ),
-                body: Container(
-                  padding: EdgeInsets.only(
-                    top: 22,
-                    bottom: 22,
-                    left: 16,
-                    right: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDarkTheme()
-                        ? DarkColors.networkDropdownBgColor
-                        : LightColors.scaffoldContainerBgColor,
-                    border: isDarkTheme()
-                        ? Border.all(
-                            width: 1.0,
-                            color: Colors.white.withOpacity(0.05),
-                          )
-                        : null,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      topLeft: Radius.circular(20),
-                      bottomLeft: Radius.circular(isFullScreen ? 20 : 0),
-                      bottomRight: Radius.circular(isFullScreen ? 20 : 0),
+                    ),
+                    child: _buildBody(
+                      context,
+                      exchangeCubit,
+                      exchangeState,
+                      transactionState,
+                      isFullScreen,
                     ),
                   ),
-                  child: _buildBody(
-                    context,
-                    exchangeCubit,
-                    exchangeState,
-                    transactionState,
-                    isFullScreen,
-                  ),
-                ),
-              );
-            } else {
-              return Loader();
-            }
-          },
-        );
-      });
-    } catch (e) {
-      print(e);
+                );
+              } else {
+                return Loader();
+              }
+            },
+          );
+        },
+        isUpdate: true,
+      );
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'swap_screen.dart',
+          method: 'build',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       return Container();
     }
   }
@@ -241,8 +251,15 @@ class _SwapScreenState extends State<SwapScreen>
                         amountFrom: amount,
                         amountTo: amountToInput,
                       );
-                    } catch (err) {
-                      log(err.toString());
+                    } catch (error, stackTrace) {
+                      SentryService.captureException(
+                        ErrorModel(
+                          file: 'swap_screen.dart',
+                          method: 'onChanged:amountFrom',
+                          exception: error.toString(),
+                        ),
+                        stackTrace: stackTrace,
+                      );
                     }
                   },
                   controller: amountFromController,
@@ -284,8 +301,15 @@ class _SwapScreenState extends State<SwapScreen>
                           fixedCount: 8,
                         );
                       });
-                    } catch (err) {
-                      log(err.toString());
+                    } catch (error, stackTrace) {
+                      SentryService.captureException(
+                        ErrorModel(
+                          file: 'swap_screen.dart',
+                          method: 'onChanged:amountTo',
+                          exception: error.toString(),
+                        ),
+                        stackTrace: stackTrace,
+                      );
                     }
                   },
                   balance: exchangeState.selectedSecondInputBalance,
@@ -344,7 +368,8 @@ class _SwapScreenState extends State<SwapScreen>
                             ),
                             onPressed: () => setState(() {
                               exchangeCubit.updateAmountsAndSlipage(
-                                  slippage: 0.03);
+                                slippage: 0.03,
+                              );
                               isShowSlippageField = false;
                               // hideOverlay();
                             }),
@@ -356,9 +381,18 @@ class _SwapScreenState extends State<SwapScreen>
                               var slippage = double.parse(value) / 100;
                               exchangeCubit.updateAmountsAndSlipage(
                                   slippage: slippage);
-                            } catch (err) {
+                            } catch (error, stackTrace) {
+                              SentryService.captureException(
+                                ErrorModel(
+                                  file: 'swap_screen.dart',
+                                  method: 'onChanged:slippage',
+                                  exception: error.toString(),
+                                ),
+                                stackTrace: stackTrace,
+                              );
                               exchangeCubit.updateAmountsAndSlipage(
-                                  slippage: 0.03);
+                                slippage: 0.03,
+                              );
                             }
                           });
                         },
@@ -538,6 +572,20 @@ class _SwapScreenState extends State<SwapScreen>
                   ),
                   callback: isDisableSubmit()
                       ? () {
+                          if (double.parse(amountFromController.text
+                                  .replaceAll(',', '')) >
+                              exchangeState.availableFrom) {
+                            showSnackBar(
+                              context,
+                              title: 'Insufficient funds',
+                              color: AppColors.txStatusError.withOpacity(0.1),
+                              prefix: Icon(
+                                Icons.close,
+                                color: AppColors.txStatusError,
+                              ),
+                            );
+                            return;
+                          }
                           if (transactionState is! TransactionLoadingState) {
                             submitReviewSwap(
                               context,
@@ -584,9 +632,17 @@ class _SwapScreenState extends State<SwapScreen>
 
   bool isDisableSubmit() {
     try {
-      return double.parse(amountFromController.text) > 0 &&
-          double.parse(amountToController.text) > 0;
-    } catch (err) {
+      return double.parse(amountFromController.text.replaceAll(',', '')) > 0 &&
+          double.parse(amountToController.text.replaceAll(',', '')) > 0;
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'swap_screen.dart',
+          method: 'onChanged:slippage',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }

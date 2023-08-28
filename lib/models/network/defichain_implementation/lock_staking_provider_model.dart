@@ -1,3 +1,4 @@
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
@@ -9,6 +10,7 @@ import 'package:defi_wallet/models/network/staking_enum.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/requests/defichain/staking/lock_requests.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 
 import '../abstract_classes/abstract_account_model.dart';
 
@@ -76,7 +78,15 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
       var user = await LockRequests.getKYC(
           this.accessTokensMap[account.accountIndex]!.accessToken);
       return user.kycLink!;
-    } catch (err) {
+    } catch (error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'lock_staking_provider_model.dart',
+          method: 'getKycLink',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
@@ -211,7 +221,15 @@ class LockStakingProviderModel extends AbstractStakingProviderModel {
           stakingModel.id,
           withdrawModel);
       return true;
-    } catch(e){
+    } catch(error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'lock_staking_provider_model.dart',
+          method: 'unstakeToken',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }

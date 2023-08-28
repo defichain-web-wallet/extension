@@ -388,6 +388,7 @@ class _SendScreenState extends State<SendScreen>
           },
         );
       },
+      isUpdate: true,
     );
   }
 

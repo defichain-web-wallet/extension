@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:defi_wallet/bloc/refactoring/ramp/ramp_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/client/hive_names.dart';
 import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
-import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/screens/buy/buy_select_currency_screen.dart';
 import 'package:defi_wallet/screens/buy/tutorials/buy_tutorial_first_screen.dart';
 import 'package:defi_wallet/screens/sell/sell_kyc_first_screen.dart';
@@ -36,31 +37,11 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
   String titleText = 'Buy / Sell';
   String subtitleText = 'Choose your next step';
   BalancesHelper balancesHelper = BalancesHelper();
-  late bool hasAccessToken;
+  bool hasAccessToken = false;
 
   @override
   void initState() {
     super.initState();
-    loadDfxData();
-  }
-
-  loadDfxData() {
-    RampCubit rampCubit = BlocProvider.of<RampCubit>(context);
-    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
-    AccessTokenModel? accessToken;
-    try {
-      accessToken = walletCubit
-          .state
-          .applicationModel!
-          .activeNetwork!
-          .rampList[0]
-          .accessTokensMap[walletCubit.state.activeAccount.accountIndex]!;
-      rampCubit.setAccessToken(accessToken);
-      rampCubit.loadUserDetails();
-    } catch (err) {
-      accessToken = null;
-    }
-    hasAccessToken = accessToken != null;
   }
 
   @override
@@ -299,10 +280,7 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
                                               return PassConfirmDialog(
                                                 onCancel: () {},
                                                 onSubmit: (password) async {
-                                                  updateAccessToken(
-                                                    password,
-                                                    isExpiredAccessToken,
-                                                  );
+                                                  log('updating access token...');
                                                 },
                                               );
                                             },
@@ -336,21 +314,6 @@ class _BuySellScreenState extends State<BuySellScreen> with ThemeMixin {
         );
       },
     );
-  }
-
-  updateAccessToken(String password, bool isExpiredAccessToken) async {
-    WalletCubit walletCubit =
-    BlocProvider.of<WalletCubit>(context);
-    if (isExpiredAccessToken) {
-      await walletCubit.signInToRamp(
-        password,
-      );
-    } else {
-      await walletCubit.signUpToRamp(
-        password,
-      );
-    }
-    loadDfxData();
   }
 
   buyCallback(context, state) {

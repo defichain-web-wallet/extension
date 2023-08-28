@@ -31,6 +31,7 @@
 .pub/
 /build/
 /scripts/client_secrets.json
+*.env
 
 # Web related
 

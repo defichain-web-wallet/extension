@@ -10,11 +10,13 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/screens/ledger/ledger_check_screen.dart';
+import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/services/transaction_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -551,8 +553,16 @@ class _SendSummaryScreenState extends State<SendSummaryScreen>
           callbackOk: callbackOk,
         );
       }
-    } catch (err) {
-      print(err);
+    } catch (error, stackTrace) {
+      print(error);
+      SentryService.captureException(
+        ErrorModel(
+          file: 'send_summary_screen.dart',
+          method: 'submitSend',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
     }
   }
 
