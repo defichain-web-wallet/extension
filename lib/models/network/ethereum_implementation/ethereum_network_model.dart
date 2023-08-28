@@ -70,7 +70,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     throw 'Use createAddressFromPrivateKey';
   }
 
-  Future<String> createAddressFromPrivateKey(String privateKey, int accountIndex, String password, SourceSeedModel source) async {
+  Future<String> createAddressFromPrivateKey(int accountIndex, String password, SourceSeedModel source) async {
     final keypair = await getKeypairWithoutAccount(password,
         accountIndex, source);
     return this._createAddressString(keypair, accountIndex);

@@ -104,7 +104,6 @@ class AccountModel extends AbstractAccountModel {
       if(network is EthereumNetworkModel){
         publicKey = publicKeyMainnet;
         addresses[network.networkType.networkName.name] = await network.createAddressFromPrivateKey(
-            publicKey,
             accountIndex, password, source);
       } else {
         addresses[network.networkType.networkName.name] = network.createAddress(
