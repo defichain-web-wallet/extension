@@ -16,7 +16,6 @@ ThemeData createDarkTheme() {
     cardColor: Colors.white.withOpacity(0.04),
     colorScheme: ColorScheme.dark(
       primary: AppColors.pinkColor,
-      primaryVariant: AppColors.pinkColor,
     ),
     iconTheme: IconThemeData(
       color: Colors.white,
