@@ -7,10 +7,12 @@ import 'package:flutter/material.dart';
 
 class RestoreWalletDialog extends StatefulWidget {
   final Function() callbackOk;
+  final Function()? callbackClose;
 
   const RestoreWalletDialog({
     Key? key,
     required this.callbackOk,
+    this.callbackClose,
   }) : super(key: key);
 
   @override
@@ -83,6 +85,9 @@ class _RestoreWalletDialogState extends State<RestoreWalletDialog> with ThemeMix
                     child: GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
+                        if (widget.callbackClose != null) {
+                          widget.callbackClose!();
+                        }
                       },
                       child: Icon(
                         Icons.close,

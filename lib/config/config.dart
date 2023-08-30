@@ -49,5 +49,5 @@ class ToolbarSizes {
 }
 
 class StorageConstants {
-  static const int storageVersion = 2;
+  static const int storageVersion = 3;
 }

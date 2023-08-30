@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/error/error_model.dart';
@@ -57,6 +58,9 @@ class WalletCubit extends Cubit<WalletState> {
     applicationModel.accounts = [account];
 
     await StorageService.saveApplication(applicationModel);
+    await StorageService.updateStorageVersion(
+      StorageConstants.storageVersion,
+    );
 
     emit(state.copyWith(
       applicationModel: applicationModel,
@@ -161,6 +165,9 @@ class WalletCubit extends Cubit<WalletState> {
 
     // await StorageService.saveAccounts(accountList);
     await StorageService.saveApplication(applicationModel);
+    await StorageService.updateStorageVersion(
+      StorageConstants.storageVersion,
+    );
 
     emit(state.copyWith(
       applicationModel: applicationModel,

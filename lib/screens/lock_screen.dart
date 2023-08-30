@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:crypt/crypt.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/client/hive_names.dart';
@@ -8,10 +7,14 @@ import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
+import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/error/error_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_staking_provider_model.dart';
 import 'package:defi_wallet/models/network/access_token_model.dart';
 import 'package:defi_wallet/models/network/application_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
+import 'package:defi_wallet/models/network/source_seed_model.dart';
 import 'package:defi_wallet/screens/auth/recovery/recovery_screen.dart';
 import 'package:defi_wallet/screens/home/home_screen.dart';
 import 'package:defi_wallet/services/errors/sentry_service.dart';
@@ -201,6 +204,11 @@ class _LockScreenState extends State<LockScreen>
 
           List<AbstractStakingProviderModel> accessTokensMap;
 
+          bool isChangedVersion = await StorageService.isChangedVersion();
+          if (isChangedVersion) {
+            await _initEthereumInstance(applicationModel, parent);
+          }
+
           try {
             accessTokensMap =
                 applicationModel.activeNetwork!.getStakingProviders();
@@ -339,6 +347,81 @@ class _LockScreenState extends State<LockScreen>
                 ErrorModel(
                   file: 'lock_screen.dart',
                   method: '_restoreExistingWallet',
+                  exception: error.toString(),
+                ),
+                stackTrace: stackTrace,
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  _initEthereumInstance(
+    ApplicationModel applicationModel,
+    dynamic parent,
+  ) async {
+    await showDialog(
+      barrierColor: AppColors.tolopea.withOpacity(0.06),
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return RestoreWalletDialog(
+          callbackClose: () {
+            parent.emitPending(false);
+          },
+          callbackOk: () async {
+            SourceSeedModel source = applicationModel.sourceList.values.first;
+
+            List<AbstractNetworkModel> ethereumNetworks =
+            ApplicationModel.initNetworks()
+                .where((network) => network is EthereumNetworkModel)
+                .toList();
+            bool hasEthereumNetworks = applicationModel.networks.where((
+                network) => network is EthereumNetworkModel)
+                .toList()
+                .length > 0;
+            if (!hasEthereumNetworks) {
+              applicationModel.networks = [
+                ...applicationModel.networks,
+                ...ethereumNetworks,
+              ];
+            }
+            applicationModel.networks.forEach((network) {
+              applicationModel!.accounts.forEach((account) async {
+                if (network is EthereumNetworkModel) {
+                  try {
+                    account.addresses[network.networkType.networkName.name] =
+                    await network.createAddressFromPrivateKey(
+                      account.accountIndex,
+                      passwordController.text,
+                      source,
+                    );
+                    account.pinnedBalances[network.networkType.networkName
+                        .name] = await network.getAllBalances(
+                      addressString: account
+                          .addresses[network.networkType.networkName.name]!,
+                    );
+                  } catch (_) {
+                    account.pinnedBalances[
+                    network.networkType.networkName.name] = [
+                      BalanceModel(balance: 0, token: network.getDefaultToken())
+                    ];
+                  }
+                }
+              });
+            });
+            try {
+              await StorageService.saveApplication(applicationModel);
+              await StorageService.updateStorageVersion(
+                StorageConstants.storageVersion,
+              );
+            } catch (error, stackTrace) {
+              SentryService.captureException(
+                ErrorModel(
+                  file: 'lock_screen.dart',
+                  method: '_initEthereumInstance',
                   exception: error.toString(),
                 ),
                 stackTrace: stackTrace,

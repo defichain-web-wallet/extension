@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:defi_wallet/client/hive_names.dart';
+import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/helpers/encrypt_helper.dart';
 import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
@@ -65,6 +66,36 @@ class StorageService {
         stackTrace: stackTrace,
       );
       throw error;
+    }
+  }
+  
+  static Future updateStorageVersion(int version) async {
+    try {
+      await HiveService.update(
+        HiveNames.storageVersion,
+        version,
+      );
+    } catch(error, stackTrace) {
+      SentryService.captureException(
+        ErrorModel(
+          file: 'storage_service.dart',
+          method: 'updateStorageVersion',
+          exception: error.toString(),
+        ),
+        stackTrace: stackTrace,
+      );
+      throw error;
+    }
+  }
+
+  static Future<bool> isChangedVersion() async {
+    var storageVersion = await HiveService.getData(HiveNames.storageVersion);
+
+    try {
+      int version = storageVersion ?? 0;
+      return version < StorageConstants.storageVersion;
+    } catch(_) {
+      return true;
     }
   }
 
