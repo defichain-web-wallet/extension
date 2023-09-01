@@ -37,7 +37,7 @@ class _NetworkSelectorState extends State<NetworkSelector> with ThemeMixin {
   onChangeNetwork(dynamic item) {
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     controller.hideMenu();
-    walletCubit.changeActiveNetwork(item);
+    walletCubit.changeActiveNetwork(item, context);
     NavigatorService.pushReplacement(context, null);
   }
 

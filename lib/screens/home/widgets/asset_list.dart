@@ -31,6 +31,7 @@ class AssetList extends StatelessWidget with ThemeMixin {
                   convertToken: ratesState.ratesModel!.getSpecificTokenName(
                     ratesState.activeAsset,
                   ),
+                  ethereumRateModel: ratesState.ethereumRateModel,
                 );
 
                 return <String, dynamic>{

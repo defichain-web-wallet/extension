@@ -41,6 +41,7 @@ class _AccountBalanceState extends State<AccountBalance> {
                   convertToken: ratesState.ratesModel!.getSpecificTokenName(
                     widget.asset,
                   ),
+                  ethereumRateModel: ratesState.ethereumRateModel,
                 );
               } catch (_) {
                 totalBalance = 0.00;

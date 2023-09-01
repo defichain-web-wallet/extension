@@ -1,8 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_rate_model.dart';
 import 'package:defi_wallet/models/network/rates/rates_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
+import 'package:defi_wallet/requests/ethereum/eth_rpc_requests.dart';
 import 'package:defi_wallet/services/errors/sentry_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,11 +35,16 @@ class RatesCubit extends Cubit<RatesState> {
     RatesModel ratesModel = state.ratesModel ?? RatesModel();
 
     try {
+      EthereumRateModel? ethereumRateModel = state.ethereumRateModel;
+      if (network is EthereumNetworkModel) {
+        ethereumRateModel = await ETHRPCRequests().loadRates();
+      }
       await ratesModel.loadTokens(network);
 
       emit(state.copyWith(
         status: RatesStatusList.success,
         ratesModel: ratesModel,
+        ethereumRateModel: ethereumRateModel,
       ));
     } catch (error, stackTrace) {
       SentryService.captureException(

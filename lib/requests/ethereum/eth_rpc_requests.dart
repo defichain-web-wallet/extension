@@ -4,6 +4,7 @@ import 'package:defi_wallet/models/history_model.dart';
 import 'dart:convert';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/bitcoin_implementation/bitcoin_network_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_rate_model.dart';
 import 'package:defi_wallet/models/network_fee_model.dart';
 import 'package:defi_wallet/models/tx_error_model.dart';
 import 'package:defi_wallet/models/tx_loader_model.dart';
@@ -121,6 +122,45 @@ class ETHRPCRequests {
       ]);
     } else {
       return TxErrorModel(isError: true, error: data['error']);
+    }
+  }
+
+  Future<EthereumRateModel> loadRates({String symbol = 'ethereum'}) async {
+    final query = {
+      "ids": "ethereum,"
+          "dash,"
+          "tether,"
+          "usd-coin,"
+          "uniswap,"
+          "the-open-network,"
+          "okb,"
+          "chainlink,"
+          "matic-network,"
+          "bridged-dai-stablecoin-linea,"
+          "bridged-wrapped-bitcoin-stargate,"
+          "staked-ether,"
+          "niccagewaluigielmo42069inu,"
+          "aave",
+      "vs_currencies": "usd,btc,eur",
+    };
+
+    final Uri url = Uri.https(
+      'api.coingecko.com',
+      '/api/v3/simple/price/',
+      query,
+    );
+
+    try {
+      final response = await https.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print(data);
+        return EthereumRateModel(rates: data);
+      } else {
+        throw Error.safeToString(response.statusCode);
+      }
+    } catch (error) {
+      throw error;
     }
   }
 }

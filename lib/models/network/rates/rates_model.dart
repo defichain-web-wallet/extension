@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_rate_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -53,7 +55,7 @@ class RatesModel {
     String jsonPoolPairs = '',
   }) async {
     List<TokenModel> tokens = await _getTokens(
-      network.networkType,
+      network,
       json: jsonTokens,
     );
     await _setTokensAndPoolPairs(
@@ -89,11 +91,11 @@ class RatesModel {
   }
 
   Future<List<TokenModel>> _getTokens(
-    NetworkTypeModel networkType, {
+    AbstractNetworkModel network, {
     String json = '',
   }) async {
     if (json.isEmpty) {
-      return await DFITokenRequests.getTokens(networkType: networkType);
+      return await DFITokenRequests.getTokens(networkType: network.networkType);
     } else {
       var data = jsonDecode(json);
 
@@ -101,7 +103,7 @@ class RatesModel {
         data.length,
         (index) => TokenModel.fromJSON(
           data[index],
-          networkName: networkType.networkName,
+          networkName: network.networkType.networkName,
         ),
       );
     }
@@ -111,20 +113,34 @@ class RatesModel {
     AbstractNetworkModel networkModel,
     BalanceModel balanceModel, {
     String convertToken = 'USDT',
+    EthereumRateModel? ethereumRateModel,
   }) {
-    double amount = networkModel.fromSatoshi(balanceModel.balance);
-    if (balanceModel.token != null) {
-      return getAmountByToken(
-        amount,
-        balanceModel.token!,
-        convertToken: convertToken,
-      );
-    } else {
-      return getPoolPairsByToken(
+    late double amount;
+    if (networkModel is EthereumNetworkModel && ethereumRateModel != null) {
+      amount = networkModel.fromSatoshi(
         balanceModel.balance,
-        balanceModel.lmPool!,
-        convertToken: convertToken,
+        decimals: balanceModel.token!.tokenDecimals,
       );
+      return amount *
+          ethereumRateModel.assetPrice(
+            balanceModel.token!.symbol,
+            convertToken,
+          );
+    } else {
+      amount = networkModel.fromSatoshi(balanceModel.balance);
+      if (balanceModel.token != null) {
+        return getAmountByToken(
+          amount,
+          balanceModel.token!,
+          convertToken: convertToken,
+        );
+      } else {
+        return getPoolPairsByToken(
+          balanceModel.balance,
+          balanceModel.lmPool!,
+          convertToken: convertToken,
+        );
+      }
     }
   }
 
@@ -132,22 +148,37 @@ class RatesModel {
     AbstractNetworkModel networkModel,
     List<BalanceModel> balances, {
     String convertToken = 'USDT',
+    EthereumRateModel? ethereumRateModel,
   }) {
-    return balances.map<double>((e) {
-      if (e.token != null) {
-        return getAmountByToken(
-          networkModel.fromSatoshi(e.balance),
-          e.token!,
-          convertToken: convertToken,
-        );
-      } else {
-        return getPoolPairsByToken(
+    if (networkModel is EthereumNetworkModel && ethereumRateModel != null) {
+      return balances.map<double>((e) {
+        double amount = networkModel.fromSatoshi(
           e.balance,
-          e.lmPool!,
-          convertToken: convertToken,
+          decimals: e.token!.tokenDecimals,
         );
-      }
-    }).reduce((value, element) => value + element);
+        return amount *
+            ethereumRateModel!.assetPrice(
+              e.token!.symbol,
+              convertToken,
+            );
+      }).reduce((value, element) => value + element);
+    } else {
+      return balances.map<double>((e) {
+        if (e.token != null) {
+          return getAmountByToken(
+            networkModel.fromSatoshi(e.balance),
+            e.token!,
+            convertToken: convertToken,
+          );
+        } else {
+          return getPoolPairsByToken(
+            e.balance,
+            e.lmPool!,
+            convertToken: convertToken,
+          );
+        }
+      }).reduce((value, element) => value + element);
+    }
   }
 
   double getAmountByToken(

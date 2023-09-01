@@ -259,7 +259,7 @@ class _AddTokenScreenState extends State<AddTokenScreen>
                           ),
                           NewPrimaryButton(
                             width: buttonSmallWidth,
-                            callback: () {
+                            callback: () async {
                               if (tokens.isEmpty) {
                                 showSnackBar(
                                   context,

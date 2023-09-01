@@ -1,12 +1,13 @@
 import 'dart:typed_data';
 
-import 'package:bloc/bloc.dart';
+import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
 import 'package:defi_wallet/config/config.dart';
 import 'package:defi_wallet/models/address_book_model.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/error/error_model.dart';
 import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/lock_staking_provider_model.dart';
+import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
 import 'package:defi_wallet/models/network/network_name.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/models/network/source_seed_model.dart';
@@ -19,6 +20,8 @@ import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:defichaindart/defichaindart.dart';
 import 'package:bip32_defichain/bip32.dart' as bip32;
 import 'package:defichaindart/src/models/networks.dart' as networks;
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'wallet_state.dart';
 
@@ -244,7 +247,15 @@ class WalletCubit extends Cubit<WalletState> {
     return state.applicationModel!.validatePassword(password);
   }
 
-  changeActiveNetwork(AbstractNetworkModel network) async {
+  changeActiveNetwork(
+    AbstractNetworkModel network,
+    BuildContext context,
+  ) async {
+    RatesCubit ratesCubit = BlocProvider.of<RatesCubit>(context);
+    if (network is EthereumNetworkModel) {
+      ratesCubit.loadRates(network);
+    }
+
     ApplicationModel applicationModel = ApplicationModel(
       sourceList: state.applicationModel!.sourceList,
       encryptedPassword: state.applicationModel!.password,
