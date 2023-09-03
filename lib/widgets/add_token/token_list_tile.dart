@@ -1,3 +1,4 @@
+import 'package:defi_wallet/helpers/balances_helper.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/token_model.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
@@ -14,6 +15,7 @@ class TokenListTile extends StatefulWidget {
   final bool isDense;
   final String tokenName;
   final String? availableTokenName;
+  final double balance;
   final Widget? customContent;
 
   const TokenListTile({
@@ -21,6 +23,7 @@ class TokenListTile extends StatefulWidget {
     this.onTap,
     required this.isSelect,
     this.availableTokenName,
+    this.balance = 0,
     this.isSingleSelect = false,
     this.isConfirm = false,
     this.isDense = false,
@@ -33,8 +36,15 @@ class TokenListTile extends StatefulWidget {
 }
 
 class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
+  BalancesHelper balancesHelper = BalancesHelper();
+
   @override
   Widget build(BuildContext context) {
+    String formatBalance = balancesHelper.numberStyling(
+      widget.balance,
+      fixedCount: 2,
+      fixed: true
+    );
     return GestureDetector(
       onTap: widget.isConfirm ? null : widget.onTap,
       child: MouseRegion(
@@ -146,7 +156,7 @@ class _TokenListTileState extends State<TokenListTile> with ThemeMixin {
                           Padding(
                             padding: EdgeInsets.only(right: 16),
                             child: Text(
-                              '0 ${widget.availableTokenName}',
+                              '$formatBalance ${widget.availableTokenName}',
                               style: Theme.of(context).textTheme.headline5,
                             ),
                           ),

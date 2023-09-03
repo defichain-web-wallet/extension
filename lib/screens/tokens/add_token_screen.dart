@@ -4,6 +4,8 @@ import 'package:defi_wallet/bloc/transaction/transaction_state.dart';
 import 'package:defi_wallet/mixins/snack_bar_mixin.dart';
 import 'package:defi_wallet/mixins/theme_mixin.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_account_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/ethereum_implementation/ethereum_network_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
 import 'package:defi_wallet/screens/tokens/import_token_screen.dart';
@@ -11,7 +13,7 @@ import 'package:defi_wallet/services/navigation/navigator_service.dart';
 import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/add_token/token_list_tile.dart';
-import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
+import 'package:defi_wallet/widgets/buttons/restore_button.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
 import 'package:defi_wallet/widgets/fields/custom_text_form_field.dart';
 import 'package:defi_wallet/widgets/loader/loader.dart';
@@ -257,28 +259,12 @@ class _AddTokenScreenState extends State<AddTokenScreen>
                           SizedBox(
                             height: 12,
                           ),
-                          NewPrimaryButton(
-                            width: buttonSmallWidth,
-                            callback: () async {
-                              if (tokens.isEmpty) {
-                                showSnackBar(
-                                  context,
-                                  title: 'Chose a least one coin',
-                                  color: AppColors.txStatusError.withOpacity(0.1),
-                                  prefix: Icon(
-                                    Icons.close,
-                                    color: AppColors.txStatusError,
-                                  ),
-                                );
-                              } else {
-                                NavigatorService.push(
-                                    context,
-                                    AddTokenConfirmScreen(
-                                      tokens: tokens,
-                                    ));
-                              }
+                          PendingButton(
+                            'Continue',
+                            callback: (parent) async {
+                              await _submit(parent);
                             },
-                            title: 'Continue',
+                            isCheckLock: false,
                           ),
                         ],
                       ),
@@ -293,5 +279,47 @@ class _AddTokenScreenState extends State<AddTokenScreen>
         );
       },
     );
+  }
+
+  _submit(parent) async {
+    if (tokens.isEmpty) {
+      showSnackBar(
+        context,
+        title: 'Chose a least one coin',
+        color: AppColors.txStatusError.withOpacity(0.1),
+        prefix: Icon(
+          Icons.close,
+          color: AppColors.txStatusError,
+        ),
+      );
+    } else {
+      List<BalanceModel> balances = await _getBalances();
+      NavigatorService.push(
+        context,
+        AddTokenConfirmScreen(
+          tokens: tokens,
+          balances: balances,
+        ),
+      );
+    }
+  }
+
+  Future<List<BalanceModel>> _getBalances() async {
+    List<BalanceModel> balances = [];
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
+    AbstractNetworkModel activeNetwork = walletCubit.state.activeNetwork;
+    AbstractAccountModel activeAccount = walletCubit.state.activeAccount;
+    if (activeNetwork is EthereumNetworkModel) {
+      for (var token in tokens) {
+        BalanceModel balance = await activeNetwork.getNewBalance(
+          token,
+          activeAccount.getAddress(activeNetwork.networkType.networkName)!,
+        );
+        balances.add(balance);
+      }
+    } else {
+      return [];
+    }
+    return balances;
   }
 }

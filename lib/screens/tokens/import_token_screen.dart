@@ -11,7 +11,6 @@ import 'package:defi_wallet/utils/theme/theme.dart';
 import 'package:defi_wallet/widgets/account_drawer/account_drawer.dart';
 import 'package:defi_wallet/widgets/buttons/new_primary_button.dart';
 import 'package:defi_wallet/widgets/common/page_title.dart';
-import 'package:defi_wallet/widgets/loader/loader.dart';
 import 'package:defi_wallet/widgets/responsive/stretch_box.dart';
 import 'package:defi_wallet/widgets/scaffold_wrapper.dart';
 import 'package:defi_wallet/widgets/toolbar/new_main_app_bar.dart';
@@ -177,6 +176,7 @@ class _ImportTokenScreenState extends State<ImportTokenScreen>
                                   context,
                                   AddTokenConfirmScreen(
                                     tokens: [newToken!],
+                                    balances: [],
                                   ),
                                 );
                               }

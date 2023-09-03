@@ -153,6 +153,27 @@ class EthereumNetworkModel extends AbstractNetworkModel {
     return balances;
   }
 
+  Future<BalanceModel> getNewBalance(
+    TokenModel token,
+    String addressString,
+  ) async {
+    final client = Web3Client(this.rpcUrl, Client());
+    final jsonString = await rootBundle.loadString('assets/abi/erc20_abi.json');
+    final contractAbi = ContractAbi.fromJson(jsonString, 'Token');
+    final contractAddress = EthereumAddress.fromHex(token!.id);
+    final contract = DeployedContract(
+      contractAbi,
+      contractAddress,
+    );
+    final function = contract.function('balanceOf');
+    final List<dynamic> result = await client.call(
+      contract: contract,
+      function: function,
+      params: [EthereumAddress.fromHex(addressString)],
+    );
+    return BalanceModel(balance: result.first.toInt(), token: token);
+  }
+
   bool isTokensPresent() {
     return false;
   }

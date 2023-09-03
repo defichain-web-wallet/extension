@@ -86,6 +86,7 @@ class RatesCubit extends Cubit<RatesState> {
     }
     emit(state.copyWith(
       tokens: tokens,
+      activeAsset: state.activeAsset,
     ));
   }
 }

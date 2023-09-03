@@ -1,13 +1,7 @@
-import 'dart:convert';
-
-import 'package:defi_wallet/bloc/account/account_cubit.dart';
 import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/helpers/tokens_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
-import 'package:defi_wallet/models/token_model.dart';
-import 'package:bloc/bloc.dart';
 import 'package:defi_wallet/services/storage/storage_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,13 +37,23 @@ class TokensCubit extends Cubit<TokensState> {
 
   }
 
-  addTokens(context, List<TokenModel> tokens) {
+  addTokens(
+    context,
+    List<TokenModel> tokens, {
+    List<BalanceModel> balances = const [],
+  }) {
     final walletCubit = BlocProvider.of<WalletCubit>(context);
     var account = walletCubit.state.applicationModel!.activeAccount!;
     var network = walletCubit.state.applicationModel!.activeNetwork!;
-    tokens.forEach((token) {
-      account.pinToken(BalanceModel(balance: 0, token: token), network);
-    });
+    if (balances.isNotEmpty) {
+      balances.forEach((balance) {
+        account.pinToken(balance, network);
+      });
+    } else {
+      tokens.forEach((token) {
+        account.pinToken(BalanceModel(balance: 0, token: token), network);
+      });
+    }
 
     StorageService.saveApplication(walletCubit.state.applicationModel!);
   }
