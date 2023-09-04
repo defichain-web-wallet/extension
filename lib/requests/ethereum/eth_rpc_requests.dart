@@ -154,7 +154,6 @@ class ETHRPCRequests {
       final response = await https.get(url);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print(data);
         return EthereumRateModel(rates: data);
       } else {
         throw Error.safeToString(response.statusCode);
