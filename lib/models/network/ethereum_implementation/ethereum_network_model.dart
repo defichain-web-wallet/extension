@@ -82,7 +82,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
       name: 'Ethereum',
       symbol: 'ETH',
       displaySymbol: 'ETH',
-      tokenDecimals: 18,
+      tokenDecimals: 16,
       id: '-1',
       networkName: this.networkType.networkName,
     );
@@ -407,7 +407,7 @@ class EthereumNetworkModel extends AbstractNetworkModel {
   }
 
   String _derivePath(int account) {
-    return 'm/0/$account';
+    return 'm/44\'/60\'/0\'/0/$account';
   }
 
   bip32.BIP32 getMasterKeypairFormMnemonic(List<String> mnemonic) {
