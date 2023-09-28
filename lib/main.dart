@@ -12,7 +12,7 @@ Future<void> main() async {
   await runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-      await dotenv.load(fileName: '.env');
+      // await dotenv.load(fileName: '.env');
       await Hive.initFlutter();
       if (kReleaseMode) {
         await SentryService.initSentry();
