@@ -1,4 +1,5 @@
 import 'package:defi_wallet/bloc/refactoring/rates/rates_cubit.dart';
+import 'package:defi_wallet/bloc/refactoring/wallet/wallet_cubit.dart';
 import 'package:defi_wallet/screens/earn/earn_screen.dart';
 import 'package:defi_wallet/screens/select_buy_or_sell/buy_sell_screen.dart';
 import 'package:defi_wallet/widgets/buttons/flat_button.dart';
@@ -22,6 +23,7 @@ class _HomeSliverAppBarState extends State<HomeSliverAppBar> {
   @override
   Widget build(BuildContext context) {
     RatesCubit ratesCubit = BlocProvider.of<RatesCubit>(context);
+    WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
     return SliverAppBar(
       pinned: true,
       floating: false,
@@ -89,9 +91,13 @@ class _HomeSliverAppBarState extends State<HomeSliverAppBar> {
                                 message: 'Buy/Sell',
                                 child: FlatButton(
                                   title: '',
-                                  iconPath: 'assets/icons/wallet.png',
+                                  iconPath:  walletCubit.state.isDisableRamp
+                                      ? 'assets/icons/wallet_disabled.png'
+                                      : 'assets/icons/wallet.png',
                                   isSmall: true,
-                                  callback: () {
+                                  callback: walletCubit.state.isDisableRamp
+                                    ? null
+                                    : () {
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(

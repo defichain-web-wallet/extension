@@ -231,10 +231,7 @@ class _SwapScreenState extends State<SwapScreen>
                   onChanged: (value) {
                     try {
                       double amount = double.parse(
-                        formatNumberStyling(
-                          double.parse(value),
-                          fixedCount: 8,
-                        ),
+                          value
                       );
                       double amountToInput = exchangeCubit.calculateRate(
                         exchangeState.selectedSecondInputBalance!.token!,
