@@ -24,7 +24,7 @@ class SentryService {
   static Future initSentry() async {
     SentryFlutter.init(
       (options) {
-        options.dsn = dotenv.env['SENTRY_DSN']!;
+        options.dsn = 'https://ebedfe3e227aff134bb53f684ab7e4c6@o4505679900901376.ingest.sentry.io/4505682134827008';
         options.tracesSampleRate = 1.0;
       },
     );
