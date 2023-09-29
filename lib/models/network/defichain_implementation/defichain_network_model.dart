@@ -30,7 +30,7 @@ import 'package:defichaindart/src/models/networks.dart' as networks;
 class DefichainNetworkModel extends AbstractNetworkModel {
   static const int DUST = 3000;
   static const int FEE = 3000;
-  static const int RESERVED_BALANCES = 30000;
+  static const int RESERVED_BALANCES = 1000000;
 
 
   DefichainNetworkModel(NetworkTypeModel networkType)
@@ -225,24 +225,24 @@ class DefichainNetworkModel extends AbstractNetworkModel {
 
       switch (type) {
         case TxType.send:
-          if (tokenDFIBalance.balance > FEE) {
-            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+          if (tokenDFIBalance.balance > FEE+RESERVED_BALANCES) {
+            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2)-RESERVED_BALANCES);
             break;
           } else {
             available = fromSatoshi(coinDFIBalance.balance - (FEE));
             break;
           }
         case TxType.swap:
-          if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+          if (coinDFIBalance.balance > (FEE * 2) + DUST+RESERVED_BALANCES) {
+            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2)-RESERVED_BALANCES);
             break;
           } else {
             available = fromSatoshi(tokenDFIBalance.balance);
             break;
           }
         case TxType.addLiq:
-          if (coinDFIBalance.balance > (FEE * 2) + DUST) {
-            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2));
+          if (coinDFIBalance.balance > (FEE * 2) + DUST+RESERVED_BALANCES) {
+            available = fromSatoshi(coinDFIBalance.balance + tokenDFIBalance.balance - (FEE * 2)-RESERVED_BALANCES);
             break;
           } else {
             available = fromSatoshi(tokenDFIBalance.balance);
