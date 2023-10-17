@@ -39,7 +39,7 @@ class DefichainExchangeModel extends AbstractExchangeModel {
     var utxoBalanceList = balances.where(
           (element) => element.token!.symbol == 'DFI' && !element.token!.isUTXO,
     );
-    if(utxoBalanceList == null){
+    if(utxoBalanceList.isEmpty || utxoBalanceList == null){
       dfiBalance = BalanceModel(balance: 0, token: network.getDefaultToken());
     } else {
       dfiBalance = utxoBalanceList.first;
