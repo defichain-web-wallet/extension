@@ -11,11 +11,10 @@ class DFIBalanceRequests {
     required String addressString,
     required List<TokenModel> tokens,
   }) async {
-    //TODO: add fallback URL
-    String urlAddress =
-        '${Hosts.oceanDefichain}/${network.networkType.networkStringLowerCase}'
-        '/address/$addressString/tokens';
-    final Uri url = Uri.parse(urlAddress);
+    final Uri url = Uri.https(
+      network.networkType.isTestnet ? Hosts.testnetHost : Hosts.mainnetHost,
+      '/v0/${network.networkType.networkStringLowerCase}/address/$addressString/tokens',
+    );
     try {
       final response = await https.get(url);
 
@@ -50,11 +49,10 @@ class DFIBalanceRequests {
         balance: 0,
       );
 
-      String urlAddress =
-          '${Hosts.oceanDefichain}/${network.networkType.networkStringLowerCase}'
-          '/address/$addressString/balance';
-      final Uri url = Uri.parse(urlAddress);
-
+      final Uri url = Uri.https(
+        network.networkType.isTestnet ? Hosts.testnetHost : Hosts.mainnetHost,
+        '/v0/${network.networkType.networkStringLowerCase}/address/$addressString/balance',
+      );
       final response = await https.get(url);
 
       if (response.statusCode == 200) {

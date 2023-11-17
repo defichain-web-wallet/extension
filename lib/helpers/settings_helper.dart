@@ -9,13 +9,7 @@ class SettingsHelper {
   static SettingsModel settings = SettingsModel();
 
   static String getHostApiUrl() {
-    if (SettingsHelper.settings.apiName == ApiName.ocean) {
-      return Hosts.ocean;
-    } else if (SettingsHelper.settings.apiName == ApiName.myDefi) {
-      return Hosts.myDefichain;
-    } else {
-      return Hosts.oceanDefichain;
-    }
+    return Hosts.fallbackMainnetUrl;
   }
 
   Future<void> saveSettings() async {

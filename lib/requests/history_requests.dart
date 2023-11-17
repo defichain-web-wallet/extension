@@ -8,6 +8,7 @@ import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/address_model.dart';
 import 'package:defi_wallet/helpers/network_helper.dart';
 import 'package:defi_wallet/models/history_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/settings_model.dart';
 import 'package:defi_wallet/models/tx_list_model.dart';
 import 'package:defi_wallet/utils/convert.dart';
@@ -20,7 +21,11 @@ class HistoryRequests {
   var balancesHelper = BalancesHelper();
   var historyHelper = HistoryHelper();
 
-  Future<List<HistoryNew>> getHistory(AddressModel addressModel, String token, String network) async {
+  Future<List<HistoryNew>> getHistory(
+    AddressModel addressModel,
+    String token,
+    String network,
+  ) async {
     try {
       String urlAddress = '${DfxApi.historyUrl}${addressModel.address}/2023/USD';
 
@@ -39,14 +44,30 @@ class HistoryRequests {
     }
   }
 
-  Future<TxListModel> getFullHistoryList(AddressModel addressModel, String token, String network, {String transactionNext = '', String historyNext = ''}) async {
+  Future<TxListModel> getFullHistoryList(
+    AddressModel addressModel,
+    String token,
+    String network, {
+    String transactionNext = '',
+    String historyNext = '',
+  }) async {
     List<HistoryModel> transactions = List<HistoryModel>.empty();
     List<HistoryModel> actions = List<HistoryModel>.empty();
     List<HistoryModel> allTransactions = List<HistoryModel>.empty();
 
     try {
-      var transactionsData = await getHistoryTxsBySingleAddress(addressModel, token, network, next: transactionNext);
-      var actionsData = await getHistoryActions(addressModel, token, network, next: historyNext);
+      var transactionsData = await getHistoryTxsBySingleAddress(
+        addressModel,
+        token,
+        network,
+        next: transactionNext,
+      );
+      var actionsData = await getHistoryActions(
+        addressModel,
+        token,
+        network,
+        next: historyNext,
+      );
 
       if (transactionsData.isNotEmpty) transactions = transactionsData[0];
       if (actionsData.isNotEmpty) actions = actionsData[0];
@@ -64,7 +85,13 @@ class HistoryRequests {
     }
   }
 
-  Future<List<dynamic>> getHistoryTxsBySingleAddress(AddressModel addressModel, String token, String network, {String next = '', String fallbackUrl = ''}) async {
+  Future<List<dynamic>> getHistoryTxsBySingleAddress(
+    AddressModel addressModel,
+    String token,
+    String network, {
+    String next = '',
+    String fallbackUrl = '',
+  }) async {
     try {
       List<HistoryModel> txModels = [];
 
@@ -111,8 +138,8 @@ class HistoryRequests {
     } catch (err) {
       if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = network == 'mainnet'
-            ? '${Hosts.myDefichain}/mainnet/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}'
-            : '${Hosts.ocean}/testnet/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}';
+            ? '${Hosts.mainnetHost}/mainnet/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}'
+            : '${Hosts.testnetHost}/testnet/address/${addressModel.address}/transactions?size=30${next != '' ? '&next=' + next : ''}';
         return getHistoryTxsBySingleAddress(addressModel, token, network, next: next, fallbackUrl: fallbackUrlAddress);
       } else {
         throw err;
@@ -120,7 +147,13 @@ class HistoryRequests {
     }
   }
 
-  Future<List<dynamic>> getHistoryActions(AddressModel addressModel, String token, String network, {String next = '', String fallbackUrl = ''}) async {
+  Future<List<dynamic>> getHistoryActions(
+    AddressModel addressModel,
+    String token,
+    String network, {
+    String next = '',
+    String fallbackUrl = '',
+  }) async {
     try {
       List<HistoryModel> txModels = [];
 
@@ -166,8 +199,8 @@ class HistoryRequests {
     } catch (err) {
       if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
         String fallbackUrlAddress = network == 'mainnet'
-            ? '${Hosts.myDefichain}/mainnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}'
-            : '${Hosts.ocean}/testnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}';
+            ? '${Hosts.mainnetHost}/mainnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}'
+            : '${Hosts.testnetHost}/testnet/address/${addressModel.address}/history?size=30${next != '' ? '&next=' + next : ''}';
         return getHistoryActions(addressModel, token, network, next: next, fallbackUrl: fallbackUrlAddress);
       } else {
         throw err;
@@ -175,12 +208,16 @@ class HistoryRequests {
     }
   }
 
-  Future<bool> getTxPresent(String txId, String network, {String fallbackUrl = ''}) async {
+  Future<bool> getTxPresent(
+    String txId,
+    AbstractNetworkModel network, {
+    Uri? fallbackUri,
+  }) async {
     try {
-      String hostUrl = SettingsHelper.getHostApiUrl();
-      String urlAddress = fallbackUrl.isEmpty ? '$hostUrl/$network/transactions/$txId' : fallbackUrl;
-
-      final Uri url = Uri.parse(urlAddress);
+      final Uri url = Uri.https(
+        network.networkType.isTestnet ? Hosts.testnetHost : Hosts.mainnetHost,
+        '/v0/${network.networkType.networkStringLowerCase}/transactions/$txId',
+      );
 
       final headers = {'Content-type': 'application/json'};
 
@@ -191,9 +228,16 @@ class HistoryRequests {
       }
       return false;
     } catch (err) {
-      if (fallbackUrl.isEmpty && SettingsHelper.settings.apiName == ApiName.auto) {
-        String fallbackUrlAddress = network == 'mainnet' ? '${Hosts.myDefichain}/mainnet/transactions/$txId' : '${Hosts.ocean}/testnet/transactions/$txId';
-        return getTxPresent(txId, network, fallbackUrl: fallbackUrlAddress);
+      if (fallbackUri == null) {
+        final Uri _fallbackUri = Uri.https(
+          network.networkType.isTestnet ? Hosts.fallbackTestnetHost : Hosts.fallbackMainnetHost,
+          '/v0/${network.networkType.networkStringLowerCase}/transactions/$txId',
+        );
+        return getTxPresent(
+          txId,
+          network,
+          fallbackUri: _fallbackUri,
+        );
       } else {
         throw err;
       }

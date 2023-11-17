@@ -103,7 +103,7 @@ class TransactionRequests {
 
   Future<String> loadRawTransaction({required String txId}) async {
     try {
-      String hostUrl = Hosts.oceanDefichain;
+      String hostUrl = Hosts.fallbackMainnetUrl;
       String urlAddress =
           '$hostUrl/${SettingsHelper.settings.network}/rawtx/$txId';
 

@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen>
     WalletCubit walletCubit = BlocProvider.of<WalletCubit>(context);
 
     transactionCubit.checkOngoingTransaction(
-      walletCubit.state.activeNetwork.networkType,
+      walletCubit.state.activeNetwork,
     );
 
     lockHelper.updateTimer();

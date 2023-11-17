@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:defi_wallet/helpers/balances_helper.dart';
-import 'package:defi_wallet/helpers/settings_helper.dart';
 import 'package:defi_wallet/models/balance/balance_model.dart';
+import 'package:defi_wallet/models/network/abstract_classes/abstract_network_model.dart';
 import 'package:defi_wallet/models/network/defichain_implementation/defichain_network_model.dart';
 import 'package:defi_wallet/models/token/lp_pool_model.dart';
 import 'package:defi_wallet/models/token/token_model.dart';
@@ -13,7 +13,6 @@ import 'package:defi_wallet/requests/defichain/dfi_transaction_requests.dart';
 import 'package:defichaindart/defichaindart.dart';
 
 import 'package:defi_wallet/models/utxo_model.dart';
-import 'package:defi_wallet/helpers/network_helper.dart';
 
 class DFITransactionService {
   static const DUST = 3000;
@@ -42,8 +41,8 @@ class DFITransactionService {
     var fraction = (n % oneHundredMillions).round();
     var integer = ((n - fraction) / oneHundredMillions).round();
 
-    await _getUtxoList(
-        senderAddress, network.networkType.networkStringLowerCase);
+    await _getUtxoList(senderAddress, network);
+
 
     if (tokenFrom.symbol == 'DFI') {
       if (balanceDFIToken.balance < amountFrom) {
@@ -58,8 +57,11 @@ class DFITransactionService {
           return TxErrorModel(isError: true, error: responseModel.error);
         }
 
-        txErrorModel = await _prepareTx(responseModel, TxType.convertUtxo,
-            network.networkType.networkStringLowerCase);
+        txErrorModel = await _prepareTx(
+          responseModel,
+          TxType.convertUtxo,
+          network,
+        );
         if (txErrorModel.isError!) {
           return txErrorModel;
         }
@@ -83,6 +85,7 @@ class DFITransactionService {
               senderAddress,
               integer,
               fraction);
+
         },
         useAllUtxo: true);
 
@@ -90,8 +93,11 @@ class DFITransactionService {
       txErrorModel.txLoaderList!
           .add(TxLoaderModel(txHex: responseModel.hex, type: TxType.swap));
     } else {
-      txErrorModel = await _prepareTx(responseModel, TxType.swap,
-          network.networkType.networkStringLowerCase);
+      txErrorModel = await _prepareTx(
+        responseModel,
+        TxType.swap,
+        network,
+      );
     }
 
     return txErrorModel;
@@ -104,8 +110,7 @@ class DFITransactionService {
     required LmPoolModel pool,
     required int amount,
   }) async {
-    await _getUtxoList(
-        senderAddress, network.networkType.networkStringLowerCase);
+    await _getUtxoList(senderAddress, network);
 
     var responseModel = await _createTransaction(
         keyPair: keyPair,
@@ -120,8 +125,11 @@ class DFITransactionService {
               int.parse(pool.id), amount, senderAddress);
         });
 
-    return await _prepareTx(responseModel, TxType.removeLiq,
-        network.networkType.networkStringLowerCase);
+    return await _prepareTx(
+      responseModel,
+      TxType.removeLiq,
+      network,
+    );
   }
 
   Future<TxErrorModel> createAndSendLiqudity({
@@ -133,8 +141,8 @@ class DFITransactionService {
     required LmPoolModel pool,
     required List<int> amountList,
   }) async {
-    await _getUtxoList(
-        senderAddress, network.networkType.networkStringLowerCase);
+    await _getUtxoList(senderAddress, network);
+
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
     int? indexDFI;
@@ -161,8 +169,11 @@ class DFITransactionService {
             amount: amountList[indexDFI] - balanceDFIToken.balance,
             tokenId: int.parse(pool.tokens[indexDFI].id));
 
-        txErrorModel = await _prepareTx(responseModel, TxType.convertUtxo,
-            network.networkType.networkStringLowerCase);
+        txErrorModel = await _prepareTx(
+          responseModel,
+          TxType.convertUtxo,
+          network,
+        );
         if (txErrorModel.isError!) {
           return txErrorModel;
         }
@@ -192,8 +203,11 @@ class DFITransactionService {
       txErrorModel.txLoaderList!
           .add(TxLoaderModel(txHex: responseModel.hex, type: TxType.addLiq));
     } else {
-      txErrorModel = await _prepareTx(responseModel, TxType.addLiq,
-          network.networkType.networkStringLowerCase);
+      txErrorModel = await _prepareTx(
+        responseModel,
+        TxType.addLiq,
+        network,
+      );
     }
 
     return txErrorModel;
@@ -258,8 +272,7 @@ class DFITransactionService {
     TxResponseModel? responseModel;
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
-    await _getUtxoList(
-        senderAddress, network.networkType.networkStringLowerCase);
+    await _getUtxoList(senderAddress, network);
 
     //Swap DFI tokens to UTXO if needed
     if (balance.balance >= DUST) {
@@ -292,8 +305,11 @@ class DFITransactionService {
         return TxErrorModel(isError: true, error: responseModel.error);
       }
 
-      txErrorModel = await _prepareTx(responseModel, TxType.convertUtxo,
-          network.networkType.networkStringLowerCase);
+      txErrorModel = await _prepareTx(
+        responseModel,
+        TxType.convertUtxo,
+        network,
+      );
 
       if (txErrorModel.isError!) {
         return txErrorModel;
@@ -316,8 +332,11 @@ class DFITransactionService {
       txErrorModel.txLoaderList!
           .add(TxLoaderModel(txHex: responseTxModel.hex, type: TxType.send));
     } else {
-      txErrorModel = await _prepareTx(responseTxModel, TxType.send,
-          network.networkType.networkStringLowerCase);
+      txErrorModel = await _prepareTx(
+        responseTxModel,
+        TxType.send,
+        network,
+      );
     }
 
     return txErrorModel;
@@ -331,8 +350,7 @@ class DFITransactionService {
     required String destinationAddress,
     required int amount,
   }) async {
-    await _getUtxoList(
-        senderAddress, network.networkType.networkStringLowerCase);
+    await _getUtxoList(senderAddress, network);
 
     var responseModel = await _createTransaction(
         keyPair: keyPair,
@@ -352,7 +370,10 @@ class DFITransactionService {
     }
 
     return await _prepareTx(
-        responseModel, TxType.send, network.networkType.networkStringLowerCase);
+      responseModel,
+      TxType.send,
+      network,
+    );
   }
 
   Future<TxResponseModel> _createTransaction({
@@ -491,10 +512,14 @@ class DFITransactionService {
   }
 
   Future<List<UtxoModel>> _getUtxoList(
-      String address, String networkString) async {
+    String address,
+    AbstractNetworkModel network,
+  ) async {
     if (accountUtxoList.isEmpty) {
       accountUtxoList = await DFITransactionRequests.getUTXOs(
-          address: address, networkString: networkString);
+        address: address,
+        network: network,
+      );
     }
 
     return accountUtxoList;
@@ -526,10 +551,12 @@ class DFITransactionService {
   Future<TxErrorModel> _prepareTx(
     TxResponseModel responseModel,
     TxType type,
-    String networkString,
+    AbstractNetworkModel network,
   ) async {
     TxErrorModel? txid = await DFITransactionRequests.sendTxHex(
-        txHex: responseModel.hex, networkString: networkString);
+      txHex: responseModel.hex,
+      network: network,
+    );
     if (!txid.isError!) {
       _updateUtxoList(responseModel, txid.txLoaderList![0].txId!);
       txid.txLoaderList![0].type = type;
