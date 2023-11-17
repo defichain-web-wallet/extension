@@ -11,7 +11,7 @@ class AvailableAmountText extends StatelessWidget {
     final roundedAmount = BalancesHelper().numberStyling(
       amount,
       fixed: true,
-      fixedCount: 6,
+      fixedCount: 8,
     );
 
     return Text(

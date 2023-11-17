@@ -16,7 +16,6 @@ ThemeData createLightTheme() {
     secondaryHeaderColor: AppColors.lightGreyColor,
     colorScheme: ColorScheme.light(
       primary: AppColors.pinkColor,
-      primaryVariant: AppColors.pinkColor,
     ),
     iconTheme: IconThemeData(
       color: Colors.black,

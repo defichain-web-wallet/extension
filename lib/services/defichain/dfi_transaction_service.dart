@@ -43,6 +43,7 @@ class DFITransactionService {
 
     await _getUtxoList(senderAddress, network);
 
+
     if (tokenFrom.symbol == 'DFI') {
       if (balanceDFIToken.balance < amountFrom) {
         var responseModel = await _utxoToAccountTransaction(
@@ -76,8 +77,15 @@ class DFITransactionService {
         amount: 0,
         network: network,
         additional: (txb, nw, newUtxo) {
-          txb.addSwapOutput(int.parse(tokenFrom.id), senderAddress, amountFrom,
-              int.parse(tokenTo.id), senderAddress, integer, fraction);
+          txb.addSwapOutput(
+              int.parse(tokenFrom.id) < 0 ? 0 : int.parse(tokenFrom.id),
+              senderAddress,
+              amountFrom,
+              int.parse(tokenTo.id) < 0 ? 0 : int.parse(tokenTo.id),
+              senderAddress,
+              integer,
+              fraction);
+
         },
         useAllUtxo: true);
 
@@ -134,6 +142,7 @@ class DFITransactionService {
     required List<int> amountList,
   }) async {
     await _getUtxoList(senderAddress, network);
+
     TxErrorModel txErrorModel = TxErrorModel(isError: false, txLoaderList: []);
 
     int? indexDFI;
@@ -220,7 +229,7 @@ class DFITransactionService {
         network: network,
         reservedBalance: amount,
         additional: (txb, nw, newUtxo) {
-          txb.addUtxosToAccountOutput(tokenId, senderAddress, amount, nw);
+          txb.addUtxosToAccountOutput(0, senderAddress, amount, nw);
         });
   }
 
@@ -388,6 +397,17 @@ class DFITransactionService {
       return TxResponseModel(
           isError: true,
           error: 'Not enough balance. Wait for approval the previous tx',
+          usingUTXO: [],
+          newUTXO: [],
+          hex: '');
+    }
+    var sumUtxo = 0;
+    utxoList.forEach((UtxoModel utxo){sumUtxo += utxo.value!;});
+
+    if(sumUtxo < (amount + FEE)){
+      return TxResponseModel(
+          isError: true,
+          error: 'Not enough balance for pay fee. Wait for approval the previous tx or add more DFI',
           usingUTXO: [],
           newUTXO: [],
           hex: '');
