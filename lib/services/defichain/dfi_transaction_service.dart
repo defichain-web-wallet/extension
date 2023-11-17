@@ -380,6 +380,17 @@ class DFITransactionService {
           newUTXO: [],
           hex: '');
     }
+    var sumUtxo = 0;
+    utxoList.forEach((UtxoModel utxo){sumUtxo += utxo.value!;});
+
+    if(sumUtxo < (amount + FEE)){
+      return TxResponseModel(
+          isError: true,
+          error: 'Not enough balance for pay fee. Wait for approval the previous tx or add more DFI',
+          usingUTXO: [],
+          newUTXO: [],
+          hex: '');
+    }
 
     if (useAllUtxo) {
       selectedUTXO = utxoList;
