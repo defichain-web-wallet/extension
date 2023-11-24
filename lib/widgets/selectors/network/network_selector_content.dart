@@ -157,21 +157,12 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                                     (item) => Column(
                                       children: [
                                         MouseRegion(
-                                          cursor: item.networkType
-                                                      .networkName !=
-                                                  NetworkName.defichainTestnet
-                                              ? SystemMouseCursors.click
-                                              : SystemMouseCursors.forbidden,
+                                          cursor: SystemMouseCursors.click,
                                           child: GestureDetector(
                                             behavior:
                                                 HitTestBehavior.translucent,
                                             onTap: () {
-                                              if (item.networkType
-                                                      .networkName !=
-                                                  NetworkName
-                                                      .defichainTestnet) {
-                                                onChange(item);
-                                              }
+                                              onChange(item);
                                             },
                                             child: Container(
                                               height: 44,
@@ -203,22 +194,11 @@ class NetworkSelectorContent extends StatelessWidget with ThemeMixin {
                                                         .textTheme
                                                         .headline5!
                                                         .copyWith(
-                                                          color: item.networkType
-                                                                      .networkName !=
-                                                                  NetworkName
-                                                                      .defichainTestnet
-                                                              ? Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .headline5!
-                                                                  .color
-                                                              : Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .headline5!
-                                                                  .color!
-                                                                  .withOpacity(
-                                                                      0.3),
+                                                          color: Theme.of(
+                                                              context)
+                                                              .textTheme
+                                                              .headline5!
+                                                              .color,
                                                         ),
                                                   ),
                                                 ],
