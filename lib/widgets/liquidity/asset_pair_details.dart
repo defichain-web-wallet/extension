@@ -140,7 +140,7 @@ class _AssetPairDetailsState extends State<AssetPairDetails> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Pooled ${widget.assetPair.tokens[0].displaySymbol}',
+                            'Pooled ${widget.assetPair.tokens[1].displaySymbol}',
                             style:
                                 Theme.of(context).textTheme.headline5!.copyWith(
                                       fontSize: 12,
